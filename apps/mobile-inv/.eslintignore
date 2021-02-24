@@ -1,0 +1,15 @@
+node_modules/
+coverage/
+dist/
+lib/
+web-build/
+web-report/
+
+.expo/
+.yarn/
+.vscode/
+.sample
+
+*/config/*
+/src/_unused/
+
