@@ -15,7 +15,7 @@
     ],
     "scope-case": [
       2,
-      "always",
+      'always',
       "lower-case"
     ],
     "subject-case": [
