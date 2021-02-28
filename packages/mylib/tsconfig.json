@@ -9,5 +9,6 @@
     "strict": true,
     "forceConsistentCasingInFileNames": false,
     "resolveJsonModule": true
-  }
+  },
+  "extends": "../../tsconfig.json"
 }
