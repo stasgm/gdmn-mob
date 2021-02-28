@@ -12,8 +12,8 @@
     "checkup": "yarn run prettier:fix",
     "prettier:check": "prettier --check \"./src/**/*.ts*\"",
     "prettier:fix": "prettier --write \"src/**/*.ts*\"",
-    "lint": "eslint \"src/**/*.ts*\"",
-    "lint:fix": "eslint --fix \"src/**/*.ts*\"",
+    "lint": "eslint \"./src/**/*.ts*\"",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
     "postinstall": "expo-yarn-workspaces postinstall"
   },
   "dependencies": {
