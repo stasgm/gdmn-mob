@@ -74,9 +74,14 @@ deploy
 # relay
 __generated__
 
+# vsCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 # editor
-.vscode
-.editorconfig
+#.editorconfig
 .idea
 
 # test
