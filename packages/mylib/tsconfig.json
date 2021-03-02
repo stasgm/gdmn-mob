@@ -1,14 +1,10 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2018",
-    "lib": ["es2015", "es2018", "dom", "ESNext"],
-    "outDir": "./dist/",
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": false,
-    "resolveJsonModule": true
+    "composite": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
   },
-  "extends": "../../tsconfig.json"
+  "include": ["src"],
 }
