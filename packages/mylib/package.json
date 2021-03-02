@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@config/eslint-config": "*",
+    "@config/prettier-config": "*",
     "@types/node": "^14.14.31",
     "typescript": "^4.2.2"
   }
