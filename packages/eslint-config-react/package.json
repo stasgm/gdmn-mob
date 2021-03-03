@@ -1,0 +1,15 @@
+{
+  "name": "@config/eslint-config-react",
+  "version": "0.0.1",
+  "description": "My eslint configs for react projects",
+  "homepage": "",
+  "license": "ISC",
+  "main": "index.js",
+  "dependencies": {
+    "babel-eslint": "10.0.3",
+    "eslint-config-airbnb": "18.2.1",
+    "eslint-config-prettier": "8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.22.0"
+  }
+}
