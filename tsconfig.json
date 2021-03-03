@@ -1,7 +1,13 @@
 {
-	"extends": "./tsconfig.base.json",
-	"compilerOptions": {
-		"noEmit": true,
-		"baseUrl": ".",
-	},
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": "."
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "packages/eslint-config"
+    }
+  ]
 }

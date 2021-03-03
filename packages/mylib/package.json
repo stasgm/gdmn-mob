@@ -1,9 +1,7 @@
 {
   "name": "@lib/mylib",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
+  "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
@@ -17,8 +15,10 @@
   },
   "devDependencies": {
     "@config/eslint-config": "*",
+    "@config/eslint-config-typescript": "*",
     "@config/prettier-config": "*",
     "@types/node": "^14.14.31",
+    "eslint": "^7.21.0",
     "typescript": "^4.2.2"
   }
 }

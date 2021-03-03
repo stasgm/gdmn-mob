@@ -18,5 +18,5 @@ jest.config.js
 fixtures
 shared-fixtures
 /*.*
-# .eslintrc.js
-# index.js
+.eslintrc.js
+index.js

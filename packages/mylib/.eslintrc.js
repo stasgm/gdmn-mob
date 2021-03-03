@@ -1,11 +1,12 @@
 module.exports = {
-  ...require('@config/eslint-config'),
-  extends: ["@config/eslint-config"],
   env: {
     node: true,
   },
+  extends: ["@config/eslint-config", "@config/eslint-config-typescript"],
+  // ...require('@config/eslint-config'),
+  // ...require('@config/eslint-config-typescript'),
   parserOptions: {
-    project: ["packages/*/tsconfig.eslint.json"],
+    project: ["/packages/*/tsconfig.eslint.json"],
     sourceType: "module",
   },
 };
