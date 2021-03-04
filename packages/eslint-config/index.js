@@ -1,8 +1,11 @@
 module.exports = {
   parser: "@typescript-eslint/parser", // Specifies the ESLint parser
-  plugins: ["import"],
+  plugins: ["import", "promise" /* , "sonarjs" */],
   extends: [
     "plugin:@typescript-eslint/recommended", // Uses the recommended rules from @typescript-eslint/eslint-plugin
+    // "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:promise/recommended",
+    // "plugin:sonarjs/recommended",
     "plugin:prettier/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
@@ -43,6 +46,9 @@ module.exports = {
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/restrict-template-expressions": "off",
     "no-unused-vars": "off",
+    // "sonarjs/no-duplicate-string": "off",
+    "padded-blocks": ["error", "never"],
+    "no-await-in-loop": "error",
   },
   /*    "sort-imports": [
       "error",

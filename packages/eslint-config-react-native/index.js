@@ -1,28 +1,32 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
-  plugins: ["react", "react-native", "react-hooks"],
+  plugins: ["react-native"],
   env: {
     es6: true,
     node: true,
     "react-native/react-native": true,
   },
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true, // Allows for the parsing of JSX
+    },
+  },
   rules: {
-    "no-use-before-define": "off",
-    "react/jsx-filename-extension": "off",
-    "react/prop-types": "off",
-    "comma-dangle": "off",
-    "padded-blocks": "off",
-    "arrow-body-style": "off",
-    "react-hooks/exhaustive-deps": "warn",
-    "react-hooks/exhaustive-deps": "warn",
     "react-native/no-unused-styles": 2,
     "react-native/split-platform-components": 2,
     "react-native/no-inline-styles": 2,
-    "react-native/no-color-literals": 2,
+    "react-native/no-color-literals": "off",
     "react-native/no-raw-text": 2,
-    "react-native/no-single-element-style-arrays": 2,
+    // "react-native/no-single-element-style-arrays": 2,
   },
   globals: {
     fetch: false,
+  },
+  settings: {
+    "import/resolver": {
+      node: {
+        extensions: [".ts", ".tsx", ".json", ".native.js"],
+      },
+    },
   },
 };

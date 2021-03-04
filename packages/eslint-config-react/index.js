@@ -5,6 +5,7 @@ module.exports = {
     es6: true,
     node: true,
   },
+  plugins: ["react", "react-hooks"],
   parserOptions: {
     ecmaFeatures: {
       jsx: true, // Allows for the parsing of JSX
@@ -19,6 +20,16 @@ module.exports = {
     react: {
       version: "detect",
     },
+  },
+  rules: {
+    "no-use-before-define": "off",
+    "react/jsx-filename-extension": "off",
+    // "react/prop-types": "off",
+    "comma-dangle": "off",
+    "padded-blocks": "off",
+    "arrow-body-style": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": "warn",
   },
   overrides: [
     {

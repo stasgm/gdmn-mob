@@ -5,6 +5,7 @@ import environnement from "./dev";
 const myMessage = winston.format.printf(
   (info) => `${info.timestamp} ${info.level}: ${info.message}`
 );
+
 const logger = winston.createLogger({
   exceptionHandlers: [
     new winston.transports.File({
