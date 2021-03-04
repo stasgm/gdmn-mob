@@ -38,8 +38,7 @@
       "yarn prettier --write"
     ],
     "*.{ts,tsx,js}": [
-      "yarn prettier:fix",
-      "yarn lint"
+      "yarn prettier:fix"
     ],
     "package.json": [
       "yarn prettier --write",
