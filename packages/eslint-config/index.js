@@ -15,17 +15,9 @@ module.exports = {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. '@typescript-eslint/explicit-function-return-type': 'off',
     indent: "off",
-    "@typescript-eslint/indent": "off", // conflicts with prettier
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-use-before-define": "off",
-    "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/interface-name-prefix": "off",
-    "@typescript-eslint/explicit-member-accessibility": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
     "import/named": "off",
     quotes: "off",
-    "no-console": "error",
+    "no-console": "off",
     "import/first": "warn",
     "import/namespace": ["error", { allowComputed: true }],
     "import/no-duplicates": "error",
@@ -36,7 +28,20 @@ module.exports = {
     "import/no-cycle": "error",
     "import/no-self-import": "warn",
     "import/extensions": ["off", "never", { ts: "never" }],
-    "@typescript-eslint/camelcase": ["off", { ignoreDestructuring: true }],
+    /*    "sort-imports": [
+      "error",
+      {
+        ignoreCase: false,
+        ignoreDeclarationSort: true,
+        ignoreMemberSort: false,
+        memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
+      },
+    ], */
+    /* "sort-keys": [
+      "error",
+      "asc",
+      { caseSensitive: true, minKeys: 2, natural: false },
+    ], */
   },
   settings: {
     "import/resolver": {

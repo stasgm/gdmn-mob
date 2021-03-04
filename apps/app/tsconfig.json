@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "jsx": "react-native",
+    "lib": ["dom", "esnext"],
+    "noEmit": true,
+    "rootDir": ".",
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

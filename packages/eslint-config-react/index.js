@@ -11,7 +11,6 @@ module.exports = {
     },
   },
   extends: [
-    "eslint:recommended",
     "plugin:react/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
@@ -24,9 +23,4 @@ module.exports = {
       },
     },
   ],
-  setting: {
-    react: {
-      version: "detect", // Tells eslint-plugin-react to automatically detect the version of React to use
-    },
-  },
 };

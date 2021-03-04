@@ -7,8 +7,6 @@
       "apps/*"
     ],
     "nohoist": [
-      "**/app",
-      "**/app/**",
       "**/mobile-inv",
       "**/mobile-inv/**",
       "**/react-native",
@@ -25,7 +23,7 @@
     "expo:inv": "lerna run --scope=@apps/mobile-inventory start --stream --",
     "expo:app": "lerna run --scope=@apps/app start --stream --",
     "lint": "lerna run --scope=@lib/* --scope=@apps/* lint --stream --",
-    "lint:fix": "lerna run --scope=@apps/* --scope=@apps/* lint:fix --stream --",
+    "lint:fix": "lerna run --scope=@lib/* --scope=@apps/* lint:fix --stream --",
     "prettier:fix": "lerna run --scope=@lib/* --scope=@apps/* prettier:fix --stream --",
     "lerna": "lerna bootstrap",
     "build:lib": "lerna run --scope=@lib/* build --stream --",

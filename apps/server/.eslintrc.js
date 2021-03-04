@@ -1,13 +1,18 @@
+// const eslintConfig = require("@config/eslint-config");
+// const eslintConfigTypescript = require("@config/eslint-config-typescript");
+
 module.exports = {
-  ...require("@config/eslint-config"),
-  ...require("@config/eslint-config-typescript"),
+  // ...eslintConfig,
+  // ...eslintConfigTypescript,
   extends: [
+    "@config/eslint-config",
+    "@config/eslint-config-typescript",
     "plugin:promise/recommended",
     "plugin:sonarjs/recommended",
     // "plugin:@typescript-eslint/recommended-requiring-type-checking",
   ],
   /* parser: "@typescript-eslint/parser", */
-  plugins: ["promise", "sonarjs", "@typescript-eslint", "prettier"],
+  plugins: ["promise", "sonarjs"],
   parserOptions: {
     parserOptions: {
       sourceType: "module", // Allows for the use of imports
@@ -18,34 +23,10 @@ module.exports = {
     },
   },
   rules: {
-    "prettier/prettier": "error",
-    "linebreak-style": ["error", "unix"],
-    "max-len": [
-      "error",
-      {
-        code: 120,
-      },
-    ],
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-unsafe-assignment": "off",
-    "@typescript-eslint/no-unsafe-member-access": "off",
-    "@typescript-eslint/restrict-template-expressions": "off",
+    // ...eslintConfig.rules,
+    // ...eslintConfigTypescript.rules,
     "sonarjs/no-duplicate-string": "off",
-    "no-extra-parens": "off",
-    "arrow-parens": "off",
-    "no-console": "off",
-    "no-trailing-spaces": "error",
-    "no-multi-spaces": "error",
-    "comma-style": ["error", "last"],
     "padded-blocks": ["error", "never"],
-    "no-multiple-empty-lines": [
-      "error",
-      {
-        max: 1,
-        maxEOF: 1,
-      },
-    ],
     "no-await-in-loop": "error",
   },
 };
