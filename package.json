@@ -16,7 +16,6 @@
   "scripts": {
     "app:server": "lerna run --scope=@apps/server start --stream --",
     "app:web": "lerna run --scope=@apps/web-interface start --stream --",
-    "expo:inv": "lerna run --scope=@apps/mobile-inventory start --stream --",
     "expo:app": "lerna run --scope=@apps/app start --stream --",
     "lint": "lerna run --scope=@lib/* --scope=@apps/* lint --stream --",
     "lint:fix": "lerna run --scope=@lib/* --scope=@apps/* lint:fix --stream --",
