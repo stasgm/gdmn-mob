@@ -1,8 +1,9 @@
 import { v1 as uuidv1 } from "uuid";
 import { ParameterizedContext } from "koa";
 
+import { IResponse, IMessage } from "@lib/types";
+
 import log from "../utils/logger";
-import { IResponse, IMessage } from "../../../common";
 import { messageService, companyService, userService } from "../services";
 
 let clients: ((result: IMessage[]) => void)[] = [];

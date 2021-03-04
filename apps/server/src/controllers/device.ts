@@ -1,7 +1,8 @@
 import { ParameterizedContext } from "koa";
 
+import { IDevice, IResponse, IDeviceInfo } from "@lib/types";
+
 import log from "../utils/logger";
-import { IDevice, IResponse, IDeviceInfo } from "../../../common";
 import { deviceService } from "../services";
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {

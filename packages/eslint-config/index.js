@@ -6,6 +6,7 @@ module.exports = {
     "plugin:prettier/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
+    "plugin:import/typescript",
   ],
   parserOptions: {
     ecmaVersion: "ESNext", // Allows for the parsing of modern ECMAScript features
@@ -28,7 +29,22 @@ module.exports = {
     "import/no-cycle": "error",
     "import/no-self-import": "warn",
     "import/extensions": ["off", "never", { ts: "never" }],
-    /*    "sort-imports": [
+    "@typescript-eslint/camelcase": ["off", { ignoreDestructuring: true }],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/indent": "off", // conflicts with prettier
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
+    "no-unused-vars": "off",
+  },
+  /*    "sort-imports": [
       "error",
       {
         ignoreCase: false,
@@ -37,12 +53,11 @@ module.exports = {
         memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
       },
     ], */
-    /* "sort-keys": [
+  /* "sort-keys": [
       "error",
       "asc",
       { caseSensitive: true, minKeys: 2, natural: false },
     ], */
-  },
   settings: {
     "import/resolver": {
       node: {

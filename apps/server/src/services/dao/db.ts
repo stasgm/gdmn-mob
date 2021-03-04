@@ -1,11 +1,12 @@
-import { Database } from "../../utils/json-db";
 import {
   IUser,
   IMessage,
   IDevice,
   IActivationCode,
   ICompany,
-} from "../../../../common";
+} from "@lib/types";
+
+import { Database } from "../../utils/json-db";
 
 const db = new Database("mob-app");
 

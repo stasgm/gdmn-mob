@@ -1,0 +1,11 @@
+{
+  "name": "@config/eslint-config-react-native",
+  "version": "0.0.1",
+  "description": "My eslint configs for react-native projects",
+  "homepage": "",
+  "license": "ISC",
+  "main": "index.js",
+  "dependencies": {
+    "eslint-plugin-react-native": "^3.10.0"
+  }
+}

@@ -2,6 +2,7 @@
   "name": "@config/prettier-config",
   "version": "0.0.1",
   "description": "",
+  "license": "ISC",
   "main": "index.js",
   "dependencies": {
     "prettier": "^2.2.1"

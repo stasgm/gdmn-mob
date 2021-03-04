@@ -19,6 +19,7 @@
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
   "dependencies": {
+    "@lib/types": "*",
     "bcrypt": "^5.0.0",
     "koa": "^2.13",
     "koa-bodyparser": "^4.3",
@@ -34,7 +35,6 @@
   },
   "devDependencies": {
     "@config/eslint-config": "*",
-    "@config/eslint-config-typescript": "*",
     "@config/prettier-config": "*",
     "@koa/cors": "^3.1",
     "@types/bcrypt": "^3.0.0",

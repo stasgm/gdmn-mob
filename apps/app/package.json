@@ -18,7 +18,8 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@lib/mylib": "1.0.0",
+    "@lib/mylib": "*",
+    "@lib/types": "*",
     "expo": "^40.0.1",
     "expo-asset": "~8.2.2",
     "expo-status-bar": "~1.0.3",
@@ -31,13 +32,10 @@
     "@babel/core": "~7.13.1",
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
-    "@config/eslint-config-typescript": "*",
+    "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
     "@types/react": "~17.0.2",
     "@types/react-native": "~0.63.50",
-    "babel-plugin-module-resolver": "^4.1.0",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react-hooks": "^4.2.0",
     "expo-yarn-workspaces": "^1.3.1",
     "typescript": "~4.2.2"
   }

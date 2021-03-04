@@ -1,7 +1,8 @@
 import { ParameterizedContext } from "koa";
 
+import { ICompany, IResponse, IUserProfile } from "@lib/types";
+
 import log from "../utils/logger";
-import { ICompany, IResponse, IUserProfile } from "../../../common";
 import { companyService } from "../services";
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {

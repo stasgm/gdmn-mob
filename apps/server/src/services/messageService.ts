@@ -1,4 +1,4 @@
-import { IMessage } from "../../../common";
+import { IMessage } from "@lib/types";
 
 import { messages } from "./dao/db";
 

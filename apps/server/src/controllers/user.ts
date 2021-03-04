@@ -1,20 +1,11 @@
 import { ParameterizedContext } from "koa";
 
+import { IResponse, IUser, IUserProfile, IDeviceInfo } from "@lib/types";
+
 import log from "../utils/logger";
-import { IResponse, IUser, IUserProfile, IDeviceInfo } from "../../../common";
 import { userService } from "../services";
 import { hashPassword } from "../utils/crypt";
-
-export const makeProfile = (user: IUser) => ({
-  id: user.id,
-  externalId: user.externalId,
-  userName: user.userName,
-  firstName: user.firstName,
-  lastName: user.lastName,
-  phoneNumber: user.phoneNumber,
-  companies: user.companies,
-  creatorId: user.creatorId,
-});
+import { makeProfile } from "../utils/user";
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;

@@ -3,11 +3,5 @@
   "compilerOptions": {
     "noEmit": true,
     "baseUrl": "."
-  },
-  "files": [],
-  "references": [
-    {
-      "path": "packages/eslint-config"
-    }
-  ]
+  }
 }

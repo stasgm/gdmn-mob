@@ -1,4 +1,4 @@
-import { IDevice } from "../../../common";
+import { IDevice } from "@lib/types";
 
 import { devices, codes, users } from "./dao/db";
 

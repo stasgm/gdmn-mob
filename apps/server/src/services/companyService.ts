@@ -1,12 +1,9 @@
-import { ICompany } from "../../../common";
+import { ICompany, IUserProfile } from "@lib/types";
 
-import { IUserProfile } from "../../../common/models";
-
-import { makeProfile } from "../controllers/user";
+import { makeProfile } from "../utils/user";
 
 import { companies, users } from "./dao/db";
-
-import { userService } from ".";
+import { addCompanyToUser } from "./userService";
 
 /**
  * Добавление новой организации
@@ -25,12 +22,12 @@ const addOne = async (company: ICompany): Promise<string> => {
   }
   const id = await companies.insert(company);
 
-  await userService.addCompanyToUser(company.admin, company.title);
+  await addCompanyToUser(company.admin, company.title);
 
   const userId = await users.find((i) => i.userName === "gdmn");
 
   if (userId.id) {
-    await userService.addCompanyToUser(userId.id, company.title);
+    await addCompanyToUser(userId.id, company.title);
   }
 
   return id;
@@ -117,7 +114,7 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
 
   // TODO заменить на company.title на companyId
   return (await users.read())
-    .filter((el) => el.companies?.some((i) => i === company.title))
+    .filter((el) => el.companies?.some((i: string) => i === company.title))
     .map((el) => makeProfile(el));
 };
 

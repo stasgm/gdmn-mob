@@ -7,12 +7,13 @@ import { VerifyFunction } from "passport-local";
 
 import bcrypt from "bcrypt";
 
+import { IUser } from "@lib/types";
+
 import log from "../utils/logger";
-import { IUser } from "../../../common";
 
 import { devices, users, codes } from "./dao/db";
 
-import { userService } from ".";
+import * as userService from "./userService";
 
 const authenticate = async (
   ctx: Context,

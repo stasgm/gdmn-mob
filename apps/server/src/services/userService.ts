@@ -1,7 +1,7 @@
-import { makeProfile } from "../controllers/user";
-import { IUser } from "../../../common";
+import { IUser } from "@lib/types";
 
 import { hashPassword } from "../utils/crypt";
+import { makeProfile } from "../utils/user";
 
 import { users, devices } from "./dao/db";
 

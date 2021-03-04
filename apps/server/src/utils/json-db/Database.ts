@@ -6,7 +6,7 @@ import config from "../../../config";
 
 import Collection from "./Collection";
 
-import { CollectionItem } from ".";
+import { CollectionItem } from "./CollectionItem";
 
 class Database {
   private dbPath: string;
