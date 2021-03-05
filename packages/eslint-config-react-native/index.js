@@ -1,5 +1,6 @@
 module.exports = {
   parser: "@typescript-eslint/parser",
+  extends: ["@config/eslint-config-react"],
   plugins: ["react-native"],
   env: {
     es6: true,

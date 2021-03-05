@@ -6,6 +6,7 @@
   "license": "ISC",
   "main": "index.js",
   "dependencies": {
+    "@config/eslint-config-react": "*",
     "eslint-plugin-react-native": "^3.10.0"
   }
 }
