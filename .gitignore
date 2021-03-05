@@ -101,3 +101,8 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+
+#config
+*/config/dev.ts
+*/config/prod.ts
+*/config/test.ts
