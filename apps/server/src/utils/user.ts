@@ -1,4 +1,4 @@
-import { IUser } from "@lib/types";
+import { IUser } from '@lib/types';
 
 export const makeProfile = (user: IUser) => ({
   id: user.id,

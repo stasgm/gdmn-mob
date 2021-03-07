@@ -1,11 +1,11 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
-  extends: ["@config/eslint-config-react"],
-  plugins: ["react-native"],
+  parser: '@typescript-eslint/parser',
+  extends: ['@react-native-community'],
+  plugins: ['react-native'],
   env: {
     es6: true,
     node: true,
-    "react-native/react-native": true,
+    'react-native/react-native': true,
   },
   parserOptions: {
     ecmaFeatures: {
@@ -13,20 +13,20 @@ module.exports = {
     },
   },
   rules: {
-    "react-native/no-unused-styles": 2,
-    "react-native/split-platform-components": 2,
-    "react-native/no-inline-styles": 2,
-    "react-native/no-color-literals": "off",
-    "react-native/no-raw-text": 2,
-    // "react-native/no-single-element-style-arrays": 2,
+    'react-native/no-unused-styles': 2,
+    'react-native/split-platform-components': 2,
+    'react-native/no-inline-styles': 2,
+    'react-native/no-color-literals': 'off',
+    'react-native/no-raw-text': 2,
+    '@typescript-eslint/no-unused-vars': 'off',
   },
   globals: {
     fetch: false,
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       node: {
-        extensions: [".ts", ".tsx", ".json", ".native.js"],
+        extensions: ['.ts', '.tsx', '.json', '.native.js'],
       },
     },
   },

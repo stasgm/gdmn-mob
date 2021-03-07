@@ -1,6 +1,6 @@
-import { IDevice } from "@lib/types";
+import { IDevice } from '@lib/types';
 
-import { devices, codes, users } from "./dao/db";
+import { devices, codes, users } from './dao/db';
 
 const findOne = async (id: string) => {
   return devices.find(id);
@@ -22,7 +22,7 @@ const findOneByUidAndUser = async ({
   );
 
   if (!user) {
-    throw new Error("пользователь не найден");
+    throw new Error('пользователь не найден');
   }
 
   return devices.find((i) => i.uid === deviceId && i.userId === user.id);
@@ -38,7 +38,7 @@ const findOneByUid = async (uid: string) => {
  * */
 const findUsers = async (deviceId: string) => {
   if (!(await devices.find(deviceId))) {
-    throw new Error("устройство не найдено");
+    throw new Error('устройство не найдено');
   }
 
   return (await devices.read())
@@ -47,13 +47,13 @@ const findUsers = async (deviceId: string) => {
       const device = await devices.find(deviceId);
 
       if (!device) {
-        throw new Error("устройство не найдено");
+        throw new Error('устройство не найдено');
       }
 
       const user = await users.find(i.userId);
 
       if (!user) {
-        throw new Error("пользователь не найден");
+        throw new Error('пользователь не найден');
       }
 
       return {
@@ -86,13 +86,13 @@ const addOne = async ({
       (device) => device.name === deviceName && device.userId === userId
     )
   ) {
-    throw new Error("устройство с таким названием уже добавлено пользователю");
+    throw new Error('устройство с таким названием уже добавлено пользователю');
   }
 
   return await devices.insert({
     name: deviceName,
-    uid: "",
-    state: "NEW",
+    uid: '',
+    state: 'NEW',
     userId: userId,
   });
 };
@@ -114,7 +114,7 @@ const updateOne = async (device: IDevice) => {
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
   if (!(await devices.find((device) => device.id === deviceId))) {
-    throw new Error("устройство не найдено");
+    throw new Error('устройство не найдено');
   }
 
   await devices.delete((device) => device.id === deviceId);
@@ -124,7 +124,7 @@ const genActivationCode = async (deviceId: string) => {
   const device = await devices.find(deviceId);
 
   if (!device) {
-    throw new Error("устройство не найдено");
+    throw new Error('устройство не найдено');
   }
 
   // const code = Math.random()
@@ -134,7 +134,7 @@ const genActivationCode = async (deviceId: string) => {
   const date = new Date();
   await codes.insert({ code, date: date.toISOString(), deviceId });
 
-  await devices.update({ ...device, state: "NON-ACTIVATED" });
+  await devices.update({ ...device, state: 'NON-ACTIVATED' });
 
   return code;
 };

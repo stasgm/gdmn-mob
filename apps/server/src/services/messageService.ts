@@ -1,6 +1,6 @@
-import { IMessage } from "@lib/types";
+import { IMessage } from '@lib/types';
 
-import { messages } from "./dao/db";
+import { messages } from './dao/db';
 
 const findOne = async (id: string) => {
   return messages.find(id);
@@ -43,7 +43,7 @@ const FindMany = async ({
 
 const addOne = async (msgObject: IMessage) => {
   if (await messages.find((i) => i.head.id === msgObject.head.id)) {
-    throw new Error("сообщение с таким идентификатором уже добавлено");
+    throw new Error('сообщение с таким идентификатором уже добавлено');
   }
 
   return await messages.insert(msgObject);
@@ -58,7 +58,7 @@ const updateOne = async (message: IMessage) => {
   const oldMessage = await messages.find((i) => i.id === message.id);
 
   if (!oldMessage) {
-    throw new Error("сообщение не найдено");
+    throw new Error('сообщение не найдено');
   }
 
   // Удаляем поля которые нельзя перезаписывать
@@ -75,7 +75,7 @@ const updateOne = async (message: IMessage) => {
  * */
 const deleteOne = async (messageId: string): Promise<void> => {
   if (!(await messages.find(messageId))) {
-    throw new Error("сообщение не найдено");
+    throw new Error('сообщение не найдено');
   }
 
   await messages.delete(messageId);
@@ -103,7 +103,7 @@ const deleteByUid = async ({
   );
 
   if (!messageObj) {
-    throw new Error("сообщение не найдено");
+    throw new Error('сообщение не найдено');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

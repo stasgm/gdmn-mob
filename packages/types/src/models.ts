@@ -1,4 +1,4 @@
-import { IDocument } from "./base";
+import { IDocument } from './base';
 
 export interface IUserProfile {
   id?: string;
@@ -10,7 +10,7 @@ export interface IUserProfile {
   creatorId: string;
 }
 
-export type userRole = "Admin" | "User";
+export type userRole = 'Admin' | 'User';
 
 export interface IUser {
   id?: string;
@@ -48,7 +48,7 @@ export interface ICompany {
   admin: string;
 }
 
-export type DeviceState = "NEW" | "NON-ACTIVATED" | "ACTIVE" | "BLOCKED";
+export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
 export interface IDevice {
   id?: string;

@@ -2,16 +2,16 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ["@config/eslint-config"],
-  parser: "@typescript-eslint/parser",
+  extends: ['@config/eslint-config'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: ["packages/*/tsconfig.eslint.json"],
-    sourceType: "module",
+    project: ['./tsconfig.eslint.json'],
+    tsconfigRootDir: __dirname,
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       node: {
-        extensions: [".ts", ".tsx", ".json"],
+        extensions: ['.ts', '.tsx', '.json'],
       },
     },
   },

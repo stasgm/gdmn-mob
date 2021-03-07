@@ -1,6 +1,6 @@
-import Router from "koa-router";
+import Router from 'koa-router';
 
-import compose from "koa-compose";
+import compose from 'koa-compose';
 
 import {
   newMessage,
@@ -9,31 +9,31 @@ import {
   subscribe,
   publish,
   clear,
-} from "../controllers/message";
-import { authMiddleware } from "../middleware/authRequired";
-import { deviceMiddleware } from "../middleware/deviceRequired";
+} from '../controllers/message';
+import { authMiddleware } from '../middleware/authRequired';
+import { deviceMiddleware } from '../middleware/deviceRequired';
 
-const router = new Router({ prefix: "/messages" });
+const router = new Router({ prefix: '/messages' });
 
-router.post("/", compose([authMiddleware, deviceMiddleware]), newMessage);
+router.post('/', compose([authMiddleware, deviceMiddleware]), newMessage);
 router.get(
-  "/:companyId/:appSystem",
+  '/:companyId/:appSystem',
   compose([authMiddleware, deviceMiddleware]),
   getMessage
 );
 router.delete(
-  "/:companyId/:id",
+  '/:companyId/:id',
   compose([authMiddleware, deviceMiddleware]),
   removeMessage
 );
-router.delete("/", compose([authMiddleware, deviceMiddleware]), clear);
+router.delete('/', compose([authMiddleware, deviceMiddleware]), clear);
 router.get(
-  "/subscribe/:companyId/:appSystem",
+  '/subscribe/:companyId/:appSystem',
   compose([authMiddleware, deviceMiddleware]),
   subscribe
 );
 router.post(
-  "/publish/:companyId",
+  '/publish/:companyId',
   compose([authMiddleware, deviceMiddleware]),
   publish
 );

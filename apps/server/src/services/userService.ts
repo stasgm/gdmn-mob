@@ -1,9 +1,9 @@
-import { IUser } from "@lib/types";
+import { IUser } from '@lib/types';
 
-import { hashPassword } from "../utils/crypt";
-import { makeProfile } from "../utils/user";
+import { hashPassword } from '../utils/crypt';
+import { makeProfile } from '../utils/user';
 
-import { users, devices } from "./dao/db";
+import { users, devices } from './dao/db';
 
 const findOne = async (userId: string) => users.find(userId);
 
@@ -23,7 +23,7 @@ const addOne = async (user: IUser) => {
       (i) => i.userName.toUpperCase() === user.userName.toUpperCase()
     )
   ) {
-    throw new Error("пользователь с таким именем уже существует");
+    throw new Error('пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(user.password);
@@ -51,7 +51,7 @@ const updateOne = async (user: IUser) => {
  * */
 const deleteOne = async (id: string): Promise<void> => {
   if (!(await users.find(id))) {
-    throw new Error("пользователь не найден");
+    throw new Error('пользователь не найден');
   }
 
   // TODO Если пользователь является админом организации то прерывать
@@ -66,7 +66,7 @@ const deleteOne = async (id: string): Promise<void> => {
 const findDevices = async (userId: string) => {
   const user = await users.find(userId);
   if (!user) {
-    throw new Error("пользователь не найден");
+    throw new Error('пользователь не найден');
   }
 
   return (await devices.read())
@@ -87,7 +87,7 @@ const addCompanyToUser = async (userId: string, companyName: string) => {
   const user = await findOne(userId);
 
   if (user.companies?.some((i) => companyName === i)) {
-    throw new Error("организация уже привязана к пользователю");
+    throw new Error('организация уже привязана к пользователю');
   }
 
   const companies = [...(user.companies || []), companyName];
@@ -98,7 +98,7 @@ const addCompanyToUser = async (userId: string, companyName: string) => {
 const removeCompanyFromUser = async (userId: string, companyName: string) => {
   const user = await findOne(userId);
   if (user.companies?.some((i) => companyName === i)) {
-    throw new Error("организация не привязана к пользователю");
+    throw new Error('организация не привязана к пользователю');
   }
 
   return users.update({

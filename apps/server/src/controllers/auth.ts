@@ -1,9 +1,9 @@
-import { ParameterizedContext, Next, Context } from "koa";
+import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, IUser } from "@lib/types";
+import { IResponse, IUser } from '@lib/types';
 
-import log from "../utils/logger";
-import { authService, deviceService } from "../services";
+import log from '../utils/logger';
+import { authService, deviceService } from '../services';
 
 /** Вход пользователя */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
@@ -11,15 +11,15 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { userName, password } = ctx.request.body;
 
   if (!userName) {
-    ctx.throw(400, "не указано имя пользователя");
+    ctx.throw(400, 'не указано имя пользователя');
   }
 
   if (!password) {
-    ctx.throw(400, "не указан пароль");
+    ctx.throw(400, 'не указан пароль');
   }
 
   if (!deviceId) {
-    ctx.throw(400, "не указан идентификатор устройства");
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
 
   try {
@@ -79,11 +79,11 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   } = ctx.request.body;
 
   if (!userName) {
-    ctx.throw(400, "не указано имя пользователя");
+    ctx.throw(400, 'не указано имя пользователя');
   }
 
   if (!password) {
-    ctx.throw(400, "не указан пароль пользователя");
+    ctx.throw(400, 'не указан пароль пользователя');
   }
 
   const user = {
@@ -118,7 +118,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   log.info(`code: ${code}`);
 
   if (!code) {
-    ctx.throw(400, "не указан код");
+    ctx.throw(400, 'не указан код');
   }
 
   try {
@@ -129,7 +129,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("verifyCode: ok");
+    log.info('verifyCode: ok');
   } catch (err) {
     ctx.throw(400, err.message);
   }
@@ -139,7 +139,7 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { deviceId } = ctx.params;
 
   if (!deviceId) {
-    ctx.throw(400, "не указан идентификатор устройства");
+    ctx.throw(400, 'не указан идентификатор устройства');
   }
 
   try {
@@ -149,7 +149,7 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getActivationCode: ativation code generated successfully");
+    log.info('getActivationCode: ativation code generated successfully');
   } catch (err) {
     ctx.throw(400, err.message);
   }

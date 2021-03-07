@@ -45,7 +45,6 @@
     "@commitlint/cli": "^12.0.1",
     "@commitlint/config-conventional": "^12.0.1",
     "@config/eslint-config": "*",
-    "@config/eslint-config-react": "*",
     "@config/prettier-config": "*",
     "@types/jest": "^26.0.20",
     "concurrently": "^6.0.0",

@@ -1,24 +1,24 @@
-import { ParameterizedContext } from "koa";
+import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IUserProfile, IDeviceInfo } from "@lib/types";
+import { IResponse, IUser, IUserProfile, IDeviceInfo } from '@lib/types';
 
-import log from "../utils/logger";
-import { userService } from "../services";
-import { hashPassword } from "../utils/crypt";
-import { makeProfile } from "../utils/user";
+import log from '../utils/logger';
+import { userService } from '../services';
+import { hashPassword } from '../utils/crypt';
+import { makeProfile } from '../utils/user';
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
   try {
     const profile = await userService.findOne(userId);
 
     if (!profile) {
-      ctx.throw(404, "пользователь не найден");
+      ctx.throw(404, 'пользователь не найден');
     }
 
     const result: IResponse<IUserProfile> = {
@@ -29,7 +29,7 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getUser: OK");
+    log.info('getUser: OK');
   } catch (err) {
     ctx.throw(400, err.message);
   }
@@ -44,7 +44,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getUsers: OK");
+    log.info('getUsers: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -55,11 +55,11 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const user = ctx.request.body as Partial<IUser>;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
   if (!user) {
-    ctx.throw(400, "не указаны данные пользователя");
+    ctx.throw(400, 'не указаны данные пользователя');
   }
 
   const oldUser = await userService.findOne(userId);
@@ -67,7 +67,7 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
 
   if (!oldUser) {
-    ctx.throw(400, "пользователь не найден");
+    ctx.throw(400, 'пользователь не найден');
   }
 
   let passwordHash: string | undefined = undefined;
@@ -93,7 +93,7 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("updateUser: OK");
+    log.info('updateUser: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -103,7 +103,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
   // TODO пользовате
@@ -115,7 +115,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result; //TODO передавать только код 204 без body
 
-    log.info("removeUser: OK");
+    log.info('removeUser: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -125,7 +125,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
   try {
@@ -138,7 +138,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getDevicesByUser: OK");
+    log.info('getDevicesByUser: OK');
   } catch (err) {
     ctx.throw(400, err);
   }

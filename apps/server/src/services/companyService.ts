@@ -1,9 +1,9 @@
-import { ICompany, IUserProfile } from "@lib/types";
+import { ICompany, IUserProfile } from '@lib/types';
 
-import { makeProfile } from "../utils/user";
+import { makeProfile } from '../utils/user';
 
-import { companies, users } from "./dao/db";
-import { addCompanyToUser } from "./userService";
+import { companies, users } from './dao/db';
+import { addCompanyToUser } from './userService';
 
 /**
  * Добавление новой организации
@@ -18,13 +18,13 @@ const addOne = async (company: ICompany): Promise<string> => {
     4. К администратору добавляем созданную организацию
   */
   if (await companies.find((el) => el.title === company.title)) {
-    throw new Error("организация уже существует");
+    throw new Error('организация уже существует');
   }
   const id = await companies.insert(company);
 
   await addCompanyToUser(company.admin, company.title);
 
-  const userId = await users.find((i) => i.userName === "gdmn");
+  const userId = await users.find((i) => i.userName === 'gdmn');
 
   if (userId.id) {
     await addCompanyToUser(userId.id, company.title);
@@ -42,7 +42,7 @@ const findOne = async (id: string): Promise<ICompany> => {
   const company = await companies.find(id);
 
   if (!company) {
-    throw new Error("организация не найдена");
+    throw new Error('организация не найдена');
   }
 
   return company;
@@ -57,7 +57,7 @@ const findOneByName = async (name: string): Promise<ICompany> => {
   const company = await companies.find((i) => i.title === name);
 
   if (!company) {
-    throw new Error("организация не найдена");
+    throw new Error('организация не найдена');
   }
 
   return company;
@@ -94,7 +94,7 @@ const deleteOne = async (company: ICompany): Promise<void> => {
     3. Удаляем организацию
   */
   if (!(await companies.find(company.id))) {
-    throw new Error("организация не найдена");
+    throw new Error('организация не найдена');
   }
 
   await companies.delete(company.id);
@@ -109,7 +109,7 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
   const company = await companies.find(id);
 
   if (!company) {
-    throw new Error("организация не найдена");
+    throw new Error('организация не найдена');
   }
 
   // TODO заменить на company.title на companyId

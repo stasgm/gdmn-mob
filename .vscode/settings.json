@@ -1,4 +1,5 @@
 {
+  "editor.formatOnSave": true,
   "eslint.packageManager": "yarn",
   "npm.packageManager": "yarn",
   "prettier.packageManager": "yarn"

@@ -1,19 +1,19 @@
-import { Next, Context } from "koa";
+import { Next, Context } from 'koa';
 
-import koaPassport from "koa-passport";
-import { v1 as uuidv1 } from "uuid";
+import koaPassport from 'koa-passport';
+import { v1 as uuidv1 } from 'uuid';
 
-import { VerifyFunction } from "passport-local";
+import { VerifyFunction } from 'passport-local';
 
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
-import { IUser } from "@lib/types";
+import { IUser } from '@lib/types';
 
-import log from "../utils/logger";
+import log from '../utils/logger';
 
-import { devices, users, codes } from "./dao/db";
+import { devices, users, codes } from './dao/db';
 
-import * as userService from "./userService";
+import * as userService from './userService';
 
 const authenticate = async (
   ctx: Context,
@@ -27,7 +27,7 @@ const authenticate = async (
   );
 
   if (!user) {
-    throw new Error(`пользователь не найден`);
+    throw new Error('пользователь не найден');
   }
 
   const device = await devices.find(
@@ -35,21 +35,21 @@ const authenticate = async (
   );
 
   if (!device) {
-    throw new Error(`связанное с пользователем устройство не найдено`);
+    throw new Error('связанное с пользователем устройство не найдено');
   }
 
-  if (device.state === "BLOCKED") {
-    throw new Error(`устройство заблокировано`);
+  if (device.state === 'BLOCKED') {
+    throw new Error('устройство заблокировано');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return koaPassport.authenticate("local", async (err: Error, user: IUser) => {
+  return koaPassport.authenticate('local', async (err: Error, user: IUser) => {
     if (err) {
       throw new Error(err.message);
     }
 
     if (!user) {
-      throw new Error("неверный пользователь или пароль");
+      throw new Error('неверный пользователь или пароль');
     }
 
     await ctx.login(user);
@@ -58,7 +58,7 @@ const authenticate = async (
   })(ctx, next);
 };
 
-const signUp = async ({ user }: { user: Omit<IUser, "role"> }) => {
+const signUp = async ({ user }: { user: Omit<IUser, 'role'> }) => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
@@ -73,33 +73,33 @@ const signUp = async ({ user }: { user: Omit<IUser, "role"> }) => {
     // await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
 
     const gdmnUserObj: IUser = {
-      userName: "gdmn",
+      userName: 'gdmn',
       creatorId: user.userName,
-      password: "gdmn",
+      password: 'gdmn',
       companies: [],
-      role: "Admin",
+      role: 'Admin',
     };
 
     const gdmnUser = await userService.addOne(gdmnUserObj);
 
     await devices.insert({
-      name: "GDMN-WEB",
-      uid: "WEB",
-      state: "ACTIVE",
+      name: 'GDMN-WEB',
+      uid: 'WEB',
+      state: 'ACTIVE',
       userId: gdmnUser,
     });
   }
 
   const userid = await userService.addOne({
     ...user,
-    role: user.creatorId === user.userName ? "Admin" : "User",
+    role: user.creatorId === user.userName ? 'Admin' : 'User',
   });
 
   if (user.creatorId === user.userName) {
     await devices.insert({
-      name: "WEB",
-      uid: "WEB",
-      state: "ACTIVE",
+      name: 'WEB',
+      uid: 'WEB',
+      state: 'ACTIVE',
       userId: userid,
     });
   }
@@ -132,7 +132,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   const rec = await codes.find((i) => i.code === code);
 
   if (!rec) {
-    throw new Error("код не найден");
+    throw new Error('код не найден');
   }
 
   const date: Date = new Date(rec.date);
@@ -148,7 +148,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
 
   if (diffDays < 0) {
     // await codes.delete(i => i.code === code);
-    throw new Error("срок действия кода истёк");
+    throw new Error('срок действия кода истёк');
   }
 
   // обновляем uid у устройства
@@ -156,10 +156,10 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   const device = await devices.find(rec.deviceId);
 
   if (!device) {
-    throw new Error("код не соответствует заданному устройству");
+    throw new Error('код не соответствует заданному устройству');
   }
 
-  await devices.update({ ...device, uid: deviceId, state: "ACTIVE" });
+  await devices.update({ ...device, uid: deviceId, state: 'ACTIVE' });
 
   // const newDeviceId = await devices.insert({ userId: rec.user, uid: deviceId, blocked: false });
 

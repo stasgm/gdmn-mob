@@ -1,9 +1,9 @@
-import fs from "fs";
+import fs from 'fs';
 
-import R from "ramda";
-import { v1 as uuid } from "uuid";
+import R from 'ramda';
+import { v1 as uuid } from 'uuid';
 
-import { CollectionItem } from "./CollectionItem";
+import { CollectionItem } from './CollectionItem';
 
 /**
  * @template T
@@ -51,7 +51,7 @@ class Collection<T extends CollectionItem> {
   public async read(): Promise<Array<T>>;
   public async read(predicate: (item: T) => boolean): Promise<Array<T>>;
   public async read(predicate?: (item: T) => boolean): Promise<Array<T>> {
-    if (typeof predicate === "undefined") return this._get();
+    if (typeof predicate === 'undefined') return this._get();
     return (await this._get()).filter(predicate);
   }
 
@@ -62,7 +62,7 @@ class Collection<T extends CollectionItem> {
   public async find(predicate: (item: T) => boolean): Promise<T>;
   public async find(id: string | ((item: T) => boolean)) {
     const predicate =
-      typeof id === "function" ? id : (item: T) => item.id === id;
+      typeof id === 'function' ? id : (item: T) => item.id === id;
     return (await this._get()).find(predicate);
   }
 
@@ -85,7 +85,7 @@ class Collection<T extends CollectionItem> {
   public async delete(predicate: (item: T) => boolean): Promise<void>;
   public async delete(id: string | ((item: T) => boolean)) {
     const predicate =
-      typeof id === "function"
+      typeof id === 'function'
         ? R.pipe(id, R.not)
         : (item: T) => item.id !== id;
 
@@ -101,7 +101,7 @@ class Collection<T extends CollectionItem> {
   }
 
   private _initObject(obj: T): T {
-    return R.assoc("id", uuid(), obj);
+    return R.assoc('id', uuid(), obj);
   }
 
   private _ensureStorage() {
@@ -110,7 +110,7 @@ class Collection<T extends CollectionItem> {
 
   private _get(): Promise<Array<T>> {
     return new Promise((resolve, reject) => {
-      fs.readFile(this.collectionPath, { encoding: "utf8" }, (err, data) => {
+      fs.readFile(this.collectionPath, { encoding: 'utf8' }, (err, data) => {
         if (err) return reject(err);
         let result: Array<T> = [];
         try {
@@ -128,7 +128,7 @@ class Collection<T extends CollectionItem> {
       fs.writeFile(
         this.collectionPath,
         JSON.stringify(data),
-        { encoding: "utf8" },
+        { encoding: 'utf8' },
         (err: unknown) => {
           if (err) return reject(err);
           return resolve();

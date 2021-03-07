@@ -35,8 +35,6 @@
   },
   "devDependencies": {
     "@config/eslint-config": "*",
-    "@config/eslint-config-react": "*",
-    "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
     "@koa/cors": "^3.1",
     "@types/bcrypt": "^3.0.0",

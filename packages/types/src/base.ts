@@ -1,9 +1,3 @@
-export interface IDocument {
-  id: number;
-  head: IHead;
-  lines: ILine[];
-}
-
 export interface IHead {
   docnumber: string;
   doctype: number;
@@ -19,6 +13,12 @@ export interface ILine {
   quantity: number;
   price?: number;
   remains?: number;
+}
+
+export interface IDocument {
+  id: number;
+  head: IHead;
+  lines: ILine[];
 }
 
 export interface IRefData {

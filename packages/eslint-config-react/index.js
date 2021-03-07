@@ -5,38 +5,27 @@ module.exports = {
     es6: true,
     node: true,
   },
-  plugins: ["react", "react-hooks"],
+  plugins: ['react', 'react-hooks'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true, // Allows for the parsing of JSX
     },
   },
-  extends: [
-    "plugin:react/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings",
-  ],
+  extends: ['plugin:react/recommended'],
   settings: {
     react: {
-      version: "detect",
+      version: 'detect',
     },
   },
   rules: {
-    "no-use-before-define": "off",
-    "react/jsx-filename-extension": "off",
-    // "react/prop-types": "off",
-    "comma-dangle": "off",
-    "padded-blocks": "off",
-    "arrow-body-style": "off",
-    "react-hooks/exhaustive-deps": "warn",
-    "react-hooks/exhaustive-deps": "warn",
+    'no-use-before-define': 'off',
+    'react/jsx-uses-react': 'error',
+    'react/jsx-uses-vars': 'error',
+    'react/jsx-filename-extension': 'off',
+    'react/no-unescaped-entities': 'off',
+    'comma-dangle': 'off',
+    'padded-blocks': 'off',
+    'arrow-body-style': 'off',
+    'react-hooks/exhaustive-deps': 'warn',
   },
-  overrides: [
-    {
-      files: ["**/*.tsx"],
-      rules: {
-        "react/prop-types": "off",
-      },
-    },
-  ],
 };

@@ -1,9 +1,9 @@
-import { Context, Next } from "koa";
+import { Context, Next } from 'koa';
 
-import { devices } from "../services/dao/db";
+import { devices } from '../services/dao/db';
 
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
-  if (ctx.query.deviceId === "WEB") {
+  if (ctx.query.deviceId === 'WEB') {
     await next();
     return;
   }
@@ -11,7 +11,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   const device = await devices.find(ctx.query.deviceId);
 
   if (!device) {
-    ctx.throw(400, "устройство не найдено");
+    ctx.throw(400, 'устройство не найдено');
   }
 
   const currDevice = await devices.find(
@@ -19,11 +19,11 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   );
 
   if (!currDevice) {
-    ctx.throw(400, "устройство для пользователя не найдено");
+    ctx.throw(400, 'устройство для пользователя не найдено');
   }
 
-  if (currDevice.state !== "ACTIVE") {
-    ctx.throw(400, "устройство заблокировано");
+  if (currDevice.state !== 'ACTIVE') {
+    ctx.throw(400, 'устройство заблокировано');
   }
 
   await next();

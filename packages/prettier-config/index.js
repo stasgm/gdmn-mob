@@ -3,6 +3,6 @@ module.exports = {
   singleQuote: true,
   semi: true,
   bracketSpacing: true,
-  trailingComma: "all",
-  arrowParens: "avoid",
+  trailingComma: 'all',
+  arrowParens: 'avoid',
 };

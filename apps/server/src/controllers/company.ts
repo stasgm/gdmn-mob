@@ -1,9 +1,9 @@
-import { ParameterizedContext } from "koa";
+import { ParameterizedContext } from 'koa';
 
-import { ICompany, IResponse, IUserProfile } from "@lib/types";
+import { ICompany, IResponse, IUserProfile } from '@lib/types';
 
-import log from "../utils/logger";
-import { companyService } from "../services";
+import log from '../utils/logger';
+import { companyService } from '../services';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { title, externalId } = ctx.request.body;
@@ -11,7 +11,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.state.user;
 
   if (!title) {
-    ctx.throw(400, "не указано название организации");
+    ctx.throw(400, 'не указано название организации');
   }
 
   const company: ICompany = { id: title, title, admin: userId, externalId };
@@ -27,7 +27,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 201;
     ctx.body = result;
 
-    log.info(`addCompany: OK`);
+    log.info('addCompany: OK');
   } catch (err) {
     ctx.throw(400, err.message);
   }
@@ -37,7 +37,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
-    ctx.throw(400, "не указан идентификатор организации");
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
   try {
@@ -48,7 +48,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info(`getCompany: ok`);
+    log.info('getCompany: ok');
   } catch (err) {
     ctx.throw(400, err.message);
   }
@@ -59,11 +59,11 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const company = ctx.request.body as Partial<ICompany>;
 
   if (!companyId) {
-    ctx.throw(400, "не указан идентификатор организации");
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
   if (!company) {
-    ctx.throw(400, "не указана информация об организации");
+    ctx.throw(400, 'не указана информация об организации');
   }
 
   const oldCompany: ICompany | undefined = await companyService.findOne(
@@ -75,7 +75,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }*/
 
   if (!oldCompany) {
-    ctx.throw(400, "организация не найдена");
+    ctx.throw(400, 'организация не найдена');
   }
 
   // Удаляем поля которые нельзя перезаписывать
@@ -92,7 +92,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("updateCompany: OK");
+    log.info('updateCompany: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -102,7 +102,7 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
-    ctx.throw(400, "не указан идентификатор организации");
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
   try {
@@ -113,7 +113,7 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getUsersByCompany: OK");
+    log.info('getUsersByCompany: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -128,7 +128,7 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getCompanies: OK");
+    log.info('getCompanies: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -138,18 +138,18 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
-    ctx.throw(400, "не указан идентификатор организации");
+    ctx.throw(400, 'не указан идентификатор организации');
   }
 
   try {
     await companyService.deleteOne(companyId);
 
-    const result: IResponse<void> = { result: true };
+    const result: IResponse = { result: true };
 
     ctx.status = 200;
     ctx.body = result; //TODO передавать только код 204 без body
 
-    log.info("deleteCompany: OK");
+    log.info('deleteCompany: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
