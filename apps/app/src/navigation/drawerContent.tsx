@@ -1,10 +1,8 @@
-/* eslint-disable react-native/no-raw-text */
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   DrawerContentComponentProps,
   DrawerContentOptions,
   DrawerContentScrollView,
-  DrawerItem,
+  DrawerItemList,
 } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -13,10 +11,10 @@ import Animated from 'react-native-reanimated';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
-export function DrawerContent({ progress, navigation }: Props) {
+export function DrawerContent(props: Props) {
   const paperTheme = useTheme();
 
-  const translateX = Animated.interpolate(progress, {
+  const translateX = Animated.interpolate(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
     outputRange: [-100, -85, -70, -45, 0],
   });
@@ -27,7 +25,7 @@ export function DrawerContent({ progress, navigation }: Props) {
         <View style={styles.userInfoSection}>
           <TouchableOpacity
             onPress={() => {
-              navigation.toggleDrawer();
+              props.navigation.toggleDrawer();
             }}
           >
             <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
@@ -40,7 +38,7 @@ export function DrawerContent({ progress, navigation }: Props) {
         <Caption style={styles.caption}>ОДО "Золотые программы"</Caption>
       </View>
       <Divider />
-      <DrawerContentScrollView {...navigation}>
+      <DrawerContentScrollView {...props}>
         <Animated.View
           style={[
             styles.drawerContent,
@@ -51,32 +49,31 @@ export function DrawerContent({ progress, navigation }: Props) {
           ]}
         >
           <Drawer.Section style={styles.drawerSection}>
-            <DrawerItem
-              icon={({ color, size }) => (
-                <MaterialCommunityIcons name="view-dashboard-outline" color={color} size={size} />
-              )}
+            <DrawerItemList {...props} />
+            {/*             <DrawerItem
+              icon={p => <Icon name="view-dashboard-outline" {...p} />}
               label="Дашборд"
-              onPress={() => navigation.navigate('Dashboard')}
+              activeBackgroundColor={'red'}
+              activeTintColor={paperTheme.colors.accent}
+              onPress={() => props.navigation.navigate('Dashboard')}
             />
             <DrawerItem
-              icon={({ color, size }) => (
-                <MaterialCommunityIcons name="file-document-outline" color={color} size={size} />
-              )}
+              icon={p => <Icon name="file-document-outline" {...p} />}
               label="Документы"
-              onPress={() => navigation.navigate('Documents')}
+              onPress={() => {
+                props.navigation.navigate('Documents');
+              }}
             />
             <DrawerItem
-              icon={({ color, size }) => (
-                <MaterialCommunityIcons name="book-multiple-outline" color={color} size={size} />
-              )}
+              icon={props => <Icon name="book-multiple-outline" {...props} />}
               label="Справочники"
               onPress={() => navigation.navigate('References')}
             />
             <DrawerItem
-              icon={({ color, size }) => <MaterialCommunityIcons name="tune" color={color} size={size} />}
+              icon={props => <Icon name="tune" {...props} />}
               label="Настройки"
               onPress={() => navigation.navigate('Settings')}
-            />
+            /> */}
           </Drawer.Section>
         </Animated.View>
       </DrawerContentScrollView>

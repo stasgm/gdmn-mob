@@ -17,13 +17,17 @@ export type RootStackParamList = {
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
-const Header = ({ scene }: StackHeaderProps) => {
+const Header = ({ scene, previous, navigation }: StackHeaderProps) => {
   const { options } = scene.descriptor;
-  const title = options.headerTitle || options.title || scene.route.name;
+  const title = options.headerTitle ?? options.title ?? scene.route.name;
 
   return (
     <Appbar.Header>
-      <Appbar.Action icon="menu" onPress={() => scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())} />
+      {previous ? (
+        <Appbar.Action icon="backburger" onPress={navigation.goBack} />
+      ) : (
+        <Appbar.Action icon="menu" onPress={() => scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())} />
+      )}
       <Appbar.Content title={title} />
     </Appbar.Header>
   );

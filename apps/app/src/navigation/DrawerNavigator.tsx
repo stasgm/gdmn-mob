@@ -1,19 +1,76 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import { DrawerHeaderProps } from '@react-navigation/drawer/lib/typescript/src/types';
+import { DrawerActions } from '@react-navigation/native';
 import React from 'react';
+import { Appbar } from 'react-native-paper';
 
 import { DrawerContent } from './drawerContent';
-import RootNavigator from './RootNavigator';
+import DashboardNavigator from './Root/DashboardNavigator';
+import DocumentsNavigator from './Root/DocumentsNavigator';
+import ReferencesNavigator from './Root/ReferencesNavigator';
+import SettingsNavigator from './Root/SettingsNavigator';
 
 export type RootDrawerParamList = {
-  Root: undefined;
+  Dashboard: undefined;
+  Documents: undefined;
+  References: undefined;
+  Settings: undefined;
 };
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
+const Header = ({ scene }: DrawerHeaderProps) => {
+  const { options } = scene.descriptor;
+  const title = options.headerTitle ?? options.title ?? scene.route.name;
+
+  return (
+    <Appbar.Header>
+      <Appbar.Action icon="menu" onPress={() => scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())} />
+      <Appbar.Content title={title} />
+    </Appbar.Header>
+  );
+};
+
 const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-      <Drawer.Screen name="Root" component={RootNavigator} />
+    <Drawer.Navigator
+      drawerContentOptions={{ activeBackgroundColor: '#5cbbff', activeTintColor: '#ffffff' }}
+      drawerContent={props => <DrawerContent {...props} />}
+      screenOptions={{ headerShown: true, header: props => <Header {...props} /> }}
+    >
+      <Drawer.Screen
+        name="Dashboard"
+        component={DashboardNavigator}
+        options={{
+          title: 'Дашборд',
+          drawerIcon: props => <Icon name="view-dashboard-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Documents"
+        component={DocumentsNavigator}
+        options={{
+          title: 'Документы',
+          drawerIcon: props => <Icon name="file-document-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="References"
+        component={ReferencesNavigator}
+        options={{
+          title: 'Справочники',
+          drawerIcon: props => <Icon name="book-multiple-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={SettingsNavigator}
+        options={{
+          title: 'Настройки',
+          drawerIcon: props => <Icon name="tune" {...props} />,
+        }}
+      />
     </Drawer.Navigator>
   );
 };
