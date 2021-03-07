@@ -3,7 +3,11 @@ import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { DrawerHeaderProps } from '@react-navigation/drawer/lib/typescript/src/types';
 import { DrawerActions } from '@react-navigation/native';
 import React from 'react';
-import { Appbar } from 'react-native-paper';
+import { Appbar, useTheme } from 'react-native-paper';
+
+import ProfileScreen from '../screens/Profile';
+
+import MapScreen from '../screens/Maps';
 
 import { DrawerContent } from './drawerContent';
 import DashboardNavigator from './Root/DashboardNavigator';
@@ -16,6 +20,8 @@ export type RootDrawerParamList = {
   Documents: undefined;
   References: undefined;
   Settings: undefined;
+  Profile: undefined;
+  Map: undefined;
 };
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
@@ -33,9 +39,10 @@ const Header = ({ scene }: DrawerHeaderProps) => {
 };
 
 const DrawerNavigator = () => {
+  const { colors } = useTheme();
   return (
     <Drawer.Navigator
-      drawerContentOptions={{ activeBackgroundColor: '#5cbbff', activeTintColor: '#ffffff' }}
+      drawerContentOptions={{ activeBackgroundColor: colors.primary, activeTintColor: '#ffffff' }}
       drawerContent={props => <DrawerContent {...props} />}
       screenOptions={{ headerShown: true, header: props => <Header {...props} /> }}
     >
@@ -68,6 +75,22 @@ const DrawerNavigator = () => {
         component={SettingsNavigator}
         options={{
           title: 'Настройки',
+          drawerIcon: props => <Icon name="tune" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Map"
+        component={MapScreen}
+        options={{
+          title: 'Карта',
+          drawerIcon: props => <Icon name="tune" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: 'Профиль',
           drawerIcon: props => <Icon name="tune" {...props} />,
         }}
       />

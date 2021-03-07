@@ -9,10 +9,14 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
+import { useAuth } from '../context/auth';
+
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
 export function DrawerContent(props: Props) {
   const paperTheme = useTheme();
+
+  const { user } = useAuth();
 
   const translateX = Animated.interpolate(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -31,11 +35,11 @@ export function DrawerContent(props: Props) {
             <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
-            <Title style={styles.title}>Шляхтич</Title>
-            <Title style={styles.title}>Станислав</Title>
+            <Title style={styles.title}>{user?.firstName}</Title>
+            <Title style={styles.title}>{user?.lastName}</Title>
           </View>
         </View>
-        <Caption style={styles.caption}>ОДО "Золотые программы"</Caption>
+        <Caption style={styles.caption}>{user?.companies?.[0]}</Caption>
       </View>
       <Divider />
       <DrawerContentScrollView {...props}>

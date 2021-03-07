@@ -18,6 +18,7 @@ module.exports = {
     'react-native/no-inline-styles': 'warn',
     'react-native/no-color-literals': 'off',
     'react-native/no-raw-text': 'off',
+    '@typescript-eslint/indent': 'off', // conflicts with prettier
     '@typescript-eslint/no-unused-vars': 'off',
   },
   globals: {

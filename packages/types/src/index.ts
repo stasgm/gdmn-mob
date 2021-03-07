@@ -26,4 +26,4 @@ export {
   IDataMessage,
   ICmd,
 } from './models';
-export { IResponse } from './requests';
+export { IResponse, IDataFetch } from './requests';
