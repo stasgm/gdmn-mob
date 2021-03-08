@@ -35,10 +35,8 @@ class Collection<T extends CollectionItem> {
   public async insertMany(obj: Array<T>): Promise<Array<string>> {
     const db = await this._get();
 
-    const initObjects = obj.map((item) =>
-      item.id ? item : this._initObject(item)
-    );
-    const ids = obj.map((item) => item.id as string);
+    const initObjects = obj.map(item => (item.id ? item : this._initObject(item)));
+    const ids = obj.map(item => item.id as string);
 
     db.push(...initObjects);
     await this._save(db);
@@ -61,8 +59,7 @@ class Collection<T extends CollectionItem> {
   public async find(id: string): Promise<T>;
   public async find(predicate: (item: T) => boolean): Promise<T>;
   public async find(id: string | ((item: T) => boolean)) {
-    const predicate =
-      typeof id === 'function' ? id : (item: T) => item.id === id;
+    const predicate = typeof id === 'function' ? id : (item: T) => item.id === id;
     return (await this._get()).find(predicate);
   }
 
@@ -73,7 +70,7 @@ class Collection<T extends CollectionItem> {
     const db = await this._get();
 
     if (!obj.id) return;
-    const newDb = db.map((val) => (val.id === obj.id ? obj : val));
+    const newDb = db.map(val => (val.id === obj.id ? obj : val));
     return this._save(newDb);
   }
 
@@ -84,10 +81,7 @@ class Collection<T extends CollectionItem> {
   public async delete(id: string): Promise<void>;
   public async delete(predicate: (item: T) => boolean): Promise<void>;
   public async delete(id: string | ((item: T) => boolean)) {
-    const predicate =
-      typeof id === 'function'
-        ? R.pipe(id, R.not)
-        : (item: T) => item.id !== id;
+    const predicate = typeof id === 'function' ? R.pipe(id, R.not) : (item: T) => item.id !== id;
 
     const db = await this._get();
 
@@ -125,15 +119,10 @@ class Collection<T extends CollectionItem> {
 
   private _save(data: Array<T>): Promise<void> {
     return new Promise((resolve, reject) => {
-      fs.writeFile(
-        this.collectionPath,
-        JSON.stringify(data),
-        { encoding: 'utf8' },
-        (err: unknown) => {
-          if (err) return reject(err);
-          return resolve();
-        }
-      );
+      fs.writeFile(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' }, (err: unknown) => {
+        if (err) return reject(err);
+        return resolve();
+      });
     });
   }
 }

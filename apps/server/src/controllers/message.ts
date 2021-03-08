@@ -23,15 +23,8 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  if (
-    !(ctx.state.user.companies as string[]).find(
-      (item) => item === head.companyId
-    )
-  ) {
-    ctx.throw(
-      403,
-      'пользователь не входит в организацию указанную в заголовке сообщения'
-    );
+  if (!(ctx.state.user.companies as string[]).find(item => item === head.companyId)) {
+    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   try {
@@ -186,9 +179,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
   let message: string | any[] = '';
 
   try {
-    message = (await promise).filter(
-      (mes) => mes.head.consumer === ctx.state.user.id
-    );
+    message = (await promise).filter(mes => mes.head.consumer === ctx.state.user.id);
   } catch (err) {
     if (err instanceof Error && err.name === 'ECONNRESET') return;
 
@@ -227,15 +218,8 @@ const publish = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  if (
-    !(ctx.state.user.companies as string[]).find(
-      (item) => item === head.companyId
-    )
-  ) {
-    ctx.throw(
-      403,
-      'пользователь не входит в организацию указанную в заголовке сообщения'
-    );
+  if (!(ctx.state.user.companies as string[]).find(item => item === head.companyId)) {
+    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   try {

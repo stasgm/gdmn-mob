@@ -129,9 +129,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const deviceIfno = ((await userService.findDevices(
-      userId
-    )) as unknown) as IDeviceInfo[];
+    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDeviceInfo[];
 
     const result: IResponse<IDeviceInfo[]> = { result: true, data: deviceIfno };
 

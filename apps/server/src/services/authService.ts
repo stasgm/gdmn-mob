@@ -15,24 +15,17 @@ import { devices, users, codes } from './dao/db';
 
 import * as userService from './userService';
 
-const authenticate = async (
-  ctx: Context,
-  next: Next
-): Promise<IUser | undefined> => {
+const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
 
-  const user = await users.find(
-    (i) => i.userName.toUpperCase() === String(userName).toUpperCase()
-  );
+  const user = await users.find(i => i.userName.toUpperCase() === String(userName).toUpperCase());
 
   if (!user) {
     throw new Error('пользователь не найден');
   }
 
-  const device = await devices.find(
-    (device) => device.uid === deviceId && device.userId === user.id
-  );
+  const device = await devices.find(device => device.uid === deviceId && device.userId === user.id);
 
   if (!device) {
     throw new Error('связанное с пользователем устройство не найдено');
@@ -112,11 +105,7 @@ const signUp = async ({ user }: { user: Omit<IUser, 'role'> }) => {
   return userid;
 };
 
-const validateAuthCreds: VerifyFunction = async (
-  userName: string,
-  password: string,
-  done
-) => {
+const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await userService.findByName(userName);
 
   if (!user) done(null, false);
@@ -129,7 +118,7 @@ const validateAuthCreds: VerifyFunction = async (
 };
 
 const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
-  const rec = await codes.find((i) => i.code === code);
+  const rec = await codes.find(i => i.code === code);
 
   if (!rec) {
     throw new Error('код не найден');
@@ -163,7 +152,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
 
   // const newDeviceId = await devices.insert({ userId: rec.user, uid: deviceId, blocked: false });
 
-  await codes.delete((i) => i.code === code);
+  await codes.delete(i => i.code === code);
 
   return deviceId;
 };

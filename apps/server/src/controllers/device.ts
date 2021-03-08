@@ -32,10 +32,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const {
-    id: deviceId,
-    userName,
-  }: { id: string; userName: string } = ctx.params;
+  const { id: deviceId, userName }: { id: string; userName: string } = ctx.params;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан uid устройства');
@@ -140,9 +137,7 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const userList = ((await deviceService.findUsers(
-      deviceId
-    )) as unknown) as IDeviceInfo[];
+    const userList = ((await deviceService.findUsers(deviceId)) as unknown) as IDeviceInfo[];
 
     const result: IResponse<IDeviceInfo[]> = { result: true, data: userList };
 
@@ -245,12 +240,4 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 */
-export {
-  getDevice,
-  getDevices,
-  getUsersByDevice,
-  addDevice,
-  updateDevice,
-  removeDevice,
-  getDeviceByUser,
-};
+export { getDevice, getDevices, getUsersByDevice, addDevice, updateDevice, removeDevice, getDeviceByUser };

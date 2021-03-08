@@ -17,20 +17,9 @@ const findAll = async () => {
  * @param {string} userId - идентификатор пользователя
  * @return массив сообщений
  * */
-const FindMany = async ({
-  appSystem,
-  companyId,
-  userId,
-}: {
-  appSystem: string;
-  companyId: string;
-  userId: string;
-}) => {
+const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
   return (await messages.read()).filter(
-    (i) =>
-      i.head.appSystem === appSystem &&
-      i.head.companyid === companyId &&
-      i.head.consumer === userId
+    i => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
   );
 };
 
@@ -42,7 +31,7 @@ const FindMany = async ({
  * */
 
 const addOne = async (msgObject: IMessage) => {
-  if (await messages.find((i) => i.head.id === msgObject.head.id)) {
+  if (await messages.find(i => i.head.id === msgObject.head.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
   }
 
@@ -55,7 +44,7 @@ const addOne = async (msgObject: IMessage) => {
  * @return id, идентификатор сообщения
  * */
 const updateOne = async (message: IMessage) => {
-  const oldMessage = await messages.find((i) => i.id === message.id);
+  const oldMessage = await messages.find(i => i.id === message.id);
 
   if (!oldMessage) {
     throw new Error('сообщение не найдено');
@@ -96,10 +85,7 @@ const deleteByUid = async ({
   userId: string;
 }): Promise<void> => {
   const messageObj = await messages.find(
-    (message) =>
-      message.head.companyid === companyId &&
-      message.head.consumer === userId &&
-      message.head.id === uid
+    message => message.head.companyid === companyId && message.head.consumer === userId && message.head.id === uid,
   );
 
   if (!messageObj) {
@@ -112,13 +98,4 @@ const deleteByUid = async ({
 
 const deleteAll = async (): Promise<void> => messages.deleteAll();
 
-export {
-  findOne,
-  findAll,
-  addOne,
-  deleteOne,
-  updateOne,
-  FindMany,
-  deleteByUid,
-  deleteAll,
-};
+export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid, deleteAll };

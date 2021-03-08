@@ -66,9 +66,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указана информация об организации');
   }
 
-  const oldCompany: ICompany | undefined = await companyService.findOne(
-    companyId
-  ); //companies.find(company.id);
+  const oldCompany: ICompany | undefined = await companyService.findOne(companyId); //companies.find(company.id);
 
   /*if (!oldCompany) {
     oldCompany = await companyService.findOneByName(company.title);
@@ -155,11 +153,4 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export {
-  addCompany,
-  updateCompany,
-  getCompany,
-  getUsersByCompany,
-  getCompanies,
-  deleteCompany,
-};
+export { addCompany, updateCompany, getCompany, getUsersByCompany, getCompanies, deleteCompany };

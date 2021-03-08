@@ -10,26 +10,18 @@ const findAll = async () => {
   return devices.read();
 };
 
-const findOneByUidAndUser = async ({
-  deviceId,
-  userName,
-}: {
-  deviceId: string;
-  userName: string;
-}) => {
-  const user = await users.find(
-    (i) => i.userName.toUpperCase() === userName.toUpperCase()
-  );
+const findOneByUidAndUser = async ({ deviceId, userName }: { deviceId: string; userName: string }) => {
+  const user = await users.find(i => i.userName.toUpperCase() === userName.toUpperCase());
 
   if (!user) {
     throw new Error('пользователь не найден');
   }
 
-  return devices.find((i) => i.uid === deviceId && i.userId === user.id);
+  return devices.find(i => i.uid === deviceId && i.userId === user.id);
 };
 
 const findOneByUid = async (uid: string) => {
-  return devices.find((i) => i.uid === uid);
+  return devices.find(i => i.uid === uid);
 };
 
 /**
@@ -42,8 +34,8 @@ const findUsers = async (deviceId: string) => {
   }
 
   return (await devices.read())
-    .filter((i) => i.uid === deviceId)
-    .map(async (i) => {
+    .filter(i => i.uid === deviceId)
+    .map(async i => {
       const device = await devices.find(deviceId);
 
       if (!device) {
@@ -74,18 +66,8 @@ const findUsers = async (deviceId: string) => {
  * @return id, идентификатор устройства
  * */
 
-const addOne = async ({
-  deviceName,
-  userId,
-}: {
-  deviceName: string;
-  userId: string;
-}) => {
-  if (
-    await devices.find(
-      (device) => device.name === deviceName && device.userId === userId
-    )
-  ) {
+const addOne = async ({ deviceName, userId }: { deviceName: string; userId: string }) => {
+  if (await devices.find(device => device.name === deviceName && device.userId === userId)) {
     throw new Error('устройство с таким названием уже добавлено пользователю');
   }
 
@@ -113,11 +95,11 @@ const updateOne = async (device: IDevice) => {
  * @param {string} id - идентификатор устройства
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
-  if (!(await devices.find((device) => device.id === deviceId))) {
+  if (!(await devices.find(device => device.id === deviceId))) {
     throw new Error('устройство не найдено');
   }
 
-  await devices.delete((device) => device.id === deviceId);
+  await devices.delete(device => device.id === deviceId);
 };
 
 const genActivationCode = async (deviceId: string) => {

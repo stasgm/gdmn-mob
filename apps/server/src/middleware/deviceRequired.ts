@@ -7,9 +7,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     ctx.throw(400, 'не указан идентификатор устройства');
   }
 
-  const currDevice = await devices.find(
-    (device) => device.uid === ctx.query.deviceId
-  );
+  const currDevice = await devices.find(device => device.uid === ctx.query.deviceId);
 
   if (!currDevice) {
     ctx.throw(400, 'устройство не найдено');

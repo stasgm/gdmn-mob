@@ -15,10 +15,7 @@ class Database {
    * @param {string} name
    */
   constructor(name: string) {
-    this.dbPath = path.join(
-      config.FILES_PATH || os.userInfo().homedir,
-      `/.${name}/`
-    );
+    this.dbPath = path.join(config.FILES_PATH || os.userInfo().homedir, `/.${name}/`);
     this.ensureStorage();
   }
 

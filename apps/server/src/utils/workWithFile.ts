@@ -25,13 +25,7 @@ export const readFile = async <T>(filename: string): Promise<T | undefined> => {
   }
 };
 
-export const writeFile = async ({
-  filename,
-  data,
-}: {
-  filename: string;
-  data: string;
-}): Promise<void> => {
+export const writeFile = async ({ filename, data }: { filename: string; data: string }): Promise<void> => {
   try {
     await promises.mkdir(path.dirname(filename), { recursive: true });
     await promises.writeFile(filename, data, { encoding: 'utf8', flag: 'w' });

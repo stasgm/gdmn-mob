@@ -8,9 +8,9 @@ import { users, devices } from './dao/db';
 const findOne = async (userId: string) => users.find(userId);
 
 const findByName = async (userName: string) =>
-  users.find((user) => user.userName.toUpperCase() === userName.toUpperCase());
+  users.find(user => user.userName.toUpperCase() === userName.toUpperCase());
 
-const findAll = async () => (await users.read()).map((el) => makeProfile(el));
+const findAll = async () => (await users.read()).map(el => makeProfile(el));
 
 /**
  * Добавляет одного пользователя
@@ -18,11 +18,7 @@ const findAll = async () => (await users.read()).map((el) => makeProfile(el));
  * @return id, идентификатор пользователя
  * */
 const addOne = async (user: IUser) => {
-  if (
-    await users.find(
-      (i) => i.userName.toUpperCase() === user.userName.toUpperCase()
-    )
-  ) {
+  if (await users.find(i => i.userName.toUpperCase() === user.userName.toUpperCase())) {
     throw new Error('пользователь с таким именем уже существует');
   }
 
@@ -70,8 +66,8 @@ const findDevices = async (userId: string) => {
   }
 
   return (await devices.read())
-    .filter((i) => i.userId === userId)
-    .map((i) => {
+    .filter(i => i.userId === userId)
+    .map(i => {
       return {
         id: i.id,
         userId: i.userId,
@@ -86,7 +82,7 @@ const findDevices = async (userId: string) => {
 const addCompanyToUser = async (userId: string, companyName: string) => {
   const user = await findOne(userId);
 
-  if (user.companies?.some((i) => companyName === i)) {
+  if (user.companies?.some(i => companyName === i)) {
     throw new Error('организация уже привязана к пользователю');
   }
 
@@ -97,13 +93,13 @@ const addCompanyToUser = async (userId: string, companyName: string) => {
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {
   const user = await findOne(userId);
-  if (user.companies?.some((i) => companyName === i)) {
+  if (user.companies?.some(i => companyName === i)) {
     throw new Error('организация не привязана к пользователю');
   }
 
   return users.update({
     ...user,
-    companies: user.companies?.filter((i) => i === companyName),
+    companies: user.companies?.filter(i => i === companyName),
   });
 };
 

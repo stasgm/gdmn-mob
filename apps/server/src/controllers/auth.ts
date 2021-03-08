@@ -67,16 +67,7 @@ const logOut = (ctx: Context): void => {
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   // const { deviceId } = ctx.query;
-  const {
-    externalId,
-    userName,
-    password,
-    firstName,
-    lastName,
-    phoneNumber,
-    companies,
-    creatorId,
-  } = ctx.request.body;
+  const { externalId, userName, password, firstName, lastName, phoneNumber, companies, creatorId } = ctx.request.body;
 
   if (!userName) {
     ctx.throw(400, 'не указано имя пользователя');
