@@ -33,6 +33,8 @@ const Header = ({ scene, previous, navigation }: StackHeaderProps) => {
   );
 };
 
+console.log('RootNavigator');
+
 const RootNavigator = () => {
   return (
     <RootStack.Navigator

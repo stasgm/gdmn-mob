@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 const ReferencesScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>References</Text>
+      <Text style={styles.title}>Справочники приложения</Text>
     </View>
   );
 };
@@ -14,8 +14,12 @@ export default ReferencesScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    margin: 10,
+  },
+  title: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
   },
 });

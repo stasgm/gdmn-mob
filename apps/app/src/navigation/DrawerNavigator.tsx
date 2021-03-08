@@ -5,7 +5,7 @@ import { DrawerActions } from '@react-navigation/native';
 import React from 'react';
 import { Appbar, useTheme } from 'react-native-paper';
 
-import ProfileScreen from '../screens/Profile';
+import ProfileScreen from '../screens/ProfileScreen';
 
 import MapScreen from '../screens/Maps';
 
@@ -37,6 +37,8 @@ const Header = ({ scene }: DrawerHeaderProps) => {
     </Appbar.Header>
   );
 };
+
+console.log('DrawerNavigator');
 
 const DrawerNavigator = () => {
   const { colors } = useTheme();
@@ -83,7 +85,7 @@ const DrawerNavigator = () => {
         component={MapScreen}
         options={{
           title: 'Карта',
-          drawerIcon: props => <Icon name="tune" {...props} />,
+          drawerIcon: props => <Icon name="map-outline" {...props} />,
         }}
       />
       <Drawer.Screen
@@ -91,7 +93,7 @@ const DrawerNavigator = () => {
         component={ProfileScreen}
         options={{
           title: 'Профиль',
-          drawerIcon: props => <Icon name="tune" {...props} />,
+          drawerIcon: props => <Icon name="account-circle-outline" {...props} />,
         }}
       />
     </Drawer.Navigator>

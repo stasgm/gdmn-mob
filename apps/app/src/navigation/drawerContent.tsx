@@ -54,30 +54,6 @@ export function DrawerContent(props: Props) {
         >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />
-            {/*             <DrawerItem
-              icon={p => <Icon name="view-dashboard-outline" {...p} />}
-              label="Дашборд"
-              activeBackgroundColor={'red'}
-              activeTintColor={paperTheme.colors.accent}
-              onPress={() => props.navigation.navigate('Dashboard')}
-            />
-            <DrawerItem
-              icon={p => <Icon name="file-document-outline" {...p} />}
-              label="Документы"
-              onPress={() => {
-                props.navigation.navigate('Documents');
-              }}
-            />
-            <DrawerItem
-              icon={props => <Icon name="book-multiple-outline" {...props} />}
-              label="Справочники"
-              onPress={() => navigation.navigate('References')}
-            />
-            <DrawerItem
-              icon={props => <Icon name="tune" {...props} />}
-              label="Настройки"
-              onPress={() => navigation.navigate('Settings')}
-            /> */}
           </Drawer.Section>
         </Animated.View>
       </DrawerContentScrollView>

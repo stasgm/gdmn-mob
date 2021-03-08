@@ -1,95 +1,143 @@
-import { IUser, IUserCredentials } from '@lib/types';
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import { IBaseUrl, IDevice, IUser, IUserCredentials } from '@lib/types';
+import React, { createContext, useEffect, useContext, useReducer } from 'react';
+
+import { config, user, device } from '../screens/Auth/constants';
 
 import api from '../services/api';
 
-interface IAuthContextData {
-  user: IUser | null;
-  signIn(user: IUserCredentials): Promise<boolean>;
-  signOut(): Promise<boolean>;
-}
+import { IAuthContextData, reducer, initialState } from './reducer';
 
-const AUTH_CONTEXT_ERROR =
-  'Authentication context not found. Have your wrapped your components with AuthContext.Consumer?';
-
-const initialState: IAuthContextData = {
-  user: null,
-  signIn: () => {
-    throw new Error(AUTH_CONTEXT_ERROR);
-  },
-  signOut: () => {
-    throw new Error(AUTH_CONTEXT_ERROR);
-  },
-};
+const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' && 'userName' in obj;
+const isDevice = (obj: unknown): obj is IDevice => obj instanceof Object && 'id' && 'name' in obj;
 
 const AuthContext = createContext<IAuthContextData>(initialState);
 
-const isUser = (obj: unknown): obj is IUser => obj instanceof Object && 'id' in obj;
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const [user, setUser] = useState<IUser | null>(null);
+  const [authState, setAuthState] = useReducer(reducer, initialState);
 
   const loadStoragedData = async () => {
-    console.log('load');
+    setAuthState({ type: 'LOAD_DATA', settings: config, device: undefined, user: undefined });
+    console.log('load settngs');
   };
 
-  const signIn = async (authUser: IUserCredentials): Promise<boolean> => {
+  const checkDevice = async (): Promise<void> => {
+    try {
+      setAuthState({ type: 'SET_CONNECTION' });
+
+      // const response = await api.getDevice();
+
+      await sleep(2000);
+
+      const deviceObj: IDevice = device;
+
+      if (isDevice(deviceObj)) {
+        setAuthState({ type: 'SET_DEVICE', device: deviceObj });
+        return;
+      }
+
+      // устройства нет на сервере, сбросим DeviceId на сутройстве
+      setAuthState({ type: 'SET_DEVICE_ERROR', text: 'ошибка сервера' });
+    } catch (err) {
+      setAuthState({ type: 'SET_ERROR', text: err.message });
+      console.log('error:', err);
+    }
+  };
+
+  const activate = async (code: string): Promise<void> => {
+    try {
+      setAuthState({ type: 'SET_CONNECTION' });
+
+      const response = await api.verifyActivationCode(code);
+
+      if (isDevice(response.result)) {
+        setAuthState({ type: 'SET_DEVICE', device: response.result });
+        return;
+      }
+
+      setAuthState({ type: 'SET_ERROR', text: 'ошибка сервера' });
+    } catch (err) {
+      setAuthState({ type: 'SET_ERROR', text: err.message });
+      console.log('error:', err);
+    }
+  };
+
+  const showSettings = async (visible: boolean): Promise<void> => {
+    setAuthState({ type: 'SETTINGS_FORM', visible });
+  };
+
+  const setSettings = async (settings: IBaseUrl): Promise<void> => {
+    setAuthState({ type: 'SET_SETTINGS', settings });
+  };
+
+  const signIn = async (authUser: IUserCredentials): Promise<void> => {
     if (!(authUser.userName && authUser.password)) {
-      return false;
+      setAuthState({ type: 'SET_ERROR', text: 'Не указан пользователь и\\или пароль' });
+      return;
     }
 
+    setAuthState({ type: 'SET_CONNECTION' });
+
     try {
-      /*       const response = await api.login({
-              userName: authUser.userName,
-              password: authUser.password,
-            });
-       */
-      // const userObj = response.data;
-      const userObj: IUser = {
-        id: '1',
-        creatorId: '1',
-        password: '1',
-        role: 'Admin',
-        userName: 'Шляхтич Станислав',
-        firstName: 'Станислав',
-        lastName: 'Шляхтич ',
-        companies: ['ОДО Золотые Программы'],
-      };
+      /*
+        const response = await api.login({
+          userName: authUser.userName,
+          password: authUser.password,
+        });
 
-      // console.log(userObj);
+         const userObj = response.data;
+      */
+      await sleep(2000);
 
-      if (!userObj) {
-        throw new Error('Server error');
-        // throw new Error(response.error);
+      const userObj: IUser = user;
+
+      if (isUser(userObj)) {
+        setAuthState({ type: 'SET_USER', user: userObj });
+        return;
       }
 
-      if (!isUser(userObj)) {
-        throw new Error('Server error');
-      }
-
-      setUser(userObj);
-
-      return true;
-    } catch (error) {
-      return false;
+      // пользователь не соответствует структуре
+      setAuthState({ type: 'SET_USER_ERROR', text: 'ошибка сервера' });
+    } catch (err) {
+      setAuthState({ type: 'SET_ERROR', text: err.message });
+      console.log('error:', err);
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (): Promise<void> => {
     try {
-      const response = await api.logout();
-      setUser(null);
-      return response.result;
-    } catch (error) {
-      return false;
+      // const response = await api.logout();
+      // const res = response.result;
+      const res = true;
+      if (res) {
+        setAuthState({ type: 'SET_USER', user: null });
+        // setUser(null);
+        return;
+      }
+      setAuthState({ type: 'SET_ERROR', text: 'ошибка сервера' });
+    } catch (err) {
+      setAuthState({ type: 'SET_ERROR', text: err.message });
     }
+  };
+
+  const disconnect = async (): Promise<void> => {
+    setAuthState({ type: 'LOAD_DATA', settings: authState.settings, device: undefined, user: undefined });
   };
 
   useEffect(() => {
     loadStoragedData();
   }, []);
 
-  return <AuthContext.Provider value={{ user, signIn, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{ ...authState, checkDevice, signIn, signOut, disconnect, setSettings, showSettings, activate }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 const useAuth = () => useContext(AuthContext);

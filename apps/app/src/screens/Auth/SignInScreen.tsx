@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { Text, TextInput, IconButton, Button, ActivityIndicator, useTheme } from 'react-native-paper';
 
-import { IDataFetch, IUserCredentials } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 
 import { useAuth } from '../../context/auth';
 
@@ -20,13 +20,12 @@ import SubTitle from '../../components/SubTitle';
 */
 const SignInScreen = () => {
   const { colors } = useTheme();
-  const [loginState, setLoginState] = useState<IDataFetch>({
-    isLoading: false,
-    isError: false,
-    status: undefined,
-  });
 
-  const { signIn } = useAuth();
+  const {
+    signIn,
+    disconnect,
+    loading: { serverReq },
+  } = useAuth();
 
   const [credential, setCredentials] = useState<IUserCredentials>({
     userName: '',
@@ -46,93 +45,10 @@ const SignInScreen = () => {
     };
   }, []);
 
-  const logIn = useCallback(async () => {
+  const logIn = async () => {
     Keyboard.dismiss();
-
-    try {
-      setLoginState({ isError: false, isLoading: true, status: undefined });
-
-      const res = await signIn(credential);
-
-      if (res) {
-        return setLoginState({ isError: false, isLoading: false, status: undefined });
-      }
-      setLoginState({ isError: true, isLoading: false, status: 'Что-то не так' });
-    } catch (e) {
-      setLoginState({ isError: true, isLoading: false, status: e });
-      throw new Error(e);
-    }
-  }, [credential, signIn]);
-
-  useEffect(() => {
-    if (!loginState.isLoading) {
-      return;
-    }
-
-    /*  const LoginUser = async () => {
-       try {
-         const device = await apiService.getDeviceByUser(credential.userName);
-
-         if (device.error === 'устройство не найдено') {
-           // Устройство не найдено. Перенаправляем на ввод кода активации
-           authActions.setUserStatus({ userID: null, userName: undefined });
-           authActions.setDeviceStatus(false);
-           return;
-         }
-
-         if (!device.result) {
-           setLoginState({
-             isLoading: false,
-             status: device.error,
-             isError: true,
-           });
-           return;
-         }
-       } catch (err) {
-         setLoginState({
-           isLoading: false,
-           status: err.message,
-           isError: true,
-         });
-         return;
-       }
-
-       try {
-         const res = await timeout<IResponse<string>>(apiService.baseUrl.timeout, apiService.auth.login(credential));
-
-         if (!res.result) {
-           setLoginState({
-             isLoading: false,
-             status: res.error,
-             isError: true,
-           });
-           return;
-         }
-
-         // Получение данных пользователя
-         const result = await apiService.auth.getUserStatus();
-
-         if (!isUser(result.data)) {
-           authActions.setUserStatus({ userID: null, userName: undefined });
-           setLoginState({ isLoading: false, isError: true, status: 'ошибка при получении пользователя' });
-           return;
-         }
-         const user = result.data as IUser;
-         authActions.setUserStatus({
-           userID: user.id,
-           userName: user.firstName ? `${user.firstName} ${user.lastName}` : user.userName,
-         });
-       } catch (err) {
-         setLoginState({
-           isLoading: false,
-           status: err.message,
-           isError: true,
-         });
-       }
-     };
-     LoginUser();
-     */
-  }, [loginState.isLoading]);
+    await signIn(credential);
+  };
 
   return (
     <>
@@ -161,7 +77,7 @@ const SignInScreen = () => {
             />
             <Button
               mode="contained"
-              disabled={loginState.isLoading}
+              disabled={serverReq.isLoading}
               icon="login"
               onPress={logIn}
               style={globalStyles.rectangularButton}
@@ -170,8 +86,8 @@ const SignInScreen = () => {
             </Button>
           </View>
           <View style={style.statusBox}>
-            {loginState.isError && <Text style={style.errorText}>Ошибка: {loginState.status}</Text>}
-            {loginState.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+            {serverReq.isError && <Text style={style.errorText}>Ошибка: {serverReq.status}</Text>}
+            {serverReq.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -180,6 +96,7 @@ const SignInScreen = () => {
           icon="server"
           size={30}
           onPress={() => {
+            disconnect();
             console.log('disconnect');
           }}
           style={{
