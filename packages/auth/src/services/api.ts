@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IResponse, IDevice, IUserCredentials, IUser } from '@lib/types';
 
-import { config, device } from '../screens/Auth/constants';
+import { config, device } from '../screens/constants';
 
 const baseUrl = `${config.protocol}${config.server}:${config.port}/${config.apiPath}`;
 

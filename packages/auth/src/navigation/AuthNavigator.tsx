@@ -1,13 +1,13 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useCallback } from 'react';
 
-import { ConfigScreen } from '../screens/Auth/ConfigScreen';
-import { ActivationScreen } from '../screens/Auth/ActivationScreen';
-import { SignInScreen } from '../screens/Auth/SignInScreen';
-import { SplashScreen } from '../screens/Auth/SplashScreen';
+import { ConfigScreen } from '../screens/ConfigScreen';
+import { ActivationScreen } from '../screens/ActivationScreen';
+import { SignInScreen } from '../screens/SignInScreen';
+import { SplashScreen } from '../screens/SplashScreen';
 import { useAuth } from '../context/auth';
 
-export type AuthStackParamList = {
+type AuthStackParamList = {
   Connection: undefined;
   Splash: undefined;
   Login: undefined;
@@ -16,8 +16,6 @@ export type AuthStackParamList = {
 };
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
-
-console.log('AuthNavigator');
 
 const AuthNavigator = () => {
   const {
@@ -57,4 +55,4 @@ const AuthNavigator = () => {
   );
 };
 
-export default AuthNavigator;
+export { AuthNavigator };

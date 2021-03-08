@@ -1,11 +1,10 @@
 import { useIsFocused } from '@react-navigation/native';
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import { Text, Button, ActivityIndicator, IconButton, TextInput, useTheme } from 'react-native-paper';
 
-import SubTitle from '../../components/SubTitle';
-import { useAuth } from '../../context/auth';
-import globalStyles from '../../styles/global';
+import { useAuth } from '../context/auth';
+import globalStyles from '../styles/global';
 
 const ActivationScreen = () => {
   const { colors } = useTheme();
@@ -13,39 +12,22 @@ const ActivationScreen = () => {
   const {
     loading: { serverReq },
     disconnect,
+    activate,
   } = useAuth(); // Переделать в пропсы
 
   const [activationCode, setActivationCode] = useState('');
 
   const isFocused = useIsFocused();
 
-  const sendActivationCode = useCallback(async () => {
-    /*
-      // Запрос к серверу на проверку кода активации
-     setServerReq({ isError: false, isLoading: true, status: undefined });
-     try {
-       const resp = await timeout<IResponse<string>>(
-         apiService.baseUrl.timeout,
-         apiService.auth.verifyActivationCode(activationCode),
-       );
-       if (!resp.result) {
-         setActivationCode('');
-         setServerReq({ isError: true, isLoading: false, status: resp.error });
-         return;
-       }
-
-       serviceActions.setDeviceId(resp.data);
-       actions.setDeviceStatus(true); // Возможно нужно сделать перенаправление на первую страницу
-     } catch (err) {
-       setServerReq({ isLoading: false, isError: true, status: err.message });
-     } */
-  }, []);
+  const sendActivationCode = async () => {
+    await activate(activationCode);
+  };
 
   return (
     <>
       <KeyboardAvoidingView style={globalStyles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={globalStyles.container}>
-          <SubTitle>Активация устройства</SubTitle>
+          <Text>Активация устройства</Text>
           <View
             style={{
               ...styles.statusBox,

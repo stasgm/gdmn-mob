@@ -1,7 +1,7 @@
 import { IBaseUrl, IDevice, IUser, IUserCredentials } from '@lib/types';
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 
-import { config, user, device } from '../screens/Auth/constants';
+import { config, user, device } from '../screens/constants';
 
 import api from '../services/api';
 

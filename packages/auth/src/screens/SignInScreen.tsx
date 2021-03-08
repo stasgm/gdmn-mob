@@ -4,10 +4,9 @@ import { Text, TextInput, IconButton, Button, ActivityIndicator, useTheme } from
 
 import { IUserCredentials } from '@lib/types';
 
-import { useAuth } from '../../context/auth';
+import { useAuth } from '../context/auth';
 
-import globalStyles from '../../styles/global';
-import SubTitle from '../../components/SubTitle';
+import globalStyles from '../styles/global';
 
 /*
   Порядок работы:
@@ -55,7 +54,7 @@ const SignInScreen = () => {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView style={[globalStyles.container, isKeyboardVisible && style.contentWidthKbd]}>
           <View>
-            <SubTitle>Вход пользователя</SubTitle>
+            <Text>Вход пользователя</Text>
             <TextInput
               returnKeyType="done"
               autoCorrect={false}

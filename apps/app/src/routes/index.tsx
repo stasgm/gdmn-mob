@@ -1,12 +1,13 @@
 import React from 'react';
 
-import { useAuth } from '../context/auth';
+import { AuthNavigator, useAuth } from '@lib/mob-auth';
+
 import DrawerNavigator from '../navigation/DrawerNavigator';
 
-import AuthNavigator from '../navigation/AuthNavigator';
-
 const Routes = () => {
-  const { user, device } = useAuth();
+  // const { user, device } = useAuth();
+  const user = null;
+  const device = null;
 
   return user && device ? <DrawerNavigator /> : <AuthNavigator />;
 };

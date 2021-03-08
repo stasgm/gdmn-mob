@@ -18,6 +18,7 @@
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
+  "prettier": "@config/prettier-config",
   "dependencies": {
     "@lib/types": "*",
     "bcrypt": "^5.0.1",

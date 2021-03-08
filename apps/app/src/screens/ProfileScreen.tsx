@@ -1,13 +1,15 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme, Button } from 'react-native-paper';
 
-import { useAuth } from '../context/auth';
+import { useAuth } from '@lib/mob-auth';
+import { IUser } from '@lib/types';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
-  const { user, signOut } = useAuth();
+  // const { user, signOut } = useAuth();
+  const user: IUser = { creatorId: '1', password: '1', role: 'Admin', userName: 'aaa' };
+  const signOut = () => console.log('signOut');
 
   return (
     <View style={styles.container}>
@@ -33,7 +35,13 @@ const ProfileScreen = () => {
         <Button mode="outlined" style={[styles.button]} onPress={signOut}>
           Сменить пользователя
         </Button>
-        <Button mode="outlined" style={[styles.button]} onPress={() => {}}>
+        <Button
+          mode="outlined"
+          style={[styles.button]}
+          onPress={() => {
+            console.log('change company');
+          }}
+        >
           Сменить организацию
         </Button>
       </View>

@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { Provider as PaperProvider } from 'react-native-paper';
 
-import { AuthProvider } from './src/context/auth';
+import { AuthProvider } from '@lib/mob-auth';
 
 import { persistor, store } from './src/store';
 

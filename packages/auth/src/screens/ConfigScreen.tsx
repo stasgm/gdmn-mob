@@ -2,10 +2,9 @@ import { IBaseUrl } from '@lib/types';
 import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, TextInput, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Text, Button } from 'react-native-paper';
 
-import SubTitle from '../../components/SubTitle';
-import styles from '../../styles/global';
+import styles from '../styles/global';
 
 import { config } from './constants';
 
@@ -48,7 +47,7 @@ const ConfigScreen = (props: Props) => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <SubTitle>Настройка подключения</SubTitle>
+      <Text>Настройка подключения</Text>
       <TextInput
         value={serverName}
         onChangeText={setServerName}
