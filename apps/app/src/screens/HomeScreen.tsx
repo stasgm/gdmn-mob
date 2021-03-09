@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { message } from '@lib/mylib';
 
 console.log('Home');
 
@@ -8,6 +9,7 @@ const Home = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Задачи на сегодня:</Text>
       <Text style={styles.text}>На сегодня задач нет</Text>
+      {message('you', 'hello')}
     </View>
   );
 };

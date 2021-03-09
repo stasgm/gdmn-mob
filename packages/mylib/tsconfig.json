@@ -3,9 +3,9 @@
   "compilerOptions": {
     "composite": false,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true,
+    "rootDir": "./",
+    "declaration": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "index.ts"],
+  "exclude": ["./node_modules", "./dist"]
 }
