@@ -1,17 +1,4 @@
 export {
-  IDocument,
-  IHead,
-  ILine,
-  IReference,
-  IRemains,
-  IRem,
-  IDocumentStatus,
-  IContact,
-  IGood,
-  IRefData,
-  IForm,
-} from './base';
-export {
   IUserProfile,
   IMessage,
   IDevice,
@@ -24,6 +11,5 @@ export {
   DeviceState,
   IDeviceInfo,
   IDataMessage,
-  ICmd,
 } from './models';
-export { IResponse, IDataFetch } from './requests';
+export { IResponse } from './requests';
