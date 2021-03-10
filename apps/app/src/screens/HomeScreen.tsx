@@ -1,15 +1,32 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { message } from '@lib/mylib';
+import { login } from '@lib/axios-config';
+import { Button } from 'react-native-paper';
+// import { MainContainer } from '@lib/common-ui/primitives/AppView';
+// import { Heading1 } from '@lib/common-ui/primitives/AppText';
+
+/* interface ChatListProps {
+  path?: string;
+}
+ */
+/* const ChatList = (_props: ChatListProps) => {
+  return (
+    <MainContainer>
+      <Heading1>ChatList</Heading1>
+    </MainContainer>
+  );
+}; */
 
 console.log('Home');
 
 const Home = () => {
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>{message('you', 'hello')}</Text>
       <Text style={styles.title}>Задачи на сегодня:</Text>
       <Text style={styles.text}>На сегодня задач нет</Text>
-      {message('you', 'hello')}
+      <Button onPress={() => console.log(login('Inna', '123'))}>Подключение</Button>
     </View>
   );
 };

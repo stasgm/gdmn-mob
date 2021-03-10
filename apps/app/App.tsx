@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { Provider as PaperProvider } from 'react-native-paper';
 
-import { AuthProvider } from '@lib/mob-auth';
+// import { AuthProvider } from '@lib/mob-auth';
 
 import { persistor, store } from './src/store';
 
@@ -18,14 +18,14 @@ export default class Root extends React.Component {
     return (
       <Provider store={store}>
         <PersistGate loading={<View />} persistor={persistor}>
-          <AuthProvider>
-            <PaperProvider theme={theme}>
-              {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
-              <NavigationContainer>
-                <Routes />
-              </NavigationContainer>
-            </PaperProvider>
-          </AuthProvider>
+          {/* <AuthProvider> */}
+          <PaperProvider theme={theme}>
+            {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
+            <NavigationContainer>
+              <Routes />
+            </NavigationContainer>
+          </PaperProvider>
+          {/* </AuthProvider> */}
         </PersistGate>
       </Provider>
     );

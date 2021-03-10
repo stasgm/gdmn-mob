@@ -9,7 +9,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
-import { useAuth } from '@lib/mob-auth';
+// import { useAuth } from '@lib/mob-auth';
 import { IUser } from '@lib/types';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
