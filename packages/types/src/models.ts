@@ -1,5 +1,3 @@
-import { IDocument } from './base';
-
 export interface IUserProfile {
   id?: string;
   userName: string;
@@ -77,11 +75,6 @@ export interface IDataMessage<T = any> {
   name: string;
   type: string;
   data: T;
-}
-
-export interface ICmd {
-  name: string;
-  params: IDocument[] | string[] | any;
 }
 
 export interface IMessage<T = any> {
