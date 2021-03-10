@@ -4,7 +4,7 @@ import { message } from '@lib/mylib';
 import { login } from '@lib/axios-config';
 import { Button } from 'react-native-paper';
 // import { MainContainer } from '@lib/common-ui/primitives/AppView';
-// import { Heading1 } from '@lib/common-ui/primitives/AppText';
+import { CoolButton } from '@lib/common-ui';
 
 /* interface ChatListProps {
   path?: string;
@@ -27,6 +27,7 @@ const Home = () => {
       <Text style={styles.title}>Задачи на сегодня:</Text>
       <Text style={styles.text}>На сегодня задач нет</Text>
       <Button onPress={() => console.log(login('Inna', '123'))}>Подключение</Button>
+      <CoolButton />
     </View>
   );
 };

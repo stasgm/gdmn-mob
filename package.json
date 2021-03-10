@@ -8,7 +8,9 @@
     ],
     "nohoist": [
       "**/app",
-      "**/app/**"
+      "**/app/**",
+      "**/common-ui",
+      "**/common-ui/**"
     ]
   },
   "scripts": {

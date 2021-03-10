@@ -1,8 +1,8 @@
 module.exports = {
   env: {
-    node: true,
+    browser: true,
   },
-  extends: ['@config/eslint-config'],
+  extends: ['@config/eslint-config', '@config/eslint-config-react', '@config/eslint-config-react-native'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: ['./tsconfig.eslint.json'],
