@@ -5,7 +5,8 @@ import { Text, Button, IconButton, useTheme } from 'react-native-paper';
 
 import SubTitle from '../../components/SubTitle';
 // import { useAuth } from '../../context/auth';
-import globalStyles from '../../styles/global';
+//import globalStyles from '../../styles/global';
+import globalStyles from '@lib/mobile-global-styles';
 
 type Props = {
   settings: IBaseUrl | undefined;
