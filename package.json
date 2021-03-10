@@ -9,8 +9,8 @@
     "nohoist": [
       "**/app",
       "**/app/**",
-      "**/mobile-inv",
-      "**/mobile-inv/**"
+      "**/expo",
+      "**/expo/**"
     ]
   },
   "scripts": {
@@ -33,7 +33,8 @@
       "yarn prettier --write"
     ],
     "*.{ts,tsx,js}": [
-      "yarn prettier:fix"
+      "yarn prettier:fix",
+      "yarn lint"
     ],
     "package.json": [
       "yarn prettier --write",

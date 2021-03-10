@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const globalstyles = StyleSheet.create({
+const globalStyles = StyleSheet.create({
   bottomButtons: {
     alignItems: 'flex-end',
   },
@@ -59,4 +59,4 @@ const globalstyles = StyleSheet.create({
   },
 });
 
-export default globalstyles;
+export { globalStyles };
