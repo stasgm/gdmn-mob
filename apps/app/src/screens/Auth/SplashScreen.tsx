@@ -7,7 +7,7 @@ import { globalStyles } from '@lib/mobile-global-styles';
 
 import SubTitle from '../../components/SubTitle';
 // import { useAuth } from '../../context/auth';
-//import globalStyles from '../../styles/global';
+// import globalStyles from '../../styles/global';
 
 type Props = {
   settings: IBaseUrl | undefined;

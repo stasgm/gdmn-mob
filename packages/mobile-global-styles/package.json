@@ -2,7 +2,7 @@
   "name": "@lib/mobile-global-styles",
   "version": "0.1.0",
   "license": "ISC",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "lint": "eslint \"src/**/*.ts*\"",
     "lint:fix": "eslint --fix \"src/**/*.ts\"",
@@ -12,6 +12,7 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "eslint": "^7.21.0",
+    "react": "^17.0.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
     "typescript": "^4.2.2"
   },
@@ -19,6 +20,7 @@
     "@config/eslint-config": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
+    "@types/react": "^17.0.3",
     "@types/react-native": "~0.63.50"
   }
 }
