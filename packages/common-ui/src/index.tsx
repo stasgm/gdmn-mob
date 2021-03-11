@@ -1,8 +1,10 @@
 import React from 'react';
-import { Button } from 'react-native-paper';
+import { Text } from 'react-native';
+// import { Button } from 'react-native-paper';
 
 const CoolButton = () => {
-  return <Button>Кнопочка</Button>;
+  return <Text>ok</Text>;
+  // return <Button>Кнопочка</Button>;
 };
 
 export { CoolButton };

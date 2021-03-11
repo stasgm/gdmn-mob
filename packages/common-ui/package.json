@@ -2,19 +2,5 @@
   "name": "@lib/common-ui",
   "version": "1.0.0",
   "main": "index.ts",
-  "prettier": "@config/prettier-config",
-  "dependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-native-paper": "^4.7.2",
-    "typescript": "^4.2.3"
-  },
-  "devDependencies": {
-    "@config/eslint-config": "*",
-    "@config/eslint-config-react": "*",
-    "@config/eslint-config-react-native": "*",
-    "@config/prettier-config": "*",
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.2"
-  }
+  "prettier": "@config/prettier-config"
 }
