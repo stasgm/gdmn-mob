@@ -15,7 +15,9 @@
     "isolatedModules": true,
     "jsx": "react-native",
     "noEmit": true,
-    "rootDir": "."
+    "outDir": "./dist",
+    "rootDir": ".",
+    "declaration": true,
   },
   "include": ["src", "index.ts"],
   "exclude": ["node_modules", "dist"]
