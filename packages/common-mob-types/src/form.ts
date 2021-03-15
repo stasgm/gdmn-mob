@@ -9,17 +9,9 @@ export interface IListItem {
   [key: string]: unknown;
 }
 
-export interface IFormParams {
-  contact?: number[];
-  dateBegin?: string;
-  dateEnd?: string;
-}
-
 export interface IDocumentParams {
   status: number;
   date?: string;
-  tocontactId?: number;
-  fromcontactId?: number;
   doctype?: number;
   docnumber?: string;
 }
