@@ -14,8 +14,7 @@
     "prettier:fix": "prettier --write \"src/**/*.ts*\"",
     "lint": "eslint \"./src/**/*.ts*\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
-    "postinstall": "expo-yarn-workspaces postinstall"
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
   "prettier": "@config/prettier-config",
   "dependencies": {

@@ -6,8 +6,8 @@ import DrawerNavigator from '../navigation/DrawerNavigator';
 
 const Routes = () => {
   // const { user, device } = useAuth();
-  const user = null;
-  const device = null;
+  /*   const user = null;
+    const device = null; */
 
   return <DrawerNavigator />;
   //  return user && device ? <DrawerNavigator /> : <AuthNavigator />;
