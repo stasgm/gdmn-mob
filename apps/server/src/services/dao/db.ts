@@ -1,4 +1,4 @@
-import { IUser, IMessage, IDevice, IActivationCode, ICompany } from '@lib/types';
+import { IUser, IMessage, IDevice, IActivationCode, ICompany } from '@lib/common-types';
 
 import { Database } from '../../utils/json-db';
 

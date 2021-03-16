@@ -1,4 +1,4 @@
-import { IUser } from '@lib/types';
+import { IUser } from '@lib/common-types';
 
 import { hashPassword } from '../utils/crypt';
 import { makeProfile } from '../utils/user';

@@ -1,4 +1,4 @@
-import { ICompany, IUserProfile } from '@lib/types';
+import { ICompany, IUserProfile } from '@lib/common-types';
 
 import { makeProfile } from '../utils/user';
 

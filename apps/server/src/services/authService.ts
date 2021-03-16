@@ -7,7 +7,7 @@ import { VerifyFunction } from 'passport-local';
 
 import bcrypt from 'bcrypt';
 
-import { IUser } from '@lib/types';
+import { IUser } from '@lib/common-types';
 
 import log from '../utils/logger';
 
