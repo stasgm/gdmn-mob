@@ -1,5 +1,3 @@
-import { IDocument } from './base';
-
 export interface IUserProfile {
   id?: string;
   userName: string;
@@ -24,14 +22,6 @@ export interface IUser {
   phoneNumber?: string;
   creatorId: string;
   role: userRole;
-}
-
-export interface IBaseUrl {
-  protocol: string;
-  server: string;
-  port: number;
-  timeout: number;
-  apiPath: string;
 }
 
 export interface IActivationCode {
@@ -72,18 +62,6 @@ export interface IMessageInfo {
   date: Date;
 }
 
-export interface IDataMessage<T = any> {
-  id: string;
-  name: string;
-  type: string;
-  data: T;
-}
-
-export interface ICmd {
-  name: string;
-  params: IDocument[] | string[] | any;
-}
-
 export interface IMessage<T = any> {
   id?: string;
   head: {
@@ -98,6 +76,13 @@ export interface IMessage<T = any> {
     type: string;
     payload: T;
   };
+}
+
+export interface IDataMessage<T = any> {
+  id: string;
+  name: string;
+  type: string;
+  data: T;
 }
 
 export interface IUserCredentials {

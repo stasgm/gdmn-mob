@@ -10,7 +10,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
-import { IUser } from '@lib/types';
+import { IUser } from '@lib/common-types';
 
 import config from '../config';
 

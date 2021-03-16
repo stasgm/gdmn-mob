@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IResponse, IDevice, IUserCredentials, IUser } from '@lib/types';
+import { IResponse, IDevice, IUserCredentials, IUser } from '@lib/common-types';
 
 import { config, device } from '../screens/Auth/constants';
 

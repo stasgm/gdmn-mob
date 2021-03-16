@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { ICompany, IResponse, IUserProfile } from '@lib/types';
+import { ICompany, IResponse, IUserProfile } from '@lib/common-types';
 
 import log from '../utils/logger';
 import { companyService } from '../services';

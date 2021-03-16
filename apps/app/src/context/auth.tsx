@@ -1,4 +1,5 @@
-import { IBaseUrl, IDevice, IUser, IUserCredentials } from '@lib/types';
+import { IDevice, IUser, IUserCredentials } from '@lib/common-types';
+import { IApiConfig } from '@lib/common-client-types';
 import React, { createContext, useEffect, useContext, useReducer } from 'react';
 
 import { config, user, device } from '../screens/Auth/constants';
@@ -69,7 +70,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     setAuthState({ type: 'SETTINGS_FORM', visible });
   };
 
-  const setSettings = async (settings: IBaseUrl): Promise<void> => {
+  const setSettings = async (settings: IApiConfig): Promise<void> => {
     setAuthState({ type: 'SET_SETTINGS', settings });
   };
 

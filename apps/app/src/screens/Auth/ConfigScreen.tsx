@@ -1,4 +1,4 @@
-import { IBaseUrl } from '@lib/types';
+import { IApiConfig } from '@lib/common-client-types';
 import { useTheme } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, TextInput, StyleSheet } from 'react-native';
@@ -10,8 +10,8 @@ import styles from '../../styles/global';
 import { config } from './constants';
 
 export type Props = {
-  settings: IBaseUrl | undefined;
-  setSettings: (settings: IBaseUrl) => void;
+  settings: IApiConfig | undefined;
+  setSettings: (settings: IApiConfig) => void;
   showSettings: (visible: boolean) => void;
 };
 
@@ -31,7 +31,7 @@ const ConfigScreen = (props: Props) => {
     const protocol: string = config.protocol;
     const server: string = serverName || config.protocol;
 
-    const url: IBaseUrl = {
+    const url: IApiConfig = {
       apiPath: config.apiPath,
       protocol,
       port: parseInt(serverPort, 10),

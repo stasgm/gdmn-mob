@@ -1,4 +1,4 @@
-import { IBaseUrl, IDataFetch } from '@lib/types';
+import { IApiConfig, IDataFetch } from '@lib/common-client-types';
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Text, Button, IconButton, useTheme } from 'react-native-paper';
@@ -10,7 +10,7 @@ import SubTitle from '../../components/SubTitle';
 // import globalStyles from '../../styles/global';
 
 type Props = {
-  settings: IBaseUrl | undefined;
+  settings: IApiConfig | undefined;
   serverReq: IDataFetch;
   checkDevice?: () => void;
   breakConnection?: () => void;
