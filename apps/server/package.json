@@ -19,7 +19,7 @@
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
   },
   "dependencies": {
-    "@lib/types": "*",
+    "@lib/common-types": "*",
     "bcrypt": "^5.0.1",
     "koa": "^2.13",
     "koa-bodyparser": "^4.3",

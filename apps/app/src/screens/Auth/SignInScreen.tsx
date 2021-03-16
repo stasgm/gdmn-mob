@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { Text, TextInput, IconButton, Button, ActivityIndicator, useTheme } from 'react-native-paper';
 
-import { IUserCredentials } from '@lib/types';
+import { IUserCredentials } from '@lib/common-types';
 
 import { useAuth } from '../../context/auth';
 

@@ -4,7 +4,7 @@ import {
   IDevice,
   IActivationCode,
   ICompany,
-} from '@lib/types';
+} from '@lib/common-types';
 
 import { Database } from '../../utils/json-db';
 

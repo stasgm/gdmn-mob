@@ -1,4 +1,5 @@
-import { IBaseUrl, IDataFetch, IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
+import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/common-types';
+import { IApiConfig, IDataFetch } from '@lib/common-client-types';
 
 export interface ILoadingState {
   serverResp: IResponse<IDevice | IUser> | undefined;
@@ -10,14 +11,14 @@ export interface IAuthContextData {
   device: IDevice | null | undefined;
   settingsForm: boolean;
   loading: ILoadingState;
-  settings: IBaseUrl | undefined;
+  settings: IApiConfig | undefined;
   signIn(user: IUserCredentials): Promise<void>;
   signOut(): Promise<void>;
   checkDevice(): Promise<void>;
   activate(code: string): Promise<void>;
   disconnect(): Promise<void>;
   showSettings(visible: boolean): Promise<void>;
-  setSettings(settings: IBaseUrl): Promise<void>;
+  setSettings(settings: IApiConfig): Promise<void>;
 }
 
 const AUTH_CONTEXT_ERROR =
@@ -61,7 +62,7 @@ type Action =
       type: 'LOAD_DATA';
       device: IDevice | null | undefined;
       user: IUser | null | undefined;
-      settings: IBaseUrl | undefined;
+      settings: IApiConfig | undefined;
     }
   | { type: 'SET_DEVICE'; device: IDevice | null }
   | { type: 'SET_DEVICE_ERROR'; text: string }
@@ -69,7 +70,7 @@ type Action =
   | { type: 'SET_USER_ERROR'; text: string }
   | { type: 'SET_CONNECTION' }
   | { type: 'SET_ERROR'; text: string }
-  | { type: 'SET_SETTINGS'; settings: IBaseUrl }
+  | { type: 'SET_SETTINGS'; settings: IApiConfig }
   | { type: 'SETTINGS_FORM'; visible: boolean }
   | { type: 'SET_RESPONSE'; result: boolean; data?: IDevice };
 
