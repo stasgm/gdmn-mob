@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const globalstyles = StyleSheet.create({
+const globalStyles = StyleSheet.create({
   bottomButtons: {
     alignItems: 'flex-end',
   },
@@ -16,9 +16,13 @@ const globalstyles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    //flexDirection: 'column',
     justifyContent: 'center',
     padding: 15,
+    backgroundColor: '#F00',
+  },
+  emptyList: {
+    marginTop: 20,
+    textAlign: 'center',
   },
   input: {
     fontSize: 18,
@@ -32,12 +36,27 @@ const globalstyles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 15,
   },
+  searchBar: {
+    elevation: 0,
+    shadowOpacity: 0,
+  },
   separator: {
     height: StyleSheet.hairlineWidth,
+  },
+  subHeader: {
+    padding: 10,
+  },
+  text: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+  textBold: {
+    fontWeight: 'bold',
   },
   title: {
     textAlign: 'center',
   },
 });
 
-export default globalstyles;
+export { globalStyles };
