@@ -22,6 +22,7 @@
     "@expo/vector-icons": "^12.0.0",
     "@lib/client-api": "1.0.0",
     "@lib/common-client-types": "1.0.0",
+    "@lib/common-mob-auth": "1.0.0",
     "@lib/common-mob-nav": "1.0.0",
     "@lib/common-mob-types": "1.0.0",
     "@lib/common-store": "1.0.0",
