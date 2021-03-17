@@ -10,10 +10,12 @@
     "lint:fix": "eslint --fix \"**/*.ts*\""
   },
   "prettier": "@config/prettier-config",
+  "dependencies": {
+    "@lib/common-types": "1.0.0",
+    "axios": "^0.21.1"
+  },
   "devDependencies": {
     "@config/eslint-config": "1.0.0",
-    "@config/prettier-config": "1.0.0",
-    "@lib/common-types": "1.0.0",
-    "async": "^3.2.0"
+    "@config/prettier-config": "1.0.0"
   }
 }

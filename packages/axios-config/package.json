@@ -1,9 +1,0 @@
-{
-  "name": "@lib/axios-config",
-  "version": "1.0.0",
-  "main": "index.ts",
-  "dependencies": {
-    "axios": "^0.21.1",
-    "typescript": "^4.2.3"
-  }
-}

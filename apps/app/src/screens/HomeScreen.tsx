@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { message } from '@lib/mylib';
-import { login } from '@lib/axios-config';
+import { requests } from '@lib/client-api';
 import { Button } from 'react-native-paper';
 // import { MainContainer } from '@lib/common-ui/primitives/AppView';
-import { CoolButton } from '@lib/common-ui';
+//import { CoolButton } from '@lib/common-ui';
 
 /* interface ChatListProps {
   path?: string;
@@ -26,8 +26,10 @@ const Home = () => {
       <Text style={styles.title}>{message('you', 'hello')}</Text>
       <Text style={styles.title}>Задачи на сегодня:</Text>
       <Text style={styles.text}>На сегодня задач нет</Text>
-      <Button onPress={() => console.log(login('Inna', '123'))}>Подключение</Button>
-      <CoolButton />
+      <Button onPress={() => console.log(requests.auth.login({ userName: 'Inna', password: '123' }))}>
+        Подключение
+      </Button>
+      {/* <CoolButton /> */}
     </View>
   );
 };

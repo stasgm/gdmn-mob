@@ -20,7 +20,7 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@lib/common-types": "*",
+    "@lib/common-types": "1.0.0",
     "bcrypt": "^5.0.1",
     "koa": "^2.13",
     "koa-bodyparser": "^4.3",
