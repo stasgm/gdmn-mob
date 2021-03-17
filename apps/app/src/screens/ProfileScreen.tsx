@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme, Button } from 'react-native-paper';
 
 // import { useAuth } from '@lib/mob-auth';
-import { IUser } from '@lib/types';
+import { IUser } from '@lib/common-types';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();

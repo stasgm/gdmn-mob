@@ -10,7 +10,7 @@ import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-
 import Animated from 'react-native-reanimated';
 
 // import { useAuth } from '@lib/mob-auth';
-import { IUser } from '@lib/types';
+import { IUser } from '@lib/common-types';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
