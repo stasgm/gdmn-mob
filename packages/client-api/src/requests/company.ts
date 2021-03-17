@@ -57,10 +57,7 @@ const getCompany = async (companyId: string) => {
 };
 
 const updateCompany = async (company: Partial<ICompany>) => {
-  const res = await api.patch<IResponse<string>>(
-    `/companies/${company.id}`,
-    company
-  );
+  const res = await api.patch<IResponse<string>>(`/companies/${company.id}`, company);
   const resData = res.data;
 
   if (resData.result) {
@@ -76,9 +73,7 @@ const updateCompany = async (company: Partial<ICompany>) => {
 };
 
 const getUsersByCompany = async (companyId: string) => {
-  const res = await api.get<IResponse<IUser[]>>(
-    `/companies/${companyId}/users`
-  );
+  const res = await api.get<IResponse<IUser[]>>(`/companies/${companyId}/users`);
   const resData = res.data;
 
   if (resData.result) {

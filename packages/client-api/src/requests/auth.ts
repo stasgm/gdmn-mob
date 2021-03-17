@@ -4,12 +4,7 @@ import { api, deviceId } from '../config';
 
 import { INetworkError, authTypes as types } from '../types';
 
-const signup = async (
-  userName: string,
-  password: string,
-  companyId?: string,
-  creatorId?: string
-) => {
+const signup = async (userName: string, password: string, companyId?: string, creatorId?: string) => {
   const body = {
     userName: userName,
     password: password,

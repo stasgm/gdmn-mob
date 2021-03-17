@@ -31,9 +31,7 @@ const addDevice = async (deviceName: string, userId: string) => {
   * @returns
   */
 const getDevices = async (userId?: string) => {
-  const res = await api.get<IResponse<IDevice[]>>(
-    `/devices?${userId ? `userId=${userId}` : ''}`
-  );
+  const res = await api.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
   const resData = res.data;
 
   if (resData.result) {
@@ -56,9 +54,7 @@ const getDevices = async (userId?: string) => {
   * @returns
   */
 const getDevice = async (deviceId: string, userId?: string) => {
-  const res = await api.get<IResponse<IDevice>>(
-    `/devices/${deviceId}${userId ? `userId=${userId}` : ''}`
-  );
+  const res = await api.get<IResponse<IDevice>>(`/devices/${deviceId}${userId ? `userId=${userId}` : ''}`);
   const resData = res.data;
 
   if (resData.result) {
@@ -74,9 +70,7 @@ const getDevice = async (deviceId: string, userId?: string) => {
 };
 
 const getUsersByDevice = async (deviceId: string) => {
-  const res = await api.get<IResponse<IDeviceInfo[]>>(
-    `/devices/${deviceId}/users`
-  );
+  const res = await api.get<IResponse<IDeviceInfo[]>>(`/devices/${deviceId}/users`);
   const resData = res.data;
 
   if (resData.result) {
@@ -92,10 +86,7 @@ const getUsersByDevice = async (deviceId: string) => {
 };
 
 const updateDevice = async (device: Partial<IDevice>) => {
-  const res = await api.patch<IResponse<string>>(
-    `/devices/${device.id}`,
-    device
-  );
+  const res = await api.patch<IResponse<string>>(`/devices/${device.id}`, device);
   const resData = res.data;
 
   if (resData.result) {

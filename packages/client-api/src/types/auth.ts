@@ -1,13 +1,6 @@
 import { IUser } from '@lib/common-types';
 export interface IAuthQueryResponse {
-  type:
-    | 'SIGNUP'
-    | 'LOGIN'
-    | 'LOGOUT'
-    | 'GET_CURRENT_USER'
-    | 'USER_NOT_AUTHENTICATED'
-    | 'GET_CODE'
-    | 'VERIFY_CODE';
+  type: 'SIGNUP' | 'LOGIN' | 'LOGOUT' | 'GET_CURRENT_USER' | 'USER_NOT_AUTHENTICATED' | 'GET_CODE' | 'VERIFY_CODE';
 }
 
 export interface ISignUpResponse extends IAuthQueryResponse {

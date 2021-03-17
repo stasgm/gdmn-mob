@@ -4,12 +4,7 @@ import { INetworkError, messageTypes as types } from '../types';
 
 import { api } from '../config';
 
-const sendMessages = async (
-  systemName: string,
-  companyId: string,
-  consumer: string,
-  message: IMessage['body']
-) => {
+const sendMessages = async (systemName: string, companyId: string, consumer: string, message: IMessage['body']) => {
   const body = {
     head: { companyId, consumer, appSystem: systemName },
     message,
@@ -30,9 +25,7 @@ const sendMessages = async (
 };
 
 const getMessages = async (systemName: string, companyId: string) => {
-  const res = await api.get<IResponse<IMessage[]>>(
-    `/messages/${companyId}/${systemName}`
-  );
+  const res = await api.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemName}`);
   const resData = res.data;
 
   if (resData.result) {
@@ -48,9 +41,7 @@ const getMessages = async (systemName: string, companyId: string) => {
 };
 
 const removeMessage = async (companyId: string, uid: string) => {
-  const res = await api.delete<IResponse<void>>(
-    `/messages/${companyId}/${uid}`
-  );
+  const res = await api.delete<IResponse<void>>(`/messages/${companyId}/${uid}`);
   const resData = res.data;
 
   if (resData.result) {
@@ -80,9 +71,7 @@ const clear = async () => {
 };
 
 const subscribe = async (systemName: string, companyId: string) => {
-  const res = await api.get<IResponse<IMessage[]>>(
-    `/messages/subscribe/${companyId}/${systemName}`
-  );
+  const res = await api.get<IResponse<IMessage[]>>(`/messages/subscribe/${companyId}/${systemName}`);
   const resData = res.data;
 
   if (resData.result) {
@@ -97,16 +86,9 @@ const subscribe = async (systemName: string, companyId: string) => {
   } as INetworkError;
 };
 
-const publish = async (
-  companyId: string,
-  consumer: string,
-  message: IMessage['body']
-) => {
+const publish = async (companyId: string, consumer: string, message: IMessage['body']) => {
   const body = { head: { companyId, consumer }, message };
-  const res = await api.post<IResponse<IMessageInfo>>(
-    `/messages/publish/${companyId}`,
-    body
-  );
+  const res = await api.post<IResponse<IMessageInfo>>(`/messages/publish/${companyId}`, body);
   const resData = res.data;
 
   if (resData.result) {

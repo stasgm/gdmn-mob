@@ -1,13 +1,7 @@
 import { IMessage } from '@lib/common-types';
 
 export interface IMessageQueryResponse {
-  type:
-    | 'SEND_MESSAGE'
-    | 'GET_MESSAGES'
-    | 'REMOVE_MESSAGE'
-    | 'CLEAR_MESSAGES'
-    | 'SUBSCRIBE'
-    | 'PUBLISH';
+  type: 'SEND_MESSAGE' | 'GET_MESSAGES' | 'REMOVE_MESSAGE' | 'CLEAR_MESSAGES' | 'SUBSCRIBE' | 'PUBLISH';
 }
 export interface ISendMessageResponse extends IMessageQueryResponse {
   type: 'SEND_MESSAGE';
