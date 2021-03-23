@@ -13,7 +13,7 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
-    "@expo/webpack-config": "^0.12.61",
+    "@expo/webpack-config": "^0.12.63",
     "@lib/common-store": "*",
     "@lib/common-types": "1.0.0",
     "@react-native-community/async-storage": "^1.12.1",
@@ -25,7 +25,7 @@
     "@react-navigation/stack": "^5.14.3",
     "@types/node": "^14.14.31",
     "@types/react": "~17.0.2",
-    "@types/react-native": "~0.63.50",
+    "@types/react-native": "~0.64.0",
     "@types/react-redux": "^7.1.16",
     "babel-loader": "^8.2.2",
     "expo": "^40.0.1",
@@ -33,11 +33,11 @@
     "expo-asset": "^8.2.2",
     "expo-constants": "~9.3.3",
     "expo-font": "~8.4.0",
-    "react": "17.0.1",
+    "react": "17.0.2",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
     "react-native-paper": "4.7.2",
     "react-native-web": "0.15.0",
-    "react-redux": "^7.2.2",
+    "react-redux": "^7.2.3",
     "typescript": "^4.2.2"
   },
   "devDependencies": {

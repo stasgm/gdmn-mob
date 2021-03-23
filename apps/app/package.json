@@ -29,7 +29,6 @@
     "@lib/common-types": "1.0.0",
     "@lib/common-ui": "1.0.0",
     "@lib/mobile-global-styles": "*",
-    "@lib/mylib": "*",
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.8",
