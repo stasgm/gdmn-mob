@@ -15,20 +15,10 @@
     "moduleResolution": "Node",
     "target": "ES6",
     "downlevelIteration": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "isolatedModules": true,
     "noEmit": true
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
-  "include": [
-    "src/**/*.ts*",
-    ".eslintrc.js"
-  ]
+  "exclude": ["node_modules", "dist", "configs"],
+  "include": ["src/**/*.ts*", ".eslintrc.js"]
 }

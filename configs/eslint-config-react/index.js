@@ -19,6 +19,7 @@ module.exports = {
   },
   rules: {
     'no-use-before-define': 'off',
+    'react/react-in-jsx-scope': 'off',
     'react/jsx-uses-react': 'error',
     'react/jsx-uses-vars': 'error',
     'react/jsx-filename-extension': 'off',

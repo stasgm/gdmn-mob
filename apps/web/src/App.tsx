@@ -2,7 +2,6 @@
 import React, { useReducer, useCallback, useEffect } from 'react';
 
 import { IUser, ICompany, IDeviceInfo } from '@lib/common-types';
-
 import { requests } from '@lib/client-api';
 
 import { Login } from './components/Login';
@@ -894,8 +893,8 @@ const App: React.FC = () => {
           appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE'
             ? () => handleSetAppState('CREATE_CURRENT_DEVICENAME')
             : appState === 'PROFILE' && isAdmin
-            ? () => handleSetAppState('CREATE_DEVICENAME')
-            : undefined
+              ? () => handleSetAppState('CREATE_DEVICENAME')
+              : undefined
         }
         isAdmin={isAdmin}
       />

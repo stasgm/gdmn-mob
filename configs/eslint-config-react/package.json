@@ -1,6 +1,6 @@
 {
   "name": "@config/eslint-config-react",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "My eslint configs for react projects",
   "homepage": "",
   "license": "ISC",
