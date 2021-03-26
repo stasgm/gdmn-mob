@@ -1,5 +1,5 @@
 {
-  "name": "gs_starter_client",
+  "name": "web",
   "version": "0.1.0",
   "description": "Starter kit for React, Webpack (with Hot Module Replacement), Typescript and Babel.",
   "scripts": {
@@ -14,6 +14,9 @@
     "test": "jest --coverage --watchAll --config=configs/jest.json"
   },
   "devDependencies": {
+    "@lib/common-types": "1.0.0",
+    "@lib/client-api": "1.0.0",
+    "office-ui-fabric-react": "^7",
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
@@ -43,8 +46,9 @@
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.7.3"
   },
+  "prettier": "@config/prettier-config",
   "dependencies": {
-    "react-router-dom": "^5.2.0",
-    "styled-components": "^5.2.1"
+    "@config/eslint-config": "1.0.0",
+    "@config/prettier-config": "1.0.0"
   }
 }

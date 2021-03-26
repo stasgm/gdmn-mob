@@ -1,21 +1,34 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    "allowJs": false,
+    "checkJs": false,
+    "composite": true,
+    "declaration": true,
+    "declarationDir": ".",
+    "declarationMap": false,
     "jsx": "react-jsx",
-    "noFallthroughCasesInSwitch": true
+    "allowSyntheticDefaultImports": true,
+    "rootDir": ".",
+    "outDir": "./dist",
+    "module": "ES6",
+    "moduleResolution": "Node",
+    "target": "ES6",
+    "downlevelIteration": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "isolatedModules": true,
+    "noEmit": true
   },
-  "include": ["./src"],
-  "exclude": ["node_modules", "./src/**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src/**/*.ts*",
+    ".eslintrc.js"
+  ]
 }

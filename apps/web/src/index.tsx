@@ -1,8 +1,15 @@
 import React from 'react';
-import { render } from 'react-dom';
+import ReactDOM from 'react-dom';
+
+import './index.css';
+import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
+
 import App from './App';
-import './assets/scss/index.scss';
+// import * as serviceWorker from './serviceWorker';
+initializeIcons();
+ReactDOM.render(<App />, document.getElementById('root'));
 
-const rootEl = document.getElementById('root');
-
-render(<App />, rootEl);
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+// serviceWorker.unregister();
