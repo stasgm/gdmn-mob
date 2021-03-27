@@ -3,4 +3,5 @@
 . "$(dirname "$0")/common.sh"
 
 yarn commitlint --edit $1
-yarn lintstaged
+yarn lint-staged
+yarn lint-staged-project
