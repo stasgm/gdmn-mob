@@ -11,7 +11,7 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@lib/common-types": "1.0.0",
+    "@lib/types": "*",
     "axios": "^0.21.1"
   },
   "devDependencies": {

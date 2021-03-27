@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, IUser } from '@lib/common-types';
+import { IResponse, IUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';

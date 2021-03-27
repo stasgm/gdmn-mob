@@ -1,0 +1,45 @@
+{
+  "name": "@lib/mobile-auth",
+  "version": "1.0.0",
+  "description": "common mobile authentification package",
+  "license": "MIT",
+  "main": "./index.ts",
+  "scripts": {
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\""
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^12.0.0",
+    "@expo/webpack-config": "^0.12.63",
+    "@lib/client-types": "*",
+    "@lib/store": "*",
+    "@lib/types": "*",
+    "@react-navigation/native": "^5.9.3",
+    "@react-navigation/stack": "^5.14.3",
+    "@types/node": "^14.14.36",
+    "@types/react": "~17.0.2",
+    "@types/react-native": "~0.64.1",
+    "@types/react-redux": "^7.1.16",
+    "babel-loader": "^8.2.2",
+    "expo": "^40.0.1",
+    "expo-app-loading": "^1.0.1",
+    "expo-asset": "^8.2.2",
+    "expo-constants": "~9.3.3",
+    "expo-font": "~8.4.0",
+    "react": "17.0.2",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
+    "react-native-paper": "4.7.2",
+    "react-native-web": "0.15.0",
+    "react-redux": "^7.2.3",
+    "typescript": "^4.2.2"
+  },
+  "devDependencies": {
+    "@config/eslint-config": "*",
+    "@config/eslint-config-react": "*",
+    "@config/eslint-config-react-native": "*",
+    "@config/prettier-config": "*"
+  },
+  "prettier": "@config/prettier-config"
+}

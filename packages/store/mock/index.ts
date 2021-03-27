@@ -1,0 +1,40 @@
+import { IBaseUrl, ICompany, IDevice, IUser } from '@lib/types';
+
+export const config: IBaseUrl = {
+  port: 3649,
+  protocol: 'http://',
+  server: '192.168.100.10',
+  apiPath: 'api',
+  timeout: 5000,
+};
+
+export const device: IDevice = {
+  name: 'iPhone',
+  state: 'ACTIVE',
+  uid: '111',
+  userId: '1',
+  id: '111',
+};
+
+export const company: ICompany = {
+  id: '1234',
+  admin: '1',
+  title: 'ОДО Золотые Программы',
+};
+
+export const company2: ICompany = {
+  id: '1232',
+  admin: '1',
+  title: 'ОДО Амперсант',
+};
+
+export const user: IUser = {
+  id: '1',
+  creatorId: '1',
+  password: '1',
+  role: 'Admin',
+  userName: 'Шляхтич Станислав',
+  firstName: 'Станислав',
+  lastName: 'Шляхтич ',
+  companies: ['1234', '1235'],
+};

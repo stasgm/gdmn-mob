@@ -1,4 +1,4 @@
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 export interface IAuthQueryResponse {
   type: 'SIGNUP' | 'LOGIN' | 'LOGOUT' | 'GET_CURRENT_USER' | 'USER_NOT_AUTHENTICATED' | 'GET_CODE' | 'VERIFY_CODE';
 }

@@ -1,4 +1,4 @@
-import { ICompany, IResponse, IUser } from '@lib/common-types';
+import { ICompany, IResponse, IUser } from '@lib/types';
 
 import { INetworkError, companyTypes as types } from '../types';
 

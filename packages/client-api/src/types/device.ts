@@ -1,4 +1,4 @@
-import { IDevice, IDeviceInfo } from '@lib/common-types';
+import { IDevice, IDeviceInfo } from '@lib/types';
 
 export interface IDeviceQueryResponse {
   type:

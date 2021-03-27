@@ -1,4 +1,4 @@
-import { IMessage, IMessageInfo, IResponse } from '@lib/common-types';
+import { IMessage, IMessageInfo, IResponse } from '@lib/types';
 
 import { INetworkError, messageTypes as types } from '../types';
 

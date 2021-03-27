@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid';
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IMessage } from '@lib/common-types';
+import { IResponse, IMessage } from '@lib/types';
 
 import log from '../utils/logger';
 import { messageService, companyService, userService } from '../services';

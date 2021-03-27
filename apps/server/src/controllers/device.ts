@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IDevice, IResponse, IDeviceInfo } from '@lib/common-types';
+import { IDevice, IResponse, IDeviceInfo } from '@lib/types';
 
 import log from '../utils/logger';
 import { deviceService } from '../services';
