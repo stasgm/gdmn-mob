@@ -40,7 +40,7 @@ const RootNavigator = () => {
     <RootStack.Navigator
       initialRouteName="Dashboard"
       headerMode="screen"
-      screenOptions={{ header: props => <Header {...props} /> }}
+      screenOptions={{ header: (props) => <Header {...props} /> }}
     >
       <RootStack.Screen name="Dashboard" component={DashboardNavigator} options={{ title: 'Дашборд' }} />
       <RootStack.Screen name="Documents" component={DocumentsNavigator} options={{ title: 'Документы' }} />

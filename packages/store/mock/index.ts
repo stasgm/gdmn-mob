@@ -1,6 +1,7 @@
-import { IBaseUrl, ICompany, IDevice, IUser } from '@lib/types';
+import { ICompany, IDevice, IUser } from '@lib/types';
+import { IApiConfig } from '@lib/client-types';
 
-export const config: IBaseUrl = {
+export const config: IApiConfig = {
   port: 3649,
   protocol: 'http://',
   server: '192.168.100.10',

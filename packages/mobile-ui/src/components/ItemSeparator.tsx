@@ -1,11 +1,11 @@
-import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 const ItemSeparator = () => {
   const { colors } = useTheme();
 
-  return <View style={[styles.separator, { backgroundColor: colors.border }]} />;
+  return <View style={[styles.separator, { backgroundColor: colors.primary }]} />;
 };
 
 export { ItemSeparator };

@@ -22,7 +22,7 @@ const ActivationScreen = (props: Props) => {
     () => ({
       isError: error,
       isLoading: loading,
-      status: status,
+      status,
     }),
     [error, loading, status],
   );
@@ -62,7 +62,7 @@ const ActivationScreen = (props: Props) => {
                 backgroundColor: colors.background,
               }}
             >
-              {request.isError && <Text style={styles.errorText}>Ошибка: {request.status}</Text>}
+              {request.isError && <Text style={styles.errorText}>Ошибка:{request.status}</Text>}
               {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
             </View>
             <TextInput
@@ -78,7 +78,7 @@ const ActivationScreen = (props: Props) => {
             <Button
               mode="contained"
               disabled={request.isLoading}
-              icon={'login'}
+              icon="login"
               onPress={handleActivate}
               style={globalStyles.rectangularButton}
             >

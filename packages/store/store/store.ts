@@ -5,6 +5,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import rootReducer from './rootReducer';
 import { IAuthState } from './auth/types';
+
 export { RootState } from './rootReducer';
 
 export type IState = IAuthState;

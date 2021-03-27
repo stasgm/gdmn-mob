@@ -11,7 +11,7 @@ const initialState: Readonly<IAuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
-  settings: config, //TODO исправить
+  settings: config, // TODO исправить
   error: false,
   loading: false,
   status: '',

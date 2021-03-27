@@ -29,7 +29,7 @@ type Props = {
 
 const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
-  const { colors } = useTheme(); //TODO Вынести в ui
+  const { colors } = useTheme(); // TODO Вынести в ui
 
   const { error, loading, status } = useSelector((state: RootState) => state.auth);
 
@@ -37,7 +37,7 @@ const SignInScreen = (props: Props) => {
     () => ({
       isError: error,
       isLoading: loading,
-      status: status,
+      status,
     }),
     [error, loading, status],
   );
@@ -81,7 +81,7 @@ const SignInScreen = (props: Props) => {
               underlineColorAndroid="transparent"
               placeholder="Имя пользователя"
               value={credential.userName}
-              onChangeText={val => setCredentials({ ...credential, userName: val })}
+              onChangeText={(val) => setCredentials({ ...credential, userName: val })}
               style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
             />
             <TextInput
@@ -91,7 +91,7 @@ const SignInScreen = (props: Props) => {
               placeholder="Пароль"
               secureTextEntry
               value={credential.password}
-              onChangeText={val => setCredentials({ ...credential, password: val })}
+              onChangeText={(val) => setCredentials({ ...credential, password: val })}
               style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
             />
             <Button
@@ -105,7 +105,7 @@ const SignInScreen = (props: Props) => {
             </Button>
           </View>
           <View style={style.statusBox}>
-            {request.isError && <Text style={style.errorText}>Ошибка: {request.status}</Text>}
+            {request.isError && <Text style={style.errorText}>Ошибка:{request.status}</Text>}
             {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
         </KeyboardAvoidingView>

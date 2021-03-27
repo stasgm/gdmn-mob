@@ -45,15 +45,15 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       drawerContentOptions={{ activeBackgroundColor: colors.primary, activeTintColor: '#ffffff' }}
-      drawerContent={props => <DrawerContent {...props} />}
-      screenOptions={{ headerShown: true, header: props => <Header {...props} /> }}
+      drawerContent={(props) => <DrawerContent {...props} />}
+      screenOptions={{ headerShown: true, header: (props) => <Header {...props} /> }}
     >
       <Drawer.Screen
         name="Dashboard"
         component={DashboardNavigator}
         options={{
           title: 'Дашборд',
-          drawerIcon: props => <Icon name="view-dashboard-outline" {...props} />,
+          drawerIcon: (props) => <Icon name="view-dashboard-outline" {...props} />,
         }}
       />
       <Drawer.Screen
@@ -61,7 +61,7 @@ const DrawerNavigator = () => {
         component={DocumentsNavigator}
         options={{
           title: 'Документы',
-          drawerIcon: props => <Icon name="file-document-outline" {...props} />,
+          drawerIcon: (props) => <Icon name="file-document-outline" {...props} />,
         }}
       />
       <Drawer.Screen
@@ -69,7 +69,7 @@ const DrawerNavigator = () => {
         component={ReferencesNavigator}
         options={{
           title: 'Справочники',
-          drawerIcon: props => <Icon name="book-multiple-outline" {...props} />,
+          drawerIcon: (props) => <Icon name="book-multiple-outline" {...props} />,
         }}
       />
       <Drawer.Screen
@@ -77,7 +77,7 @@ const DrawerNavigator = () => {
         component={SettingsNavigator}
         options={{
           title: 'Настройки',
-          drawerIcon: props => <Icon name="tune" {...props} />,
+          drawerIcon: (props) => <Icon name="tune" {...props} />,
         }}
       />
       <Drawer.Screen
@@ -85,7 +85,7 @@ const DrawerNavigator = () => {
         component={MapScreen}
         options={{
           title: 'Карта',
-          drawerIcon: props => <Icon name="map-outline" {...props} />,
+          drawerIcon: (props) => <Icon name="map-outline" {...props} />,
         }}
       />
       <Drawer.Screen
@@ -93,7 +93,7 @@ const DrawerNavigator = () => {
         component={ProfileScreen}
         options={{
           title: 'Профиль',
-          drawerIcon: props => <Icon name="account-circle-outline" {...props} />,
+          drawerIcon: (props) => <Icon name="account-circle-outline" {...props} />,
         }}
       />
     </Drawer.Navigator>

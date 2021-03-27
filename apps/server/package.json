@@ -21,6 +21,7 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@lib/types": "*",
+    "@koa/cors": "^3.1",
     "bcrypt": "^5.0.1",
     "koa": "^2.13",
     "koa-bodyparser": "^4.3",
@@ -37,7 +38,6 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "@koa/cors": "^3.1",
     "@types/bcrypt": "^3.0.0",
     "@types/jest": "^26.0.22",
     "@types/koa": "^2.13",

@@ -1,7 +1,7 @@
 import { TouchableHighlight } from '@gorhom/bottom-sheet';
-import { useTheme } from '@react-navigation/native';
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 type IListItem = {
   id: number;
@@ -19,7 +19,7 @@ const RadioGroup = ({ horizontal = false, options, onChange, activeButtonId }: P
   const { colors } = useTheme();
 
   const onPress = useCallback(
-    option => {
+    (option) => {
       if (option.id === activeButtonId) {
         return;
       }
@@ -31,7 +31,7 @@ const RadioGroup = ({ horizontal = false, options, onChange, activeButtonId }: P
   return (
     <View style={styles.container}>
       <View>
-        {options.map(option => {
+        {options.map((option) => {
           return (
             <TouchableHighlight
               activeOpacity={0.6}
@@ -49,7 +49,7 @@ const RadioGroup = ({ horizontal = false, options, onChange, activeButtonId }: P
                 <View
                   style={[
                     styles.radioCircle,
-                    { borderColor: activeButtonId === option.id ? colors.primary : colors.border },
+                    { borderColor: activeButtonId === option.id ? colors.primary : colors.primary },
                   ]}
                 >
                   {activeButtonId === option.id && (

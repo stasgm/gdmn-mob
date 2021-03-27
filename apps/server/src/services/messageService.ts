@@ -19,7 +19,7 @@ const findAll = async () => {
  * */
 const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
   return (await messages.read()).filter(
-    i => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
+    (i) => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
   );
 };
 
@@ -30,12 +30,12 @@ const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; c
  * @return id, идентификатор сообщения
  * */
 
-const addOne = async (msgObject: IMessage) => {
-  if (await messages.find(i => i.head.id === msgObject.head.id)) {
+const addOne = async (msgObject: IMessage): Promise<string> => {
+  if (await messages.find((i) => i.head.id === msgObject.head.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
   }
 
-  return await messages.insert(msgObject);
+  return messages.insert(msgObject);
 };
 
 /**
@@ -43,19 +43,20 @@ const addOne = async (msgObject: IMessage) => {
  * @param {IMessage} message - сообщение
  * @return id, идентификатор сообщения
  * */
-const updateOne = async (message: IMessage) => {
-  const oldMessage = await messages.find(i => i.id === message.id);
+const updateOne = async (message: IMessage): Promise<string> => {
+  const oldMessage = await messages.find((i) => i.id === message.id);
 
   if (!oldMessage) {
     throw new Error('сообщение не найдено');
   }
 
   // Удаляем поля которые нельзя перезаписывать
+  // eslint-disable-next-line no-param-reassign
   delete message.id;
 
   await messages.update({ ...oldMessage, ...message });
 
-  return message.id;
+  return message.id!;
 };
 
 /**
@@ -85,7 +86,7 @@ const deleteByUid = async ({
   userId: string;
 }): Promise<void> => {
   const messageObj = await messages.find(
-    message => message.head.companyid === companyId && message.head.consumer === userId && message.head.id === uid,
+    (message) => message.head.companyid === companyId && message.head.consumer === userId && message.head.id === uid,
   );
 
   if (!messageObj) {

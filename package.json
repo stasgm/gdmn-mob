@@ -19,6 +19,8 @@
     "build:lib": "lerna run --scope=@lib/* build --stream --",
     "clean": "lerna clean",
     "clean:all": "yarn clean:node-modules && yarn clean:expo-cache",
+    "clean:node-modules": "rimraf node_modules packages/*/node_modules apps/*/node_modules configs/*/node_modules",
+    "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
     "new-version": "lerna version --conventional-commits --yes",
     "diff": "lerna diff",
     "upg": "yarn upgrade-interactive --latest",

@@ -9,11 +9,11 @@ import { authActions } from './actions';
 import { DevicePayload, IAuthState, UserPayload } from './types';
 
 function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
-  return async dispatch => {
+  return async (dispatch) => {
     let response: DevicePayload = { deviceData: device };
 
     dispatch(authActions.checkDeviceAsync.request(''));
@@ -35,7 +35,7 @@ const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
 };
 
 const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, AnyAction> => {
-  return async dispatch => {
+  return async (dispatch) => {
     let response: DevicePayload;
 
     dispatch(authActions.activateDeviceAsync.request(''));
@@ -59,7 +59,7 @@ const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, An
 };
 
 const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
-  return async dispatch => {
+  return async (dispatch) => {
     let response: UserPayload;
 
     dispatch(authActions.loginUserAsync.request(''));

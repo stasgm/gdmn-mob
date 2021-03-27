@@ -17,14 +17,14 @@ const addOne = async (company: ICompany): Promise<string> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  if (await companies.find(el => el.title === company.title)) {
+  if (await companies.find((el) => el.title === company.title)) {
     throw new Error('организация уже существует');
   }
   const id = await companies.insert(company);
 
   await addCompanyToUser(company.admin, company.title);
 
-  const userId = await users.find(i => i.userName === 'gdmn');
+  const userId = await users.find((i) => i.userName === 'gdmn');
 
   if (userId.id) {
     await addCompanyToUser(userId.id, company.title);
@@ -54,7 +54,7 @@ const findOne = async (id: string): Promise<ICompany> => {
  * @return company, организация
  * */
 const findOneByName = async (name: string): Promise<ICompany> => {
-  const company = await companies.find(i => i.title === name);
+  const company = await companies.find((i) => i.title === name);
 
   if (!company) {
     throw new Error('организация не найдена');
@@ -114,8 +114,8 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
 
   // TODO заменить на company.title на companyId
   return (await users.read())
-    .filter(el => el.companies?.some((i: string) => i === company.title))
-    .map(el => makeProfile(el));
+    .filter((el) => el.companies?.some((i: string) => i === company.title))
+    .map((el) => makeProfile(el));
 };
 
 export { findOne, findAll, addOne, updateOne, deleteOne, findUsers, findOneByName };

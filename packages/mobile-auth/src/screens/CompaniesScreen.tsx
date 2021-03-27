@@ -95,35 +95,33 @@ const CompaniesScreen = (props: Props) => {
         <SubTitle>Выбор организации</SubTitle>
         <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
           <RadioButton.Group
-            onValueChange={value => setSelectedCompany(companies.find(i => i.id === value))}
+            onValueChange={(value) => setSelectedCompany(companies.find((i) => i.id === value))}
             value={selectedCompany?.id || ''}
           >
             {companies?.length > 0 &&
-              companies.map(el => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => setSelectedCompany(el)}
-                    key={el.id}
-                    style={[
-                      {
-                        backgroundColor: selectedCompany === el ? colors.primary : colors.background,
-                      },
-                      localStyles.item,
-                    ]}
-                  >
-                    <View style={localStyles.row}>
-                      <RadioButton value={el.id} color={colors.background} />
-                      <Text
-                        style={{
-                          color: selectedCompany === el ? colors.background : colors.text,
-                        }}
-                      >
-                        {el.title}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
+              companies.map((el) => (
+                <TouchableOpacity
+                  onPress={() => setSelectedCompany(el)}
+                  key={el.id}
+                  style={[
+                    {
+                      backgroundColor: selectedCompany === el ? colors.primary : colors.background,
+                    },
+                    localStyles.item,
+                  ]}
+                >
+                  <View style={localStyles.row}>
+                    <RadioButton value={el.id} color={colors.background} />
+                    <Text
+                      style={{
+                        color: selectedCompany === el ? colors.background : colors.text,
+                      }}
+                    >
+                      {el.title}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
           </RadioButton.Group>
         </ScrollView>
         <View style={localStyles.buttonView}>

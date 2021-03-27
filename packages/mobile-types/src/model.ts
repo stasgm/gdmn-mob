@@ -7,7 +7,7 @@ export interface IMGoodData<T = unknown> {
 }
 
 export interface IModel<T = IModelData> {
-  //id: number;
+  // id: number;
   name: string;
   type: string;
   data: T;

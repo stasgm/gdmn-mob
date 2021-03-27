@@ -1,1 +1,1 @@
-export { AuthNavigator } from './src/navigation/AuthNavigator';
+export * as AuthNavigator from './src/navigation/AuthNavigator';

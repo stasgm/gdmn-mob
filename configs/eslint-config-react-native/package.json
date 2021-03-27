@@ -1,7 +1,7 @@
 {
   "name": "@config/eslint-config-react-native",
   "version": "1.0.0",
-  "description": "ESlint configs for react-native projects",
+  "description": "ESlint config for react-native projects",
   "license": "MIT",
   "main": "index.js",
   "dependencies": {

@@ -1,8 +1,8 @@
 import { IApiConfig } from '@lib/client-types';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Platform, TextInput, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, useTheme } from 'react-native-paper';
 
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle } from '@lib/mobile-ui/src/components';
@@ -50,19 +50,19 @@ const ConfigScreen = (props: Props) => {
         value={serverName}
         onChangeText={setServerName}
         placeholder="Адрес сервера"
-        style={[globalStyles.input, { backgroundColor: colors.card, color: colors.text }]}
+        style={[globalStyles.input, { backgroundColor: colors.background, color: colors.text }]}
       />
       <TextInput
         value={serverPort}
         onChangeText={setServerPort}
         placeholder="Порт"
-        style={[globalStyles.input, { backgroundColor: colors.card, color: colors.text }]}
+        style={[globalStyles.input, { backgroundColor: colors.background, color: colors.text }]}
       />
       <TextInput
         value={timeout}
         onChangeText={setTimeout}
         placeholder="Варемя ожидания, м\с"
-        style={[globalStyles.input, { backgroundColor: colors.card, color: colors.text }]}
+        style={[globalStyles.input, { backgroundColor: colors.background, color: colors.text }]}
       />
       <View style={localStyles.buttonsView}>
         <Button

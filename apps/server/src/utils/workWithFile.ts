@@ -2,7 +2,7 @@
 import { promises } from 'fs';
 import path from 'path';
 
-import log from '../utils/logger';
+import log from './logger';
 
 export const readFile = async <T>(filename: string): Promise<T | undefined> => {
   try {

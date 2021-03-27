@@ -18,19 +18,19 @@ const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply }: 
   return (
     <View>
       <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
-        <View style={localStyles.container}>
-          <View style={localStyles.headerContainer}>
+        <View style={styles.container}>
+          <View style={styles.headerContainer}>
             <TouchableOpacity onPress={handelDismiss}>
               <MaterialCommunityIcons name={'close'} color={'#000'} size={24} />
             </TouchableOpacity>
-            <Text style={localStyles.text}>{title}</Text>
+            <Text style={styles.text}>{title}</Text>
             <TouchableOpacity onPress={handelApply}>
               <MaterialCommunityIcons name={'check'} color={'#000'} size={24} />
             </TouchableOpacity>
           </View>
           <ItemSeparator />
         </View>
-        <BottomSheetScrollView style={localStyles.content}>
+        <BottomSheetScrollView style={styles.content}>
           <View>{children}</View>
         </BottomSheetScrollView>
       </BottomSheetModal>
@@ -38,7 +38,7 @@ const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply }: 
   );
 };
 
-const localStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     marginHorizontal: 10,
   },

@@ -1,7 +1,7 @@
-import { ConfigScreen } from '../screens/ConfigScreen';
-import { ActivationScreen } from '../screens/ActivationScreen';
-import { SignInScreen } from '../screens/SignInScreen';
-import { SplashScreen } from '../screens/SplashScreen';
-import { CompaniesScreen } from '../screens/CompaniesScreen';
+import { ConfigScreen } from './ConfigScreen';
+import { ActivationScreen } from './ActivationScreen';
+import { SignInScreen } from './SignInScreen';
+import { SplashScreen } from './SplashScreen';
+import { CompaniesScreen } from './CompaniesScreen';
 
 export { ActivationScreen, SplashScreen, CompaniesScreen, ConfigScreen, SignInScreen };

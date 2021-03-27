@@ -40,7 +40,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
 /** Проверка текущего пользователя в сессии koa */
 const getCurrentUser = (ctx: ParameterizedContext): void => {
-  const user = ctx.state.user;
+  const { user } = ctx.state;
 
   delete user.password;
 
@@ -53,7 +53,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 };
 
 const logOut = (ctx: Context): void => {
-  const user = ctx.state.user;
+  const { user } = ctx.state;
 
   ctx.logout();
 
