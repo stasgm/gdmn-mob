@@ -27,5 +27,6 @@ module.exports = {
     'padded-blocks': 'off',
     'arrow-body-style': 'off',
     'react-hooks/exhaustive-deps': 'warn',
+    'jsx-a11y/no-autofocus': 'off',
   },
 };

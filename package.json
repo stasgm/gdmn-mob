@@ -31,10 +31,7 @@
     "*.yml": [
       "yarn prettier --write"
     ],
-    "*.{ts,tsx,js}": [
-      "yarn prettier:fix",
-      "yarn lint"
-    ],
+    "*.{ts,tsx,js}": [],
     "package.json": [
       "yarn prettier --write",
       "yarn sort-package-json"
