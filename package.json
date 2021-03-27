@@ -23,8 +23,8 @@
     "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
     "new-version": "lerna version --conventional-commits --yes",
     "diff": "lerna diff",
-    "upg": "yarn upgrade-interactive --latest",
-    "upgrade": "lerna exec --scope @lib/* @apps/* -- yarn upgrade-interactive --latest",
+    "upgrade": "yarn upgrade-interactive --latest",
+    "lintstaged": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
     "postinstall": "husky install"
   },
   "lint-staged": {

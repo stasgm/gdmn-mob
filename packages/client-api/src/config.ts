@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-export const deviceId = '123';
+export const deviceId = '123-456-789';
 export const systemName = 'Inventory';
+
 const PROTOCOL = 'http';
 const HOST = 'localhost';
 const PORT = '3649';
