@@ -1,1 +1,1 @@
-export * as AuthNavigator from './src/navigation/AuthNavigator';
+export { default as AuthNavigator } from './src/navigation/AuthNavigator';

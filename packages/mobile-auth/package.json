@@ -17,6 +17,7 @@
       "yarn lint"
     ]
   },
+  "prettier": "@config/prettier-config",
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
     "@expo/webpack-config": "^0.12.63",
@@ -47,7 +48,7 @@
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
-    "@config/prettier-config": "*"
-  },
-  "prettier": "@config/prettier-config"
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
+  }
 }

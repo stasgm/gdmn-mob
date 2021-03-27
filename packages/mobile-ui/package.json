@@ -8,7 +8,14 @@
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
-    "lint:fix": "eslint --fix \"**/*.ts*\""
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
@@ -28,19 +35,13 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
     "react-native-paper": "^4.7.2",
     "react-native-web": "0.15.0",
-    "typescript": "^4.2.2",
-    "precommit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "yarn prettier:fix",
-      "yarn lint"
-    ]
+    "typescript": "^4.2.2"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
-    "@config/prettier-config": "*"
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
   }
 }

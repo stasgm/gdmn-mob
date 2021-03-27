@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@config/eslint-config": "*",
-    "@config/prettier-config": "*"
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
   }
 }

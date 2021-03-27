@@ -8,7 +8,14 @@
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
-    "lint:fix": "eslint --fix \"**/*.ts*\""
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
@@ -40,17 +47,11 @@
     "react-native-reanimated": "^2.0.0",
     "react-native-web": "0.15.0",
     "react-redux": "^7.2.3",
-    "typescript": "^4.2.2",
-    "precommit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "yarn prettier:fix",
-      "yarn lint"
-    ]
+    "typescript": "^4.2.2"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
-    "@config/prettier-config": "*"
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
   }
 }
