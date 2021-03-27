@@ -21,17 +21,11 @@
     "clean:all": "yarn clean:node-modules && yarn clean:expo-cache",
     "clean:node-modules": "rimraf node_modules packages/*/node_modules apps/*/node_modules configs/*/node_modules",
     "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
-    "new-version": "lerna version --conventional-commits --yes",
-    "diff": "lerna diff",
     "upgrade": "yarn upgrade-interactive --latest",
     "lintstaged": "lerna run --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
     "postinstall": "husky install"
   },
   "lint-staged": {
-    "*.yml": [
-      "yarn prettier --write"
-    ],
-    "*.{ts,tsx,js}": [],
     "package.json": [
       "yarn prettier --write",
       "yarn sort-package-json"

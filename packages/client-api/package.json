@@ -14,10 +14,6 @@
     "*.{ts,tsx}": [
       "yarn prettier:fix",
       "yarn lint"
-    ],
-    "package.json": [
-      "yarn prettier --write",
-      "yarn sort-package-json"
     ]
   },
   "prettier": "@config/prettier-config",
@@ -26,7 +22,7 @@
     "axios": "^0.21.1"
   },
   "devDependencies": {
-    "@config/eslint-config": "1.0.0",
-    "@config/prettier-config": "1.0.0"
+    "@config/eslint-config": "*",
+    "@config/prettier-config": "*"
   }
 }

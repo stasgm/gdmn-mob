@@ -22,7 +22,14 @@
     "redux-thunk": "^2.3.0",
     "reselect": "4.0.0",
     "typesafe-actions": "^5.1.0",
-    "redux-devtools-extension": "^2.13.9"
+    "redux-devtools-extension": "^2.13.9",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
   },
   "devDependencies": {
     "@config/eslint-config": "*",

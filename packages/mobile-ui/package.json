@@ -28,7 +28,14 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
     "react-native-paper": "^4.7.2",
     "react-native-web": "0.15.0",
-    "typescript": "^4.2.2"
+    "typescript": "^4.2.2",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
   },
   "devDependencies": {
     "@config/eslint-config": "*",
