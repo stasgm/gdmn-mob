@@ -1,4 +1,4 @@
-import { IDevice, IResponse } from '@lib/common-types';
+import { IDevice, IResponse } from '@lib/types';
 
 import { INetworkError, deviceTypes } from '../types';
 

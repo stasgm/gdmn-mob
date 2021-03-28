@@ -5,13 +5,13 @@ module.exports = {
     es6: true,
     node: true,
   },
-  plugins: ['react', 'react-hooks'],
+  plugins: ['react', 'react-hooks', 'jsx-a11y'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true, // Allows for the parsing of JSX
     },
   },
-  extends: ['plugin:react/recommended'],
+  extends: ['plugin:react/recommended', 'plugin:jsx-a11y/recommended'],
   settings: {
     react: {
       version: 'detect',
@@ -28,5 +28,6 @@ module.exports = {
     'padded-blocks': 'off',
     'arrow-body-style': 'off',
     'react-hooks/exhaustive-deps': 'warn',
+    'jsx-a11y/no-autofocus': 'off',
   },
 };

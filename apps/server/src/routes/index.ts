@@ -9,8 +9,11 @@ import Test from './test.router';
 
 const rootRouter = new Router({ prefix: '/api' });
 
-for (const route of [Auth, Company, Device, User, Message, Test]) {
-  rootRouter.use(route.routes());
-}
+rootRouter.use(Auth.routes());
+rootRouter.use(Company.routes());
+rootRouter.use(Device.routes());
+rootRouter.use(User.routes());
+rootRouter.use(Message.routes());
+rootRouter.use(Test.routes());
 
 export default rootRouter;

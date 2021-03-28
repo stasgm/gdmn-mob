@@ -1,4 +1,4 @@
-import { IResponse, IUser, IUserCredentials } from '@lib/common-types';
+import { IResponse, IUser, IUserCredentials } from '@lib/types';
 
 import { api, deviceId } from '../config';
 

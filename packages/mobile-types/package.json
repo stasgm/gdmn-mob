@@ -1,0 +1,28 @@
+{
+  "name": "@lib/mobile-types",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "./index.ts",
+  "scripts": {
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "prettier": "@config/prettier-config",
+  "dependencies": {
+    "@lib/client-types": "*"
+  },
+  "devDependencies": {
+    "@config/eslint-config": "*",
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
+  }
+}

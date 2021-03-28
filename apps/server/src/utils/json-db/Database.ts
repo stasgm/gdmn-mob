@@ -10,6 +10,7 @@ import { CollectionItem } from './CollectionItem';
 
 class Database {
   private dbPath: string;
+
   /**
    *
    * @param {string} name

@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 import { StyleSheet } from 'react-native';
@@ -7,6 +7,7 @@ import Home from '../../screens/HomeScreen';
 
 export type TabsStackParams = {
   Main: undefined;
+  Tasks: undefined;
 };
 
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
@@ -18,29 +19,20 @@ const TabsNavigator = () => {
         name="Main"
         component={Home}
         options={{
-          title: 'Главное',
-          tabBarLabel: 'Главное',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="home-circle-outline" color={color} />,
-        }}
-      />
-      {/*       <TabsStack.Screen
-        name="References"
-        component={ReferencesNavigator}
-        options={{
-          title: 'Справочники',
-          tabBarLabel: 'Справочники',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="book-multiple-outline" color={color} />,
+          title: 'Дела',
+          tabBarLabel: 'Дела',
+          tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="copy" color={color} />,
         }}
       />
       <TabsStack.Screen
-        name="Sync"
-        component={Settings}
+        name="Tasks"
+        component={Home}
         options={{
-          title: 'Обмен',
-          tabBarLabel: 'Обмен',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons size={26} name="sync" color={color} />,
+          title: 'Задачи',
+          tabBarLabel: 'Задачи',
+          tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="tasks" color={color} />,
         }}
-      /> */}
+      />
     </TabsStack.Navigator>
   );
 };

@@ -1,4 +1,4 @@
-import { IMessage } from '@lib/common-types';
+import { IMessage } from '@lib/types';
 
 export interface IMessageQueryResponse {
   type: 'SEND_MESSAGE' | 'GET_MESSAGES' | 'REMOVE_MESSAGE' | 'CLEAR_MESSAGES' | 'SUBSCRIBE' | 'PUBLISH';

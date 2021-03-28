@@ -7,15 +7,23 @@
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
-    "lint:fix": "eslint --fix \"**/*.ts*\""
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@lib/common-types": "1.0.0",
+    "@lib/types": "*",
     "axios": "^0.21.1"
   },
   "devDependencies": {
-    "@config/eslint-config": "1.0.0",
-    "@config/prettier-config": "1.0.0"
+    "@config/eslint-config": "*",
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
   }
 }
