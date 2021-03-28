@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PrimaryButton, Stack, TextField, Text } from 'office-ui-fabric-react';
 
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 export interface IUserProps {
   user: IUser;
@@ -93,7 +93,7 @@ export const User = ({
                   onCreateProfile(state);
                 } else if (onEditProfile) {
                   const partialUser: Partial<IUser> = (Object.keys(state) as (keyof IUser)[])
-                    .filter(key => user[key] !== state[key])
+                    .filter((key) => user[key] !== state[key])
                     .reduce((partialObj, key) => {
                       partialObj[key] = state[key];
                       return partialObj;

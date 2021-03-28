@@ -23,6 +23,11 @@ export const Login = ({
   const [userName_state, setUserName] = useState(userName ?? '');
   const [password_state, setPassword] = useState(password ?? '');
 
+  const handleSignUp = () => {
+    onClearError();
+    onSetSignUp();
+  };
+
   return (
     <div>
       <Stack horizontalAlign="center">
@@ -49,10 +54,10 @@ export const Login = ({
             }}
           />
           <div
-            onClick={() => {
-              onClearError();
-              onSetSignUp();
-            }}
+            onClick={handleSignUp}
+            onKeyPress={handleSignUp}
+            role="button"
+            tabIndex={0}
             style={{
               width: '100%',
               float: 'right',

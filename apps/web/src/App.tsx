@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars-experimental */
 import React, { useReducer, useCallback, useEffect } from 'react';
 
-import { IUser, ICompany, IDevice } from '@lib/common-types';
+import { IUser, ICompany, IDevice } from '@lib/types';
 import { requests } from '@lib/client-api';
 
 import { Login } from './components/Login';
@@ -120,7 +120,8 @@ const reducer = (state: IState, action: Action): IState => {
       return {
         ...state,
         appState: action.appState,
-        //  needReReadCompanies: state.needReReadCompanies || (state.appState !== action.appState && (action.appState === 'LOGIN' ))
+        //  needReReadCompanies: state.needReReadCompanies || (state.appState
+        //!== action.appState && (action.appState === 'LOGIN' ))
       };
     }
     case 'SET_ERROR': {
@@ -187,7 +188,7 @@ const reducer = (state: IState, action: Action): IState => {
       const { companyId, companyName } = action;
       return {
         ...state,
-        companies: state.companies?.map(comp => (comp.id === companyId ? { ...comp, companyName } : comp)),
+        companies: state.companies?.map((comp) => (comp.id === companyId ? { ...comp, companyName } : comp)),
       };
     }
     case 'SET_COMPANIES': {
@@ -198,7 +199,7 @@ const reducer = (state: IState, action: Action): IState => {
        */
 
       const { companies } = action;
-      const isAdmin = companies?.some(c => c.admin === (state.user?.id || ''));
+      const isAdmin = companies?.some((c) => c.admin === (state.user?.id || ''));
       return {
         ...state,
         companies,
@@ -263,7 +264,7 @@ const reducer = (state: IState, action: Action): IState => {
     case 'UPDATE_CURRENT_DEVICE': {
       const { device } = action;
       const { currentDevices } = state;
-      const idx = currentDevices?.findIndex(item => item.id === device.id);
+      const idx = currentDevices?.findIndex((item) => item.id === device.id);
       if (currentDevices && idx !== undefined && idx > -1) {
         return {
           ...state,
@@ -280,7 +281,7 @@ const reducer = (state: IState, action: Action): IState => {
       if (currentDevices) {
         return {
           ...state,
-          currentDevices: currentDevices.filter(item => item.id !== id),
+          currentDevices: currentDevices.filter((item) => item.id !== id),
         };
       } else {
         return state;
@@ -368,7 +369,7 @@ const App = () => {
     if (data.type === 'ERROR') {
       dispatch({ type: 'SET_ERROR', errorMessage: data.message });
     } else if (data.type === 'GET_USERS') {
-      dispatch({ type: 'SET_ALL_USERS', allUsers: data.users.filter(u => u.id !== user?.id) });
+      dispatch({ type: 'SET_ALL_USERS', allUsers: data.users.filter((u) => u.id !== user?.id) });
       dispatch({ type: 'SET_STATE', appState: 'ADD_USER_FROM_SYSTEM' });
     }
   };
@@ -383,7 +384,7 @@ const App = () => {
         dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
         dispatch({
           type: 'SET_DEVICES',
-          devices: devices?.map(d => (d.id === deviceId ? { ...d, state: d.state } : { ...d })),
+          devices: devices?.map((d) => (d.id === deviceId ? { ...d, state: d.state } : { ...d })),
         });
         dispatch({ type: 'SET_STATE', appState: 'SHOW_CODE' });
       }
@@ -399,7 +400,7 @@ const App = () => {
         dispatch({ type: 'SET_ACTIVATION_CODE', code: data.code });
         dispatch({
           type: 'SET_CURRENT_DEVICES',
-          devices: currentDevices?.map(d => (d.id === deviceId ? { ...d, state: 'NON-ACTIVATED' } : { ...d })),
+          devices: currentDevices?.map((d) => (d.id === deviceId ? { ...d, state: 'NON-ACTIVATED' } : { ...d })),
         });
         dispatch({ type: 'SET_STATE', appState: 'SHOW_CURRENT_CODE' });
       }
@@ -476,7 +477,7 @@ const App = () => {
           dispatch({ type: 'SET_COMPANY', company: newCompany });
           dispatch({
             type: 'SET_COMPANIES',
-            companies: (companies ? [...companies, newCompany] : [newCompany]).filter(c => c.admin === user.id),
+            companies: (companies ? [...companies, newCompany] : [newCompany]).filter((c) => c.admin === user.id),
           });
           dispatch({ type: 'SET_IS_ADMIN', isAdmin: true });
           dispatch({ type: 'SET_STATE', appState: 'ADMIN' });
@@ -498,14 +499,14 @@ const App = () => {
               : [{ ...new_user, id: data.userId }],
           });
           dispatch({ type: 'SET_CURRENT_DEVICES', devices: [] });
-          dispatch({ type: 'SET_COMPANIES', companies: companies?.filter(c => c.id === company.id) });
+          dispatch({ type: 'SET_COMPANIES', companies: companies?.filter((c) => c.id === company.id) });
           dispatch({ type: 'SET_STATE', appState: 'UPDATE_COMPANY' });
         }
       }
     };
 
     const handleAddSystemUser = async (userId: string) => {
-      const systemUser = allUsers?.find(item => item.id === userId);
+      const systemUser = allUsers?.find((item) => item.id === userId);
       if (company?.id && systemUser) {
         const data = await requests.user.updateUser({
           ...systemUser,
@@ -514,7 +515,7 @@ const App = () => {
         if (data.type === 'ERROR') {
           dispatch({ type: 'SET_ERROR', errorMessage: data.message });
         } else if (data.type === 'UPDATE_USER') {
-          const addedUser = allUsers?.find(u => u.id === userId);
+          const addedUser = allUsers?.find((u) => u.id === userId);
           if (addedUser) {
             dispatch({ type: 'SET_CURRENT_USER', user: { ...addedUser } });
             dispatch({
@@ -553,8 +554,8 @@ const App = () => {
         dispatch({ type: 'SET_ERROR', errorMessage: data.message });
       } else if (data.type === 'GET_COMPANIES') {
         const getCompanies = data.companies
-          .filter(item => comps.some(c => c === item.id))
-          .map(item => {
+          .filter((item) => comps.some((c) => c === item.id))
+          .map((item) => {
             return ({
               companyId: item.id,
               companyName: item.title,
@@ -586,8 +587,8 @@ const App = () => {
 
     const handleRemoveCompanyUsers = (userIds: string[]) => {
       if (company?.id) {
-        const uIds = userIds.filter(u => u !== user?.id);
-        uIds.forEach(async uId => {
+        const uIds = userIds.filter((u) => u !== user?.id);
+        uIds.forEach(async (uId) => {
           const data = await requests.user.getUser(uId);
 
           if (data.type === 'ERROR') {
@@ -596,7 +597,7 @@ const App = () => {
             if (data.user && data.user.companies) {
               const dataUpdate = await requests.user.updateUser({
                 ...data.user,
-                companies: data.user.companies.filter(item => item !== company?.id),
+                companies: data.user.companies.filter((item) => item !== company?.id),
               });
               if (dataUpdate?.type === 'ERROR') {
                 dispatch({ type: 'SET_ERROR', errorMessage: dataUpdate.message });
@@ -611,13 +612,13 @@ const App = () => {
     };
 
     const handleRemoveDevices = (deviceIds: string[]) => {
-      deviceIds.forEach(async dId => {
+      deviceIds.forEach(async (dId) => {
         if (user && user.id) {
           const data = await requests.device.removeDevice(dId);
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           } else if (data.type === 'REMOVE_DEVICE') {
-            const newDevices = devices?.filter(c => dId !== c.id);
+            const newDevices = devices?.filter((c) => dId !== c.id);
             dispatch({ type: 'SET_DEVICES', devices: newDevices });
           }
         }
@@ -626,13 +627,13 @@ const App = () => {
 
     const handleBlockDevices = (deviceIds: string[], isUnBlock: boolean) => {
       if (user?.id) {
-        deviceIds.forEach(async dId => {
+        deviceIds.forEach(async (dId) => {
           const data = await requests.device.updateDevice({ id: dId, state: !isUnBlock ? 'BLOCKED' : 'ACTIVE' });
 
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           } else if (data.type === 'UPDATE_DEVICE') {
-            const newDevices: IDevice[] | undefined = devices?.map(dev =>
+            const newDevices: IDevice[] | undefined = devices?.map((dev) =>
               dev.id === data.deviceId ? { ...dev, state: isUnBlock ? 'ACTIVE' : 'BLOCKED' } : dev,
             );
             dispatch({ type: 'SET_DEVICES', devices: newDevices });
@@ -643,13 +644,13 @@ const App = () => {
 
     const handleRemoveCurrentDevices = (deviceIds: string[]) => {
       if (currentUser?.id) {
-        deviceIds.forEach(async dId => {
+        deviceIds.forEach(async (dId) => {
           const data = await requests.device.removeDevice(dId);
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           } else if (data.type === 'REMOVE_DEVICE') {
             dispatch({ type: 'DELETE_CURRENT_DEVICE', id: dId });
-            const newDevices = currentDevices?.filter(c => dId !== c.id);
+            const newDevices = currentDevices?.filter((c) => dId !== c.id);
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices });
           }
         });
@@ -658,13 +659,13 @@ const App = () => {
 
     const handleBlockCurrentDevices = (deviceIds: string[], isUnBlock: boolean) => {
       if (currentUser?.id) {
-        deviceIds.forEach(async dId => {
+        deviceIds.forEach(async (dId) => {
           const data = await requests.device.updateDevice({ id: dId, state: isUnBlock ? 'ACTIVE' : 'BLOCKED' });
 
           if (data.type === 'ERROR') {
             dispatch({ type: 'SET_ERROR', errorMessage: data.message });
           } else if (data.type === 'UPDATE_DEVICE') {
-            const newDevices: IDevice[] | undefined = currentDevices?.map(dev =>
+            const newDevices: IDevice[] | undefined = currentDevices?.map((dev) =>
               dev.id === data.deviceId ? { ...dev, state: isUnBlock ? 'ACTIVE' : 'BLOCKED' } : dev,
             );
             dispatch({ type: 'SET_CURRENT_DEVICES', devices: newDevices });
@@ -674,7 +675,7 @@ const App = () => {
     };
 
     const handleGetCurrentUser = (userId: string) => {
-      dispatch({ type: 'SET_CURRENT_USER', user: companyUsers?.find(u => u.id === userId) });
+      dispatch({ type: 'SET_CURRENT_USER', user: companyUsers?.find((u) => u.id === userId) });
       dispatch({ type: 'SET_STATE', appState: 'UPDATE_USER' });
     };
 
@@ -706,7 +707,7 @@ const App = () => {
         console.log('useEffect: needReReadUserData');
         requests.auth
           .getCurrentUser()
-          .then(data => {
+          .then((data) => {
             if (data.type === 'ERROR') {
               dispatch({ type: 'SET_ERROR', errorMessage: data.message });
             } else if (data.type === 'GET_CURRENT_USER') {
@@ -717,7 +718,7 @@ const App = () => {
             }
             return;
           })
-          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
+          .catch((error) => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       }
     }, [needReReadUserData]);
 
@@ -730,18 +731,18 @@ const App = () => {
         console.log('useEffect: company');
         requests.company
           .getUsersByCompany(company.id)
-          .then(data => {
+          .then((data) => {
             if (data.type === 'ERROR') {
               dispatch({ type: 'SET_ERROR', errorMessage: data.message });
             } else if (data.type === 'GET_USERS_BY_COMPANY') {
               dispatch({
                 type: 'SET_COMPANY_USERS',
-                companyUsers: data.users.map(u => (u.id === user?.id ? { ...u, isAdmin: true } : u)),
+                companyUsers: data.users.map((u) => (u.id === user?.id ? { ...u, isAdmin: true } : u)),
               });
             }
             return;
           })
-          .catch(error => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
+          .catch((error) => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       } else {
         dispatch({ type: 'SET_COMPANY_USERS', companyUsers: undefined });
       }
@@ -787,7 +788,7 @@ const App = () => {
         />
         {appState === 'ADMIN' && companies ? (
           <AdminBox
-            companies={companies?.filter(comp => comp.admin === user.id)}
+            companies={companies?.filter((comp) => comp.admin === user.id)}
             onClearError={handleSetError}
             onSelectCompany={handleSelectCompany}
           />

@@ -10,7 +10,7 @@ import {
   Selection,
 } from 'office-ui-fabric-react';
 
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 import { IItem } from '../types';
 
@@ -42,8 +42,8 @@ export const CompanyBox = ({
       onSelectionChanged: () => {
         const newSelection = selection.current
           .getSelection()
-          .map(s => s.key)
-          .filter(s => typeof s === 'string') as typeof selectedItems;
+          .map((s) => s.key)
+          .filter((s) => typeof s === 'string') as typeof selectedItems;
         setSelectedItems(newSelection);
       },
     }),
@@ -51,8 +51,8 @@ export const CompanyBox = ({
 
   const items: IItem[] =
     users
-      ?.filter(u => u.userName !== 'gdmn')
-      .map(u => ({ key: u.id ?? u.userName, name: u.userName, status: u.role === 'Admin' ? 'Администратор' : '' })) ||
+      ?.filter((u) => u.userName !== 'gdmn')
+      .map((u) => ({ key: u.id ?? u.userName, name: u.userName, status: u.role === 'Admin' ? 'Администратор' : '' })) ||
     [];
 
   const linkComponent = (item: IItem) => (
@@ -84,7 +84,7 @@ export const CompanyBox = ({
       <Company
         companyName={companyName}
         onClearError={onClearError}
-        onUpdateCompany={newCompanyName => onUpdateCompany(companyId, newCompanyName)}
+        onUpdateCompany={(newCompanyName) => onUpdateCompany(companyId, newCompanyName)}
       />
       <Stack.Item>
         <DetailsList

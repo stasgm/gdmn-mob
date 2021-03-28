@@ -1,6 +1,6 @@
 import { Stack } from 'office-ui-fabric-react';
 
-import { IDevice, IUser, ICompany } from '@lib/common-types';
+import { IDevice, IUser, ICompany } from '@lib/types';
 
 import { User } from './User';
 import { CompanyList } from './CompanyList';

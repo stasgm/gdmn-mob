@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PrimaryButton, Stack, VirtualizedComboBox, IComboBoxOption } from 'office-ui-fabric-react';
 
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 export interface ISystemUserProps {
   allUsers?: IUser[];
@@ -14,7 +14,7 @@ export const SystemUser = ({ onClearError, onAddUser, allUsers, companyUsers }: 
   const [user, setUser] = useState<string | number | undefined>();
   const users: IComboBoxOption[] =
     allUsers?.map(
-      u => ({ key: u.id, text: u.userName, disabled: companyUsers?.find(cu => cu.id === u.id) } as IComboBoxOption),
+      (u) => ({ key: u.id, text: u.userName, disabled: companyUsers?.find((cu) => cu.id === u.id) } as IComboBoxOption),
     ) || [];
 
   return (

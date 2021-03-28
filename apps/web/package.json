@@ -44,13 +44,14 @@
     "webpack-cli": "^4.4.0",
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.7.3",
-    "@lib/common-types": "1.0.0",
+    "@lib/types": "1.0.0",
     "@lib/client-api": "1.0.0"
   },
   "prettier": "@config/prettier-config",
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "@config/eslint-config-react": "*"
+    "@config/eslint-config-react": "*",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0"
   }
 }

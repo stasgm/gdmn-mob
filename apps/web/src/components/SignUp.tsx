@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Stack, TextField, Label, PrimaryButton } from 'office-ui-fabric-react';
 
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 interface ISignUpProps {
   user?: IUser;

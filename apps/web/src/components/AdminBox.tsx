@@ -1,6 +1,6 @@
 import { Stack, IColumn, DetailsList, SelectionMode, Link } from 'office-ui-fabric-react';
 
-import { ICompany } from '@lib/common-types';
+import { ICompany } from '@lib/types';
 
 import { IItem } from '../types';
 
@@ -11,7 +11,7 @@ export interface IAdminProps {
 }
 
 export const AdminBox = ({ companies, onClearError, onSelectCompany }: IAdminProps) => {
-  const items: IItem[] = companies.map(c => ({ key: c.id, name: c.title }));
+  const items: IItem[] = companies.map((c) => ({ key: c.id, name: c.title }));
 
   const linkComponent = (item: IItem) => (
     <Link
