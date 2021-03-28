@@ -1,4 +1,3 @@
-import React from 'react';
 import { Stack, IColumn, DetailsList, SelectionMode, Link } from 'office-ui-fabric-react';
 
 import { ICompany } from '@lib/common-types';

@@ -1,12 +1,12 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { IColumn, DetailsList, SelectionMode, Stack, PrimaryButton, Selection } from 'office-ui-fabric-react';
 
-import { IDeviceInfo } from '@lib/common-types';
+import { IDevice } from '@lib/common-types';
 
 import { IItem } from '../types';
 
 export interface IDeviceListProps {
-  devices: IDeviceInfo[];
+  devices: IDevice[];
   onRemoveDevices: (uIds: string[]) => void;
   onBlockDevices: (uIds: string[], isUnBlock: boolean) => void;
   onGetCode: (deviceId: string) => void;
@@ -35,7 +35,7 @@ export const DeviceList = ({
     }),
   );
 
-  const deviceItems: IItem[] = devices.map(d => ({ key: d.id, name: d.deviceName, state: d.state })) || [];
+  const deviceItems: IItem[] = devices.map(d => ({ key: d.id, name: d.name, state: d.state })) || [];
   const deviceColumns: IColumn[] = [
     {
       key: 'title',

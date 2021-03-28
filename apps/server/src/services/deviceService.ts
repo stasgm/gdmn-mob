@@ -51,9 +51,8 @@ const findUsers = async (deviceId: string) => {
       return {
         id: i.id,
         userId: i.userId,
-        userName: user.userName,
-        deviceId: i.uid,
-        deviceName: device.name,
+        uId: i.uid,
+        name: device.name,
         state: i.state,
       };
     });
@@ -87,7 +86,7 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
 const updateOne = async (device: IDevice) => {
   await devices.update(device);
 
-  return device.uid;
+  return device.id; // ?????
 };
 
 /**

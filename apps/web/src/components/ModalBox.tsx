@@ -1,5 +1,4 @@
 import { Modal, IconButton, getTheme, mergeStyleSets, FontSizes, FontWeights } from 'office-ui-fabric-react';
-import React from 'react';
 
 export interface IMenuProps {
   title: string;

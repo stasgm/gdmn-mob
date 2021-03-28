@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Stack, TextField, Label, PrimaryButton } from 'office-ui-fabric-react';
 
 interface ILoginProps {

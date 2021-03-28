@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PrimaryButton, Stack, TextField, Text } from 'office-ui-fabric-react';
 
 import { IUser } from '@lib/common-types';

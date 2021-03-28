@@ -44,18 +44,18 @@ export interface IDevice {
   id?: string;
   name: string;
   userId: string;
-  uid: string;
+  uid?: string;
   state: DeviceState;
 }
 
-export interface IDeviceInfo {
-  id: string;
-  deviceId: string;
-  deviceName: string;
-  userId: string;
-  userName: string;
-  state: DeviceState;
-}
+// export interface IDeviceInfo {
+//   id: string;
+//   deviceId: string;
+//   deviceName: string;
+//   userId: string;
+//   userName: string;
+//   state: DeviceState;
+// }
 
 export interface IMessageInfo {
   uid: string;

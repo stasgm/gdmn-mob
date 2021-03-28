@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IUserProfile, IDeviceInfo } from '@lib/common-types';
+import { IResponse, IUser, IUserProfile, IDevice } from '@lib/common-types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
@@ -129,9 +129,9 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDeviceInfo[];
+    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDevice[];
 
-    const result: IResponse<IDeviceInfo[]> = { result: true, data: deviceIfno };
+    const result: IResponse<IDevice[]> = { result: true, data: deviceIfno };
 
     ctx.status = 200;
     ctx.body = result;

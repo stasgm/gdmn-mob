@@ -18,6 +18,7 @@ export interface IUserCompany {
 export interface IItem {
   key: string;
   name: string;
+  [name: string]: unknown;
 }
 
 export enum IDeviceState {

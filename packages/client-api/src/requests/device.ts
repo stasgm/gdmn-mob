@@ -1,4 +1,4 @@
-import { IDevice, IDeviceInfo, IResponse } from '@lib/common-types';
+import { IDevice, IResponse } from '@lib/common-types';
 
 import { INetworkError, deviceTypes } from '../types';
 
@@ -15,7 +15,7 @@ const addDevice = async (deviceName: string, userId: string) => {
   if (resData.result) {
     return {
       type: 'ADD_DEVICE',
-      uid: resData.data,
+      id: resData.data,
     } as deviceTypes.IAddDeviceResponse;
   }
   return {
@@ -70,7 +70,7 @@ const getDevice = async (deviceId: string, userId?: string) => {
 };
 
 const getUsersByDevice = async (deviceId: string) => {
-  const res = await api.get<IResponse<IDeviceInfo[]>>(`/devices/${deviceId}/users`);
+  const res = await api.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
   const resData = res.data;
 
   if (resData.result) {

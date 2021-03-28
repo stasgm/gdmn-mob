@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PrimaryButton, Stack, TextField } from 'office-ui-fabric-react';
 
 export interface IDeviceProps {

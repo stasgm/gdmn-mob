@@ -15,8 +15,6 @@
     "test": "jest --coverage --watchAll --config=configs/jest.json"
   },
   "dependencies": {
-    "@lib/common-types": "1.0.0",
-    "@lib/client-api": "1.0.0",
     "office-ui-fabric-react": "^7",
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
@@ -45,7 +43,9 @@
     "webpack": "^5.19.0",
     "webpack-cli": "^4.4.0",
     "webpack-dev-server": "^3.11.2",
-    "webpack-merge": "^5.7.3"
+    "webpack-merge": "^5.7.3",
+    "@lib/common-types": "1.0.0",
+    "@lib/client-api": "1.0.0"
   },
   "prettier": "@config/prettier-config",
   "devDependencies": {

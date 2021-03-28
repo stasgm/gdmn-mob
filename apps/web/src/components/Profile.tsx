@@ -1,7 +1,6 @@
-import React from 'react';
 import { Stack } from 'office-ui-fabric-react';
 
-import { IDeviceInfo, IUser, ICompany } from '@lib/common-types';
+import { IDevice, IUser, ICompany } from '@lib/common-types';
 
 import { User } from './User';
 import { CompanyList } from './CompanyList';
@@ -10,7 +9,7 @@ import { DeviceList } from './DeviceList';
 export interface IProfileProps {
   user: IUser;
   companies?: ICompany[];
-  devices?: IDeviceInfo[];
+  devices?: IDevice[];
   isEditOK?: boolean;
   onClearEditOK?: () => void;
   onEditProfile: (user: Partial<IUser>) => void;

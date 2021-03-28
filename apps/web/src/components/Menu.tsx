@@ -1,5 +1,4 @@
 import { ICommandBarItemProps, Stack, CommandBar, Label } from 'office-ui-fabric-react';
-import React from 'react';
 
 export interface IMenuProps {
   isAdmin?: boolean;

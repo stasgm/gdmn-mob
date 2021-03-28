@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PrimaryButton, Stack, VirtualizedComboBox, IComboBoxOption } from 'office-ui-fabric-react';
 
 import { IUser } from '@lib/common-types';
