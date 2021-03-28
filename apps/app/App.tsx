@@ -1,33 +1,34 @@
-import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
-import { StatusBar, View, Platform } from 'react-native';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/lib/integration/react';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider, useSelector } from 'react-redux';
+import { StatusBar, Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { enableScreens } from 'react-native-screens';
 
-// import { AuthProvider } from '@lib/mob-auth';
+import { configureStore, RootState } from '@lib/store';
+import { AuthNavigator } from '@lib/mobile-auth';
+import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
-import { persistor, store } from './src/store';
+import RootNavigator from './src/navigation/RootNavigator';
 
-import theme from './src/styles/theme';
+enableScreens();
 
-import Routes from './src/routes';
+const store = configureStore;
 
-export default class Root extends React.Component {
-  public render() {
-    return (
-      <Provider store={store}>
-        <PersistGate loading={<View />} persistor={persistor}>
-          {/* <AuthProvider> */}
-          <PaperProvider theme={theme}>
-            {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
-            <NavigationContainer>
-              <Routes />
-            </NavigationContainer>
-          </PaperProvider>
-          {/* </AuthProvider> */}
-        </PersistGate>
-      </Provider>
-    );
-  }
+const Router = () => {
+  const { device, user, company } = useSelector((state: RootState) => state.auth);
+
+  return user && device && company ? <RootNavigator /> : <AuthNavigator />;
+};
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <UIProvider theme={defaultTheme}>
+        {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
+        <NavigationContainer>
+          <Router />
+        </NavigationContainer>
+      </UIProvider>
+    </Provider>
+  );
 }

@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   dataText: {
-    color: colors.gray2,
+    color: colors.text,
   },
   label: {
     paddingLeft: '2%',

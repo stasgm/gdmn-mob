@@ -1,17 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { requests } from '@lib/client-api';
-import { Button } from 'react-native-paper';
 
 const Home = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Задачи на сегодня:</Text>
       <Text style={styles.text}>На сегодня задач нет</Text>
-      <Button onPress={() => console.log(requests.auth.login({ userName: 'Inna', password: '123' }))}>
-        Подключение
-      </Button>
-      {/* <CoolButton /> */}
     </View>
   );
 };

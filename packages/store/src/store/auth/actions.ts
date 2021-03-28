@@ -1,10 +1,11 @@
-import { IBaseUrl, ICompany, IDevice, IUser } from '@lib/types';
+import { IApiConfig } from '@lib/client-types';
+import { ICompany, IDevice, IUser } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { IAuthState } from './types';
 
 const init = createAction('AUTH/INIT')<IAuthState>();
-export const setSettings = createAction('AUTH/SET_SETTINGS')<IBaseUrl>();
+export const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
 export const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 export const disconnect = createAction('AUTH/DISCONNECT')();
 export const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере

@@ -2,7 +2,7 @@ import { Reducer } from 'redux';
 
 import { getType } from 'typesafe-actions';
 
-import { config } from '../../mock';
+import { config } from '../../../mock';
 
 import { IAuthState } from './types';
 import { AuthActionType, authActions } from './actions';
@@ -17,7 +17,7 @@ const initialState: Readonly<IAuthState> = {
   status: '',
 };
 
-const reducer: Reducer<IAuthState, AuthActionType> = (state = initialState, action: AuthActionType) => {
+const reducer: Reducer<IAuthState, AuthActionType> = (state = initialState, action) => {
   switch (action.type) {
     case getType(authActions.init):
       return initialState;

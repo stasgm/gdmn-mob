@@ -53,7 +53,7 @@ const Input: React.FC<Props> = ({
           theme={{
             colors: {
               primary: colors.light,
-              text: colors.gray2,
+              text: colors.text,
               placeholder: colors.light,
               background: colors.primary,
             },
@@ -63,7 +63,7 @@ const Input: React.FC<Props> = ({
           autoCorrect={autoCorrect}
           style={styles.input}
           maxLength={maxLength}
-          placeholderTextColor={colors.gray2}
+          placeholderTextColor={colors.text}
           secureTextEntry={secureText}
           spellCheck={spellCheck}
         />

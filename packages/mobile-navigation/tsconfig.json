@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "jsx": "react-native",
     "noEmit": true
   },
   "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts"],

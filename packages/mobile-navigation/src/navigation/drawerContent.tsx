@@ -17,9 +17,12 @@ type Props = DrawerContentComponentProps<DrawerContentOptions>;
 export function DrawerContent(props: Props) {
   const paperTheme = useTheme();
 
-  const user = useSelector((state: RootState) => state.auth.user);
+  // const theme = 'dark';
+  // const navigation = useNavigation();
 
-  const translateX = Animated.interpolate(props.progress, {
+  const { user, company } = useSelector((state: RootState) => state.auth);
+
+  const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
     outputRange: [-100, -85, -70, -45, 0],
   });
@@ -40,7 +43,7 @@ export function DrawerContent(props: Props) {
             <Title style={styles.title}>{user?.lastName}</Title>
           </View>
         </View>
-        <Caption style={styles.caption}>{user?.companies?.[0]}</Caption>
+        <Caption style={styles.caption}>{company?.title || ''}</Caption>
       </View>
       <Divider />
       <DrawerContentScrollView {...props}>
@@ -54,8 +57,33 @@ export function DrawerContent(props: Props) {
           ]}
         >
           <Drawer.Section style={styles.drawerSection}>
+            {/*  {props?.items?.map((item) => (
+              <DrawerItem
+                label={item.title}
+                onPress={() => {
+                  props.navigation.navigate(item.name);
+                }}
+                key={item.title}
+                icon={({ color, size }) => <Icon name={item.icon} {...props} color={color} size={size} />}
+              />
+            ))}
+            <Divider /> */}
             <DrawerItemList {...props} />
           </Drawer.Section>
+          {/*  <Drawer.Section title="Preferences">
+            <TouchableRipple
+              onPress={() => {
+                // toggleTheme();
+              }}
+            >
+              <View style={styles.preference}>
+                <Text style={styles.text}>Тёмная тема</Text>
+                <View pointerEvents="none">
+                  <Switch value={theme === 'dark'} />
+                </View>
+              </View>
+            </TouchableRipple>
+          </Drawer.Section> */}
         </Animated.View>
       </DrawerContentScrollView>
       <View style={styles.systemInfo}>
@@ -88,6 +116,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     lineHeight: 20,
   },
+  text: {
+    padding: 2,
+  },
   caption: {
     textAlign: 'center',
     fontSize: 14,
@@ -100,5 +131,11 @@ const styles = StyleSheet.create({
   },
   drawerSection: {
     marginTop: 0,
+  },
+  preference: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
 });

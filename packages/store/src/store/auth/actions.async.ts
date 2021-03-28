@@ -3,7 +3,7 @@ import { AnyAction } from 'redux';
 
 import { IUserCredentials } from '@lib/types';
 
-import { device, user } from '../../mock';
+import { device, user } from '../../../mock';
 
 import { authActions } from './actions';
 import { DevicePayload, IAuthState, UserPayload } from './types';

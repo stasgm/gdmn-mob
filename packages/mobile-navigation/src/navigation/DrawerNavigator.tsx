@@ -7,11 +7,8 @@ import { Appbar, useTheme } from 'react-native-paper';
 
 import ProfileScreen from '../screens/ProfileScreen';
 
-import MapScreen from '../screens/Maps';
-
 import { DrawerContent } from './drawerContent';
-import DashboardNavigator from './Root/DashboardNavigator';
-import DocumentsNavigator from './Root/DocumentsNavigator';
+
 import ReferencesNavigator from './Root/ReferencesNavigator';
 import SettingsNavigator from './Root/SettingsNavigator';
 
@@ -22,6 +19,7 @@ export type RootDrawerParamList = {
   Settings: undefined;
   Profile: undefined;
   Map: undefined;
+  [itemName: string]: undefined;
 };
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
@@ -40,30 +38,37 @@ const Header = ({ scene }: DrawerHeaderProps) => {
 
 console.log('DrawerNavigator');
 
-const DrawerNavigator = () => {
+export interface INavItem {
+  name: string;
+  title: string;
+  icon: keyof typeof Icon.glyphMap;
+  component: any;
+}
+
+export interface IProps {
+  items?: INavItem[];
+}
+
+const DrawerNavigator = (props: IProps) => {
   const { colors } = useTheme();
+
   return (
     <Drawer.Navigator
       drawerContentOptions={{ activeBackgroundColor: colors.primary, activeTintColor: '#ffffff' }}
       drawerContent={(props) => <DrawerContent {...props} />}
       screenOptions={{ headerShown: true, header: (props) => <Header {...props} /> }}
     >
-      <Drawer.Screen
-        name="Dashboard"
-        component={DashboardNavigator}
-        options={{
-          title: 'Дашборд',
-          drawerIcon: (props) => <Icon name="view-dashboard-outline" {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Documents"
-        component={DocumentsNavigator}
-        options={{
-          title: 'Документы',
-          drawerIcon: (props) => <Icon name="file-document-outline" {...props} />,
-        }}
-      />
+      {props?.items?.map((item) => (
+        <Drawer.Screen
+          name={item.name}
+          key={item.name}
+          component={item.component}
+          options={{
+            title: item.title,
+            drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
+          }}
+        />
+      ))}
       <Drawer.Screen
         name="References"
         component={ReferencesNavigator}
@@ -78,14 +83,6 @@ const DrawerNavigator = () => {
         options={{
           title: 'Настройки',
           drawerIcon: (props) => <Icon name="tune" {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          title: 'Карта',
-          drawerIcon: (props) => <Icon name="map-outline" {...props} />,
         }}
       />
       <Drawer.Screen

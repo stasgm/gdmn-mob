@@ -4,14 +4,14 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 type IListItem = {
-  id: number;
+  id: string;
   value: string;
 };
 
 type Props = {
   options: IListItem[];
   horizontal?: boolean;
-  activeButtonId?: number;
+  activeButtonId?: string;
   onChange: (option: IListItem) => void;
 };
 

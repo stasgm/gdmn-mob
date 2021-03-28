@@ -59,7 +59,7 @@ const ActivationScreen = (props: Props) => {
             <View
               style={{
                 ...styles.statusBox,
-                backgroundColor: colors.background,
+                // backgroundColor: colors.background,
               }}
             >
               {request.isError && <Text style={styles.errorText}>Ошибка:{request.status}</Text>}
@@ -73,6 +73,7 @@ const ActivationScreen = (props: Props) => {
               autoCorrect={false}
               underlineColorAndroid="transparent"
               value={activationCode}
+              style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
               onChangeText={setActivationCode}
             />
             <Button

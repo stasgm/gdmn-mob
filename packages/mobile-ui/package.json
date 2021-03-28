@@ -33,6 +33,7 @@
     "expo-font": "~8.4.0",
     "react": "^17.0.2",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
+    "react-native-datepicker": "^1.7.2",
     "react-native-paper": "^4.7.2",
     "react-native-web": "0.15.0",
     "typescript": "^4.2.2"

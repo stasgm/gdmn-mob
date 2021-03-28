@@ -7,11 +7,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
-  const user = useSelector((state: RootState) => state.auth.user);
 
+  const { user, company, device } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
 
   const handleLogout = () => dispatch(authActions.logout());
+  const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 
   return (
     <View style={styles.container}>
@@ -27,9 +28,18 @@ const ProfileScreen = () => {
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.lastName || ''}</Text>
-          <Text style={[styles.profileInfoTextCompany, { color: colors.placeholder }]}>
-            {user?.companies?.[0] || ''}
-          </Text>
+          <Text style={[styles.profileInfoTextCompany, { color: colors.placeholder }]}>{company?.title || ''}</Text>
+        </View>
+      </View>
+      <Divider />
+      <View style={[styles.profileContainer]}>
+        <View style={styles.profileIcon}>
+          <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.background }} color={colors.text} />
+        </View>
+        <View style={styles.profileInfo}>
+          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{device?.name || ''}</Text>
+          <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.state || ''}</Text>
+          <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.uid || ''}</Text>
         </View>
       </View>
       <Divider />
@@ -37,13 +47,7 @@ const ProfileScreen = () => {
         <Button mode="outlined" style={[styles.button]} onPress={handleLogout}>
           Сменить пользователя
         </Button>
-        <Button
-          mode="outlined"
-          style={[styles.button]}
-          onPress={() => {
-            console.log('change company');
-          }}
-        >
+        <Button mode="outlined" style={[styles.button]} onPress={handleChangeCompany}>
           Сменить организацию
         </Button>
       </View>
@@ -57,6 +61,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 10,
+  },
+  deviceInfo: {
+    flex: 1,
+    justifyContent: 'center',
   },
   profileContainer: {
     alignItems: 'center',

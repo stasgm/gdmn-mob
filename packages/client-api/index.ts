@@ -1,2 +1,4 @@
-export * as requests from './src/requests';
-export * as types from './src/types';
+import * as requests from './src/requests';
+import * as types from './src/types';
+
+export { types, requests };

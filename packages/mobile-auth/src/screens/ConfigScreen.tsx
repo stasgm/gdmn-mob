@@ -50,19 +50,19 @@ const ConfigScreen = (props: Props) => {
         value={serverName}
         onChangeText={setServerName}
         placeholder="Адрес сервера"
-        style={[globalStyles.input, { backgroundColor: colors.background, color: colors.text }]}
+        style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
       />
       <TextInput
         value={serverPort}
         onChangeText={setServerPort}
         placeholder="Порт"
-        style={[globalStyles.input, { backgroundColor: colors.background, color: colors.text }]}
+        style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
       />
       <TextInput
         value={timeout}
         onChangeText={setTimeout}
         placeholder="Варемя ожидания, м\с"
-        style={[globalStyles.input, { backgroundColor: colors.background, color: colors.text }]}
+        style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
       />
       <View style={localStyles.buttonsView}>
         <Button

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, RadioButton, Button, IconButton, useTheme } from 'react-native-paper';
+import { StyleSheet, View, ScrollView } from 'react-native';
+import { Button, IconButton, useTheme } from 'react-native-paper';
 
 import { globalStyles } from '@lib/mobile-ui';
-import { SubTitle } from '@lib/mobile-ui/src/components';
+import { SubTitle, RadioGroup } from '@lib/mobile-ui/src/components';
 import { ICompany, IResponse } from '@lib/types';
 import { company, company2 } from '@lib/store/mock';
 
@@ -94,35 +94,11 @@ const CompaniesScreen = (props: Props) => {
       <View style={globalStyles.container}>
         <SubTitle>Выбор организации</SubTitle>
         <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
-          <RadioButton.Group
-            onValueChange={(value) => setSelectedCompany(companies.find((i) => i.id === value))}
-            value={selectedCompany?.id || ''}
-          >
-            {companies?.length > 0 &&
-              companies.map((el) => (
-                <TouchableOpacity
-                  onPress={() => setSelectedCompany(el)}
-                  key={el.id}
-                  style={[
-                    {
-                      backgroundColor: selectedCompany === el ? colors.primary : colors.background,
-                    },
-                    localStyles.item,
-                  ]}
-                >
-                  <View style={localStyles.row}>
-                    <RadioButton value={el.id} color={colors.background} />
-                    <Text
-                      style={{
-                        color: selectedCompany === el ? colors.background : colors.text,
-                      }}
-                    >
-                      {el.title}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-          </RadioButton.Group>
+          <RadioGroup
+            onChange={(value) => setSelectedCompany(companies.find((i) => i.id === value.id))}
+            options={companies.map((i) => ({ id: i.id, value: i.title }))}
+            activeButtonId={selectedCompany?.id}
+          />
         </ScrollView>
         <View style={localStyles.buttonView}>
           <Button
@@ -130,7 +106,7 @@ const CompaniesScreen = (props: Props) => {
             icon="check-circle-outline"
             style={[globalStyles.rectangularButton, localStyles.button]}
             disabled={!selectedCompany}
-            onPress={async () => {
+            onPress={() => {
               selectedCompany && onSetCompany(selectedCompany);
               // actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
               // await appStorage.setItem(`${userID}/companyId`, selectedCompany);
