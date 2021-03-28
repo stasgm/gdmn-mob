@@ -9,8 +9,9 @@ module.exports = {
   context: resolve(__dirname, '../../src'),
   module: {
     rules: [
+      { test: /\.tsx?$/, loader: 'ts-loader' },
       {
-        test: [/\.jsx?$/, /\.tsx?$/],
+        test: [/\.jsx?$/],
         use: ['babel-loader'],
         exclude: /node_modules/,
       },

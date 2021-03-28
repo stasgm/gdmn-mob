@@ -35,7 +35,7 @@ export const DeviceList = ({
     }),
   );
 
-  const deviceItems: IItem[] = devices.map((d) => ({ key: d.id, name: d.name, state: d.state })) || [];
+  const deviceItems: IItem[] = devices.map((d) => ({ key: d.id!, name: d.name, state: d.state })) || [];
   const deviceColumns: IColumn[] = [
     {
       key: 'title',

@@ -15,12 +15,13 @@
     "test": "jest --coverage --watchAll --config=configs/jest.json"
   },
   "dependencies": {
-    "office-ui-fabric-react": "^7",
+    "office-ui-fabric-react": "^7.165.1",
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
     "@babel/preset-typescript": "^7.12.7",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@types/jest": "^26.0.20",
     "@types/node": "^14.14.22",
     "@types/react": "^17.0.0",
@@ -44,6 +45,7 @@
     "webpack-cli": "^4.4.0",
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.7.3",
+    "ts-loader": "^8.1.0",
     "@lib/types": "1.0.0",
     "@lib/client-api": "1.0.0"
   },
@@ -51,7 +53,6 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "@config/eslint-config-react": "*",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0"
+    "@config/eslint-config-react": "*"
   }
 }

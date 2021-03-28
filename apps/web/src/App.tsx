@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars-experimental */
-import React, { useReducer, useCallback, useEffect } from 'react';
+import { useReducer, useCallback, useEffect } from 'react';
 
 import { IUser, ICompany, IDevice } from '@lib/types';
 import { requests } from '@lib/client-api';
@@ -685,7 +684,7 @@ const App = () => {
         handleGetCompanies(user.companies ?? [], user.id, 'SET_COMPANIES');
         handleGetUserDevices(user.id, 'SET_DEVICES');
       }
-    }, [needReReadCompanies, user]);
+    }, []);
 
     useEffect(() => {
       if (currentUser?.id) {
@@ -693,14 +692,14 @@ const App = () => {
         handleGetCompanies(currentUser.companies ?? [], currentUser.id, 'SET_CURRENT_COMPANIES');
         handleGetUserDevices(currentUser.id, 'SET_CURRENT_DEVICES');
       }
-    }, [currentUser]);
+    }, []);
 
     useEffect(() => {
       console.log('useEffect: isAdmin = ' + isAdmin);
       if (isAdmin !== undefined) {
         dispatch({ type: 'SET_STATE', appState: isAdmin ? 'ADMIN' : 'PROFILE' });
       }
-    }, [isAdmin]);
+    }, []);
 
     useEffect(() => {
       if (needReReadUserData) {
@@ -720,7 +719,7 @@ const App = () => {
           })
           .catch((error) => dispatch({ type: 'SET_ERROR', errorMessage: JSON.stringify(error) }));
       }
-    }, [needReReadUserData]);
+    }, []);
 
     /**
      * Получить пользователей компании надо, когда
@@ -746,7 +745,7 @@ const App = () => {
       } else {
         dispatch({ type: 'SET_COMPANY_USERS', companyUsers: undefined });
       }
-    }, [company?.id, needReReadUsers, user?.id]);
+    }, []);
 
     return appState === 'LOGIN' || appState === 'QUERY_LOGIN' ? (
       <Login
@@ -781,14 +780,14 @@ const App = () => {
             appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE'
               ? () => handleSetAppState('CREATE_CURRENT_DEVICENAME')
               : appState === 'PROFILE' && isAdmin
-              ? () => handleSetAppState('CREATE_DEVICENAME')
-              : undefined
+                ? () => handleSetAppState('CREATE_DEVICENAME')
+                : undefined
           }
           isAdmin={isAdmin}
         />
         {appState === 'ADMIN' && companies ? (
           <AdminBox
-            companies={companies?.filter((comp) => comp.admin === user.id)}
+            companies={companies?.filter((comp) => comp.admin === user?.id) || []}
             onClearError={handleSetError}
             onSelectCompany={handleSelectCompany}
           />
@@ -803,7 +802,7 @@ const App = () => {
           <Company onUpdateCompany={handleCreateCompany} onClearError={handleSetError} />
         ) : appState === 'CREATE_USER' && user?.id ? (
           <User
-            user={{ userName: '', id: user.id, password: '', role: 'User', creatorId: user.id }}
+            user={{ userName: '', id: user?.id, password: '', role: 'User', creatorId: user?.id || '0' }}
             mode={'creating'}
             onCreateProfile={handleCreateUser}
             onClearError={handleSetError}
@@ -818,8 +817,8 @@ const App = () => {
           />
         ) : appState === 'UPDATE_COMPANY' && company ? (
           <CompanyBox
-            companyName={company.title}
-            companyId={company.id}
+            companyName={company?.title || ''}
+            companyId={company?.id || '0'}
             users={companyUsers}
             allUsers={allUsers}
             onUpdateCompany={handleUpdateCompany}
@@ -835,7 +834,7 @@ const App = () => {
             onClearEditOK={() => handleSetAppState('PROFILE')}
             onEditProfile={(user_: Partial<IUser>) => handleUpdateUser(user_, 'UPDATE_CURRENT_USER')}
             onClearError={handleSetError}
-            isCanEditUser={currentUser.creatorId === user.id}
+            isCanEditUser={currentUser?.creatorId === user?.id}
             isCanEditDevices={isAdmin}
             onRemoveDevices={handleRemoveCurrentDevices}
             onBlockDevices={handleBlockCurrentDevices}
@@ -844,7 +843,7 @@ const App = () => {
         ) : (appState === 'SHOW_CODE' || appState === 'SHOW_CURRENT_CODE') && activationCode ? (
           <ModalBox
             title={'Код для активации устройства'}
-            text={activationCode}
+            text={activationCode || ''}
             onClose={() => {
               dispatch({ type: 'SET_ACTIVATION_CODE' });
               handleSetAppState('UPDATE_USER');
