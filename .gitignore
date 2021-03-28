@@ -103,10 +103,12 @@ npm-debug.*
 web-build/
 
 #config
-*/config/*.ts
+config/*.ts
 
 .expo/*
 
 # log
-*/log/*
+log/*
+
+# yarn
 yarn-error.log

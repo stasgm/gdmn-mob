@@ -1,8 +1,0 @@
-node_modules/**/*
-.expo/*
-
-# Config
-./src/config/*.ts
-
-*/log/*
-yarn-error.log
