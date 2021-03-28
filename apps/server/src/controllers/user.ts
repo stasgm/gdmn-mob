@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IUserProfile, IDeviceInfo } from '@lib/common-types';
+import { IResponse, IUser, IUserProfile, IDeviceInfo } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
@@ -70,13 +70,13 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'пользователь не найден');
   }
 
-  let passwordHash: string | undefined = undefined;
+  let passwordHash: string | undefined;
 
   if (user.password) {
     passwordHash = await hashPassword(user.password);
   }
 
-  //Удаляем поля, которые нелья менять
+  // Удаляем поля, которые нелья менять
   delete user.creatorId;
   delete user.role;
 
@@ -113,7 +113,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
     const result: IResponse<void> = { result: true };
 
     ctx.status = 200;
-    ctx.body = result; //TODO передавать только код 204 без body
+    ctx.body = result; // TODO передавать только код 204 без body
 
     log.info('removeUser: OK');
   } catch (err) {
@@ -129,9 +129,7 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const deviceIfno = ((await userService.findDevices(
-      userId
-    )) as unknown) as IDeviceInfo[];
+    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDeviceInfo[];
 
     const result: IResponse<IDeviceInfo[]> = { result: true, data: deviceIfno };
 

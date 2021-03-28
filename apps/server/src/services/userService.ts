@@ -1,4 +1,4 @@
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 import { hashPassword } from '../utils/crypt';
 import { makeProfile } from '../utils/user';
@@ -18,17 +18,13 @@ const findAll = async () => (await users.read()).map((el) => makeProfile(el));
  * @return id, идентификатор пользователя
  * */
 const addOne = async (user: IUser) => {
-  if (
-    await users.find(
-      (i) => i.userName.toUpperCase() === user.userName.toUpperCase()
-    )
-  ) {
+  if (await users.find((i) => i.userName.toUpperCase() === user.userName.toUpperCase())) {
     throw new Error('пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(user.password);
 
-  return await users.insert({
+  return users.insert({
     ...user,
     password: passwordHash,
   });

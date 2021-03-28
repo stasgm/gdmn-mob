@@ -1,4 +1,4 @@
-import { ICompany, IUserProfile } from '@lib/common-types';
+import { ICompany, IUserProfile } from '@lib/types';
 
 import { makeProfile } from '../utils/user';
 
@@ -118,12 +118,4 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
     .map((el) => makeProfile(el));
 };
 
-export {
-  findOne,
-  findAll,
-  addOne,
-  updateOne,
-  deleteOne,
-  findUsers,
-  findOneByName,
-};
+export { findOne, findAll, addOne, updateOne, deleteOne, findUsers, findOneByName };

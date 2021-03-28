@@ -14,9 +14,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     ctx.throw(400, 'устройство не найдено');
   }
 
-  const currDevice = await devices.find(
-    (i) => i.uid === device.id && i.userId === ctx.state.user.id
-  );
+  const currDevice = await devices.find((i) => i.uid === device.id && i.userId === ctx.state.user.id);
 
   if (!currDevice) {
     ctx.throw(400, 'устройство для пользователя не найдено');

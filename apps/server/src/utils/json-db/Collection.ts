@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import fs from 'fs';
 
 import R from 'ramda';
@@ -11,6 +12,10 @@ import { CollectionItem } from './CollectionItem';
 class Collection<T extends CollectionItem> {
   private collectionPath: string;
 
+  private static _initObject<K extends CollectionItem>(obj: K): K {
+    return R.assoc('id', uuid(), obj);
+  }
+
   constructor(path: string) {
     this.collectionPath = path;
     this._ensureStorage();
@@ -22,7 +27,7 @@ class Collection<T extends CollectionItem> {
   public async insert(obj: T): Promise<string> {
     const db = await this._get();
 
-    const initObject = obj.id ? obj : this._initObject(obj);
+    const initObject = obj.id ? obj : Collection._initObject(obj);
 
     db.push(initObject);
     await this._save(db);
@@ -35,9 +40,7 @@ class Collection<T extends CollectionItem> {
   public async insertMany(obj: Array<T>): Promise<Array<string>> {
     const db = await this._get();
 
-    const initObjects = obj.map((item) =>
-      item.id ? item : this._initObject(item)
-    );
+    const initObjects = obj.map((item) => (item.id ? item : Collection._initObject(item)));
     const ids = obj.map((item) => item.id as string);
 
     db.push(...initObjects);
@@ -49,7 +52,9 @@ class Collection<T extends CollectionItem> {
    * Returns every entry in the collection.
    */
   public async read(): Promise<Array<T>>;
+
   public async read(predicate: (item: T) => boolean): Promise<Array<T>>;
+
   public async read(predicate?: (item: T) => boolean): Promise<Array<T>> {
     if (typeof predicate === 'undefined') return this._get();
     return (await this._get()).filter(predicate);
@@ -59,10 +64,11 @@ class Collection<T extends CollectionItem> {
    * Finds an item by id or using the specified predicate.
    */
   public async find(id: string): Promise<T>;
+
   public async find(predicate: (item: T) => boolean): Promise<T>;
+
   public async find(id: string | ((item: T) => boolean)) {
-    const predicate =
-      typeof id === 'function' ? id : (item: T) => item.id === id;
+    const predicate = typeof id === 'function' ? id : (item: T) => item.id === id;
     return (await this._get()).find(predicate);
   }
 
@@ -74,7 +80,7 @@ class Collection<T extends CollectionItem> {
 
     if (!obj.id) return;
     const newDb = db.map((val) => (val.id === obj.id ? obj : val));
-    return this._save(newDb);
+    this._save(newDb);
   }
 
   /**
@@ -82,12 +88,11 @@ class Collection<T extends CollectionItem> {
    * Items for which the predicate returns true will be deleted.
    */
   public async delete(id: string): Promise<void>;
+
   public async delete(predicate: (item: T) => boolean): Promise<void>;
+
   public async delete(id: string | ((item: T) => boolean)) {
-    const predicate =
-      typeof id === 'function'
-        ? R.pipe(id, R.not)
-        : (item: T) => item.id !== id;
+    const predicate = typeof id === 'function' ? R.pipe(id, R.not) : (item: T) => item.id !== id;
 
     const db = await this._get();
 
@@ -100,12 +105,8 @@ class Collection<T extends CollectionItem> {
     return this._save([]);
   }
 
-  private _initObject(obj: T): T {
-    return R.assoc('id', uuid(), obj);
-  }
-
   private _ensureStorage() {
-    if (!fs.existsSync(this.collectionPath)) void this._save([]);
+    if (!fs.existsSync(this.collectionPath)) this._save([]);
   }
 
   private _get(): Promise<Array<T>> {
@@ -125,15 +126,10 @@ class Collection<T extends CollectionItem> {
 
   private _save(data: Array<T>): Promise<void> {
     return new Promise((resolve, reject) => {
-      fs.writeFile(
-        this.collectionPath,
-        JSON.stringify(data),
-        { encoding: 'utf8' },
-        (err: unknown) => {
-          if (err) return reject(err);
-          return resolve();
-        }
-      );
+      fs.writeFile(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' }, (err: unknown) => {
+        if (err) return reject(err);
+        return resolve();
+      });
     });
   }
 }

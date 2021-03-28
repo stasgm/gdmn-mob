@@ -7,7 +7,7 @@ import { VerifyFunction } from 'passport-local';
 
 import bcrypt from 'bcrypt';
 
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 import log from '../utils/logger';
 
@@ -15,24 +15,17 @@ import { devices, users, codes } from './dao/db';
 
 import * as userService from './userService';
 
-const authenticate = async (
-  ctx: Context,
-  next: Next
-): Promise<IUser | undefined> => {
+const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
 
-  const user = await users.find(
-    (i) => i.userName.toUpperCase() === String(userName).toUpperCase()
-  );
+  const user = await users.find((i) => i.userName.toUpperCase() === String(userName).toUpperCase());
 
   if (!user) {
     throw new Error('пользователь не найден');
   }
 
-  const device = await devices.find(
-    (device) => device.uid === deviceId && device.userId === user.id
-  );
+  const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
 
   if (!device) {
     throw new Error('связанное с пользователем устройство не найдено');
@@ -43,18 +36,18 @@ const authenticate = async (
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return koaPassport.authenticate('local', async (err: Error, user: IUser) => {
+  return koaPassport.authenticate('local', async (err: Error, usr: IUser) => {
     if (err) {
       throw new Error(err.message);
     }
 
-    if (!user) {
+    if (!usr) {
       throw new Error('неверный пользователь или пароль');
     }
 
-    await ctx.login(user);
+    await ctx.login(usr);
 
-    return user;
+    return usr;
   })(ctx, next);
 };
 
@@ -104,19 +97,15 @@ const signUp = async ({ user }: { user: Omit<IUser, 'role'> }) => {
     });
   }
 
-  //TODO: обработать поиск по передаваемой организации
-  /*if (deviceId === 'WEB') {
+  // TODO: обработать поиск по передаваемой организации
+  /* if (deviceId === 'WEB') {
     await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
-  }*/
+  } */
 
   return userid;
 };
 
-const validateAuthCreds: VerifyFunction = async (
-  userName: string,
-  password: string,
-  done
-) => {
+const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
   const user = await userService.findByName(userName);
 
   if (!user) done(null, false);

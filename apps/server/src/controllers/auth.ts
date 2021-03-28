@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, IUser } from '@lib/common-types';
+import { IResponse, IUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -40,7 +40,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
 /** Проверка текущего пользователя в сессии koa */
 const getCurrentUser = (ctx: ParameterizedContext): void => {
-  const user = ctx.state.user;
+  const { user } = ctx.state;
 
   delete user.password;
 
@@ -53,7 +53,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 };
 
 const logOut = (ctx: Context): void => {
-  const user = ctx.state.user;
+  const { user } = ctx.state;
 
   ctx.logout();
 
@@ -67,16 +67,7 @@ const logOut = (ctx: Context): void => {
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   // const { deviceId } = ctx.query;
-  const {
-    externalId,
-    userName,
-    password,
-    firstName,
-    lastName,
-    phoneNumber,
-    companies,
-    creatorId,
-  } = ctx.request.body;
+  const { externalId, userName, password, firstName, lastName, phoneNumber, companies, creatorId } = ctx.request.body;
 
   if (!userName) {
     ctx.throw(400, 'не указано имя пользователя');

@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { ICompany, IResponse, IUserProfile } from '@lib/common-types';
+import { ICompany, IResponse, IUserProfile } from '@lib/types';
 
 import log from '../utils/logger';
 import { companyService } from '../services';
@@ -66,20 +66,18 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указана информация об организации');
   }
 
-  const oldCompany: ICompany | undefined = await companyService.findOne(
-    companyId
-  ); //companies.find(company.id);
+  const oldCompany: ICompany | undefined = await companyService.findOne(companyId); // companies.find(company.id);
 
-  /*if (!oldCompany) {
+  /* if (!oldCompany) {
     oldCompany = await companyService.findOneByName(company.title);
-  }*/
+  } */
 
   if (!oldCompany) {
     ctx.throw(400, 'организация не найдена');
   }
 
   // Удаляем поля которые нельзя перезаписывать
-  //company.admin = undefined;
+  // company.admin = undefined;
 
   try {
     const id = await companyService.updateOne({
@@ -147,7 +145,7 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
     const result: IResponse = { result: true };
 
     ctx.status = 200;
-    ctx.body = result; //TODO передавать только код 204 без body
+    ctx.body = result; // TODO передавать только код 204 без body
 
     log.info('deleteCompany: OK');
   } catch (err) {
@@ -155,11 +153,4 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export {
-  addCompany,
-  updateCompany,
-  getCompany,
-  getUsersByCompany,
-  getCompanies,
-  deleteCompany,
-};
+export { addCompany, updateCompany, getCompany, getUsersByCompany, getCompanies, deleteCompany };

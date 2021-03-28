@@ -1,0 +1,39 @@
+{
+  "name": "@lib/store",
+  "version": "1.0.0",
+  "description": "common store package",
+  "license": "MIT",
+  "main": "./index.ts",
+  "scripts": {
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "prettier": "@config/prettier-config",
+  "dependencies": {
+    "@lib/client-types": "*",
+    "@lib/types": "*",
+    "@types/redux": "^3.6.0",
+    "@types/redux-actions": "2.6.1",
+    "@types/redux-logger": "3.0.8",
+    "redux": "4.0.5",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-logger": "3.0.6",
+    "redux-thunk": "^2.3.0",
+    "reselect": "4.0.0",
+    "typesafe-actions": "^5.1.0"
+  },
+  "devDependencies": {
+    "@config/eslint-config": "*",
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4"
+  }
+}

@@ -13,6 +13,6 @@
     "noEmit": true,
     "rootDir": "."
   },
-  "include": ["./src/**/*", "./__tests__/**/*", "./config/*", "./App.tsx"],
+  "include": ["src/**/*", "__tests__/**/*", "config/*", "./App.tsx"],
   "exclude": ["dist", "node_modules"]
 }

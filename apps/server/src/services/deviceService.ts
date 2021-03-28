@@ -1,4 +1,4 @@
-import { IDevice } from '@lib/common-types';
+import { IDevice } from '@lib/types';
 
 import { devices, codes, users } from './dao/db';
 
@@ -10,16 +10,8 @@ const findAll = async () => {
   return devices.read();
 };
 
-const findOneByUidAndUser = async ({
-  deviceId,
-  userName,
-}: {
-  deviceId: string;
-  userName: string;
-}) => {
-  const user = await users.find(
-    (i) => i.userName.toUpperCase() === userName.toUpperCase()
-  );
+const findOneByUidAndUser = async ({ deviceId, userName }: { deviceId: string; userName: string }) => {
+  const user = await users.find((i) => i.userName.toUpperCase() === userName.toUpperCase());
 
   if (!user) {
     throw new Error('пользователь не найден');
@@ -74,26 +66,16 @@ const findUsers = async (deviceId: string) => {
  * @return id, идентификатор устройства
  * */
 
-const addOne = async ({
-  deviceName,
-  userId,
-}: {
-  deviceName: string;
-  userId: string;
-}) => {
-  if (
-    await devices.find(
-      (device) => device.name === deviceName && device.userId === userId
-    )
-  ) {
+const addOne = async ({ deviceName, userId }: { deviceName: string; userId: string }): Promise<string> => {
+  if (await devices.find((device) => device.name === deviceName && device.userId === userId)) {
     throw new Error('устройство с таким названием уже добавлено пользователю');
   }
 
-  return await devices.insert({
+  return devices.insert({
     name: deviceName,
     uid: '',
     state: 'NEW',
-    userId: userId,
+    userId,
   });
 };
 

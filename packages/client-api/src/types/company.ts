@@ -1,13 +1,7 @@
-import { ICompany, IUser } from '@lib/common-types';
+import { ICompany, IUser } from '@lib/types';
 
 export interface ICompanyQueryResponse {
-  type:
-    | 'GET_COMPANY'
-    | 'GET_COMPANIES'
-    | 'ADD_COMPANY'
-    | 'UPDATE_COMPANY'
-    | 'GET_USERS_BY_COMPANY'
-    | 'REMOVE_COMPANY';
+  type: 'GET_COMPANY' | 'GET_COMPANIES' | 'ADD_COMPANY' | 'UPDATE_COMPANY' | 'GET_USERS_BY_COMPANY' | 'REMOVE_COMPANY';
 }
 
 export interface IGetCompanyResponse extends ICompanyQueryResponse {

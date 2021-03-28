@@ -1,13 +1,7 @@
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 export interface IUserQueryResponse {
-  type:
-    | 'GET_USERS'
-    | 'GET_USER'
-    | 'ADD_USER'
-    | 'USER_NOT_AUTHENTICATED'
-    | 'UPDATE_USER'
-    | 'REMOVE_USER';
+  type: 'GET_USERS' | 'GET_USER' | 'ADD_USER' | 'USER_NOT_AUTHENTICATED' | 'UPDATE_USER' | 'REMOVE_USER';
 }
 
 export interface IUserNotAuthResponse extends IUserQueryResponse {

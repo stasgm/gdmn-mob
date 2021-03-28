@@ -1,4 +1,4 @@
-import { IMessage } from '@lib/common-types';
+import { IMessage } from '@lib/types';
 
 import { messages } from './dao/db';
 
@@ -17,20 +17,9 @@ const findAll = async () => {
  * @param {string} userId - идентификатор пользователя
  * @return массив сообщений
  * */
-const FindMany = async ({
-  appSystem,
-  companyId,
-  userId,
-}: {
-  appSystem: string;
-  companyId: string;
-  userId: string;
-}) => {
+const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
   return (await messages.read()).filter(
-    (i) =>
-      i.head.appSystem === appSystem &&
-      i.head.companyid === companyId &&
-      i.head.consumer === userId
+    (i) => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
   );
 };
 
@@ -41,12 +30,12 @@ const FindMany = async ({
  * @return id, идентификатор сообщения
  * */
 
-const addOne = async (msgObject: IMessage) => {
+const addOne = async (msgObject: IMessage): Promise<string> => {
   if (await messages.find((i) => i.head.id === msgObject.head.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
   }
 
-  return await messages.insert(msgObject);
+  return messages.insert(msgObject);
 };
 
 /**
@@ -54,7 +43,7 @@ const addOne = async (msgObject: IMessage) => {
  * @param {IMessage} message - сообщение
  * @return id, идентификатор сообщения
  * */
-const updateOne = async (message: IMessage) => {
+const updateOne = async (message: IMessage): Promise<string> => {
   const oldMessage = await messages.find((i) => i.id === message.id);
 
   if (!oldMessage) {
@@ -62,11 +51,12 @@ const updateOne = async (message: IMessage) => {
   }
 
   // Удаляем поля которые нельзя перезаписывать
+  // eslint-disable-next-line no-param-reassign
   delete message.id;
 
   await messages.update({ ...oldMessage, ...message });
 
-  return message.id;
+  return message.id!;
 };
 
 /**
@@ -96,10 +86,7 @@ const deleteByUid = async ({
   userId: string;
 }): Promise<void> => {
   const messageObj = await messages.find(
-    (message) =>
-      message.head.companyid === companyId &&
-      message.head.consumer === userId &&
-      message.head.id === uid
+    (message) => message.head.companyid === companyId && message.head.consumer === userId && message.head.id === uid,
   );
 
   if (!messageObj) {
@@ -112,13 +99,4 @@ const deleteByUid = async ({
 
 const deleteAll = async (): Promise<void> => messages.deleteAll();
 
-export {
-  findOne,
-  findAll,
-  addOne,
-  deleteOne,
-  updateOne,
-  FindMany,
-  deleteByUid,
-  deleteAll,
-};
+export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid, deleteAll };

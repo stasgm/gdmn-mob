@@ -1,7 +1,7 @@
 import { v1 as uuidv1 } from 'uuid';
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IMessage } from '@lib/common-types';
+import { IResponse, IMessage } from '@lib/types';
 
 import log from '../utils/logger';
 import { messageService, companyService, userService } from '../services';
@@ -23,15 +23,8 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  if (
-    !(ctx.state.user.companies as string[]).find(
-      (item) => item === head.companyId
-    )
-  ) {
-    ctx.throw(
-      403,
-      'пользователь не входит в организацию указанную в заголовке сообщения'
-    );
+  if (!(ctx.state.user.companies as string[]).find((item) => item === head.companyId)) {
+    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   try {
@@ -47,7 +40,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
       body,
     };
 
-    clients.forEach(function (resolve) {
+    clients.forEach((resolve) => {
       resolve([msgObject]);
     });
 
@@ -77,7 +70,7 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   const company = await companyService.findOneByName(companyName);
 
-  const userName = (await userService.findOne(userId)).userName;
+  const { userName } = await userService.findOne(userId);
 
   if (userName === 'gdmn') {
     // TODO переделать
@@ -115,7 +108,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   try {
     let userId = ctx.state.user.id;
 
-    const userName = (await userService.findOne(userId)).userName;
+    const { userName } = await userService.findOne(userId);
 
     if (userName === 'gdmn') {
       // TODO переделать
@@ -127,7 +120,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
     const result: IResponse<void> = { result: true };
 
     ctx.status = 200;
-    ctx.body = result; //TODO передавать только код 204 без body
+    ctx.body = result; // TODO передавать только код 204 без body
 
     log.info('removeMessage: OK');
   } catch (err) {
@@ -142,7 +135,7 @@ const clear = async (ctx: ParameterizedContext): Promise<void> => {
     const result: IResponse<void> = { result: true };
 
     ctx.status = 200;
-    ctx.body = result; //TODO передавать только код 204 без body
+    ctx.body = result; // TODO передавать только код 204 без body
 
     log.info('clear messages: OK');
   } catch (err) {
@@ -175,7 +168,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
   const promise = new Promise<IMessage[]>((resolve, reject) => {
     clients.push(resolve);
 
-    ctx.res.on('close', function () {
+    ctx.res.on('close', () => {
       clients.splice(clients.indexOf(resolve), 1);
       const error = new Error('Connection closed');
       error.name = 'ECONNRESET';
@@ -186,9 +179,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
   let message: string | any[] = '';
 
   try {
-    message = (await promise).filter(
-      (mes) => mes.head.consumer === ctx.state.user.id
-    );
+    message = (await promise).filter((mes) => mes.head.consumer === ctx.state.user.id);
   } catch (err) {
     if (err instanceof Error && err.name === 'ECONNRESET') return;
 
@@ -227,15 +218,8 @@ const publish = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  if (
-    !(ctx.state.user.companies as string[]).find(
-      (item) => item === head.companyId
-    )
-  ) {
-    ctx.throw(
-      403,
-      'пользователь не входит в организацию указанную в заголовке сообщения'
-    );
+  if (!(ctx.state.user.companies as string[]).find((item) => item === head.companyId)) {
+    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   try {

@@ -1,0 +1,10 @@
+{
+  "name": "@config/prettier-config",
+  "version": "1.0.0",
+  "description": "prettier config for project",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "prettier": "^2.2.1"
+  }
+}

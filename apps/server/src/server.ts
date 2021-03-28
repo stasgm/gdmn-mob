@@ -10,7 +10,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
-import { IUser } from '@lib/common-types';
+import { IUser } from '@lib/types';
 
 import config from '../config';
 
@@ -33,15 +33,11 @@ const CONFIG = {
   sameSite: true /** (string) lets require that a cookie shouldn't
     be sent with cross-origin requests (default undefined) */,
 };
-export async function init(): Promise<
-  Koa<Koa.DefaultState, Koa.DefaultContext>
-> {
+export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
-  passport.serializeUser((user: unknown, done) =>
-    done(null, (user as IUser).id)
-  );
+  passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
@@ -52,19 +48,14 @@ export async function init(): Promise<
     }
   });
 
-  passport.use(
-    new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds)
-  );
+  passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
 
   // Логи для Morgan
   const logPath = path.join(process.cwd(), '/logs/');
   if (!fs.existsSync(logPath)) {
     fs.mkdirSync(logPath);
   }
-  const accessLogStream: fs.WriteStream = fs.createWriteStream(
-    path.join(logPath, 'access.log'),
-    { flags: 'a' }
-  );
+  const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
   app
     .use(morganlogger('combined', { stream: accessLogStream }))
@@ -75,7 +66,7 @@ export async function init(): Promise<
         jsonLimit: '20mb',
         textLimit: '10mb',
         enableTypes: ['json', 'form', 'text'],
-      })
+      }),
     )
     .use(errorHandler)
     .use(passport.initialize())
