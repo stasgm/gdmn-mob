@@ -62,7 +62,7 @@ const ActivationScreen = (props: Props) => {
                 // backgroundColor: colors.background,
               }}
             >
-              {request.isError && <Text style={styles.errorText}>Ошибка:{request.status}</Text>}
+              {request.isError && <Text style={styles.errorText}>Ошибка: {request.status}</Text>}
               {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
             </View>
             <TextInput

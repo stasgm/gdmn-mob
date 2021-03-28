@@ -1,6 +1,6 @@
 import { combineReducers, createStore, Reducer, Store, applyMiddleware, compose, StoreEnhancer } from 'redux';
 import thunk from 'redux-thunk';
-import logger from 'redux-logger';
+// import logger from 'redux-logger';
 
 import { composeWithDevTools } from 'redux-devtools-extension';
 
@@ -27,7 +27,7 @@ function createReducer(asyncReducers: { [key: string]: Reducer } = {}) {
 const enhancer = reactotron.createEnhancer?.(true) as StoreEnhancer<any, any>;
 
 const composed = __DEV__
-  ? compose(enhancer, composeWithDevTools(applyMiddleware(thunk, logger)))
+  ? compose(enhancer, composeWithDevTools(applyMiddleware(thunk /* , logger */)))
   : applyMiddleware(thunk);
 
 function configureStore() {

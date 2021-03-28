@@ -8,16 +8,15 @@ import { AuthNavigator } from '@lib/mobile-auth';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
+// import config from './src/config';
 
 enableScreens();
-
-const store = configureStore;
 
 const Router = () => (authSelectors.isLogged() ? <RootNavigator /> : <AuthNavigator />);
 
 const App = () => {
   return (
-    <Provider store={store}>
+    <Provider store={configureStore}>
       <UIProvider theme={defaultTheme}>
         <NavigationContainer>
           <Router />

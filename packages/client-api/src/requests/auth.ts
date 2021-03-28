@@ -20,6 +20,7 @@ const signup = async (userName: string, password: string, companyId?: string, cr
       userId: resData.data,
     } as types.ISignUpResponse;
   }
+
   return {
     type: 'ERROR',
     message: resData.error,
