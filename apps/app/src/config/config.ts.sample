@@ -1,0 +1,29 @@
+export default {
+  server: {
+    protocol: 'http://',
+    name: '192.168.0.49',
+    port: 3649,
+  },
+  timeout: 5000,
+  apiPath: 'api',
+  debug: {
+    showWarnings: true,
+    useMockup: false,
+  },
+  system: [{
+    name: "Inventory",
+    component: "DocumentsNavigator",
+    options: {
+      title: 'Документы',
+      tabBarLabel: 'Документы',
+      tabBarIcon: 'file-document-box',
+      tabBarColor: '#CEE7E3',
+    },
+    defaultDocType: [147160592],
+    weightSettings: {
+      weightCode: '22',
+      code: 5,
+      weight: 5
+    }
+  }]
+};

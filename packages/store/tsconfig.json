@@ -3,6 +3,6 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts", "mock/index.ts"],
+  "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts", "mock/index.ts", "config"],
   "exclude": ["node_modules"]
 }
