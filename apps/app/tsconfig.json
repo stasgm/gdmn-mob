@@ -14,5 +14,5 @@
     "rootDir": "."
   },
   "include": ["src/**/*", "__tests__/**/*", "config/*", "./App.tsx"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "*.sample"]
 }

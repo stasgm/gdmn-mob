@@ -7,8 +7,7 @@
     "App.tsx",
     "babel.config.js",
     "metro.config.js",
-    "jest.config.js",
-    "declarations.d.ts"
+    "jest.config.js"
   ],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "*.sample"]
 }
