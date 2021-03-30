@@ -52,8 +52,10 @@ export interface IDeviceInfo {
   id: string;
   deviceId: string;
   deviceName: string;
-  userId: string;
-  userName: string;
+  user: {
+    id: string;
+    name: string;
+  };
   state: DeviceState;
 }
 

@@ -4,11 +4,11 @@ import { AnyAction } from 'redux';
 import { sleep } from '@lib/store/src/utils/tools';
 
 import { docActions } from './actions';
-import { IDocPayload, IDocState } from './types';
+import { DocPayload, IDocState } from './types';
 
 export const fetchDoc = (): ThunkAction<void, IDocState, unknown, AnyAction> => {
   return async (dispatch) => {
-    const response: IDocPayload = { docData: [{ number: 6 }, { number: 2 }] };
+    const response: DocPayload = { docData: [{ number: 6 }, { number: 2 }] };
 
     dispatch(docActions.fetchDocsAsync.request(''));
 
