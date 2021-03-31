@@ -14,10 +14,6 @@ import { Device } from './components/Device';
 import { User } from './components/User';
 import { ModalBox } from './components/ModalBox';
 import { SystemUser } from './components/SystemUser';
-// import { signup, getCurrentUser } from './service/auth.requests';
-// import { updateUser, getUserDevices, getUser } from './service/user.requests';
-// import { deleteDevice, blockDevice } from './service/device.request';
-// import { createCompany, updateCompany, getAllCompanies, getCompanyUsers } from './service/company.requests';
 
 type AppState =
   | 'LOGIN'
@@ -292,7 +288,12 @@ const reducer = (state: IState, action: Action): IState => {
   }
 };
 
-const App = () => {
+const App = async () => {
+  const data = await requests.auth.login({ userName: 'userName', password: 'password' });
+  return <div>444444bb4</div>;
+};
+
+const App2 = () => {
   const [
     {
       appState,
@@ -780,8 +781,8 @@ const App = () => {
             appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE'
               ? () => handleSetAppState('CREATE_CURRENT_DEVICENAME')
               : appState === 'PROFILE' && isAdmin
-                ? () => handleSetAppState('CREATE_DEVICENAME')
-                : undefined
+              ? () => handleSetAppState('CREATE_DEVICENAME')
+              : undefined
           }
           isAdmin={isAdmin}
         />

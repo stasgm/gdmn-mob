@@ -1,4 +1,5 @@
 // shared config (dev and prod)
+ //      { test: /\.tsx?$/, loader: 'ts-loader' },
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -9,9 +10,8 @@ module.exports = {
   context: resolve(__dirname, '../../src'),
   module: {
     rules: [
-      { test: /\.tsx?$/, loader: 'ts-loader' },
       {
-        test: [/\.jsx?$/],
+        test: [/\.jsx?$/, /\.tsx?$/],
         use: ['babel-loader'],
         exclude: /node_modules/,
       },
