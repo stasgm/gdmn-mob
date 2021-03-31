@@ -9,7 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
 import docActions from '../store/docs';
-import { IAppState } from '../store/roodReducer';
+import { IAppState } from '../store/rootReducer';
 import { IDocument } from '../store/docs/types';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {
