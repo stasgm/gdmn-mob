@@ -1,9 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
+    "noEmit": false,
+    "declaration": true,
+    "outDir": "dist",
     "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }

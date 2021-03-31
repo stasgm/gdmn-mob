@@ -1,9 +1,11 @@
 {
   "name": "@lib/client-api",
   "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
-  "main": "./index.ts",
   "scripts": {
+    "build": "tsc",
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",

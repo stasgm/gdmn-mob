@@ -7,7 +7,7 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 
 import MapScreen from '../screens/Maps';
 
-import rootReducer from '../store/roodReducer';
+import rootReducer from '../store/rootReducer';
 
 import DashboardNavigator from './Root/DashboardNavigator';
 import DocumentsNavigator from './Root/DocumentsNavigator';
