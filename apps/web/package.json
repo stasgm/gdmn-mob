@@ -1,8 +1,8 @@
 {
-  "name": "@apps/web-api",
+  "name": "@apps/web",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "Web-api",
+  "description": "Web",
   "scripts": {
     "build": "yarn run clean-dist && webpack --config=configs/webpack/prod.js",
     "clean-dist": "rimraf dist/*",
