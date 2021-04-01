@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
     "sourceMap": true,
     "pretty": true,
     "removeComments": true,
+    "allowJs": false,
+    "checkJs": false,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "noImplicitThis": true,
+    "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
@@ -20,6 +21,10 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "module": "ES6",
+    "moduleResolution": "Node",
+    "target": "ES6",
+    "isolatedModules": false
   }
 }
