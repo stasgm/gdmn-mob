@@ -5,7 +5,7 @@ import { Box, Container, Grid } from '@material-ui/core';
 // import LatestProducts from '../components/dashboard//LatestProducts';
 // import Sales from '../components/dashboard//Sales';
 // import TasksProgress from '../components/dashboard//TasksProgress';
-// import TotalCustomers from '../components/dashboard//TotalCustomers';
+// import Totalusers from '../components/dashboard//Totalusers';
 // import TotalProfit from '../components/dashboard//TotalProfit';
 // import TrafficByDevice from '../components/dashboard//TrafficByDevice';
 
@@ -27,7 +27,7 @@ const Dashboard = () => (
             <Budget />
           </Grid>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
-            <TotalCustomers />
+            <Totalusers />
           </Grid>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
             <TasksProgress />

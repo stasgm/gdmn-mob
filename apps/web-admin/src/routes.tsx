@@ -4,7 +4,7 @@ import { PartialRouteObject } from 'react-router';
 import DashboardLayout from './components/DashboardLayout';
 import MainLayout from './components/MainLayout';
 import Account from './pages/Account';
-// import CustomerList from './pages/CustomerList';
+import UserList from './pages/UserList';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -18,7 +18,7 @@ const routes: PartialRouteObject[] = [
     element: <DashboardLayout />,
     children: [
       { path: 'account', element: <Account /> },
-      // { path: 'customers', element: <CustomerList /> },
+      { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
       // { path: 'products', element: <ProductList /> },
       // { path: 'settings', element: <Settings /> },

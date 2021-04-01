@@ -39,9 +39,9 @@ const items = [
     title: 'Устройства',
   },
   {
-    href: '/app/settings',
+    href: '/app/account',
     icon: SettingsIcon,
-    title: 'Settings',
+    title: 'Профиль',
   },
 ];
 
