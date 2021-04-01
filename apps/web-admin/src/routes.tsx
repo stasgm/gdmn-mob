@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom';
+import { PartialRouteObject } from 'react-router';
 
 import DashboardLayout from './components/DashboardLayout';
 import MainLayout from './components/MainLayout';
@@ -11,7 +12,7 @@ import NotFound from './pages/NotFound';
 import Register from './pages/Register';
 // import Settings from './pages/Settings';
 
-const routes = [
+const routes: PartialRouteObject[] = [
   {
     path: 'app',
     element: <DashboardLayout />,

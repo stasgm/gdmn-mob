@@ -3,11 +3,9 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, Hidden, List, Typography } from '@material-ui/core';
 import {
   BarChart as BarChartIcon,
-  Lock as LockIcon,
   Settings as SettingsIcon,
   ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
-  UserPlus as UserPlusIcon,
   Users as UsersIcon,
 } from 'react-feather';
 
@@ -23,37 +21,27 @@ const items = [
   {
     href: '/app/dashboard',
     icon: BarChartIcon,
-    title: 'Dashboard',
+    title: 'Сводка',
   },
   {
-    href: '/app/customers',
+    href: '/app/companies',
     icon: UsersIcon,
-    title: 'Customers',
+    title: 'Организации',
   },
   {
-    href: '/app/products',
+    href: '/app/users',
     icon: ShoppingBagIcon,
-    title: 'Products',
+    title: 'Пользователи',
   },
   {
-    href: '/app/account',
+    href: '/app/devices',
     icon: UserIcon,
-    title: 'Account',
+    title: 'Устройства',
   },
   {
     href: '/app/settings',
     icon: SettingsIcon,
     title: 'Settings',
-  },
-  {
-    href: '/login',
-    icon: LockIcon,
-    title: 'Login',
-  },
-  {
-    href: '/register',
-    icon: UserPlusIcon,
-    title: 'Register',
   },
 ];
 
