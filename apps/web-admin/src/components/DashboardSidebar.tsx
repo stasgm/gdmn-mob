@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, Hidden, List, Typography } from '@material-ui/core';
 import {
   BarChart as BarChartIcon,
@@ -9,10 +8,13 @@ import {
   Users as UsersIcon,
 } from 'react-feather';
 
+import { useState } from 'react';
+
 import NavItem from './NavItem';
+import NavToggle from './NavToggle';
 
 const user = {
-  avatar: '../../assets/avatar_1.png',
+  avatar: '../assets/images/avatar_1.png',
   jobTitle: 'Senior Developer',
   name: 'Katarina Smith',
 };
@@ -45,19 +47,13 @@ const items = [
   },
 ];
 
-interface props {
+interface IProps {
   onMobileClose: () => void;
   openMobile: boolean;
 }
 
-const DashboardSidebar = ({ onMobileClose, openMobile }: props) => {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (openMobile && onMobileClose) {
-      onMobileClose();
-    }
-  }, [location.pathname, onMobileClose, openMobile]);
+const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
+  const [isCompact, setCompact] = useState(false);
 
   const content = (
     <Box
@@ -65,6 +61,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: props) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        flexGrow: Number(isCompact ? 0 : 1),
       }}
     >
       <Box
@@ -72,7 +69,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: props) => {
           alignItems: 'center',
           display: 'flex',
           flexDirection: 'column',
-          p: 2,
+          p: Number(isCompact ? 1 : 2),
         }}
       >
         <Avatar
@@ -86,20 +83,24 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: props) => {
           to="/app/account"
         />
         <Typography color="textPrimary" variant="h5">
-          {user.name}
+          {!isCompact ? user.name : user.name.split(' ')[0].slice(0, 1)}
         </Typography>
-        <Typography color="textSecondary" variant="body2">
-          {user.jobTitle}
-        </Typography>
+        {!isCompact && (
+          <Typography color="textSecondary" variant="body2">
+            {user.jobTitle}
+          </Typography>
+        )}
       </Box>
       <Divider />
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: Number(isCompact ? 0 : 2) }}>
         <List>
           {items.map((item) => (
-            <NavItem href={item.href} key={item.title} title={item.title} icon={item.icon} />
+            <NavItem href={item.href} key={item.title} title={item.title} icon={item.icon} compact={isCompact} />
           ))}
         </List>
       </Box>
+      <Divider />
+      <NavToggle compact={isCompact} setCompact={setCompact} />
     </Box>
   );
 
@@ -113,7 +114,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: props) => {
           variant="temporary"
           PaperProps={{
             sx: {
-              width: 256,
+              width: isCompact ? 70 : 256,
             },
           }}
         >
@@ -127,9 +128,12 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: props) => {
           variant="persistent"
           PaperProps={{
             sx: {
-              width: 256,
+              width: isCompact ? 70 : 256,
               top: 64,
               height: 'calc(100% - 64px)',
+              transitionProperty: 'width, transform !important',
+              transitionDuration: '0.3s !important',
+              transitionTimingFunction: 'cubic-bezier(0.4, 0, 1, 1) !important',
             },
           }}
         >

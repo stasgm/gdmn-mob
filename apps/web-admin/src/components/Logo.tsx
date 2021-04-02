@@ -1,3 +1,3 @@
-const Logo = (props: any) => <img alt="Logo" src="../assets/logo.svg" {...props} />;
+const Logo = (props: any) => <img alt="Logo" src="../assets/images/logo.svg" {...props} />;
 
 export default Logo;

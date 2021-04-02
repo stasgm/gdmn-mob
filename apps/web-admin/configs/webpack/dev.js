@@ -15,6 +15,7 @@ module.exports = merge(commonConfig, {
     hot: true, // enable HMR on the server
     open: true,
     contentBase: './',
+    publicPath: '/',
     historyApiFallback: true,
   },
   devtool: 'cheap-module-source-map',

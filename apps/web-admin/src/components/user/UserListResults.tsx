@@ -17,11 +17,11 @@ import {
 
 import getInitials from '../../utils/getInitials';
 
-interface props {
+interface IProps {
   users: any;
 }
 
-const UserListResults = ({ users, ...rest }: props) => {
+const UserListResults = ({ users, ...rest }: IProps) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);

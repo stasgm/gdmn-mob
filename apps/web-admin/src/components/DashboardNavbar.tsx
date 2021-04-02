@@ -7,11 +7,11 @@ import InputIcon from '@material-ui/icons/Input';
 
 import Logo from './Logo';
 
-interface props {
+interface IProps {
   onMobileNavOpen: () => void;
 }
 
-const DashboardNavbar = ({ onMobileNavOpen, ...rest }: props) => {
+const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
   const [notifications] = useState([]);
 
   return (
