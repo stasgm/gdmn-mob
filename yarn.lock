@@ -3115,7 +3115,7 @@
   dependencies:
     "@babel/runtime" "^7.4.4"
 
-"@material-ui/styled-engine@5.0.0-alpha.25", "@material-ui/styled-engine@^5.0.0-alpha.28":
+"@material-ui/styled-engine@5.0.0-alpha.25", "@material-ui/styled-engine@^5.0.0-alpha.25":
   version "5.0.0-alpha.25"
   resolved "https://registry.yarnpkg.com/@material-ui/styled-engine/-/styled-engine-5.0.0-alpha.25.tgz#3008d08baec33c69fa1381c4c375a8863c11722a"
   integrity sha512-z9piABOWycFx1yA9Th8MAs/03SfVOobh+4X1owZmOzXVSln3Xm0C3GjsFmfUpYMC8oC0vddFj00IcCCxm0OECg==

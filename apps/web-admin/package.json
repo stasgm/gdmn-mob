@@ -68,7 +68,8 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
-    "@config/prettier-config": "*"
+    "@config/prettier-config": "*",
+    "react-hot-loader": "^4.13.0"
   },
   "browserslist": {
     "production": [

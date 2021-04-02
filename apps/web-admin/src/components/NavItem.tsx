@@ -1,13 +1,14 @@
 import { NavLink as RouterLink, matchPath, useLocation } from 'react-router-dom';
 import { Button, ListItem } from '@material-ui/core';
 
-interface props {
+interface IProps {
   href: string;
   icon: any;
   title: string;
+  compact: boolean;
 }
 
-const NavItem = ({ href, icon: Icon, title, ...rest }: props) => {
+const NavItem = ({ href, icon: Icon, title, compact, ...rest }: IProps) => {
   const location = useLocation();
 
   const active = href
@@ -26,6 +27,7 @@ const NavItem = ({ href, icon: Icon, title, ...rest }: props) => {
       sx={{
         display: 'flex',
         py: 0,
+        minHeight: '36px',
       }}
       {...rest}
     >
@@ -36,7 +38,7 @@ const NavItem = ({ href, icon: Icon, title, ...rest }: props) => {
           fontWeight: 'medium',
           justifyContent: 'flex-start',
           letterSpacing: 0,
-          py: 1.25,
+          py: compact ? 1 : 1.25,
           textTransform: 'none',
           width: '100%',
           ...(active && {
@@ -49,7 +51,7 @@ const NavItem = ({ href, icon: Icon, title, ...rest }: props) => {
         to={href}
       >
         {Icon && <Icon size="20" />}
-        <span>{title}</span>
+        {!compact && <span>{title}</span>}
       </Button>
     </ListItem>
   );
