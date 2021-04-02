@@ -3,9 +3,32 @@ import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typography } from '@material-ui/core';
+// import { IUserCredentials } from '@lib/types';
+// import { useSelector } from 'react-redux';
+// import { RootState } from '@lib/store';
+// import { useState, useEffect, useMemo } from 'react';
+
+// interface Props {
+//   onSignIn: (credentials: IUserCredentials) => void;
+// }
 
 const Register = () => {
   const navigate = useNavigate();
+  // const { error, loading, status } = useSelector((state: RootState) => state.auth);
+
+  // const request = useMemo(
+  //   () => ({
+  //     isError: error,
+  //     isLoading: loading,
+  //     status,
+  //   }),
+  //   [error, loading, status],
+  // );
+
+  // const [credential, setCredentials] = useState<IUserCredentials>({
+  //   userName: 'Stas',
+  //   password: '123',
+  // });
 
   return (
     <>
@@ -55,7 +78,7 @@ const Register = () => {
                   error={Boolean(touched.firstName && errors.firstName)}
                   fullWidth
                   helperText={touched.firstName && errors.firstName}
-                  label="First name"
+                  label="Имя пользователя"
                   margin="normal"
                   name="firstName"
                   onBlur={handleBlur}

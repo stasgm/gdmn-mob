@@ -18,10 +18,10 @@ import {
 import getInitials from '../../utils/getInitials';
 
 interface props {
-  users: any;
+  devices: any;
 }
 
-const UserListResults = ({ users, ...rest }: props) => {
+const DeviceListResults = ({ devices, ...rest }: props) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -30,7 +30,7 @@ const UserListResults = ({ users, ...rest }: props) => {
     let newSelectedCustomerIds;
 
     if (event.target.checked) {
-      newSelectedCustomerIds = users.map((user: any) => user.id);
+      newSelectedCustomerIds = devices.map((device: any) => device.id);
     } else {
       newSelectedCustomerIds = [];
     }
@@ -75,9 +75,9 @@ const UserListResults = ({ users, ...rest }: props) => {
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedCustomerIds.length === users.length}
+                    checked={selectedCustomerIds.length === devices.length}
                     color="primary"
-                    indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < users.length}
+                    indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < devices.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
@@ -89,12 +89,12 @@ const UserListResults = ({ users, ...rest }: props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user: any) => (
-                <TableRow hover key={user.id} selected={selectedCustomerIds.indexOf(user.id) !== -1}>
+              {devices.slice(0, limit).map((device: any) => (
+                <TableRow hover key={device.id} selected={selectedCustomerIds.indexOf(device.id) !== -1}>
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selectedCustomerIds.indexOf(user.id) !== -1}
-                      onChange={(event) => handleSelectOne(event, user.id)}
+                      checked={selectedCustomerIds.indexOf(device.id) !== -1}
+                      onChange={(event) => handleSelectOne(event, device.id)}
                       value="true"
                     />
                   </TableCell>
@@ -105,18 +105,18 @@ const UserListResults = ({ users, ...rest }: props) => {
                         display: 'flex',
                       }}
                     >
-                      <Avatar src={user.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(user.name)}
+                      <Avatar src={device.avatarUrl} sx={{ mr: 2 }}>
+                        {getInitials(device.name)}
                       </Avatar>
                       <Typography color="textPrimary" variant="body1">
-                        {user.name}
+                        {device.name}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{`${user.address.city}, ${user.address.state}, ${user.address.country}`}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{moment(user.createdAt).format('DD/MM/YYYY')}</TableCell>
+                  <TableCell>{device.email}</TableCell>
+                  <TableCell>{`${device.address.city}, ${device.address.state}, ${device.address.country}`}</TableCell>
+                  <TableCell>{device.phone}</TableCell>
+                  <TableCell>{moment(device.createdAt).format('DD/MM/YYYY')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -125,7 +125,7 @@ const UserListResults = ({ users, ...rest }: props) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={users.length}
+        count={devices.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -136,4 +136,4 @@ const UserListResults = ({ users, ...rest }: props) => {
   );
 };
 
-export default UserListResults;
+export default DeviceListResults;

@@ -6,9 +6,10 @@ import MainLayout from './components/MainLayout';
 import Account from './pages/Account';
 import UserList from './pages/UserList';
 import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
+import SignInWithParams from './navigation/SignInWithParams';
 import NotFound from './pages/NotFound';
-// import ProductList from './pages/ProductList';
+import CompanyList from './pages/CompanyList';
+import DeviceList from './pages/DeviceList';
 import Register from './pages/Register';
 // import Settings from './pages/Settings';
 
@@ -20,7 +21,8 @@ const routes: PartialRouteObject[] = [
       { path: 'account', element: <Account /> },
       { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
-      // { path: 'products', element: <ProductList /> },
+      { path: 'companies', element: <CompanyList /> },
+      { path: 'devices', element: <DeviceList /> },
       // { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> },
     ],
@@ -29,7 +31,7 @@ const routes: PartialRouteObject[] = [
     path: '/',
     element: <MainLayout />,
     children: [
-      { path: 'login', element: <Login /> },
+      { path: 'login', element: <SignInWithParams /> },
       { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
       { path: '/', element: <Navigate to="/login" /> },

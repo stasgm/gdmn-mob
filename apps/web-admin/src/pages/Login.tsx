@@ -3,9 +3,36 @@ import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography } from '@material-ui/core';
+import { IUserCredentials } from '@lib/types';
+import { useSelector } from 'react-redux';
+import { RootState } from '@lib/store';
+import { useState, useMemo } from 'react';
 
-const Login = () => {
+interface Props {
+  onSignIn: (credentials: IUserCredentials) => void;
+}
+
+const Login = ({ onSignIn }: Props) => {
   const navigate = useNavigate();
+  const { error, loading, status } = useSelector((state: RootState) => state.auth);
+
+  const request = useMemo(
+    () => ({
+      isError: error,
+      isLoading: loading,
+      status,
+    }),
+    [error, loading, status],
+  );
+
+  const handleLogIn = () => {
+    onSignIn(credential);
+  };
+
+  const [credential, setCredentials] = useState<IUserCredentials>({
+    userName: 'Stas',
+    password: '123',
+  });
 
   return (
     <>
@@ -23,10 +50,7 @@ const Login = () => {
       >
         <Container maxWidth="sm">
           <Formik
-            initialValues={{
-              email: 'demo@devias.io',
-              password: 'Password123',
-            }}
+            initialValues={credential}
             validationSchema={Yup.object().shape({
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
               password: Yup.string().max(255).required('Password is required'),
@@ -35,43 +59,43 @@ const Login = () => {
               navigate('/app/dashboard', { replace: true });
             }}
           >
-            {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-              <form onSubmit={handleSubmit}>
+            {({ errors, handleBlur }) => (
+              <form onSubmit={handleLogIn}>
                 <Box sx={{ mb: 3 }}>
                   <Typography color="textPrimary" variant="h2">
                     Sign in
                   </Typography>
                 </Box>
                 <TextField
-                  error={Boolean(touched.email && errors.email)}
+                  error={Boolean(credential.userName && errors.userName)}
                   fullWidth
-                  helperText={touched.email && errors.email}
-                  label="Email Address"
+                  helperText={credential.userName && errors.userName}
+                  label="Имя пользователя"
                   margin="normal"
-                  name="email"
+                  name="name"
                   onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="email"
-                  value={values.email}
+                  onChange={(val) => setCredentials({ ...credential, userName: val.target.value })}
+                  type="name"
+                  value={credential.userName}
                   variant="outlined"
                 />
                 <TextField
-                  error={Boolean(touched.password && errors.password)}
+                  error={Boolean(credential.password && errors.password)}
                   fullWidth
-                  helperText={touched.password && errors.password}
+                  helperText={credential.password && errors.password}
                   label="Password"
                   margin="normal"
                   name="password"
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(val) => setCredentials({ ...credential, password: val.target.value })}
                   type="password"
-                  value={values.password}
+                  value={credential.password}
                   variant="outlined"
                 />
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"
-                    disabled={isSubmitting}
+                    disabled={request.isLoading}
                     fullWidth
                     size="large"
                     type="submit"

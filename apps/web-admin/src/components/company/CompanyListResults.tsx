@@ -18,10 +18,10 @@ import {
 import getInitials from '../../utils/getInitials';
 
 interface props {
-  users: any;
+  companys: any;
 }
 
-const UserListResults = ({ users, ...rest }: props) => {
+const CompanyListResults = ({ companys, ...rest }: props) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -30,7 +30,7 @@ const UserListResults = ({ users, ...rest }: props) => {
     let newSelectedCustomerIds;
 
     if (event.target.checked) {
-      newSelectedCustomerIds = users.map((user: any) => user.id);
+      newSelectedCustomerIds = companys.map((company: any) => company.id);
     } else {
       newSelectedCustomerIds = [];
     }
@@ -75,9 +75,9 @@ const UserListResults = ({ users, ...rest }: props) => {
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedCustomerIds.length === users.length}
+                    checked={selectedCustomerIds.length === companys.length}
                     color="primary"
-                    indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < users.length}
+                    indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < companys.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
@@ -89,12 +89,12 @@ const UserListResults = ({ users, ...rest }: props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user: any) => (
-                <TableRow hover key={user.id} selected={selectedCustomerIds.indexOf(user.id) !== -1}>
+              {companys.slice(0, limit).map((company: any) => (
+                <TableRow hover key={company.id} selected={selectedCustomerIds.indexOf(company.id) !== -1}>
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selectedCustomerIds.indexOf(user.id) !== -1}
-                      onChange={(event) => handleSelectOne(event, user.id)}
+                      checked={selectedCustomerIds.indexOf(company.id) !== -1}
+                      onChange={(event) => handleSelectOne(event, company.id)}
                       value="true"
                     />
                   </TableCell>
@@ -105,18 +105,22 @@ const UserListResults = ({ users, ...rest }: props) => {
                         display: 'flex',
                       }}
                     >
-                      <Avatar src={user.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(user.name)}
+                      <Avatar src={company.avatarUrl} sx={{ mr: 2 }}>
+                        {getInitials(company.name)}
                       </Avatar>
                       <Typography color="textPrimary" variant="body1">
-                        {user.name}
+                        {company.name}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{`${user.address.city}, ${user.address.state}, ${user.address.country}`}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{moment(user.createdAt).format('DD/MM/YYYY')}</TableCell>
+                  <TableCell>{company.email}</TableCell>
+                  <TableCell>
+                    {`${company.address.city},
+                    ${company.address.state},
+                    ${company.address.country}`}
+                  </TableCell>
+                  <TableCell>{company.phone}</TableCell>
+                  <TableCell>{moment(company.createdAt).format('DD/MM/YYYY')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -125,7 +129,7 @@ const UserListResults = ({ users, ...rest }: props) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={users.length}
+        count={companys.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -136,4 +140,4 @@ const UserListResults = ({ users, ...rest }: props) => {
   );
 };
 
-export default UserListResults;
+export default CompanyListResults;
