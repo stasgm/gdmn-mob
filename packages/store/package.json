@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "common store package",
   "license": "MIT",
-  "main": "./index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^10.5.4"
+    "lint-staged": "^10.5.4",
+    "typescript": "^4.2.3"
   }
 }

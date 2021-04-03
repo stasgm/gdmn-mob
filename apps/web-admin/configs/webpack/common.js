@@ -1,17 +1,19 @@
 // shared config (dev and prod)
-const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const pkg = require('../../package.json');
+const config = require('../config.json');
+const { getRootRelativePath } = require('./utils');
 
 module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
-  context: resolve(__dirname, '../../src'),
+  context: getRootRelativePath('src'),
   module: {
     rules: [
-      { test: /\.tsx?$/, loader: 'ts-loader' },
+      // { test: /\.tsx?$/, loader: 'ts-loader' },
       {
-        test: [/\.jsx?$/],
+        test: /\.(j|t)sx?$/,
         use: ['babel-loader'],
         exclude: /node_modules/,
       },
@@ -34,7 +36,13 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      favicon: getRootRelativePath('assets/favicon.ico'),
       template: 'index.html.ejs',
+      title: pkg.displayName,
+      /* template params */
+      appMountNodeId: config.webpack.appMountNodeId,
+      description: pkg.description,
+      mobile: true,
       minify: {
         collapseWhitespace: true,
         removeAttributeQuotes: true,

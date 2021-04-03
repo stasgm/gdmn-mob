@@ -20,7 +20,7 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
-    "@expo/webpack-config": "^0.12.63",
+    "@expo/webpack-config": "^0.12.64",
     "@lib/client-types": "*",
     "@lib/mobile-ui": "*",
     "@lib/store": "*",

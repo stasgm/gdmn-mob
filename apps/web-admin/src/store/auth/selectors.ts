@@ -2,9 +2,11 @@ import { useSelector } from 'react-redux';
 
 import { RootState } from '../rootReducer';
 
-const isLogged = () => {
-  const { device, user, company } = useSelector((state: RootState) => state.auth);
+const selectIsLogged = (state: RootState) => {
+  const { device, user, company } = state.auth;
   return device && user && company;
 };
+
+const isLogged = useSelector(selectIsLogged);
 
 export default { isLogged };

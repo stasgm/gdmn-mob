@@ -1,22 +1,24 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "pretty": true,
+    "sourceMap": true, // Создавать ли соответствующие source map файлы ".map"?
+    "pretty": true, // Окрашивать в терминале сообщения об ошибках.
     "removeComments": true,
-    "allowJs": false,
-    "checkJs": false,
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "checkJs": false,  // Сообщить об ошибках в .js-файлах? Используйте совместно с "allowJs".
+    "allowJs": false, // Разрешать компилировать файлы с JavaScript-кодом?
+    "strict": true, // Включить ли все строги проверки типов сразу: noImplicitAny, noImplicitThis, alwaysStrict, strictNullChecks, strictFunctionTypes, strictPropertyInitialization?  
+    "strictPropertyInitialization": false,
+    "alwaysStrict": false, // Компилировать ли каждый файл в строгом режиме и создавать ли 'use strict' для каждого выходного файла? Требуется TypeScript версии 2.1 или новее.   
+    "strictNullChecks": true, // Значения "null" и "undefined" могут быть присвоены только значениям данного типа и значениям только с типом "any"?
     "strictFunctionTypes": true,
-    "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
-    "alwaysStrict": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
-    "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "skipLibCheck": true, // Не проверять типы, заданные во всех файлах описания типов (*.d.ts)?
+    "noImplicitUseStrict": false, // Не записывать 'use strict' в итоговый выходной файл?
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "resolveJsonModule": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -24,7 +26,7 @@
     "forceConsistentCasingInFileNames": true,
     "module": "ES6",
     "moduleResolution": "Node",
-    "target": "ES6",
+    "target": "ES6", // Тип кода создаваемого итогового файла.
     "isolatedModules": false
   }
 }

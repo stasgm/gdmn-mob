@@ -1,20 +1,34 @@
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography } from '@material-ui/core';
 import { IUserCredentials } from '@lib/types';
-import { useSelector } from 'react-redux';
-import { RootState } from '@lib/store';
-import { useState, useMemo } from 'react';
+// import { useSelector } from 'react-redux';
+import yup from 'yup';
+import { useTypedSelector } from '@lib/store';
+import { useMemo } from 'react';
 
 interface Props {
   onSignIn: (credentials: IUserCredentials) => void;
 }
 
+/* const validate = (values: IUserCredentials) => {
+  const errors = {};
+  if (!values.userName) {
+    errors.userName = 'Required';
+
+  }
+
+  if (!values.password) {
+    errors.password = 'Required';
+  }
+
+  return errors;
+};
+ */
 const Login = ({ onSignIn }: Props) => {
-  const navigate = useNavigate();
-  const { error, loading, status } = useSelector((state: RootState) => state.auth);
+  // const navigate = useNavigate();
+  const { error, loading, status } = useTypedSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({
@@ -25,19 +39,31 @@ const Login = ({ onSignIn }: Props) => {
     [error, loading, status],
   );
 
-  const handleLogIn = () => {
-    onSignIn(credential);
-  };
+  /*   const [credential, setCredentials] = useState<IUserCredentials>({
+      userName: 'Stas',
+      password: '123',
+    });
+   */
 
-  const [credential, setCredentials] = useState<IUserCredentials>({
-    userName: 'Stas',
-    password: '123',
+  const formik = useFormik<IUserCredentials>({
+    initialValues: {
+      userName: 'Stas',
+      password: '123',
+    },
+    /*   validationSchema: yup.object({
+      userName: yup.string().max(15, 'Must be 15 characters or less').required('Required'),
+      password: yup.string().max(20, 'Must be 20 characters or less').required('Required'),
+    }), */
+    onSubmit: (values) => {
+      onSignIn(values);
+      alert(JSON.stringify(values, null, 2));
+    },
   });
 
   return (
     <>
       <Helmet>
-        <title>Login | Material Kit</title>
+        <title>Login</title>
       </Helmet>
       <Box
         sx={{
@@ -49,70 +75,58 @@ const Login = ({ onSignIn }: Props) => {
         }}
       >
         <Container maxWidth="sm">
-          <Formik
-            initialValues={credential}
-            validationSchema={Yup.object().shape({
-              email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-              password: Yup.string().max(255).required('Password is required'),
-            })}
-            onSubmit={() => {
-              navigate('/app/dashboard', { replace: true });
-            }}
-          >
-            {({ errors, handleBlur }) => (
-              <form onSubmit={handleLogIn}>
-                <Box sx={{ mb: 3 }}>
-                  <Typography color="textPrimary" variant="h2">
-                    Sign in
-                  </Typography>
-                </Box>
-                <TextField
-                  error={Boolean(credential.userName && errors.userName)}
-                  fullWidth
-                  helperText={credential.userName && errors.userName}
-                  label="Имя пользователя"
-                  margin="normal"
-                  name="name"
-                  onBlur={handleBlur}
-                  onChange={(val) => setCredentials({ ...credential, userName: val.target.value })}
-                  type="name"
-                  value={credential.userName}
-                  variant="outlined"
-                />
-                <TextField
-                  error={Boolean(credential.password && errors.password)}
-                  fullWidth
-                  helperText={credential.password && errors.password}
-                  label="Password"
-                  margin="normal"
-                  name="password"
-                  onBlur={handleBlur}
-                  onChange={(val) => setCredentials({ ...credential, password: val.target.value })}
-                  type="password"
-                  value={credential.password}
-                  variant="outlined"
-                />
-                <Box sx={{ py: 2 }}>
-                  <Button
-                    color="primary"
-                    disabled={request.isLoading}
-                    fullWidth
-                    size="large"
-                    type="submit"
-                    variant="contained"
-                  >
-                    Sign in now
-                  </Button>
-                </Box>
-                <Typography color="textSecondary" variant="body1">
-                  Don&apos;t have an account?{' '}
-                  <Link component={RouterLink} to="/register" variant="h6">
-                    Sign up
-                  </Link>
-                </Typography>
-              </form>
-            )}
-          </Formik>
+          <form onSubmit={formik.handleSubmit}>
+            <Box sx={{ mb: 3 }}>
+              <Typography color="textPrimary" variant="h2">
+                Sign in
+              </Typography>
+            </Box>
+            <TextField
+              error={Boolean(formik.values.userName && formik.errors.userName)}
+              fullWidth
+              helperText={formik.values.userName && formik.errors.userName}
+              label="Имя пользователя"
+              margin="normal"
+              name="name"
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              type="name"
+              value={formik.values.userName}
+              variant="outlined"
+            />
+            {formik.touched.userName && formik.errors.userName ? <div>{formik.errors.userName}</div> : null}
+            <TextField
+              error={Boolean(formik.values.password && formik.errors.password)}
+              fullWidth
+              helperText={formik.values.password && formik.errors.password}
+              label="Password"
+              margin="normal"
+              name="password"
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              type="password"
+              value={formik.values.password}
+              variant="outlined"
+            />
+            <Box sx={{ py: 2 }}>
+              <Button
+                color="primary"
+                disabled={request.isLoading}
+                fullWidth
+                size="large"
+                type="submit"
+                variant="contained"
+              >
+                Sign in now
+              </Button>
+            </Box>
+            <Typography color="textSecondary" variant="body1">
+              Don&apos;t have an account?{' '}
+              <Link component={RouterLink} to="/register" variant="h6">
+                Sign up
+              </Link>
+            </Typography>
+          </form>
         </Container>
       </Box>
     </>

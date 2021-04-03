@@ -11,7 +11,6 @@ import NotFound from './pages/NotFound';
 import CompanyList from './pages/CompanyList';
 import DeviceList from './pages/DeviceList';
 import Register from './pages/Register';
-// import Settings from './pages/Settings';
 
 const routes: PartialRouteObject[] = [
   {
@@ -23,7 +22,6 @@ const routes: PartialRouteObject[] = [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'companies', element: <CompanyList /> },
       { path: 'devices', element: <DeviceList /> },
-      // { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> },
     ],
   },
@@ -35,7 +33,6 @@ const routes: PartialRouteObject[] = [
       { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
       { path: '/', element: <Navigate to="/login" /> },
-      // { path: '/', element: <Navigate to="/app/dashboard" /> },
       { path: '*', element: <Navigate to="/404" /> },
     ],
   },

@@ -6,34 +6,40 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import rootReducer from './rootReducer';
 import { IAuthState } from './auth/types';
-import reactotron from './ReactotronConfig';
+// import reactotron from './ReactotronConfig';
 
-export { RootState } from './rootReducer';
+// export { RootState } from './rootReducer';
 
 export type IState = IAuthState;
 
-export interface StoreWithAsyncReducers extends Store {
+/* export interface StoreWithAsyncReducers extends Store {
   asyncReducers?: { [key: string]: Reducer };
   addReducer?: (key: string, asyncReducer: Reducer) => void;
-}
+} */
 
-function createReducer(asyncReducers: { [key: string]: Reducer } = {}) {
+/* function createReducer(asyncReducers: { [key: string]: Reducer } = {}) {
   return combineReducers<any, any>({
     ...rootReducer,
     ...asyncReducers,
   });
 }
+ */
+const enhancer = {} as StoreEnhancer<any, any>;
+// const enhancer = reactotron.createEnhancer?.(true) as StoreEnhancer<any, any>;
 
-const enhancer = reactotron.createEnhancer?.(true) as StoreEnhancer<any, any>;
-
-const composed = __DEV__
+// заменить __DEV__  на env... __DEV__  - только для rn
+/* const composed = __DEV__
   ? compose(enhancer, composeWithDevTools(applyMiddleware(thunk, logger)))
   : applyMiddleware(thunk);
+ */
+const composed = compose(enhancer, composeWithDevTools(applyMiddleware(thunk, logger)));
 
 function configureStore() {
   const rootStore: Store = createStore(combineReducers(rootReducer), composed);
 
-  const store: StoreWithAsyncReducers = {
+  return rootStore;
+
+  /*   const store: StoreWithAsyncReducers = {
     ...rootStore,
     asyncReducers: {},
     addReducer: (key, asyncReducer) => {
@@ -45,7 +51,7 @@ function configureStore() {
     },
   };
 
-  return store;
+  return store; */
 }
 
 const store = configureStore();

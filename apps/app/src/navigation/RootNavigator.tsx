@@ -5,9 +5,9 @@ import { DrawerNavigator } from '@lib/mobile-navigation';
 
 import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator';
 
-import MapScreen from '../screens/Maps';
+import { combinedReducer } from '../store';
 
-import rootReducer from '../store/rootReducer';
+import MapScreen from '../screens/Maps';
 
 import DashboardNavigator from './Root/DashboardNavigator';
 import DocumentsNavigator from './Root/DocumentsNavigator';
@@ -36,7 +36,7 @@ const navItems: INavItem[] = [
 ];
 
 const RootNavigator = () => {
-  useAddReducer('docs', rootReducer.docs);
+  useAddReducer('app', combinedReducer.docs);
 
   return <DrawerNavigator items={navItems} />;
 };

@@ -11,14 +11,24 @@ module.exports = merge(commonConfig, {
     'webpack/hot/only-dev-server', // bundle the client for hot reloading, only- means to only hot reload for successful updates
     './index.tsx', // the entry point of our app
   ],
+  output: {
+    publicPath: '/',
+  },
   devServer: {
     hot: true, // enable HMR on the server
     open: true,
     contentBase: './',
-    publicPath: '/',
     historyApiFallback: true,
   },
-  devtool: 'cheap-module-source-map',
+  resolve: {
+    modules: ['node_modules'],
+    alias: {
+      'react-dom': '@hot-loader/react-dom',
+    },
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
+  // devtool: 'cheap-module-source-map',
+  devtool: 'eval-source-map',
   plugins: [
     new webpack.HotModuleReplacementPlugin(), // enable HMR globally
   ],

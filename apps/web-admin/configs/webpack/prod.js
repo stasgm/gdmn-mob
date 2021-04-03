@@ -1,6 +1,6 @@
 // production config
 const { merge } = require("webpack-merge");
-const { resolve } = require("path");
+const { getRootRelativePath } = require('./utils');
 
 const commonConfig = require("./common");
 
@@ -8,8 +8,8 @@ module.exports = merge(commonConfig, {
   mode: "production",
   entry: "./index.tsx",
   output: {
+    path: getRootRelativePath(config.webpack.buildPath),
     filename: "js/bundle.[contenthash].min.js",
-    path: resolve(__dirname, "../../dist"),
     publicPath: "/",
   },
   devtool: "source-map",

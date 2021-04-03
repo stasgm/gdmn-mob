@@ -6,8 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle } from '@lib/mobile-ui/src/components';
-import { RootState } from '@lib/store';
-import { useSelector } from 'react-redux';
+import { useTypedSelector } from '@lib/store';
 
 type Props = {
   settings: IApiConfig | undefined;
@@ -22,7 +21,7 @@ const SplashScreen = (props: Props) => {
 
   const navigation = useNavigation();
 
-  const { error, loading, status } = useSelector((state: RootState) => state.auth);
+  const { error, loading, status } = useTypedSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({

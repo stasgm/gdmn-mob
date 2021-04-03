@@ -1,7 +1,7 @@
 import { useStore } from 'react-redux';
 import { Reducer } from 'redux';
 
-import { StoreWithAsyncReducers } from '../store/store';
+import { StoreWithAsyncReducers } from '../';
 
 const useAddReducer = (name: string, reducer: Reducer<any, any>) => {
   const store: StoreWithAsyncReducers = useStore();

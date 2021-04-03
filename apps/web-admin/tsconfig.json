@@ -4,7 +4,7 @@
     "jsx": "react-jsx",
     "rootDir": ".",
     "sourceMap": true,
-    "outDir": "./dist"
+    "outDir": "dist"
   },
   "include": ["src/**/*.ts*", ".eslintrc.js"],
   "exclude": ["node_modules", "dist", "configs/**/*.js", "configs/webpack/*.js"]
