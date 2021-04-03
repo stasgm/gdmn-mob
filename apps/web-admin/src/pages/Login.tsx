@@ -1,10 +1,10 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography } from '@material-ui/core';
 import { IUserCredentials } from '@lib/types';
 // import { useSelector } from 'react-redux';
-import yup from 'yup';
+import * as yup from 'yup';
 import { useTypedSelector } from '@lib/store';
 import { useMemo } from 'react';
 
@@ -30,6 +30,8 @@ const Login = ({ onSignIn }: Props) => {
   // const navigate = useNavigate();
   const { error, loading, status } = useTypedSelector((state) => state.auth);
 
+  const navigate = useNavigate();
+
   const request = useMemo(
     () => ({
       isError: error,
@@ -50,13 +52,14 @@ const Login = ({ onSignIn }: Props) => {
       userName: 'Stas',
       password: '123',
     },
-    /*   validationSchema: yup.object({
-      userName: yup.string().max(15, 'Must be 15 characters or less').required('Required'),
-      password: yup.string().max(20, 'Must be 20 characters or less').required('Required'),
-    }), */
+    validationSchema: yup.object().shape({
+      userName: yup.string().required('Required'),
+      password: yup.string().required('Required'),
+    }),
     onSubmit: (values) => {
       onSignIn(values);
-      alert(JSON.stringify(values, null, 2));
+      navigate('/app');
+      // alert(JSON.stringify(values, null, 2));
     },
   });
 
@@ -108,6 +111,7 @@ const Login = ({ onSignIn }: Props) => {
               value={formik.values.password}
               variant="outlined"
             />
+            {formik.touched.password && formik.errors.password ? <div>{formik.errors.password}</div> : null}
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
