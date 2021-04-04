@@ -9,8 +9,8 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
-import { RootState } from '@lib/store';
-import { useSelector } from 'react-redux';
+import { useTypedSelector } from '@lib/store';
+// import { useSelector } from 'react-redux';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
@@ -20,7 +20,8 @@ export function DrawerContent(props: Props) {
   // const theme = 'dark';
   // const navigation = useNavigation();
 
-  const { user, company } = useSelector((state: RootState) => state.auth);
+  const { user, company } = useTypedSelector((state) => state.auth);
+  // const { user, company } = useSelector((state: RootState) => state.auth);
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -57,17 +58,6 @@ export function DrawerContent(props: Props) {
           ]}
         >
           <Drawer.Section style={styles.drawerSection}>
-            {/*  {props?.items?.map((item) => (
-              <DrawerItem
-                label={item.title}
-                onPress={() => {
-                  props.navigation.navigate(item.name);
-                }}
-                key={item.title}
-                icon={({ color, size }) => <Icon name={item.icon} {...props} color={color} size={size} />}
-              />
-            ))}
-            <Divider /> */}
             <DrawerItemList {...props} />
           </Drawer.Section>
           {/*  <Drawer.Section title="Preferences">

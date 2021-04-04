@@ -55,13 +55,7 @@ const AuthNavigator: React.FC = () => {
   ]);
 
   const ActivateWithParams = useCallback(
-    () => (
-      <ActivationScreen
-        // request={serverReq}
-        onDisconnect={disconnect}
-        onActivate={activateDevice}
-      />
-    ),
+    () => <ActivationScreen onDisconnect={disconnect} onActivate={activateDevice} />,
     [activateDevice, disconnect],
   );
 

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useReducer, useCallback, useEffect } from 'react';
 
 import { IUser, ICompany, IDevice } from '@lib/types';
@@ -288,12 +289,7 @@ const reducer = (state: IState, action: Action): IState => {
   }
 };
 
-const App = async () => {
-  const data = await requests.auth.login({ userName: 'userName', password: 'password' });
-  return <div>444444bb4</div>;
-};
-
-const App2 = () => {
+const App = () => {
   const [
     {
       appState,
@@ -781,8 +777,8 @@ const App2 = () => {
             appState === 'UPDATE_USER' || appState === 'SAVED_PROFILE'
               ? () => handleSetAppState('CREATE_CURRENT_DEVICENAME')
               : appState === 'PROFILE' && isAdmin
-              ? () => handleSetAppState('CREATE_DEVICENAME')
-              : undefined
+                ? () => handleSetAppState('CREATE_DEVICENAME')
+                : undefined
           }
           isAdmin={isAdmin}
         />

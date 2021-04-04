@@ -11,7 +11,7 @@ import RootNavigator from './src/navigation/RootNavigator';
 
 enableScreens();
 
-const store = configureStore;
+const store = configureStore();
 
 const Router = () => (authSelectors.isLogged() ? <RootNavigator /> : <AuthNavigator />);
 
