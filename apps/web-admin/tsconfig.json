@@ -7,5 +7,5 @@
     "outDir": "dist"
   },
   "include": ["src/**/*.ts*", ".eslintrc.js"],
-  "exclude": ["node_modules", "dist", "configs/**/*.js", "configs/webpack/*.js"]
+  "exclude": ["node_modules", "dist"]
 }

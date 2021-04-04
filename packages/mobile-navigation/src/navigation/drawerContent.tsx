@@ -10,6 +10,7 @@ import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-
 import Animated from 'react-native-reanimated';
 
 import { useTypedSelector } from '@lib/store';
+// import { user, company } from '@lib/mock';
 // import { useSelector } from 'react-redux';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
@@ -20,8 +21,10 @@ export function DrawerContent(props: Props) {
   // const theme = 'dark';
   // const navigation = useNavigation();
 
+  // const state = useTypedSelector((state) => state);
+  // console.log('state', state);
+  // // const user = {};
   const { user, company } = useTypedSelector((state) => state.auth);
-  // const { user, company } = useSelector((state: RootState) => state.auth);
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],

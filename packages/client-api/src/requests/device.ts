@@ -62,9 +62,9 @@ const getDevice = async (deviceId: string, userId?: string) => {
     res = await api.get<IResponse<IDevice>>(`/devices/${deviceId}${paramQuery}`);
 
     console.log(res);
-    const resData = res.data;
+    const resData = res?.data;
 
-    if (resData.result) {
+    if (resData?.result) {
       return {
         type: 'GET_DEVICE',
         device: resData.data,
@@ -78,7 +78,7 @@ const getDevice = async (deviceId: string, userId?: string) => {
   } catch (err) {
     return {
       type: 'ERROR',
-      message: err.response.data.error,
+      message: err?.response?.data?.error || 'ошибка подключения',
     } as INetworkError;
   }
 };

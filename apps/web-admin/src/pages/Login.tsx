@@ -1,36 +1,22 @@
+import { useMemo, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography } from '@material-ui/core';
-import { IUserCredentials } from '@lib/types';
-// import { useSelector } from 'react-redux';
 import * as yup from 'yup';
-import { useTypedSelector } from '@lib/store';
-import { useMemo } from 'react';
 
-interface Props {
-  onSignIn: (credentials: IUserCredentials) => void;
-}
+import { authActions, useTypedSelector } from '@lib/store';
+import { IUserCredentials } from '@lib/types';
 
-/* const validate = (values: IUserCredentials) => {
-  const errors = {};
-  if (!values.userName) {
-    errors.userName = 'Required';
-
-  }
-
-  if (!values.password) {
-    errors.password = 'Required';
-  }
-
-  return errors;
-};
- */
-const Login = ({ onSignIn }: Props) => {
-  // const navigate = useNavigate();
-  const { error, loading, status } = useTypedSelector((state) => state.auth);
-
+const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
+  const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
+
+  const { error, loading, status } = useTypedSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({
@@ -41,12 +27,6 @@ const Login = ({ onSignIn }: Props) => {
     [error, loading, status],
   );
 
-  /*   const [credential, setCredentials] = useState<IUserCredentials>({
-      userName: 'Stas',
-      password: '123',
-    });
-   */
-
   const formik = useFormik<IUserCredentials>({
     initialValues: {
       userName: 'Stas',
@@ -56,10 +36,10 @@ const Login = ({ onSignIn }: Props) => {
       userName: yup.string().required('Required'),
       password: yup.string().required('Required'),
     }),
-    onSubmit: (values) => {
-      onSignIn(values);
+    onSubmit: async (values) => {
+      await checkDevice();
+      await signIn(values);
       navigate('/app');
-      // alert(JSON.stringify(values, null, 2));
     },
   });
 
@@ -85,21 +65,20 @@ const Login = ({ onSignIn }: Props) => {
               </Typography>
             </Box>
             <TextField
-              error={Boolean(formik.values.userName && formik.errors.userName)}
+              error={formik.touched.userName && Boolean(formik.errors.userName)}
               fullWidth
               helperText={formik.values.userName && formik.errors.userName}
               label="Имя пользователя"
               margin="normal"
-              name="name"
+              name="userName"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               type="name"
               value={formik.values.userName}
               variant="outlined"
             />
-            {formik.touched.userName && formik.errors.userName ? <div>{formik.errors.userName}</div> : null}
             <TextField
-              error={Boolean(formik.values.password && formik.errors.password)}
+              error={formik.touched.password && Boolean(formik.errors.password)}
               fullWidth
               helperText={formik.values.password && formik.errors.password}
               label="Password"
@@ -111,11 +90,11 @@ const Login = ({ onSignIn }: Props) => {
               value={formik.values.password}
               variant="outlined"
             />
-            {formik.touched.password && formik.errors.password ? <div>{formik.errors.password}</div> : null}
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={request.isLoading}
+                startIcon={''}
+                disabled={request.isLoading || !!formik.errors.password || !!formik.errors.userName}
                 fullWidth
                 size="large"
                 type="submit"

@@ -15,7 +15,7 @@ import { sleep } from '../utils/tools';
 import { authActions } from './actions';
 import { DevicePayload, IAuthState, UserPayload } from './types';
 
-const isMock = false;
+const isMock = true; // TODO брать из конфига
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
@@ -24,8 +24,9 @@ const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
     dispatch(authActions.checkDeviceAsync.request(''));
 
     if (isMock) {
-      await sleep(1000);
+      await sleep(500);
       response = { device: device, type: 'GET_DEVICE' };
+      // response = { message: 'device not found', type: 'ERROR' };
     } else {
       response = await requests.device.getDevice(device.uid || '');
     }

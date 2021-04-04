@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, Hidden, List, Typography } from '@material-ui/core';
 import {
@@ -8,12 +9,12 @@ import {
   Users as UsersIcon,
 } from 'react-feather';
 
-import { useState } from 'react';
+import { useTypedSelector } from '@lib/store';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
 
-const user = {
+const userInfo = {
   avatar: '../assets/images/avatar_1.png',
   jobTitle: 'Senior Developer',
   name: 'Katarina Smith',
@@ -55,6 +56,8 @@ interface IProps {
 const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
   const [isCompact, setCompact] = useState(false);
 
+  const { user } = useTypedSelector((state) => state.auth);
+
   const content = (
     <Box
       sx={{
@@ -74,7 +77,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
       >
         <Avatar
           component={RouterLink}
-          src={user.avatar}
+          src={userInfo.avatar}
           sx={{
             cursor: 'pointer',
             width: 64,
@@ -83,11 +86,13 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           to="/app/account"
         />
         <Typography color="textPrimary" variant="h5">
-          {!isCompact ? user.name : user.name.split(' ')[0].slice(0, 1)}
+          {!isCompact
+            ? `${user?.lastName || ''} ${user?.firstName || ''}`
+            : `${user?.lastName?.slice(0, 1)}${user?.firstName?.slice(0, 1)}`}
         </Typography>
         {!isCompact && (
           <Typography color="textSecondary" variant="body2">
-            {user.jobTitle}
+            {userInfo.jobTitle}
           </Typography>
         )}
       </Box>
