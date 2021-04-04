@@ -1,16 +1,17 @@
 import { useMemo, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
-import { Box, Button, Container, Link, TextField, Typography } from '@material-ui/core';
+import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
 import * as yup from 'yup';
 
 import { authActions, useTypedSelector } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 
+import Logo from '../components/Logo';
+
 const Login = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
@@ -37,16 +38,15 @@ const Login = () => {
       password: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      await checkDevice();
-      await signIn(values);
-      navigate('/app');
+      checkDevice();
+      signIn(values);
     },
   });
 
   return (
     <>
       <Helmet>
-        <title>Login</title>
+        <title>Вход в систему</title>
       </Helmet>
       <Box
         sx={{
@@ -57,11 +57,31 @@ const Login = () => {
           justifyContent: 'center',
         }}
       >
-        <Container maxWidth="sm">
+        <Container
+          maxWidth="xs"
+          sx={{
+            py: 2,
+            backgroundColor: 'white',
+          }}
+        >
+          <Box
+            sx={{
+              mb: 2,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Logo />
+            <Typography color="textPrimary" variant="h4">
+              GDMN-MOBILE
+            </Typography>
+          </Box>
+
           <form onSubmit={formik.handleSubmit}>
-            <Box sx={{ mb: 3 }}>
-              <Typography color="textPrimary" variant="h2">
-                Sign in
+            <Box sx={{ mb: 2 }}>
+              <Typography color="textPrimary" variant="h4">
+                Вход
               </Typography>
             </Box>
             <TextField
@@ -81,7 +101,7 @@ const Login = () => {
               error={formik.touched.password && Boolean(formik.errors.password)}
               fullWidth
               helperText={formik.values.password && formik.errors.password}
-              label="Password"
+              label="Пароль"
               margin="normal"
               name="password"
               onBlur={formik.handleBlur}
@@ -93,20 +113,19 @@ const Login = () => {
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                startIcon={''}
                 disabled={request.isLoading || !!formik.errors.password || !!formik.errors.userName}
                 fullWidth
                 size="large"
                 type="submit"
                 variant="contained"
               >
-                Sign in now
+                {request.isLoading && <CircularProgress size={20} />} <Typography>Войти</Typography>
               </Button>
             </Box>
             <Typography color="textSecondary" variant="body1">
-              Don&apos;t have an account?{' '}
+              Ещё не с нами?{' '}
               <Link component={RouterLink} to="/register" variant="h6">
-                Sign up
+                Зарегистрироваться
               </Link>
             </Typography>
           </form>

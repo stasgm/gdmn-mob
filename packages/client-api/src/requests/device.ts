@@ -61,7 +61,6 @@ const getDevice = async (deviceId: string, userId?: string) => {
 
     res = await api.get<IResponse<IDevice>>(`/devices/${deviceId}${paramQuery}`);
 
-    console.log(res);
     const resData = res?.data;
 
     if (resData?.result) {
