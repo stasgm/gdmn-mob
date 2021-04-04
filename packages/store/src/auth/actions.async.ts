@@ -4,33 +4,41 @@ import { AnyAction } from 'redux';
 import { IUserCredentials } from '@lib/types';
 
 import { device, user } from '@lib/mock';
+import { requests } from '@lib/client-api';
+
+import { IGetDeviceResponse } from '@lib/client-api/src/types/device';
+
+import { INetworkError } from '@lib/client-api/src/types';
+
+import { sleep } from '../utils/tools';
 
 import { authActions } from './actions';
 import { DevicePayload, IAuthState, UserPayload } from './types';
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+const isMock = false;
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: DevicePayload = { deviceData: device };
+    let response: IGetDeviceResponse | INetworkError;
 
     dispatch(authActions.checkDeviceAsync.request(''));
 
-    await sleep(1000);
-
-    response = { deviceData: null, errorMessage: 'something wrong' };
-
-    if (response.deviceData) {
-      return dispatch(authActions.checkDeviceAsync.success(response.deviceData));
+    if (isMock) {
+      await sleep(1000);
+      response = { device: device, type: 'GET_DEVICE' };
+    } else {
+      response = await requests.device.getDevice(device.uid || '');
     }
 
-    if (response.deviceData === null) {
-      return dispatch(authActions.checkDeviceAsync.success(response.deviceData));
+    if (response.type === 'GET_DEVICE') {
+      return dispatch(authActions.checkDeviceAsync.success(response.device));
     }
 
-    return dispatch(authActions.checkDeviceAsync.failure(response.errorMessage || 'device does not exist'));
+    if (response.type === 'ERROR') {
+      return dispatch(authActions.checkDeviceAsync.failure(response.message));
+    }
+
+    return dispatch(authActions.checkDeviceAsync.failure('something wrong'));
   };
 };
 

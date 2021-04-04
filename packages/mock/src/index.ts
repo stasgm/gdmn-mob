@@ -1,6 +1,8 @@
 import { ICompany, IDevice, IUser } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
+export const systemName = 'Inventory';
+
 export const config: IApiConfig = {
   port: 3649,
   protocol: 'http://',
@@ -12,7 +14,7 @@ export const config: IApiConfig = {
 export const device: IDevice = {
   name: 'iPhone',
   state: 'ACTIVE',
-  uid: '111',
+  uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
   userId: '1',
   id: '111',
 };

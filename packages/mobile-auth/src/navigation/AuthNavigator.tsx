@@ -89,15 +89,11 @@ const AuthNavigator: React.FC = () => {
         )
       ) : device === undefined ? (
         <>
-          <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
+          <AuthStack.Screen name="Splash" component={SplashWithParams} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />
         </>
       ) : (
-        <AuthStack.Screen
-          name="Activation"
-          component={ActivateWithParams}
-          options={{ animationTypeForReplace: 'push' }}
-        />
+        <AuthStack.Screen name="Activation" component={ActivateWithParams} />
       )}
     </AuthStack.Navigator>
   );

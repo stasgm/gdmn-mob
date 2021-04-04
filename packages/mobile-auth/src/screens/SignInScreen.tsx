@@ -103,7 +103,7 @@ const SignInScreen = (props: Props) => {
             </Button>
           </View>
           <View style={style.statusBox}>
-            {request.isError && <Text style={style.errorText}>Ошибка:{request.status}</Text>}
+            {request.isError && <Text style={style.errorText}>Ошибка: {request.status}</Text>}
             {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
           </View>
         </KeyboardAvoidingView>
