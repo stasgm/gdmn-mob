@@ -10,11 +10,11 @@ export const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>
 export const disconnect = createAction('AUTH/DISCONNECT')();
 export const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
 
-const checkDeviceAsync = createAsyncAction('AUTH/CONNECTION', 'AUTH/CONNECTION_SUCCCES', 'AUTH/CONNECTION_FAILURE')<
-  string | undefined,
-  IDevice | null,
-  string
->();
+const checkDeviceAsync = createAsyncAction(
+  'AUTH/CHECK_DEVICE',
+  'AUTH/CHECK_DEVICE_SUCCCES',
+  'AUTH/CHECK_DEVICE_FAILURE',
+)<string | undefined, IDevice | null, string>();
 
 const activateDeviceAsync = createAsyncAction(
   'AUTH/ACTIVATE_DEVICE',
