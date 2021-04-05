@@ -3,31 +3,12 @@ import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography } from '@material-ui/core';
 import { IUserCredentials } from '@lib/types';
-// import { useSelector } from 'react-redux';
-import yup from 'yup';
-import { useTypedSelector } from '@lib/store';
-import { useMemo } from 'react';
 
-interface Props {
-  onSignIn: (credentials: IUserCredentials) => void;
-}
+import { authActions, useTypedSelector } from '@lib/store';
+import { useCallback, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 
-/* const validate = (values: IUserCredentials) => {
-  const errors = {};
-  if (!values.userName) {
-    errors.userName = 'Required';
-
-  }
-
-  if (!values.password) {
-    errors.password = 'Required';
-  }
-
-  return errors;
-};
- */
-const Login = ({ onSignIn }: Props) => {
-  // const navigate = useNavigate();
+const Login = () => {
   const { error, loading, status } = useTypedSelector((state) => state.auth);
 
   const request = useMemo(
@@ -39,11 +20,11 @@ const Login = ({ onSignIn }: Props) => {
     [error, loading, status],
   );
 
-  /*   const [credential, setCredentials] = useState<IUserCredentials>({
-      userName: 'Stas',
-      password: '123',
-    });
-   */
+  const dispatch = useDispatch();
+
+  const handleSignIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [
+    dispatch,
+  ]);
 
   const formik = useFormik<IUserCredentials>({
     initialValues: {
@@ -55,7 +36,7 @@ const Login = ({ onSignIn }: Props) => {
       password: yup.string().max(20, 'Must be 20 characters or less').required('Required'),
     }), */
     onSubmit: (values) => {
-      onSignIn(values);
+      handleSignIn(values);
       alert(JSON.stringify(values, null, 2));
     },
   });

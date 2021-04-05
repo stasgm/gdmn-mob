@@ -1,8 +1,12 @@
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Formik, useFormik } from 'formik';
 import { Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typography } from '@material-ui/core';
+import { useCallback, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import { authActions, useTypedSelector } from '@lib/store';
+import { IUserCredentials } from '@lib/types';
 // import { IUserCredentials } from '@lib/types';
 // import { useSelector } from 'react-redux';
 // import { RootState } from '@lib/store';
@@ -14,21 +18,38 @@ import { Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typo
 
 const Register = () => {
   const navigate = useNavigate();
-  // const { error, loading, status } = useSelector((state: RootState) => state.auth);
+  const { error, loading, status } = useTypedSelector((state) => state.auth);
 
-  // const request = useMemo(
-  //   () => ({
-  //     isError: error,
-  //     isLoading: loading,
-  //     status,
-  //   }),
-  //   [error, loading, status],
+  const request = useMemo(
+    () => ({
+      isError: error,
+      isLoading: loading,
+      status,
+    }),
+    [error, loading, status],
+  );
+
+  const dispatch = useDispatch();
+
+  // const handleSignUp = useCallback(
+  //   (userName: string, password: string) => dispatch(authActions.signup(userName, password)),
+  //   [dispatch],
   // );
 
-  // const [credential, setCredentials] = useState<IUserCredentials>({
-  //   userName: 'Stas',
-  //   password: '123',
-  // });
+  const formik = useFormik<IUserCredentials>({
+    initialValues: {
+      userName: '',
+      password: '',
+    },
+    /*   validationSchema: yup.object({
+      userName: yup.string().max(15, 'Must be 15 characters or less').required('Required'),
+      password: yup.string().max(20, 'Must be 20 characters or less').required('Required'),
+    }), */
+    onSubmit: (values) => {
+      //handleSignUp(values);
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
 
   return (
     <>

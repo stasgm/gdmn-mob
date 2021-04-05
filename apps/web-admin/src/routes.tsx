@@ -6,11 +6,15 @@ import MainLayout from './components/MainLayout';
 import Account from './pages/Account';
 import UserList from './pages/UserList';
 import Dashboard from './pages/Dashboard';
-import SignInWithParams from './navigation/SignInWithParams';
 import NotFound from './pages/NotFound';
 import CompanyList from './pages/CompanyList';
 import DeviceList from './pages/DeviceList';
 import Register from './pages/Register';
+import Login from './pages/Login';
+
+const isLoggin = true;
+
+const Home = isLoggin ? <DashboardLayout /> : <Navigate to="/login" />;
 
 const routes: PartialRouteObject[] = [
   {
@@ -29,10 +33,10 @@ const routes: PartialRouteObject[] = [
     path: '/',
     element: <MainLayout />,
     children: [
-      { path: 'login', element: <SignInWithParams /> },
+      { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
-      { path: '/', element: <Navigate to="/login" /> },
+      { path: '/', element: Home },
       { path: '*', element: <Navigate to="/404" /> },
     ],
   },
