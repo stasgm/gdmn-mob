@@ -1,4 +1,4 @@
-import { IResponse, IUser, IUserCredentials } from '@lib/types';
+import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 
 import { api, deviceId } from '../config';
 
@@ -11,15 +11,16 @@ const signup = async (userName: string, password: string, companyId?: string, cr
     companies: companyId ? [companyId] : undefined,
     creatorId: creatorId ?? userName,
   };
-  const res = await api.post<IResponse<string>>('/auth/signup', body);
+  const res = await api.post<IResponse<IUser>>('/auth/signup', body);
   const resData = res.data;
 
   if (resData.result) {
     return {
       type: 'SIGNUP',
-      userId: resData.data,
+      user: resData.data,
     } as types.ISignUpResponse;
   }
+
   return {
     type: 'ERROR',
     message: resData.error,
@@ -31,13 +32,13 @@ const login = async (userCredentials: IUserCredentials) => {
     userName: userCredentials.userName,
     password: userCredentials.password,
   };
-  const res = await api.post<IResponse<string>>('/auth/login', body);
-  const resData = res.data;
+  const res = await api.post<IResponse<IUser>>('/auth/login', body);
+  const resData = res?.data;
 
-  if (resData.result) {
+  if (resData?.result) {
     return {
       type: 'LOGIN',
-      userId: resData.data,
+      user: resData?.data,
     } as types.ILoginResponse;
   }
   return {
@@ -99,20 +100,31 @@ const getActivationCode = async () => {
 };
 
 const verifyCode = async (code: string) => {
-  const body = { uid: deviceId, code };
-  const res = await api.post<IResponse<string>>('/auth/device/code', body);
-  const resData = res.data;
+  let res;
+  try {
+    const body = { uid: deviceId, code };
 
-  if (resData.result) {
+    res = await api.post<IResponse<IDevice>>('/auth/device/code', body);
+
+    const resData = res?.data;
+
+    if (resData?.result) {
+      return {
+        type: 'VERIFY_CODE',
+        device: resData?.data,
+      } as types.IVerifyCodeResponse;
+    }
+
     return {
-      type: 'VERIFY_CODE',
-      deviceUid: resData.data,
-    } as types.IVerifyCodeResponse;
+      type: 'ERROR',
+      message: resData?.error,
+    } as INetworkError;
+  } catch (err) {
+    return {
+      type: 'ERROR',
+      message: err?.response?.data?.error || 'ошибка подключения',
+    } as INetworkError;
   }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
 };
 
 export default {

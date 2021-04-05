@@ -11,11 +11,12 @@ import RootNavigator from './src/navigation/RootNavigator';
 
 enableScreens();
 
-const store = configureStore;
-
-const Router = () => (authSelectors.isLogged() ? <RootNavigator /> : <AuthNavigator />);
+const store = configureStore();
 
 const App = () => {
+  const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
+  // const Router = () => <RootNavigator />;
+
   return (
     <Provider store={store}>
       <UIProvider theme={defaultTheme}>

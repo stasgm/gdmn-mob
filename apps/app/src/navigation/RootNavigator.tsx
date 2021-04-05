@@ -36,7 +36,7 @@ const navItems: INavItem[] = [
 ];
 
 const RootNavigator = () => {
-  useAddReducer('app', combinedReducer.docs);
+  useAddReducer('docs', combinedReducer.docs);
 
   return <DrawerNavigator items={navItems} />;
 };

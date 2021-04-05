@@ -45,7 +45,7 @@ const SplashScreen = (props: Props) => {
             backgroundColor: colors.background,
           }}
         >
-          {request.isError && <Text style={localStyles.errorText}>Ошибка:{request.status}</Text>}
+          {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
           {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
         </View>
         {!request.isLoading ? (

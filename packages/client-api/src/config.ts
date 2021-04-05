@@ -1,16 +1,16 @@
 import axios from 'axios';
+import { config, device } from '@lib/mock';
 
-export const deviceId = '123-456-789';
-export const systemName = 'Inventory';
+const { port, protocol, server, apiPath } = config;
 
-const PROTOCOL = 'http';
-const HOST = 'localhost';
-const PORT = '3649';
-const PREFIX = 'api';
-const URL = `${PROTOCOL}://${HOST}:${PORT}/${PREFIX}`;
-const DEVICE_ID = 'WEB';
+export const deviceId = device.uid;
 
-const params = { deviceId: DEVICE_ID };
+const URL = `${protocol}${server}:${port}/${apiPath}`;
+
+console.log(URL);
+// const DEVICE_ID = 'WEB';
+
+const params = { deviceId };
 
 export const api = axios.create({
   baseURL: URL,

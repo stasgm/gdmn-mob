@@ -3,13 +3,21 @@ import thunkMiddleware from 'redux-thunk';
 import { createStore, combineReducers, applyMiddleware, Reducer, Store } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 
+import { StateType } from 'typesafe-actions';
+
 import auth from './auth/reducer';
 
-const rootReducer = combineReducers({
+/* const rootReducer = combineReducers({
   auth,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
+ */
+const rootReducer = {
+  auth,
+};
+
+export type RootState = StateType<typeof rootReducer>;
 
 export interface StoreWithAsyncReducers extends Store {
   asyncReducers?: { [key: string]: Reducer };
@@ -26,7 +34,7 @@ const createReducer = (asyncReducers: { [key: string]: Reducer } = {}) => {
 export default function configureStore() {
   const middleware = [thunkMiddleware];
   const middleWareEnhancer = applyMiddleware(...middleware);
-  const rootStore: Store = createStore(rootReducer, composeWithDevTools(middleWareEnhancer));
+  const rootStore: Store = createStore(combineReducers(rootReducer), composeWithDevTools(middleWareEnhancer));
 
   const store: StoreWithAsyncReducers = {
     ...rootStore,

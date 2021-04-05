@@ -5,7 +5,7 @@ import { Button, IconButton, useTheme } from 'react-native-paper';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle, RadioGroup } from '@lib/mobile-ui/src/components';
 import { ICompany, IResponse } from '@lib/types';
-import { company, company2 } from '@lib/store/mock';
+import { company, company2 } from '@lib/mock';
 
 type Props = {
   onLogout: () => void;

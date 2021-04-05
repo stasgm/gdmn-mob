@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 
-import users from '../__mocks__/users';
+import { users } from '@lib/mock';
 
 import UserListResults from '../components/user/UserListResults';
 import UserListToolbar from '../components/user/UserListToolbar';
@@ -9,7 +9,7 @@ import UserListToolbar from '../components/user/UserListToolbar';
 const UserList = () => (
   <>
     <Helmet>
-      <title>users | Material Kit</title>
+      <title>users</title>
     </Helmet>
     <Box
       sx={{

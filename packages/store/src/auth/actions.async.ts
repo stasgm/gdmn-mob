@@ -3,84 +3,106 @@ import { AnyAction } from 'redux';
 
 import { IUserCredentials } from '@lib/types';
 
-import { device, user } from '../mock';
+import { device, user } from '@lib/mock';
+import { requests } from '@lib/client-api';
+
+import { IGetDeviceResponse } from '@lib/client-api/src/types/device';
+
+import { INetworkError } from '@lib/client-api/src/types';
+
+import { ILoginResponse, IVerifyCodeResponse } from '@lib/client-api/src/types/auth';
+
+import { sleep } from '../utils/tools';
 
 import { authActions } from './actions';
-import { DevicePayload, IAuthState, UserPayload } from './types';
+import { IAuthState } from './types';
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+const isMock = true; // TODO брать из конфига
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: DevicePayload = { deviceData: device };
+    let response: IGetDeviceResponse | INetworkError;
 
     dispatch(authActions.checkDeviceAsync.request(''));
 
-    await sleep(1000);
+    if (isMock) {
+      await sleep(500);
 
-    response = { deviceData: null, errorMessage: 'something wrong' };
-
-    if (response.deviceData) {
-      return dispatch(authActions.checkDeviceAsync.success(response.deviceData));
+      response = { device: device, type: 'GET_DEVICE' };
+      // response = { message: 'device not found', type: 'ERROR' };
+    } else {
+      response = await requests.device.getDevice(device.uid || '');
     }
 
-    if (response.deviceData === null) {
-      return dispatch(authActions.checkDeviceAsync.success(response.deviceData));
+    if (response.type === 'GET_DEVICE') {
+      return dispatch(authActions.checkDeviceAsync.success(response.device));
     }
 
-    return dispatch(authActions.checkDeviceAsync.failure(response.errorMessage || 'device does not exist'));
+    if (response.type === 'ERROR') {
+      return dispatch(authActions.checkDeviceAsync.failure(response.message));
+    }
+
+    return dispatch(authActions.checkDeviceAsync.failure('something wrong'));
   };
 };
 
 const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: DevicePayload;
+    let response: IVerifyCodeResponse | INetworkError;
 
     dispatch(authActions.activateDeviceAsync.request(''));
 
-    await sleep(1000);
-    console.log('code', code);
+    if (isMock) {
+      await sleep(500);
 
-    if (code === '1234') {
-      response = {
-        deviceData: device,
-      };
-
-      if (response.deviceData) {
-        return dispatch(authActions.activateDeviceAsync.success(response.deviceData));
+      if (code === '1234') {
+        response = { type: 'VERIFY_CODE', device };
+      } else {
+        return dispatch(authActions.activateDeviceAsync.failure('не верный код'));
       }
-
-      return dispatch(authActions.activateDeviceAsync.failure('device does not exist'));
+    } else {
+      response = await requests.auth.verifyCode(code);
     }
-    return dispatch(authActions.activateDeviceAsync.failure('wrong code'));
+
+    if (response.type === 'VERIFY_CODE') {
+      return dispatch(authActions.activateDeviceAsync.success(response.device));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(authActions.activateDeviceAsync.failure(response.message));
+    }
+
+    return dispatch(authActions.activateDeviceAsync.failure('something wrong'));
   };
 };
 
 const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: UserPayload;
+    let response: ILoginResponse | INetworkError;
 
     dispatch(authActions.loginUserAsync.request(''));
 
-    await sleep(1000); // Запрос к серверу
+    if (isMock) {
+      await sleep(500);
 
-    if (credentials.userName === 'Stas') {
-      if (credentials.password === '123') {
-        response = {
-          userData: user,
-        };
-
-        if (response.userData) {
-          return dispatch(authActions.loginUserAsync.success(response.userData));
-        }
-
-        return dispatch(authActions.loginUserAsync.failure(response?.errorMessage || 'чт-то не так'));
+      if (credentials.userName === 'Stas' && credentials.password === '123') {
+        response = { type: 'LOGIN', user };
+      } else {
+        return dispatch(authActions.loginUserAsync.failure('не верный пароль'));
       }
-      return dispatch(authActions.loginUserAsync.failure('wrong password'));
+    } else {
+      response = await requests.auth.login(credentials);
     }
-    return dispatch(authActions.loginUserAsync.failure('user does not exist'));
+
+    if (response.type === 'LOGIN') {
+      return dispatch(authActions.loginUserAsync.success(response.user));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(authActions.loginUserAsync.failure(response.message));
+    }
+
+    return dispatch(authActions.loginUserAsync.failure('something wrong'));
   };
 };
 

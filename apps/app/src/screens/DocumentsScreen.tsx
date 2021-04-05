@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useTheme, Button } from 'react-native-paper';
@@ -9,9 +9,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
 import docActions from '../store/docs';
-// import useTypesSelector from '../store/useTypedSelectors';
+import useTypedSelector from '../store/useTypedSelectors';
 import { IDocument } from '../store/docs/types';
-import { IAppState } from '../store';
+// import { IAppState } from '../store';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
@@ -38,8 +38,8 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
 };
 
 const DocumentsScreen = () => {
-  // const { docData, loading } = useTypesSelector((state) => state.docs);
-  const { docData, loading } = useSelector((state: IAppState) => state.docs);
+  const { docData, loading } = useTypedSelector((state) => state.docs);
+  // const { docData, loading } = useSelector((state: IAppState) => state.docs);
 
   const dispatch = useDispatch();
 

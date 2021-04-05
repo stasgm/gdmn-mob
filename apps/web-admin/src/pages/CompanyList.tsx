@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 
-import companies from '../__mocks__/companies';
+import { companies } from '@lib/mock';
 
 import CompanyListResults from '../components/company/CompanyListResults';
 import CompanyListToolbar from '../components/company/CompanyListToolbar';

@@ -6,6 +6,6 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts", "mock/index.ts", "config"],
+  "include": ["src", "index.ts"],
   "exclude": ["node_modules", "dist"]
 }

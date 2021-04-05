@@ -4,6 +4,6 @@
     "jsx": "react-native",
     "noEmit": true
   },
-  "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts"],
+  "include": ["src", "index.ts"],
   "exclude": ["node_modules"]
 }

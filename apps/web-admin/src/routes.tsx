@@ -12,34 +12,31 @@ import DeviceList from './pages/DeviceList';
 import Register from './pages/Register';
 import Login from './pages/Login';
 
-const isLoggin = true;
-
-const Home = isLoggin ? <DashboardLayout /> : <Navigate to="/login" />;
-
-const routes: PartialRouteObject[] = [
+const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
   {
     path: 'app',
-    element: <DashboardLayout />,
+    element: isLoggedIn ? <DashboardLayout /> : <Navigate to="/login" />,
     children: [
       { path: 'account', element: <Account /> },
       { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'companies', element: <CompanyList /> },
       { path: 'devices', element: <DeviceList /> },
+      { path: '/', element: <Navigate to="/app/dashboard" /> },
       { path: '*', element: <Navigate to="/404" /> },
     ],
   },
   {
     path: '/',
-    element: <MainLayout />,
+    element: !isLoggedIn ? <MainLayout /> : <Navigate to="/app/dashboard" />,
     children: [
       { path: 'login', element: <Login /> },
       { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
-      { path: '/', element: Home },
-      { path: '*', element: <Navigate to="/404" /> },
+      { path: '/', element: <Navigate to="/login" /> },
     ],
   },
+  { path: '*', element: <Navigate to="/404" /> },
 ];
 
 export default routes;

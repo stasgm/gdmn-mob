@@ -2,7 +2,7 @@ import { Reducer } from 'redux';
 
 import { getType } from 'typesafe-actions';
 
-import { config } from '../mock';
+import { config } from '@lib/mock';
 
 import { IAuthState } from './types';
 import { AuthActionType, authActions } from './actions';

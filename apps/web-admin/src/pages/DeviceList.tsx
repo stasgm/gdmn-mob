@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 
-import devices from '../__mocks__/devices';
+import { devices } from '@lib/mock';
 
 import DeviceListResults from '../components/device/DeviceListResults';
 import DeviceListToolbar from '../components/device/DeviceListToolbar';
@@ -9,7 +9,7 @@ import DeviceListToolbar from '../components/device/DeviceListToolbar';
 const DeviceList = () => (
   <>
     <Helmet>
-      <title>devices | Material Kit</title>
+      <title>devices</title>
     </Helmet>
     <Box
       sx={{

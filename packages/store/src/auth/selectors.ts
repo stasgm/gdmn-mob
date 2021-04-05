@@ -2,10 +2,14 @@ import { useSelector } from 'react-redux';
 
 import { RootState } from '../';
 
-const isLogged = () => {
-  const { device, user, company } = useSelector((state: RootState) => state.auth);
-
-  return device && user && company;
+const isLogged = (): boolean => {
+  const { device, user } = useSelector((state: RootState) => state.auth);
+  return Boolean(device && user);
 };
 
-export default { isLogged };
+const isLoggedWithCompany = (): boolean => {
+  const { device, user, company } = useSelector((state: RootState) => state.auth);
+  return Boolean(device && user && company);
+};
+
+export default { isLogged, isLoggedWithCompany };

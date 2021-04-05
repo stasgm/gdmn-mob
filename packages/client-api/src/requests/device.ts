@@ -47,26 +47,39 @@ const getDevices = async (userId?: string) => {
 };
 
 /**
-  * Получить
-    - устройство по id;
-    - устройство по id и по пользователю;
-  * @param userId
-  * @returns
+  * Получить устройство (IDevice)
+    - устройство по uid;
+    - устройство по uid и по пользователю;
+  * @param string deviceId
+  * @param string userId
+  * @returns IDevice
   */
 const getDevice = async (deviceId: string, userId?: string) => {
-  const res = await api.get<IResponse<IDevice>>(`/devices/${deviceId}${userId ? `userId=${userId}` : ''}`);
-  const resData = res.data;
+  let res;
+  try {
+    const paramQuery = userId ? `?userId=${userId}` : '';
 
-  if (resData.result) {
+    res = await api.get<IResponse<IDevice>>(`/devices/${deviceId}${paramQuery}`);
+
+    const resData = res?.data;
+
+    if (resData?.result) {
+      return {
+        type: 'GET_DEVICE',
+        device: resData.data,
+      } as deviceTypes.IGetDeviceResponse;
+    }
+
     return {
-      type: 'GET_DEVICE',
-      device: resData.data,
-    } as deviceTypes.IGetDeviceResponse;
+      type: 'ERROR',
+      message: resData.error,
+    } as INetworkError;
+  } catch (err) {
+    return {
+      type: 'ERROR',
+      message: err?.response?.data?.error || 'ошибка подключения',
+    } as INetworkError;
   }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
 };
 
 const getUsersByDevice = async (deviceId: string) => {
