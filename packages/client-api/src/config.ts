@@ -7,7 +7,6 @@ export const deviceId = device.uid;
 
 const URL = `${protocol}${server}:${port}/${apiPath}`;
 
-console.log(URL);
 // const DEVICE_ID = 'WEB';
 
 const params = { deviceId };

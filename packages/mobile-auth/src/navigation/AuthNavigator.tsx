@@ -71,6 +71,12 @@ const AuthNavigator: React.FC = () => {
     };
   }, []);
 
+  /*
+    Если device undefined то переходим на окно с подключеним
+    Если device null то переходим на окно активации устройства
+    Если device не null и user undefined то переходим на окно входа пользователя
+    Если device не null и user не undefined или null то переходим на окно выбора компании
+  */
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {device ? (
