@@ -1,6 +1,6 @@
 import { IMessage, IMessageInfo, IResponse } from '@lib/types';
 
-import { INetworkError, messageTypes as types } from '../types';
+import { error, message as types } from '../types';
 
 import { api } from '../config';
 
@@ -21,7 +21,7 @@ const sendMessages = async (systemName: string, companyId: string, consumer: str
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getMessages = async (systemName: string, companyId: string) => {
@@ -37,7 +37,7 @@ const getMessages = async (systemName: string, companyId: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const removeMessage = async (companyId: string, uid: string) => {
@@ -52,7 +52,7 @@ const removeMessage = async (companyId: string, uid: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const clear = async () => {
@@ -67,7 +67,7 @@ const clear = async () => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const subscribe = async (systemName: string, companyId: string) => {
@@ -83,7 +83,7 @@ const subscribe = async (systemName: string, companyId: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const publish = async (companyId: string, consumer: string, message: IMessage['body']) => {
@@ -101,7 +101,7 @@ const publish = async (companyId: string, consumer: string, message: IMessage['b
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 export default {

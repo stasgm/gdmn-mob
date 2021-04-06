@@ -1,6 +1,6 @@
 import { ICompany, IResponse, IUser } from '@lib/types';
 
-import { INetworkError, companyTypes as types } from '../types';
+import { error, company as types } from '../types';
 
 import { api } from '../config';
 
@@ -21,7 +21,7 @@ const addCompany = async (title: string, externalId: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getCompanies = async () => {
@@ -37,7 +37,7 @@ const getCompanies = async () => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getCompany = async (companyId: string) => {
@@ -53,7 +53,7 @@ const getCompany = async (companyId: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const updateCompany = async (company: Partial<ICompany>) => {
@@ -69,7 +69,7 @@ const updateCompany = async (company: Partial<ICompany>) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getUsersByCompany = async (companyId: string) => {
@@ -85,7 +85,7 @@ const getUsersByCompany = async (companyId: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const removeCompany = async (companyId: string) => {
@@ -100,7 +100,7 @@ const removeCompany = async (companyId: string) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 export default {

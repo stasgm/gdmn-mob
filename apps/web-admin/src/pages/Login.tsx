@@ -14,8 +14,10 @@ import Logo from '../components/Logo';
 const Login = () => {
   const dispatch = useDispatch();
 
-  const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
-  const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
+  const checkDevice = useCallback(async () => dispatch(authActions.checkDevice()), [dispatch]);
+  const signIn = useCallback(async (credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [
+    dispatch,
+  ]);
 
   const { error, loading, status } = useTypedSelector((state) => state.auth);
 
@@ -38,7 +40,7 @@ const Login = () => {
       password: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      checkDevice();
+      await checkDevice();
       signIn(values);
     },
   });

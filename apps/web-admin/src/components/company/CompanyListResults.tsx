@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import moment from 'moment';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 import {
-  Avatar,
   Box,
   Card,
   Checkbox,
@@ -13,15 +13,15 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  CircularProgress,
 } from '@material-ui/core';
-
-import getInitials from '../../utils/getInitials';
+import { ICompany } from '@lib/types';
 
 interface props {
-  companys: any;
+  companies?: ICompany[];
 }
 
-const CompanyListResults = ({ companys, ...rest }: props) => {
+const CompanyListResults = ({ companies = [], ...rest }: props) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -30,7 +30,7 @@ const CompanyListResults = ({ companys, ...rest }: props) => {
     let newSelectedCustomerIds;
 
     if (event.target.checked) {
-      newSelectedCustomerIds = companys.map((company: any) => company.id);
+      newSelectedCustomerIds = companies.map((company: any) => company.id);
     } else {
       newSelectedCustomerIds = [];
     }
@@ -66,6 +66,59 @@ const CompanyListResults = ({ companys, ...rest }: props) => {
     setPage(newPage);
   };
 
+  const YourTableBody = () => {
+    const companyList = companies.slice(0, limit).map((company: any) => (
+      <TableRow hover key={company.id} selected={selectedCustomerIds.indexOf(company.id) !== -1}>
+        <TableCell padding="checkbox">
+          <Checkbox
+            checked={selectedCustomerIds.indexOf(company.id) !== -1}
+            onChange={(event) => handleSelectOne(event, company.id)}
+            value="true"
+          />
+        </TableCell>
+        <TableCell>
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+            }}
+          >
+            {/* <Avatar src={company.avatarUrl} sx={{ mr: 2 }}>
+                        {getInitials(company.title)}
+                      </Avatar> */}
+            <Typography color="textPrimary" variant="body1">
+              {company.title}
+            </Typography>
+          </Box>
+        </TableCell>
+        {/* <TableCell>{company.email}</TableCell>
+                  <TableCell>
+                    {`${company.address.city},
+                    ${company.address.state},
+                    ${company.address.country}`}
+                  </TableCell>
+                  <TableCell>{company.phone}</TableCell>
+                  <TableCell>{moment(company.createdAt).format('DD/MM/YYYY')}</TableCell> */}
+      </TableRow>
+    ));
+    return <>{companyList}</>;
+  };
+
+  const Spinner = () => (
+    <Box
+      sx={{
+        mb: 2,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 'auto',
+      }}
+    >
+      <CircularProgress />
+      {/* <span style={{ marginLeft: '20px' }}>Загружается. Пожалуйста, подождите...</span> */}
+    </Box>
+  );
+
   return (
     <Card {...rest}>
       <PerfectScrollbar>
@@ -75,61 +128,26 @@ const CompanyListResults = ({ companys, ...rest }: props) => {
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedCustomerIds.length === companys.length}
+                    checked={selectedCustomerIds.length === companies.length}
                     color="primary"
-                    indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < companys.length}
+                    indeterminate={selectedCustomerIds.length > 0 && selectedCustomerIds.length < companies.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
+                <TableCell>Наименование</TableCell>
+                {/* <TableCell>Email</TableCell>
                 <TableCell>Location</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Registration date</TableCell>
+                <TableCell>Registration date</TableCell> */}
               </TableRow>
             </TableHead>
-            <TableBody>
-              {companys.slice(0, limit).map((company: any) => (
-                <TableRow hover key={company.id} selected={selectedCustomerIds.indexOf(company.id) !== -1}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedCustomerIds.indexOf(company.id) !== -1}
-                      onChange={(event) => handleSelectOne(event, company.id)}
-                      value="true"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        alignItems: 'center',
-                        display: 'flex',
-                      }}
-                    >
-                      <Avatar src={company.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(company.name)}
-                      </Avatar>
-                      <Typography color="textPrimary" variant="body1">
-                        {company.name}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>{company.email}</TableCell>
-                  <TableCell>
-                    {`${company.address.city},
-                    ${company.address.state},
-                    ${company.address.country}`}
-                  </TableCell>
-                  <TableCell>{company.phone}</TableCell>
-                  <TableCell>{moment(company.createdAt).format('DD/MM/YYYY')}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+            <TableBody>{true ? <Spinner /> : <YourTableBody />}</TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={companys.length}
+        count={companies.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}

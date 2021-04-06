@@ -1,7 +1,7 @@
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 
-import { sleep } from '@lib/store/src/utils/tools';
+import { sleep } from '@lib/store';
 
 import { docActions } from './actions';
 import { IDocPayload, IDocState } from './types';

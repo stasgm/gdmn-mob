@@ -1,6 +1,6 @@
 import { IDevice, IResponse } from '@lib/types';
 
-import { INetworkError, deviceTypes } from '../types';
+import { error, device as types } from '../types';
 
 import { api } from '../config';
 
@@ -16,12 +16,12 @@ const addDevice = async (deviceName: string, userId: string) => {
     return {
       type: 'ADD_DEVICE',
       id: resData.data,
-    } as deviceTypes.IAddDeviceResponse;
+    } as types.IAddDeviceResponse;
   }
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 /**
   * Получить
@@ -38,12 +38,12 @@ const getDevices = async (userId?: string) => {
     return {
       type: 'GET_DEVICES',
       devices: resData.data,
-    } as deviceTypes.IGetDevicesResponse;
+    } as types.IGetDevicesResponse;
   }
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 /**
@@ -67,18 +67,18 @@ const getDevice = async (deviceId: string, userId?: string) => {
       return {
         type: 'GET_DEVICE',
         device: resData.data,
-      } as deviceTypes.IGetDeviceResponse;
+      } as types.IGetDeviceResponse;
     }
 
     return {
       type: 'ERROR',
       message: resData.error,
-    } as INetworkError;
+    } as error.INetworkError;
   } catch (err) {
     return {
       type: 'ERROR',
       message: err?.response?.data?.error || 'ошибка подключения',
-    } as INetworkError;
+    } as error.INetworkError;
   }
 };
 
@@ -90,12 +90,12 @@ const getUsersByDevice = async (deviceId: string) => {
     return {
       type: 'GET_USERS_BY_DEVICE',
       userList: resData.data,
-    } as deviceTypes.IGetUsersByDeviceResponse;
+    } as types.IGetUsersByDeviceResponse;
   }
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const updateDevice = async (device: Partial<IDevice>) => {
@@ -106,12 +106,12 @@ const updateDevice = async (device: Partial<IDevice>) => {
     return {
       type: 'UPDATE_DEVICE',
       deviceId: resData.data,
-    } as deviceTypes.IUpdateDeviceResponse;
+    } as types.IUpdateDeviceResponse;
   }
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const removeDevice = async (deviceId: string) => {
@@ -121,12 +121,12 @@ const removeDevice = async (deviceId: string) => {
   if (resData.result) {
     return {
       type: 'REMOVE_DEVICE',
-    } as deviceTypes.IRemoveDeviceResponse;
+    } as types.IRemoveDeviceResponse;
   }
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 export default {

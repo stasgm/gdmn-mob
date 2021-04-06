@@ -1,16 +1,23 @@
-import { useStore } from 'react-redux';
+// import { useStore } from 'react-redux';
 import { Reducer } from 'redux';
 
 import { StoreWithAsyncReducers } from '../';
 
-const useAddReducer = (name: string, reducer: Reducer<any, any>) => {
-  const store: StoreWithAsyncReducers = useStore();
+type params = {
+  name: string;
+  reducer: Reducer<any, any>;
+  store: StoreWithAsyncReducers;
+};
+
+const useAddReducer = ({ name, reducer, store }: params) => {
+  // const store: StoreWithAsyncReducers = useStore();
 
   if (!store.addReducer) {
     return;
   }
 
   store.addReducer(name, reducer);
+  console.log('end addReducer', name);
 };
 
 /* interface IReducers {
