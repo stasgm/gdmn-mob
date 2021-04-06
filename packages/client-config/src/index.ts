@@ -1,4 +1,26 @@
-import dev from './dev';
-import prod from './prod';
+export interface IEnvConfig {
+  server: {
+    protocol: string;
+    name: string;
+    port: number;
+  };
+  timeout: number;
+  apiPath: string;
+  debug: {
+    useMockup: boolean;
+  };
+}
 
-export default process.env.NODE_ENV === 'production' ? prod : dev;
+export const baseConfig: IEnvConfig = {
+  server: {
+    protocol: 'http://',
+    name: '192.168.100.10',
+    port: 3649,
+  },
+  timeout: 10000,
+  apiPath: 'api',
+  debug: {
+    useMockup: false,
+  },
+};
+

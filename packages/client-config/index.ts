@@ -1,1 +1,1 @@
-export { default as config } from './src';
+export { baseConfig, IEnvConfig } from './src';
