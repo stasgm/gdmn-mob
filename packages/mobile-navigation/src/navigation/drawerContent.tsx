@@ -21,9 +21,6 @@ export function DrawerContent(props: Props) {
   // const theme = 'dark';
   // const navigation = useNavigation();
 
-  // const state = useTypedSelector((state) => state);
-  // console.log('state', state);
-  // // const user = {};
   const { user, company } = useTypedSelector((state) => state.auth);
 
   const translateX = Animated.interpolateNode(props.progress, {

@@ -83,7 +83,7 @@ const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, un
       if (credentials.userName === 'Stas' && credentials.password === '123') {
         response = { type: 'LOGIN', user };
       } else {
-        return dispatch(authActions.loginUserAsync.failure('не верный пароль'));
+        return dispatch(authActions.loginUserAsync.failure('не верные данные'));
       }
     } else {
       response = await requests.auth.login(credentials);

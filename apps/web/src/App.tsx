@@ -315,8 +315,6 @@ const App = () => {
     needReReadUserData: true,
   });
 
-  console.log('appState: ' + appState);
-
   const handleSetError = useCallback(
     (errMessage?: string) => {
       dispatch({ type: 'SET_ERROR', errorMessage: errMessage });
