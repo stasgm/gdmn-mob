@@ -2,7 +2,7 @@ import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 
 import { api, deviceId } from '../config';
 
-import { INetworkError, authTypes as types } from '../types';
+import { error, auth as types } from '../types';
 
 const signup = async (userName: string, password: string, companyId?: string, creatorId?: string) => {
   const body = {
@@ -24,7 +24,7 @@ const signup = async (userName: string, password: string, companyId?: string, cr
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const login = async (userCredentials: IUserCredentials) => {
@@ -44,7 +44,7 @@ const login = async (userCredentials: IUserCredentials) => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const logout = async () => {
@@ -59,7 +59,7 @@ const logout = async () => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getCurrentUser = async () => {
@@ -80,7 +80,7 @@ const getCurrentUser = async () => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getActivationCode = async () => {
@@ -96,7 +96,7 @@ const getActivationCode = async () => {
   return {
     type: 'ERROR',
     message: resData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const verifyCode = async (code: string) => {
@@ -118,12 +118,12 @@ const verifyCode = async (code: string) => {
     return {
       type: 'ERROR',
       message: resData?.error,
-    } as INetworkError;
+    } as error.INetworkError;
   } catch (err) {
     return {
       type: 'ERROR',
       message: err?.response?.data?.error || 'ошибка подключения',
-    } as INetworkError;
+    } as error.INetworkError;
   }
 };
 

@@ -3,9 +3,9 @@ import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
 import { Formik, useFormik } from 'formik';
 import { Box, Button, Checkbox, Container, FormHelperText, Link, TextField, Typography } from '@material-ui/core';
-import { useCallback, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
-import { authActions, useTypedSelector } from '@lib/store';
+// import { useMemo } from 'react';
+// import { useDispatch } from 'react-redux';
+// import { useTypedSelector } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 // import { IUserCredentials } from '@lib/types';
 // import { useSelector } from 'react-redux';
@@ -18,18 +18,18 @@ import { IUserCredentials } from '@lib/types';
 
 const Register = () => {
   const navigate = useNavigate();
-  const { error, loading, status } = useTypedSelector((state) => state.auth);
+  //const { error, loading, status } = useTypedSelector((state) => state.auth);
 
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
+  // const request = useMemo(
+  //   () => ({
+  //     isError: error,
+  //     isLoading: loading,
+  //     status,
+  //   }),
+  //   [error, loading, status],
+  // );
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   // const handleSignUp = useCallback(
   //   (userName: string, password: string) => dispatch(authActions.signup(userName, password)),
@@ -85,8 +85,8 @@ const Register = () => {
               navigate('/app/dashboard', { replace: true });
             }}
           >
-            {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-              <form onSubmit={handleSubmit}>
+            {({ errors, handleBlur, handleChange, isSubmitting, touched, values }) => (
+              <form onSubmit={formik.handleSubmit}>
                 <Box sx={{ mb: 3 }}>
                   <Typography color="textPrimary" variant="h2">
                     Create new account

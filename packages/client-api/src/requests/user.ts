@@ -1,6 +1,6 @@
 import { IResponse, IUser } from '@lib/types';
 
-import { INetworkError, userTypes as types } from '../types';
+import { error, user as types } from '../types';
 
 import { api } from '../config';
 
@@ -17,7 +17,7 @@ const getUsers = async () => {
   return {
     type: 'ERROR',
     message: userData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const getUser = async (userId: string) => {
@@ -33,7 +33,7 @@ const getUser = async (userId: string) => {
   return {
     type: 'ERROR',
     message: userData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const updateUser = async (user: Partial<IUser>) => {
@@ -49,7 +49,7 @@ const updateUser = async (user: Partial<IUser>) => {
   return {
     type: 'ERROR',
     message: userData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 const removeUser = async (userId: string) => {
@@ -64,7 +64,7 @@ const removeUser = async (userId: string) => {
   return {
     type: 'ERROR',
     message: userData.error,
-  } as INetworkError;
+  } as error.INetworkError;
 };
 
 export default { getUsers, getUser, updateUser, removeUser };

@@ -4,13 +4,8 @@ import { AnyAction } from 'redux';
 import { IUserCredentials } from '@lib/types';
 
 import { device, user } from '@lib/mock';
-import { requests } from '@lib/client-api';
 
-import { IGetDeviceResponse } from '@lib/client-api/src/types/device';
-
-import { INetworkError } from '@lib/client-api/src/types';
-
-import { ILoginResponse, IVerifyCodeResponse } from '@lib/client-api/src/types/auth';
+import { types, requests } from '@lib/client-api';
 
 import { sleep } from '../utils/tools';
 
@@ -21,7 +16,7 @@ const isMock = true; // TODO брать из конфига
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: IGetDeviceResponse | INetworkError;
+    let response: types.device.IGetDeviceResponse | types.error.INetworkError;
 
     dispatch(authActions.checkDeviceAsync.request(''));
 
@@ -48,7 +43,7 @@ const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
 
 const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: IVerifyCodeResponse | INetworkError;
+    let response: types.auth.IVerifyCodeResponse | types.error.INetworkError;
 
     dispatch(authActions.activateDeviceAsync.request(''));
 
@@ -78,7 +73,7 @@ const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, An
 
 const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: ILoginResponse | INetworkError;
+    let response: types.auth.ILoginResponse | types.error.INetworkError;
 
     dispatch(authActions.loginUserAsync.request(''));
 
