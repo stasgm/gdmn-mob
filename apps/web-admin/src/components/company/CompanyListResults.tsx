@@ -141,7 +141,9 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
                 <TableCell>Registration date</TableCell> */}
               </TableRow>
             </TableHead>
-            <TableBody>{true ? <Spinner /> : <YourTableBody />}</TableBody>
+            <TableBody>
+              <YourTableBody />
+            </TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>

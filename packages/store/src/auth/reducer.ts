@@ -2,16 +2,29 @@ import { Reducer } from 'redux';
 
 import { getType } from 'typesafe-actions';
 
-import { config } from '@lib/mock';
+import { config } from '@lib/client-config';
 
 import { IAuthState } from './types';
 import { AuthActionType, authActions } from './actions';
+// import { config } from '@lib/mock';
+
+const {
+  server: { name, port, protocol },
+  timeout,
+  apiPath,
+} = config;
 
 const initialState: Readonly<IAuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
-  settings: config, // TODO исправить
+  settings: {
+    apiPath,
+    port,
+    protocol,
+    server: name,
+    timeout,
+  },
   error: false,
   loading: false,
   status: '',

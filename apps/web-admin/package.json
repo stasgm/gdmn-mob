@@ -2,9 +2,9 @@
   "name": "@apps/web-admin",
   "displayName": "web-admin",
   "version": "1.0.0",
-  "license": "MIT",
-  "description": "web-admin",
   "private": true,
+  "description": "web-admin",
+  "license": "MIT",
   "scripts": {
     "build": "yarn run clean-dist && webpack --config=configs/webpack/prod.js",
     "clean-dist": "rimraf dist/*",
@@ -13,11 +13,31 @@
     "lint": "eslint \"**/*.ts*\"",
     "lint:fix": "eslint --fix \"**/*.ts*\"",
     "start": "yarn run start-dev",
+    "start:mock": "cross-env MOCK=true DEVICE_ID=web yarn start-dev",
     "start-dev": "webpack serve --config=configs/webpack/dev.js",
     "start-prod": "yarn run build",
     "precommit": "lint-staged",
     "test": "jest --coverage --watchAll --config=configs/jest.json"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "prettier": "@config/prettier-config",
   "dependencies": {
     "@babel/cli": "^7.13.14",
     "@babel/core": "^7.13.14",
@@ -28,9 +48,9 @@
     "@emotion/styled": "^11.1.5",
     "@hot-loader/react-dom": "^17.0.1",
     "@lib/client-api": "*",
+    "@lib/mock": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@lib/mock": "*",
     "@material-ui/core": "^5.0.0-alpha.28",
     "@material-ui/icons": "^5.0.0-alpha.28",
     "@material-ui/styled-engine": "^5.0.0-alpha.25",
@@ -45,6 +65,7 @@
     "@types/yup": "^0.29.11",
     "babel-loader": "^8.2.2",
     "clsx": "^1.1.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.0.1",
     "formik": "^2.1.5",
     "history": "^5.0.0",
@@ -72,30 +93,11 @@
     "webpack-merge": "^5.7.3",
     "yup": "^0.32.9"
   },
-  "prettier": "@config/prettier-config",
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/prettier-config": "*",
     "lint-staged": "^10.5.4",
     "react-hot-loader": "^4.13.0"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "yarn prettier:fix",
-      "yarn lint"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }

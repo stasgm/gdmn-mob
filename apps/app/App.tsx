@@ -8,12 +8,12 @@ import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
 
-import './src/config';
 import { combinedReducer } from './src/store';
 
 enableScreens();
 
 const store = configureStore();
+console.log('MOCK:', process.env.MOCK);
 
 const App = () => {
   useAddReducer({ name: 'docs', reducer: combinedReducer.docs, store });

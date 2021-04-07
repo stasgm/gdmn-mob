@@ -1,3 +1,4 @@
 #config
-src/prod.ts
-src/dev.ts
+src/*
+!src/index.ts
+!src/config.sample

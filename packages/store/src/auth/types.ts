@@ -11,7 +11,7 @@ export type IAuthState = {
   readonly status: string;
 };
 
-// TODO: заменить на  IResponse<ICompany>
+/* // TODO: заменить на  IResponse<ICompany>
 export type CompanyPayload = Partial<{
   errorMessage: string;
   companyData: ICompany;
@@ -27,4 +27,4 @@ export type DevicePayload = Partial<{
 export type UserPayload = Partial<{
   errorMessage: string;
   userData: IUser;
-}>;
+}>; */

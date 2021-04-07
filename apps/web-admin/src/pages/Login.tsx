@@ -33,7 +33,7 @@ const Login = () => {
   const formik = useFormik<IUserCredentials>({
     initialValues: {
       userName: 'Stas',
-      password: '123',
+      password: '@123!',
     },
     validationSchema: yup.object().shape({
       userName: yup.string().required('Required'),
