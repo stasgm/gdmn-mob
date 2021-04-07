@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -20,6 +21,21 @@ import { ICompany } from '@lib/types';
 interface props {
   companies?: ICompany[];
 }
+
+export const Spinner = () => (
+  <Box
+    sx={{
+      mb: 2,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      margin: 'auto',
+    }}
+  >
+    <CircularProgress />
+    {/* <span style={{ marginLeft: '20px' }}>Загружается. Пожалуйста, подождите...</span> */}
+  </Box>
+);
 
 const CompanyListResults = ({ companies = [], ...rest }: props) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
@@ -66,8 +82,8 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
     setPage(newPage);
   };
 
-  const YourTableBody = () => {
-    const companyList = companies.slice(0, limit).map((company: any) => (
+  const TableRows = () => {
+    const companyList = companies.slice(0, limit).map((company: ICompany) => (
       <TableRow hover key={company.id} selected={selectedCustomerIds.indexOf(company.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
@@ -86,9 +102,12 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
             {/* <Avatar src={company.avatarUrl} sx={{ mr: 2 }}>
                         {getInitials(company.title)}
                       </Avatar> */}
-            <Typography color="textPrimary" variant="body1">
-              {company.title}
-            </Typography>
+
+            <NavLink to={company.id}>
+              <Typography color="textPrimary" variant="body1" key={company.id}>
+                {company.title}
+              </Typography>
+            </NavLink>
           </Box>
         </TableCell>
         {/* <TableCell>{company.email}</TableCell>
@@ -103,21 +122,6 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
     ));
     return <>{companyList}</>;
   };
-
-  const Spinner = () => (
-    <Box
-      sx={{
-        mb: 2,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 'auto',
-      }}
-    >
-      <CircularProgress />
-      {/* <span style={{ marginLeft: '20px' }}>Загружается. Пожалуйста, подождите...</span> */}
-    </Box>
-  );
 
   return (
     <Card {...rest}>
@@ -141,7 +145,9 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
                 <TableCell>Registration date</TableCell> */}
               </TableRow>
             </TableHead>
-            <TableBody>{true ? <Spinner /> : <YourTableBody />}</TableBody>
+            <TableBody>
+              <TableRows />
+            </TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>

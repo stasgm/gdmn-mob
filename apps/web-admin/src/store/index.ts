@@ -3,11 +3,11 @@ import { combineReducers } from 'redux';
 import companyReducer from './company/reducer';
 
 export const combinedReducer = {
-  companies: companyReducer,
+  company: companyReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
 
-export type IRootState = ReturnType<typeof rootReducer>;
+export type IAppState = ReturnType<typeof rootReducer>;
 
 export default rootReducer;

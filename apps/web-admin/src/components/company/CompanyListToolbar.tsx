@@ -2,10 +2,12 @@ import { Box, Button, Card, CardContent, TextField, InputAdornment, SvgIcon } fr
 import { Search as SearchIcon } from 'react-feather';
 
 interface props {
-  onLoadCompanies: any;
+  onLoadCompanies: () => void;
+  onAddCompany: () => void;
+  onOpenCompany: () => void;
 }
 
-const CompanyListToolbar = ({ onLoadCompanies, ...rest }: props) => {
+const CompanyListToolbar = ({ onLoadCompanies, onAddCompany, onOpenCompany, ...rest }: props) => {
   return (
     <Box {...rest}>
       <Box
@@ -17,8 +19,11 @@ const CompanyListToolbar = ({ onLoadCompanies, ...rest }: props) => {
         <Button onClick={onLoadCompanies}>Load</Button>
         <Button>Import</Button>
         <Button sx={{ mx: 1 }}>Export</Button>
-        <Button color="primary" variant="contained">
+        <Button color="primary" variant="contained" onClick={onAddCompany}>
           Add company
+        </Button>
+        <Button color="primary" variant="contained" onClick={onOpenCompany}>
+          Edit company
         </Button>
       </Box>
       <Box sx={{ mt: 3 }}>

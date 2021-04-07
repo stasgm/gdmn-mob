@@ -2,6 +2,7 @@ import { ICompany } from '@lib/types';
 
 export type ICompanyState = {
   readonly companyData: ICompany[] | undefined;
+  readonly companyId: string | undefined;
   readonly loading: boolean;
   readonly errorMessage: string;
 };

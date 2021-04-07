@@ -1,7 +1,7 @@
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
 
-import { IRootState } from '.';
+import { IAppState } from '.';
 
-const useCompanyTypedSelectors: TypedUseSelectorHook<IRootState> = useSelector;
+const useCompanyTypedSelectors: TypedUseSelectorHook<IAppState> = useSelector;
 
 export default useCompanyTypedSelectors;

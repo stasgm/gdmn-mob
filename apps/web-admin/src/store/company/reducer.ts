@@ -11,6 +11,7 @@ const initialState: Readonly<ICompanyState> = {
     // { id: '3', title: 'Company 3', admin: 'admin' },
     // { id: '4', title: 'Company 4', admin: 'admin' },
   ],
+  companyId: '',
   loading: false,
   errorMessage: '',
 };
@@ -31,6 +32,39 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
       };
 
     case getType(companyActions.fetchCompaniesAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    case getType(companyActions.addCompanyAsync.request):
+      return { ...state, loading: true, companyId: undefined };
+
+    case getType(companyActions.addCompanyAsync.success):
+      return {
+        ...state,
+        loading: false,
+        companyId: action.payload,
+      };
+
+    case getType(companyActions.addCompanyAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    case getType(companyActions.updateCompanyAsync.request):
+      return { ...state, loading: true };
+
+    case getType(companyActions.updateCompanyAsync.success):
+      return {
+        ...state,
+        loading: false,
+      };
+
+    case getType(companyActions.updateCompanyAsync.failure):
       return {
         ...state,
         loading: false,

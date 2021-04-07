@@ -11,6 +11,7 @@ import CompanyList from './pages/CompanyList';
 import DeviceList from './pages/DeviceList';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import CompanyDetails from './components/company/CompanyDetails';
 
 const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
   {
@@ -20,7 +21,14 @@ const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
       { path: 'account', element: <Account /> },
       { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
-      { path: 'companies', element: <CompanyList /> },
+      {
+        path: 'companies',
+        children: [
+          { path: '/', element: <CompanyList /> },
+          { path: '/new', element: <CompanyDetails /> },
+          { path: '/:id', element: <CompanyDetails /> },
+        ],
+      },
       { path: 'devices', element: <DeviceList /> },
       { path: '/', element: <Navigate to="/app/dashboard" /> },
       { path: '*', element: <Navigate to="/404" /> },

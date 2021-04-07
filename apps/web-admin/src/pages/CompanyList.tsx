@@ -5,13 +5,17 @@ import { useDispatch } from 'react-redux';
 
 // import { companies } from '@lib/mock';
 
+import { useNavigate } from 'react-router';
+
 import CompanyListResults from '../components/company/CompanyListResults';
 import CompanyListToolbar from '../components/company/CompanyListToolbar';
 import useCompanyTypedSelectors from '../store/useCompanyTypedSelectors';
 import companyAsyncActions from '../store/company/actions.async';
 
 const CompanyList = () => {
-  const { companyData } = useCompanyTypedSelectors((state) => state.companies);
+  const { companyData } = useCompanyTypedSelectors((state) => state.company);
+  const navigate = useNavigate();
+
   // const companyData = companies;
   console.log(companyData);
 
@@ -23,10 +27,18 @@ const CompanyList = () => {
     dispatch(companyAsyncActions.fetchCompanies());
   };
 
+  const handleAddCompany = () => {
+    navigate('/app/companies/new');
+  };
+
+  const handleOpenCompany = () => {
+    navigate('/app/companies/123');
+  };
+
   return (
     <>
       <Helmet>
-        <title>companys | Material Kit</title>
+        <title>Companies</title>
       </Helmet>
       <Box
         sx={{
@@ -36,7 +48,11 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CompanyListToolbar onLoadCompanies={handleLoadCompanies} />
+          <CompanyListToolbar
+            onLoadCompanies={handleLoadCompanies}
+            onAddCompany={handleAddCompany}
+            onOpenCompany={handleOpenCompany}
+          />
           <Box sx={{ pt: 3 }}>
             <CompanyListResults companies={companyData} />
           </Box>

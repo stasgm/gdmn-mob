@@ -15,7 +15,7 @@ import { combinedReducer } from './store';
 
 const store = configureStore();
 
-useAddReducer({ name: 'companies', reducer: combinedReducer.companies, store });
+useAddReducer({ name: 'company', reducer: combinedReducer.company, store });
 
 const Routing = () => {
   // const Router = () => (authSelectors.isLogged() ? <RootNavigator /> : <AuthNavigator />);
