@@ -5,13 +5,7 @@ import { ICompanyState } from './types';
 import { CompanyActionType, companyActions } from './actions';
 
 const initialState: Readonly<ICompanyState> = {
-  companyData: [
-    { id: '1', title: 'Company 1', admin: 'admin' },
-    // { id: '2', title: 'Company 2', admin: 'admin' },
-    // { id: '3', title: 'Company 3', admin: 'admin' },
-    // { id: '4', title: 'Company 4', admin: 'admin' },
-  ],
-  companyId: '',
+  list: [],
   loading: false,
   errorMessage: '',
 };
@@ -22,13 +16,13 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
       return initialState;
 
     case getType(companyActions.fetchCompaniesAsync.request):
-      return { ...state, loading: true, companyData: [] };
+      return { ...state, loading: true, list: [] };
 
     case getType(companyActions.fetchCompaniesAsync.success):
       return {
         ...state,
+        list: action.payload,
         loading: false,
-        companyData: action.payload,
       };
 
     case getType(companyActions.fetchCompaniesAsync.failure):
@@ -39,13 +33,13 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
       };
 
     case getType(companyActions.addCompanyAsync.request):
-      return { ...state, loading: true, companyId: undefined };
+      return { ...state, loading: true };
 
     case getType(companyActions.addCompanyAsync.success):
       return {
         ...state,
+        list: [...(state.list || []), action.payload],
         loading: false,
-        companyId: action.payload,
       };
 
     case getType(companyActions.addCompanyAsync.failure):
@@ -61,6 +55,7 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
     case getType(companyActions.updateCompanyAsync.success):
       return {
         ...state,
+        list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
         loading: false,
       };
 

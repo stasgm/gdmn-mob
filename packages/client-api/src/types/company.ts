@@ -16,11 +16,12 @@ export interface IGetCompaniesResponse extends ICompanyQueryResponse {
 
 export interface IAddCompanyResponse extends ICompanyQueryResponse {
   type: 'ADD_COMPANY';
-  companyId: string;
+  company: ICompany;
 }
 
 export interface IUpdateCompanyResponse extends ICompanyQueryResponse {
   type: 'UPDATE_COMPANY';
+  company: ICompany;
 }
 
 export interface IGetCompanyUsersResponse extends ICompanyQueryResponse {

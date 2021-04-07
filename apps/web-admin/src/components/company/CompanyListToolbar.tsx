@@ -4,10 +4,9 @@ import { Search as SearchIcon } from 'react-feather';
 interface props {
   onLoadCompanies: () => void;
   onAddCompany: () => void;
-  onOpenCompany: () => void;
 }
 
-const CompanyListToolbar = ({ onLoadCompanies, onAddCompany, onOpenCompany, ...rest }: props) => {
+const CompanyListToolbar = ({ onLoadCompanies, onAddCompany, ...rest }: props) => {
   return (
     <Box {...rest}>
       <Box
@@ -21,9 +20,6 @@ const CompanyListToolbar = ({ onLoadCompanies, onAddCompany, onOpenCompany, ...r
         <Button sx={{ mx: 1 }}>Export</Button>
         <Button color="primary" variant="contained" onClick={onAddCompany}>
           Add company
-        </Button>
-        <Button color="primary" variant="contained" onClick={onOpenCompany}>
-          Edit company
         </Button>
       </Box>
       <Box sx={{ mt: 3 }}>

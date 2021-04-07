@@ -1,13 +1,15 @@
 import { combineReducers } from 'redux';
+import { TypedUseSelectorHook, useSelector as useReduxSelector } from 'react-redux';
+import { RootState } from '@lib/store';
 
 import companyReducer from './company/reducer';
 
 export const combinedReducer = {
-  company: companyReducer,
+  companies: companyReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
 
-export type IAppState = ReturnType<typeof rootReducer>;
+export type IAppState = ReturnType<typeof rootReducer> & RootState;
 
-export default rootReducer;
+export const useSelector: TypedUseSelectorHook<IAppState> = useReduxSelector;

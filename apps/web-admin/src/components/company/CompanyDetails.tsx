@@ -12,24 +12,27 @@ import {
   CircularProgress,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { ICompany } from '@lib/types';
+import { v4 as uuid } from 'uuid';
 
-import { IAppState } from '../../store';
+import { useSelector } from '../../store';
 
 import companyAsyncActions from '../../store/company/actions.async';
-import useCompanyTypedSelectors from '../../store/useCompanyTypedSelectors';
 
 // import { Spinner } from './CompanyListResults';
 
 const CompanyDetails = (props: any) => {
+  const dispatch = useDispatch();
+  const { errorMessage, loading } = useSelector((state) => state.companies);
+
   const { id: selectedCompanyId } = useParams();
   const isAddMode = !selectedCompanyId;
 
   const [values, setValues] = useState<ICompany>({
     admin: '',
-    id: '0',
+    id: uuid(),
     title: '',
   });
 
@@ -38,21 +41,16 @@ const CompanyDetails = (props: any) => {
       ...values,
       [event.target.name]: event.target.value,
     });
-    console.log('values', event.target.name, values);
   };
-
-  const dispatch = useDispatch();
-
-  const { errorMessage, loading } = useCompanyTypedSelectors((state) => state.company);
 
   let company: ICompany | undefined = {
     admin: '',
-    id: '',
+    id: uuid(),
     title: '',
   };
 
   if (!isAddMode) {
-    company = useSelector((state: IAppState) => state.company.companyData?.find(({ id }) => id === selectedCompanyId));
+    company = useSelector((state) => state.companies.list?.find(({ id }) => id === selectedCompanyId));
 
     if (!company) {
       return <Box>Компания не найдена</Box>;
@@ -64,18 +62,18 @@ const CompanyDetails = (props: any) => {
   const navigate = useNavigate();
 
   const handleSubmit = () => {
-    console.log('handleSubmit', company, values.title);
+    // console.log('handleSubmit', company, values.title);
     isAddMode
-      ? dispatch(companyAsyncActions.addCompany(values.title))
+      ? dispatch(companyAsyncActions.addCompany(values))
       : company
-      ? dispatch(companyAsyncActions.updateCompany(company))
-      : console.log('company does not find');
+        ? dispatch(companyAsyncActions.updateCompany({ ...values, id: company.id }))
+        : console.log('company does not find');
     navigate('/app/companies');
   };
 
   useEffect(() => {
     setValues((prev) => ({ ...prev, title }));
-  }, [selectedCompanyId]);
+  }, [selectedCompanyId, title]);
 
   return (
     <form autoComplete="off" noValidate {...props}>
@@ -90,8 +88,8 @@ const CompanyDetails = (props: any) => {
             <Grid item md={6} xs={12}>
               <TextField
                 fullWidth
-                helperText="Please specify the first name"
-                label="First name"
+                helperText="Введите название организации"
+                label="Название организации"
                 name="title"
                 onChange={handleChange}
                 required

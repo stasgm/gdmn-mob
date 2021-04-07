@@ -14,7 +14,7 @@ export type IAuthState = {
 /* // TODO: заменить на  IResponse<ICompany>
 export type CompanyPayload = Partial<{
   errorMessage: string;
-  companyData: ICompany;
+  list: ICompany;
 }>;
 
 // TODO: заменить на  IResponse<IDevice>

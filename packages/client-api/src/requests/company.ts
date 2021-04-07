@@ -9,13 +9,13 @@ const addCompany = async (title: string, externalId: string) => {
     title,
     externalId,
   };
-  const res = await api.post<IResponse<string>>('/companies', body);
+  const res = await api.post<IResponse<ICompany>>('/companies', body);
   const resData = res.data;
 
   if (resData.result) {
     return {
       type: 'ADD_COMPANY',
-      companyId: resData.data,
+      company: resData.data,
     } as types.IAddCompanyResponse;
   }
   return {
@@ -57,13 +57,13 @@ const getCompany = async (companyId: string) => {
 };
 
 const updateCompany = async (company: Partial<ICompany>) => {
-  const res = await api.patch<IResponse<string>>(`/companies/${company.id}`, company);
+  const res = await api.patch<IResponse<ICompany>>(`/companies/${company.id}`, company);
   const resData = res.data;
 
   if (resData.result) {
     return {
       type: 'UPDATE_COMPANY',
-      companyId: resData.data,
+      company: resData.data,
     } as types.IUpdateCompanyResponse;
   }
   return {

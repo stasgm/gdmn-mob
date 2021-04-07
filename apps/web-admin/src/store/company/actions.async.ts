@@ -6,13 +6,15 @@ import { sleep } from '@lib/store';
 import { types, requests } from '@lib/client-api';
 
 import { companies } from '@lib/mock';
-
+import { config } from '@lib/client-config';
 import { ICompany } from '@lib/types';
 
 import { companyActions } from './actions';
 import { ICompanyState } from './types';
 
-const isMock = true; // TODO брать из конфига
+const {
+  debug: { useMockup: isMock },
+} = config;
 
 const fetchCompanies = (): ThunkAction<void, ICompanyState, unknown, AnyAction> => {
   return async (dispatch) => {
@@ -41,7 +43,7 @@ const fetchCompanies = (): ThunkAction<void, ICompanyState, unknown, AnyAction> 
   };
 };
 
-const addCompany = (companyName: string): ThunkAction<void, ICompanyState, unknown, AnyAction> => {
+const addCompany = (company: ICompany): ThunkAction<void, ICompanyState, unknown, AnyAction> => {
   return async (dispatch) => {
     let response: types.company.IAddCompanyResponse | types.error.INetworkError;
 
@@ -50,13 +52,13 @@ const addCompany = (companyName: string): ThunkAction<void, ICompanyState, unkno
     if (isMock) {
       await sleep(500);
 
-      response = { companyId: '666', type: 'ADD_COMPANY' };
+      response = { company, type: 'ADD_COMPANY' };
     } else {
-      response = await requests.company.addCompany(companyName, '666');
+      response = await requests.company.addCompany(company.title, '666');
     }
 
     if (response.type === 'ADD_COMPANY') {
-      return dispatch(companyActions.addCompanyAsync.success(response.companyId));
+      return dispatch(companyActions.addCompanyAsync.success(response.company));
     }
 
     if (response.type === 'ERROR') {
@@ -76,13 +78,13 @@ const updateCompany = (company: ICompany): ThunkAction<void, ICompanyState, unkn
     if (isMock) {
       await sleep(500);
 
-      response = { type: 'UPDATE_COMPANY' };
+      response = { type: 'UPDATE_COMPANY', company };
     } else {
       response = await requests.company.updateCompany(company);
     }
 
     if (response.type === 'UPDATE_COMPANY') {
-      return dispatch(companyActions.updateCompanyAsync.success());
+      return dispatch(companyActions.updateCompanyAsync.success(company));
     }
 
     if (response.type === 'ERROR') {

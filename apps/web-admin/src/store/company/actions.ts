@@ -11,13 +11,13 @@ const fetchCompaniesAsync = createAsyncAction('COMPANY/FETCH', 'COMPANY/FETCH_SU
 
 const addCompanyAsync = createAsyncAction('COMPANY/ADD', 'COMPANY/ADD_SUCCCES', 'COMPANY/ADD_FAILURE')<
   string | undefined,
-  string,
+  ICompany,
   string
 >();
 
 const updateCompanyAsync = createAsyncAction('COMPANY/UPDATE', 'COMPANY/UPDATE_SUCCCES', 'COMPANY/UPDATE_FAILURE')<
   string | undefined,
-  undefined,
+  ICompany,
   string
 >();
 

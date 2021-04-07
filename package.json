@@ -10,7 +10,7 @@
   },
   "scripts": {
     "app:server": "lerna run --scope=@apps/server start --stream --",
-    "app:web": "lerna run --scope=@apps/web-api start --stream --",
+    "app:web": "lerna run --scope=@apps/web-admin start --stream --",
     "expo:app": "lerna run --scope=@apps/app start --stream --",
     "lint": "lerna run --scope=@lib/* --scope=@apps/* lint --stream --",
     "lint:fix": "lerna run --scope=@lib/* --scope=@apps/* lint:fix --stream --",

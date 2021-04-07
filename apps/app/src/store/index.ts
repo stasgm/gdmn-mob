@@ -15,4 +15,3 @@ export type IAppState = ReturnType<typeof rootReducer> & RootState;
 // export type AppDispatch = typeof store.dispatch;
 
 export const useSelector: TypedUseSelectorHook<IAppState> = useReduxSelector;
-// export default rootReducer;

@@ -3,25 +3,24 @@ import { Box, Container } from '@material-ui/core';
 
 import { useDispatch } from 'react-redux';
 
-// import { companies } from '@lib/mock';
-
 import { useNavigate } from 'react-router';
+
+import { useEffect } from 'react';
 
 import CompanyListResults from '../components/company/CompanyListResults';
 import CompanyListToolbar from '../components/company/CompanyListToolbar';
-import useCompanyTypedSelectors from '../store/useCompanyTypedSelectors';
+import { useSelector } from '../store';
 import companyAsyncActions from '../store/company/actions.async';
 
 const CompanyList = () => {
-  const { companyData } = useCompanyTypedSelectors((state) => state.company);
+  const { list } = useSelector((state) => state.companies);
   const navigate = useNavigate();
-
-  // const companyData = companies;
-  console.log(companyData);
-
-  // const { docData, loading } = useSelector((state: IAppState) => state.docs);
-
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    /* Загружаем данные при загрузке компонента. В дальейшем надо загружать при открытии приложения */
+    !list?.length && dispatch(companyAsyncActions.fetchCompanies());
+  }, [dispatch, list?.length]);
 
   const handleLoadCompanies = () => {
     dispatch(companyAsyncActions.fetchCompanies());
@@ -29,10 +28,6 @@ const CompanyList = () => {
 
   const handleAddCompany = () => {
     navigate('/app/companies/new');
-  };
-
-  const handleOpenCompany = () => {
-    navigate('/app/companies/123');
   };
 
   return (
@@ -48,13 +43,9 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CompanyListToolbar
-            onLoadCompanies={handleLoadCompanies}
-            onAddCompany={handleAddCompany}
-            onOpenCompany={handleOpenCompany}
-          />
+          <CompanyListToolbar onLoadCompanies={handleLoadCompanies} onAddCompany={handleAddCompany} />
           <Box sx={{ pt: 3 }}>
-            <CompanyListResults companies={companyData} />
+            <CompanyListResults companies={list} />
           </Box>
         </Container>
       </Box>
