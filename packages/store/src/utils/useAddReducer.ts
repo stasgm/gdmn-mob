@@ -10,14 +10,11 @@ type params = {
 };
 
 const useAddReducer = ({ name, reducer, store }: params) => {
-  // const store: StoreWithAsyncReducers = useStore();
-
   if (!store.addReducer) {
     return;
   }
 
   store.addReducer(name, reducer);
-  console.log('end addReducer', name);
 };
 
 /* interface IReducers {

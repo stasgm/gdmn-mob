@@ -9,7 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
 import docActions from '../store/docs';
-import useTypedSelector from '../store/useTypedSelectors';
+import { useSelector } from '../store';
 import { IDocument } from '../store/docs/types';
 // import { IAppState } from '../store';
 
@@ -38,8 +38,7 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
 };
 
 const DocumentsScreen = () => {
-  const { docData, loading } = useTypedSelector((state) => state.docs);
-  // const { docData, loading } = useSelector((state: IAppState) => state.docs);
+  const { docData, loading } = useSelector((state) => state.docs);
 
   const dispatch = useDispatch();
 

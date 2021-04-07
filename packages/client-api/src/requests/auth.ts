@@ -1,6 +1,6 @@
 import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 
-import { api, deviceId } from '../config';
+import { api, deviceUid as deviceId } from '../config';
 
 import { error, auth as types } from '../types';
 

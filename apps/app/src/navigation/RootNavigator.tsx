@@ -1,11 +1,8 @@
 import React from 'react';
-import { useAddReducer } from '@lib/store';
 
 import { DrawerNavigator } from '@lib/mobile-navigation';
 
 import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator';
-
-import { combinedReducer } from '../store';
 
 import MapScreen from '../screens/Maps';
 
@@ -36,8 +33,6 @@ const navItems: INavItem[] = [
 ];
 
 const RootNavigator = () => {
-  useAddReducer('docs', combinedReducer.docs);
-
   return <DrawerNavigator items={navItems} />;
 };
 

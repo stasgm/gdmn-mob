@@ -7,12 +7,16 @@ import { device, user } from '@lib/mock';
 
 import { types, requests } from '@lib/client-api';
 
+import { config } from '@lib/client-config';
+
 import { sleep } from '../utils/tools';
 
 import { authActions } from './actions';
 import { IAuthState } from './types';
 
-const isMock = true; // TODO брать из конфига
+const {
+  debug: { useMockup: isMock },
+} = config;
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
@@ -80,7 +84,7 @@ const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, un
     if (isMock) {
       await sleep(500);
 
-      if (credentials.userName === 'Stas' && credentials.password === '123') {
+      if (credentials.userName === 'Stas' && credentials.password === '@123!') {
         response = { type: 'LOGIN', user };
       } else {
         return dispatch(authActions.loginUserAsync.failure('не верные данные'));
