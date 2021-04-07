@@ -46,6 +46,7 @@
     "@types/react-test-renderer": "^17.0.1",
     "@types/redux-persist": "^4.3.1",
     "axios": "^0.21.1",
+    "babel-plugin-inline-dotenv": "^1.6.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "expo": "^40.0.1",
     "expo-asset": "~8.2.2",
