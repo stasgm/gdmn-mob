@@ -5,20 +5,23 @@ import { ThemeProvider } from '@material-ui/core';
 import { hot } from 'react-hot-loader/root';
 import { Provider } from 'react-redux';
 
-import { authSelectors, configureStore, useAddReducer } from '@lib/store';
+// import { authSelectors } from '@lib/store';
+
+import { setStore } from './store';
 
 import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
 import routes from './routes';
 
-import { combinedReducer } from './store';
+// const store = configureStore();
 
-const store = configureStore();
+const store = setStore();
 
-useAddReducer({ name: 'companies', reducer: combinedReducer.companies, store });
+// setStore(store);
 
 const Routing = () => {
-  const isLogged = authSelectors.isLogged();
+  // const isLogged = authSelectors.isLogged();
+  const isLogged = true;
 
   return useRoutes(routes(isLogged));
 };

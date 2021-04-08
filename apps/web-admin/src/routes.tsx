@@ -7,11 +7,12 @@ import Account from './pages/Account';
 import UserList from './pages/UserList';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
-import CompanyList from './pages/CompanyList';
+import Companies from './pages/Companies';
+// import CompanyList from './pages/Companies/CompanyList';
 import DeviceList from './pages/DeviceList';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import CompanyDetails from './components/company/CompanyDetails';
+// import CompanyDetails from './components/company/CompanyDetails';
 
 const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
   {
@@ -22,12 +23,13 @@ const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
       { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
       {
-        path: 'companies',
-        children: [
+        path: 'companies/*',
+        element: <Companies />,
+        /* children: [
           { path: '/', element: <CompanyList /> },
           { path: '/new', element: <CompanyDetails /> },
-          { path: '/:id', element: <CompanyDetails /> },
-        ],
+          { path: '/edit/:id', element: <CompanyDetails /> },
+        ], */
       },
       { path: 'devices', element: <DeviceList /> },
       { path: '/', element: <Navigate to="/app/dashboard" /> },

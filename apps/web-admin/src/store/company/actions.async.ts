@@ -1,5 +1,5 @@
 import { ThunkAction } from 'redux-thunk';
-import { AnyAction } from 'redux';
+import { AnyAction, Action } from 'redux';
 
 import { sleep } from '@lib/store';
 
@@ -16,7 +16,45 @@ const {
   debug: { useMockup: isMock },
 } = config;
 
-const fetchCompanies = (): ThunkAction<void, ICompanyState, unknown, AnyAction> => {
+type AppThunk<R = void, S = ICompanyState, A extends Action = AnyAction> = ThunkAction<R, S, unknown, A>;
+
+const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void): AppThunk => {
+  return async (dispatch) => {
+    let response: types.company.IGetCompanyResponse | types.error.INetworkError;
+
+    dispatch(companyActions.fetchCompanyAsync.request(''));
+
+    if (isMock) {
+      // await sleep(500);
+      const company = companies.find((item) => item.id === id);
+
+      if (company) {
+        response = { company, type: 'GET_COMPANY' };
+      } else {
+        response = { message: 'Компания не найдена', type: 'ERROR' };
+      }
+    } else {
+      response = await requests.company.getCompany(id);
+    }
+
+    if (response.type === 'GET_COMPANY') {
+      dispatch(companyActions.fetchCompanyAsync.success(response.company));
+      onSuccess?.(response.company);
+      return;
+    }
+
+    if (response.type === 'ERROR') {
+      dispatch(companyActions.fetchCompanyAsync.failure(response.message));
+      onSuccess?.();
+      return;
+    }
+
+    dispatch(companyActions.fetchCompaniesAsync.failure('something wrong'));
+    return;
+  };
+};
+
+const fetchCompanies = (): AppThunk => {
   return async (dispatch) => {
     let response: types.company.IGetCompaniesResponse | types.error.INetworkError;
 
@@ -32,18 +70,21 @@ const fetchCompanies = (): ThunkAction<void, ICompanyState, unknown, AnyAction> 
     }
 
     if (response.type === 'GET_COMPANIES') {
-      return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
+      dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
+      return;
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
+      dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
+      return;
     }
 
-    return dispatch(companyActions.fetchCompaniesAsync.failure('something wrong'));
+    dispatch(companyActions.fetchCompaniesAsync.failure('something wrong'));
+    return;
   };
 };
 
-const addCompany = (company: ICompany): ThunkAction<void, ICompanyState, unknown, AnyAction> => {
+const addCompany = (company: ICompany, onSuccess?: (company: ICompany) => void): AppThunk => {
   return async (dispatch) => {
     let response: types.company.IAddCompanyResponse | types.error.INetworkError;
 
@@ -52,28 +93,38 @@ const addCompany = (company: ICompany): ThunkAction<void, ICompanyState, unknown
     if (isMock) {
       await sleep(500);
 
-      response = { company, type: 'ADD_COMPANY' };
+      if (company.title === '1') {
+        // Ошибка добавления компании
+        response = { message: 'Компания с таким названием уже существует!', type: 'ERROR' };
+      } else {
+        // Добаляем компанию
+        response = { company, type: 'ADD_COMPANY' };
+      }
     } else {
       response = await requests.company.addCompany(company.title, '666');
     }
 
     if (response.type === 'ADD_COMPANY') {
-      return dispatch(companyActions.addCompanyAsync.success(response.company));
+      dispatch(companyActions.addCompanyAsync.success(response.company));
+      onSuccess?.(response.company);
+      return;
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(companyActions.addCompanyAsync.failure(response.message));
+      dispatch(companyActions.addCompanyAsync.failure(response.message));
+      return;
     }
 
-    return dispatch(companyActions.addCompanyAsync.failure('something wrong'));
+    dispatch(companyActions.addCompanyAsync.failure('something wrong'));
+    return;
   };
 };
 
-const updateCompany = (company: ICompany): ThunkAction<void, ICompanyState, unknown, AnyAction> => {
+const updateCompany = (company: ICompany, onSuccess?: (company: ICompany) => void): AppThunk => {
   return async (dispatch) => {
     let response: types.company.IUpdateCompanyResponse | types.error.INetworkError;
 
-    dispatch(companyActions.updateCompanyAsync.request(''));
+    dispatch(companyActions.updateCompanyAsync.request('обновление компании'));
 
     if (isMock) {
       await sleep(500);
@@ -84,15 +135,19 @@ const updateCompany = (company: ICompany): ThunkAction<void, ICompanyState, unkn
     }
 
     if (response.type === 'UPDATE_COMPANY') {
-      return dispatch(companyActions.updateCompanyAsync.success(company));
+      dispatch(companyActions.updateCompanyAsync.success(response.company));
+      onSuccess?.(response.company);
+      return;
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(companyActions.updateCompanyAsync.failure(response.message));
+      dispatch(companyActions.updateCompanyAsync.failure(response.message));
+      return;
     }
 
-    return dispatch(companyActions.updateCompanyAsync.failure('something wrong'));
+    dispatch(companyActions.updateCompanyAsync.failure('something wrong'));
+    return;
   };
 };
 
-export default { fetchCompanies, addCompany, updateCompany };
+export default { fetchCompanies, fetchCompanyById, addCompany, updateCompany };

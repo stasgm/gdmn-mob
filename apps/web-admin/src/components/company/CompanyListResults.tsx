@@ -103,7 +103,7 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
                         {getInitials(company.title)}
                       </Avatar> */}
 
-            <NavLink to={company.id}>
+            <NavLink to={`edit/${company.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.id}>
                 {company.title}
               </Typography>
@@ -116,8 +116,8 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
                     ${company.address.state},
                     ${company.address.country}`}
                   </TableCell>
-                  <TableCell>{company.phone}</TableCell>
-                  <TableCell>{moment(company.createdAt).format('DD/MM/YYYY')}</TableCell> */}
+          <TableCell>{company.phone}</TableCell>
+          <TableCell>{moment(company.createdAt).format('DD/MM/YYYY')}</TableCell> */}
       </TableRow>
     ));
     return <>{companyList}</>;

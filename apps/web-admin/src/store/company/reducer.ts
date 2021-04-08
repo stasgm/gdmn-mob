@@ -15,6 +15,9 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
     case getType(companyActions.init):
       return initialState;
 
+    case getType(companyActions.clearError):
+      return { ...state, errorMessage: '' };
+
     case getType(companyActions.fetchCompaniesAsync.request):
       return { ...state, loading: true, list: [] };
 
@@ -49,6 +52,7 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
         errorMessage: action.payload || 'error',
       };
 
+    // Обновление компании
     case getType(companyActions.updateCompanyAsync.request):
       return { ...state, loading: true };
 
@@ -66,6 +70,23 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
         errorMessage: action.payload || 'error',
       };
 
+    // Получение компании
+    case getType(companyActions.fetchCompanyAsync.request):
+      return { ...state, loading: true };
+
+    case getType(companyActions.fetchCompanyAsync.success):
+      return {
+        ...state,
+        list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
+        loading: false,
+      };
+
+    case getType(companyActions.fetchCompanyAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
     default:
       return state;
   }

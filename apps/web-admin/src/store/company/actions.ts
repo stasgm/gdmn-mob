@@ -2,12 +2,19 @@ import { ICompany } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('COMPANY/INIT')();
+const clearError = createAction('COMPANY/CLEAR_ERROR')();
 
-const fetchCompaniesAsync = createAsyncAction('COMPANY/FETCH', 'COMPANY/FETCH_SUCCCES', 'COMPANY/FETCH_FAILURE')<
-  string | undefined,
-  ICompany[],
-  string
->();
+const fetchCompaniesAsync = createAsyncAction(
+  'COMPANY/FETCH_COMPANIES',
+  'COMPANY/FETCH_COMPANIES_SUCCCES',
+  'COMPANY/FETCH_COMPANIES_FAILURE',
+)<string | undefined, ICompany[], string>();
+
+const fetchCompanyAsync = createAsyncAction(
+  'COMPANY/FETCH_COMPANY',
+  'COMPANY/FETCH_COMPANY_SUCCCES',
+  'COMPANY/FETCH_COMPANY_FAILURE',
+)<string | undefined, ICompany, string>();
 
 const addCompanyAsync = createAsyncAction('COMPANY/ADD', 'COMPANY/ADD_SUCCCES', 'COMPANY/ADD_FAILURE')<
   string | undefined,
@@ -23,8 +30,10 @@ const updateCompanyAsync = createAsyncAction('COMPANY/UPDATE', 'COMPANY/UPDATE_S
 
 export const companyActions = {
   fetchCompaniesAsync,
+  fetchCompanyAsync,
   addCompanyAsync,
   updateCompanyAsync,
+  clearError,
   init,
 };
 

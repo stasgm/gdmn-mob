@@ -1,6 +1,6 @@
 import thunkMiddleware from 'redux-thunk';
 
-import { createStore, combineReducers, applyMiddleware, Reducer, Store } from 'redux';
+import { createStore, combineReducers, applyMiddleware, Reducer } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 
 import { StateType } from 'typesafe-actions';
@@ -19,19 +19,21 @@ const rootReducer = {
 
 export type RootState = StateType<typeof rootReducer>;
 
-export interface StoreWithAsyncReducers extends Store {
+/* export interface StoreWithAsyncReducers extends Store {
   asyncReducers?: { [key: string]: Reducer };
   addReducer?: (key: string, asyncReducer: Reducer) => void;
 }
+ */
+type AppReducers = { [key: string]: Reducer };
 
-const createReducer = (asyncReducers: { [key: string]: Reducer } = {}) => {
+const createReducer = (asyncReducers: AppReducers = {}) => {
   return combineReducers<any, any>({
     ...rootReducer,
     ...asyncReducers,
   });
 };
 
-export default function configureStore() {
+/* export function configureStore2() {
   const middleware = [thunkMiddleware];
   const middleWareEnhancer = applyMiddleware(...middleware);
   const rootStore: Store = createStore(combineReducers(rootReducer), composeWithDevTools(middleWareEnhancer));
@@ -48,4 +50,24 @@ export default function configureStore() {
     },
   };
   return store;
+} */
+
+export default function configureStore(appReducers: AppReducers) {
+  const middleware = [thunkMiddleware];
+  const middleWareEnhancer = applyMiddleware(...middleware);
+
+  return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
+
+  /*   const store: StoreWithAsyncReducers = {
+    ...rootStore,
+    asyncReducers: {},
+    addReducer: (key, asyncReducer) => {
+      if (!store || !key || !store.asyncReducers) {
+        return;
+      }
+      store.asyncReducers[key] = asyncReducer;
+      store.replaceReducer(createReducer(store.asyncReducers));
+    },
+  };
+  return store;*/
 }

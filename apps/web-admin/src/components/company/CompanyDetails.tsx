@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -8,96 +8,133 @@ import {
   Divider,
   Grid,
   TextField,
-  Typography,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-
 import { ICompany } from '@lib/types';
+
 import { v4 as uuid } from 'uuid';
 
-import { useSelector } from '../../store';
-
-import companyAsyncActions from '../../store/company/actions.async';
-
-// import { Spinner } from './CompanyListResults';
+import { useSelector, useDispatch } from '../../store';
+import actions from '../../store/company';
 
 const CompanyDetails = (props: any) => {
+  const navigate = useNavigate();
+
   const dispatch = useDispatch();
+
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
-  const { id: selectedCompanyId } = useParams();
-  const isAddMode = !selectedCompanyId;
+  const { id: companyId } = useParams();
 
-  const [values, setValues] = useState<ICompany>({
+  const isAddMode = !companyId;
+
+  const [loaded, setLoaded] = useState(false);
+
+  const [companyForm, setCompanyForm] = useState<ICompany>({
     admin: '',
-    id: uuid(),
+    id: uuid(), // времено ID будет присваиваться сервером
     title: '',
   });
 
   const handleChange = (event: any) => {
-    setValues({
-      ...values,
+    setCompanyForm((prev) => ({
+      ...prev,
       [event.target.name]: event.target.value,
-    });
+    }));
   };
 
-  let company: ICompany | undefined = {
-    admin: '',
-    id: uuid(),
-    title: '',
-  };
-
-  if (!isAddMode) {
-    company = useSelector((state) => state.companies.list?.find(({ id }) => id === selectedCompanyId));
-
-    if (!company) {
-      return <Box>Компания не найдена</Box>;
+  const onSuccessfulLoad = (company?: ICompany) => {
+    if (company) {
+      setCompanyForm(company);
     }
-  }
-
-  const { title, id } = company;
-
-  const navigate = useNavigate();
-
-  const handleSubmit = () => {
-    // console.log('handleSubmit', company, values.title);
-    isAddMode
-      ? dispatch(companyAsyncActions.addCompany(values))
-      : company
-        ? dispatch(companyAsyncActions.updateCompany({ ...values, id: company.id }))
-        : console.log('company does not find');
-    navigate('/app/companies');
+    setLoaded(true);
   };
 
   useEffect(() => {
-    setValues((prev) => ({ ...prev, title }));
-  }, [selectedCompanyId, title]);
+    if (isAddMode && !companyId) {
+      return;
+    }
+
+    dispatch(actions.fetchCompanyById(companyId, onSuccessfulLoad));
+  }, [companyId, dispatch, isAddMode]);
+
+  const onSuccessfulSave = () => {
+    navigate('/app/companies');
+  };
+
+  const handleCancel = () => {
+    navigate('/app/companies');
+  };
+
+  const handleSubmit = () => {
+    dispatch(
+      isAddMode
+        ? actions.addCompany(companyForm, onSuccessfulSave)
+        : actions.updateCompany(companyForm, onSuccessfulSave),
+    );
+  };
+
+  // SnackBar
+  const [openAlert, setOpenAlert] = useState(false);
+
+  const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    dispatch(actions.companyActions.clearError());
+    setOpenAlert(false);
+  };
+
+  useEffect(() => {
+    if (!errorMessage) {
+      return;
+    }
+    setOpenAlert(true);
+  }, [errorMessage]);
+
+  console.log('isAddMode', isAddMode);
+  console.log('companyForm', companyForm);
+  console.log('loaded', loaded);
+
+  if (!isAddMode && !companyForm?.title && loaded) {
+    // Если редактирование  компании и компания не найдена
+    return <Box>Компания не найдена</Box>;
+  }
 
   return (
-    <form autoComplete="off" noValidate {...props}>
-      <Card>
-        <CardHeader subheader="The information can be edited" title={`${!id ? 'Новая ' : ''} компания`} />
-        <Divider />
-        <Box>
-          {loading && <CircularProgress size={20} />} {errorMessage && <Typography>{errorMessage}</Typography>}
-        </Box>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                helperText="Введите название организации"
-                label="Название организации"
-                name="title"
-                onChange={handleChange}
-                required
-                value={values.title}
-                variant="outlined"
-              />
-            </Grid>
-            {/* <Grid item md={6} xs={12}>
+    <>
+      <form autoComplete="off" noValidate {...props}>
+        <Card>
+          <Box
+            sx={{
+              display: 'flex',
+              // justifyContent: 'space-between',
+              alignItems: 'center',
+              // p: 2,
+            }}
+          >
+            <CardHeader title={`${!companyForm.id ? 'Новая компания' : 'Компания'}`} />
+            {loading && <CircularProgress size={20} />}
+          </Box>
+          <Divider />
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid item md={6} xs={12}>
+                <TextField
+                  fullWidth
+                  helperText="Введите название организации"
+                  label="Название организации"
+                  name="title"
+                  onChange={handleChange}
+                  required
+                  value={companyForm.title}
+                  variant="outlined"
+                />
+              </Grid>
+              {/* <Grid item md={6} xs={12}>
               <TextField
                 fullWidth
                 label="Last name"
@@ -141,22 +178,31 @@ const CompanyDetails = (props: any) => {
                 variant="outlined"
               />
             </Grid> */}
-          </Grid>
-        </CardContent>
-        <Divider />
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            p: 2,
-          }}
-        >
-          <Button color="primary" variant="contained" onClick={handleSubmit}>
-            Save details
-          </Button>
-        </Box>
-      </Card>
-    </form>
+            </Grid>
+          </CardContent>
+          <Divider />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              p: 2,
+            }}
+          >
+            <Button color="secondary" variant="contained" onClick={handleCancel} disabled={loading}>
+              Отмена
+            </Button>
+            <Button color="primary" variant="contained" onClick={handleSubmit} disabled={loading}>
+              Сохранить
+            </Button>
+          </Box>
+        </Card>
+      </form>
+      <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error">
+          {errorMessage}!
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
