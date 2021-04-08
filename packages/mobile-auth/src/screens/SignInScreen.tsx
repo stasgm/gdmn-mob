@@ -7,7 +7,7 @@ import { IUserCredentials } from '@lib/types';
 // import { useAuth } from '../context/auth';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle } from '@lib/mobile-ui/src/components';
-import { useTypedSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 /*
   Порядок работы:
@@ -29,7 +29,7 @@ const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
   const { colors } = useTheme(); // TODO Вынести в ui
 
-  const { error, loading, status } = useTypedSelector((state) => state.auth);
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({

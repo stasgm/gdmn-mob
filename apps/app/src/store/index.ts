@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
-import { TypedUseSelectorHook, useSelector as useReduxSelector } from 'react-redux';
-import { RootState } from '@lib/store';
+import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
+import { configureStore, RootState } from '@lib/store';
 
 import docsReducer from './docs/reducer';
 
@@ -10,8 +10,15 @@ export const combinedReducer = {
 
 const rootReducer = combineReducers(combinedReducer);
 
-export type IAppState = ReturnType<typeof rootReducer> & RootState;
+export const setStore = () => {
+  // store.dispatch
+  const store = configureStore(combinedReducer);
 
+  return store;
+};
+
+export type IAppState = ReturnType<typeof rootReducer> & RootState;
 // export type AppDispatch = typeof store.dispatch;
 
 export const useSelector: TypedUseSelectorHook<IAppState> = useReduxSelector;
+export const useDispatch = useReduxDispatch;

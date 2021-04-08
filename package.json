@@ -16,7 +16,7 @@
     "lint:fix": "lerna run --scope=@lib/* --scope=@apps/* lint:fix --stream --",
     "prettier:fix": "lerna run --scope=@lib/* --scope=@apps/* prettier:fix --stream --",
     "lerna": "lerna bootstrap",
-    "build:lib": "lerna run --scope=@lib/* build --stream --",
+    "build:lib": "lerna run --scope=@lib/* build --stream",
     "clean": "lerna clean",
     "clean:all": "yarn clean:dist && clean:node-modules && yarn clean:expo-cache",
     "clean:dist": "rimraf packages/*/dist apps/*/dist configs/*/dist",

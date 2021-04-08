@@ -13,11 +13,7 @@ import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
 import routes from './routes';
 
-// const store = configureStore();
-
 const store = setStore();
-
-// setStore(store);
 
 const Routing = () => {
   // const isLogged = authSelectors.isLogged();

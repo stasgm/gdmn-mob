@@ -8,15 +8,15 @@ import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
 
-import { combinedReducer } from './src/store';
+import { setStore } from './src/store';
 
 enableScreens();
 
-const store = configureStore();
+const store = setStore();
+
 console.log('MOCK:', process.env.MOCK);
 
 const App = () => {
-  useAddReducer({ name: 'docs', reducer: combinedReducer.docs, store });
   const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
   // const Router = () => <RootNavigator />;
 

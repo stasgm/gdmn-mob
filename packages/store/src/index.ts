@@ -1,4 +1,5 @@
 import thunkMiddleware from 'redux-thunk';
+import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 
 import { createStore, combineReducers, applyMiddleware, Reducer } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
@@ -7,12 +8,6 @@ import { StateType } from 'typesafe-actions';
 
 import auth from './auth/reducer';
 
-/* const rootReducer = combineReducers({
-  auth,
-});
-
-export type RootState = ReturnType<typeof rootReducer>;
- */
 const rootReducer = {
   auth,
 };
@@ -71,3 +66,6 @@ export default function configureStore(appReducers: AppReducers) {
   };
   return store;*/
 }
+
+export const useDispatch = useReduxDispatch;
+export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;

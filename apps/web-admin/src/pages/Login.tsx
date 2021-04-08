@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
 import * as yup from 'yup';
 
-import { authActions, useTypedSelector } from '@lib/store';
+import { authActions, useSelector } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 
 import Logo from '../components/Logo';
@@ -19,7 +19,7 @@ const Login = () => {
     dispatch,
   ]);
 
-  const { error, loading, status } = useTypedSelector((state) => state.auth);
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({

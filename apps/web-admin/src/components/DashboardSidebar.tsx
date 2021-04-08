@@ -9,7 +9,7 @@ import {
   Users as UsersIcon,
 } from 'react-feather';
 
-import { useTypedSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
@@ -56,7 +56,7 @@ interface IProps {
 const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
   const [isCompact, setCompact] = useState(false);
 
-  const { user } = useTypedSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
   const content = (
     <Box

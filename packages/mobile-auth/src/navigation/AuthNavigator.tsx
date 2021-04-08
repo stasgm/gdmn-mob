@@ -2,7 +2,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { authActions, useTypedSelector } from '@lib/store';
+import { authActions, useSelector } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
@@ -20,7 +20,7 @@ type AuthStackParamList = {
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { device, settings, user } = useTypedSelector((state) => state.auth);
+  const { device, settings, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const saveSettings = useCallback((newSettings: IApiConfig) => dispatch(authActions.setSettings(newSettings)), [
