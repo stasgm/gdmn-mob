@@ -3,7 +3,7 @@ import { PartialRouteObject } from 'react-router';
 
 import CompanyDetails from '../../components/company/CompanyDetails';
 
-import CompanyList from './Companies';
+import CompanyList from './CompanyList';
 
 const routes: PartialRouteObject[] = [
   { path: '/', element: <CompanyList /> },

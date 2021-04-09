@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -14,21 +14,10 @@ import Logo from '../components/Logo';
 const Login = () => {
   const dispatch = useDispatch();
 
-  const checkDevice = useCallback(async () => dispatch(authActions.checkDevice()), [dispatch]);
-  const signIn = useCallback(async (credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [
-    dispatch,
-  ]);
+  const checkDevice = async () => dispatch(authActions.checkDevice());
+  const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
 
-  const { error, loading, status } = useSelector((state) => state.auth);
-
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
+  const { error, loading, status, device } = useSelector((state) => state.auth);
 
   const formik = useFormik<IUserCredentials>({
     initialValues: {
@@ -39,11 +28,16 @@ const Login = () => {
       userName: yup.string().required('Required'),
       password: yup.string().required('Required'),
     }),
-    onSubmit: async (values) => {
+    onSubmit: async () => {
       await checkDevice();
-      signIn(values);
     },
   });
+
+  useEffect(() => {
+    if (device && !error) {
+      signIn(formik.values);
+    }
+  }, [device, error, formik.values, signIn]);
 
   return (
     <>
@@ -81,10 +75,16 @@ const Login = () => {
           </Box>
 
           <form onSubmit={formik.handleSubmit}>
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'flex-end' }}>
               <Typography color="textPrimary" variant="h4">
                 Вход
               </Typography>
+              {loading && <CircularProgress size={20} sx={{ mx: 2 }} />}
+              {error && (
+                <Typography color="error" variant="h5" sx={{ flexGrow: 1, textAlign: 'end' }}>
+                  {status}
+                </Typography>
+              )}
             </Box>
             <TextField
               error={formik.touched.userName && Boolean(formik.errors.userName)}
@@ -98,6 +98,7 @@ const Login = () => {
               type="name"
               value={formik.values.userName}
               variant="outlined"
+              disabled={loading}
             />
             <TextField
               error={formik.touched.password && Boolean(formik.errors.password)}
@@ -111,17 +112,18 @@ const Login = () => {
               type="password"
               value={formik.values.password}
               variant="outlined"
+              disabled={loading}
             />
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={request.isLoading || !!formik.errors.password || !!formik.errors.userName}
+                disabled={loading || !!formik.errors.password || !!formik.errors.userName}
                 fullWidth
                 size="large"
                 type="submit"
                 variant="contained"
               >
-                {request.isLoading && <CircularProgress size={20} />} <Typography>Войти</Typography>
+                <Typography>Войти</Typography>
               </Button>
             </Box>
             <Typography color="textSecondary" variant="body1">

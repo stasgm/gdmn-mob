@@ -1,7 +1,7 @@
 import thunkMiddleware from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 
-import { createStore, combineReducers, applyMiddleware, Reducer } from 'redux';
+import { Reducer, createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 
 import { StateType } from 'typesafe-actions';
@@ -12,13 +12,6 @@ const rootReducer = {
   auth,
 };
 
-export type RootState = StateType<typeof rootReducer>;
-
-/* export interface StoreWithAsyncReducers extends Store {
-  asyncReducers?: { [key: string]: Reducer };
-  addReducer?: (key: string, asyncReducer: Reducer) => void;
-}
- */
 type AppReducers = { [key: string]: Reducer };
 
 const createReducer = (asyncReducers: AppReducers = {}) => {
@@ -28,44 +21,22 @@ const createReducer = (asyncReducers: AppReducers = {}) => {
   });
 };
 
-/* export function configureStore2() {
-  const middleware = [thunkMiddleware];
-  const middleWareEnhancer = applyMiddleware(...middleware);
-  const rootStore: Store = createStore(combineReducers(rootReducer), composeWithDevTools(middleWareEnhancer));
-
-  const store: StoreWithAsyncReducers = {
-    ...rootStore,
-    asyncReducers: {},
-    addReducer: (key, asyncReducer) => {
-      if (!store || !key || !store.asyncReducers) {
-        return;
-      }
-      store.asyncReducers[key] = asyncReducer;
-      store.replaceReducer(createReducer(store.asyncReducers));
-    },
-  };
-  return store;
-} */
-
 export default function configureStore(appReducers: AppReducers) {
   const middleware = [thunkMiddleware];
   const middleWareEnhancer = applyMiddleware(...middleware);
 
-  return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
+  const store = createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
+  /*  if (module.hot) {
+    // Enable Webpack hot module replacement for reducers
+    module.hot.accept('../reducers', () => {
+      const nextReducer = require('../reducers/index').default;
 
-  /*   const store: StoreWithAsyncReducers = {
-    ...rootStore,
-    asyncReducers: {},
-    addReducer: (key, asyncReducer) => {
-      if (!store || !key || !store.asyncReducers) {
-        return;
-      }
-      store.asyncReducers[key] = asyncReducer;
-      store.replaceReducer(createReducer(store.asyncReducers));
-    },
-  };
-  return store;*/
+      store.replaceReducer(nextReducer);
+    });
+  } */
+  return store;
 }
 
+export type RootState = StateType<typeof rootReducer>;
 export const useDispatch = useReduxDispatch;
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
