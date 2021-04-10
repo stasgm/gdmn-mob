@@ -12,7 +12,7 @@ import { Box, Container, Grid } from '@material-ui/core';
 const Dashboard = () => (
   <>
     <Helmet>
-      <title>Dashboard | Material Kit</title>
+      <title>Dashboard</title>
     </Helmet>
     <Box
       sx={{

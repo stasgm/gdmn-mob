@@ -105,7 +105,13 @@ const CompanyDetails = (props: any) => {
   }
 
   return (
-    <>
+    <Box
+      sx={{
+        backgroundColor: 'background.default',
+        minHeight: '100%',
+        p: 3,
+      }}
+    >
       <form autoComplete="off" noValidate {...props}>
         <Card>
           <Box
@@ -202,7 +208,7 @@ const CompanyDetails = (props: any) => {
           {errorMessage}!
         </Alert>
       </Snackbar>
-    </>
+    </Box>
   );
 };
 
