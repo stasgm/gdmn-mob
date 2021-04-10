@@ -54,7 +54,7 @@ const reducer: Reducer<IAuthState, AuthActionType> = (state = initialState, acti
       return { ...state, device: action.payload, error: false, status: '', loading: false };
 
     case getType(authActions.activateDeviceAsync.failure):
-      return { ...state, error: true, status: action.payload, loading: false };
+      return { ...state, device: null, error: true, status: action.payload, loading: false };
     // User
     case getType(authActions.loginUserAsync.request):
       return { ...state, error: false, status: '', loading: true, user: undefined };
