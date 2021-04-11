@@ -5,7 +5,7 @@ import { IUserCredentials } from '@lib/types';
 
 import { device, user } from '@lib/mock';
 
-import { types, requests } from '@lib/client-api';
+import Api, { types, requests } from '@lib/client-api';
 
 import { config } from '@lib/client-config';
 
@@ -15,8 +15,13 @@ import { authActions } from './actions';
 import { IAuthState } from './types';
 
 const {
-  debug: { useMockup: isMock },
+  debug: { useMockup: isMock, deviceId },
+  server: { name, port, protocol },
+  timeout,
+  apiPath,
 } = config;
+
+const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
@@ -30,7 +35,8 @@ const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
       response = { device: device, type: 'GET_DEVICE' };
       // response = { message: 'device not found', type: 'ERROR' };
     } else {
-      response = await requests.device.getDevice(device.uid || '');
+      // response = await requests.device.getDevice(device.uid || '');
+      response = await api.getDevice();
     }
 
     if (response.type === 'GET_DEVICE') {
