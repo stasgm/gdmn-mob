@@ -1,4 +1,4 @@
-import { IUser } from '@lib/types';
+import { IUserDto } from '@lib/types';
 
 import { hashPassword } from '../utils/crypt';
 import { makeProfile } from '../utils/user';
@@ -14,10 +14,10 @@ const findAll = async () => (await users.read()).map((el) => makeProfile(el));
 
 /**
  * Добавляет одного пользователя
- * @param {IUser} user - пользователь
+ * @param {IUserDto} user - пользователь
  * @return id, идентификатор пользователя
  * */
-const addOne = async (user: IUser) => {
+const addOne = async (user: IUserDto) => {
   if (await users.find((i) => i.userName.toUpperCase() === user.userName.toUpperCase())) {
     throw new Error('пользователь с таким именем уже существует');
   }
@@ -32,10 +32,10 @@ const addOne = async (user: IUser) => {
 
 /**
  * Обновляет одного пользователя
- * @param {IUser} user - пользователь
+ * @param {IUserDto} user - пользователь
  * @return id, идентификатор пользователя
  * */
-const updateOne = async (user: IUser) => {
+const updateOne = async (user: IUserDto) => {
   await users.update(user);
 
   return user.id;

@@ -13,19 +13,19 @@ import {
   Alert,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/types';
+import { ICompany } from '@lib/client-types';
 
 import { v4 as uuid } from 'uuid';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
 
-const CompanyDetails = (props: any) => {
+const NewCompany = (props: any) => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companies);
+  const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
 
   const { id: companyId } = useParams();
 
@@ -36,7 +36,7 @@ const CompanyDetails = (props: any) => {
   const [companyForm, setCompanyForm] = useState<ICompany>({
     admin: '',
     id: uuid(), // времено ID будет присваиваться сервером
-    title: '',
+    name: '',
   });
 
   const handleChange = (event: any) => {
@@ -99,7 +99,7 @@ const CompanyDetails = (props: any) => {
   console.log('companyForm', companyForm);
   console.log('loaded', loaded);
 
-  if (!isAddMode && !companyForm?.title && loaded) {
+  if (!isAddMode && !companyForm?.name && loaded) {
     // Если редактирование  компании и компания не найдена
     return <Box>Компания не найдена</Box>;
   }
@@ -133,10 +133,10 @@ const CompanyDetails = (props: any) => {
                   fullWidth
                   helperText="Введите название организации"
                   label="Название организации"
-                  name="title"
+                  name="name"
                   onChange={handleChange}
                   required
-                  value={companyForm.title}
+                  value={companyForm.name}
                   variant="outlined"
                 />
               </Grid>
@@ -212,4 +212,4 @@ const CompanyDetails = (props: any) => {
   );
 };
 
-export default CompanyDetails;
+export default NewCompany;

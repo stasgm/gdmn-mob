@@ -4,7 +4,7 @@ import { types, requests } from '@lib/client-api';
 
 import { companies } from '@lib/mock';
 import { config } from '@lib/client-config';
-import { ICompany } from '@lib/types';
+import { ICompany } from '@lib/client-types';
 
 import { AppThunk } from '../';
 
@@ -89,7 +89,7 @@ const addCompany = (company: ICompany, onSuccess?: (company: ICompany) => void):
     if (isMock) {
       await sleep(500);
 
-      if (company.title === '1') {
+      if (company.name === '1') {
         // Ошибка добавления компании
         response = { message: 'Компания с таким названием уже существует!', type: 'ERROR' };
       } else {
@@ -97,7 +97,7 @@ const addCompany = (company: ICompany, onSuccess?: (company: ICompany) => void):
         response = { company, type: 'ADD_COMPANY' };
       }
     } else {
-      response = await requests.company.addCompany(company.title, '666');
+      response = await requests.company.addCompany(company.name, '666');
     }
 
     if (response.type === 'ADD_COMPANY') {

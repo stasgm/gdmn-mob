@@ -1,25 +1,25 @@
 import { ParameterizedContext } from 'koa';
 
-import { ICompany, IResponse, IUserProfile } from '@lib/types';
+import { IDBCompany, IResponse, IUserProfile } from '@lib/types';
 
 import log from '../utils/logger';
 import { companyService } from '../services';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { title, externalId } = ctx.request.body;
+  const { name, externalId } = ctx.request.body;
 
   const { id: userId } = ctx.state.user;
 
-  if (!title) {
+  if (!name) {
     ctx.throw(400, 'не указано название организации');
   }
 
-  const company: ICompany = { id: title, title, admin: userId, externalId };
+  const company: IDBCompany = { id: name, name, adminId: userId, externalId };
 
   try {
     const companyId = await companyService.addOne({
       ...company,
-      admin: userId,
+      adminId: userId,
     });
 
     const result: IResponse<string> = { result: true, data: companyId };
@@ -43,7 +43,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   try {
     const company = await companyService.findOne(companyId);
 
-    const result: IResponse<ICompany> = { result: true, data: company };
+    const result: IResponse<IDBCompany> = { result: true, data: company };
 
     ctx.status = 200;
     ctx.body = result;
@@ -56,7 +56,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
-  const company = ctx.request.body as Partial<ICompany>;
+  const company = ctx.request.body as Partial<IDBCompany>;
 
   if (!companyId) {
     ctx.throw(400, 'не указан идентификатор организации');
@@ -66,7 +66,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'не указана информация об организации');
   }
 
-  const oldCompany: ICompany | undefined = await companyService.findOne(companyId); // companies.find(company.id);
+  const oldCompany: IDBCompany | undefined = await companyService.findOne(companyId); // companies.find(company.id);
 
   /* if (!oldCompany) {
     oldCompany = await companyService.findOneByName(company.title);
@@ -121,7 +121,7 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   try {
     const companyList = await companyService.findAll();
 
-    const result: IResponse<ICompany[]> = { result: true, data: companyList };
+    const result: IResponse<IDBCompany[]> = { result: true, data: companyList };
 
     ctx.status = 200;
     ctx.body = result;

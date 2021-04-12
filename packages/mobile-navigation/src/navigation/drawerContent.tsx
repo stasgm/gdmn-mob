@@ -44,7 +44,7 @@ export function DrawerContent(props: Props) {
             <Title style={styles.title}>{user?.lastName}</Title>
           </View>
         </View>
-        <Caption style={styles.caption}>{company?.title || ''}</Caption>
+        <Caption style={styles.caption}>{company?.name || ''}</Caption>
       </View>
       <Divider />
       <DrawerContentScrollView {...props}>

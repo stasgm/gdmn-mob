@@ -4,7 +4,7 @@ import { Box, Container } from '@material-ui/core';
 import { devices } from '@lib/mock';
 
 import DeviceListResults from '../components/device/DeviceListResults';
-import DeviceListToolbar from '../components/device/DeviceListToolbar';
+import TopToolbar from '../components/TopToolbar';
 
 const DeviceList = () => (
   <>
@@ -19,7 +19,7 @@ const DeviceList = () => (
       }}
     >
       <Container maxWidth={false}>
-        <DeviceListToolbar />
+        <TopToolbar />
         <Box sx={{ pt: 3 }}>
           <DeviceListResults devices={devices} />
         </Box>
