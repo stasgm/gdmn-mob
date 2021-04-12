@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import { IApiConfig } from '@lib/client-types';
 import { IDevice, IResponse } from '@lib/types';
 
-import { device, error } from '../src/types';
+import { device, error } from './types';
 
 // import { config as defaultConfig } from '@lib/client-config';
 

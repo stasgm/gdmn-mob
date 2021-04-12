@@ -25,16 +25,7 @@ export default function configureStore(appReducers: AppReducers) {
   const middleware = [thunkMiddleware];
   const middleWareEnhancer = applyMiddleware(...middleware);
 
-  const store = createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
-  /*  if (module.hot) {
-    // Enable Webpack hot module replacement for reducers
-    module.hot.accept('../reducers', () => {
-      const nextReducer = require('../reducers/index').default;
-
-      store.replaceReducer(nextReducer);
-    });
-  } */
-  return store;
+  return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
 }
 
 export type RootState = StateType<typeof rootReducer>;
