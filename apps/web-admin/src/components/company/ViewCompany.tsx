@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/types';
+import { ICompany } from '@lib/client-types';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -22,19 +22,24 @@ import * as yup from 'yup';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
 
-const ViewCompany = (company: ICompany) => {
+const ViewCompany = () => {
   const { id: companyId } = useParams();
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
+  const { errorMessage, loading, list } = useSelector((state) => state.companiesReducer);
+  const company = list?.length ? list[0] : undefined;
+
+  if (!company) {
+    return <Typography>эээээ</Typography>;
+  }
 
   // const [loaded, setLoaded] = useState(false);
 
   // const [companyForm, setCompanyForm] = useState<ICompany>({
-  //   admin: '',
+  //   adminId: '',
   //   id: uuid(), // времено ID будет присваиваться сервером
   //   name: '',
   // });
@@ -65,9 +70,9 @@ const ViewCompany = (company: ICompany) => {
     navigate('/app/companies');
   };
 
-  // const handleCancel = () => {
-  //   navigate('/app/companies');
-  // };
+  const handleCancel = () => {
+    navigate('/app/companies');
+  };
 
   // const handleSubmit = () => {
   //   dispatch(actions.updateCompany(companyForm, onSuccessfulSave));
@@ -94,14 +99,10 @@ const ViewCompany = (company: ICompany) => {
   const formik = useFormik<ICompany>({
     initialValues: company,
     validationSchema: yup.object().shape({
-      userName: yup.string().required('Required'),
-      password: yup.string().required('Required'),
+      name: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
       dispatch(actions.updateCompany(values, onSuccessfulSave));
-    },
-    onReset: () => {
-      navigate('/app/companies');
     },
   });
 
@@ -154,13 +155,12 @@ const ViewCompany = (company: ICompany) => {
             {/* <Button color="primary" variant="contained" onClick={handleSubmit} disabled={loading}>
               Сохранить
             </Button> */}
-            <Button color="primary" fullWidth size="small" type="reset" variant="contained">
+            <Button color="primary" size="small" type="button" variant="contained" onClick={handleCancel}>
               <Typography>Отмена</Typography>
             </Button>
             <Button
               color="primary"
               disabled={loading || !!formik.errors.name}
-              fullWidth
               size="small"
               type="submit"
               variant="contained"

@@ -31,21 +31,28 @@ export interface IActivationCode {
   deviceId: string;
 }
 
-export interface ICompany extends IAbstractDBModal, IName {
-  id: string;
-  externalId?: string;
-  name: string;
-  admin: string;
+export interface IDBCompany extends INamedEntity, IExernalSystemProps {
+  adminId: string;
 }
 
-export interface IAbstractDBModal {
+export type NewCompany = Pick<IDBCompany, 'name' | 'externalId'>;
+
+export type CompanyDto = IDBCompany;
+
+export type UserDto = IUser;
+
+export interface IEntity {
   id: string;
   createDate?: string;
   updateDate?: string;
 }
 
-export interface IName {
-  name?: string;
+export interface INamedEntity extends IEntity {
+  name: string;
+}
+
+export interface IExernalSystemProps {
+  externalId?: string;
 }
 
 export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';

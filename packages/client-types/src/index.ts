@@ -1,3 +1,4 @@
+import { IDBCompany, IUser } from '@lib/types';
 export interface IApiConfig {
   protocol: string;
   server: string;
@@ -22,4 +23,8 @@ export interface IAuthState {
     userName: string;
     companyName: string;
   };
+}
+
+export interface ICompany extends Omit<IDBCompany, 'adminId'> {
+  admin: IUser;
 }

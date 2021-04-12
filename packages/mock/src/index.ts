@@ -21,14 +21,14 @@ export const device: IDevice = {
 
 export const company: ICompany = {
   id: '1234',
-  admin: '1',
-  title: 'ОДО Золотые Программы',
+  adminId: '1',
+  name: 'ОДО Золотые Программы',
 };
 
 export const company2: ICompany = {
   id: '1232',
-  admin: '1',
-  title: 'ОДО Амперсант',
+  adminId: '1',
+  name: 'ОДО Амперсант',
 };
 
 export const user: IUser = {

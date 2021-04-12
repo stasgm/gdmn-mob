@@ -15,7 +15,7 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import { ICompany } from '@lib/types';
+import { ICompany } from '@lib/client-types';
 
 interface props {
   companies?: ICompany[];

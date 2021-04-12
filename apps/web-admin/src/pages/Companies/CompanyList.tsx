@@ -24,7 +24,7 @@ const CompanyList = () => {
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     !list?.length && fetchCompanies();
-  }, [fetchCompanies, list?.length]);
+  }, [fetchCompanies]);
 
   const handleLoadCompanies = () => fetchCompanies();
 

@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IUserProfile, IDevice } from '@lib/types';
+import { IResponse, IUserDto, IUserProfile, IDevice } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
@@ -52,7 +52,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-  const user = ctx.request.body as Partial<IUser>;
+  const user = ctx.request.body as Partial<IUserDto>;
 
   if (!userId) {
     ctx.throw(400, 'не указан идентификатор пользователя');

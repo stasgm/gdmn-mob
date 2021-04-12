@@ -13,7 +13,7 @@ import {
   Alert,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/types';
+import { ICompany } from '@lib/client-types';
 
 import { v4 as uuid } from 'uuid';
 

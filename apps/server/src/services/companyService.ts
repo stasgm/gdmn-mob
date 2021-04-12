@@ -1,4 +1,4 @@
-import { ICompany, IUserProfile } from '@lib/types';
+import { IDBCompany, IUserProfile } from '@lib/types';
 
 import { makeProfile } from '../utils/user';
 
@@ -10,24 +10,24 @@ import { addCompanyToUser } from './userService';
  * @param {string} title - наименование организации
  * @return id, идентификатор организации
  * */
-const addOne = async (company: ICompany): Promise<string> => {
+const addOne = async (company: IDBCompany): Promise<string> => {
   /*
     1. Проверяем что организация существует
     2. Добавляем организацию
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  if (await companies.find((el) => el.title === company.title)) {
+  if (await companies.find((el) => el.name === company.name)) {
     throw new Error('организация уже существует');
   }
   const id = await companies.insert(company);
 
-  await addCompanyToUser(company.admin, company.title);
+  await addCompanyToUser(company.adminId, company.name);
 
   const userId = await users.find((i) => i.userName === 'gdmn');
 
   if (userId.id) {
-    await addCompanyToUser(userId.id, company.title);
+    await addCompanyToUser(userId.id, company.name);
   }
 
   return id;
@@ -38,7 +38,7 @@ const addOne = async (company: ICompany): Promise<string> => {
  * @param {string} id - идентификатор организации
  * @return company, организация
  * */
-const findOne = async (id: string): Promise<ICompany> => {
+const findOne = async (id: string): Promise<IDBCompany> => {
   const company = await companies.find(id);
 
   if (!company) {
@@ -53,8 +53,8 @@ const findOne = async (id: string): Promise<ICompany> => {
  * @param {string} name - наименование организации
  * @return company, организация
  * */
-const findOneByName = async (name: string): Promise<ICompany> => {
-  const company = await companies.find((i) => i.title === name);
+const findOneByName = async (name: string): Promise<IDBCompany> => {
+  const company = await companies.find((i) => i.name === name);
 
   if (!company) {
     throw new Error('организация не найдена');
@@ -68,16 +68,16 @@ const findOneByName = async (name: string): Promise<ICompany> => {
  * @param {string} id - идентификатор организации
  * @return company, организация
  * */
-const findAll = async (): Promise<ICompany[]> => {
+const findAll = async (): Promise<IDBCompany[]> => {
   return companies.read();
 };
 
 /**
  * Обновляет одну организацию
- * @param {ICompany} company - организациия
+ * @param {IDBCompany} company - организациия
  * @return id, идентификатор организации
  * */
-const updateOne = async (company: ICompany): Promise<string> => {
+const updateOne = async (company: IDBCompany): Promise<string> => {
   await companies.update(company);
 
   return company.id;
@@ -87,7 +87,7 @@ const updateOne = async (company: ICompany): Promise<string> => {
  * Удаляет одну организацию
  * @param {string} id - идентификатор организации
  * */
-const deleteOne = async (company: ICompany): Promise<void> => {
+const deleteOne = async (company: IDBCompany): Promise<void> => {
   /*
     1. Проверяем что организация существует
     2. Удаляем у пользователей организацию //TODO
@@ -114,7 +114,7 @@ const findUsers = async (id: string): Promise<IUserProfile[]> => {
 
   // TODO заменить на company.title на companyId
   return (await users.read())
-    .filter((el) => el.companies?.some((i: string) => i === company.title))
+    .filter((el) => el.companies?.some((i: string) => i === company.name))
     .map((el) => makeProfile(el));
 };
 
