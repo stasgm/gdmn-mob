@@ -31,11 +31,21 @@ export interface IActivationCode {
   deviceId: string;
 }
 
-export interface ICompany {
+export interface ICompany extends IAbstractDBModal, IName {
   id: string;
   externalId?: string;
-  title: string;
+  name: string;
   admin: string;
+}
+
+export interface IAbstractDBModal {
+  id: string;
+  createDate?: string;
+  updateDate?: string;
+}
+
+export interface IName {
+  name?: string;
 }
 
 export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';

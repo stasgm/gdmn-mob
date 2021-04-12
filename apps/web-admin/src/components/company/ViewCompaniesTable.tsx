@@ -14,7 +14,6 @@ import {
   TablePagination,
   TableRow,
   Typography,
-  CircularProgress,
 } from '@material-ui/core';
 import { ICompany } from '@lib/types';
 
@@ -22,22 +21,7 @@ interface props {
   companies?: ICompany[];
 }
 
-export const Spinner = () => (
-  <Box
-    sx={{
-      mb: 2,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      margin: 'auto',
-    }}
-  >
-    <CircularProgress />
-    {/* <span style={{ marginLeft: '20px' }}>Загружается. Пожалуйста, подождите...</span> */}
-  </Box>
-);
-
-const CompanyListResults = ({ companies = [], ...rest }: props) => {
+const ViewCompaniesTable = ({ companies = [], ...rest }: props) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -99,25 +83,13 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            {/* <Avatar src={company.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(company.title)}
-                      </Avatar> */}
-
             <NavLink to={`edit/${company.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.id}>
-                {company.title}
+                {company.name}
               </Typography>
             </NavLink>
           </Box>
         </TableCell>
-        {/* <TableCell>{company.email}</TableCell>
-                  <TableCell>
-                    {`${company.address.city},
-                    ${company.address.state},
-                    ${company.address.country}`}
-                  </TableCell>
-          <TableCell>{company.phone}</TableCell>
-          <TableCell>{moment(company.createdAt).format('DD/MM/YYYY')}</TableCell> */}
       </TableRow>
     ));
     return <>{companyList}</>;
@@ -139,10 +111,6 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
-                {/* <TableCell>Email</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Registration date</TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -164,4 +132,4 @@ const CompanyListResults = ({ companies = [], ...rest }: props) => {
   );
 };
 
-export default CompanyListResults;
+export default ViewCompaniesTable;

@@ -7,7 +7,7 @@ import companyReducer from './company/reducer';
 import AsyncActions from './company/actions.async'; */
 
 export const combinedReducer = {
-  companies: companyReducer,
+  companiesReducer: companyReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
