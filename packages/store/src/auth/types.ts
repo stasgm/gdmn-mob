@@ -10,21 +10,3 @@ export type IAuthState = {
   readonly error: boolean;
   readonly status: string;
 };
-
-/* // TODO: заменить на  IResponse<ICompany>
-export type CompanyPayload = Partial<{
-  errorMessage: string;
-  list: ICompany;
-}>;
-
-// TODO: заменить на  IResponse<IDevice>
-export type DevicePayload = Partial<{
-  errorMessage: string;
-  deviceData: IDevice | null;
-}>;
-
-// TODO: заменить на  IResponse<IUser>
-export type UserPayload = Partial<{
-  errorMessage: string;
-  userData: IUser;
-}>; */

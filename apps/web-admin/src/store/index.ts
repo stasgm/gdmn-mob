@@ -1,5 +1,6 @@
-import { combineReducers } from 'redux';
+import { combineReducers, Action } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
+import { ThunkAction } from 'redux-thunk';
 import { RootState, configureStore } from '@lib/store';
 
 import companyReducer from './company/reducer';
@@ -12,19 +13,15 @@ export const combinedReducer = {
 
 const rootReducer = combineReducers(combinedReducer);
 
-export type IAppState = ReturnType<typeof rootReducer> & RootState;
+export const store = configureStore(combinedReducer);
 
-// type Actions = CompanyActionType & typeof AsyncActions;
+export type AppState = ReturnType<typeof rootReducer> & RootState;
+export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
+export type AppDispatch = typeof store.dispatch;
 
-// export const useDispatch = () => useReduxDispatch<Actions>();
+export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
-export const useSelector: TypedUseSelectorHook<IAppState> = useReduxSelector;
+// export type AppState = typeof store.getState;
+// export const useDispatch = () => useReduxDispatch<AppDispatch>();
 
-export const setStore = () => {
-  // store.dispatch
-  const store = configureStore(combinedReducer);
-
-  // useAddReducer({ name: 'companies', reducer: combinedReducer.companies, store });
-
-  return store;
-};
+export default store;

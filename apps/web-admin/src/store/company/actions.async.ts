@@ -1,6 +1,3 @@
-import { ThunkAction } from 'redux-thunk';
-import { AnyAction, Action } from 'redux';
-
 import { sleep } from '@lib/store';
 
 import { types, requests } from '@lib/client-api';
@@ -9,14 +6,13 @@ import { companies } from '@lib/mock';
 import { config } from '@lib/client-config';
 import { ICompany } from '@lib/types';
 
+import { AppThunk } from '../';
+
 import { companyActions } from './actions';
-import { ICompanyState } from './types';
 
 const {
   debug: { useMockup: isMock },
 } = config;
-
-type AppThunk<R = void, S = ICompanyState, A extends Action = AnyAction> = ThunkAction<R, S, unknown, A>;
 
 const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void): AppThunk => {
   return async (dispatch) => {

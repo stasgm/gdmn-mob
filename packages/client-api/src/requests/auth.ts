@@ -32,19 +32,28 @@ const login = async (userCredentials: IUserCredentials) => {
     userName: userCredentials.userName,
     password: userCredentials.password,
   };
-  const res = await api.post<IResponse<IUser>>('/auth/login', body);
-  const resData = res?.data;
 
-  if (resData?.result) {
+  try {
+    const res = await api.post<IResponse<IUser>>('/auth/login', body);
+    const resData = res?.data;
+
+    if (resData?.result) {
+      return {
+        type: 'LOGIN',
+        user: resData?.data,
+      } as types.ILoginResponse;
+    }
+
     return {
-      type: 'LOGIN',
-      user: resData?.data,
-    } as types.ILoginResponse;
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  } catch (err) {
+    return {
+      type: 'ERROR',
+      message: err?.response?.data?.error || 'ошибка подключения',
+    } as error.INetworkError;
   }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
 };
 
 const logout = async () => {
