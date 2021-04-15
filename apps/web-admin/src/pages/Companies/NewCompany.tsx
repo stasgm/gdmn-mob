@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -11,36 +10,22 @@ import {
   CircularProgress,
   Typography,
 } from '@material-ui/core';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/client-types';
+import { useNavigate } from 'react-router-dom';
+import { NewCompany } from '@lib/types';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
-import SnackBar from '../SnackBar';
+import SnackBar from '../../components/SnackBar';
 
-const ViewCompany = () => {
-  const { id: companyId } = useParams();
-
+const NewCompany = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
-
-  const [company, setCompany] = useState<ICompany>();
-
-  const onSuccessfulLoad = (company?: ICompany) => {
-    if (company) {
-      setCompany(company);
-    }
-  };
-
-  useEffect(() => {
-    dispatch(actions.fetchCompanyById(companyId, onSuccessfulLoad));
-  }, [companyId, dispatch]);
 
   const onSuccessfulSave = () => {
     navigate('/app/companies');
@@ -50,40 +35,30 @@ const ViewCompany = () => {
     navigate('/app/companies');
   };
 
-  // // SnackBar
-  // const [openAlert, setOpenAlert] = useState(false);
+  const handleClearError = () => {
+    dispatch(actions.companyActions.clearError());
+  };
 
-  // const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
-  //   if (reason === 'clickaway') {
-  //     return;
-  //   }
-  //   dispatch(actions.companyActions.clearError());
-  //   setOpenAlert(false);
-  // };
-
-  // useEffect(() => {
-  //   if (!errorMessage) {
-  //     return;
-  //   }
-  //   setOpenAlert(true);
-  // }, [errorMessage]);
-
-  if (!company) {
-    return <Box>Компания не найдена</Box>;
-  }
-
-  const formik = useFormik<ICompany>({
-    initialValues: company,
+  const formik = useFormik<NewCompany>({
+    initialValues: {
+      name: '',
+    },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      dispatch(actions.updateCompany(values, onSuccessfulSave));
+      dispatch(actions.addCompany(values, onSuccessfulSave));
     },
   });
 
   return (
-    <>
+    <Box
+      sx={{
+        backgroundColor: 'background.default',
+        minHeight: '100%',
+        p: 3,
+      }}
+    >
       <form onSubmit={formik.handleSubmit}>
         <Card>
           <Box
@@ -94,7 +69,7 @@ const ViewCompany = () => {
               // p: 2,
             }}
           >
-            <CardHeader title={'Компания'} />
+            <CardHeader title={'Новая компания'} />
             {loading && <CircularProgress size={20} />}
           </Box>
           <Divider />
@@ -140,14 +115,9 @@ const ViewCompany = () => {
           </Box>
         </Card>
       </form>
-      <SnackBar errorMessage={errorMessage} onCleanError={() => dispatch(actions.companyActions.clearError())} />
-      {/* <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="error">
-          {errorMessage}!
-        </Alert>
-      </Snackbar> */}
-    </>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+    </Box>
   );
 };
 
-export default ViewCompany;
+export default NewCompany;

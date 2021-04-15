@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import ViewCompaniesTable from '../../components/company/ViewCompaniesTable';
+import CompanyListTable from '../../components/company/CompanyListTable';
 import TopToolbar from '../../components/TopToolbar';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company/actions.async';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
+import { buttons } from '../../components/company/CompanyButtons';
 
 const CompanyList = () => {
   const navigate = useNavigate();
@@ -45,12 +46,12 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <TopToolbar onLoad={handleLoadCompanies} onAdd={handleAddCompany} />
+          <TopToolbar buttons={buttons} onLoad={handleLoadCompanies} onAdd={handleAddCompany} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 3 }}>
-              <ViewCompaniesTable companies={list} />
+              <CompanyListTable companies={list} />
             </Box>
           )}
         </Container>

@@ -3,18 +3,17 @@ import { Snackbar, Alert } from '@material-ui/core';
 
 interface props {
   errorMessage: string;
-  onCleanError: () => void;
+  onClearError: () => void;
 }
 
-const SnackBar = ({ errorMessage, onCleanError }: props) => {
-  // SnackBar
+const SnackBar = ({ errorMessage, onClearError }: props) => {
   const [openAlert, setOpenAlert] = useState(false);
 
   const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
-    onCleanError;
+    onClearError;
     setOpenAlert(false);
   };
 

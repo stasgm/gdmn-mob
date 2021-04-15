@@ -21,7 +21,7 @@ interface props {
   companies?: ICompany[];
 }
 
-const ViewCompaniesTable = ({ companies = [], ...rest }: props) => {
+const CompanyListTable = ({ companies = [], ...rest }: props) => {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -132,4 +132,4 @@ const ViewCompaniesTable = ({ companies = [], ...rest }: props) => {
   );
 };
 
-export default ViewCompaniesTable;
+export default CompanyListTable;
