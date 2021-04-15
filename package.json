@@ -20,7 +20,7 @@
     "clean": "lerna clean",
     "clean:all": "yarn clean:dist && clean:node-modules && yarn clean:expo-cache",
     "clean:dist": "rimraf packages/*/dist apps/*/dist configs/*/dist",
-    "clean:node-modules": "rimraf node_modules packages/*/node_modules apps/*/node_modules configs/*/node_modules",
+    "clean:node-modules": "rimraf node_modules",
     "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
     "update": "yarn upgrade-interactive --latest",
     "lint-staged-project": "lerna run  --scope=@lib/* --scope=@apps/* --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
