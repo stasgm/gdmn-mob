@@ -23,6 +23,7 @@ const addDevice = async (deviceName: string, userId: string) => {
     message: resData.error,
   } as error.INetworkError;
 };
+
 /**
   * Получить
     - все устройства;

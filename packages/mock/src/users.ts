@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-export default [
+const users = [
   {
     id: uuid(),
     address: {
@@ -142,3 +142,5 @@ export default [
     phone: '801-301-7894',
   },
 ];
+
+export default users;

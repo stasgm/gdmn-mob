@@ -1,7 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { enableScreens } from 'react-native-screens';
 import { useAddReducer, configureStore, authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
@@ -9,8 +8,6 @@ import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 import RootNavigator from './src/navigation/RootNavigator';
 
 import { setStore } from './src/store';
-
-enableScreens();
 
 const store = setStore();
 
