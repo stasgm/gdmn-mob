@@ -7,6 +7,54 @@ interface props {
 }
 
 const TopToolbar = ({ onLoad, onAdd, ...rest }: props) => {
+  interface IToolBarButton {
+    name: string;
+    onClick: () => void;
+    sx?: any;
+    color?: any;
+    variant?: any;
+  }
+
+  const buttons: IToolBarButton[] = [
+    {
+      name: 'Load',
+      onClick: () => {
+        return;
+      },
+    },
+    {
+      name: 'Export',
+      sx: { mx: 1 },
+      onClick: () => {
+        return;
+      },
+    },
+    {
+      name: ' Add company',
+      color: 'primary',
+      variant: 'contained',
+      onClick: () => {
+        return;
+      },
+    },
+  ];
+
+  const buttonList = (
+    <>
+      {buttons.map((button: IToolBarButton) => (
+        <Button
+          key={button.name}
+          color={button.color || 'default'}
+          variant={button.variant || 'text'}
+          onClick={button.onClick}
+          sx={button.sx}
+        >
+          {button.name}
+        </Button>
+      ))}
+    </>
+  );
+
   return (
     <Box {...rest}>
       <Box
@@ -15,12 +63,13 @@ const TopToolbar = ({ onLoad, onAdd, ...rest }: props) => {
           justifyContent: 'flex-end',
         }}
       >
-        <Button onClick={onLoad}>Load</Button>
+        {buttonList}
+        {/* <Button onClick={onLoad}>Load</Button>
         <Button>Import</Button>
         <Button sx={{ mx: 1 }}>Export</Button>
         <Button color="primary" variant="contained" onClick={onAdd}>
           Add company
-        </Button>
+        </Button> */}
       </Box>
       <Box sx={{ mt: 3 }}>
         <Card>
