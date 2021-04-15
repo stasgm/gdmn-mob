@@ -1,5 +1,5 @@
-import { IApiConfig } from '@lib/client-types';
-import { ICompany, IDevice, IUserDto } from '@lib/types';
+import { IApiConfig, ICompany } from '@lib/client-types';
+import { IDevice, UserDto } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { IAuthState } from './types';
@@ -24,7 +24,7 @@ const activateDeviceAsync = createAsyncAction(
 
 const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCCES', 'AUTH/LOGIN_FAILURE')<
   string | undefined,
-  IUserDto | null,
+  UserDto | null,
   string
 >();
 

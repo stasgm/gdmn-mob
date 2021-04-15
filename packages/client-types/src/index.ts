@@ -1,4 +1,5 @@
 import { IDBCompany, IUser } from '@lib/types';
+
 export interface IApiConfig {
   protocol: string;
   server: string;

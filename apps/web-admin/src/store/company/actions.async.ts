@@ -2,7 +2,7 @@ import { sleep } from '@lib/store';
 
 import { types, requests } from '@lib/client-api';
 
-import { companies } from '@lib/mock';
+import { companies, company2 } from '@lib/mock';
 import { config } from '@lib/client-config';
 import { ICompany } from '@lib/client-types';
 
@@ -27,7 +27,7 @@ const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void):
       const company = companies.find((item) => item.id === id);
 
       if (company) {
-        response = { company, type: 'GET_COMPANY' };
+        response = { company: company2, type: 'GET_COMPANY' };
       } else {
         response = { message: 'Компания не найдена', type: 'ERROR' };
       }
@@ -89,17 +89,17 @@ const addCompany = (company: NewCompany, onSuccess?: (company: ICompany) => void
     dispatch(companyActions.addCompanyAsync.request(''));
 
     if (isMock) {
-      await sleep(500);
+      // await sleep(500);
 
       if (company.name === '1') {
         // Ошибка добавления компании
         response = { message: 'Компания с таким названием уже существует!', type: 'ERROR' };
       } else {
         // Добаляем компанию
-        response = { company, type: 'ADD_COMPANY' };
+        response = { company: { ...company, ...company2 }, type: 'ADD_COMPANY' };
       }
     } else {
-      response = await requests.company.addCompany(company.name, '666');
+      response = await requests.company.addCompany(company);
     }
 
     if (response.type === 'ADD_COMPANY') {
