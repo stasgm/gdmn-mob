@@ -1,5 +1,5 @@
-import { ICompany, IDevice, IUser } from '@lib/types';
-import { IApiConfig } from '@lib/client-types';
+import { IDevice, IUser } from '@lib/types';
+import { IApiConfig, ICompany } from '@lib/client-types';
 
 export const systemName = 'Inventory';
 
@@ -21,13 +21,13 @@ export const device: IDevice = {
 
 export const company: ICompany = {
   id: '1234',
-  adminId: '1',
+  admin: { id: '1', userName: 'Admin' },
   name: 'ОДО Золотые Программы',
 };
 
 export const company2: ICompany = {
   id: '1232',
-  adminId: '1',
+  admin: { id: '1', userName: 'Admin' },
   name: 'ОДО Амперсант',
 };
 

@@ -11,7 +11,8 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company/actions.async';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { buttons } from '../../components/company/CompanyButtons';
+
+import { IToolBarButton } from '../../types';
 
 const CompanyList = () => {
   const navigate = useNavigate();
@@ -27,11 +28,25 @@ const CompanyList = () => {
     !list?.length && fetchCompanies();
   }, [fetchCompanies]);
 
-  const handleLoadCompanies = () => fetchCompanies();
-
-  const handleAddCompany = () => {
-    navigate(`${location.pathname}/new`);
-  };
+  const buttons: IToolBarButton[] = [
+    {
+      name: 'Load',
+      onClick: () => fetchCompanies(),
+    },
+    {
+      name: 'Export',
+      sx: { mx: 1 },
+      onClick: () => {
+        return;
+      },
+    },
+    {
+      name: ' Add company',
+      color: 'primary',
+      variant: 'contained',
+      onClick: () => navigate(`${location.pathname}/new`),
+    },
+  ];
 
   return (
     <>
@@ -46,7 +61,7 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <TopToolbar buttons={buttons} onLoad={handleLoadCompanies} onAdd={handleAddCompany} />
+          <TopToolbar buttons={buttons} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (

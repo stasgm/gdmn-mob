@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -11,8 +10,8 @@ import {
   CircularProgress,
   Typography,
 } from '@material-ui/core';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/client-types';
+import { useNavigate } from 'react-router-dom';
+import { NewCompany } from '@lib/types';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -21,26 +20,12 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
 import SnackBar from '../../components/SnackBar';
 
-const ViewCompany = () => {
-  const { id: companyId } = useParams();
-
+const CompanyCreate = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
-
-  const [company, setCompany] = useState<ICompany>();
-
-  useEffect(() => {
-    dispatch(actions.fetchCompanyById(companyId, onSuccessfulLoad));
-  }, [companyId, dispatch]);
-
-  const onSuccessfulLoad = (company?: ICompany) => {
-    if (company) {
-      setCompany(company);
-    }
-  };
 
   const onSuccessfulSave = () => {
     navigate('/app/companies');
@@ -54,22 +39,26 @@ const ViewCompany = () => {
     dispatch(actions.companyActions.clearError());
   };
 
-  if (!company) {
-    return <Box>Компания не найдена</Box>;
-  }
-
-  const formik = useFormik<ICompany>({
-    initialValues: company,
+  const formik = useFormik<NewCompany>({
+    initialValues: {
+      name: '',
+    },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      dispatch(actions.updateCompany(values, onSuccessfulSave));
+      dispatch(actions.addCompany(values, onSuccessfulSave));
     },
   });
 
   return (
-    <>
+    <Box
+      sx={{
+        backgroundColor: 'background.default',
+        minHeight: '100%',
+        p: 3,
+      }}
+    >
       <form onSubmit={formik.handleSubmit}>
         <Card>
           <Box
@@ -80,7 +69,7 @@ const ViewCompany = () => {
               // p: 2,
             }}
           >
-            <CardHeader title={'Компания'} />
+            <CardHeader title={'Новая компания'} />
             {loading && <CircularProgress size={20} />}
           </Box>
           <Divider />
@@ -127,8 +116,8 @@ const ViewCompany = () => {
         </Card>
       </form>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
-    </>
+    </Box>
   );
 };
 
-export default ViewCompany;
+export default CompanyCreate;

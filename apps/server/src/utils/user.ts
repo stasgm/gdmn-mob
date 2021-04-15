@@ -1,6 +1,6 @@
-import { IUserDto } from '@lib/types';
+import { UserDto } from '@lib/types';
 
-export const makeProfile = (user: IUserDto) => ({
+export const makeProfile = (user: UserDto) => ({
   id: user.id,
   externalId: user.externalId,
   userName: user.userName,

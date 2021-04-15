@@ -26,5 +26,7 @@ export interface IAuthState {
 }
 
 export interface ICompany extends Omit<IDBCompany, 'adminId'> {
-  admin: IUser;
+  admin: Admin;
 }
+
+export type Admin = Pick<IUser, 'id' | 'userName'>;

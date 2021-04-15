@@ -10,7 +10,7 @@ import { Strategy as LocalStrategy } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
-import { IUserDto } from '@lib/types';
+import { UserDto } from '@lib/types';
 
 import config from '../config';
 
@@ -37,7 +37,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
-  passport.serializeUser((user: unknown, done) => done(null, (user as IUserDto).id));
+  passport.serializeUser((user: unknown, done) => done(null, (user as UserDto).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {

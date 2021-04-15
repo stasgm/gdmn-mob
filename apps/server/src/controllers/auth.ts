@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, IUserDto } from '@lib/types';
+import { IResponse, UserDto } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -25,7 +25,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   try {
     await authService.authenticate(ctx as Context, next);
 
-    const user = ctx.state.user as IUserDto;
+    const user = ctx.state.user as UserDto;
 
     const result: IResponse<string> = { result: true, data: user.id };
 
@@ -44,7 +44,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   delete user.password;
 
-  const res: IResponse<IUserDto> = { result: true, data: user };
+  const res: IResponse<UserDto> = { result: true, data: user };
 
   ctx.status = 200;
   ctx.body = res;
@@ -86,7 +86,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
     phoneNumber,
     companies: companies || [],
     creatorId: creatorId || userName,
-  } as IUserDto;
+  } as UserDto;
 
   try {
     const id = await authService.signUp({ user });

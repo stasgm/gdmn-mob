@@ -7,7 +7,7 @@ import { VerifyFunction } from 'passport-local';
 
 import bcrypt from 'bcrypt';
 
-import { IUserDto } from '@lib/types';
+import { UserDto } from '@lib/types';
 
 import log from '../utils/logger';
 
@@ -15,7 +15,7 @@ import { devices, users, codes } from './dao/db';
 
 import * as userService from './userService';
 
-const authenticate = async (ctx: Context, next: Next): Promise<IUserDto | undefined> => {
+const authenticate = async (ctx: Context, next: Next): Promise<UserDto | undefined> => {
   const { deviceId } = ctx.query;
   const { userName } = ctx.request.body;
 
@@ -36,7 +36,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUserDto | undefi
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return koaPassport.authenticate('local', async (err: Error, usr: IUserDto) => {
+  return koaPassport.authenticate('local', async (err: Error, usr: UserDto) => {
     if (err) {
       throw new Error(err.message);
     }
@@ -51,7 +51,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUserDto | undefi
   })(ctx, next);
 };
 
-const signUp = async ({ user }: { user: Omit<IUserDto, 'role'> }) => {
+const signUp = async ({ user }: { user: Omit<UserDto, 'role'> }) => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
@@ -65,7 +65,7 @@ const signUp = async ({ user }: { user: Omit<IUserDto, 'role'> }) => {
     // });
     // await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
 
-    const gdmnUserObj: IUserDto = {
+    const gdmnUserObj: UserDto = {
       userName: 'gdmn',
       creatorId: user.userName,
       password: 'gdmn',
