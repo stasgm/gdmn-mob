@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -9,8 +9,6 @@ import {
   Grid,
   TextField,
   CircularProgress,
-  Snackbar,
-  Alert,
   Typography,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +19,7 @@ import * as yup from 'yup';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
+import SnackBar from '../SnackBar';
 
 const ViewCompany = () => {
   const { id: companyId } = useParams();
@@ -29,41 +28,18 @@ const ViewCompany = () => {
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading, list } = useSelector((state) => state.companiesReducer);
-  const company = list?.length ? list[0] : undefined;
+  const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
 
-  if (!company) {
-    return <Typography>эээээ</Typography>;
-  }
+  const [company, setCompany] = useState<ICompany>();
 
-  // const [loaded, setLoaded] = useState(false);
-
-  // const [companyForm, setCompanyForm] = useState<ICompany>({
-  //   adminId: '',
-  //   id: uuid(), // времено ID будет присваиваться сервером
-  //   name: '',
-  // });
-
-  // const handleChange = (event: any) => {
-  //   setCompanyForm((prev) => ({
-  //     ...prev,
-  //     [event.target.name]: event.target.value,
-  //   }));
-  // };
-
-  // const onSuccessfulLoad = () => {
-  //   // if (company) {
-  //   //   setCompanyForm(company);
-  //   // }
-  //   setLoaded(true);
-  // };
+  const onSuccessfulLoad = (company?: ICompany) => {
+    if (company) {
+      setCompany(company);
+    }
+  };
 
   useEffect(() => {
-    // if (isAddMode && !companyId) {
-    //   return;
-    // }
-
-    dispatch(actions.fetchCompanyById(companyId));
+    dispatch(actions.fetchCompanyById(companyId, onSuccessfulLoad));
   }, [companyId, dispatch]);
 
   const onSuccessfulSave = () => {
@@ -74,27 +50,27 @@ const ViewCompany = () => {
     navigate('/app/companies');
   };
 
-  // const handleSubmit = () => {
-  //   dispatch(actions.updateCompany(companyForm, onSuccessfulSave));
+  // // SnackBar
+  // const [openAlert, setOpenAlert] = useState(false);
+
+  // const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
+  //   if (reason === 'clickaway') {
+  //     return;
+  //   }
+  //   dispatch(actions.companyActions.clearError());
+  //   setOpenAlert(false);
   // };
 
-  // SnackBar
-  const [openAlert, setOpenAlert] = useState(false);
+  // useEffect(() => {
+  //   if (!errorMessage) {
+  //     return;
+  //   }
+  //   setOpenAlert(true);
+  // }, [errorMessage]);
 
-  const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    dispatch(actions.companyActions.clearError());
-    setOpenAlert(false);
-  };
-
-  useEffect(() => {
-    if (!errorMessage) {
-      return;
-    }
-    setOpenAlert(true);
-  }, [errorMessage]);
+  if (!company) {
+    return <Box>Компания не найдена</Box>;
+  }
 
   const formik = useFormik<ICompany>({
     initialValues: company,
@@ -149,12 +125,6 @@ const ViewCompany = () => {
               p: 2,
             }}
           >
-            {/* <Button color="secondary" variant="contained" onClick={handleCancel} disabled={loading}>
-              Отмена
-            </Button> */}
-            {/* <Button color="primary" variant="contained" onClick={handleSubmit} disabled={loading}>
-              Сохранить
-            </Button> */}
             <Button color="primary" size="small" type="button" variant="contained" onClick={handleCancel}>
               <Typography>Отмена</Typography>
             </Button>
@@ -165,16 +135,17 @@ const ViewCompany = () => {
               type="submit"
               variant="contained"
             >
-              {loading && <CircularProgress size={20} />} <Typography>Сохранить</Typography>
+              <Typography>Сохранить</Typography>
             </Button>
           </Box>
         </Card>
       </form>
-      <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+      <SnackBar errorMessage={errorMessage} onCleanError={() => dispatch(actions.companyActions.clearError())} />
+      {/* <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error">
           {errorMessage}!
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </>
   );
 };

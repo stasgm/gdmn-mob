@@ -9,57 +9,57 @@ import {
   Grid,
   TextField,
   CircularProgress,
-  Snackbar,
-  Alert,
+  Typography,
 } from '@material-ui/core';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/client-types';
+import { useNavigate } from 'react-router-dom';
+import { NewCompany } from '@lib/types';
 
-import { v4 as uuid } from 'uuid';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+// import { v4 as uuid } from 'uuid';
+
+// import { ICompany } from '@lib/client-types';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
+import SnackBar from '../SnackBar';
 
-const NewCompany = (props: any) => {
+const NewCompany = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
 
-  const { id: companyId } = useParams();
+  // const [loaded, setLoaded] = useState(false);
 
-  const isAddMode = !companyId;
+  // const [companyForm, setCompanyForm] = useState<ICompany>({
+  //   admin: {},
+  //   id: uuid(), // времено ID будет присваиваться сервером
+  //   name: '',
+  // });
 
-  const [loaded, setLoaded] = useState(false);
+  // const handleChange = (event: any) => {
+  //   setCompanyForm((prev) => ({
+  //     ...prev,
+  //     [event.target.name]: event.target.value,
+  //   }));
+  // };
 
-  const [companyForm, setCompanyForm] = useState<ICompany>({
-    admin: '',
-    id: uuid(), // времено ID будет присваиваться сервером
-    name: '',
-  });
+  // const onSuccessfulLoad = (company?: ICompany) => {
+  //   if (company) {
+  //     setCompanyForm(company);
+  //   }
+  //   setLoaded(true);
+  // };
 
-  const handleChange = (event: any) => {
-    setCompanyForm((prev) => ({
-      ...prev,
-      [event.target.name]: event.target.value,
-    }));
-  };
+  // useEffect(() => {
+  //   if (isAddMode && !companyId) {
+  //     return;
+  //   }
 
-  const onSuccessfulLoad = (company?: ICompany) => {
-    if (company) {
-      setCompanyForm(company);
-    }
-    setLoaded(true);
-  };
-
-  useEffect(() => {
-    if (isAddMode && !companyId) {
-      return;
-    }
-
-    dispatch(actions.fetchCompanyById(companyId, onSuccessfulLoad));
-  }, [companyId, dispatch, isAddMode]);
+  //   dispatch(actions.fetchCompanyById(companyId, onSuccessfulLoad));
+  // }, [companyId, dispatch, isAddMode]);
 
   const onSuccessfulSave = () => {
     navigate('/app/companies');
@@ -69,13 +69,13 @@ const NewCompany = (props: any) => {
     navigate('/app/companies');
   };
 
-  const handleSubmit = () => {
-    dispatch(
-      isAddMode
-        ? actions.addCompany(companyForm, onSuccessfulSave)
-        : actions.updateCompany(companyForm, onSuccessfulSave),
-    );
-  };
+  // const handleSubmit = () => {
+  //   dispatch(
+  //     isAddMode
+  //       ? actions.addCompany(companyForm, onSuccessfulSave)
+  //       : actions.updateCompany(companyForm, onSuccessfulSave),
+  //   );
+  // };
 
   // SnackBar
   const [openAlert, setOpenAlert] = useState(false);
@@ -95,14 +95,17 @@ const NewCompany = (props: any) => {
     setOpenAlert(true);
   }, [errorMessage]);
 
-  console.log('isAddMode', isAddMode);
-  console.log('companyForm', companyForm);
-  console.log('loaded', loaded);
-
-  if (!isAddMode && !companyForm?.name && loaded) {
-    // Если редактирование  компании и компания не найдена
-    return <Box>Компания не найдена</Box>;
-  }
+  const formik = useFormik<NewCompany>({
+    initialValues: {
+      name: '',
+    },
+    validationSchema: yup.object().shape({
+      name: yup.string().required('Required'),
+    }),
+    onSubmit: async (values) => {
+      dispatch(actions.addCompany(values, onSuccessfulSave));
+    },
+  });
 
   return (
     <Box
@@ -112,7 +115,7 @@ const NewCompany = (props: any) => {
         p: 3,
       }}
     >
-      <form autoComplete="off" noValidate {...props}>
+      <form onSubmit={formik.handleSubmit}>
         <Card>
           <Box
             sx={{
@@ -122,7 +125,7 @@ const NewCompany = (props: any) => {
               // p: 2,
             }}
           >
-            <CardHeader title={`${!companyForm.id ? 'Новая компания' : 'Компания'}`} />
+            <CardHeader title={'Новая компания'} />
             {loading && <CircularProgress size={20} />}
           </Box>
           <Divider />
@@ -130,60 +133,19 @@ const NewCompany = (props: any) => {
             <Grid container spacing={3}>
               <Grid item md={6} xs={12}>
                 <TextField
+                  error={formik.touched.name && Boolean(formik.errors.name)}
                   fullWidth
-                  helperText="Введите название организации"
-                  label="Название организации"
+                  helperText="Введите наименование организации"
+                  label="Наименование организации"
                   name="name"
-                  onChange={handleChange}
                   required
-                  value={companyForm.name}
                   variant="outlined"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="name"
+                  value={formik.values.name}
                 />
               </Grid>
-              {/* <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Last name"
-                name="lastName"
-                onChange={handleChange}
-                required
-                value={values.title}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Email Address"
-                name="email"
-                onChange={handleChange}
-                required
-                value={values.title}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Phone Number"
-                name="phone"
-                onChange={handleChange}
-                type="number"
-                value={values.title}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Country"
-                name="country"
-                onChange={handleChange}
-                required
-                value={values.title}
-                variant="outlined"
-              />
-            </Grid> */}
             </Grid>
           </CardContent>
           <Divider />
@@ -194,20 +156,27 @@ const NewCompany = (props: any) => {
               p: 2,
             }}
           >
-            <Button color="secondary" variant="contained" onClick={handleCancel} disabled={loading}>
-              Отмена
+            <Button color="primary" size="small" type="button" variant="contained" onClick={handleCancel}>
+              <Typography>Отмена</Typography>
             </Button>
-            <Button color="primary" variant="contained" onClick={handleSubmit} disabled={loading}>
-              Сохранить
+            <Button
+              color="primary"
+              disabled={loading || !!formik.errors.name}
+              size="small"
+              type="submit"
+              variant="contained"
+            >
+              <Typography>Сохранить</Typography>
             </Button>
           </Box>
         </Card>
       </form>
-      <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+      <SnackBar errorMessage={errorMessage} onCleanError={() => dispatch(actions.companyActions.clearError())} />
+      {/* <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error">
           {errorMessage}!
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </Box>
   );
 };

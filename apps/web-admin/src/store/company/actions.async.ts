@@ -6,6 +6,8 @@ import { companies } from '@lib/mock';
 import { config } from '@lib/client-config';
 import { ICompany } from '@lib/client-types';
 
+import { NewCompany } from '@lib/types';
+
 import { AppThunk } from '../';
 
 import { companyActions } from './actions';
@@ -80,7 +82,7 @@ const fetchCompanies = (): AppThunk => {
   };
 };
 
-const addCompany = (company: ICompany, onSuccess?: (company: ICompany) => void): AppThunk => {
+const addCompany = (company: NewCompany, onSuccess?: (company: ICompany) => void): AppThunk => {
   return async (dispatch) => {
     let response: types.company.IAddCompanyResponse | types.error.INetworkError;
 
