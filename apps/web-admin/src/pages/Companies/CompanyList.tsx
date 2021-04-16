@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import CachedIcon from '@material-ui/icons/Cached';
+import ImportExportIcon from '@material-ui/icons/ImportExport';
+
 import CompanyListTable from '../../components/company/CompanyListTable';
 import TopToolbar from '../../components/TopToolbar';
 
@@ -19,7 +23,7 @@ const CompanyList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.companiesReducer);
+  const { list, loading } = useSelector((state) => state.companies);
 
   const fetchCompanies = useCallback(() => dispatch(actions.fetchCompanies()), [dispatch]);
 
@@ -32,6 +36,14 @@ const CompanyList = () => {
     {
       name: 'Load',
       onClick: () => fetchCompanies(),
+      icon: <CachedIcon />,
+    },
+    {
+      name: 'Import',
+      onClick: () => {
+        return;
+      },
+      icon: <ImportExportIcon />,
     },
     {
       name: 'Export',
@@ -45,6 +57,7 @@ const CompanyList = () => {
       color: 'primary',
       variant: 'contained',
       onClick: () => navigate(`${location.pathname}/new`),
+      icon: <AddCircleOutlineIcon />,
     },
   ];
 
@@ -61,7 +74,7 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <TopToolbar buttons={buttons} />
+          <TopToolbar buttons={buttons} searchTitle={'Найти компанию'} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (

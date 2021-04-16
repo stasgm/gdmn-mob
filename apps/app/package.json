@@ -27,7 +27,7 @@
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.8.0",
     "@expo/vector-icons": "^12.0.0",
-    "@gorhom/bottom-sheet": "^2.0.3",
+    "@gorhom/bottom-sheet": "^3.6.3",
     "@lib/client-api": "*",
     "@lib/client-types": "*",
     "@lib/mobile-auth": "*",
@@ -63,7 +63,7 @@
     "react-native-reanimated": "~2.1.0",
     "react-native-safe-area-context": "3.2.0",
     "react-native-screens": "~3.0.0",
-    "react-native-web": "~0.13.12",
+    "react-native-web": "~0.15.7",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",
     "react-redux": "^7.2.3",

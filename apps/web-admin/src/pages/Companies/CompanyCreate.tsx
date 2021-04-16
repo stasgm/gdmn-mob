@@ -25,7 +25,7 @@ const CompanyCreate = () => {
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companiesReducer);
+  const { errorMessage, loading } = useSelector((state) => state.companies);
 
   const onSuccessfulSave = () => {
     navigate('/app/companies');

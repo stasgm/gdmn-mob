@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -31,6 +31,8 @@ const CompanyEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
+  console.log(company);
+
   // const [company, setCompany] = useState<ICompany>();
 
   useEffect(() => {
@@ -60,6 +62,7 @@ const CompanyEdit = () => {
   }
 
   const formik = useFormik<ICompany>({
+    enableReinitialize: true,
     initialValues: company,
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
@@ -99,7 +102,7 @@ const CompanyEdit = () => {
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   type="name"
-                  value={formik.values.name}
+                  value={company.name}
                 />
               </Grid>
             </Grid>

@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
-  Avatar,
   Box,
   Card,
   Checkbox,
@@ -15,7 +13,7 @@ import {
   Typography,
 } from '@material-ui/core';
 
-import getInitials from '../../utils/getInitials';
+import { IUser } from '@lib/types';
 
 interface IProps {
   users: any;
@@ -81,15 +79,14 @@ const UserListResults = ({ users, ...rest }: IProps) => {
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Registration date</TableCell>
+                <TableCell>Логин</TableCell>
+                <TableCell>Фамилия</TableCell>
+                <TableCell>Имя</TableCell>
+                <TableCell>Телефон</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.slice(0, limit).map((user: any) => (
+              {users.slice(0, limit).map((user: IUser) => (
                 <TableRow hover key={user.id} selected={selectedCustomerIds.indexOf(user.id) !== -1}>
                   <TableCell padding="checkbox">
                     <Checkbox
@@ -105,18 +102,14 @@ const UserListResults = ({ users, ...rest }: IProps) => {
                         display: 'flex',
                       }}
                     >
-                      <Avatar src={user.avatarUrl} sx={{ mr: 2 }}>
-                        {getInitials(user.name)}
-                      </Avatar>
                       <Typography color="textPrimary" variant="body1">
-                        {user.name}
+                        {user.userName}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{`${user.address.city}, ${user.address.state}, ${user.address.country}`}</TableCell>
-                  <TableCell>{user.phone}</TableCell>
-                  <TableCell>{moment(user.createdAt).format('DD/MM/YYYY')}</TableCell>
+                  <TableCell>{user.lastName}</TableCell>
+                  <TableCell>{user.firstName}</TableCell>
+                  <TableCell>{user.phoneNumber}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
