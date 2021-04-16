@@ -40,6 +40,7 @@ const CompanyCreate = () => {
   };
 
   const formik = useFormik<NewCompany>({
+    enableReinitialize: true,
     initialValues: {
       name: '',
     },

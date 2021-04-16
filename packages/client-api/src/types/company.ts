@@ -1,5 +1,4 @@
-import { IUser } from '@lib/types';
-import { ICompany } from '@lib/client-types';
+import { IUser, ICompany } from '@lib/types';
 
 export interface ICompanyQueryResponse {
   type: 'GET_COMPANY' | 'GET_COMPANIES' | 'ADD_COMPANY' | 'UPDATE_COMPANY' | 'GET_USERS_BY_COMPANY' | 'REMOVE_COMPANY';

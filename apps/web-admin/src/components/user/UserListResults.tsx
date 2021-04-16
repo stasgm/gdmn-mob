@@ -103,7 +103,7 @@ const UserListResults = ({ users, ...rest }: IProps) => {
                       }}
                     >
                       <Typography color="textPrimary" variant="body1">
-                        {user.userName}
+                        {user.name}
                       </Typography>
                     </Box>
                   </TableCell>

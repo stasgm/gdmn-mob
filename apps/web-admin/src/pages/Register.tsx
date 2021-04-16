@@ -37,6 +37,7 @@ const Register = () => {
   // );
 
   const formik = useFormik<IUserCredentials>({
+    enableReinitialize: true,
     initialValues: {
       userName: '',
       password: '',

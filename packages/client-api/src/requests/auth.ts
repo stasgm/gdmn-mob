@@ -6,7 +6,7 @@ import { error, auth as types } from '../types';
 
 const signup = async (userName: string, password: string, companyId?: string, creatorId?: string) => {
   const body = {
-    userName,
+    name: userName,
     password,
     companies: companyId ? [companyId] : undefined,
     creatorId: creatorId ?? userName,

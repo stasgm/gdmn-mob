@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/client-types';
+import { ICompany } from '@lib/types';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -31,19 +31,11 @@ const CompanyEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
-  console.log(company);
-
-  // const [company, setCompany] = useState<ICompany>();
+  // const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     dispatch(actions.fetchCompanyById(companyId));
   }, [companyId, dispatch]);
-
-  /*   const onSuccessfulLoad = (company?: ICompany) => {
-    if (company) {
-      setCompany(company);
-    }
-  }; */
 
   const onSuccessfulSave = () => {
     navigate('/app/companies');
@@ -67,7 +59,7 @@ const CompanyEdit = () => {
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
-    onSubmit: async (values) => {
+    onSubmit: (values) => {
       dispatch(actions.updateCompany(values, onSuccessfulSave));
     },
   });

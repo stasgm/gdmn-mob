@@ -1,5 +1,7 @@
-import { ICompany, IApiConfig } from '@lib/client-types';
-import { IDevice, IUser } from '@lib/types';
+import { IApiConfig } from '@lib/client-types';
+import { IDevice } from '@lib/types';
+import companies from './companies';
+import users from './users';
 
 export const systemName = 'Inventory';
 
@@ -19,25 +21,8 @@ export const device: IDevice = {
   id: '111',
 };
 
-export const user: IUser = {
-  id: '1',
-  creatorId: '1',
-  password: '1',
-  role: 'Admin',
-  userName: 'Шляхтич Станислав',
-  firstName: 'Станислав',
-  lastName: 'Шляхтич ',
-  companies: ['1234', '1235'],
-};
+export const company = companies[0];
 
-export const company: ICompany = {
-  id: '1234',
-  admin: user,
-  name: 'ОДО Золотые Программы',
-};
+export const company2 = companies[1];
 
-export const company2: ICompany = {
-  id: '1232',
-  admin: user,
-  name: 'ОДО Амперсант',
-};
+export const user = users[0];

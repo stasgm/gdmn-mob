@@ -1,4 +1,4 @@
-import { IDBCompany, IUser } from '@lib/types';
+import { IDBCompany, INamedEntity } from '@lib/types';
 
 export interface IApiConfig {
   protocol: string;
@@ -24,8 +24,4 @@ export interface IAuthState {
     userName: string;
     companyName: string;
   };
-}
-
-export interface ICompany extends Omit<IDBCompany, 'adminId'> {
-  admin: IUser;
 }
