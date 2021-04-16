@@ -28,11 +28,11 @@ const requestInterceptor = (config) => {
 }; */
 
 class Api {
-  private config: IApiConfig;
-  private deviceId: string;
+  // private config: IApiConfig;
+  // private deviceId: string;
   private readonly axios: AxiosInstance;
 
-  constructor(config: IApiConfig, deviceId: string) {
+  constructor(private config: IApiConfig, private deviceId: string = '') {
     this.config = config;
     this.deviceId = deviceId;
     // const config = defaultConfig;

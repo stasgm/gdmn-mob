@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Box,
   Button,
@@ -61,6 +61,7 @@ const CompanyEdit = () => {
 
   const formik = useFormik<ICompany>({
     initialValues: company,
+    enableReinitialize: true,
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),

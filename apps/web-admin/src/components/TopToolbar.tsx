@@ -13,7 +13,6 @@ const TopToolbar = ({ buttons, ...rest }: props) => {
       {buttons.map((button: IToolBarButton) => (
         <Button
           key={button.name}
-          color={button.color || 'default'}
           variant={button.variant || 'text'}
           onClick={button.onClick}
           sx={button.sx}

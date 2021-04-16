@@ -19,14 +19,14 @@ const CompanyList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.companiesReducer);
+  const { list, loading } = useSelector((state) => state.companies);
 
   const fetchCompanies = useCallback(() => dispatch(actions.fetchCompanies()), [dispatch]);
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     !list?.length && fetchCompanies();
-  }, [fetchCompanies]);
+  }, [fetchCompanies, list?.length]);
 
   const buttons: IToolBarButton[] = [
     {
