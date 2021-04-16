@@ -4,9 +4,8 @@ import { types, requests } from '@lib/client-api';
 
 import { companies, company2 } from '@lib/mock';
 import { config } from '@lib/client-config';
-import { ICompany } from '@lib/client-types';
 
-import { NewCompany } from '@lib/types';
+import { NewCompany, ICompany } from '@lib/types';
 
 import { AppThunk } from '../';
 
@@ -23,11 +22,11 @@ const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void):
     dispatch(companyActions.fetchCompanyAsync.request(''));
 
     if (isMock) {
-      // await sleep(500);
+      await sleep(1000);
       const company = companies.find((item) => item.id === id);
 
       if (company) {
-        response = { company: company2, type: 'GET_COMPANY' };
+        response = { company: { ...company2, id }, type: 'GET_COMPANY' };
       } else {
         response = { message: 'Компания не найдена', type: 'ERROR' };
       }

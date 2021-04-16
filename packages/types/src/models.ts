@@ -10,19 +10,23 @@ export interface IUserProfile {
 
 export type userRole = 'Admin' | 'User';
 
-export interface IUser {
-  id?: string;
-  externalId?: string;
-  userName: string;
+export interface IDBUser extends INamedEntity, IExernalSystemProps {
   password: string;
+  creatorId: string;
+  role: userRole;
   activationCode?: string;
   companies?: string[];
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
-  creatorId: string;
-  role: userRole;
 }
+
+export interface IUser extends Omit<IDBUser, 'creatorId' | 'companies'> {
+  creator: INamedEntity;
+  companies?: INamedEntity[];
+}
+
+export type NewUser = Pick<IDBUser, 'name' | 'externalId'>;
 
 export interface IActivationCode {
   id?: string;
@@ -35,11 +39,15 @@ export interface IDBCompany extends INamedEntity, IExernalSystemProps {
   adminId: string;
 }
 
+export interface ICompany extends Omit<IDBCompany, 'adminId'> {
+  admin: INamedEntity;
+}
+
 export type NewCompany = Pick<IDBCompany, 'name' | 'externalId'>;
 
-export type CompanyDto = IDBCompany;
+// export type CompanyDto = IDBCompany;
 
-export type UserDto = IUser;
+// export type IUser = IUser;
 
 export interface IEntity {
   id: string;

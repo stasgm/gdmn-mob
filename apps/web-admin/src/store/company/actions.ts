@@ -1,4 +1,4 @@
-import { ICompany } from '@lib/client-types';
+import { ICompany } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('COMPANY/INIT')();

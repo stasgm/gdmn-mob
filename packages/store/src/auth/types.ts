@@ -1,5 +1,5 @@
-import { IDevice, IUser } from '@lib/types';
-import { IApiConfig, ICompany } from '@lib/client-types';
+import { IDevice, IUser, ICompany } from '@lib/types';
+import { IApiConfig } from '@lib/client-types';
 
 export type IAuthState = {
   readonly user: IUser | null | undefined;

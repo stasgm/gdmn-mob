@@ -1,12 +1,11 @@
-import { NewCompany, CompanyDto, UserDto, IResponse, IUser } from '@lib/types';
-import { ICompany } from '@lib/client-types';
+import { NewCompany, IResponse, IUser, ICompany } from '@lib/types';
 
 import { error, company as types } from '../types';
 
 import { api } from '../config';
 
 const addCompany = async (newCompany: NewCompany) => {
-  const res = await api.post<IResponse<CompanyDto>>('/companies', newCompany);
+  const res = await api.post<IResponse<ICompany>>('/companies', newCompany);
   const dto = res.data;
 
   if (!dto.result || !dto.data) {
@@ -15,16 +14,16 @@ const addCompany = async (newCompany: NewCompany) => {
       message: res.data.error,
     } as error.INetworkError;
   }
-  const newObject = await mapDtoToObject(dto.data);
+  // const newObject = await mapDtoToObject(dto.data);
 
   return {
     type: 'ADD_COMPANY',
-    company: newObject,
+    company: dto.data,
   } as types.IAddCompanyResponse;
 };
 
 const getCompanies = async () => {
-  const res = await api.get<IResponse<CompanyDto[]>>('/companies');
+  const res = await api.get<IResponse<ICompany[]>>('/companies');
   const dto = res.data;
 
   if (!dto.result || !dto.data) {
@@ -34,20 +33,20 @@ const getCompanies = async () => {
     } as error.INetworkError;
   }
 
-  const promises = dto.data.map(async (i) => {
-    return await mapDtoToObject(i);
-  });
+  // const promises = dto.data.map(async (i) => {
+  //   return await mapDtoToObject(i);
+  // });
 
-  const newObjects = await Promise.all(promises);
+  // const newObjects = await Promise.all(promises);
 
-  return ({
+  return {
     type: 'GET_COMPANIES',
-    companies: newObjects,
-  } as unknown) as types.IGetCompaniesResponse;
+    companies: dto.data,
+  } as types.IGetCompaniesResponse;
 };
 
 const getCompany = async (companyId: string) => {
-  const res = await api.get<IResponse<CompanyDto>>(`/companies/${companyId}`);
+  const res = await api.get<IResponse<ICompany>>(`/companies/${companyId}`);
   const dto = res.data;
 
   if (!dto.result || !dto.data) {
@@ -56,15 +55,15 @@ const getCompany = async (companyId: string) => {
       message: res.data.error,
     } as error.INetworkError;
   }
-  const newObject = await mapDtoToObject(dto.data);
+  // const newObject = await mapDtoToObject(dto.data);
   return {
     type: 'GET_COMPANY',
-    company: newObject,
+    company: dto.data,
   } as types.IGetCompanyResponse;
 };
 
 const updateCompany = async (object: Partial<ICompany>) => {
-  const res = await api.patch<IResponse<CompanyDto>>(`/companies/${object.id}`, object);
+  const res = await api.patch<IResponse<ICompany>>(`/companies/${object.id}`, object);
   const dto = res.data;
 
   if (!dto.result || !dto.data) {
@@ -73,11 +72,11 @@ const updateCompany = async (object: Partial<ICompany>) => {
       message: res.data.error,
     } as error.INetworkError;
   }
-  const newObject = await mapDtoToObject(dto.data);
+  // const newObject = await mapDtoToObject(dto.data);
 
   return {
     type: 'UPDATE_COMPANY',
-    company: newObject,
+    company: dto.data,
   } as types.IUpdateCompanyResponse;
 };
 
@@ -122,18 +121,18 @@ export default {
   removeCompany,
 };
 
-const mapDtoToObject = async (companyDto: CompanyDto): Promise<ICompany> => {
-  let user = {} as IUser;
+// const mapDtoToObject = async (companyDto: CompanyDto): Promise<ICompany> => {
+//   let user = {} as IUser;
 
-  const res = await api.get<IResponse<UserDto>>(`/users/${companyDto.adminId}`);
-  const adminDto = res.data;
+//   const res = await api.get<IResponse<IUser>>(`/users/${companyDto.adminId}`);
+//   const adminDto = res.data;
 
-  if (adminDto.data) {
-    user = adminDto.data;
-  }
+//   if (adminDto.data) {
+//     user = adminDto.data;
+//   }
 
-  return {
-    ...companyDto,
-    admin: user,
-  };
-};
+//   return {
+//     ...companyDto,
+//     admin: user,
+//   };
+// };

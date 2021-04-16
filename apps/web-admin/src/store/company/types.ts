@@ -1,4 +1,4 @@
-import { ICompany } from '@lib/client-types';
+import { ICompany } from '@lib/types';
 
 export type ICompanyState = {
   readonly list: ICompany[];

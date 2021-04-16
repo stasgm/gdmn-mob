@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/client-types';
+import { ICompany } from '@lib/types';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -31,17 +31,11 @@ const CompanyEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
-  // const [company, setCompany] = useState<ICompany>();
+  // const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     dispatch(actions.fetchCompanyById(companyId));
   }, [companyId, dispatch]);
-
-  /*   const onSuccessfulLoad = (company?: ICompany) => {
-    if (company) {
-      setCompany(company);
-    }
-  }; */
 
   const onSuccessfulSave = () => {
     navigate('/app/companies');
@@ -60,12 +54,13 @@ const CompanyEdit = () => {
   }
 
   const formik = useFormik<ICompany>({
+    enableReinitialize: true,
     initialValues: company,
     enableReinitialize: true,
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
-    onSubmit: async (values) => {
+    onSubmit: (values) => {
       dispatch(actions.updateCompany(values, onSuccessfulSave));
     },
   });
@@ -100,7 +95,7 @@ const CompanyEdit = () => {
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   type="name"
-                  value={formik.values.name}
+                  value={company.name}
                 />
               </Grid>
             </Grid>
