@@ -98,7 +98,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
   return (
     <Card {...rest}>
       <PerfectScrollbar>
-        <Box sx={{ minWidth: 1050 }}>
+        <Box sx={{ minWidth: 1050, p: 1 }}>
           <Table>
             <TableHead>
               <TableRow>
