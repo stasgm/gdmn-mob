@@ -33,8 +33,8 @@ class Api {
   private readonly axios: AxiosInstance;
 
   constructor(private config: IApiConfig, private deviceId: string = '') {
-    this.config = config;
-    this.deviceId = deviceId;
+    // this.config = config;
+    // this.deviceId = deviceId;
     // const config = defaultConfig;
     this.axios = axios.create({
       baseURL: `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`,
@@ -46,7 +46,9 @@ class Api {
     this.axios.interceptors.request.use(
       (request) => {
         // Добавляем  device_ID
-        request.params['deviceId'] = this.deviceId;
+        if (this.deviceId) {
+          request.params['deviceId'] = this.deviceId;
+        }
         console.info('✉️ request', request);
         return request;
       },

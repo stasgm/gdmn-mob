@@ -56,7 +56,6 @@ const CompanyEdit = () => {
   const formik = useFormik<ICompany>({
     enableReinitialize: true,
     initialValues: company,
-    enableReinitialize: true,
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
