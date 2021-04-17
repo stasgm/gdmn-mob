@@ -1,4 +1,4 @@
-import { Box, Button, TextField, InputAdornment, SvgIcon, Hidden, IconButton, Toolbar } from '@material-ui/core';
+import { Box, Button, TextField, InputAdornment, SvgIcon, Hidden, IconButton, Toolbar, Card } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { Search as SearchIcon } from 'react-feather';
 
@@ -31,7 +31,7 @@ const TopToolbar = ({ buttons, searchTitle }: props) => {
   );
 
   return (
-    <Box>
+    <Card>
       <Box
         sx={{
           display: 'flex',
@@ -39,14 +39,15 @@ const TopToolbar = ({ buttons, searchTitle }: props) => {
           justifyContent: 'space-between',
         }}
       >
-        <Box sx={{ maxWidth: 500, minWidth: 200, flexGrow: 1 }}>
+        <Box sx={{ maxWidth: 500, minWidth: 200, flexGrow: 1, alignSelf: 'center' }}>
           <TextField
             fullWidth
-            sx={{ backgroundColor: 'background.paper' }}
+            // size='small'
+            sx={{ p: 2 }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SvgIcon fontSize="small" color="action">
+                  <SvgIcon fontSize="small">
                     <SearchIcon />
                   </SvgIcon>
                 </InputAdornment>
@@ -75,7 +76,7 @@ const TopToolbar = ({ buttons, searchTitle }: props) => {
           </Toolbar>
         </Box>
       </Box>
-    </Box>
+    </Card>
   );
 };
 

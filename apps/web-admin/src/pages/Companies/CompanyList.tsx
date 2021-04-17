@@ -30,30 +30,31 @@ const CompanyList = () => {
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     !list?.length && fetchCompanies();
-  }, [fetchCompanies]);
+  }, [fetchCompanies, list?.length]);
 
   const buttons: IToolBarButton[] = [
     {
-      name: 'Load',
+      name: 'Обновить',
+      sx: { mx: 1 },
       onClick: () => fetchCompanies(),
       icon: <CachedIcon />,
     },
     {
-      name: 'Import',
+      name: 'Загрузить',
       onClick: () => {
         return;
       },
       icon: <ImportExportIcon />,
     },
     {
-      name: 'Export',
+      name: 'Выгрузить',
       sx: { mx: 1 },
       onClick: () => {
         return;
       },
     },
     {
-      name: ' Add company',
+      name: 'Добавить',
       color: 'primary',
       variant: 'contained',
       onClick: () => navigate(`${location.pathname}/new`),
@@ -78,7 +79,7 @@ const CompanyList = () => {
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
-            <Box sx={{ pt: 3 }}>
+            <Box sx={{ pt: 2 }}>
               <CompanyListTable companies={list} />
             </Box>
           )}
