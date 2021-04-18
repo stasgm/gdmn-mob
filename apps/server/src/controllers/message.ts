@@ -70,9 +70,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   const company = await companyService.findOneByName(companyName);
 
-  const { userName } = await userService.findOne(userId);
+  const { name } = await userService.findOne(userId);
 
-  if (userName === 'gdmn') {
+  if (name === 'gdmn') {
     // TODO переделать
     userId = 'gdmn';
   }
@@ -108,9 +108,9 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   try {
     let userId = ctx.state.user.id;
 
-    const { userName } = await userService.findOne(userId);
+    const { name } = await userService.findOne(userId);
 
-    if (userName === 'gdmn') {
+    if (name === 'gdmn') {
       // TODO переделать
       userId = 'gdmn';
     }

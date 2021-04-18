@@ -1,70 +1,77 @@
+import { AxiosInstance } from 'axios';
 import { IResponse, IUser } from '@lib/types';
 
 import { error, user as types } from '../types';
 
-import { api } from '../config';
+import { BaseApi } from '../requests/baseApi';
 
-const getUsers = async () => {
-  const res = await api.get<IResponse<IUser[]>>('/users');
-  const userData = res.data;
-
-  if (userData.result) {
-    return {
-      type: 'GET_USERS',
-      users: userData.data,
-    } as types.IGetUsersResponse;
+class User extends BaseApi {
+  constructor(api: AxiosInstance, deviceId: string) {
+    super(api, deviceId);
   }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as error.INetworkError;
-};
 
-const getUser = async (userId: string) => {
-  const res = await api.get<IResponse<IUser>>(`/users/${userId}`);
-  const userData = res.data;
+  getUsers = async () => {
+    const res = await this.api.get<IResponse<IUser[]>>('/users');
+    const userData = res.data;
 
-  if (userData.result) {
+    if (userData.result) {
+      return {
+        type: 'GET_USERS',
+        users: userData.data,
+      } as types.IGetUsersResponse;
+    }
     return {
-      type: 'GET_USER',
-      user: userData.data,
-    } as types.IGetUserResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: userData.error,
+    } as error.INetworkError;
+  };
 
-const updateUser = async (user: Partial<IUser>) => {
-  const res = await api.patch<IResponse<string>>(`/users/${user.id}`, user);
-  const userData = res.data;
+  getUser = async (userId: string) => {
+    const res = await this.api.get<IResponse<IUser>>(`/users/${userId}`);
+    const userData = res.data;
 
-  if (userData.result) {
+    if (userData.result) {
+      return {
+        type: 'GET_USER',
+        user: userData.data,
+      } as types.IGetUserResponse;
+    }
     return {
-      type: 'UPDATE_USER',
-      userId: userData.data,
-    } as types.IUpdateUserResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: userData.error,
+    } as error.INetworkError;
+  };
 
-const removeUser = async (userId: string) => {
-  const res = await api.delete<IResponse<void>>(`/users/${userId}`);
-  const userData = res.data;
+  updateUser = async (user: Partial<IUser>) => {
+    const res = await this.api.patch<IResponse<string>>(`/users/${user.id}`, user);
+    const userData = res.data;
 
-  if (userData.result) {
+    if (userData.result) {
+      return {
+        type: 'UPDATE_USER',
+        userId: userData.data,
+      } as types.IUpdateUserResponse;
+    }
     return {
-      type: 'REMOVE_USER',
-    } as types.IRemoveUserResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: userData.error,
+    } as error.INetworkError;
+  };
 
-export default { getUsers, getUser, updateUser, removeUser };
+  removeUser = async (userId: string) => {
+    const res = await this.api.delete<IResponse<void>>(`/users/${userId}`);
+    const userData = res.data;
+
+    if (userData.result) {
+      return {
+        type: 'REMOVE_USER',
+      } as types.IRemoveUserResponse;
+    }
+    return {
+      type: 'ERROR',
+      message: userData.error,
+    } as error.INetworkError;
+  };
+}
+
+export default User;

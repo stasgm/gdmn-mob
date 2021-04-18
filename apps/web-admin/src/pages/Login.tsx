@@ -19,11 +19,11 @@ const Login = () => {
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {
-      userName: 'Stas',
+      name: 'Stas',
       password: '@123!',
     },
     validationSchema: yup.object().shape({
-      userName: yup.string().required('Required'),
+      name: yup.string().required('Required'),
       password: yup.string().required('Required'),
     }),
     onSubmit: () => {
@@ -85,16 +85,16 @@ const Login = () => {
               )}
             </Box>
             <TextField
-              error={formik.touched.userName && Boolean(formik.errors.userName)}
+              error={formik.touched.name && Boolean(formik.errors.name)}
               fullWidth
-              helperText={formik.values.userName && formik.errors.userName}
+              helperText={formik.values.name && formik.errors.name}
               label="Имя пользователя"
               margin="normal"
-              name="userName"
+              name="name"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               type="name"
-              value={formik.values.userName}
+              value={formik.values.name}
               variant="outlined"
               disabled={loading}
             />
@@ -115,7 +115,7 @@ const Login = () => {
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={loading || !!formik.errors.password || !!formik.errors.userName}
+                disabled={loading || !!formik.errors.password || !!formik.errors.name}
                 fullWidth
                 size="large"
                 type="submit"

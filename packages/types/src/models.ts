@@ -1,54 +1,4 @@
-export interface IUserProfile {
-  id?: string;
-  userName: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  creatorId: string;
-}
-
-export type userRole = 'Admin' | 'User';
-
-export interface IDBUser extends INamedEntity, IExernalSystemProps {
-  password: string;
-  creatorId: string;
-  role: userRole;
-  activationCode?: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-}
-
-export interface IUser extends Omit<IDBUser, 'creatorId' | 'companies'> {
-  creator: INamedEntity;
-  companies?: INamedEntity[];
-}
-
-export type NewUser = Pick<IDBUser, 'name' | 'externalId'>;
-
-export interface IActivationCode {
-  id?: string;
-  code: string;
-  date: string;
-  deviceId: string;
-}
-
-export interface IDBCompany extends INamedEntity, IExernalSystemProps {
-  adminId: string;
-}
-
-export interface ICompany extends Omit<IDBCompany, 'adminId'> {
-  admin: INamedEntity;
-}
-
-export type NewCompany = Pick<IDBCompany, 'name' | 'externalId'>;
-
-// export type CompanyDto = IDBCompany;
-
-// export type IUser = IUser;
-
+// Базовые типы
 export interface IEntity {
   id: string;
   createDate?: string;
@@ -59,26 +9,67 @@ export interface INamedEntity extends IEntity {
   name: string;
 }
 
-export interface IExernalSystemProps {
+export interface IExternalSystemProps {
   externalId?: string;
 }
 
 export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
-export interface IDevice {
-  id?: string;
+export type UserRole = 'Admin' | 'User';
+
+// Типы для хранения данных в бд
+export interface IDBUser extends INamedEntity, IExternalSystemProps {
+  password: string;
+  creatorId: string;
+  role: UserRole;
+  // activationCode?: string; // код активации должен быть не у пользователя а в талице кодов активации
+  companies: string[]; // по умолчанию пустой массив
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
+export interface IDBCompany extends INamedEntity, IExternalSystemProps {
+  adminId: string;
+}
+
+export interface IDBDevice {
+  id: string;
   name: string;
   userId: string;
-  uid?: string;
+  uid: string;
   state: DeviceState;
 }
+
+export interface IDBActivationCode {
+  id?: string;
+  code: string;
+  date: string;
+  deviceId: string;
+}
+
+// Типы для передачи и хранения данных на клиенте
+export interface IUser extends Omit<IDBUser, 'creatorId' | 'companies' | 'password'> {
+  creator?: INamedEntity;
+  companies: INamedEntity[];
+}
+
+export type NewUser = Pick<IDBUser, 'name' | 'externalId'>;
+
+export type IUserCredentials = Pick<IDBUser, 'name' | 'password'>;
+
+export interface ICompany extends Omit<IDBCompany, 'adminId'> {
+  admin: INamedEntity;
+}
+
+export type NewCompany = Pick<IDBCompany, 'name' | 'externalId'>;
 
 // export interface IDeviceInfo {
 //   id: string;
 //   deviceId: string;
 //   deviceName: string;
 //   userId: string;
-//   userName: string;
+//   name: string;
 //   state: DeviceState;
 // }
 
@@ -87,7 +78,7 @@ export interface IMessageInfo {
   date: Date;
 }
 
-export interface IMessage<T = any> {
+export interface IDBMessage<T = any> {
   id?: string;
   head: {
     id: string;
@@ -110,7 +101,5 @@ export interface IDataMessage<T = any> {
   data: T;
 }
 
-export interface IUserCredentials {
-  userName: string;
-  password: string;
-}
+export type IMessage = IDBMessage;
+export type IDevice = IDBDevice;

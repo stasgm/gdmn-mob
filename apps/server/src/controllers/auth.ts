@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, UserDto } from '@lib/types';
+import { IResponse, IUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -8,26 +8,26 @@ import { authService, deviceService } from '../services';
 /** Вход пользователя */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { deviceId } = ctx.query;
-  const { userName, password } = ctx.request.body;
+  const { name, password } = ctx.request.body;
 
-  if (!userName) {
-    ctx.throw(400, 'не указано имя пользователя');
+  if (!name) {
+    ctx.throw(400, 'Не указано имя пользователя');
   }
 
   if (!password) {
-    ctx.throw(400, 'не указан пароль');
+    ctx.throw(400, 'Не указан пароль');
   }
 
   if (!deviceId) {
-    ctx.throw(400, 'не указан идентификатор устройства');
+    ctx.throw(400, 'Не указан идентификатор устройства');
   }
 
   try {
     await authService.authenticate(ctx as Context, next);
 
-    const user = ctx.state.user as UserDto;
+    const user = ctx.state.user as IUser;
 
-    const result: IResponse<string> = { result: true, data: user.id };
+    const result: IResponse<IUser> = { result: true, data: user };
 
     ctx.status = 200;
     ctx.body = result;
@@ -44,12 +44,12 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   delete user.password;
 
-  const res: IResponse<UserDto> = { result: true, data: user };
+  const res: IResponse<IUser> = { result: true, data: user };
 
   ctx.status = 200;
   ctx.body = res;
 
-  log.info(`getCurrentUser: user '${ctx.state.user.userName}' authenticated`);
+  log.info(`getCurrentUser: user '${ctx.state.user.name}' authenticated`);
 };
 
 const logOut = (ctx: Context): void => {
@@ -62,41 +62,44 @@ const logOut = (ctx: Context): void => {
   ctx.status = 200;
   ctx.body = res;
 
-  log.info(`logOut: user '${user.userName}' successfully logged out`);
+  log.info(`logOut: user '${user.name}' successfully logged out`);
 };
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   // const { deviceId } = ctx.query;
-  const { externalId, userName, password, firstName, lastName, phoneNumber, companies, creatorId } = ctx.request.body;
+  const { externalId, name, password, firstName, lastName, phoneNumber, companies, creator } = ctx.request.body as Omit<
+    IUser,
+    'role' | 'id'
+  > & { password: string };
 
-  if (!userName) {
-    ctx.throw(400, 'не указано имя пользователя');
+  if (!name) {
+    ctx.throw(400, 'Не указано имя пользователя');
   }
 
   if (!password) {
-    ctx.throw(400, 'не указан пароль пользователя');
+    ctx.throw(400, 'Не указан пароль');
   }
 
-  const user = {
+  const user: Omit<IUser, 'role' | 'id'> & { password: string } = {
     externalId,
-    userName,
     password,
+    name,
     firstName,
     lastName,
     phoneNumber,
     companies: companies || [],
-    creatorId: creatorId || userName,
-  } as UserDto;
+    creator,
+  };
 
   try {
-    const id = await authService.signUp({ user });
+    const newUser = await authService.signUp({ user });
 
-    const result: IResponse<string> = { result: true, data: id };
+    const result: IResponse<IUser> = { result: true, data: newUser };
 
     ctx.status = 200;
     ctx.body = result;
 
-    log.info(`signUp: user '${userName}' is successfully signed up`);
+    log.info(`signUp: user '${name}' is successfully signed up`);
   } catch (err) {
     ctx.throw(400, err.message);
   }

@@ -1,13 +1,13 @@
-import { UserDto, IMessage, IDevice, IActivationCode, IDBCompany } from '@lib/types';
+import { IDBUser, IDBMessage, IDBDevice, IDBActivationCode, IDBCompany } from '@lib/types';
 
 import { Database } from '../../utils/json-db';
 
 const db = new Database('mob-app');
 
-const users = db.collection<UserDto>('user');
-const codes = db.collection<IActivationCode>('activation-codes');
+const users = db.collection<IDBUser>('user');
+const codes = db.collection<IDBActivationCode>('activation-codes');
 const companies = db.collection<IDBCompany>('companies');
-const messages = db.collection<IMessage>('messages');
-const devices = db.collection<IDevice>('devices');
+const messages = db.collection<IDBMessage>('messages');
+const devices = db.collection<IDBDevice>('devices');
 
 export { users, codes, companies, messages, devices };

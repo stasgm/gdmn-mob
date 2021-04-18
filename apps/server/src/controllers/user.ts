@@ -1,11 +1,9 @@
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, UserDto, IUserProfile, IDevice } from '@lib/types';
+import { IResponse, IUser, IDBDevice } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
-import { hashPassword } from '../utils/crypt';
-import { makeProfile } from '../utils/user';
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
@@ -15,15 +13,15 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const profile = await userService.findOne(userId);
+    const user = await userService.findOne(userId);
 
-    if (!profile) {
+    if (!user) {
       ctx.throw(404, 'пользователь не найден');
     }
 
-    const result: IResponse<IUserProfile> = {
+    const result: IResponse<IUser> = {
       result: true,
-      data: makeProfile(profile),
+      data: user,
     };
 
     ctx.status = 200;
@@ -37,9 +35,9 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   try {
-    const user = await userService.findAll();
+    const users = await userService.findAll();
 
-    const result: IResponse<IUserProfile[]> = { result: true, data: user };
+    const result: IResponse<IUser[]> = { result: true, data: users };
 
     ctx.status = 200;
     ctx.body = result;
@@ -52,43 +50,20 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-  const user = ctx.request.body as Partial<UserDto>;
+  const userData = ctx.request.body as Partial<IUser & { password: string }>;
 
   if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
+    ctx.throw(400, 'Не указан идентификатор пользователя');
   }
 
-  if (!user) {
-    ctx.throw(400, 'не указаны данные пользователя');
+  if (!userData) {
+    ctx.throw(400, 'Не указаны данные пользователя');
   }
-
-  const oldUser = await userService.findOne(userId);
-
-  // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
-
-  if (!oldUser) {
-    ctx.throw(400, 'пользователь не найден');
-  }
-
-  let passwordHash: string | undefined;
-
-  if (user.password) {
-    passwordHash = await hashPassword(user.password);
-  }
-
-  // Удаляем поля, которые нелья менять
-  delete user.creatorId;
-  delete user.role;
 
   try {
-    const id = await userService.updateOne({
-      ...oldUser,
-      ...user,
-      id: userId,
-      password: passwordHash ?? oldUser.password,
-    });
+    const updatedUser = await userService.updateOne(userId, userData);
 
-    const result: IResponse<string> = { result: true, data: id };
+    const result: IResponse<IUser> = { result: true, data: updatedUser };
 
     ctx.status = 200;
     ctx.body = result;
@@ -103,7 +78,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
+    ctx.throw(400, 'Не указан идентификатор пользователя');
   }
 
   // TODO пользовате
@@ -129,9 +104,9 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDevice[];
+    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDBDevice[];
 
-    const result: IResponse<IDevice[]> = { result: true, data: deviceIfno };
+    const result: IResponse<IDBDevice[]> = { result: true, data: deviceIfno };
 
     ctx.status = 200;
     ctx.body = result;

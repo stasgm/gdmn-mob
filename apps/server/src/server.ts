@@ -6,11 +6,11 @@ import koaCors from '@koa/cors';
 
 import session from 'koa-session';
 import passport from 'koa-passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import { Strategy as LocalStrategy, IStrategyOptions } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
-import { UserDto } from '@lib/types';
+import { IUser } from '@lib/types';
 
 import config from '../config';
 
@@ -33,11 +33,12 @@ const CONFIG = {
   sameSite: true /** (string) lets require that a cookie shouldn't
     be sent with cross-origin requests (default undefined) */,
 };
+
 export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
-  passport.serializeUser((user: unknown, done) => done(null, (user as UserDto).id));
+  passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
@@ -48,7 +49,8 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     }
   });
 
-  passport.use(new LocalStrategy({ usernameField: 'userName' }, validateAuthCreds));
+  const strategy: IStrategyOptions = { usernameField: 'name' };
+  passport.use(new LocalStrategy(strategy, validateAuthCreds));
 
   // Логи для Morgan
   const logPath = path.join(process.cwd(), '/logs/');

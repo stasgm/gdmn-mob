@@ -1,13 +1,12 @@
 import { ParameterizedContext } from 'koa';
 
-import { IDevice, IResponse } from '@lib/types';
+import { IDBDevice, IResponse } from '@lib/types';
 
 import log from '../utils/logger';
 import { deviceService } from '../services';
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
-  // const { userId }: { userId: string } = ctx.request.body;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');
@@ -20,7 +19,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
       ctx.throw(404, 'устройство не найдено');
     }
 
-    const result: IResponse<IDevice> = { result: true, data: device };
+    const result: IResponse<IDBDevice> = { result: true, data: device };
 
     ctx.status = 200;
     ctx.body = result;
@@ -32,27 +31,27 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId, userName }: { id: string; userName: string } = ctx.params;
+  const { id: deviceId, name }: { id: string; name: string } = ctx.params;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан uid устройства');
   }
 
-  if (!userName) {
+  if (!name) {
     ctx.throw(400, 'не указано имя пользователя');
   }
 
   try {
     const device = await deviceService.findOneByUidAndUser({
       deviceId,
-      userName,
+      name,
     });
 
     if (!device) {
       ctx.throw(404, 'устройство не найдено');
     }
 
-    const result: IResponse<IDevice> = { result: true, data: device };
+    const result: IResponse<IDBDevice> = { result: true, data: device };
 
     ctx.status = 200;
     ctx.body = result;
@@ -67,7 +66,7 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
   try {
     const deviceList = await deviceService.findAll();
 
-    const result: IResponse<IDevice[]> = { result: true, data: deviceList };
+    const result: IResponse<IDBDevice[]> = { result: true, data: deviceList };
 
     ctx.status = 200;
     ctx.body = result;
@@ -137,9 +136,9 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const userList = ((await deviceService.findUsers(deviceId)) as unknown) as IDevice[];
+    const userList = ((await deviceService.findUsers(deviceId)) as unknown) as IDBDevice[];
 
-    const result: IResponse<IDevice[]> = { result: true, data: userList };
+    const result: IResponse<IDBDevice[]> = { result: true, data: userList };
 
     ctx.status = 200;
     ctx.body = result;
@@ -152,7 +151,7 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId } = ctx.params;
-  const deviceInfo = ctx.request.body as Partial<IDevice>;
+  const deviceInfo = ctx.request.body as Partial<IDBDevice>;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');

@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IDBCompany, IResponse, IUserProfile } from '@lib/types';
+import { IDBCompany, IResponse } from '@lib/types';
 
 import log from '../utils/logger';
 import { companyService } from '../services';
@@ -11,7 +11,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.state.user;
 
   if (!name) {
-    ctx.throw(400, 'не указано название организации');
+    ctx.throw(400, 'Не указано название компании');
   }
 
   const company: IDBCompany = { id: name, name, adminId: userId, externalId };
@@ -73,7 +73,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   } */
 
   if (!oldCompany) {
-    ctx.throw(400, 'организация не найдена');
+    ctx.throw(400, 'Компания не найдена');
   }
 
   // Удаляем поля которые нельзя перезаписывать
@@ -96,7 +96,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
+/* const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
   if (!companyId) {
@@ -115,11 +115,11 @@ const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
   } catch (err) {
     ctx.throw(400, err);
   }
-};
+}; */
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   try {
-    const companyList = await companyService.findAll();
+    const companyList = await companyService.findMany();
 
     const result: IResponse<IDBCompany[]> = { result: true, data: companyList };
 
@@ -153,4 +153,4 @@ const deleteCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { addCompany, updateCompany, getCompany, getUsersByCompany, getCompanies, deleteCompany };
+export { addCompany, updateCompany, getCompany, /* getUsersByCompany,  */ getCompanies, deleteCompany };

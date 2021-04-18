@@ -1,114 +1,113 @@
+import { AxiosInstance } from 'axios';
 import { IMessage, IMessageInfo, IResponse } from '@lib/types';
 
 import { error, message as types } from '../types';
+import { BaseApi } from '../requests/baseApi';
 
-import { api } from '../config';
+class Message extends BaseApi {
+  constructor(api: AxiosInstance, deviceId: string) {
+    super(api, deviceId);
+  }
 
-const sendMessages = async (systemName: string, companyId: string, consumer: string, message: IMessage['body']) => {
-  const body = {
-    head: { companyId, consumer, appSystem: systemName },
-    message,
+  sendMessages = async (systemName: string, companyId: string, consumer: string, message: IMessage['body']) => {
+    const body = {
+      head: { companyId, consumer, appSystem: systemName },
+      message,
+    };
+    const res = await this.api.post<IResponse<IMessageInfo>>('/messages', body);
+    const resData = res.data;
+    if (resData.result) {
+      return {
+        type: 'SEND_MESSAGE',
+        uid: resData.data?.uid,
+        date: resData.data?.date,
+      } as types.ISendMessageResponse;
+    }
+    return {
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
   };
-  const res = await api.post<IResponse<IMessageInfo>>('/messages', body);
-  const resData = res.data;
-  if (resData.result) {
+
+  getMessages = async (systemName: string, companyId: string) => {
+    const res = await this.api.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemName}`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'GET_MESSAGES',
+        messageList: resData.data,
+      } as types.IGetMessagesResponse;
+    }
     return {
-      type: 'SEND_MESSAGE',
-      uid: resData.data?.uid,
-      date: resData.data?.date,
-    } as types.ISendMessageResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const getMessages = async (systemName: string, companyId: string) => {
-  const res = await api.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemName}`);
-  const resData = res.data;
+  removeMessage = async (companyId: string, uid: string) => {
+    const res = await this.api.delete<IResponse<void>>(`/messages/${companyId}/${uid}`);
+    const resData = res.data;
 
-  if (resData.result) {
+    if (resData.result) {
+      return {
+        type: 'REMOVE_MESSAGE',
+      } as types.IRemoveMessageResponse;
+    }
     return {
-      type: 'GET_MESSAGES',
-      messageList: resData.data,
-    } as types.IGetMessagesResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const removeMessage = async (companyId: string, uid: string) => {
-  const res = await api.delete<IResponse<void>>(`/messages/${companyId}/${uid}`);
-  const resData = res.data;
+  clear = async () => {
+    const res = await this.api.delete<IResponse<void>>('/messages');
+    const resData = res.data;
 
-  if (resData.result) {
+    if (resData.result) {
+      return {
+        type: 'CLEAR_MESSAGES',
+      } as types.IClearMessagesResponse;
+    }
     return {
-      type: 'REMOVE_MESSAGE',
-    } as types.IRemoveMessageResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const clear = async () => {
-  const res = await api.delete<IResponse<void>>('/messages');
-  const resData = res.data;
+  subscribe = async (systemName: string, companyId: string) => {
+    const res = await this.api.get<IResponse<IMessage[]>>(`/messages/subscribe/${companyId}/${systemName}`);
+    const resData = res.data;
 
-  if (resData.result) {
+    if (resData.result) {
+      return {
+        type: 'SUBSCRIBE',
+        messageList: resData.data,
+      } as types.ISubscribeResponse;
+    }
     return {
-      type: 'CLEAR_MESSAGES',
-    } as types.IClearMessagesResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const subscribe = async (systemName: string, companyId: string) => {
-  const res = await api.get<IResponse<IMessage[]>>(`/messages/subscribe/${companyId}/${systemName}`);
-  const resData = res.data;
+  publish = async (companyId: string, consumer: string, message: IMessage['body']) => {
+    const body = { head: { companyId, consumer }, message };
+    const res = await this.api.post<IResponse<IMessageInfo>>(`/messages/publish/${companyId}`, body);
+    const resData = res.data;
 
-  if (resData.result) {
+    if (resData.result) {
+      return {
+        type: 'PUBLISH',
+        uid: resData.data?.uid,
+        date: resData.data?.date,
+      } as types.IPublishResponse;
+    }
     return {
-      type: 'SUBSCRIBE',
-      messageList: resData.data,
-    } as types.ISubscribeResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
+}
 
-const publish = async (companyId: string, consumer: string, message: IMessage['body']) => {
-  const body = { head: { companyId, consumer }, message };
-  const res = await api.post<IResponse<IMessageInfo>>(`/messages/publish/${companyId}`, body);
-  const resData = res.data;
-
-  if (resData.result) {
-    return {
-      type: 'PUBLISH',
-      uid: resData.data?.uid,
-      date: resData.data?.date,
-    } as types.IPublishResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as error.INetworkError;
-};
-
-export default {
-  sendMessages,
-  getMessages,
-  removeMessage,
-  clear,
-  subscribe,
-  publish,
-};
+export default Message;

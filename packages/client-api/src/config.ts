@@ -1,3 +1,4 @@
+/*
 import axios from 'axios';
 import { device } from '@lib/mock';
 import { config } from '@lib/client-config';
@@ -18,3 +19,4 @@ export const api = axios.create({
   baseURL: URL,
   params,
 });
+*/

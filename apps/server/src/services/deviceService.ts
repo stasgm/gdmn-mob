@@ -1,4 +1,4 @@
-import { IDevice } from '@lib/types';
+import { IDBDevice } from '@lib/types';
 
 import { devices, codes, users } from './dao/db';
 
@@ -10,11 +10,11 @@ const findAll = async () => {
   return devices.read();
 };
 
-const findOneByUidAndUser = async ({ deviceId, userName }: { deviceId: string; userName: string }) => {
-  const user = await users.find((i) => i.userName.toUpperCase() === userName.toUpperCase());
+const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name: string }) => {
+  const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new Error('пользователь не найден');
+    throw new Error('Пользователь не найден');
   }
 
   return devices.find((i) => i.uid === deviceId && i.userId === user.id);
@@ -30,7 +30,7 @@ const findOneByUid = async (uid: string) => {
  * */
 const findUsers = async (deviceId: string) => {
   if (!(await devices.find(deviceId))) {
-    throw new Error('устройство не найдено');
+    throw new Error('Устройство не найдено');
   }
 
   return (await devices.read())
@@ -39,13 +39,13 @@ const findUsers = async (deviceId: string) => {
       const device = await devices.find(deviceId);
 
       if (!device) {
-        throw new Error('устройство не найдено');
+        throw new Error('Устройство не найдено');
       }
 
       const user = await users.find(i.userId);
 
       if (!user) {
-        throw new Error('пользователь не найден');
+        throw new Error('Пользователь не найден');
       }
 
       return {
@@ -71,6 +71,7 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
   }
 
   return devices.insert({
+    id: '',
     name: deviceName,
     uid: '',
     state: 'NEW',
@@ -80,10 +81,10 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
 
 /**
  * Обновляет устройство
- * @param {IDevice} device - устройство
+ * @param {IDBDevice} device - устройство
  * @return uid, идентификатор устройства
  * */
-const updateOne = async (device: IDevice) => {
+const updateOne = async (device: IDBDevice) => {
   await devices.update(device);
 
   return device.id; // ?????

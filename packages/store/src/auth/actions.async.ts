@@ -5,7 +5,7 @@ import { IUserCredentials } from '@lib/types';
 
 import { device, user } from '@lib/mock';
 
-import Api, { types, requests } from '@lib/client-api';
+import Api, { types } from '@lib/client-api';
 
 import { config } from '@lib/client-config';
 
@@ -36,7 +36,7 @@ const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
       // response = { message: 'device not found', type: 'ERROR' };
     } else {
       // response = await requests.device.getDevice(device.uid || '');
-      response = await api.getDevice();
+      response = await api.device.getDevice(deviceId);
     }
 
     if (response.type === 'GET_DEVICE') {
@@ -66,7 +66,7 @@ const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, An
         return dispatch(authActions.activateDeviceAsync.failure('не верный код'));
       }
     } else {
-      response = await requests.auth.verifyCode(code);
+      response = await api.auth.verifyCode(code);
     }
 
     if (response.type === 'VERIFY_CODE') {
@@ -90,13 +90,13 @@ const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, un
     if (isMock) {
       await sleep(500);
 
-      if (credentials.userName === 'Stas' && credentials.password === '@123!') {
+      if (credentials.name === 'Stas' && credentials.password === '@123!') {
         response = { type: 'LOGIN', user };
       } else {
         return dispatch(authActions.loginUserAsync.failure('не верные данные'));
       }
     } else {
-      response = await requests.auth.login(credentials);
+      response = await api.auth.login(credentials);
     }
 
     if (response.type === 'LOGIN') {

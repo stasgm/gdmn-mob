@@ -2,7 +2,7 @@
   "name": "@apps/server",
   "version": "0.1.0",
   "private": true,
-  "description": "Microservice for mobile application",
+  "description": "Microservice for web & molb application",
   "scripts": {
     "pm2:start": "pm2 start ./dist/server/src/index.js --watch --name mob-app",
     "pm2:status": "pm2 status mob-app",

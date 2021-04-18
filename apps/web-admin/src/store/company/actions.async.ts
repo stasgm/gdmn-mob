@@ -1,6 +1,6 @@
 import { sleep } from '@lib/store';
 
-import { types, requests } from '@lib/client-api';
+import Api, { types } from '@lib/client-api';
 
 import { companies, company2 } from '@lib/mock';
 import { config } from '@lib/client-config';
@@ -11,9 +11,18 @@ import { AppThunk } from '../';
 
 import { companyActions } from './actions';
 
-const {
+/* const {
   debug: { useMockup: isMock },
+} = config; */
+
+const {
+  debug: { useMockup: isMock, deviceId },
+  server: { name, port, protocol },
+  timeout,
+  apiPath,
 } = config;
+
+const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void): AppThunk => {
   return async (dispatch) => {
@@ -31,7 +40,7 @@ const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void):
         response = { message: 'Компания не найдена', type: 'ERROR' };
       }
     } else {
-      response = await requests.company.getCompany(id);
+      response = await api.company.getCompany(id);
     }
 
     if (response.type === 'GET_COMPANY') {
@@ -63,7 +72,7 @@ const fetchCompanies = (): AppThunk => {
       response = { companies, type: 'GET_COMPANIES' };
       // response = { message: 'device not found', type: 'ERROR' };
     } else {
-      response = await requests.company.getCompanies();
+      response = await api.company.getCompanies();
     }
 
     if (response.type === 'GET_COMPANIES') {
@@ -98,7 +107,7 @@ const addCompany = (company: NewCompany, onSuccess?: (company: ICompany) => void
         response = { company: { ...company, ...company2 }, type: 'ADD_COMPANY' };
       }
     } else {
-      response = await requests.company.addCompany(company);
+      response = await api.company.addCompany(company);
     }
 
     if (response.type === 'ADD_COMPANY') {
@@ -128,7 +137,7 @@ const updateCompany = (company: ICompany, onSuccess?: (company: ICompany) => voi
 
       response = { type: 'UPDATE_COMPANY', company };
     } else {
-      response = await requests.company.updateCompany(company);
+      response = await api.company.updateCompany(company);
     }
 
     if (response.type === 'UPDATE_COMPANY') {
