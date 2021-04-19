@@ -1,6 +1,4 @@
-import { useEffect } from 'react';
-
-import { Box } from '@material-ui/core';
+import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { ICompany } from '@lib/types';
@@ -9,6 +7,7 @@ import CompanyDetails from '../../components/company/CompanyDetails';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
+import SnackBar from '../../components/SnackBar';
 
 const CompanyEdit = () => {
   const { id: companyId } = useParams();
@@ -20,18 +19,12 @@ const CompanyEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
-  // const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    dispatch(actions.fetchCompanyById(companyId));
-  }, [companyId, dispatch]);
-
   const onSuccessfulSave = () => {
     navigate('/app/companies');
   };
 
   const handleCancel = () => {
-    navigate('/app/companies');
+    navigate(`/app/companies/${companyId}`);
   };
 
   const handleClearError = () => {
@@ -39,6 +32,7 @@ const CompanyEdit = () => {
   };
 
   const handleSubmit = (values: ICompany) => {
+    console.log('handleSubmit', values);
     dispatch(actions.updateCompany(values, onSuccessfulSave));
   };
 
@@ -47,15 +41,25 @@ const CompanyEdit = () => {
   }
 
   return (
-    <CompanyDetails
-      mode="EDIT"
-      company={company}
-      errorMessage={errorMessage}
-      loading={loading}
-      onClearError={handleClearError}
-      onCancel={handleCancel}
-      onSubmit={handleSubmit}
-    />
+    <>
+      <Box
+        sx={{
+          p: 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <CardHeader title={'Редактирование компании'} />
+          {loading && <CircularProgress size={40} />}
+        </Box>
+        <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={handleCancel} />
+        <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+      </Box>
+    </>
   );
 };
 

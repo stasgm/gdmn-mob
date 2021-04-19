@@ -83,7 +83,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`edit/${company.id}`}>
+            <NavLink to={`${company.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.id}>
                 {company.name}
               </Typography>
