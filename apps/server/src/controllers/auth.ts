@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, IUser } from '@lib/types';
+import { IResponse, IUser, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -67,10 +67,8 @@ const logOut = (ctx: Context): void => {
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   // const { deviceId } = ctx.query;
-  const { externalId, name, password, firstName, lastName, phoneNumber, companies, creator } = ctx.request.body as Omit<
-    IUser,
-    'role' | 'id'
-  > & { password: string };
+  const { externalId, name, password, firstName, lastName, phoneNumber, companies, creator } = ctx.request
+    .body as NewUser;
 
   if (!name) {
     ctx.throw(400, 'Не указано имя пользователя');
@@ -80,7 +78,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'Не указан пароль');
   }
 
-  const user: Omit<IUser, 'role' | 'id'> & { password: string } = {
+  const user: NewUser = {
     externalId,
     password,
     name,

@@ -41,7 +41,7 @@ class Api {
     this.axios.interceptors.request.use(
       (request) => {
         // Добавляем device_ID
-        request.params.deviceId = 'WEB';
+        request.params.deviceId = this.deviceId;
         console.info('✉️ request', request);
         return request;
       },
@@ -57,7 +57,7 @@ class Api {
 
     this.axios.interceptors.response.use(
       (response) => {
-        console.info('✉️ request', response);
+        console.info('✉️ response', response);
         return response;
       },
       (error) => {
@@ -78,33 +78,6 @@ class Api {
   getUrl = () => {
     return `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`;
   };
-
-  /* getDevice = async (deviceId?: string, userId?: string) => {
-    try {
-      const paramQuery = userId ? `?userId=${userId}` : '';
-
-      const res = await this.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.deviceId}${paramQuery}`);
-
-      const resData = res?.data;
-
-      if (resData?.result) {
-        return {
-          type: 'GET_DEVICE',
-          device: resData.data,
-        } as device.IGetDeviceResponse;
-      }
-
-      return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
-      } as error.INetworkError;
-    }
-  }; */
 }
 
 export default Api;

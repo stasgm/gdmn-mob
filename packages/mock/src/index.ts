@@ -1,5 +1,6 @@
 import { IApiConfig } from '@lib/client-types';
 import { IDevice } from '@lib/types';
+
 import companies from './companies';
 import users from './users';
 

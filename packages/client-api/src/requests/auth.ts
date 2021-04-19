@@ -8,13 +8,6 @@ class Auth extends BaseApi {
   constructor(api: AxiosInstance, deviceId: string) {
     super(api, deviceId);
   }
-  /*   private deviceId: string;
-    private readonly api: AxiosInstance;
-
-    constructor(api: AxiosInstance, deviceId: string) {
-      this.api = api;
-      this.deviceId = deviceId;
-    } */
 
   signup = async (name: string, password: string, companyId?: string, creatorId?: string) => {
     const body = {

@@ -54,24 +54,16 @@ export interface IUser extends Omit<IDBUser, 'creatorId' | 'companies' | 'passwo
   companies: INamedEntity[];
 }
 
-export type NewUser = Pick<IDBUser, 'name' | 'externalId'>;
+// export type NewUser = Pick<IUser, 'name' | 'externalId'>;
+export type NewUser = Omit<IUser, 'role' | 'id'> & { password: string };
 
-export type IUserCredentials = Pick<IDBUser, 'name' | 'password'>;
+export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
 
 export interface ICompany extends Omit<IDBCompany, 'adminId'> {
   admin: INamedEntity;
 }
 
 export type NewCompany = Pick<IDBCompany, 'name' | 'externalId'>;
-
-// export interface IDeviceInfo {
-//   id: string;
-//   deviceId: string;
-//   deviceName: string;
-//   userId: string;
-//   name: string;
-//   state: DeviceState;
-// }
 
 export interface IMessageInfo {
   uid: string;
