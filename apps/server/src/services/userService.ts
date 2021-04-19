@@ -174,22 +174,6 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
 };
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
-  /*   const companyList: INamedEntity[] = [];
-
-    for await (const companyId of user.companies) {
-      const company = await companies.find(companyId);
-
-      company &&
-        companyList.push({
-          id: company.id,
-          name: company.name,
-        });
-    }
-   */
-  /*   const userCreator = await users.find(user.creatorId);
-
-  const creator: INamedEntity = userCreator && { id: userCreator.id, name: userCreator.name }; */
-
   const companyList = await getNamedArrayObject(user.companies, companies);
 
   const creator = await getNamedObject(user.creatorId, users);
