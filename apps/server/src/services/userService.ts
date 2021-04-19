@@ -174,21 +174,25 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
 };
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
-  const companyList: INamedEntity[] = [];
+  /*   const companyList: INamedEntity[] = [];
 
-  for await (const companyId of user.companies) {
-    const company = await companies.find(companyId);
+    for await (const companyId of user.companies) {
+      const company = await companies.find(companyId);
 
-    company &&
-      companyList.push({
-        id: company.id,
-        name: company.name,
-      });
-  }
+      company &&
+        companyList.push({
+          id: company.id,
+          name: company.name,
+        });
+    }
+   */
+  /*   const userCreator = await users.find(user.creatorId);
 
-  const userCreator = await users.find(user.creatorId);
+  const creator: INamedEntity = userCreator && { id: userCreator.id, name: userCreator.name }; */
 
-  const creator: INamedEntity = userCreator && { id: userCreator.id, name: userCreator.name };
+  const companyList = await getNamedArrayObject(user.companies, companies);
+
+  const creator = await getNamedObject(user.creatorId, users);
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
@@ -204,6 +208,30 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     createDate: user.createDate,
     updateDate: user.updateDate,
   };
+};
+
+type DBEntities = typeof users | typeof devices | typeof companies;
+
+const getNamedObject = async (id: string, dbObject: DBEntities): Promise<INamedEntity> => {
+  const item = await dbObject.find(id);
+
+  return item && { id: item.id, name: item.name };
+};
+
+const getNamedArrayObject = async (ids: string[], dbObject: DBEntities): Promise<INamedEntity[]> => {
+  const items: INamedEntity[] = [];
+
+  for await (const id of ids) {
+    const item = await dbObject.find(id);
+
+    item &&
+      items.push({
+        id: item.id,
+        name: item.name,
+      });
+  }
+
+  return items || [];
 };
 
 export {
