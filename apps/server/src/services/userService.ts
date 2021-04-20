@@ -206,13 +206,9 @@ const getNamedArrayObject = async (ids: string[], dbObject: DBEntities): Promise
   const items: INamedEntity[] = [];
 
   for await (const id of ids) {
-    const item = await dbObject.find(id);
+    const item = await getNamedObject(id, dbObject);
 
-    item &&
-      items.push({
-        id: item.id,
-        name: item.name,
-      });
+    item && items.push(item);
   }
 
   return items || [];

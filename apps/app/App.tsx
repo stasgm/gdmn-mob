@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { useAddReducer, configureStore, authSelectors } from '@lib/store';
+import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
