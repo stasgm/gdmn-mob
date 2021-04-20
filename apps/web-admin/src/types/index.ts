@@ -5,4 +5,5 @@ export interface IToolBarButton {
   color?: any;
   variant?: any;
   icon?: JSX.Element;
+  disabled?: boolean;
 }

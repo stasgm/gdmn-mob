@@ -1,5 +1,4 @@
-import { Box, CardHeader, CircularProgress, Button, IconButton } from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { ICompany } from '@lib/types';
 
@@ -16,11 +15,7 @@ const CompanyCreate = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
-  const onSuccessfulSave = () => {
-    navigate('/app/companies');
-  };
-
-  const handleCancel = () => {
+  const handleGoBack = () => {
     navigate('/app/companies');
   };
 
@@ -29,7 +24,7 @@ const CompanyCreate = () => {
   };
 
   const handleSubmit = (values: ICompany) => {
-    dispatch(actions.addCompany(values, onSuccessfulSave));
+    dispatch(actions.addCompany(values, handleGoBack));
   };
 
   return (
@@ -55,7 +50,7 @@ const CompanyCreate = () => {
           company={{ name: '' } as ICompany}
           loading={loading}
           onSubmit={handleSubmit}
-          onCancel={handleCancel}
+          onCancel={handleGoBack}
         />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />

@@ -15,47 +15,47 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import { ICompany } from '@lib/types';
+import { IUser } from '@lib/types';
 
 interface props {
-  companies?: ICompany[];
+  users?: IUser[];
 }
 
-const CompanyListTable = ({ companies = [], ...rest }: props) => {
-  const [selectedCompanyIds, setSelectedCompanyIds] = useState<any>([]);
+const UserListTable = ({ users = [], ...rest }: props) => {
+  const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
   const handleSelectAll = (event: any) => {
-    let newSelectedCompanyIds;
+    let newSelectedUserIds;
 
     if (event.target.checked) {
-      newSelectedCompanyIds = companies.map((company: any) => company.id);
+      newSelectedUserIds = users.map((user: any) => user.id);
     } else {
-      newSelectedCompanyIds = [];
+      newSelectedUserIds = [];
     }
 
-    setSelectedCompanyIds(newSelectedCompanyIds);
+    setSelectedUserIds(newSelectedUserIds);
   };
 
   const handleSelectOne = (_event: any, id: any) => {
-    const selectedIndex = selectedCompanyIds.indexOf(id);
-    let newSelectedCompanyIds: any = [];
+    const selectedIndex = selectedUserIds.indexOf(id);
+    let newSelectedUserIds: any = [];
 
     if (selectedIndex === -1) {
-      newSelectedCompanyIds = newSelectedCompanyIds.concat(selectedCompanyIds, id);
+      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds, id);
     } else if (selectedIndex === 0) {
-      newSelectedCompanyIds = newSelectedCompanyIds.concat(selectedCompanyIds.slice(1));
-    } else if (selectedIndex === selectedCompanyIds.length - 1) {
-      newSelectedCompanyIds = newSelectedCompanyIds.concat(selectedCompanyIds.slice(0, -1));
+      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(1));
+    } else if (selectedIndex === selectedUserIds.length - 1) {
+      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelectedCompanyIds = newSelectedCompanyIds.concat(
-        selectedCompanyIds.slice(0, selectedIndex),
-        selectedCompanyIds.slice(selectedIndex + 1),
+      newSelectedUserIds = newSelectedUserIds.concat(
+        selectedUserIds.slice(0, selectedIndex),
+        selectedUserIds.slice(selectedIndex + 1),
       );
     }
 
-    setSelectedCompanyIds(newSelectedCompanyIds);
+    setSelectedUserIds(newSelectedUserIds);
   };
 
   const handleLimitChange = (event: any) => {
@@ -67,32 +67,35 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
   };
 
   const TableRows = () => {
-    const companyList = companies.slice(0, limit).map((company: ICompany) => (
-      <TableRow hover key={company.id} selected={selectedCompanyIds.indexOf(company.id) !== -1}>
+    const userList = users.slice(0, limit).map((user: IUser) => (
+      <TableRow hover key={user.id} selected={selectedUserIds.indexOf(user.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
-            checked={selectedCompanyIds.indexOf(company.id) !== -1}
-            onChange={(event) => handleSelectOne(event, company.id)}
+            checked={selectedUserIds.indexOf(user.id) !== -1}
+            onChange={(event) => handleSelectOne(event, user.id)}
             value="true"
           />
         </TableCell>
-        <TableCell>
+        <TableCell style={{ padding: '0 16px' }}>
           <Box
             sx={{
               alignItems: 'center',
               display: 'flex',
             }}
           >
-            <NavLink to={`${company.id}`}>
-              <Typography color="textPrimary" variant="body1" key={company.id}>
-                {company.name}
+            <NavLink to={`${user.id}`}>
+              <Typography color="textPrimary" variant="body1" key={user.id}>
+                {user.name}
               </Typography>
             </NavLink>
           </Box>
         </TableCell>
+        <TableCell>{user.lastName}</TableCell>
+        <TableCell>{user.firstName}</TableCell>
+        <TableCell>{user.phoneNumber}</TableCell>
       </TableRow>
     ));
-    return <>{companyList}</>;
+    return <>{userList}</>;
   };
 
   return (
@@ -104,13 +107,16 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedCompanyIds.length === companies.length}
+                    checked={selectedUserIds.length === users.length}
                     color="primary"
-                    indeterminate={selectedCompanyIds.length > 0 && selectedCompanyIds.length < companies.length}
+                    indeterminate={selectedUserIds.length > 0 && selectedUserIds.length < users.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Наименование</TableCell>
+                <TableCell>Логин</TableCell>
+                <TableCell>Фамилия</TableCell>
+                <TableCell>Имя</TableCell>
+                <TableCell>Телефон</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -121,7 +127,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={companies.length}
+        count={users.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -132,4 +138,4 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
   );
 };
 
-export default CompanyListTable;
+export default UserListTable;

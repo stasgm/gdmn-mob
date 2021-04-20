@@ -19,11 +19,7 @@ const CompanyEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
-  const onSuccessfulSave = () => {
-    navigate('/app/companies');
-  };
-
-  const handleCancel = () => {
+  const handleGoBack = () => {
     navigate(`/app/companies/${companyId}`);
   };
 
@@ -32,8 +28,7 @@ const CompanyEdit = () => {
   };
 
   const handleSubmit = (values: ICompany) => {
-    console.log('handleSubmit', values);
-    dispatch(actions.updateCompany(values, onSuccessfulSave));
+    dispatch(actions.updateCompany(values, handleGoBack));
   };
 
   if (!company) {
@@ -41,25 +36,23 @@ const CompanyEdit = () => {
   }
 
   return (
-    <>
+    <Box
+      sx={{
+        p: 3,
+      }}
+    >
       <Box
         sx={{
-          p: 3,
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          <CardHeader title={'Редактирование компании'} />
-          {loading && <CircularProgress size={40} />}
-        </Box>
-        <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={handleCancel} />
-        <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+        <CardHeader title={'Редактирование компании'} />
+        {loading && <CircularProgress size={40} />}
       </Box>
-    </>
+      <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={handleGoBack} />
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+    </Box>
   );
 };
 

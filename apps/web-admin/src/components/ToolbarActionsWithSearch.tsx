@@ -1,35 +1,17 @@
-import { Box, Button, TextField, InputAdornment, SvgIcon, Hidden, IconButton, Toolbar, Card } from '@material-ui/core';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { Box, Card, TextField, InputAdornment, SvgIcon } from '@material-ui/core';
+
 import { Search as SearchIcon } from 'react-feather';
 
 import { IToolBarButton } from '../types';
+
+import ToolBarActions from './ToolBarActions';
 
 interface props {
   buttons: IToolBarButton[];
   searchTitle: string;
 }
 
-const TopToolbar = ({ buttons, searchTitle }: props) => {
-  const buttonList = (
-    <>
-      {buttons.map((button: IToolBarButton) => (
-        <Button key={button.name} color={button.color} variant={button.variant} onClick={button.onClick} sx={button.sx}>
-          {button.name}
-        </Button>
-      ))}
-    </>
-  );
-
-  const iconButtonList = (
-    <>
-      {buttons.map((button: IToolBarButton) => (
-        <IconButton key={button.name} color="primary">
-          {button.icon}
-        </IconButton>
-      ))}
-    </>
-  );
-
+const ToolbarActionsWithSearch = ({ buttons, searchTitle }: props) => {
   return (
     <Card>
       <Box
@@ -63,21 +45,11 @@ const TopToolbar = ({ buttons, searchTitle }: props) => {
             justifyContent: 'flex-end',
           }}
         >
-          <Toolbar>
-            <Hidden smUp>
-              <IconButton color="primary">
-                <MoreVertIcon />
-              </IconButton>
-            </Hidden>
-            <Hidden mdUp smDown>
-              {iconButtonList}
-            </Hidden>
-            <Hidden mdDown>{buttonList}</Hidden>
-          </Toolbar>
+          <ToolBarActions buttons={buttons} />
         </Box>
       </Box>
     </Card>
   );
 };
 
-export default TopToolbar;
+export default ToolbarActionsWithSearch;

@@ -8,7 +8,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
 import DeviceListResults from '../components/device/DeviceListResults';
-import TopToolbar from '../components/TopToolbar';
+import ToolbarActionsWithSearch from '../components/ToolbarActionsWithSearch';
 import { IToolBarButton } from '../types';
 
 const DeviceList = () => {
@@ -58,7 +58,7 @@ const DeviceList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <TopToolbar buttons={buttons} searchTitle={'Найти устройство'} />
+          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти устройство'} />
           <Box sx={{ pt: 3 }}>
             <DeviceListResults devices={devices} />
           </Box>

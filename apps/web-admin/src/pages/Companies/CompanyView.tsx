@@ -1,29 +1,22 @@
-import {
-  Box,
-  CardHeader,
-  Button,
-  IconButton,
-  CardContent,
-  Grid,
-  Card,
-  Divider,
-  TextField,
-  CircularProgress,
-} from '@material-ui/core';
+import { Box, CardHeader, IconButton, CardContent, Grid, Card, TextField, CircularProgress } from '@material-ui/core';
+
+import CachedIcon from '@material-ui/icons/Cached';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { useFormik } from 'formik';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { ICompany } from '@lib/types';
-
-import * as yup from 'yup';
-
-import SnackBar from '../../components/SnackBar';
+import { users } from '@lib/mock';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company';
+import CompanyUsers from '../../components/company/CompanyUsers';
+
+import { IToolBarButton } from '../../types';
+
+import ToolBarAction from '../../components/ToolBarActions';
 
 const CompanyView = () => {
   const { id: companyId } = useParams();
@@ -32,8 +25,9 @@ const CompanyView = () => {
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companies);
+  const { loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
+  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по companyId
 
   const handleCancel = () => {
     navigate('/app/companies');
@@ -45,26 +39,42 @@ const CompanyView = () => {
 
   const handleRefresh = () => {
     dispatch(actions.fetchCompanyById(companyId));
-  };
-
-  const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
+    //обновить пользователей
   };
 
   if (!company) {
     return <Box>Компания не найдена</Box>;
   }
 
-  // const formik = useFormik<ICompany>({
-  //   enableReinitialize: true,
-  //   initialValues: company,
-  //   validationSchema: yup.object().shape({
-  //     name: yup.string().required('Required'),
-  //   }),
-  //   onSubmit: (values) => {
-  //     onSubmit(values);
-  //   },
-  // });
+  const buttons: IToolBarButton[] = [
+    {
+      name: 'Обновить',
+      sx: { marginRight: 1 },
+      color: 'primary',
+      variant: 'contained',
+      onClick: () => handleRefresh(),
+      icon: <CachedIcon />,
+    },
+    {
+      name: 'Редактировать',
+      sx: { marginRight: 1 },
+      disabled: true,
+      color: 'secondary',
+      variant: 'contained',
+      onClick: () => handleEdit(),
+      icon: <EditIcon />,
+    },
+    {
+      name: 'Удалить',
+      disabled: true,
+      color: 'secondary',
+      variant: 'contained',
+      onClick: () => {
+        return;
+      },
+      icon: <DeleteIcon />,
+    },
+  ];
 
   return (
     <>
@@ -92,57 +102,39 @@ const CompanyView = () => {
               justifyContent: 'right',
             }}
           >
-            <Button
-              color="primary"
-              variant="contained"
-              onClick={handleRefresh}
-              disabled={loading}
-              sx={{ marginRight: 1 }}
-            >
-              Обновить
-            </Button>
-            <Button
-              color="secondary"
-              variant="contained"
-              onClick={handleEdit}
-              disabled={loading}
-              sx={{ marginRight: 1 }}
-            >
-              Редактировать
-            </Button>
-            <Button color="secondary" variant="contained" disabled={loading}>
-              Удалить
-            </Button>
+            <ToolBarAction buttons={buttons} />
           </Box>
         </Box>
-        <>
-          <Box
-            sx={{
-              backgroundColor: 'background.default',
-              minHeight: '100%',
-            }}
-          >
-            <Card sx={{ p: 1 }}>
-              <CardContent>
-                <Grid container spacing={3}>
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      inputProps={{ readOnly: 'true' }}
-                      fullWidth
-                      label="Наименование компании"
-                      name="name"
-                      variant="outlined"
-                      type="name"
-                      disabled={loading}
-                      value={company.name}
-                      margin="dense"
-                    />
-                  </Grid>
+        <Box
+          sx={{
+            backgroundColor: 'background.default',
+            minHeight: '100%',
+          }}
+        >
+          <Card sx={{ p: 1 }}>
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    inputProps={{ readOnly: true }}
+                    fullWidth
+                    label="Наименование компании"
+                    name="name"
+                    variant="outlined"
+                    type="name"
+                    disabled={loading}
+                    value={company.name}
+                    margin="dense"
+                  />
                 </Grid>
-              </CardContent>
-            </Card>
-          </Box>
-        </>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
+      <Box>
+        <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
+        <CompanyUsers users={users.filter((u) => u.companies.find((c) => c.id === companyId))} />
       </Box>
     </>
   );
