@@ -1,4 +1,4 @@
-import { Box, Container, CardHeader } from '@material-ui/core';
+import { Box, Container } from '@material-ui/core';
 
 import { useNavigate } from 'react-router-dom';
 

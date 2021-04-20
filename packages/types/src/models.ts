@@ -22,7 +22,6 @@ export interface IDBUser extends INamedEntity, IExternalSystemProps {
   password: string;
   creatorId: string;
   role: UserRole;
-  // activationCode?: string; // код активации должен быть не у пользователя а в талице кодов активации
   companies: string[]; // по умолчанию пустой массив
   firstName?: string;
   lastName?: string;
@@ -48,8 +47,28 @@ export interface IDBActivationCode {
   deviceId: string;
 }
 
+export interface IDBMessage<T = any> {
+  id?: string;
+  head: {
+    id: string;
+    appSystem: string;
+    companyid: string;
+    producer: string;
+    consumer: string;
+    dateTime: string;
+  };
+  body: {
+    type: string;
+    payload: T;
+  };
+}
+
 // Типы для передачи и хранения данных на клиенте
-export interface IUser extends Omit<IDBUser, 'creatorId' | 'companies' | 'password'> {
+export interface IUser extends INamedEntity, IExternalSystemProps {
+  role: UserRole;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
   creator?: INamedEntity;
   companies: INamedEntity[];
 }
@@ -70,21 +89,15 @@ export interface IMessageInfo {
   date: Date;
 }
 
-export interface IDBMessage<T = any> {
-  id?: string;
-  head: {
-    id: string;
-    appSystem: string;
-    companyid: string;
-    producer: string;
-    consumer: string;
-    dateTime: string;
-  };
-  body: {
-    type: string;
-    payload: T;
-  };
+export interface IDevice extends Omit<IDBDevice, 'userId'> {
+  user: INamedEntity;
 }
+
+export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
+  device: INamedEntity;
+}
+
+export type IMessage = IDBMessage;
 
 export interface IDataMessage<T = any> {
   id: string;
@@ -92,6 +105,3 @@ export interface IDataMessage<T = any> {
   type: string;
   data: T;
 }
-
-export type IMessage = IDBMessage;
-export type IDevice = IDBDevice;
