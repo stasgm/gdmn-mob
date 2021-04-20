@@ -9,7 +9,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
 import CompanyListTable from '../../components/company/CompanyListTable';
-import TopToolbar from '../../components/TopToolbar';
+import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/company/actions.async';
@@ -30,7 +30,7 @@ const CompanyList = () => {
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     !list?.length && fetchCompanies();
-  }, [fetchCompanies, list?.length]);
+  }, [fetchCompanies, list.length]);
 
   const buttons: IToolBarButton[] = [
     {
@@ -75,7 +75,7 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <TopToolbar buttons={buttons} searchTitle={'Найти компанию'} />
+          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти компанию'} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
