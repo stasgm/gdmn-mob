@@ -4,7 +4,7 @@ import { PartialRouteObject } from 'react-router';
 import DashboardLayout from './components/DashboardLayout';
 import MainLayout from './components/MainLayout';
 import Account from './pages/Account';
-import UserList from './pages/UserList';
+import Users from './pages/Users';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import Companies from './pages/Companies';
@@ -20,17 +20,9 @@ const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
     element: isLoggedIn ? <DashboardLayout /> : <Navigate to="/login" />,
     children: [
       { path: 'account', element: <Account /> },
-      { path: 'users', element: <UserList /> },
       { path: 'dashboard', element: <Dashboard /> },
-      {
-        path: 'companies/*',
-        element: <Companies />,
-        /* children: [
-          { path: '/', element: <CompanyList /> },
-          { path: '/new', element: <CompanyDetails /> },
-          { path: '/edit/:id', element: <CompanyDetails /> },
-        ], */
-      },
+      { path: 'companies/*', element: <Companies /> },
+      { path: 'users/*', element: <Users /> },
       { path: 'devices', element: <DeviceList /> },
       { path: '/', element: <Navigate to="/app/dashboard" /> },
       { path: '*', element: <Navigate to="/404" /> },

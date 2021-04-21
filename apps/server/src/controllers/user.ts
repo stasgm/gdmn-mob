@@ -1,9 +1,46 @@
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IDBDevice } from '@lib/types';
+import { IResponse, IUser, IDBDevice, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
+
+const addUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { externalId, name, password, firstName, lastName, phoneNumber, companies, creator } = ctx.request
+    .body as NewUser;
+
+  if (!name) {
+    ctx.throw(400, 'Не указано имя пользователя');
+  }
+
+  if (!password) {
+    ctx.throw(400, 'Не указан пароль');
+  }
+
+  const user: NewUser = {
+    externalId,
+    password,
+    name,
+    firstName,
+    lastName,
+    phoneNumber,
+    companies: companies || [],
+    creator,
+  };
+
+  try {
+    const newUser = await userService.addOne(user);
+
+    const result: IResponse<IUser> = { result: true, data: newUser };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`signUp: user '${name}' is successfully signed up`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
@@ -117,4 +154,4 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { getDevicesByUser, getUsers, getUser, removeUser, updateUser };
+export { addUser, getDevicesByUser, getUsers, getUser, removeUser, updateUser };

@@ -18,7 +18,7 @@ export const device: IDevice = {
   name: 'iPhone',
   state: 'ACTIVE',
   uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
-  userId: '1',
+  user: users[0],
   id: '111',
 };
 
@@ -27,3 +27,4 @@ export const company = companies[0];
 export const company2 = companies[1];
 
 export const user = users[0];
+export const user2 = users[1];

@@ -18,14 +18,14 @@ export interface IGetUserResponse extends IUserQueryResponse {
   user: IUser;
 }
 
-export interface ICreateUserResponse extends IUserQueryResponse {
+export interface IAddUserResponse extends IUserQueryResponse {
   type: 'ADD_USER';
   user: IUser;
 }
 
 export interface IUpdateUserResponse extends IUserQueryResponse {
   type: 'UPDATE_USER';
-  userId: string;
+  user: IUser;
 }
 
 export interface IRemoveUserResponse extends IUserQueryResponse {
@@ -35,7 +35,7 @@ export interface IRemoveUserResponse extends IUserQueryResponse {
 export type UserQueryResponse =
   | IGetUsersResponse
   | IGetUserResponse
-  | ICreateUserResponse
+  | IAddUserResponse
   | IUpdateUserResponse
   | IRemoveUserResponse
   | IUserNotAuthResponse;

@@ -4,11 +4,11 @@ import { ThunkAction } from 'redux-thunk';
 import { RootState, configureStore } from '@lib/store';
 
 import companyReducer from './company/reducer';
-/* import { CompanyActionType } from './company/actions';
-import AsyncActions from './company/actions.async'; */
+import userReducer from './user/reducer';
 
 export const combinedReducer = {
   companies: companyReducer,
+  users: userReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
@@ -21,7 +21,5 @@ export type AppDispatch = typeof store.dispatch;
 
 export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
-// export type AppState = typeof store.getState;
-// export const useDispatch = () => useReduxDispatch<AppDispatch>();
 
 export default store;

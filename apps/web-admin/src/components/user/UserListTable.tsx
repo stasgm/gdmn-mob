@@ -83,7 +83,7 @@ const UserListTable = ({ users = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`${user.id}`}>
+            <NavLink to={`/app/users/${user.id}`}>
               <Typography color="textPrimary" variant="body1" key={user.id}>
                 {user.name}
               </Typography>
@@ -113,7 +113,7 @@ const UserListTable = ({ users = [], ...rest }: props) => {
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Логин</TableCell>
+                <TableCell>Пользователь</TableCell>
                 <TableCell>Фамилия</TableCell>
                 <TableCell>Имя</TableCell>
                 <TableCell>Телефон</TableCell>

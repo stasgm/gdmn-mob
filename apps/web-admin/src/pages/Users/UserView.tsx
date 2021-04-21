@@ -8,50 +8,51 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { users } from '@lib/mock';
+// import { users } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/company';
-import CompanyUsers from '../../components/company/CompanyUsers';
+import actions from '../../store/user';
+// import CompanyUsers from '../../components/user/CompanyUsers';
 
 import { IToolBarButton } from '../../types';
 
 import ToolBarAction from '../../components/ToolBarActions';
 
-import CompanyDetailsView from '../../components/company/CompanyDetailsView';
+import UserDetailsView from '../../components/user/UserDetailsView';
 
-const CompanyView = () => {
-  const { id: companyId } = useParams();
+const UserView = () => {
+  const { id: userId } = useParams();
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
+  // const classes = useStyles();
+
   const { loading } = useSelector((state) => state.companies);
-  const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
-  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по companyId
+  const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
+  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
 
   const handleCancel = () => {
-    navigate('/app/companies');
+    navigate('/app/users');
   };
 
   const handleEdit = () => {
-    navigate(`/app/companies/edit/${companyId}`);
+    navigate(`/app/users/edit/${userId}`);
   };
 
   const handleRefresh = useCallback(() => {
-    dispatch(actions.fetchCompanyById(companyId));
-    //обновить пользователей
-  }, [dispatch, companyId]);
+    dispatch(actions.fetchUserById(userId));
+  }, [dispatch, userId]);
 
   useEffect(() => {
     handleRefresh();
   }, [handleRefresh]);
 
-  if (!company) {
-    return <Box>Компания не найдена</Box>;
+  if (!user) {
+    return <Box>Пользователь не найден</Box>;
   }
 
   const buttons: IToolBarButton[] = [
@@ -102,7 +103,7 @@ const CompanyView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список компаний'} />
+            <CardHeader title={'Список пользователей'} />
             {loading && <CircularProgress size={40} />}
           </Box>
           <Box
@@ -119,15 +120,11 @@ const CompanyView = () => {
             minHeight: '100%',
           }}
         >
-          <CompanyDetailsView company={company} />
+          <UserDetailsView user={user} />
         </Box>
-      </Box>
-      <Box>
-        <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users.filter((u) => u.companies.find((c) => c.id === companyId))} />
       </Box>
     </>
   );
 };
 
-export default CompanyView;
+export default UserView;

@@ -79,10 +79,7 @@ const signUp = async ({ user }: { user: Omit<IUser, 'role' | 'id'> & { password:
     });
   }
 
-  const newUser = await userService.addOne({
-    ...user,
-    role: !user.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
-  });
+  const newUser = await userService.addOne(user);
 
   if (!user.creator?.id) {
     // TODO временно!!! если создаётся не пользователем то добавляем устройство WEB

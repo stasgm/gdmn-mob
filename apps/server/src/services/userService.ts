@@ -1,4 +1,4 @@
-import { IDBUser, INamedEntity, IUser } from '@lib/types';
+import { IDBUser, INamedEntity, IUser, NewUser } from '@lib/types';
 
 import { hashPassword } from '../utils/crypt';
 
@@ -28,7 +28,7 @@ const findAll = async (): Promise<IUser[]> => {
  * @param {IUser} user - пользователь
  * @return id, идентификатор пользователя
  * */
-const addOne = async (user: Omit<IUser, 'id'> & { password: string }): Promise<IUser> => {
+const addOne = async (user: NewUser): Promise<IUser> => {
   if (await users.find((i) => i.name.toUpperCase() === user.name.toUpperCase())) {
     throw new Error('Пользователь с таким именем уже существует');
   }
@@ -40,7 +40,7 @@ const addOne = async (user: Omit<IUser, 'id'> & { password: string }): Promise<I
     name: user.name,
     companies: user.companies.map((i) => i.id),
     password: passwordHash,
-    role: user.role,
+    role: !user.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
     creatorId: user.creator?.id || '',
     externalId: user.externalId,
     firstName: user.firstName,
