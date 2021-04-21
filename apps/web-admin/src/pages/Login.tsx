@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -14,7 +13,7 @@ import Logo from '../components/Logo';
 const Login = () => {
   const dispatch = useDispatch();
 
-  const { error, loading, status, device } = useSelector((state) => state.auth);
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
@@ -26,16 +25,16 @@ const Login = () => {
       name: yup.string().required('Required'),
       password: yup.string().required('Required'),
     }),
-    onSubmit: () => {
-      dispatch(authActions.checkDevice());
+    onSubmit: (values) => {
+      dispatch(authActions.signInWithDevice(values));
     },
   });
 
-  useEffect(() => {
-    if (device && !error) {
-      dispatch(authActions.signIn(formik.values));
-    }
-  }, [device, error, formik.values, dispatch]);
+  // useEffect(() => {
+  //   if (device && !error) {
+  //     dispatch(authActions.signIn(formik.values));
+  //   }
+  // }, [device, error, formik.values, dispatch]);
 
   return (
     <>
