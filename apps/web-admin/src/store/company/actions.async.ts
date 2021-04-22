@@ -1,8 +1,7 @@
+import { v4 as uuid } from 'uuid';
 import { sleep } from '@lib/store';
-
 import Api, { types } from '@lib/client-api';
-
-import { companies, company2 } from '@lib/mock';
+import { companies, company2, user } from '@lib/mock';
 import { config } from '@lib/client-config';
 
 import { NewCompany, ICompany } from '@lib/types';
@@ -10,10 +9,6 @@ import { NewCompany, ICompany } from '@lib/types';
 import { AppThunk } from '../';
 
 import { companyActions } from './actions';
-
-/* const {
-  debug: { useMockup: isMock },
-} = config; */
 
 const {
   debug: { useMockup: isMock, deviceId },
@@ -104,7 +99,7 @@ const addCompany = (company: NewCompany, onSuccess?: (company: ICompany) => void
         response = { message: 'Компания с таким названием уже существует!', type: 'ERROR' };
       } else {
         // Добаляем компанию
-        response = { company: { ...company, ...company2 }, type: 'ADD_COMPANY' };
+        response = { company: { ...company, admin: user, id: uuid() }, type: 'ADD_COMPANY' };
       }
     } else {
       response = await api.company.addCompany(company);
