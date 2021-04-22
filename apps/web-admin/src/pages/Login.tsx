@@ -22,8 +22,8 @@ const Login = () => {
       password: '@123!',
     },
     validationSchema: yup.object().shape({
-      name: yup.string().required('Required'),
-      password: yup.string().required('Required'),
+      name: yup.string().required('Заполните это поле'),
+      password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values) => {
       dispatch(authActions.signInWithDevice(values));

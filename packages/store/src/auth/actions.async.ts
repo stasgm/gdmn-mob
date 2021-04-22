@@ -93,7 +93,7 @@ const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, un
       if (credentials.name === 'Stas' && credentials.password === '@123!') {
         response = { type: 'LOGIN', user };
       } else {
-        return dispatch(authActions.loginUserAsync.failure('не верные данные'));
+        return dispatch(authActions.loginUserAsync.failure('Неверные данные'));
       }
     } else {
       response = await api.auth.login(credentials);
@@ -140,7 +140,7 @@ const signInWithDevice = (credentials: IUserCredentials): ThunkAction<void, IAut
         if (credentials.name === 'Stas' && credentials.password === '@123!') {
           responseLogin = { type: 'LOGIN', user };
         } else {
-          return dispatch(authActions.loginUserAsync.failure('не верные данные'));
+          return dispatch(authActions.loginUserAsync.failure('Неверные данные'));
         }
       } else {
         responseLogin = await api.auth.login(credentials);

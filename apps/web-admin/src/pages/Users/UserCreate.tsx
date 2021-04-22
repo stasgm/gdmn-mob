@@ -15,7 +15,7 @@ const UserCreate = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
-  const handleGoBack = () => {
+  const handleGoToUsers = () => {
     navigate('/app/users');
   };
 
@@ -24,7 +24,7 @@ const UserCreate = () => {
   };
 
   const handleSubmit = (values: IUser | NewUser) => {
-    dispatch(actions.addUser(values as NewUser, handleGoBack));
+    dispatch(actions.addUser(values as NewUser, handleGoToUsers));
   };
 
   return (
@@ -46,7 +46,12 @@ const UserCreate = () => {
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>
-        <UserDetails user={{ name: '' } as NewUser} loading={loading} onSubmit={handleSubmit} onCancel={handleGoBack} />
+        <UserDetails
+          user={{ name: '' } as NewUser}
+          loading={loading}
+          onSubmit={handleSubmit}
+          onCancel={handleGoToUsers}
+        />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
