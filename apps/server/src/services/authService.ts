@@ -9,10 +9,10 @@ import bcrypt from 'bcrypt';
 
 import { IUser } from '@lib/types';
 
-import { devices, users, codes } from './dao/db';
-
-// eslint-disable-next-line import/no-cycle
+import { entities } from './dao/db';
 import * as userService from './userService';
+
+const { devices, users, codes } = entities;
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;

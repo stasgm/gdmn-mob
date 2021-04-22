@@ -2,9 +2,10 @@ import { IDBCompany } from '@lib/types';
 
 import log from '../utils/logger';
 
-import { companies, users } from './dao/db';
+import { entities } from './dao/db';
 import { addCompanyToUser } from './userService';
 
+const { companies, users } = entities;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации

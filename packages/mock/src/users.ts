@@ -1,6 +1,7 @@
 import { INamedEntity, IUser } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
+// eslint-disable-next-line import/no-cycle
 import companies from './companies';
 
 export const superAdmin: INamedEntity = {
@@ -28,7 +29,7 @@ const users: IUser[] = [
     lastName: 'Dzadzevich',
     phoneNumber: '+37529-33-333-33',
     creator: superAdmin,
-    companies: [companies[0]],
+    companies: [{ id: companies[2].id, name: companies[2].name }],
     role: 'Admin',
   },
   {
@@ -39,7 +40,7 @@ const users: IUser[] = [
     lastName: 'Svinka',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [companies[0]],
+    companies: [{ id: companies[1].id, name: companies[1].name }],
     role: 'User',
   },
   {
@@ -50,7 +51,7 @@ const users: IUser[] = [
     lastName: 'Doctor',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [companies[0]],
+    companies: [{ id: companies[2].id, name: companies[2].name }],
     role: 'User',
   },
   {
@@ -61,7 +62,7 @@ const users: IUser[] = [
     lastName: 'Marley',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [companies[1]],
+    companies: [{ id: companies[1].id, name: companies[1].name }],
     role: 'User',
   },
 ];

@@ -1,8 +1,11 @@
-import { IDBUser, INamedEntity, IUser } from '@lib/types';
+import { IDBUser, IUser } from '@lib/types';
 
 import { hashPassword } from '../utils/crypt';
 
-import { users, devices, companies } from './dao/db';
+import { entities } from './dao/db';
+import { getNamedEntity } from './dao/utils';
+
+const { users, devices, companies } = entities;
 
 const findOne = async (userId: string): Promise<IUser> => {
   return makeUser(await users.find(userId));
@@ -174,9 +177,9 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
 };
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
-  const companyList = await getNamedArrayObject(user.companies, companies);
+  const companyList = await getNamedEntity(user.companies, companies);
 
-  const creator = await getNamedObject(user.creatorId, users);
+  const creator = await getNamedEntity(user.creatorId, users);
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
@@ -192,26 +195,6 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     createDate: user.createDate,
     updateDate: user.updateDate,
   };
-};
-
-type DBEntities = typeof users | typeof devices | typeof companies;
-
-const getNamedObject = async (id: string, dbObject: DBEntities): Promise<INamedEntity> => {
-  const item = await dbObject.find(id);
-
-  return item && { id: item.id, name: item.name };
-};
-
-const getNamedArrayObject = async (ids: string[], dbObject: DBEntities): Promise<INamedEntity[]> => {
-  const items: INamedEntity[] = [];
-
-  for await (const id of ids) {
-    const item = await getNamedObject(id, dbObject);
-
-    item && items.push(item);
-  }
-
-  return items || [];
 };
 
 export {
