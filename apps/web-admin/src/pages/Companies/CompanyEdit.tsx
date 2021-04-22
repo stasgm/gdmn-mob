@@ -19,7 +19,7 @@ const CompanyEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
-  const handleGoBack = () => {
+  const handleGoToCompanyView = () => {
     navigate(`/app/companies/${companyId}`);
   };
 
@@ -28,7 +28,7 @@ const CompanyEdit = () => {
   };
 
   const handleSubmit = (values: ICompany) => {
-    dispatch(actions.updateCompany(values, handleGoBack));
+    dispatch(actions.updateCompany(values, handleGoToCompanyView));
   };
 
   if (!company) {
@@ -50,7 +50,7 @@ const CompanyEdit = () => {
         <CardHeader title={'Редактирование компании'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={handleGoBack} />
+      <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={handleGoToCompanyView} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );

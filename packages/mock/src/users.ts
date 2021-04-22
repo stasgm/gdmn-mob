@@ -62,7 +62,10 @@ const users: IUser[] = [
     lastName: 'Marley',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [{ id: companies[1].id, name: companies[1].name }],
+    companies: [
+      { id: companies[1].id, name: companies[1].name },
+      { id: companies[0].id, name: companies[0].name },
+    ],
     role: 'User',
   },
 ];

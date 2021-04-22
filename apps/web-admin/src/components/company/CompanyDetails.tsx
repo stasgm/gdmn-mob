@@ -39,7 +39,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
-                    label="Наименование компанинии"
+                    label="Наименование компании"
                     name="name"
                     required
                     variant="outlined"

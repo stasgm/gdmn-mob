@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { IResponse, IUser } from '@lib/types';
+import { IResponse, IUser, NewUser } from '@lib/types';
 
 import { error, user as types } from '../types';
 
@@ -9,6 +9,23 @@ class User extends BaseApi {
   constructor(api: AxiosInstance, deviceId: string) {
     super(api, deviceId);
   }
+
+  addUser = async (newUser: NewUser) => {
+    const res = await this.api.post<IResponse<IUser>>('/users', newUser);
+    const userData = res.data;
+
+    if (!userData.result || !userData.data) {
+      return {
+        type: 'ERROR',
+        message: res.data.error,
+      } as error.INetworkError;
+    }
+
+    return {
+      type: 'ADD_USER',
+      user: userData.data,
+    } as types.IAddUserResponse;
+  };
 
   getUsers = async () => {
     const res = await this.api.get<IResponse<IUser[]>>('/users');
@@ -43,13 +60,13 @@ class User extends BaseApi {
   };
 
   updateUser = async (user: Partial<IUser>) => {
-    const res = await this.api.patch<IResponse<string>>(`/users/${user.id}`, user);
+    const res = await this.api.patch<IResponse<IUser>>(`/users/${user.id}`, user);
     const userData = res.data;
 
     if (userData.result) {
       return {
         type: 'UPDATE_USER',
-        userId: userData.data,
+        user: userData.data,
       } as types.IUpdateUserResponse;
     }
     return {

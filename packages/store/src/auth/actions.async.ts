@@ -111,4 +111,59 @@ const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, un
   };
 };
 
-export default { checkDevice, activateDevice, signIn };
+const signInWithDevice = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+  return async (dispatch) => {
+    //Если устройство найдено, то проверяем пользователя, иначе возвращаем ошибку устройства
+    //Если пользователь найден, записываем в хранилище объект пользователя, иначе возвращаем ошибку идентификации
+    let responseDevice: types.device.IGetDeviceResponse | types.error.INetworkError;
+
+    dispatch(authActions.checkDeviceAsync.request(''));
+
+    if (isMock) {
+      await sleep(500);
+
+      responseDevice = { device: device, type: 'GET_DEVICE' };
+    } else {
+      responseDevice = await api.device.getDevice(deviceId);
+    }
+
+    if (responseDevice.type === 'GET_DEVICE') {
+      dispatch(authActions.checkDeviceAsync.success(responseDevice.device));
+
+      let responseLogin: types.auth.ILoginResponse | types.error.INetworkError;
+
+      dispatch(authActions.loginUserAsync.request(''));
+
+      if (isMock) {
+        await sleep(500);
+
+        if (credentials.name === 'Stas' && credentials.password === '@123!') {
+          responseLogin = { type: 'LOGIN', user };
+        } else {
+          return dispatch(authActions.loginUserAsync.failure('не верные данные'));
+        }
+      } else {
+        responseLogin = await api.auth.login(credentials);
+      }
+
+      if (responseLogin.type === 'LOGIN') {
+        return dispatch(authActions.loginUserAsync.success(responseLogin.user));
+      }
+
+      if (responseLogin.type === 'ERROR') {
+        return dispatch(authActions.loginUserAsync.failure(responseLogin.message));
+      }
+
+      return dispatch(authActions.loginUserAsync.failure('something wrong'));
+      //return dispatch(authActions.checkDeviceAsync.success(response.device));
+    }
+
+    if (responseDevice.type === 'ERROR') {
+      return dispatch(authActions.checkDeviceAsync.failure(responseDevice.message));
+    }
+
+    return dispatch(authActions.checkDeviceAsync.failure('something wrong'));
+  };
+};
+
+export default { checkDevice, activateDevice, signIn, signInWithDevice };

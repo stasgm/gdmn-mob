@@ -1,0 +1,66 @@
+import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
+
+import { ICompany } from '@lib/types';
+
+interface IProps {
+  company: ICompany;
+}
+
+const CompanyDetailsView = ({ company }: IProps) => {
+  return (
+    <Card>
+      <CardHeader title="Общая информация" />
+      <Divider />
+      <CardContent>
+        <Grid>
+          <Grid>
+            <Grid container md={10} xs={12}>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Наименование
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {company.name}
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Город
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  Минск
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Дата создания
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {company.createDate}
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Дата редактирования
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {company.updateDate}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default CompanyDetailsView;

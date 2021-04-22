@@ -1,14 +1,14 @@
 import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
-import { ICompany, NewCompany } from '@lib/types';
+import { IUser, NewUser } from '@lib/types';
 
-import CompanyDetails from '../../components/company/CompanyDetails';
+import UserDetails from '../../components/user/UserDetails';
 import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/company';
+import actions from '../../store/user';
 
-const CompanyCreate = () => {
+const UserCreate = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -16,15 +16,15 @@ const CompanyCreate = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
   const handleGoBack = () => {
-    navigate('/app/companies');
+    navigate('/app/users');
   };
 
   const handleClearError = () => {
-    dispatch(actions.companyActions.clearError());
+    dispatch(actions.userActions.clearError());
   };
 
-  const handleSubmit = (values: NewCompany) => {
-    dispatch(actions.addCompany(values, handleGoBack));
+  const handleSubmit = (values: IUser | NewUser) => {
+    dispatch(actions.addUser(values as NewUser, handleGoBack));
   };
 
   return (
@@ -46,16 +46,11 @@ const CompanyCreate = () => {
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>
-        <CompanyDetails
-          company={{ name: '' } as ICompany}
-          loading={loading}
-          onSubmit={handleSubmit}
-          onCancel={handleGoBack}
-        />
+        <UserDetails user={{ name: '' } as NewUser} loading={loading} onSubmit={handleSubmit} onCancel={handleGoBack} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };
 
-export default CompanyCreate;
+export default UserCreate;
