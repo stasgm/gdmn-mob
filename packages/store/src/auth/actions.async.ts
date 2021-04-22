@@ -25,19 +25,9 @@ const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId
 
 const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
-    let response: types.device.IGetDeviceResponse | types.error.INetworkError;
-
     dispatch(authActions.checkDeviceAsync.request(''));
 
-    if (isMock) {
-      await sleep(500);
-
-      response = { device: device, type: 'GET_DEVICE' };
-      // response = { message: 'device not found', type: 'ERROR' };
-    } else {
-      // response = await requests.device.getDevice(device.uid || '');
-      response = await api.device.getDevice(deviceId);
-    }
+    const response = await api.device.getDevice(deviceId);
 
     if (response.type === 'GET_DEVICE') {
       return dispatch(authActions.checkDeviceAsync.success(response.device));
@@ -115,36 +105,16 @@ const signInWithDevice = (credentials: IUserCredentials): ThunkAction<void, IAut
   return async (dispatch) => {
     //Если устройство найдено, то проверяем пользователя, иначе возвращаем ошибку устройства
     //Если пользователь найден, записываем в хранилище объект пользователя, иначе возвращаем ошибку идентификации
-    let responseDevice: types.device.IGetDeviceResponse | types.error.INetworkError;
-
     dispatch(authActions.checkDeviceAsync.request(''));
 
-    if (isMock) {
-      await sleep(500);
-
-      responseDevice = { device: device, type: 'GET_DEVICE' };
-    } else {
-      responseDevice = await api.device.getDevice(deviceId);
-    }
+    const responseDevice = await api.device.getDevice(deviceId);
 
     if (responseDevice.type === 'GET_DEVICE') {
       dispatch(authActions.checkDeviceAsync.success(responseDevice.device));
 
-      let responseLogin: types.auth.ILoginResponse | types.error.INetworkError;
-
       dispatch(authActions.loginUserAsync.request(''));
 
-      if (isMock) {
-        await sleep(500);
-
-        if (credentials.name === 'Stas' && credentials.password === '@123!') {
-          responseLogin = { type: 'LOGIN', user };
-        } else {
-          return dispatch(authActions.loginUserAsync.failure('Неверные данные'));
-        }
-      } else {
-        responseLogin = await api.auth.login(credentials);
-      }
+      const responseLogin = await api.auth.login(credentials);
 
       if (responseLogin.type === 'LOGIN') {
         return dispatch(authActions.loginUserAsync.success(responseLogin.user));
@@ -155,7 +125,6 @@ const signInWithDevice = (credentials: IUserCredentials): ThunkAction<void, IAut
       }
 
       return dispatch(authActions.loginUserAsync.failure('something wrong'));
-      //return dispatch(authActions.checkDeviceAsync.success(response.device));
     }
 
     if (responseDevice.type === 'ERROR') {
