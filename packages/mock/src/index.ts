@@ -1,6 +1,5 @@
-import { IDevice } from '@lib/types';
-
 import companies from './companies';
+import devices from './devices';
 
 import users from './users';
 
@@ -8,12 +7,8 @@ export const systemName = 'Inventory';
 
 export const company = companies[0];
 export const company2 = companies[1];
-export const user = users[0];
 
-export const device: IDevice = {
-  name: 'iPhone',
-  state: 'ACTIVE',
-  uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
-  user: { id: user.id, name: user.name },
-  id: '111',
-};
+export const user = users[0];
+export const user2 = users[1];
+
+export const device = devices[0];
