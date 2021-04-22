@@ -15,7 +15,7 @@ const CompanyCreate = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
-  const handleGoBack = () => {
+  const handleGoToCompanies = () => {
     navigate('/app/companies');
   };
 
@@ -24,7 +24,7 @@ const CompanyCreate = () => {
   };
 
   const handleSubmit = (values: NewCompany) => {
-    dispatch(actions.addCompany(values, handleGoBack));
+    dispatch(actions.addCompany(values, handleGoToCompanies));
   };
 
   return (
@@ -50,7 +50,7 @@ const CompanyCreate = () => {
           company={{ name: '' } as ICompany}
           loading={loading}
           onSubmit={handleSubmit}
-          onCancel={handleGoBack}
+          onCancel={handleGoToCompanies}
         />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />

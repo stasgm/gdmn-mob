@@ -103,7 +103,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     type="phoneNumber"
                     disabled={loading}
-                    value={'test@gmail.com'}
+                    value={formik.values.email}
                   />
                 </Grid>
               </Grid>
