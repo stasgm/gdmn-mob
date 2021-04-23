@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "gdmn-mobile",
-    "slug": "app",
+    "slug": "inventory",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.gs.app"
+      "package": "com.gs.inventory"
     },
     "web": {
       "favicon": "./assets/favicon.png"
