@@ -1,12 +1,16 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container, Typography } from '@material-ui/core';
-// import Budget from '../components/dashboard//Budget';
-// import LatestOrders from '../components/dashboard//LatestOrders';
-// import LatestProducts from '../components/dashboard//LatestProducts';
-// import Sales from '../components/dashboard//Sales';
-// import TasksProgress from '../components/dashboard//TasksProgress';
-// import Totalusers from '../components/dashboard//Totalusers';
-// import TotalProfit from '../components/dashboard//TotalProfit';
+import { Box, Container, Typography, Grid } from '@material-ui/core';
+
+// import TotalUsers from '../components/account/AccountProfile';
+
+import TotalUsers from '../components/dashboard/Totals';
+
+// import Budget from '../components/dashboard/Budget';
+// import LatestOrders from '../components/dashboard/LatestOrders';
+// import LatestProducts from '../components/dashboard/LatestProducts';
+// import Sales from '../components/dashboard/Sales';
+// import TasksProgress from '../components/dashboard/TasksProgress';
+// import TotalProfit from '../components/dashboard/TotalProfit';
 // import TrafficByDevice from '../components/dashboard//TrafficByDevice';
 
 const Dashboard = () => (
@@ -22,18 +26,19 @@ const Dashboard = () => (
       }}
     >
       <Container maxWidth={false}>
-        <Typography color="textPrimary" variant="h4">
-          Тут будет сводная информация
-        </Typography>
-
-        {/*        <Grid container spacing={3}>
-           <Grid item lg={3} sm={6} xl={3} xs={12}>
+        <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+          <Typography color="textPrimary" variant="h4">
+            Cводная информация
+          </Typography>
+        </Box>
+        <Grid container spacing={3}>
+          {/* <Grid item lg={3} sm={6} xl={3} xs={12}>
             <Budget />
-          </Grid>
+          </Grid> */}
           <Grid item lg={3} sm={6} xl={3} xs={12}>
-            <Totalusers />
+            <TotalUsers totalusers={10} />
           </Grid>
-          <Grid item lg={3} sm={6} xl={3} xs={12}>
+          {/* <Grid item lg={3} sm={6} xl={3} xs={12}>
             <TasksProgress />
           </Grid>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
@@ -50,9 +55,8 @@ const Dashboard = () => (
           </Grid>
           <Grid item lg={8} md={12} xl={9} xs={12}>
             <LatestOrders />
-          </Grid>
+          </Grid> */}
         </Grid>
-      */}
       </Container>
     </Box>
   </>
