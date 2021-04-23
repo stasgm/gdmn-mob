@@ -1,38 +1,38 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { IUser, NewUser } from '@lib/types';
+import { IDevice, NewDevice } from '@lib/types';
 
-import UserDetails from '../../components/user/UserDetails';
+import DeviceDetails from '../../components/device/DeviceDetails';
 
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user';
+import actions from '../../store/device';
 import SnackBar from '../../components/SnackBar';
 
-const UserEdit = () => {
-  const { id: userId } = useParams();
+const DeviceEdit = () => {
+  const { id: deviceId } = useParams();
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.users);
-  const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
+  const { errorMessage, loading } = useSelector((state) => state.devices);
+  const device = useSelector((state) => state.devices.list.find((i) => i.id === deviceId));
 
-  const handleGoToUserView = () => {
-    navigate(`/app/users/${userId}`);
+  const handleGoToDeviceView = () => {
+    navigate(`/app/devices/${deviceId}`);
   };
 
   const handleClearError = () => {
-    dispatch(actions.userActions.clearError());
+    dispatch(actions.deviceActions.clearError());
   };
 
-  const handleSubmit = (values: IUser | NewUser) => {
-    dispatch(actions.updateUser(values as IUser, handleGoToUserView));
+  const handleSubmit = (values: IDevice | NewDevice) => {
+    dispatch(actions.updateDevice(values as IDevice, handleGoToDeviceView));
   };
 
-  if (!user) {
-    return <Box>Пользователь не найден</Box>;
+  if (!device) {
+    return <Box>Устройство не найдено</Box>;
   }
 
   return (
@@ -47,13 +47,13 @@ const UserEdit = () => {
           alignItems: 'center',
         }}
       >
-        <CardHeader title={'Редактирование пользователя'} />
+        <CardHeader title={'Редактирование устройства'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={handleGoToUserView} />
+      <DeviceDetails device={device} loading={loading} onSubmit={handleSubmit} onCancel={handleGoToDeviceView} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };
 
-export default UserEdit;
+export default DeviceEdit;

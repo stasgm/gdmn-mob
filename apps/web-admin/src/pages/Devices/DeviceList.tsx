@@ -8,11 +8,11 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import UserListTable from '../../components/user/UserListTable';
+import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user/actions.async';
+import actions from '../../store/device/actions.async';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
@@ -23,20 +23,20 @@ const DeviceList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.users);
+  const { list, loading } = useSelector((state) => state.devices);
 
-  const fetchUsers = useCallback(() => dispatch(actions.fetchUsers()), [dispatch]);
+  const fetchDevices = useCallback(() => dispatch(actions.fetchDevices()), [dispatch]);
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    !list?.length && fetchUsers();
-  }, [fetchUsers, list.length]);
+    !list?.length && fetchDevices();
+  }, [fetchDevices, list.length]);
 
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchUsers(),
+      onClick: () => fetchDevices(),
       icon: <CachedIcon />,
     },
     {
@@ -65,7 +65,7 @@ const DeviceList = () => {
   return (
     <>
       <Helmet>
-        <title>Пользователи</title>
+        <title>Устройства</title>
       </Helmet>
       <Box
         sx={{
@@ -75,12 +75,12 @@ const DeviceList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти пользователя'} />
+          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти устройство'} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <UserListTable users={list} />
+              <DeviceListTable devices={list} />
             </Box>
           )}
         </Container>

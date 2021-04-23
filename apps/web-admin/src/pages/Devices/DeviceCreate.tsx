@@ -13,7 +13,7 @@ const DeviceCreate = () => {
 
   const dispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.companies);
+  const { errorMessage, loading } = useSelector((state) => state.devices);
 
   const handleGoToDevices = () => {
     navigate('/app/devices');
@@ -42,12 +42,12 @@ const DeviceCreate = () => {
           }}
         >
           <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <CardHeader title={'Добавление компании'} />
+            <CardHeader title={'Добавление устройства'} />
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>
         <DeviceDetails
-          device={{ name: '' } as NewDevice}
+          device={{ name: '' } as IDevice}
           loading={loading}
           onSubmit={handleSubmit}
           onCancel={handleGoToDevices}
