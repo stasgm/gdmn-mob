@@ -23,5 +23,3 @@ export type AppDispatch = typeof store.dispatch;
 
 export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
-
-// export { store, persistor };

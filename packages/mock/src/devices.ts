@@ -35,4 +35,6 @@ const devices: IDevice[] = [
   },
 ];
 
-export default devices;
+const device = devices[0];
+
+export { device, devices };

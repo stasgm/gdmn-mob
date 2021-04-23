@@ -13,7 +13,7 @@ import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
 import routes from './routes';
 
-const Routing = () => {
+const Router = () => {
   const isLogged = authSelectors.isLogged();
   // const isLogged = true;
 
@@ -26,7 +26,7 @@ const App = () => {
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider theme={theme}>
           <GlobalStyles />
-          <Routing />
+          <Router />
         </ThemeProvider>
       </PersistGate>
     </Provider>
