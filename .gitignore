@@ -72,7 +72,7 @@ dist
 deploy
 
 # relay
-__generated__
+# __generated__
 
 # vsCode
 .vscode/*
