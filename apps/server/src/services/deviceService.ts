@@ -1,9 +1,9 @@
-import { IDBDevice } from '@lib/types';
+import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { devices, codes, users } from './dao/db';
 
 const findOne = async (id: string) => {
-  return devices.find(id);
+  return makeDevice(await devices.find(id));
 };
 
 const findAll = async () => {
@@ -17,11 +17,11 @@ const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name:
     throw new Error('Пользователь не найден');
   }
 
-  return devices.find((i) => i.uid === deviceId && i.userId === user.id);
+  return makeDevice(await devices.find((i) => i.uid === deviceId && i.userId === user.id));
 };
 
 const findOneByUid = async (uid: string) => {
-  return devices.find((i) => i.uid === uid);
+  return makeDevice(await devices.find((i) => i.uid === uid));
 };
 
 /**
@@ -65,18 +65,22 @@ const findUsers = async (deviceId: string) => {
  * @return id, идентификатор устройства
  * */
 
-const addOne = async ({ deviceName, userId }: { deviceName: string; userId: string }): Promise<string> => {
-  if (await devices.find((device) => device.name === deviceName && device.userId === userId)) {
+const addOne = async (device: NewDevice): Promise<IDevice> => {
+  if (await devices.find((i) => i.name === device.userId && i.userId === device.userId)) {
     throw new Error('устройство с таким названием уже добавлено пользователю');
   }
 
-  return devices.insert({
+  const newDevice: IDBDevice = {
     id: '',
-    name: deviceName,
+    name: device.name,
     uid: '',
     state: 'NEW',
-    userId,
-  });
+    userId: device.userId,
+  };
+
+  const createdDevice = await devices.find(await devices.insert(newDevice));
+
+  return makeDevice(createdDevice);
 };
 
 /**
@@ -84,10 +88,26 @@ const addOne = async ({ deviceName, userId }: { deviceName: string; userId: stri
  * @param {IDBDevice} device - устройство
  * @return uid, идентификатор устройства
  * */
-const updateOne = async (device: IDBDevice) => {
-  await devices.update(device);
+const updateOne = async (deviceId: string, deviceData: IDevice) => {
+  const oldDevice = await devices.find(deviceId);
 
-  return device.id; // ?????
+  if (!oldDevice) {
+    throw new Error('Устройство не найдено');
+  }
+
+  const newDevice: IDBDevice = {
+    id: deviceId,
+    name: deviceData.name || oldDevice.name,
+    state: deviceData.state || oldDevice.state,
+    uid: deviceData.uid || oldDevice.uid,
+    userId: deviceData.user.id || oldDevice.userId,
+  };
+
+  await devices.update(newDevice);
+
+  const updatedDevice = await devices.find(deviceId);
+
+  return makeDevice(updatedDevice);
 };
 
 /**
@@ -119,6 +139,21 @@ const genActivationCode = async (deviceId: string) => {
   await devices.update({ ...device, state: 'NON-ACTIVATED' });
 
   return code;
+};
+
+export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
+  const user = await users.find(device.userId);
+
+  const userEntity: INamedEntity = user && { id: user.id, name: user.name };
+
+  /* TODO В звависимости от прав возвращать разный набор полей */
+  return {
+    id: device.id,
+    name: device.name,
+    user: userEntity,
+    state: device.state,
+    uid: device.uid,
+  };
 };
 
 export {

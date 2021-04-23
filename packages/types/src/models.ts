@@ -94,6 +94,8 @@ export interface IDevice extends Omit<IDBDevice, 'userId'> {
   user: INamedEntity;
 }
 
+export type NewDevice = Pick<IDBDevice, 'name' | 'userId'>;
+
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;
 }

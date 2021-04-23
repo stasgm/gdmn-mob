@@ -1,11 +1,21 @@
 import { INamedEntity, IUser } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
-import companies from './companies';
+import { companies } from './companies';
 
-export const superAdmin: INamedEntity = {
+const superAdmin: INamedEntity = {
   id: 'gdmn',
   name: 'gdmn',
+};
+
+const company: INamedEntity = {
+  id: companies[0].id,
+  name: companies[0].name,
+};
+
+const company2: INamedEntity = {
+  id: companies[1].id,
+  name: companies[1].name,
 };
 
 const users: IUser[] = [
@@ -28,7 +38,7 @@ const users: IUser[] = [
     lastName: 'Dzadzevich',
     phoneNumber: '+37529-33-333-33',
     creator: superAdmin,
-    companies: [companies[0]],
+    companies: [company, company2],
     role: 'Admin',
   },
   {
@@ -39,7 +49,7 @@ const users: IUser[] = [
     lastName: 'Svinka',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [companies[0]],
+    companies: [company],
     role: 'User',
   },
   {
@@ -50,7 +60,7 @@ const users: IUser[] = [
     lastName: 'Doctor',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [companies[0]],
+    companies: [company],
     role: 'User',
   },
   {
@@ -61,9 +71,12 @@ const users: IUser[] = [
     lastName: 'Marley',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [companies[0], companies[1]],
+    companies: [company, company2],
     role: 'User',
   },
 ];
 
-export default users;
+const user = users[0];
+const user2 = users[1];
+
+export { users, user, user2 };

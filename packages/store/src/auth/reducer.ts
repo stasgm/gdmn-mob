@@ -35,6 +35,9 @@ const reducer: Reducer<IAuthState, AuthActionType> = (state = initialState, acti
     case getType(authActions.init):
       return initialState;
 
+    case getType(authActions.clearError):
+      return { ...state, error: false };
+
     case getType(authActions.setSettings):
       return { ...state, settings: action.payload };
     // Device

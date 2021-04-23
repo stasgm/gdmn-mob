@@ -7,7 +7,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import DeviceListResults from '../components/device/DeviceListResults';
+import DeviceListResults from '../components/device/DeviceListResults111';
 import ToolbarActionsWithSearch from '../components/ToolbarActionsWithSearch';
 import { IToolBarButton } from '../types';
 

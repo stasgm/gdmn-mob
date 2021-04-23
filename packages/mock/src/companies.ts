@@ -1,12 +1,12 @@
 import { ICompany, INamedEntity } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
-export const admin: INamedEntity = {
+const admin: INamedEntity = {
   id: '1',
   name: 'Stas',
 };
 
-export const admin2: INamedEntity = {
+const admin2: INamedEntity = {
   id: '1',
   name: 'Ina',
 };
@@ -20,4 +20,8 @@ const companies: ICompany[] = [
   { id: uuid(), name: 'Company 4', admin },
 ];
 
-export default companies;
+const company = companies[0];
+
+const company2 = companies[1];
+
+export { companies, company, company2 };
