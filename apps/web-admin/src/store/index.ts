@@ -5,10 +5,12 @@ import { RootState, configureStore } from '@lib/store';
 
 import companyReducer from './company/reducer';
 import userReducer from './user/reducer';
+import deviceReducer from './device/reducer';
 
 export const combinedReducer = {
   companies: companyReducer,
   users: userReducer,
+  devices: deviceReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);

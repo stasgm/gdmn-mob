@@ -5,6 +5,8 @@ import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
 import { NewUser } from '@lib/types';
 
+import { useEffect } from 'react';
+
 import Logo from '../components/Logo';
 
 import actions from '../store/user';
@@ -20,6 +22,10 @@ const Register = () => {
   const handleGoToMain = () => {
     navigate('/app');
   };
+
+  useEffect(() => {
+    dispatch(actions.userActions.clearError());
+  }, [dispatch]);
 
   const formik = useFormik<NewUser>({
     enableReinitialize: true,

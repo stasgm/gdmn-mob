@@ -8,23 +8,24 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { device } from '@lib/mock';
+// import { device } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user';
+import actions from '../../store/device';
+// import CompanyDevices from '../../components/device/CompanyDevices';
 
 import { IToolBarButton } from '../../types';
 
 import ToolBarAction from '../../components/ToolBarActions';
 
-import UserDetailsView from '../../components/user/UserDetailsView';
+import DeviceDetailsView from '../../components/device/DeviceDetailsView';
 
-import UserDevices from '../../components/user/UserDevices';
+// import UserDevices from '../../components/device/';
 
-const UserView = () => {
-  const { id: userId } = useParams();
+const DeviceView = () => {
+  const { id: deviceId } = useParams();
 
   const navigate = useNavigate();
 
@@ -32,28 +33,28 @@ const UserView = () => {
 
   // const classes = useStyles();
 
-  const { loading } = useSelector((state) => state.companies);
-  const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
-  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
+  const { loading } = useSelector((state) => state.devices);
+  const device = useSelector((state) => state.devices.list.find((i) => i.id === deviceId));
+  // const { devices, devicesLoading } = useSelector((state) => state.devices); пользователи из хранилища по deviceId
 
   const handleCancel = () => {
-    navigate('/app/users');
+    navigate('/app/devices');
   };
 
   const handleEdit = () => {
-    navigate(`/app/users/edit/${userId}`);
+    navigate(`/app/devices/edit/${deviceId}`);
   };
 
   const handleRefresh = useCallback(() => {
-    dispatch(actions.fetchUserById(userId));
-  }, [dispatch, userId]);
+    dispatch(actions.fetchDeviceById(deviceId));
+  }, [dispatch, deviceId]);
 
   useEffect(() => {
     handleRefresh();
   }, [handleRefresh]);
 
-  if (!user) {
-    return <Box>Пользователь не найден</Box>;
+  if (!device) {
+    return <Box>Устройство не найдено</Box>;
   }
 
   const buttons: IToolBarButton[] = [
@@ -121,15 +122,15 @@ const UserView = () => {
             minHeight: '100%',
           }}
         >
-          <UserDetailsView user={user} />
+          <DeviceDetailsView device={device} />
         </Box>
       </Box>
-      <Box>
+      {/* <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
         <UserDevices devices={[device]} />
-      </Box>
+      </Box> */}
     </>
   );
 };
 
-export default UserView;
+export default DeviceView;

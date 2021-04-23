@@ -20,4 +20,8 @@ const companies: ICompany[] = [
   { id: uuid(), name: 'Company 4', admin: user2 },
 ];
 
-export default companies;
+const company = companies[0];
+
+const company2 = companies[1];
+
+export { companies, company, company2 };

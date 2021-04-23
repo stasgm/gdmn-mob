@@ -67,4 +67,7 @@ const users: IUser[] = [
   },
 ];
 
-export default users;
+const user = users[0];
+const user2 = users[1];
+
+export { users, user, user2 };

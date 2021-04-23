@@ -8,6 +8,8 @@ import * as yup from 'yup';
 import { authActions, useSelector } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 
+import { useEffect } from 'react';
+
 import Logo from '../components/Logo';
 
 const Login = () => {
@@ -29,6 +31,10 @@ const Login = () => {
       dispatch(authActions.signInWithDevice(values));
     },
   });
+
+  useEffect(() => {
+    dispatch(authActions.authActions.clearError());
+  }, [dispatch]);
 
   // useEffect(() => {
   //   if (device && !error) {
