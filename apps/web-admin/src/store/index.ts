@@ -13,7 +13,7 @@ export const combinedReducer = {
 
 const rootReducer = combineReducers(combinedReducer);
 
-export const store = configureStore(combinedReducer);
+export const { store, persistor } = configureStore(combinedReducer);
 
 export type AppState = ReturnType<typeof rootReducer> & RootState;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
@@ -22,4 +22,4 @@ export type AppDispatch = typeof store.dispatch;
 export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
 
-export default store;
+// export { store, persistor };

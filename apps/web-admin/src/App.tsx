@@ -1,13 +1,13 @@
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import { useRoutes } from 'react-router-dom';
 import { ThemeProvider } from '@material-ui/core';
-
 import { hot } from 'react-hot-loader/root';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import { authSelectors } from '@lib/store';
 
-import { default as store } from './store';
+import { store, persistor } from './store';
 
 import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
@@ -23,10 +23,12 @@ const Routing = () => {
 const App = () => {
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <GlobalStyles />
-        <Routing />
-      </ThemeProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyles />
+          <Routing />
+        </ThemeProvider>
+      </PersistGate>
     </Provider>
   );
 };
