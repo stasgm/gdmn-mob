@@ -1,8 +1,9 @@
 import thunkMiddleware, { ThunkAction } from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
-
 import { Action, Reducer, createStore, combineReducers, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
 import { StateType } from 'typesafe-actions';
 
@@ -21,11 +22,25 @@ const createReducer = (asyncReducers: AppReducers = {}) => {
   });
 };
 
+const persistConfig = {
+  key: 'auth',
+  storage: storage,
+  // whitelist: ['auth'],
+};
+
 export default function configureStore(appReducers: AppReducers) {
   const middleware = [thunkMiddleware];
   const middleWareEnhancer = applyMiddleware(...middleware);
 
-  return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
+  const pReducer = persistReducer(persistConfig, createReducer(appReducers));
+
+  const store = createStore(pReducer, composeWithDevTools(middleWareEnhancer));
+  // return persistStore(store);
+
+  const persistor = persistStore(store);
+  return { store, persistor };
+
+  // return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
 }
 
 export type RootState = StateType<typeof rootReducer>;

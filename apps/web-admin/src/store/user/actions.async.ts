@@ -1,6 +1,4 @@
-import { sleep } from '@lib/store';
-
-import Api, { types } from '@lib/client-api';
+import Api, { types, sleep } from '@lib/client-api';
 
 import { users, user2 } from '@lib/mock';
 import { config } from '@lib/client-config';

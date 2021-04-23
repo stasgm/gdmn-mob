@@ -36,6 +36,5 @@ const devices: IDevice[] = [
 ];
 
 const device = devices[0];
-const device2 = devices[1];
 
-export { devices, device, device2 };
+export { device, devices };

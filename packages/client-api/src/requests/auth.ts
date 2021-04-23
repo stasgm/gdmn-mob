@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios';
+
 import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
