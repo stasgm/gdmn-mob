@@ -1,6 +1,8 @@
 import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
-import { devices, codes, users } from './dao/db';
+import { entities } from './dao/db';
+
+const { devices, codes, users } = entities;
 
 const findOne = async (id: string) => {
   return makeDevice(await devices.find(id));

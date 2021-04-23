@@ -1,6 +1,8 @@
 import { IMessage } from '@lib/types';
 
-import { messages } from './dao/db';
+import { entities } from './dao/db';
+
+const { messages } = entities;
 
 const findOne = async (id: string) => {
   return messages.find(id);

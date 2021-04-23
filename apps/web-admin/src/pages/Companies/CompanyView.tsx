@@ -30,6 +30,7 @@ const CompanyView = () => {
   const dispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.companies);
+  //TODO Вынести в селекторы
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
   // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по companyId
 

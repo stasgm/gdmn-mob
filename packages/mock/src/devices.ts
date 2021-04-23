@@ -1,32 +1,38 @@
 import { IDevice, INamedEntity } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
-import { users } from './users';
+const user1: INamedEntity = {
+  id: '123',
+  name: 'Stas',
+};
 
-const user: INamedEntity = {
-  id: users[0].id,
-  name: users[0].name,
+const user2: INamedEntity = {
+  id: '345',
+  name: 'Ina',
 };
 
 const devices: IDevice[] = [
   {
     id: uuid(),
     name: 'iPhone',
-    user,
-    uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
     state: 'ACTIVE',
+    uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
+    user: user1,
   },
   {
     id: uuid(),
-    name: 'Samsung',
-    user,
-    uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
+    name: 'Android',
     state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb503',
+    user: user2,
+  },
+  {
+    id: uuid(),
+    name: 'WEB',
+    state: 'ACTIVE',
+    uid: 'WEB',
+    user: user1,
   },
 ];
 
-const device = devices[0];
-
-const device2 = devices[1];
-
-export { devices, device, device2 };
+export default devices;

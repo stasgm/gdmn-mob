@@ -18,7 +18,7 @@ import {
 import { ICompany } from '@lib/types';
 
 interface props {
-  companies?: ICompany[];
+  companies: ICompany[];
 }
 
 const CompanyListTable = ({ companies = [], ...rest }: props) => {
@@ -90,6 +90,20 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
             </NavLink>
           </Box>
         </TableCell>
+        <TableCell>
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+            }}
+          >
+            <NavLink to={`/app/users/${company.admin.id}`}>
+              <Typography color="textPrimary" variant="body1" key={company.admin.id}>
+                {company.admin.name}
+              </Typography>
+            </NavLink>
+          </Box>
+        </TableCell>
       </TableRow>
     ));
     return <>{companyList}</>;
@@ -111,6 +125,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>Администратор</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

@@ -1,5 +1,3 @@
-import { IDBCompany, INamedEntity } from '@lib/types';
-
 export interface IApiConfig {
   protocol: string;
   server: string;
@@ -8,13 +6,13 @@ export interface IApiConfig {
   apiPath: string;
 }
 
-export interface IDataFetch {
+/* export interface IDataFetch {
   isLoading: boolean;
   isError: boolean;
   status?: string;
-}
+} */
 
-export interface IAuthState {
+/* export interface IAuthState {
   companyID?: string | null;
   userID?: string | null;
   deviceRegistered?: boolean;
@@ -25,3 +23,4 @@ export interface IAuthState {
     companyName: string;
   };
 }
+ */

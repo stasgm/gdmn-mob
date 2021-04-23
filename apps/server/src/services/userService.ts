@@ -1,8 +1,11 @@
-import { IDBUser, INamedEntity, IUser, NewUser } from '@lib/types';
+import { IDBUser, IUser, NewUser } from '@lib/types';
 
 import { hashPassword } from '../utils/crypt';
 
-import { users, devices, companies } from './dao/db';
+import { entities } from './dao/db';
+import { getNamedEntity } from './dao/utils';
+
+const { users, devices, companies } = entities;
 
 const findOne = async (userId: string): Promise<IUser> => {
   return makeUser(await users.find(userId));
@@ -174,21 +177,9 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
 };
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
-  const companyList: INamedEntity[] = [];
+  const companyList = await getNamedEntity(user.companies, companies);
 
-  for await (const companyId of user.companies) {
-    const company = await companies.find(companyId);
-
-    company &&
-      companyList.push({
-        id: company.id,
-        name: company.name,
-      });
-  }
-
-  const userCreator = await users.find(user.creatorId);
-
-  const creator: INamedEntity = userCreator && { id: userCreator.id, name: userCreator.name };
+  const creator = await getNamedEntity(user.creatorId, users);
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
