@@ -11,7 +11,6 @@ module.exports = {
   context: getRootRelativePath('src'),
   module: {
     rules: [
-      // { test: /\.tsx?$/, loader: 'ts-loader' },
       {
         test: /\.(j|t)sx?$/,
         use: ['babel-loader'],
