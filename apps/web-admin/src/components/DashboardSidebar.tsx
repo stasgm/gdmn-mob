@@ -15,7 +15,7 @@ import NavItem from './NavItem';
 import NavToggle from './NavToggle';
 
 const userInfo = {
-  avatar: '../assets/images/avatar1.svg',
+  avatar: '/assets/images/avatar1.svg',
   jobTitle: 'Senior Developer',
   name: 'Katarina Smith',
 };

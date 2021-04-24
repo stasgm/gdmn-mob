@@ -1,14 +1,16 @@
 import { Avatar, Box, Card, CardContent, Grid, Typography } from '@material-ui/core';
-import { blue } from '@material-ui/core/colors';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
+import { useTheme } from '@material-ui/core/styles';
+import ArrowDowndIcon from '@material-ui/icons/ArrowDownward';
+import DevicesIcon from '@material-ui/icons/Devices';
 
 interface IProps {
-  totalusers: number;
+  value: number;
 }
 
-const TotalUsers = (props: IProps) => {
-  const { totalusers } = props;
+const TotalDevices = (props: IProps) => {
+  const { value } = props;
+
+  const { palette } = useTheme();
 
   return (
     <Card {...props}>
@@ -16,21 +18,21 @@ const TotalUsers = (props: IProps) => {
         <Grid container spacing={3} sx={{ justifyContent: 'space-between' }}>
           <Grid item>
             <Typography color="textSecondary" gutterBottom variant="h6">
-              Всего пользователей
+              Всего устройств
             </Typography>
             <Typography color="textPrimary" variant="h3">
-              {totalusers}
+              {value}
             </Typography>
           </Grid>
           <Grid item>
             <Avatar
               sx={{
-                backgroundColor: blue[600],
+                backgroundColor: palette.primary.main,
                 height: 56,
                 width: 56,
               }}
             >
-              <PeopleIcon />
+              <DevicesIcon />
             </Avatar>
           </Grid>
         </Grid>
@@ -41,15 +43,15 @@ const TotalUsers = (props: IProps) => {
             pt: 2,
           }}
         >
-          <ArrowUpwardIcon sx={{ color: blue[900] }} />
+          <ArrowDowndIcon sx={{ color: palette.primary.dark }} />
           <Typography
             variant="body2"
             sx={{
-              color: blue[900],
+              color: palette.primary.dark,
               mr: 1,
             }}
           >
-            16%
+            -3%
           </Typography>
           <Typography color="textSecondary" variant="caption">
             За последний месяц
@@ -60,4 +62,4 @@ const TotalUsers = (props: IProps) => {
   );
 };
 
-export default TotalUsers;
+export default TotalDevices;

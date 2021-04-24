@@ -39,7 +39,7 @@ const DeviceDetails = ({ device, loading, onSubmit, onCancel }: IProps) => {
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
-                    label="Наименование компании"
+                    label="Наименование устройства"
                     name="name"
                     required
                     variant="outlined"
