@@ -3,9 +3,11 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { configureStore, RootState } from '@lib/store';
 
 import docsReducer from './docs/reducer';
+import refsReducer from './refs/reducer';
 
 export const combinedReducer = {
   docs: docsReducer,
+  refs: refsReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);

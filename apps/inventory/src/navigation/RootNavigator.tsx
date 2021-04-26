@@ -8,6 +8,7 @@ import MapScreen from "../screens/Maps";
 
 import DashboardNavigator from "./Root/DashboardNavigator";
 import DocumentsNavigator from "./Root/DocumentsNavigator";
+import ReferencesNavigator from "./Root/ReferencesNavigator";
 
 console.log("RootNavigator");
 
@@ -23,6 +24,12 @@ const navItems: INavItem[] = [
     title: "Документы",
     icon: "file-document-outline",
     component: DocumentsNavigator,
+  },
+  {
+    name: "References",
+    title: "Справочники",
+    icon: "file-document-outline",
+    component: ReferencesNavigator,
   },
   {
     name: "Map",

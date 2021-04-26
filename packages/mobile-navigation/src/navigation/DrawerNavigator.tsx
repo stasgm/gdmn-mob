@@ -1,16 +1,16 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
-import { DrawerHeaderProps } from '@react-navigation/drawer/lib/typescript/src/types';
-import { DrawerActions } from '@react-navigation/native';
-import React from 'react';
-import { Appbar, useTheme } from 'react-native-paper';
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
+import { DrawerHeaderProps } from "@react-navigation/drawer/lib/typescript/src/types";
+import { DrawerActions } from "@react-navigation/native";
+import React from "react";
+import { Appbar, useTheme } from "react-native-paper";
 
-import ProfileScreen from '../screens/ProfileScreen';
+import ProfileScreen from "../screens/ProfileScreen";
 
-import { DrawerContent } from './drawerContent';
+import { DrawerContent } from "./drawerContent";
 
-import ReferencesNavigator from './Root/ReferencesNavigator';
-import SettingsNavigator from './Root/SettingsNavigator';
+//import ReferencesNavigator from "./Root/ReferencesNavigator";
+import SettingsNavigator from "./Root/SettingsNavigator";
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
@@ -30,13 +30,18 @@ const Header = ({ scene }: DrawerHeaderProps) => {
 
   return (
     <Appbar.Header>
-      <Appbar.Action icon="menu" onPress={() => scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())} />
+      <Appbar.Action
+        icon="menu"
+        onPress={() =>
+          scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())
+        }
+      />
       <Appbar.Content title={title} />
     </Appbar.Header>
   );
 };
 
-console.log('DrawerNavigator');
+console.log("DrawerNavigator");
 
 export interface INavItem {
   name: string;
@@ -54,9 +59,15 @@ const DrawerNavigator = (props: IProps) => {
 
   return (
     <Drawer.Navigator
-      drawerContentOptions={{ activeBackgroundColor: colors.primary, activeTintColor: '#ffffff' }}
+      drawerContentOptions={{
+        activeBackgroundColor: colors.primary,
+        activeTintColor: "#ffffff",
+      }}
       drawerContent={(props) => <DrawerContent {...props} />}
-      screenOptions={{ headerShown: true, header: (props) => <Header {...props} /> }}
+      screenOptions={{
+        headerShown: true,
+        header: (props) => <Header {...props} />,
+      }}
     >
       {props?.items?.map((item) => (
         <Drawer.Screen
@@ -69,19 +80,19 @@ const DrawerNavigator = (props: IProps) => {
           }}
         />
       ))}
-      <Drawer.Screen
+      {/*<Drawer.Screen
         name="References"
         component={ReferencesNavigator}
         options={{
           title: 'Справочники',
           drawerIcon: (props) => <Icon name="book-multiple-outline" {...props} />,
         }}
-      />
+      />*/}
       <Drawer.Screen
         name="Settings"
         component={SettingsNavigator}
         options={{
-          title: 'Настройки',
+          title: "Настройки",
           drawerIcon: (props) => <Icon name="tune" {...props} />,
         }}
       />
@@ -89,8 +100,10 @@ const DrawerNavigator = (props: IProps) => {
         name="Profile"
         component={ProfileScreen}
         options={{
-          title: 'Профиль',
-          drawerIcon: (props) => <Icon name="account-circle-outline" {...props} />,
+          title: "Профиль",
+          drawerIcon: (props) => (
+            <Icon name="account-circle-outline" {...props} />
+          ),
         }}
       />
     </Drawer.Navigator>
