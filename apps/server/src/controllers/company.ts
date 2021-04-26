@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IDBCompany, IResponse } from '@lib/types';
+import { ICompany, IDBCompany, IResponse, NewCompany } from '@lib/types';
 
 import log from '../utils/logger';
 import { companyService } from '../services';
@@ -14,15 +14,12 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'Не указано название компании');
   }
 
-  const company: IDBCompany = { id: name, name, adminId: userId, externalId };
+  const company: NewCompany = { name, adminId: userId, externalId };
 
   try {
-    const companyId = await companyService.addOne({
-      ...company,
-      adminId: userId,
-    });
+    const newCompany = await companyService.addOne(company);
 
-    const result: IResponse<string> = { result: true, data: companyId };
+    const result: IResponse<ICompany> = { result: true, data: newCompany };
 
     ctx.status = 201;
     ctx.body = result;

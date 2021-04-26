@@ -1,4 +1,4 @@
-import { IDBCompany } from '@lib/types';
+import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
 
 import log from '../utils/logger';
 
@@ -11,30 +11,40 @@ const { companies, users } = entities;
  * @param {string} title - наименование организации
  * @return id, идентификатор организации
  * */
-const addOne = async (company: IDBCompany): Promise<string> => {
+const addOne = async (company: NewCompany): Promise<ICompany> => {
   /*
     1. Проверяем что организация существует
     2. Добавляем организацию
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
+
+  const newCompany: IDBCompany = {
+    id: '',
+    name: company.name,
+    adminId: company.adminId,
+    externalId: company.externalId,
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
+  };
+
   if (await companies.find((el) => el.name === company.name)) {
     throw new Error('Компания уже существует');
   }
 
-  const id = await companies.insert(company);
+  const createdCompany = await companies.find(await companies.insert(newCompany));
 
   // Добавляем к текущему
-  await addCompanyToUser(company.adminId, company.name);
+  await addCompanyToUser(createdCompany.adminId, createdCompany.name);
 
   // Добавляем к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
 
   if (user) {
-    await addCompanyToUser(user.id, company.name);
+    await addCompanyToUser(user.id, createdCompany.name);
   }
 
-  return id;
+  return makeCompany(createdCompany);
 };
 
 /**
@@ -42,14 +52,14 @@ const addOne = async (company: IDBCompany): Promise<string> => {
  * @param {string} id - идентификатор организации
  * @return company, организация
  * */
-const findOne = async (id: string): Promise<IDBCompany> => {
+const findOne = async (id: string): Promise<ICompany> => {
   const company = await companies.find(id);
 
   if (!company) {
     throw new Error('Компания не найдена');
   }
 
-  return company;
+  return makeCompany(company);
 };
 
 /**
@@ -57,14 +67,8 @@ const findOne = async (id: string): Promise<IDBCompany> => {
  * @param {string} name - наименование организации
  * @return company, организация
  * */
-const findOneByName = async (name: string): Promise<IDBCompany> => {
-  const company = await companies.find((i) => i.name === name);
-
-  if (!company) {
-    throw new Error('Компания не найдена');
-  }
-
-  return company;
+const findOneByName = async (name: string): Promise<ICompany> => {
+  return makeCompany(await companies.find((i) => i.name === name));
 };
 
 /**
@@ -77,9 +81,11 @@ type Param = {
   [key in keyof Pick<IDBCompany, 'adminId'>]: string;
 };
 
-const findMany = async (param?: Param): Promise<IDBCompany[]> => {
+const findMany = async (param?: Param): Promise<ICompany[]> => {
   log.info(param);
-  return companies.read();
+  return (await companies.read()).map((c) => {
+    return makeCompany(c);
+  });
 };
 
 /**
@@ -130,5 +136,21 @@ const findUsers = async (id: string): Promise<IUser[]> => {
     .filter((el) => el.companies?.some((i: string) => i === company.name))
     .map((el) => makeUser(el));
 }; */
+
+export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
+  const admin = await users.find(company.adminId);
+
+  const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };
+
+  /* TODO В звависимости от прав возвращать разный набор полей */
+  return {
+    id: company.id,
+    name: company.name,
+    admin: adminEntity,
+    externalId: company.externalId,
+    creationDate: company.creationDate,
+    editionDate: company.editionDate,
+  };
+};
 
 export { findOne, findMany, addOne, updateOne, deleteOne, findOneByName };

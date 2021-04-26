@@ -41,7 +41,7 @@ const SignInScreen = (props: Props) => {
   );
 
   const [credential, setCredentials] = useState<IUserCredentials>({
-    userName: 'Stas',
+    name: 'Stas',
     password: '123',
   });
 
@@ -78,8 +78,8 @@ const SignInScreen = (props: Props) => {
               autoCorrect={false}
               underlineColorAndroid="transparent"
               placeholder="Имя пользователя"
-              value={credential.userName}
-              onChangeText={(val) => setCredentials({ ...credential, userName: val })}
+              value={credential.name}
+              onChangeText={(val) => setCredentials({ ...credential, name: val })}
               style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
             />
             <TextInput

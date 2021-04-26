@@ -67,7 +67,7 @@ const fetchUsers = (): AppThunk => {
     if (isMock) {
       await sleep(500);
 
-      response = { users: users, type: 'GET_USERS' };
+      response = { users, type: 'GET_USERS' };
       // response = { message: 'device not found', type: 'ERROR' };
     } else {
       response = await api.user.getUsers();
@@ -128,7 +128,7 @@ const updateUser = (user: IUser, onSuccess?: (user: IUser) => void): AppThunk =>
   return async (dispatch) => {
     let response: types.user.IUpdateUserResponse | types.error.INetworkError;
 
-    dispatch(userActions.updateUserAsync.request('обновление компании'));
+    dispatch(userActions.updateUserAsync.request('обновление пользователя'));
 
     if (isMock) {
       await sleep(500);
