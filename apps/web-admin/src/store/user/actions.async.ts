@@ -128,7 +128,7 @@ const updateUser = (user: IUser, onSuccess?: (user: IUser) => void): AppThunk =>
   return async (dispatch) => {
     let response: types.user.IUpdateUserResponse | types.error.INetworkError;
 
-    dispatch(userActions.updateUserAsync.request('обновление компании'));
+    dispatch(userActions.updateUserAsync.request('обновление пользователя'));
 
     if (isMock) {
       await sleep(500);
