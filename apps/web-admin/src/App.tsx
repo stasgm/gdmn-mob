@@ -8,7 +8,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { authSelectors } from '@lib/store';
 
 import { store, persistor } from './store';
-
 import GlobalStyles from './components/GlobalStyles';
 import theme from './theme';
 import routes from './routes';

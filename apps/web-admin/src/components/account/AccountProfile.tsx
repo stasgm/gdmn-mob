@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@material-ui/core';
 
 const user = {
-  avatar: '../assets/images/avatar1.svg',
+  avatar: '/assets/images/avatar1.svg',
   city: 'Los Angeles',
   country: 'USA',
   jobTitle: 'Senior Developer',
