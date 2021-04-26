@@ -23,27 +23,18 @@ const CompanyList = () => {
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
 
-  /*
-  const useReduxDispatch: AppDispatch = () => {
-    return useDispatch<AppDispatch>();
-  }; */
-
   const { list, loading } = useSelector((state) => state.companies);
-
-  /*   useEffect(() => {
-    dispatch(actions.fetchCompanies2()).then;
-  }, [dispatch]); */
 
   const fetchCompanies = useCallback(
     () =>
-      dispatch(actions.fetchCompanies2())
+      dispatch(actions.fetchCompanies())
         .then((payload) => console.log('done', payload))
         .catch((err) => console.log(err)),
     [dispatch],
   );
 
   useEffect(() => {
-    // Загружаем данные при загрузке компонента. В дальнейшем надо загружать при открытии приложения
+    // Загружаем данные при загрузке компонента.
     fetchCompanies();
   }, [fetchCompanies]);
 
