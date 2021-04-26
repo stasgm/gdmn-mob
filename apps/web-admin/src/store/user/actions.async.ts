@@ -67,7 +67,7 @@ const fetchUsers = (): AppThunk => {
     if (isMock) {
       await sleep(500);
 
-      response = { users: users, type: 'GET_USERS' };
+      response = { users, type: 'GET_USERS' };
       // response = { message: 'device not found', type: 'ERROR' };
     } else {
       response = await api.user.getUsers();

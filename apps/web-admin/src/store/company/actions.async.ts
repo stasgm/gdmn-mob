@@ -91,10 +91,10 @@ const addCompany = (company: NewCompany, onSuccess?: (company: ICompany) => void
       // await sleep(500);
 
       if (company.name === '1') {
-        // Ошибка добавления пользователя
+        // Ошибка добавления компании
         response = { message: 'Компания с таким наименованием уже существует!', type: 'ERROR' };
       } else {
-        // Добаляем пользователя
+        // Добаляем компанию
         response = { company: { ...company, ...company2 }, type: 'ADD_COMPANY' };
       }
     } else {
