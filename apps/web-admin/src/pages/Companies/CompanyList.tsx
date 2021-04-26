@@ -11,7 +11,7 @@ import ImportExportIcon from '@material-ui/icons/ImportExport';
 import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company/actions.async';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
@@ -21,22 +21,37 @@ import { IToolBarButton } from '../../types';
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
+
+  /*
+  const useReduxDispatch: AppDispatch = () => {
+    return useDispatch<AppDispatch>();
+  }; */
 
   const { list, loading } = useSelector((state) => state.companies);
 
-  const fetchCompanies = useCallback(() => dispatch(actions.fetchCompanies()), [dispatch]);
+  /*   useEffect(() => {
+    dispatch(actions.fetchCompanies2()).then;
+  }, [dispatch]); */
+
+  const fetchCompanies = useCallback(
+    () =>
+      dispatch(actions.fetchCompanies2())
+        .then((payload) => console.log('done', payload))
+        .catch((err) => console.log(err)),
+    [dispatch],
+  );
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    !list?.length && fetchCompanies();
-  }, [fetchCompanies, list.length]);
+    // Загружаем данные при загрузке компонента. В дальнейшем надо загружать при открытии приложения
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchCompanies(),
+      onClick: fetchCompanies,
       icon: <CachedIcon />,
     },
     {

@@ -1,11 +1,12 @@
 import Api from '@lib/client-api';
 import { config } from '@lib/client-config';
-
 import { NewCompany, ICompany } from '@lib/types';
 
-import { AppThunk } from '../';
+import { ThunkAction } from 'redux-thunk';
 
-import { companyActions } from './actions';
+import { AppThunk, AppState } from '../';
+
+import { companyActions, CompanyActionType } from './actions';
 
 const {
   debug: { deviceId },
@@ -15,6 +16,26 @@ const {
 } = config;
 
 const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+
+export type AppThunk2 = ThunkAction<Promise<CompanyActionType>, AppState, null, CompanyActionType>;
+
+const fetchCompanies2 = (): ThunkAction<Promise<CompanyActionType>, AppState, null, CompanyActionType> => {
+  return async (dispatch) => {
+    dispatch(companyActions.fetchCompanyAsync.request(''));
+
+    const response = await api.company.getCompanies();
+
+    if (response.type === 'GET_COMPANIES') {
+      return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
+    }
+
+    return dispatch(companyActions.fetchCompaniesAsync.failure('Oops, Something Went Wrong'));
+  };
+};
 
 const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void): AppThunk => {
   return async (dispatch) => {
@@ -29,13 +50,10 @@ const fetchCompanyById = (id: string, onSuccess?: (company?: ICompany) => void):
     }
 
     if (response.type === 'ERROR') {
-      dispatch(companyActions.fetchCompanyAsync.failure(response.message));
-      onSuccess?.();
-      return;
+      return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
     }
 
-    dispatch(companyActions.fetchCompaniesAsync.failure('something wrong'));
-    return;
+    return dispatch(companyActions.fetchCompaniesAsync.failure('something wrong'));
   };
 };
 
@@ -104,4 +122,4 @@ const updateCompany = (company: ICompany, onSuccess?: (company: ICompany) => voi
   };
 };
 
-export default { fetchCompanies, fetchCompanyById, addCompany, updateCompany };
+export default { fetchCompanies, fetchCompanyById, addCompany, updateCompany, fetchCompanies2 };
