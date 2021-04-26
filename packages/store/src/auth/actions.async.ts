@@ -53,6 +53,25 @@ const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, An
   };
 };
 
+const signUp = (userCredentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+  return async (dispatch) => {
+    dispatch(authActions.signUpAsync.request(''));
+
+    const response = await api.auth.signup(userCredentials);
+
+    if (response.type === 'SIGNUP') {
+      return dispatch(authActions.signUpAsync.success(response.user));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(authActions.signUpAsync.failure(response.message));
+    }
+
+    dispatch(authActions.signUpAsync.failure('something wrong'));
+    return;
+  };
+};
+
 const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   return async (dispatch) => {
     dispatch(authActions.loginUserAsync.request(''));
@@ -105,4 +124,4 @@ const signInWithDevice = (credentials: IUserCredentials): ThunkAction<void, IAut
   };
 };
 
-export default { checkDevice, activateDevice, signIn, signInWithDevice };
+export default { checkDevice, activateDevice, signUp, signIn, signInWithDevice };

@@ -5,7 +5,7 @@ import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 import { IAuthState } from './types';
 
 const init = createAction('AUTH/INIT')<IAuthState>();
-const clearError = createAction('USER/CLEAR_ERROR')();
+const clearError = createAction('AUTH/CLEAR_ERROR')();
 export const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
 export const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 export const disconnect = createAction('AUTH/DISCONNECT')();
@@ -29,6 +29,12 @@ const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCCES', 'AU
   string
 >();
 
+const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCCES', 'AUTH/SIGNUP_FAILURE')<
+  string | undefined,
+  IUser,
+  string
+>();
+
 export const authActions = {
   init,
   clearError,
@@ -38,6 +44,7 @@ export const authActions = {
   setCompany,
   checkDeviceAsync,
   loginUserAsync,
+  signUpAsync,
   activateDeviceAsync,
 };
 

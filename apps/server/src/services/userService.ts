@@ -7,25 +7,6 @@ import { getNamedEntity } from './dao/utils';
 
 const { users, devices, companies } = entities;
 
-const findOne = async (userId: string): Promise<IUser> => {
-  return makeUser(await users.find(userId));
-};
-
-const findByName = async (name: string): Promise<IUser> => {
-  return makeUser(await users.find((user) => user.name.toUpperCase() === name.toUpperCase()));
-};
-
-const getUserPassword = async (userId: string): Promise<string> => {
-  return (await users.find(userId)).password;
-};
-
-const findAll = async (): Promise<IUser[]> => {
-  const userList = await users.read();
-  const pr = userList.map(async (i) => await makeUser(i));
-
-  return Promise.all(pr);
-};
-
 /**
  * Добавляет одного пользователя
  * @param {IUser} user - пользователь
@@ -49,13 +30,32 @@ const addOne = async (user: NewUser): Promise<IUser> => {
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
-    createDate: new Date().toISOString(),
-    updateDate: new Date().toISOString(),
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
   };
 
   const createdUser = await users.find(await users.insert(newUser));
 
   return makeUser(createdUser);
+};
+
+const findOne = async (userId: string): Promise<IUser> => {
+  return makeUser(await users.find(userId));
+};
+
+const findByName = async (name: string): Promise<IUser> => {
+  return makeUser(await users.find((user) => user.name.toUpperCase() === name.toUpperCase()));
+};
+
+const getUserPassword = async (userId: string): Promise<string> => {
+  return (await users.find(userId)).password;
+};
+
+const findAll = async (): Promise<IUser[]> => {
+  const userList = await users.read();
+  const pr = userList.map(async (i) => await makeUser(i));
+
+  return Promise.all(pr);
 };
 
 /**
@@ -94,8 +94,8 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     firstName: userData.firstName || oldUser.firstName,
     lastName: userData.lastName || oldUser.lastName,
     phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
-    createDate: oldUser.createDate,
-    updateDate: new Date().toISOString(),
+    creationDate: oldUser.creationDate,
+    editionDate: new Date().toISOString(),
   };
 
   await users.update(newUser);
@@ -192,8 +192,8 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
     externalId: user.externalId,
-    createDate: user.createDate,
-    updateDate: user.updateDate,
+    creationDate: user.creationDate,
+    editionDate: user.editionDate,
   };
 };
 

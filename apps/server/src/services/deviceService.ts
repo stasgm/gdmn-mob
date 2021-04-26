@@ -4,6 +4,31 @@ import { entities } from './dao/db';
 
 const { devices, codes, users } = entities;
 
+/**
+ * Добавляет одно устройство
+ * @param {string} name - название устройства
+ * @param {string} userId - идентификатор пользователя
+ * @return id, идентификатор устройства
+ * */
+
+const addOne = async (device: NewDevice): Promise<IDevice> => {
+  if (await devices.find((i) => i.name === device.userId && i.userId === device.userId)) {
+    throw new Error('устройство с таким названием уже добавлено пользователю');
+  }
+
+  const newDevice: IDBDevice = {
+    id: '',
+    name: device.name,
+    uid: '',
+    state: 'NEW',
+    userId: device.userId,
+  };
+
+  const createdDevice = await devices.find(await devices.insert(newDevice));
+
+  return makeDevice(createdDevice);
+};
+
 const findOne = async (id: string) => {
   return makeDevice(await devices.find(id));
 };
@@ -58,31 +83,6 @@ const findUsers = async (deviceId: string) => {
         state: i.state,
       };
     });
-};
-
-/**
- * Добавляет одно устройство
- * @param {string} name - название устройства
- * @param {string} userId - идентификатор пользователя
- * @return id, идентификатор устройства
- * */
-
-const addOne = async (device: NewDevice): Promise<IDevice> => {
-  if (await devices.find((i) => i.name === device.userId && i.userId === device.userId)) {
-    throw new Error('устройство с таким названием уже добавлено пользователю');
-  }
-
-  const newDevice: IDBDevice = {
-    id: '',
-    name: device.name,
-    uid: '',
-    state: 'NEW',
-    userId: device.userId,
-  };
-
-  const createdDevice = await devices.find(await devices.insert(newDevice));
-
-  return makeDevice(createdDevice);
 };
 
 /**
