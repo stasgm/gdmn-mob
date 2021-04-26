@@ -68,6 +68,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   role: UserRole;
   firstName?: string;
   lastName?: string;
+  surName?: string;
   email?: string;
   phoneNumber?: string;
   creator?: INamedEntity;
