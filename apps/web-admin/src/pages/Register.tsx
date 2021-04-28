@@ -6,7 +6,10 @@ import { Box, Button, Container, Link, TextField, Typography, CircularProgress }
 import { IUserCredentials } from '@lib/types';
 
 import { useEffect } from 'react';
-import { authActions, useSelector, useDispatch, AppDispatch } from '@lib/store';
+
+import { authActions } from '@lib/store';
+
+import { useSelector, useDispatch, AppDispatch } from '../store';
 
 import Logo from '../components/Logo';
 
@@ -29,7 +32,7 @@ const Register = () => {
   };
 
   useEffect(() => {
-    dispatch(authActions.authActions.clearError());
+    //dispatch(authActions.authActions.clearError());
   }, [dispatch]);
 
   const formik = useFormik<IUserCredentials>({

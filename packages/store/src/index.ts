@@ -5,16 +5,18 @@ import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
+import { StateType } from 'typesafe-actions';
+
 import authReducer from './auth/reducer';
 import { AuthActionType } from './auth/actions';
 
-const combinedReducer = {
+const rootReducer = {
   auth: authReducer,
 };
 
 type AppReducers = { [key: string]: Reducer };
 
-const rootReducer = combineReducers(combinedReducer);
+//const rootReducer = combinedReducer; //combineReducers(combinedReducer);
 
 const createReducer = (asyncReducers: AppReducers = {}) => {
   return combineReducers<any, any>({
@@ -44,7 +46,7 @@ export default function configureStore(appReducers: AppReducers) {
   // return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
 }
 
-export type RootState = ReturnType<typeof rootReducer>;
+export type RootState = StateType<typeof rootReducer>;
 export type AppThunk = ThunkAction<void, RootState, null, Action<any>>;
 export type AppDispatch = ThunkDispatch<RootState, any, AuthActionType>;
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;

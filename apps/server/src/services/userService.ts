@@ -4,8 +4,9 @@ import { hashPassword } from '../utils/crypt';
 
 import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
+import { makeDevice } from './deviceService';
 
-const { users, companies } = entities;
+const { users, companies, devices } = entities;
 
 /**
  * Добавляет одного пользователя
@@ -64,13 +65,16 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     }
   }
 
+  // Проверяем есть ли в базе переданный creator
+  const creatorId = userData?.creator ? (await users.find(userData.creator.id))?.id : oldUser.creatorId;
+
   const newUser: IDBUser = {
     id: userId,
     name: userData.name || oldUser.name,
     companies: companyList || oldUser.companies,
     password: passwordHash,
     role: userData.role || oldUser.role,
-    creatorId: userData.creator?.id || oldUser.creatorId,
+    creatorId,
     externalId: userData.externalId || oldUser.externalId,
     firstName: userData.firstName || oldUser.firstName,
     lastName: userData.lastName || oldUser.lastName,
@@ -123,26 +127,17 @@ const findAll = async (): Promise<IUser[]> => {
  * Возвращает список устройств пользователя
  * @param {string} id - идентификатор пользователя
  * */
-// const findDevices = async (userId: string) => {
-//   //нужен ли?
-//   const user = await users.find(userId);
-//   if (!user) {
-//     throw new Error('Пользователь не найден');
-//   }
+const findDevices = async (userId: string) => {
+  const user = await users.find(userId);
+  if (!user) {
+    throw new Error('Пользователь не найден');
+  }
 
-//   return (await devices.read())
-//     .filter((i) => i.userId === userId)
-//     .map((i) => {
-//       return {
-//         id: i.id,
-//         userId: i.userId,
-//         name: user.name,
-//         deviceId: i.uid,
-//         deviceName: i.name,
-//         state: i.state,
-//       };
-//     });
-// };
+  const deviceList = await devices.read();
+  const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
+
+  return Promise.all(pr);
+};
 
 const addCompanyToUser = async (userId: string, companyName: string) => {
   const user = await users.find(userId);
@@ -208,4 +203,5 @@ export {
   addCompanyToUser,
   removeCompanyFromUser,
   getUserPassword,
+  findDevices,
 };

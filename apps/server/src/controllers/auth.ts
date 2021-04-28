@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IResponse, IUser, NewUser } from '@lib/types';
+import { IResponse, IUser, IUserCredentials, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -8,7 +8,7 @@ import { authService, deviceService } from '../services';
 /** Вход пользователя */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { deviceId } = ctx.query;
-  const { name, password } = ctx.request.body;
+  const { name, password } = ctx.request.body as IUserCredentials;
 
   if (!name) {
     ctx.throw(400, 'Не указано имя пользователя');
@@ -67,8 +67,7 @@ const logOut = (ctx: Context): void => {
 
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   // const { deviceId } = ctx.query;
-  const { externalId, name, password, firstName, lastName, surName, phoneNumber, companies, creator } = ctx.request
-    .body as NewUser;
+  const { name, password } = ctx.request.body as IUserCredentials;
 
   if (!name) {
     ctx.throw(400, 'Не указано имя пользователя');
@@ -79,19 +78,13 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   const user: NewUser = {
-    externalId,
     password,
     name,
-    firstName,
-    lastName,
-    surName,
-    phoneNumber,
-    companies: companies || [],
-    creator,
+    companies: [],
   };
 
   try {
-    const newUser = await authService.signUp({ user });
+    const newUser = await authService.signUp(user);
 
     const result: IResponse<IUser> = { result: true, data: newUser };
 

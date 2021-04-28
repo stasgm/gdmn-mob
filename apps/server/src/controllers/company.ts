@@ -71,7 +71,7 @@ const removeCompany = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.status = 200;
     ctx.body = result; // TODO передавать только код 204 без body
 
-    log.info('deleteCompany: OK');
+    log.info('removeCompany: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -125,6 +125,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   try {
+    console.log('controller getCompanies');
     const companyList = await companyService.findAll();
 
     const result: IResponse<ICompany[]> = { result: true, data: companyList };

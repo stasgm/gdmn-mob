@@ -56,7 +56,7 @@ const updateOne = async (companyId: string, companyData: Partial<ICompany>): Pro
   const oldCompany = await companies.find(companyId);
 
   // Проверяем есть ли в базе переданный админ
-  const adminId = companyData?.admin ? (await users.find(companyData?.admin?.id))?.id : oldCompany.adminId;
+  const adminId = companyData?.admin ? (await users.find(companyData.admin.id))?.id : oldCompany.adminId;
 
   const newCompany: IDBCompany = {
     id: companyId,
@@ -121,9 +121,10 @@ type Param = {
 
 const findAll = async (param?: Param): Promise<ICompany[]> => {
   log.info(param);
+  console.log('service findAll');
   const companyList = await companies.read();
   const pr = companyList.map(async (i) => await makeCompany(i));
-
+  console.log('service findAll', pr);
   return Promise.all(pr);
 };
 
