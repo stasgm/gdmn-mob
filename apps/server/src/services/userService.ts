@@ -5,7 +5,7 @@ import { hashPassword } from '../utils/crypt';
 import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
 
-const { users, devices, companies } = entities;
+const { users, companies } = entities;
 
 /**
  * Добавляет одного пользователя
@@ -37,25 +37,6 @@ const addOne = async (user: NewUser): Promise<IUser> => {
   const createdUser = await users.find(await users.insert(newUser));
 
   return makeUser(createdUser);
-};
-
-const findOne = async (userId: string): Promise<IUser> => {
-  return makeUser(await users.find(userId));
-};
-
-const findByName = async (name: string): Promise<IUser> => {
-  return makeUser(await users.find((user) => user.name.toUpperCase() === name.toUpperCase()));
-};
-
-const getUserPassword = async (userId: string): Promise<string> => {
-  return (await users.find(userId)).password;
-};
-
-const findAll = async (): Promise<IUser[]> => {
-  const userList = await users.read();
-  const pr = userList.map(async (i) => await makeUser(i));
-
-  return Promise.all(pr);
 };
 
 /**
@@ -119,29 +100,49 @@ const deleteOne = async (id: string): Promise<void> => {
   await users.delete(id);
 };
 
+const findOne = async (userId: string): Promise<IUser> => {
+  return makeUser(await users.find(userId));
+};
+
+const findByName = async (name: string): Promise<IUser> => {
+  return makeUser(await users.find((user) => user.name.toUpperCase() === name.toUpperCase()));
+};
+
+const getUserPassword = async (userId: string): Promise<string> => {
+  return (await users.find(userId)).password;
+};
+
+const findAll = async (): Promise<IUser[]> => {
+  const userList = await users.read();
+  const pr = userList.map(async (i) => await makeUser(i));
+
+  return Promise.all(pr);
+};
+
 /**
  * Возвращает список устройств пользователя
  * @param {string} id - идентификатор пользователя
  * */
-const findDevices = async (userId: string) => {
-  const user = await users.find(userId);
-  if (!user) {
-    throw new Error('Пользователь не найден');
-  }
+// const findDevices = async (userId: string) => {
+//   //нужен ли?
+//   const user = await users.find(userId);
+//   if (!user) {
+//     throw new Error('Пользователь не найден');
+//   }
 
-  return (await devices.read())
-    .filter((i) => i.userId === userId)
-    .map((i) => {
-      return {
-        id: i.id,
-        userId: i.userId,
-        name: user.name,
-        deviceId: i.uid,
-        deviceName: i.name,
-        state: i.state,
-      };
-    });
-};
+//   return (await devices.read())
+//     .filter((i) => i.userId === userId)
+//     .map((i) => {
+//       return {
+//         id: i.id,
+//         userId: i.userId,
+//         name: user.name,
+//         deviceId: i.uid,
+//         deviceName: i.name,
+//         state: i.state,
+//       };
+//     });
+// };
 
 const addCompanyToUser = async (userId: string, companyName: string) => {
   const user = await users.find(userId);
@@ -201,7 +202,6 @@ export {
   findOne,
   findAll,
   findByName,
-  findDevices,
   addOne,
   updateOne,
   deleteOne,

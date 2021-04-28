@@ -1,12 +1,12 @@
 import { ThunkAction } from 'redux-thunk';
-import { AnyAction } from 'redux';
 
 import { IUserCredentials } from '@lib/types';
 import Api from '@lib/client-api';
 import { config } from '@lib/client-config';
 
-import { authActions } from './actions';
-import { IAuthState } from './types';
+import { RootState } from '../..';
+
+import { authActions, AuthActionType } from './actions';
 
 const {
   debug: { deviceId },
@@ -17,7 +17,9 @@ const {
 
 const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
-const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+export type AppThunk = ThunkAction<Promise<AuthActionType>, RootState, null, AuthActionType>;
+
+const checkDevice = (): AppThunk => {
   return async (dispatch) => {
     dispatch(authActions.checkDeviceAsync.request(''));
 
@@ -35,7 +37,7 @@ const checkDevice = (): ThunkAction<void, IAuthState, unknown, AnyAction> => {
   };
 };
 
-const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+const activateDevice = (code: string): AppThunk => {
   return async (dispatch) => {
     dispatch(authActions.activateDeviceAsync.request(''));
 
@@ -53,7 +55,7 @@ const activateDevice = (code: string): ThunkAction<void, IAuthState, unknown, An
   };
 };
 
-const signUp = (userCredentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+const signUp = (userCredentials: IUserCredentials): AppThunk => {
   return async (dispatch) => {
     dispatch(authActions.signUpAsync.request(''));
 
@@ -67,12 +69,11 @@ const signUp = (userCredentials: IUserCredentials): ThunkAction<void, IAuthState
       return dispatch(authActions.signUpAsync.failure(response.message));
     }
 
-    dispatch(authActions.signUpAsync.failure('something wrong'));
-    return;
+    return dispatch(authActions.signUpAsync.failure('something wrong'));
   };
 };
 
-const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+const signIn = (credentials: IUserCredentials): AppThunk => {
   return async (dispatch) => {
     dispatch(authActions.loginUserAsync.request(''));
 
@@ -90,7 +91,7 @@ const signIn = (credentials: IUserCredentials): ThunkAction<void, IAuthState, un
   };
 };
 
-const signInWithDevice = (credentials: IUserCredentials): ThunkAction<void, IAuthState, unknown, AnyAction> => {
+const signInWithDevice = (credentials: IUserCredentials): AppThunk => {
   return async (dispatch) => {
     //Если устройство найдено, то проверяем пользователя, иначе возвращаем ошибку устройства
     //Если пользователь найден, записываем в хранилище объект пользователя, иначе возвращаем ошибку идентификации

@@ -29,12 +29,78 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
   return makeDevice(createdDevice);
 };
 
+/**
+ * Обновляет устройство
+ * @param {IDBDevice} device - устройство
+ * @return устройство
+ * */
+const updateOne = async (deviceId: string, deviceData: Partial<IDevice>) => {
+  const oldDevice = await devices.find(deviceId);
+
+  if (!oldDevice) {
+    throw new Error('Устройство не найдено');
+  }
+
+  // Проверяем есть ли в базе переданный пользователь
+  const userId = deviceData?.user ? (await users.find(deviceData?.user?.id))?.id : oldDevice.userId;
+
+  const newDevice: IDBDevice = {
+    id: deviceId,
+    name: deviceData.name || oldDevice.name,
+    state: deviceData.state || oldDevice.state,
+    uid: deviceData.uid || oldDevice.uid,
+    userId,
+    creationDate: oldDevice.creationDate,
+    editionDate: new Date().toISOString(),
+  };
+
+  await devices.update(newDevice);
+
+  const updatedDevice = await devices.find(deviceId);
+
+  return makeDevice(updatedDevice);
+};
+
+/**
+ * Удаляет одно устройство
+ * @param {string} id - идентификатор устройства
+ * */
+const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
+  if (!(await devices.find((device) => device.id === deviceId))) {
+    throw new Error('устройство не найдено');
+  }
+
+  await devices.delete((device) => device.id === deviceId);
+};
+
+const genActivationCode = async (deviceId: string) => {
+  const device = await devices.find(deviceId);
+
+  if (!device) {
+    throw new Error('устройство не найдено');
+  }
+
+  // const code = Math.random()
+  //   .toString(36)
+  //   .substr(3, 6);
+  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+  const date = new Date();
+  await codes.insert({ code, date: date.toISOString(), deviceId });
+
+  await devices.update({ ...device, state: 'NON-ACTIVATED' });
+
+  return code;
+};
+
 const findOne = async (id: string) => {
   return makeDevice(await devices.find(id));
 };
 
-const findAll = async () => {
-  return devices.read();
+const findAll = async (): Promise<IDevice[]> => {
+  const deviceList = await devices.read();
+  const pr = deviceList.map(async (i) => await makeDevice(i));
+
+  return Promise.all(pr);
 };
 
 const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name: string }) => {
@@ -83,64 +149,6 @@ const findUsers = async (deviceId: string) => {
         state: i.state,
       };
     });
-};
-
-/**
- * Обновляет устройство
- * @param {IDBDevice} device - устройство
- * @return uid, идентификатор устройства
- * */
-const updateOne = async (deviceId: string, deviceData: IDevice) => {
-  const oldDevice = await devices.find(deviceId);
-
-  if (!oldDevice) {
-    throw new Error('Устройство не найдено');
-  }
-
-  const newDevice: IDBDevice = {
-    id: deviceId,
-    name: deviceData.name || oldDevice.name,
-    state: deviceData.state || oldDevice.state,
-    uid: deviceData.uid || oldDevice.uid,
-    userId: deviceData.user.id || oldDevice.userId,
-  };
-
-  await devices.update(newDevice);
-
-  const updatedDevice = await devices.find(deviceId);
-
-  return makeDevice(updatedDevice);
-};
-
-/**
- * Удаляет одно устройство
- * @param {string} id - идентификатор устройства
- * */
-const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
-  if (!(await devices.find((device) => device.id === deviceId))) {
-    throw new Error('устройство не найдено');
-  }
-
-  await devices.delete((device) => device.id === deviceId);
-};
-
-const genActivationCode = async (deviceId: string) => {
-  const device = await devices.find(deviceId);
-
-  if (!device) {
-    throw new Error('устройство не найдено');
-  }
-
-  // const code = Math.random()
-  //   .toString(36)
-  //   .substr(3, 6);
-  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-  const date = new Date();
-  await codes.insert({ code, date: date.toISOString(), deviceId });
-
-  await devices.update({ ...device, state: 'NON-ACTIVATED' });
-
-  return code;
 };
 
 export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {

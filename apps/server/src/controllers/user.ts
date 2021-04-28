@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IDBDevice, NewUser } from '@lib/types';
+import { IResponse, IUser, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
@@ -39,49 +39,6 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
     log.info(`signUp: user '${name}' is successfully signed up`);
   } catch (err) {
     ctx.throw(400, err.message);
-  }
-};
-
-const getUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: userId } = ctx.params;
-
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
-  }
-
-  try {
-    const user = await userService.findOne(userId);
-
-    if (!user) {
-      ctx.throw(404, 'пользователь не найден');
-    }
-
-    const result: IResponse<IUser> = {
-      result: true,
-      data: user,
-    };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUser: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
-};
-
-const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  try {
-    const users = await userService.findAll();
-
-    const result: IResponse<IUser[]> = { result: true, data: users };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUsers: OK');
-  } catch (err) {
-    ctx.throw(400, err);
   }
 };
 
@@ -133,7 +90,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
+const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
@@ -141,17 +98,61 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDBDevice[];
+    const user = await userService.findOne(userId);
 
-    const result: IResponse<IDBDevice[]> = { result: true, data: deviceIfno };
+    if (!user) {
+      ctx.throw(404, 'пользователь не найден');
+    }
+
+    const result: IResponse<IUser> = {
+      result: true,
+      data: user,
+    };
 
     ctx.status = 200;
     ctx.body = result;
 
-    log.info('getDevicesByUser: OK');
+    log.info('getUser: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
+const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
+  try {
+    const users = await userService.findAll();
+
+    const result: IResponse<IUser[]> = { result: true, data: users };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsers: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
 };
 
-export { addUser, getDevicesByUser, getUsers, getUser, removeUser, updateUser };
+// const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
+//   //нужен ли?
+//   const { id: userId } = ctx.params;
+
+//   if (!userId) {
+//     ctx.throw(400, 'не указан идентификатор пользователя');
+//   }
+
+//   try {
+//     const deviceIfno = ((await userService.findDevices(userId)) as unknown) as IDBDevice[];
+
+//     const result: IResponse<IDBDevice[]> = { result: true, data: deviceIfno };
+
+//     ctx.status = 200;
+//     ctx.body = result;
+
+//     log.info('getDevicesByUser: OK');
+//   } catch (err) {
+//     ctx.throw(400, err);
+//   }
+// };
+
+export { addUser, getUsers, getUser, removeUser, updateUser };
