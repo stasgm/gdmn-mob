@@ -5,13 +5,13 @@ import { ICompany, NewCompany } from '@lib/types';
 import CompanyDetails from '../../components/company/CompanyDetails';
 import SnackBar from '../../components/SnackBar';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
@@ -23,8 +23,11 @@ const CompanyCreate = () => {
     dispatch(actions.companyActions.clearError());
   };
 
-  const handleSubmit = (values: NewCompany) => {
-    dispatch(actions.addCompany(values, handleGoToCompanies));
+  const handleSubmit = async (values: ICompany | NewCompany) => {
+    const res = await dispatch(actions.addCompany(values as NewCompany));
+    if (res.type === 'COMPANY/ADD_SUCCCES') {
+      handleGoToCompanies();
+    }
   };
 
   return (

@@ -28,6 +28,8 @@ class Api {
 
     this.axios = axios.create({
       baseURL: `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`,
+      url: this.config.apiPath,
+      timeout: config.timeout,
     });
 
     this.auth = new Auth(this.axios, this.deviceId);
@@ -42,7 +44,7 @@ class Api {
       (request) => {
         // Добавляем device_ID
         request.params.deviceId = this.deviceId;
-        console.info('✉️ request', request);
+        // console.info('✉️ request', request);
         return request;
       },
       (error) => {

@@ -3,44 +3,49 @@ import { Helmet } from 'react-helmet';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
-import { NewUser } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 
 import { useEffect } from 'react';
 
-import Logo from '../components/Logo';
+import { authActions } from '@lib/store';
 
-import actions from '../store/user';
-import { useDispatch, useSelector } from '../store';
+import { useSelector, useDispatch, AppDispatch } from '../store';
+
+import Logo from '../components/Logo';
 
 const Register = () => {
   const navigate = useNavigate();
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
-  const handleGoToMain = () => {
-    navigate('/app');
+  // const handleGoToMain = () => {
+  //   navigate('/app');
+  // };
+
+  const handleSubmit = async (values: IUserCredentials) => {
+    const res = await dispatch(authActions.signUp(values));
+    if (res.type === 'AUTH/SIGNUP_SUCCCES') {
+      navigate('/app');
+    }
   };
 
   useEffect(() => {
-    dispatch(actions.userActions.clearError());
+    //dispatch(authActions.authActions.clearError());
   }, [dispatch]);
 
-  const formik = useFormik<NewUser>({
+  const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {
       name: '',
       password: '',
-      companies: [],
     },
     validationSchema: yup.object({
       name: yup.string().required('Заполните это поле'),
       password: yup.string().required('Заполните это поле'),
     }),
-    onSubmit: (values) => {
-      dispatch(actions.addUser(values, handleGoToMain));
-    },
+    onSubmit: (values) => handleSubmit(values),
   });
 
   return (
@@ -102,7 +107,7 @@ const Register = () => {
               value={formik.values.name}
               variant="outlined"
             />
-            <TextField
+            {/* <TextField
               error={Boolean(formik.touched.firstName && formik.errors.firstName)}
               fullWidth
               helperText={formik.touched.firstName && formik.errors.firstName}
@@ -138,7 +143,7 @@ const Register = () => {
               type="email"
               value={formik.values.email}
               variant="outlined"
-            />
+            /> */}
             <TextField
               error={Boolean(formik.touched.password && formik.errors.password)}
               required
@@ -174,7 +179,7 @@ const Register = () => {
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={formik.isSubmitting}
+                disabled={loading || !!formik.errors.password || !!formik.errors.name}
                 fullWidth
                 size="large"
                 type="submit"

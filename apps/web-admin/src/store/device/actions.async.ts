@@ -3,9 +3,11 @@ import { devices, device2 } from '@lib/mock';
 import { config } from '@lib/client-config';
 import { IDevice, NewDevice } from '@lib/types';
 
-import { AppThunk } from '..';
+import { ThunkAction } from 'redux-thunk';
 
-import { deviceActions } from './actions';
+import { AppState } from '..';
+
+import { deviceActions, DeviceActionType } from './actions';
 
 const {
   debug: { useMockup: isMock, deviceId },
@@ -16,7 +18,9 @@ const {
 
 const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
-const fetchDeviceById = (id: string, onSuccess?: (device?: IDevice) => void): AppThunk => {
+export type AppThunk = ThunkAction<Promise<DeviceActionType>, AppState, null, DeviceActionType>;
+
+const fetchDeviceById = (id: string): AppThunk => {
   return async (dispatch) => {
     let response: types.device.IGetDeviceResponse | types.error.INetworkError;
 
@@ -36,115 +40,68 @@ const fetchDeviceById = (id: string, onSuccess?: (device?: IDevice) => void): Ap
     }
 
     if (response.type === 'GET_DEVICE') {
-      dispatch(deviceActions.fetchDeviceAsync.success(response.device));
-      onSuccess?.(response.device);
-      return;
+      return dispatch(deviceActions.fetchDeviceAsync.success(response.device));
     }
 
     if (response.type === 'ERROR') {
-      dispatch(deviceActions.fetchDeviceAsync.failure(response.message));
-      onSuccess?.();
-      return;
+      return dispatch(deviceActions.fetchDeviceAsync.failure(response.message));
     }
 
-    dispatch(deviceActions.fetchDevicesAsync.failure('something wrong'));
-    return;
+    return dispatch(deviceActions.fetchDevicesAsync.failure('something wrong'));
   };
 };
 
 const fetchDevices = (): AppThunk => {
   return async (dispatch) => {
-    let response: types.device.IGetDevicesResponse | types.error.INetworkError;
-
     dispatch(deviceActions.fetchDevicesAsync.request(''));
 
-    if (isMock) {
-      await sleep(500);
-
-      response = { devices, type: 'GET_DEVICES' };
-      // response = { message: 'device not found', type: 'ERROR' };
-    } else {
-      response = await api.device.getDevices();
-    }
+    const response = await api.device.getDevices();
 
     if (response.type === 'GET_DEVICES') {
-      dispatch(deviceActions.fetchDevicesAsync.success(response.devices));
-      return;
+      return dispatch(deviceActions.fetchDevicesAsync.success(response.devices));
     }
 
     if (response.type === 'ERROR') {
-      dispatch(deviceActions.fetchDevicesAsync.failure(response.message));
-      return;
+      return dispatch(deviceActions.fetchDevicesAsync.failure(response.message));
     }
 
-    dispatch(deviceActions.fetchDevicesAsync.failure('something wrong'));
-    return;
+    return dispatch(deviceActions.fetchDevicesAsync.failure('something wrong'));
   };
 };
 
-const addDevice = (device: NewDevice, onSuccess?: (device: IDevice) => void): AppThunk => {
+const addDevice = (device: NewDevice): AppThunk => {
   return async (dispatch) => {
-    let response: types.device.IAddDeviceResponse | types.error.INetworkError;
-
     dispatch(deviceActions.addDeviceAsync.request(''));
 
-    if (isMock) {
-      // await sleep(500);
-
-      if (device.name === '1') {
-        // Ошибка добавления устройства
-        response = { message: 'Устройство с таким наименованием уже существует!', type: 'ERROR' };
-      } else {
-        // Добаляем устройство
-        response = { device: { ...device, ...device2 }, type: 'ADD_DEVICE' };
-      }
-    } else {
-      response = await api.device.addDevice(device);
-    }
+    const response = await api.device.addDevice(device);
 
     if (response.type === 'ADD_DEVICE') {
-      dispatch(deviceActions.addDeviceAsync.success(response.device));
-      onSuccess?.(response.device);
-      return;
+      return dispatch(deviceActions.addDeviceAsync.success(response.device));
     }
 
     if (response.type === 'ERROR') {
-      dispatch(deviceActions.addDeviceAsync.failure(response.message));
-      return;
+      return dispatch(deviceActions.addDeviceAsync.failure(response.message));
     }
 
-    dispatch(deviceActions.addDeviceAsync.failure('something wrong'));
-    return;
+    return dispatch(deviceActions.addDeviceAsync.failure('something wrong'));
   };
 };
 
-const updateDevice = (device: IDevice, onSuccess?: (device: IDevice) => void): AppThunk => {
+const updateDevice = (device: IDevice): AppThunk => {
   return async (dispatch) => {
-    let response: types.device.IUpdateDeviceResponse | types.error.INetworkError;
-
     dispatch(deviceActions.updateDeviceAsync.request('обновление устройства'));
 
-    if (isMock) {
-      await sleep(500);
-
-      response = { type: 'UPDATE_DEVICE', device };
-    } else {
-      response = await api.device.updateDevice(device);
-    }
+    const response = await api.device.updateDevice(device);
 
     if (response.type === 'UPDATE_DEVICE') {
-      dispatch(deviceActions.updateDeviceAsync.success(response.device));
-      onSuccess?.(response.device);
-      return;
+      return dispatch(deviceActions.updateDeviceAsync.success(response.device));
     }
 
     if (response.type === 'ERROR') {
-      dispatch(deviceActions.updateDeviceAsync.failure(response.message));
-      return;
+      return dispatch(deviceActions.updateDeviceAsync.failure(response.message));
     }
 
-    dispatch(deviceActions.updateDeviceAsync.failure('something wrong'));
-    return;
+    return dispatch(deviceActions.updateDeviceAsync.failure('something wrong'));
   };
 };
 

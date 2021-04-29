@@ -34,7 +34,11 @@ const findOne = async (id: string) => {
 };
 
 const findAll = async () => {
-  return devices.read();
+  const deviceList = await devices.read();
+  const pr = deviceList.map(async (i) => await makeDevice(i));
+
+  return Promise.all(pr);
+  //return devices.read();
 };
 
 const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name: string }) => {
@@ -60,29 +64,38 @@ const findUsers = async (deviceId: string) => {
     throw new Error('Устройство не найдено');
   }
 
-  return (await devices.read())
-    .filter((i) => i.uid === deviceId)
-    .map(async (i) => {
-      const device = await devices.find(deviceId);
+  // const deviceList = await devices.read();
+  // const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
 
-      if (!device) {
-        throw new Error('Устройство не найдено');
-      }
+  // return Promise.all(pr);
 
-      const user = await users.find(i.userId);
+  return Promise.all(
+    (await devices.read())
+      .filter((i) => i.uid === deviceId)
+      .map(async (i) => {
+        const device = await devices.find(deviceId);
 
-      if (!user) {
-        throw new Error('Пользователь не найден');
-      }
+        if (!device) {
+          throw new Error('Устройство не найдено');
+        }
 
-      return {
-        id: i.id,
-        userId: i.userId,
-        uId: i.uid,
-        name: device.name,
-        state: i.state,
-      };
-    });
+        const user = await users.find(i.userId);
+
+        if (!user) {
+          throw new Error('Пользователь не найден');
+        }
+
+        return await makeDevice(i);
+
+        // return {
+        //   id: i.id,
+        //   userId: i.userId,
+        //   uId: i.uid,
+        //   name: device.name,
+        //   state: i.state,
+        // };
+      }),
+  );
 };
 
 /**
@@ -90,19 +103,22 @@ const findUsers = async (deviceId: string) => {
  * @param {IDBDevice} device - устройство
  * @return uid, идентификатор устройства
  * */
-const updateOne = async (deviceId: string, deviceData: IDevice) => {
+const updateOne = async (deviceId: string, deviceData: Partial<IDevice>) => {
   const oldDevice = await devices.find(deviceId);
 
   if (!oldDevice) {
     throw new Error('Устройство не найдено');
   }
 
+  // Проверяем есть ли в базе переданный пользователь
+  const userId = deviceData?.user ? (await users.find(deviceData.user.id))?.id : oldDevice.userId;
+
   const newDevice: IDBDevice = {
     id: deviceId,
     name: deviceData.name || oldDevice.name,
     state: deviceData.state || oldDevice.state,
     uid: deviceData.uid || oldDevice.uid,
-    userId: deviceData.user.id || oldDevice.userId,
+    userId,
   };
 
   await devices.update(newDevice);

@@ -4,7 +4,7 @@ import { getType } from 'typesafe-actions';
 
 import { config } from '@lib/client-config';
 
-import { IAuthState } from './types';
+import { AuthState } from './types';
 import { AuthActionType, authActions } from './actions';
 // import { config } from '@lib/mock';
 
@@ -14,7 +14,7 @@ const {
   apiPath,
 } = config;
 
-const initialState: Readonly<IAuthState> = {
+const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
@@ -30,7 +30,7 @@ const initialState: Readonly<IAuthState> = {
   status: '',
 };
 
-const reducer: Reducer<IAuthState, AuthActionType> = (state = initialState, action) => {
+const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
   switch (action.type) {
     case getType(authActions.init):
       return initialState;

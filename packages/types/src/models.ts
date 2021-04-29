@@ -32,7 +32,7 @@ export interface IDBCompany extends INamedEntity, IExternalSystemProps {
   adminId: string;
 }
 
-export interface IDBDevice {
+export interface IDBDevice extends INamedEntity {
   id: string;
   name: string;
   userId: string;

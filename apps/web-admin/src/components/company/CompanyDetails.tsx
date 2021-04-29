@@ -1,18 +1,18 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { ICompany } from '@lib/types';
+import { ICompany, NewCompany } from '@lib/types';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 interface IProps {
   loading: boolean;
-  company: ICompany;
-  onSubmit: (values: ICompany) => void;
+  company: ICompany | NewCompany;
+  onSubmit: (values: ICompany | NewCompany) => void;
   onCancel: () => void;
 }
 
 const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
-  const formik = useFormik<ICompany>({
+  const formik = useFormik<ICompany | NewCompany>({
     enableReinitialize: true,
     initialValues: company,
     validationSchema: yup.object().shape({
