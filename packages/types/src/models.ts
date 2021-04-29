@@ -48,13 +48,13 @@ export interface IDBActivationCode {
 }
 
 export interface IDBMessage<T = any> {
-  id?: string;
+  id: string;
   head: {
-    id: string;
+    //id: string;
     appSystem: string;
-    companyid: string;
-    producer: string;
-    consumer: string;
+    company: INamedEntity;
+    producer: INamedEntity;
+    consumer: INamedEntity;
     dateTime: string;
   };
   body: {
@@ -62,6 +62,8 @@ export interface IDBMessage<T = any> {
     payload: T;
   };
 }
+
+export type TNewDBMessage<T = any> = Omit<IDBMessage<T>, 'id'>;
 
 // Типы для передачи и хранения данных на клиенте
 export interface IUser extends INamedEntity, IExternalSystemProps {

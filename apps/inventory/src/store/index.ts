@@ -4,10 +4,12 @@ import { configureStore, RootState } from '@lib/store';
 
 import docsReducer from './docs/reducer';
 import refsReducer from './refs/reducer';
+import messReducer from './mess/reducer';
 
 export const combinedReducer = {
   docs: docsReducer,
   refs: refsReducer,
+  messanges: messReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);

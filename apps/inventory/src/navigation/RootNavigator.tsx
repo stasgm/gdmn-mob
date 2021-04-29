@@ -9,6 +9,7 @@ import MapScreen from "../screens/Maps";
 import DashboardNavigator from "./Root/DashboardNavigator";
 import DocumentsNavigator from "./Root/DocumentsNavigator";
 import ReferencesNavigator from "./Root/ReferencesNavigator";
+import MessagesNavigator from "./Root/MessagesNavigator";
 
 console.log("RootNavigator");
 
@@ -20,6 +21,12 @@ const navItems: INavItem[] = [
     component: DashboardNavigator,
   },
   {
+    name: "Messages",
+    title: "Сообщения",
+    icon: "message-text-outline",
+    component: MessagesNavigator,
+  },
+  {
     name: "Documents",
     title: "Документы",
     icon: "file-document-outline",
@@ -28,7 +35,7 @@ const navItems: INavItem[] = [
   {
     name: "References",
     title: "Справочники",
-    icon: "file-document-outline",
+    icon: "file-search-outline",
     component: ReferencesNavigator,
   },
   {
