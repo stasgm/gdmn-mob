@@ -28,7 +28,7 @@ const createReducer = (asyncReducers: AppReducers = {}) => {
 const persistConfig = {
   key: 'auth',
   storage: storage,
-  // whitelist: ['auth'],
+  whitelist: ['auth'],
 };
 
 export default function configureStore(appReducers: AppReducers) {

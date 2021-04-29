@@ -25,13 +25,16 @@ const CompanyList = () => {
 
   const { list, loading } = useSelector((state) => state.companies);
 
-  const fetchCompanies = useCallback(
-    () =>
-      dispatch(actions.fetchCompanies())
-        .then((payload) => console.log('done', payload))
-        .catch((err) => console.log(err)),
-    [dispatch],
-  );
+  const fetchCompanies = useCallback(async () => {
+    const res = await dispatch(actions.fetchCompanies());
+
+    if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCCES') {
+      console.log(res.payload);
+    }
+    if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
+      console.log('ошибочка', res.payload);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
