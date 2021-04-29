@@ -28,9 +28,9 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={[styles.name, { color: colors.text }]}>{item.number}</Text>
+            <Text style={[styles.name, { color: colors.text }]}>{item.head.number}</Text>
           </View>
-          <Text style={[styles.number, styles.field, { color: colors.text }]}>Документ</Text>
+          <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.head.outlet.name}</Text>
         </View>
       </View>
     </TouchableOpacity>

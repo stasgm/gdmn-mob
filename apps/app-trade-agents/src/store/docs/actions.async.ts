@@ -5,10 +5,11 @@ import { sleep } from '@lib/store';
 
 import { docActions } from './actions';
 import { IDocPayload, IDocState } from './types';
+import { documentData } from './mock';
 
 export const fetchDoc = (): ThunkAction<void, IDocState, unknown, AnyAction> => {
   return async (dispatch) => {
-    const response: IDocPayload = { docData: [{ number: 6 }, { number: 2 }] };
+    const response: IDocPayload = { docData: documentData };
 
     dispatch(docActions.fetchDocsAsync.request(''));
 
