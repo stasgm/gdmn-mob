@@ -14,9 +14,9 @@ const store = setStore();
 console.log("MOCK:", process.env.MOCK);
 
 const App = () => {
-  /*const Router = () =>
-    authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />;*/
-  const Router = () => <RootNavigator />;
+  const Router = () =>
+    authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />;
+  //const Router = () => <RootNavigator />;
 
   return (
     <Provider store={store}>

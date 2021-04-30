@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Constants from "expo-constants";
 
 import { useTheme, Button } from "react-native-paper";
 
@@ -20,6 +21,7 @@ import { IMessage } from "@lib/types";
 
 import Api from "@lib/client-api";
 import { config } from "@lib/client-config";
+import { useSelector as useAuthSelector } from "@lib/store";
 
 import { useSelector } from "../store";
 import mesActions from "../store/mess";
@@ -61,6 +63,7 @@ const MessageItem = ({ item }: { item: IMessage }) => {
 
 const MessagesScreen = () => {
   const { data, loading } = useSelector((state) => state.messanges);
+  const { company } = useAuthSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
@@ -77,9 +80,12 @@ const MessagesScreen = () => {
   );
 
   const handleSend = async () => {
+    if (!company) {
+      return;
+    }
     const response = await api.message.sendMessages(
-      newMessage.head.appSystem,
-      newMessage.head.company,
+      Constants.manifest.extra.SYSTEM_NAME,
+      company,
       newMessage.head.consumer,
       newMessage.body
     );

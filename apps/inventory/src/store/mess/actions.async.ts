@@ -1,7 +1,8 @@
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
+import Constants from 'expo-constants';
 
-import { sleep } from '@lib/store';
+import { sleep, useSelector } from '@lib/store';
 
 import Api from '@lib/client-api';
 import { config } from '@lib/client-config';
@@ -23,11 +24,12 @@ const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId
 export const fetchMes = (): ThunkAction<void, IMesState, unknown, AnyAction> => {
   return async (dispatch) => {
     //const response: IMesPayload = { data };
+    const { company } = useSelector((state) => state.auth);
 
     dispatch(mesActions.fetchMessAsync.request(''));
 
     //await sleep(1000);
-    const response = await api.message.getMessages('Inventory', 'My Company');
+    const response = await api.message.getMessages(Constants.manifest.extra.SYSTEM_NAME, company?.id || 'gdmn');
 
     if (response.type === "GET_MESSAGES") {
       return dispatch(mesActions.fetchMessAsync.success(response.messageList));
