@@ -16,7 +16,7 @@ import { config } from '@lib/client-config';
 import { useSelector as useAuthSelector } from '@lib/store';
 
 import { useSelector } from '../store';
-import mesActions from '../store/mess';
+import mesActions from '../store/messages';
 import { newMessage } from '../store/mock';
 
 // import { IAppState } from '../store';
@@ -63,12 +63,16 @@ const MessagesScreen = () => {
   const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
   const handleSend = async () => {
-    if (!company) {
-      return;
-    }
+    console.log('send new message to server');
+    /*
+    //if (!company) {
+    //  return;
+    //}
     const response = await api.message.sendMessages(
-      Constants.manifest.extra.SYSTEM_NAME,
-      company,
+      //Constants.manifest.extra.SYSTEM_NAME,
+      //company,
+      newMessage.head.appSystem,
+      newMessage.head.company,
       newMessage.head.consumer,
       newMessage.body,
     );
@@ -81,7 +85,8 @@ const MessagesScreen = () => {
       Alert.alert('Ошибка!', response.message, [{ text: 'Закрыть' }]);
     }
 
-    Alert.alert('Ошибка!', 'something wrong', [{ text: 'Закрыть' }]);
+    Alert.alert("Ошибка!", "something wrong", [{ text: "Закрыть" }]);
+    */
   };
 
   const handleLoad = () => {

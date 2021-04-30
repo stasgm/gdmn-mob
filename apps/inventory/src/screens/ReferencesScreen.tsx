@@ -6,9 +6,9 @@ import { useDispatch } from 'react-redux';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import refActions from '../store/refs';
+import refActions from '../store/references';
 import { useSelector } from '../store';
-import { IReference } from '../store/refs/types';
+import { IReference } from '../store/references/types';
 
 const ReferenceItem = ({ item }: { item: IReference }) => {
   const { colors } = useTheme();

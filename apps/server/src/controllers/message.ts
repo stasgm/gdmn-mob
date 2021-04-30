@@ -23,7 +23,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  if (!(ctx.state.user.companies as string[]).find((item) => item === head.companyId)) {
+  if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
     ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 

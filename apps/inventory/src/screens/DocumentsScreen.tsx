@@ -8,9 +8,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
-import docActions from '../store/docs';
+import docActions from '../store/documents';
 import { useSelector } from '../store';
-import { IDocument } from '../store/docs/types';
+import { IDocument } from '../store/documents/types';
 // import { IAppState } from '../store';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {
