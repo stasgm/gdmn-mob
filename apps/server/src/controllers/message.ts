@@ -1,7 +1,7 @@
-import { v1 as uuidv1 } from 'uuid';
+//import { v1 as uuidv1 } from 'uuid';
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IMessage } from '@lib/types';
+import { IResponse, IMessage, TNewMessage } from '@lib/types';
 
 import log from '../utils/logger';
 import { messageService, companyService, userService } from '../services';
@@ -9,17 +9,17 @@ import { messageService, companyService, userService } from '../services';
 let clients: ((result: IMessage[]) => void)[] = [];
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { head, body } = ctx.request.body;
+  const message = ctx.request.body as TNewMessage;
 
-  if (!head) {
+  if (!message.head) {
     ctx.throw(400, 'отсутствует заголовок сообщения');
   }
 
-  if (!body) {
+  if (!message.body) {
     ctx.throw(400, 'отсутствует сообщение');
   }
 
-  if (!(body.type && body.payload && head.companyId)) {
+  if (!(message.body.type && message.body.payload && message.head.company)) {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
@@ -28,23 +28,24 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const msgObject: IMessage = {
+    /*const msgObject: IMessage = {
+      id: uuidv1(),
       head: {
-        id: uuidv1(),
-        companyid: head.companyId,
-        consumer: head.consumer || 'gdmn',
-        producer: ctx.state.user.id,
+        companyId: head.company.id,
+        consumerId: head.consumer.id || 'gdmn',
+        //producer: ctx.state.user.id,
+        producerId: '3',
         dateTime: new Date().toISOString(),
         appSystem: head.appSystem,
       },
       body,
-    };
+    };*/
 
-    clients.forEach((resolve) => {
-      resolve([msgObject]);
-    });
+    /*clients.forEach((resolve) => {
+      resolve([message]);
+    });*/
 
-    const messageId = await messageService.addOne(msgObject);
+    const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
 
     const result: IResponse<{ uid: string; date: Date }> = {
       result: true,
@@ -204,38 +205,38 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const publish = async (ctx: ParameterizedContext): Promise<void> => {
-  const { head, body } = ctx.request.body;
+  const message = ctx.request.body as TNewMessage;
 
-  if (!head) {
+  if (!message.head) {
     ctx.throw(400, 'отсутствует заголовок сообщения');
   }
 
-  if (!body) {
+  if (!message.body) {
     ctx.throw(400, 'отсутствует сообщение');
   }
 
-  if (!(body.type && body.payload && head.companyId)) {
+  if (!(message.body.type && message.body.payload && message.head.company.id)) {
     ctx.throw(400, 'некорректный формат сообщения');
   }
 
-  if (!(ctx.state.user.companies as string[]).find((item) => item === head.companyId)) {
+  if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
     ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   try {
-    const msgObject: IMessage = {
+    /*const msgObject: IDBMessage = {
+      id: uuidv1(),
       head: {
-        id: uuidv1(),
-        companyid: head.companyId,
-        consumer: head.consumer || 'gdmn',
-        producer: ctx.state.user.id,
+        companyId: head.company.id,
+        consumerId: head.consumer.id || 'gdmn',
+        producerId: ctx.state.user.id,
         dateTime: new Date().toISOString(),
         appSystem: head.appSystem,
       },
       body,
-    };
+    };*/
 
-    const messageId = await messageService.addOne(msgObject);
+    const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
 
     const result: IResponse<{ uid: string; date: Date }> = {
       result: true,

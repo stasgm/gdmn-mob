@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { useDispatch } from "react-redux";
 import {
+  Alert,
   FlatList,
   RefreshControl,
   StyleSheet,
@@ -15,14 +16,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { ItemSeparator } from "@lib/mobile-ui/src/components";
 
-import { IDBMessage } from "@lib/types";
+import { IMessage } from "@lib/types";
+
+import Api from "@lib/client-api";
+import { config } from "@lib/client-config";
 
 import { useSelector } from "../store";
 import mesActions from "../store/mess";
+import { newMessage } from "../store/mock";
 
 // import { IAppState } from '../store';
 
-const MessageItem = ({ item }: { item: IDBMessage }) => {
+const MessageItem = ({ item }: { item: IMessage }) => {
   const { colors } = useTheme();
 
   return (
@@ -59,8 +64,35 @@ const MessagesScreen = () => {
 
   const dispatch = useDispatch();
 
-  const handleSend = () => {
-    //dispatch(mesActions.fetchMes);
+  const {
+    debug: { deviceId },
+    server: { name, port, protocol },
+    timeout,
+    apiPath,
+  } = config;
+
+  const api = new Api(
+    { apiPath, timeout, protocol, port, server: name },
+    deviceId
+  );
+
+  const handleSend = async () => {
+    const response = await api.message.sendMessages(
+      newMessage.head.appSystem,
+      newMessage.head.company,
+      newMessage.head.consumer,
+      newMessage.body
+    );
+
+    if (response.type === "SEND_MESSAGE") {
+      Alert.alert("Запрос отправлен!", response.uid, [{ text: "Закрыть" }]);
+    }
+
+    if (response.type === "ERROR") {
+      Alert.alert("Ошибка!", response.message, [{ text: "Закрыть" }]);
+    }
+
+    Alert.alert("Ошибка!", "something wrong", [{ text: "Закрыть" }]);
   };
 
   const handleLoad = () => {
@@ -71,16 +103,16 @@ const MessagesScreen = () => {
     dispatch(mesActions.mesActions.init());
   };
 
-  const renderItem = ({ item }: { item: IDBMessage }) => (
+  const renderItem = ({ item }: { item: IMessage }) => (
     <MessageItem item={item} />
   );
 
-  const ref = useRef<FlatList<IDBMessage>>(null);
+  const ref = useRef<FlatList<IMessage>>(null);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Сообщения приложения</Text>
-      <Button compact={false} onPress={handleSend}>
+      <Button compact={false} onPress={async () => handleSend()}>
         Отправить
       </Button>
       <Button compact={false} onPress={handleLoad}>

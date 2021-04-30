@@ -1,4 +1,4 @@
-import { IDBMessage, TNewDBMessage } from '@lib/types';
+import { IMessage, TNewMessage } from '@lib/types';
 
 const companies = [
   { id: '1', name: 'My Company' },
@@ -11,13 +11,11 @@ const users = [
   { id: '4', name: 'Gedemin' },
 ];
 
-export const newMessage: TNewDBMessage<string> = {
+export const newMessage: TNewMessage<string> = {
   head: {
     appSystem: 'Inventory',
     company: companies[0],
-    producer: users[0],
     consumer: users[3],
-    dateTime: new Date().toISOString(),
   },
   body: {
     type: 'cmd',
@@ -25,7 +23,7 @@ export const newMessage: TNewDBMessage<string> = {
   },
 };
 
-export const data: IDBMessage<string>[] = [
+export const data: IMessage<string>[] = [
   {
     id: '14',
     head: {

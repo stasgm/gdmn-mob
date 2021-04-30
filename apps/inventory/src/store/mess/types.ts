@@ -1,12 +1,12 @@
-import { IDBMessage } from '@lib/types';
+import { IMessage } from '@lib/types';
 
 export type IMesState = {
-  readonly data: IDBMessage[] | undefined;
+  readonly data: IMessage[] | undefined;
   readonly loading: boolean;
   readonly errorMessage: string;
 };
 
 export type IMesPayload = Partial<{
   errorMessage: string;
-  data: IDBMessage[];
+  data: IMessage[];
 }>;

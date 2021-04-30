@@ -50,11 +50,10 @@ export interface IDBActivationCode {
 export interface IDBMessage<T = any> {
   id: string;
   head: {
-    //id: string;
     appSystem: string;
-    company: INamedEntity;
-    producer: INamedEntity;
-    consumer: INamedEntity;
+    companyId: string;
+    producerId: string;
+    consumerId: string;
     dateTime: string;
   };
   body: {
@@ -62,8 +61,6 @@ export interface IDBMessage<T = any> {
     payload: T;
   };
 }
-
-export type TNewDBMessage<T = any> = Omit<IDBMessage<T>, 'id'>;
 
 // Типы для передачи и хранения данных на клиенте
 export interface IUser extends INamedEntity, IExternalSystemProps {
@@ -100,7 +97,30 @@ export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;
 }
 
-export type IMessage = IDBMessage;
+interface IHeadMessage {
+  appSystem: string;
+  company: INamedEntity;
+  producer: INamedEntity;
+  consumer: INamedEntity;
+  dateTime: string;
+}
+
+export interface IMessage<T = any> {
+  id: string;
+  head: IHeadMessage;
+  body: {
+    type: string;
+    payload: T;
+  };
+}
+
+export type TNewMessage<T = any> = {
+  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+  body: {
+    type: string;
+    payload: T;
+  };
+};
 
 export interface IDataMessage<T = any> {
   id: string;

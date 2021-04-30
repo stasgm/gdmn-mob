@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { IMessage, IMessageInfo, IResponse } from '@lib/types';
+import { IMessage, IMessageInfo, INamedEntity, IResponse, TNewMessage } from '@lib/types';
 
 import { error, message as types } from '../types';
 import { BaseApi } from '../requests/baseApi';
@@ -9,10 +9,15 @@ class Message extends BaseApi {
     super(api, deviceId);
   }
 
-  sendMessages = async (systemName: string, companyId: string, consumer: string, message: IMessage['body']) => {
-    const body = {
-      head: { companyId, consumer, appSystem: systemName },
-      message,
+  sendMessages = async (
+    systemName: string,
+    company: INamedEntity,
+    consumer: INamedEntity,
+    message: IMessage['body'],
+  ) => {
+    const body: TNewMessage = {
+      head: { company, consumer, appSystem: systemName },
+      body: message,
     };
     const res = await this.api.post<IResponse<IMessageInfo>>('/messages', body);
     const resData = res.data;
