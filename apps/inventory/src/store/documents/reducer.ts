@@ -5,7 +5,7 @@ import { IDocState } from './types';
 import { DocActionType, docActions } from './actions';
 
 const initialState: Readonly<IDocState> = {
-  docData: [{ number: 1 }, { number: 3 }, { number: 6 }, { number: 10 }],
+  list: [{ number: 1 }, { number: 3 }, { number: 6 }, { number: 10 }],
   loading: false,
   errorMessage: '',
 };
@@ -16,13 +16,13 @@ const reducer: Reducer<IDocState, DocActionType> = (state = initialState, action
       return initialState;
 
     case getType(docActions.fetchDocsAsync.request):
-      return { ...state, loading: true, docData: [] };
+      return { ...state, loading: true, list: [] };
 
     case getType(docActions.fetchDocsAsync.success):
       return {
         ...state,
         loading: false,
-        docData: action.payload,
+        list: action.payload,
       };
 
     case getType(docActions.fetchDocsAsync.failure):

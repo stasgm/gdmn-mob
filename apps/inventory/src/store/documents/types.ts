@@ -3,12 +3,7 @@ export interface IDocument {
 }
 
 export type IDocState = {
-  readonly docData: IDocument[] | undefined;
+  readonly list: IDocument[];
   readonly loading: boolean;
   readonly errorMessage: string;
 };
-
-export type IDocPayload = Partial<{
-  errorMessage: string;
-  docData: IDocument[];
-}>;

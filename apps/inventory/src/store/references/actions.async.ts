@@ -1,28 +1,25 @@
 import { ThunkAction } from 'redux-thunk';
-import { AnyAction } from 'redux';
 
-import { sleep } from '@lib/store';
+import { sleep } from '@lib/client-api';
 
-import { refActions } from './actions';
-import { IRefPayload, IRefState } from './types';
+import { refActions, RefActionType } from './actions';
+import { IReference, IRefState } from './types';
 
-export const fetchRef = (): ThunkAction<void, IRefState, unknown, AnyAction> => {
+export type AppThunk = ThunkAction<Promise<RefActionType>, IRefState, null, RefActionType>;
+
+export const fetchRef = (): AppThunk => {
   return async (dispatch) => {
-    const response: IRefPayload = { data: [{ name: 'Магазины' }, { name: 'Товары' }] };
+    const response: IReference[] = [{ name: 'Магазины' }, { name: 'Товары' }];
 
     dispatch(refActions.fetchRefsAsync.request(''));
 
     await sleep(1000);
 
-    if (response.data) {
-      return dispatch(refActions.fetchRefsAsync.success(response.data));
+    if (response) {
+      return dispatch(refActions.fetchRefsAsync.success(response));
     }
 
-    if (response.data === null) {
-      return dispatch(refActions.fetchRefsAsync.success(response.data));
-    }
-
-    return dispatch(refActions.fetchRefsAsync.failure(response.errorMessage || 'something wrong'));
+    return dispatch(refActions.fetchRefsAsync.failure('something wrong'));
   };
 };
 

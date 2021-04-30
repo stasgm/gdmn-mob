@@ -1,28 +1,26 @@
 import { ThunkAction } from 'redux-thunk';
-import { AnyAction } from 'redux';
 
-import { sleep } from '@lib/store';
+import { sleep } from '@lib/client-api';
 
-import { docActions } from './actions';
-import { IDocPayload, IDocState } from './types';
+import { IDocument, IDocState } from './types';
 
-export const fetchDoc = (): ThunkAction<void, IDocState, unknown, AnyAction> => {
+import { DocActionType, docActions } from './actions';
+
+export type AppThunk = ThunkAction<Promise<DocActionType>, IDocState, null, DocActionType>;
+
+export const fetchDoc = (): AppThunk => {
   return async (dispatch) => {
-    const response: IDocPayload = { docData: [{ number: 6 }, { number: 2 }] };
+    const response: IDocument[] = [{ number: 6 }, { number: 2 }];
 
     dispatch(docActions.fetchDocsAsync.request(''));
 
     await sleep(1000);
 
-    if (response.docData) {
-      return dispatch(docActions.fetchDocsAsync.success(response.docData));
+    if (response) {
+      return dispatch(docActions.fetchDocsAsync.success(response));
     }
 
-    if (response.docData === null) {
-      return dispatch(docActions.fetchDocsAsync.success(response.docData));
-    }
-
-    return dispatch(docActions.fetchDocsAsync.failure(response.errorMessage || 'something wrong'));
+    return dispatch(docActions.fetchDocsAsync.failure('something wrong'));
   };
 };
 

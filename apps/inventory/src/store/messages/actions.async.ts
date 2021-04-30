@@ -3,7 +3,7 @@ import { ThunkAction } from 'redux-thunk';
 
 // import { useSelector } from '@lib/store';
 
-import Api, { sleep } from '@lib/client-api';
+import { sleep } from '@lib/client-api';
 // import { config } from '@lib/client-config';
 
 import { IGetMessagesResponse } from '@lib/client-api/dist/src/types/message';
@@ -13,7 +13,6 @@ import { data } from '../mock';
 
 import { AppState } from '../';
 
-// import { IMesState } from './types';
 import { mesActions, MesActionType } from './actions';
 
 /*

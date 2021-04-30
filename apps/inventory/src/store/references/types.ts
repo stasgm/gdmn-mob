@@ -7,8 +7,3 @@ export type IRefState = {
   readonly loading: boolean;
   readonly errorMessage: string;
 };
-
-export type IRefPayload = Partial<{
-  errorMessage: string;
-  data: IReference[];
-}>;
