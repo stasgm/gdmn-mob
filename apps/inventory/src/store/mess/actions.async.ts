@@ -31,7 +31,7 @@ export const fetchMes = (): ThunkAction<void, IMesState, unknown, AnyAction> => 
     //await sleep(1000);
     const response = await api.message.getMessages(Constants.manifest.extra.SYSTEM_NAME, company?.id || 'gdmn');
 
-    if (response.type === "GET_MESSAGES") {
+    if (response.type === 'GET_MESSAGES') {
       return dispatch(mesActions.fetchMessAsync.success(response.messageList));
     }
 

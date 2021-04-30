@@ -1,21 +1,14 @@
-import { ItemSeparator } from "@lib/mobile-ui/src/components";
-import React, { useRef } from "react";
-import {
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Button, useTheme } from "react-native-paper";
-import { useDispatch } from "react-redux";
+import { ItemSeparator } from '@lib/mobile-ui/src/components';
+import React, { useRef } from 'react';
+import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, useTheme } from 'react-native-paper';
+import { useDispatch } from 'react-redux';
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import refActions from "../store/refs";
-import { useSelector } from "../store";
-import { IReference } from "../store/refs/types";
+import refActions from '../store/refs';
+import { useSelector } from '../store';
+import { IReference } from '../store/refs/types';
 
 const ReferenceItem = ({ item }: { item: IReference }) => {
   const { colors } = useTheme();
@@ -28,21 +21,13 @@ const ReferenceItem = ({ item }: { item: IReference }) => {
     >
       <View style={[styles.item, { backgroundColor: colors.background }]}>
         <View style={[styles.icon]}>
-          <MaterialCommunityIcons
-            name="file-document"
-            size={20}
-            color={"#FFF"}
-          />
+          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={[styles.name, { color: colors.text }]}>
-              {item.name}
-            </Text>
+            <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
           </View>
-          <Text style={[styles.number, styles.field, { color: colors.text }]}>
-            Справочник
-          </Text>
+          <Text style={[styles.number, styles.field, { color: colors.text }]}>Справочник</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -62,9 +47,7 @@ const ReferencesScreen = () => {
     dispatch(refActions.refActions.init());
   };
 
-  const renderItem = ({ item }: { item: IReference }) => (
-    <ReferenceItem item={item} />
-  );
+  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   const ref = useRef<FlatList<IReference>>(null);
 
@@ -86,12 +69,8 @@ const ReferencesScreen = () => {
         scrollEventThrottle={400}
         onEndReached={() => ({})}
         // refreshing={loading}
-        refreshControl={
-          <RefreshControl refreshing={loading} title="загрузка данных..." />
-        }
-        ListEmptyComponent={
-          !loading ? <Text style={styles.emptyList}>Список пуст</Text> : null
-        }
+        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </View>
   );
@@ -106,11 +85,11 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   icon: {
-    alignItems: "center",
-    backgroundColor: "#e91e63",
+    alignItems: 'center',
+    backgroundColor: '#e91e63',
     borderRadius: 18,
     height: 36,
-    justifyContent: "center",
+    justifyContent: 'center',
     width: 36,
   },
   details: {
@@ -120,28 +99,28 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    textAlign: "center",
+    textAlign: 'center',
     margin: 10,
   },
   item: {
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     padding: 8,
   },
   name: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   number: {
     fontSize: 12,
   },
   directionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   emptyList: {
     marginTop: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
   field: {
     opacity: 0.5,
