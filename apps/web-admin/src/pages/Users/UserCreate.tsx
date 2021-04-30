@@ -42,7 +42,7 @@ const UserCreate = () => {
           }}
         >
           <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <CardHeader title={'Добавление компании'} />
+            <CardHeader title={'Добавление пользователя'} />
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>

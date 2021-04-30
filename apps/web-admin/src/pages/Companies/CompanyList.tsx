@@ -11,7 +11,7 @@ import ImportExportIcon from '@material-ui/icons/ImportExport';
 import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company/actions.async';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
@@ -21,22 +21,31 @@ import { IToolBarButton } from '../../types';
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { list, loading } = useSelector((state) => state.companies);
 
-  const fetchCompanies = useCallback(() => dispatch(actions.fetchCompanies()), [dispatch]);
+  const fetchCompanies = useCallback(async () => {
+    const res = await dispatch(actions.fetchCompanies());
+
+    if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCCES') {
+      console.log(res.payload);
+    }
+    if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
+      console.log('ошибочка', res.payload);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    !list?.length && fetchCompanies();
-  }, [fetchCompanies, list.length]);
+    // Загружаем данные при загрузке компонента.
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchCompanies(),
+      onClick: fetchCompanies,
       icon: <CachedIcon />,
     },
     {

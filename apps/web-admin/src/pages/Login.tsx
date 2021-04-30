@@ -1,17 +1,22 @@
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
 import { Box, Button, Container, Link, TextField, Typography, CircularProgress } from '@material-ui/core';
 import * as yup from 'yup';
 
-import { authActions, useSelector } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
+
+import { useEffect } from 'react';
+
+import { authActions } from '@lib/store';
+
+import { useSelector, useDispatch, AppDispatch } from '../store';
 
 import Logo from '../components/Logo';
 
 const Login = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
@@ -29,6 +34,10 @@ const Login = () => {
       dispatch(authActions.signInWithDevice(values));
     },
   });
+
+  useEffect(() => {
+    //dispatch(authActions.authActions.clearError());
+  }, [dispatch]);
 
   // useEffect(() => {
   //   if (device && !error) {

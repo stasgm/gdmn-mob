@@ -13,7 +13,7 @@ export interface IDeviceQueryResponse {
 
 export interface IAddDeviceResponse extends IDeviceQueryResponse {
   type: 'ADD_DEVICE';
-  id: string;
+  device: IDevice;
 }
 
 export interface IGetDevicesResponse extends IDeviceQueryResponse {
@@ -33,7 +33,7 @@ export interface IGetUsersByDeviceResponse extends IDeviceQueryResponse {
 
 export interface IUpdateDeviceResponse extends IDeviceQueryResponse {
   type: 'UPDATE_DEVICE';
-  deviceId: string;
+  device: IDevice;
 }
 
 export interface IRemoveDeviceResponse extends IDeviceQueryResponse {

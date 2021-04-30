@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios';
+
 import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
@@ -14,21 +15,21 @@ class Auth extends BaseApi {
     super(api, deviceId);
   }
 
-  signup = async (name: string, password: string, companyId?: string, creatorId?: string) => {
+  signup = async (userCredentials: IUserCredentials) => {
     if (isMock) {
       await sleep(mockTimeout);
 
       return {
         type: 'SIGNUP',
-        user: { ...mockUser, name },
+        user: { ...mockUser, name: userCredentials.name },
       } as types.ISignUpResponse;
     }
 
     const body = {
-      name: name,
-      password,
-      companies: companyId ? [companyId] : undefined,
-      creatorId: creatorId ?? name,
+      name: userCredentials.name,
+      password: userCredentials.name,
+      // companies: companyId ? [companyId] : undefined,
+      // creatorId: creatorId ?? name,
     };
 
     const res = await this.api.post<IResponse<IUser>>('/auth/signup', body);

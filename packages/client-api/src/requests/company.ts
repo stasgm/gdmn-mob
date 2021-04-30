@@ -52,20 +52,27 @@ class Company extends BaseApi {
       } as types.IGetCompaniesResponse;
     }
 
-    const res = await this.api.get<IResponse<ICompany[]>>('/companies');
-    const resData = res.data;
+    try {
+      const res = await this.api.get<IResponse<ICompany[]>>('/companies');
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'GET_COMPANIES',
+          companies: resData.data,
+        } as types.IGetCompaniesResponse;
+      }
+
       return {
-        type: 'GET_COMPANIES',
-        companies: resData.data,
-      } as types.IGetCompaniesResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   getCompany = async (companyId: string) => {

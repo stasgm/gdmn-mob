@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { AppBar, Badge, Box, Hidden, IconButton, Toolbar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
-import InputIcon from '@material-ui/icons/Input';
+import LogoutIcon from '@material-ui/icons/ExitToAppOutlined';
+
+import { authActions } from '@lib/store';
 
 import Logo from './Logo';
 
@@ -13,6 +16,8 @@ interface IProps {
 
 const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
   const [notifications] = useState([]);
+
+  const dispatch = useDispatch();
 
   return (
     <AppBar elevation={0} {...rest}>
@@ -27,8 +32,8 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton color="inherit">
-            <InputIcon />
+          <IconButton color="inherit" onClick={() => dispatch(authActions.logout())}>
+            <LogoutIcon />
           </IconButton>
         </Hidden>
         <Hidden lgUp>

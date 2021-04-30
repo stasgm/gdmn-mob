@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import Companies from './pages/Companies';
 // import CompanyList from './pages/Companies/CompanyList';
-import DeviceList from './pages/DeviceList';
+import Devices from './pages/Devices';
 import Register from './pages/Register';
 import Login from './pages/Login';
 // import CompanyDetails from './components/company/CompanyDetails';
@@ -23,7 +23,7 @@ const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'companies/*', element: <Companies /> },
       { path: 'users/*', element: <Users /> },
-      { path: 'devices', element: <DeviceList /> },
+      { path: 'devices/*', element: <Devices /> },
       { path: '/', element: <Navigate to="/app/dashboard" /> },
       { path: '*', element: <Navigate to="/404" /> },
     ],

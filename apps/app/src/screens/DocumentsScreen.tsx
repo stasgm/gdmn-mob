@@ -11,7 +11,7 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import docActions from '../store/docs';
 import { useSelector } from '../store';
 import { IDocument } from '../store/docs/types';
-// import { IAppState } from '../store';
+// import { AppState } from '../store';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {
   const { colors } = useTheme();

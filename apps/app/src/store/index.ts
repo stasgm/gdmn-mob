@@ -1,8 +1,12 @@
-import { combineReducers } from 'redux';
+import { combineReducers, Action } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore, RootState } from '@lib/store';
 
 import docsReducer from './docs/reducer';
+import { DocActionType } from './docs/actions';
+
+type TActions = DocActionType;
 
 export const combinedReducer = {
   docs: docsReducer,
@@ -10,15 +14,13 @@ export const combinedReducer = {
 
 const rootReducer = combineReducers(combinedReducer);
 
-export const setStore = () => {
-  // store.dispatch
-  const store = configureStore(combinedReducer);
+export const { store, persistor } = configureStore(combinedReducer);
 
-  return store;
-};
-
-export type IAppState = ReturnType<typeof rootReducer> & RootState;
+export type AppState = ReturnType<typeof rootReducer> & RootState;
+export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
 // export type AppDispatch = typeof store.dispatch;
+export type AppDispatch = ThunkDispatch<AppState, any, TActions>;
 
-export const useSelector: TypedUseSelectorHook<IAppState> = useReduxSelector;
+export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
+export const useThunkDispatch = () => useReduxDispatch<AppDispatch>();
