@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { PersistGate } from 'redux-persist/integration/react';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
@@ -19,9 +20,11 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <UIProvider theme={defaultTheme}>
-          <NavigationContainer>
-            <Router />
-          </NavigationContainer>
+          <ActionSheetProvider>
+            <NavigationContainer>
+              <Router />
+            </NavigationContainer>
+          </ActionSheetProvider>
         </UIProvider>
       </PersistGate>
     </Provider>

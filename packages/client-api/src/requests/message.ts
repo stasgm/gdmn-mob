@@ -1,8 +1,15 @@
 import { AxiosInstance } from 'axios';
-import { IMessage, IMessageInfo, INamedEntity, IResponse, TNewMessage } from '@lib/types';
+import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
+import { messages as mockMessages } from '@lib/mock';
 
 import { error, message as types } from '../types';
-import { BaseApi } from '../requests/baseApi';
+
+import { sleep } from '../utils';
+
+import { BaseApi } from './baseApi';
+
+const isMock = process.env.MOCK || true;
+const mockTimeout = 500;
 
 class Message extends BaseApi {
   constructor(api: AxiosInstance, deviceId: string) {
@@ -15,12 +22,14 @@ class Message extends BaseApi {
     consumer: INamedEntity,
     message: IMessage['body'],
   ) => {
-    const body: TNewMessage = {
+    const body: NewMessage = {
       head: { company, consumer, appSystem: systemName },
       body: message,
     };
+
     const res = await this.api.post<IResponse<IMessageInfo>>('/messages', body);
     const resData = res.data;
+
     if (resData.result) {
       return {
         type: 'SEND_MESSAGE',
@@ -28,14 +37,25 @@ class Message extends BaseApi {
         date: resData.data?.date,
       } as types.ISendMessageResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,
     } as error.INetworkError;
   };
 
-  getMessages = async (systemName: string, companyId: string) => {
-    const res = await this.api.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemName}`);
+  getMessages = async ({ companyId, systemId }: { systemId: string; companyId: string }) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'GET_MESSAGES',
+        messageList: mockMessages,
+        // : { ...mockMessages, id: uuid() },
+      } as types.IGetMessagesResponse;
+    }
+
+    const res = await this.api.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemId}`);
     const resData = res.data;
 
     if (resData.result) {
@@ -44,9 +64,10 @@ class Message extends BaseApi {
         messageList: resData.data,
       } as types.IGetMessagesResponse;
     }
+
     return {
       type: 'ERROR',
-      message: resData.error,
+      message: resData.error || 'Oops, Something Went Wrong',
     } as error.INetworkError;
   };
 
@@ -74,6 +95,7 @@ class Message extends BaseApi {
         type: 'CLEAR_MESSAGES',
       } as types.IClearMessagesResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,
@@ -90,6 +112,7 @@ class Message extends BaseApi {
         messageList: resData.data,
       } as types.ISubscribeResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,
@@ -108,6 +131,7 @@ class Message extends BaseApi {
         date: resData.data?.date,
       } as types.IPublishResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,

@@ -27,5 +27,6 @@
     "moduleResolution": "Node",
     "target": "ES6",
     "isolatedModules": false
-  }
+  },
+  "exclude": ["node_modules", "dist", "config"]
 }

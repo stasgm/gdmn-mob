@@ -5,7 +5,7 @@ import { getType } from 'typesafe-actions';
 import { config } from '@lib/client-config';
 
 import { AuthState } from './types';
-import { AuthActionType, authActions } from './actions';
+import { AuthActionType, actions } from './actions';
 // import { config } from '@lib/mock';
 
 const {
@@ -32,49 +32,49 @@ const initialState: Readonly<AuthState> = {
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
   switch (action.type) {
-    case getType(authActions.init):
+    case getType(actions.init):
       return initialState;
 
-    case getType(authActions.clearError):
+    case getType(actions.clearError):
       return { ...state, error: false };
 
-    case getType(authActions.setSettings):
+    case getType(actions.setSettings):
       return { ...state, settings: action.payload };
     // Device
-    case getType(authActions.checkDeviceAsync.request):
+    case getType(actions.checkDeviceAsync.request):
       return { ...state, loading: true, status: '', error: false };
 
-    case getType(authActions.checkDeviceAsync.success):
+    case getType(actions.checkDeviceAsync.success):
       return { ...state, loading: false, status: '', error: false, device: action.payload };
 
-    case getType(authActions.checkDeviceAsync.failure):
+    case getType(actions.checkDeviceAsync.failure):
       return { ...state, loading: false, status: action.payload, error: true };
 
-    case getType(authActions.activateDeviceAsync.request):
+    case getType(actions.activateDeviceAsync.request):
       return { ...state, error: false, status: '', loading: true };
 
-    case getType(authActions.activateDeviceAsync.success):
+    case getType(actions.activateDeviceAsync.success):
       return { ...state, device: action.payload, error: false, status: '', loading: false };
 
-    case getType(authActions.activateDeviceAsync.failure):
+    case getType(actions.activateDeviceAsync.failure):
       return { ...state, device: null, error: true, status: action.payload, loading: false };
     // User
-    case getType(authActions.loginUserAsync.request):
+    case getType(actions.loginUserAsync.request):
       return { ...state, error: false, status: '', loading: true, user: undefined };
 
-    case getType(authActions.loginUserAsync.success):
+    case getType(actions.loginUserAsync.success):
       return { ...state, user: action.payload, error: false, status: '', loading: false, company: undefined };
 
-    case getType(authActions.loginUserAsync.failure):
+    case getType(actions.loginUserAsync.failure):
       return { ...state, error: true, status: action.payload, loading: false, user: null };
 
-    case getType(authActions.logout):
+    case getType(actions.logout):
       return { ...state, user: undefined };
     // Misc
-    case getType(authActions.setCompany):
+    case getType(actions.setCompany):
       return { ...state, company: action.payload };
 
-    case getType(authActions.disconnect):
+    case getType(actions.disconnect):
       return { ...state, device: undefined, error: false, status: '', loading: false };
 
     default:

@@ -1,7 +1,7 @@
 //import { v1 as uuidv1 } from 'uuid';
 import { ParameterizedContext } from 'koa';
 
-import { IResponse, IMessage, TNewMessage } from '@lib/types';
+import { IResponse, IMessage, NewMessage } from '@lib/types';
 
 import log from '../utils/logger';
 import { messageService, companyService, userService } from '../services';
@@ -9,7 +9,7 @@ import { messageService, companyService, userService } from '../services';
 let clients: ((result: IMessage[]) => void)[] = [];
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const message = ctx.request.body as TNewMessage;
+  const message = ctx.request.body as NewMessage;
 
   if (!message.head) {
     ctx.throw(400, 'отсутствует заголовок сообщения');
@@ -205,7 +205,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const publish = async (ctx: ParameterizedContext): Promise<void> => {
-  const message = ctx.request.body as TNewMessage;
+  const message = ctx.request.body as NewMessage;
 
   if (!message.head) {
     ctx.throw(400, 'отсутствует заголовок сообщения');

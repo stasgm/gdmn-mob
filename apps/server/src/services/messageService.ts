@@ -1,4 +1,4 @@
-import { IDBMessage, IMessage, TNewMessage } from '@lib/types';
+import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
 import { entities } from './dao/db';
@@ -40,7 +40,7 @@ const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; c
  * @return id, идентификатор сообщения
  * */
 
-const addOne = async ({ msgObject, producerId }: { msgObject: TNewMessage; producerId: string }): Promise<string> => {
+const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; producerId: string }): Promise<string> => {
   /*if (await messages.find((i) => i.id === msgObject.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
   }*/
@@ -141,7 +141,7 @@ export const makeDBMessage = (message: IMessage): IDBMessage => {
   };
 };
 
-export const makeDBNewMessage = (message: TNewMessage, producerId: string): IDBMessage => {
+export const makeDBNewMessage = (message: NewMessage, producerId: string): IDBMessage => {
   return {
     id: uuidv1(),
     head: {

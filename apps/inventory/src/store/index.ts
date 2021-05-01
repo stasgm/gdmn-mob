@@ -2,26 +2,31 @@ import { combineReducers, Action } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore, RootState } from '@lib/store';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import ExpoFileSystemStorage from 'redux-persist-expo-filesystem';
 
 import docsReducer from './documents/reducer';
 import refsReducer from './references/reducer';
-import messReducer from './messages/reducer';
 
 import { DocActionType } from './documents/actions';
 import { RefActionType } from './references/actions';
-import { MesActionType } from './messages/actions';
 
-type TActions = DocActionType | RefActionType | MesActionType;
+type TActions = DocActionType | RefActionType;
 
 export const combinedReducer = {
   docs: docsReducer,
   refs: refsReducer,
-  messanges: messReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
 
-export const { store, persistor } = configureStore(combinedReducer);
+const persistConfig = {
+  key: 'auth',
+  storage: ExpoFileSystemStorage,
+  whitelist: ['auth'],
+};
+
+export const { store, persistor } = configureStore(combinedReducer, persistConfig);
 
 export type AppState = ReturnType<typeof rootReducer> & RootState;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

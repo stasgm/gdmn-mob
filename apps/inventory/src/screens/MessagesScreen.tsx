@@ -1,25 +1,13 @@
-import React, { useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { Alert, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Constants from 'expo-constants';
-
-import { useTheme, Button } from 'react-native-paper';
-
+import React, { useCallback, useRef } from 'react';
+import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme, FAB } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
-
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
-
-import Api from '@lib/client-api';
-import { config } from '@lib/client-config';
-import { useSelector as useAuthSelector } from '@lib/store';
-
-import { useSelector } from '../store';
-import mesActions from '../store/messages';
-import { newMessage } from '../store/mock';
-
-// import { IAppState } from '../store';
+import { useSelector, msgActions, useDispatch } from '@lib/store';
+// import colors from '@lib/mobile-ui/src/styles/colors';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
   const { colors } = useTheme();
@@ -48,84 +36,95 @@ const MessageItem = ({ item }: { item: IMessage }) => {
 };
 
 const MessagesScreen = () => {
-  const { data, loading } = useSelector((state) => state.messanges);
-  const { company } = useAuthSelector((state) => state.auth);
+  const { data, loading } = useSelector((state) => state.messages);
+  const { company } = useSelector((state) => state.auth);
+  const { colors } = useTheme();
 
   const dispatch = useDispatch();
+  const showActionSheet = useActionSheet();
 
-  const {
-    debug: { deviceId },
-    server: { name, port, protocol },
-    timeout,
-    apiPath,
-  } = config;
+  /*
+const handleSend = async () => {
+  console.log('send new message to server');
+  //if (!company) {
+  //  return;
+  //}
+  const response = await api.message.sendMessages(
+    //Constants.manifest.extra.SYSTEM_NAME,
+    //company,
+    newMessage.head.appSystem,
+    newMessage.head.company,
+    newMessage.head.consumer,
+    newMessage.body,
+  );
 
-  const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+  if (response.type === 'SEND_MESSAGE') {
+    Alert.alert('Запрос отправлен!', response.uid, [{ text: 'Закрыть' }]);
+  }
 
-  const handleSend = async () => {
-    console.log('send new message to server');
-    /*
-    //if (!company) {
-    //  return;
-    //}
-    const response = await api.message.sendMessages(
-      //Constants.manifest.extra.SYSTEM_NAME,
-      //company,
-      newMessage.head.appSystem,
-      newMessage.head.company,
-      newMessage.head.consumer,
-      newMessage.body,
-    );
+  if (response.type === 'ERROR') {
+    Alert.alert('Ошибка!', response.message, [{ text: 'Закрыть' }]);
+  }
 
-    if (response.type === 'SEND_MESSAGE') {
-      Alert.alert('Запрос отправлен!', response.uid, [{ text: 'Закрыть' }]);
-    }
+  Alert.alert("Ошибка!", "something wrong", [{ text: "Закрыть" }]);
 
-    if (response.type === 'ERROR') {
-      Alert.alert('Ошибка!', response.message, [{ text: 'Закрыть' }]);
-    }
+}; */
 
-    Alert.alert("Ошибка!", "something wrong", [{ text: "Закрыть" }]);
-    */
-  };
+  const handleLoad = useCallback(() => {
+    company && dispatch(msgActions.fetchMsg({ companyId: company.id, systemId: 'Inventory' })); //TODO systemId из конфига
+  }, [company, dispatch]);
 
-  const handleLoad = () => {
-    dispatch(mesActions.fetchMes());
-  };
+  const handleReset = useCallback(() => {
+    dispatch(msgActions.init());
+  }, [dispatch]);
 
-  const handleReset = () => {
-    dispatch(mesActions.mesActions.init());
-  };
+  const handleDeleteAll = useCallback(() => {
+    dispatch(msgActions.deleteAllMessages());
+  }, [dispatch]);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDeleteAll,
+      },
+      {
+        title: 'Сбросить',
+        onPress: handleReset,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleDeleteAll, handleLoad, handleReset, showActionSheet]);
 
   const renderItem = ({ item }: { item: IMessage }) => <MessageItem item={item} />;
 
   const ref = useRef<FlatList<IMessage>>(null);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Сообщения приложения</Text>
-      <Button compact={false} onPress={async () => handleSend()}>
-        Отправить
-      </Button>
-      <Button compact={false} onPress={handleLoad}>
-        Получить
-      </Button>
-      <Button compact={false} onPress={handleReset}>
-        Сбросить
-      </Button>
-      <FlatList
-        ref={ref}
-        data={data}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
-        scrollEventThrottle={400}
-        onEndReached={() => ({})}
-        // refreshing={loading}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-      />
-    </View>
+    <>
+      <View style={styles.container}>
+        <FlatList
+          ref={ref}
+          data={data}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparator}
+          scrollEventThrottle={400}
+          onEndReached={() => ({})}
+          refreshControl={<RefreshControl refreshing={loading} title="Загрузка данных..." />}
+          ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        />
+      </View>
+      <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
+    </>
   );
 };
 
@@ -135,7 +134,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 5,
-    // alignItems: 'center',
   },
   icon: {
     alignItems: 'center',
@@ -149,11 +147,6 @@ const styles = StyleSheet.create({
     margin: 8,
     marginRight: 0,
     flex: 1,
-  },
-  title: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
   },
   item: {
     alignItems: 'center',
@@ -177,5 +170,11 @@ const styles = StyleSheet.create({
   },
   field: {
     opacity: 0.5,
+  },
+  fabAdd: {
+    bottom: 0,
+    margin: 20,
+    position: 'absolute',
+    right: 0,
   },
 });

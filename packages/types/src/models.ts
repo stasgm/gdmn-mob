@@ -117,7 +117,7 @@ export interface IMessage<T = any> {
   };
 }
 
-export type TNewMessage<T = any> = {
+export type NewMessage<T = any> = {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
   body: {
     type: string;

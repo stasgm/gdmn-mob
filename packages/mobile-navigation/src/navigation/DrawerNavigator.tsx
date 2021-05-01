@@ -25,13 +25,14 @@ export type RootDrawerParamList = {
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
 const Header = ({ scene }: DrawerHeaderProps) => {
-  const { options } = scene.descriptor;
+  const { options, navigation } = scene.descriptor;
   const title = options.headerTitle ?? options.title ?? scene.route.name;
 
   return (
     <Appbar.Header>
-      <Appbar.Action icon="menu" onPress={() => scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())} />
+      <Appbar.Action icon="menu" onPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
       <Appbar.Content title={title} />
+      {/* <Appbar.Action icon="dots-vertical" /> */}
     </Appbar.Header>
   );
 };

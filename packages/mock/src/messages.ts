@@ -1,21 +1,35 @@
-import { IMessage, TNewMessage } from '@lib/types';
+import { ICompany, IMessage, INamedEntity, NewMessage } from '@lib/types';
+import { v4 as uuid } from 'uuid';
 
-const companies = [
-  { id: '1', name: 'My Company' },
-  { id: '2', name: 'Company 1' },
-];
-const users = [
-  { id: '1', name: 'Lena' },
-  { id: '2', name: 'Stas' },
-  { id: '3', name: 'Inna' },
-  { id: '4', name: 'Gedemin' },
+const user1: INamedEntity = {
+  id: '123',
+  name: 'Stas',
+};
+
+const user2: INamedEntity = {
+  id: '345',
+  name: 'Ina',
+};
+
+const user3: INamedEntity = {
+  id: '654',
+  name: 'Gedemin',
+};
+
+const companies: ICompany[] = [
+  { id: '789', name: 'ОДО Золотые Программы', admin: user1 },
+  { id: '654', name: 'ОДО Амперсант', admin: user2 },
+  { id: uuid(), name: 'Company 1', admin: user2 },
+  { id: uuid(), name: 'Company 2', admin: user2 },
+  { id: uuid(), name: 'Company 3', admin: user1 },
+  { id: uuid(), name: 'Company 4', admin: user2 },
 ];
 
-export const newMessage: TNewMessage<string> = {
+export const newMessage: NewMessage<string> = {
   head: {
     appSystem: 'Inventory',
     company: companies[0],
-    consumer: users[3],
+    consumer: user1,
   },
   body: {
     type: 'cmd',
@@ -23,14 +37,14 @@ export const newMessage: TNewMessage<string> = {
   },
 };
 
-export const data: IMessage<string>[] = [
+export const messages: IMessage<string>[] = [
   {
     id: '14',
     head: {
       appSystem: 'Inventory',
       company: companies[0],
-      producer: users[0],
-      consumer: users[3],
+      producer: user3,
+      consumer: user1,
       dateTime: '2021-04-15T10:47:33.376Z',
     },
     body: {
@@ -43,8 +57,8 @@ export const data: IMessage<string>[] = [
     head: {
       appSystem: 'Inventory',
       company: companies[0],
-      producer: users[3],
-      consumer: users[2],
+      producer: user3,
+      consumer: user1,
       dateTime: '2021-04-21T10:52:33.376Z',
     },
     body: {
@@ -57,8 +71,8 @@ export const data: IMessage<string>[] = [
     head: {
       appSystem: 'Inventory',
       company: companies[0],
-      producer: users[3],
-      consumer: users[1],
+      producer: user3,
+      consumer: user1,
       dateTime: '2021-04-21T18:03:33.376Z',
     },
     body: {
@@ -71,8 +85,8 @@ export const data: IMessage<string>[] = [
     head: {
       appSystem: 'Inventory',
       company: companies[0],
-      producer: users[1],
-      consumer: users[3],
+      producer: user2,
+      consumer: user3,
       dateTime: '2021-04-25T09:21:33.376Z',
     },
     body: {
@@ -85,8 +99,8 @@ export const data: IMessage<string>[] = [
     head: {
       appSystem: 'Inventory',
       company: companies[0],
-      producer: users[2],
-      consumer: users[3],
+      producer: user3,
+      consumer: user2,
       dateTime: '2021-04-28T14:10:33.376Z',
     },
     body: {
