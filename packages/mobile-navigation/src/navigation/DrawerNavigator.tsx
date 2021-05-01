@@ -11,6 +11,7 @@ import { DrawerContent } from './drawerContent';
 
 //import ReferencesNavigator from "./Root/ReferencesNavigator";
 import SettingsNavigator from './Root/SettingsNavigator';
+import MessagesNavigator from './Root/MessagesNavigator';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
@@ -18,7 +19,7 @@ export type RootDrawerParamList = {
   References: undefined;
   Settings: undefined;
   Profile: undefined;
-  Map: undefined;
+  Messages: undefined;
   [itemName: string]: undefined;
 };
 
@@ -76,14 +77,14 @@ const DrawerNavigator = (props: IProps) => {
           }}
         />
       ))}
-      {/*<Drawer.Screen
-        name="References"
-        component={ReferencesNavigator}
+      <Drawer.Screen
+        name="Messages"
+        component={MessagesNavigator}
         options={{
-          title: 'Справочники',
-          drawerIcon: (props) => <Icon name="book-multiple-outline" {...props} />,
+          title: 'Сообщения',
+          drawerIcon: (props) => <Icon name="message-text-outline" {...props} />,
         }}
-      />*/}
+      />
       <Drawer.Screen
         name="Settings"
         component={SettingsNavigator}

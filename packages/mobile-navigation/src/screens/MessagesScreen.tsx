@@ -71,8 +71,15 @@ const handleSend = async () => {
 }; */
 
   const handleLoad = useCallback(() => {
-    company && dispatch(msgActions.fetchMsg({ companyId: company.id, systemId: 'Inventory' })); //TODO systemId из конфига
+    //TODO systemId из конфига
+    company && dispatch(msgActions.fetchMsg({ companyId: company.id, systemId: 'Inventory' }));
   }, [company, dispatch]);
+
+  const handleProcessAll = useCallback(async () => {
+    for await (const message of data) {
+      console.log(message);
+    }
+  }, [data]);
 
   const handleReset = useCallback(() => {
     dispatch(msgActions.init());
@@ -89,14 +96,18 @@ const handleSend = async () => {
         onPress: handleLoad,
       },
       {
-        title: 'Удалить',
+        title: 'Обработать все',
+        onPress: handleProcessAll,
+      },
+      {
+        title: 'Удалить все',
         type: 'destructive',
         onPress: handleDeleteAll,
       },
-      {
-        title: 'Сбросить',
-        onPress: handleReset,
-      },
+      /*       {
+              title: 'Сбросить',
+              onPress: handleReset,
+            }, */
       {
         title: 'Отмена',
         type: 'cancel',
