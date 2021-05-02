@@ -1,19 +1,20 @@
-import { AxiosInstance } from 'axios';
+// import { AxiosInstance } from 'axios';
 import { v4 as uuid } from 'uuid';
 
 import { IResponse, IUser, NewUser } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
 import { error, user as types } from '../types';
-import { BaseApi } from '../requests/baseApi';
+import { BaseRequest } from '../requests/baseApi';
 import { sleep } from '../utils';
+import { BaseApi } from '../types/types';
 
 const isMock = process.env.MOCK;
 const mockTimeout = 500;
 
-class User extends BaseApi {
-  constructor(api: AxiosInstance, deviceId: string) {
-    super(api, deviceId);
+class User extends BaseRequest {
+  constructor(api: BaseApi) {
+    super(api);
   }
 
   addUser = async (user: NewUser) => {
@@ -26,7 +27,7 @@ class User extends BaseApi {
       } as types.IAddUserResponse;
     }
 
-    const res = await this.api.post<IResponse<IUser>>('/users', user);
+    const res = await this.api.axios.post<IResponse<IUser>>('/users', user);
     const resData = res.data;
 
     if (resData.result) {
@@ -59,7 +60,7 @@ class User extends BaseApi {
       } as error.INetworkError;
     }
 
-    const res = await this.api.get<IResponse<IUser[]>>('/users');
+    const res = await this.api.axios.get<IResponse<IUser[]>>('/users');
     const resData = res.data;
 
     if (resData.result) {
@@ -93,7 +94,7 @@ class User extends BaseApi {
       } as error.INetworkError;
     }
 
-    const res = await this.api.get<IResponse<IUser>>(`/users/${userId}`);
+    const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
     const resData = res.data;
 
     if (resData.result) {
@@ -127,7 +128,7 @@ class User extends BaseApi {
       } as error.INetworkError;
     }
 
-    const res = await this.api.patch<IResponse<IUser>>(`/users/${user.id}`, user);
+    const res = await this.api.axios.patch<IResponse<IUser>>(`/users/${user.id}`, user);
     const resData = res.data;
 
     if (resData.result) {
@@ -151,7 +152,7 @@ class User extends BaseApi {
       } as types.IRemoveUserResponse;
     }
 
-    const res = await this.api.delete<IResponse<void>>(`/users/${userId}`);
+    const res = await this.api.axios.delete<IResponse<void>>(`/users/${userId}`);
     const resData = res.data;
 
     if (resData.result) {
