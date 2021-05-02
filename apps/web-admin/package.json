@@ -1,0 +1,102 @@
+{
+  "name": "@apps/web-admin",
+  "displayName": "web-admin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "web-admin",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn run clean-dist && webpack --config=configs/webpack/prod.js",
+    "clean-dist": "rimraf dist/*",
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "start": "yarn run start-dev",
+    "start:mock": "cross-env MOCK=true DEVICE_ID=web yarn start-dev",
+    "start-dev": "webpack serve --config=configs/webpack/dev.js",
+    "start-prod": "yarn run build",
+    "precommit": "lint-staged",
+    "test": "jest --coverage --watchAll --config=configs/jest.json"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "prettier": "@config/prettier-config",
+  "dependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@emotion/react": "^11.1.5",
+    "@emotion/styled": "^11.3.0",
+    "@hot-loader/react-dom": "^17.0.1",
+    "@lib/client-api": "*",
+    "@lib/mock": "*",
+    "@lib/store": "*",
+    "@lib/types": "*",
+    "@material-ui/core": "^5.0.0-alpha.28",
+    "@material-ui/icons": "^5.0.0-alpha.28",
+    "@material-ui/styled-engine": "^5.0.0-alpha.25",
+    "@material-ui/styles": "^5.0.0-alpha.28",
+    "@types/material-ui": "^0.21.8",
+    "@types/node": "^14.14.41",
+    "@types/react": "~17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@types/react-helmet": "^6.1.1",
+    "@types/react-redux": "^7.1.16",
+    "@types/styled-components": "^5.1.9",
+    "@types/yup": "^0.29.11",
+    "babel-loader": "^8.2.2",
+    "clsx": "^1.1.1",
+    "cross-env": "^7.0.3",
+    "css-loader": "^5.2.4",
+    "formik": "^2.2.6",
+    "history": "^5.0.0",
+    "html-webpack-plugin": "^5.3.1",
+    "image-webpack-loader": "^7.0.1",
+    "node-sass": "^5.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-feather": "^2.0.9",
+    "react-helmet": "^6.1.0",
+    "react-hot-loader": "^4.13.0",
+    "react-perfect-scrollbar": "^1.5.8",
+    "react-redux": "^7.2.3",
+    "react-router": "^6.0.0-beta.0",
+    "react-router-dom": "^6.0.0-beta.0",
+    "rimraf": "^3.0.2",
+    "sass-loader": "^11.0.1",
+    "style-loader": "^2.0.0",
+    "typescript": "^4.2.4",
+    "uuid": "^8.3.2",
+    "webpack": "^5.35.1",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.7.3",
+    "yup": "^0.32.9"
+  },
+  "devDependencies": {
+    "@config/eslint-config": "*",
+    "@config/eslint-config-react": "*",
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4",
+    "react-hot-loader": "^4.13.0"
+  }
+}

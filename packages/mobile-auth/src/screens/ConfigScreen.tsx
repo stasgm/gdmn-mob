@@ -14,21 +14,17 @@ export type Props = {
 
 const ConfigScreen = (props: Props) => {
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   const { settings, onSetSettings } = props;
   const [serverName, setServerName] = useState(`${settings?.protocol}${settings?.server}` || '');
   const [serverPort, setServerPort] = useState(settings?.port.toString() || '');
   const [timeout, setTimeout] = useState(settings?.timeout?.toString() || '');
 
-  const { colors } = useTheme();
-
   const handleSaveSettings = () => {
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
     const protocol: string = match?.[1] || '';
     const server: string = match?.[2] || '';
-
-    // const protocol: string = settings?.protocol || '';
-    // const server: string = serverName;
 
     const newSettings: IApiConfig = {
       apiPath: settings?.apiPath || '',

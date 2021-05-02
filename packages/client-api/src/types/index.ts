@@ -1,8 +1,8 @@
-import * as authTypes from './auth';
-import * as userTypes from './user';
-import * as companyTypes from './company';
-import * as deviceTypes from './device';
-import * as messageTypes from './message';
+import * as auth from './auth';
+import * as user from './user';
+import * as company from './company';
+import * as device from './device';
+import * as message from './message';
+import * as error from './error';
 
-export { INetworkError } from './error';
-export { authTypes, userTypes, messageTypes, companyTypes, deviceTypes };
+export { auth, user, message, company, device, error };

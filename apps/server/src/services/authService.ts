@@ -7,28 +7,27 @@ import { VerifyFunction } from 'passport-local';
 
 import bcrypt from 'bcrypt';
 
-import { IUser } from '@lib/types';
+import { IUser, NewUser } from '@lib/types';
 
-import log from '../utils/logger';
-
-import { devices, users, codes } from './dao/db';
-
+import { entities } from './dao/db';
 import * as userService from './userService';
+
+const { devices, users, codes } = entities;
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
-  const { userName } = ctx.request.body;
+  const { name }: { name: string } = ctx.request.body;
 
-  const user = await users.find((i) => i.userName.toUpperCase() === String(userName).toUpperCase());
+  const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new Error('пользователь не найден');
+    throw new Error('Неверное имя пользователя или пароль');
   }
 
   const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
 
   if (!device) {
-    throw new Error('связанное с пользователем устройство не найдено');
+    throw new Error('Cвязанное с пользователем устройство не найдено');
   }
 
   if (device.state === 'BLOCKED') {
@@ -42,7 +41,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
     }
 
     if (!usr) {
-      throw new Error('неверный пользователь или пароль');
+      throw new Error('Неверное имя пользователя или пароль');
     }
 
     await ctx.login(usr);
@@ -51,23 +50,19 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   })(ctx, next);
 };
 
-const signUp = async ({ user }: { user: Omit<IUser, 'role'> }) => {
+const signUp = async (user: NewUser): Promise<IUser> => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;
 
   if (!userCount) {
-    // const gdmnUser = await users.insert({
-    //   userName: 'gdmn',
-    //   creatorId: user.userName,
-    //   password: passwordHash,
-    //   companies: [],
-    // });
-    // await devices.insert({ name: 'GDMN-WEB', uid: 'WEB', state: 'ACTIVE', userId: gdmnUser });
-
-    const gdmnUserObj: IUser = {
-      userName: 'gdmn',
-      creatorId: user.userName,
+    // TODO временно!!! в дальнейшем пользователя внешней системы тоже надо создавать
+    const gdmnUserObj: Omit<IUser, 'id'> & { password: string } = {
+      name: 'gdmn',
+      creator: {
+        id: '',
+        name: '',
+      },
       password: 'gdmn',
       companies: [],
       role: 'Admin',
@@ -76,41 +71,38 @@ const signUp = async ({ user }: { user: Omit<IUser, 'role'> }) => {
     const gdmnUser = await userService.addOne(gdmnUserObj);
 
     await devices.insert({
+      id: '',
       name: 'GDMN-WEB',
       uid: 'WEB',
       state: 'ACTIVE',
-      userId: gdmnUser,
+      userId: gdmnUser.id,
     });
   }
 
-  const userid = await userService.addOne({
-    ...user,
-    role: user.creatorId === user.userName ? 'Admin' : 'User',
-  });
+  const newUser = await userService.addOne(user);
 
-  if (user.creatorId === user.userName) {
+  if (!user.creator?.id) {
+    // TODO временно!!! если создаётся не пользователем то добавляем устройство WEB
     await devices.insert({
+      id: '',
       name: 'WEB',
       uid: 'WEB',
       state: 'ACTIVE',
-      userId: userid,
+      userId: newUser.id,
     });
   }
 
-  // TODO: обработать поиск по передаваемой организации
-  /* if (deviceId === 'WEB') {
-    await devices.insert({ name: 'WEB', uid: 'WEB', state: 'ACTIVE', userId: userid });
-  } */
-
-  return userid;
+  return newUser;
 };
 
-const validateAuthCreds: VerifyFunction = async (userName: string, password: string, done) => {
-  const user = await userService.findByName(userName);
+const validateAuthCreds: VerifyFunction = async (name: string, password: string, done) => {
+  const user = await userService.findByName(name);
+
+  const hashedPassword = await userService.getUserPassword(user.id);
 
   if (!user) done(null, false);
 
-  if (await bcrypt.compare(password, user.password)) {
+  if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
   } else {
     done(null, false);
@@ -126,9 +118,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
 
   const date: Date = new Date(rec.date);
 
-  log.info(date);
   date.setDate(date.getDate() + 7);
-  log.info(date);
 
   // const dateDiff = date.getDate() - new Date().getDate();
 

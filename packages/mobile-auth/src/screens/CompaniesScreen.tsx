@@ -5,7 +5,7 @@ import { Button, IconButton, useTheme } from 'react-native-paper';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle, RadioGroup } from '@lib/mobile-ui/src/components';
 import { ICompany, IResponse } from '@lib/types';
-import { company, company2 } from '@lib/store/mock';
+import { company, company2 } from '@lib/mock';
 
 type Props = {
   onLogout: () => void;
@@ -96,7 +96,7 @@ const CompaniesScreen = (props: Props) => {
         <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
           <RadioGroup
             onChange={(value) => setSelectedCompany(companies.find((i) => i.id === value.id))}
-            options={companies.map((i) => ({ id: i.id, value: i.title }))}
+            options={companies.map((i) => ({ id: i.id, value: i.name }))}
             activeButtonId={selectedCompany?.id}
           />
         </ScrollView>

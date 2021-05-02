@@ -1,8 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { authActions, RootState } from '@lib/store';
+import { authActions, useSelector } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
@@ -20,7 +20,7 @@ type AuthStackParamList = {
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { device, settings, user } = useSelector((state: RootState) => state.auth);
+  const { device, settings, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const saveSettings = useCallback((newSettings: IApiConfig) => dispatch(authActions.setSettings(newSettings)), [
@@ -71,6 +71,12 @@ const AuthNavigator: React.FC = () => {
     };
   }, []);
 
+  /*
+    Если device undefined то переходим на окно с подключеним
+    Если device null то переходим на окно активации устройства
+    Если device не null и user undefined то переходим на окно входа пользователя
+    Если device не null и user не undefined или null то переходим на окно выбора компании
+  */
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {device ? (

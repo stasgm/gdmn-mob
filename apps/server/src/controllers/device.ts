@@ -1,13 +1,89 @@
 import { ParameterizedContext } from 'koa';
 
-import { IDevice, IResponse, IDeviceInfo } from '@lib/types';
+import { IDevice, IResponse, NewDevice } from '@lib/types';
 
 import log from '../utils/logger';
 import { deviceService } from '../services';
 
+const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
+  const { deviceName, userId } = ctx.request.body;
+
+  if (!deviceName) {
+    ctx.throw(400, 'не указано наименование устройства');
+  }
+
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
+
+  const device: NewDevice = {
+    name: deviceName,
+    userId,
+  };
+
+  try {
+    const newDevice = await deviceService.addOne(device);
+
+    const result: IResponse<IDevice> = { result: true, data: newDevice };
+
+    ctx.status = 201;
+    ctx.body = result;
+
+    log.info('addDevice: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
+const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: deviceId } = ctx.params;
+  const deviceData = ctx.request.body as Partial<IDevice>;
+
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
+  }
+
+  if (!deviceData) {
+    ctx.throw(400, 'не указана информация об устройстве');
+  }
+
+  try {
+    const updatedDevice = await deviceService.updateOne(deviceId, deviceData);
+
+    const result: IResponse<IDevice> = { result: true, data: updatedDevice };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('updateDevice: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
+};
+
+const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: deviceId } = ctx.params;
+
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
+  }
+
+  try {
+    await deviceService.deleteOne({ deviceId });
+
+    const result: IResponse<void> = { result: true };
+
+    ctx.status = 200;
+    ctx.body = result; // TODO передавать только код 204 без body
+
+    log.info('updateDevice: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
+};
+
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
-  // const { userId }: { userId: string } = ctx.request.body;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан идентификатор устройства');
@@ -32,20 +108,20 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId, userName }: { id: string; userName: string } = ctx.params;
+  const { id: deviceId, name }: { id: string; name: string } = ctx.params;
 
   if (!deviceId) {
     ctx.throw(400, 'не указан uid устройства');
   }
 
-  if (!userName) {
+  if (!name) {
     ctx.throw(400, 'не указано имя пользователя');
   }
 
   try {
     const device = await deviceService.findOneByUidAndUser({
       deviceId,
-      userName,
+      name,
     });
 
     if (!device) {
@@ -104,31 +180,6 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
   }
 }; */
 
-const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceName, userId } = ctx.request.body;
-
-  if (!deviceName) {
-    ctx.throw(400, 'не указано наименование устройства');
-  }
-
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
-  }
-
-  try {
-    const id = await deviceService.addOne({ deviceName, userId });
-
-    const result: IResponse<string> = { result: true, data: id };
-
-    ctx.status = 201;
-    ctx.body = result;
-
-    log.info('addDevice: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
-};
-
 const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
 
@@ -137,9 +188,9 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    const userList = ((await deviceService.findUsers(deviceId)) as unknown) as IDeviceInfo[];
+    const userList = await deviceService.findUsers(deviceId);
 
-    const result: IResponse<IDeviceInfo[]> = { result: true, data: userList };
+    const result: IResponse<IDevice[]> = { result: true, data: userList };
 
     ctx.status = 200;
     ctx.body = result;
@@ -147,69 +198,6 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
     log.info('getUsersByDevice: ok');
   } catch (err) {
     ctx.throw(400, err.message);
-  }
-};
-
-const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId } = ctx.params;
-  const deviceInfo = ctx.request.body as Partial<IDevice>;
-
-  if (!deviceId) {
-    ctx.throw(400, 'не указан идентификатор устройства');
-  }
-
-  if (!deviceInfo) {
-    ctx.throw(400, 'не указана информация об устройстве');
-  }
-
-  const oldDevice = await deviceService.findOne(deviceId); // devices.find(i => i.id === device.id);
-
-  if (!oldDevice) {
-    ctx.throw(400, 'устройство не найдено');
-  }
-
-  // Удаляем поля которые нельзя перезаписывать
-  delete deviceInfo.userId;
-  delete deviceInfo.id;
-  // deviceInfo.userId = '';
-  // deviceInfo.id = undefined;
-
-  try {
-    const id = await deviceService.updateOne({
-      ...oldDevice,
-      ...deviceInfo,
-      uid: deviceId,
-    });
-
-    const result: IResponse<string> = { result: true, data: id };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('updateDevice: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
-};
-
-const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId } = ctx.params;
-
-  if (!deviceId) {
-    ctx.throw(400, 'не указан идентификатор устройства');
-  }
-
-  try {
-    await deviceService.deleteOne({ deviceId });
-
-    const result: IResponse<void> = { result: true };
-
-    ctx.status = 200;
-    ctx.body = result; // TODO передавать только код 204 без body
-
-    log.info('updateDevice: OK');
-  } catch (err) {
-    ctx.throw(400, err);
   }
 };
 

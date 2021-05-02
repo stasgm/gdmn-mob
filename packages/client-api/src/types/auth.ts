@@ -1,4 +1,4 @@
-import { IUser } from '@lib/types';
+import { IDevice, IUser } from '@lib/types';
 
 export interface IAuthQueryResponse {
   type: 'SIGNUP' | 'LOGIN' | 'LOGOUT' | 'GET_CURRENT_USER' | 'USER_NOT_AUTHENTICATED' | 'GET_CODE' | 'VERIFY_CODE';
@@ -6,12 +6,12 @@ export interface IAuthQueryResponse {
 
 export interface ISignUpResponse extends IAuthQueryResponse {
   type: 'SIGNUP';
-  userId: string;
+  user: IUser;
 }
 
 export interface ILoginResponse extends IAuthQueryResponse {
   type: 'LOGIN';
-  userId: string;
+  user: IUser;
 }
 
 export interface ILogOutResponse extends IAuthQueryResponse {
@@ -35,7 +35,7 @@ export interface ICreateCodeResponse extends IAuthQueryResponse {
 
 export interface IVerifyCodeResponse extends IAuthQueryResponse {
   type: 'VERIFY_CODE';
-  deviceUid: string;
+  device: IDevice;
 }
 
 export type QueryResponse =

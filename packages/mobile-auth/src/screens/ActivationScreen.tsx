@@ -4,8 +4,7 @@ import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedb
 import { Text, Button, ActivityIndicator, IconButton, TextInput, useTheme } from 'react-native-paper';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle } from '@lib/mobile-ui/src/components';
-import { useSelector } from 'react-redux';
-import { RootState } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 type Props = {
   onDisconnect: () => void;
@@ -16,7 +15,7 @@ const ActivationScreen = (props: Props) => {
   const { colors } = useTheme();
   const { onDisconnect, onActivate } = props;
 
-  const { error, loading, status } = useSelector((state: RootState) => state.auth);
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({

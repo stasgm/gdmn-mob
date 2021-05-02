@@ -9,7 +9,7 @@ import { deviceMiddleware } from '../middleware/deviceRequired';
 const router = new Router({ prefix: '/auth' });
 
 router.post('/signup', signUp);
-router.post('/login', logIn);
+router.post('/login', logIn); // В методе logIn идёт проверка связи устройства с пользователем
 router.get('/logout', authMiddleware, logOut);
 router.get('/user', compose([authMiddleware, deviceMiddleware]), getCurrentUser);
 router.get('/device/:deviceId/code', getActivationCode);

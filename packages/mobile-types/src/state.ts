@@ -48,7 +48,7 @@ export interface IViewParams {
   [name: string]: IViewParam;
 }
 
-export interface IAppState {
+export interface AppState {
   settings?: IAppSettings;
   companySettings?: ICompanySettings;
   documents?: IDocument[];

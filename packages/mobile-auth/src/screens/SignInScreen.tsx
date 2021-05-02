@@ -7,9 +7,7 @@ import { IUserCredentials } from '@lib/types';
 // import { useAuth } from '../context/auth';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle } from '@lib/mobile-ui/src/components';
-import { RootState } from '@lib/store';
-import { useSelector } from 'react-redux';
-// import globalStyles from '../styles/global';
+import { useSelector } from '@lib/store';
 
 /*
   Порядок работы:
@@ -31,7 +29,7 @@ const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
   const { colors } = useTheme(); // TODO Вынести в ui
 
-  const { error, loading, status } = useSelector((state: RootState) => state.auth);
+  const { error, loading, status } = useSelector((state) => state.auth);
 
   const request = useMemo(
     () => ({
@@ -43,7 +41,7 @@ const SignInScreen = (props: Props) => {
   );
 
   const [credential, setCredentials] = useState<IUserCredentials>({
-    userName: 'Stas',
+    name: 'Stas',
     password: '123',
   });
 
@@ -80,8 +78,8 @@ const SignInScreen = (props: Props) => {
               autoCorrect={false}
               underlineColorAndroid="transparent"
               placeholder="Имя пользователя"
-              value={credential.userName}
-              onChangeText={(val) => setCredentials({ ...credential, userName: val })}
+              value={credential.name}
+              onChangeText={(val) => setCredentials({ ...credential, name: val })}
               style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
             />
             <TextInput

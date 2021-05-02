@@ -1,4 +1,4 @@
-import { ICompany, IUser } from '@lib/types';
+import { IUser, ICompany } from '@lib/types';
 
 export interface ICompanyQueryResponse {
   type: 'GET_COMPANY' | 'GET_COMPANIES' | 'ADD_COMPANY' | 'UPDATE_COMPANY' | 'GET_USERS_BY_COMPANY' | 'REMOVE_COMPANY';
@@ -16,11 +16,12 @@ export interface IGetCompaniesResponse extends ICompanyQueryResponse {
 
 export interface IAddCompanyResponse extends ICompanyQueryResponse {
   type: 'ADD_COMPANY';
-  companyId: string;
+  company: ICompany;
 }
 
 export interface IUpdateCompanyResponse extends ICompanyQueryResponse {
   type: 'UPDATE_COMPANY';
+  company: ICompany;
 }
 
 export interface IGetCompanyUsersResponse extends ICompanyQueryResponse {

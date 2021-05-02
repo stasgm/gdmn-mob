@@ -1,18 +1,22 @@
-import { useStore } from 'react-redux';
-import { Reducer } from 'redux';
+// import { useStore } from 'react-redux';
+// import { Reducer } from 'redux';
+/*
+import { StoreWithAsyncReducers } from '../';
 
-import { StoreWithAsyncReducers } from '../store/store';
+type params = {
+  name: string;
+  reducer: Reducer<any, any>;
+  store: StoreWithAsyncReducers;
+};
 
-const useAddReducer = (name: string, reducer: Reducer<any, any>) => {
-  const store: StoreWithAsyncReducers = useStore();
-
+const useAddReducer = ({ name, reducer, store }: params) => {
   if (!store.addReducer) {
     return;
   }
 
   store.addReducer(name, reducer);
 };
-
+ */
 /* interface IReducers {
   [name: string]: Reducer<any, any>;
 }
@@ -31,4 +35,4 @@ const useAddReducers = (reducers: IReducers) => {
   });
 }; */
 
-export default useAddReducer;
+// export default useAddReducer;

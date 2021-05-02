@@ -1,70 +1,170 @@
-import { IResponse, IUser } from '@lib/types';
+import { AxiosInstance } from 'axios';
+import { v4 as uuid } from 'uuid';
 
-import { INetworkError, userTypes as types } from '../types';
+import { IResponse, IUser, NewUser } from '@lib/types';
+import { user as mockUser, users as mockUsers } from '@lib/mock';
 
-import { api } from '../config';
+import { error, user as types } from '../types';
+import { BaseApi } from '../requests/baseApi';
+import { sleep } from '../utils';
 
-const getUsers = async () => {
-  const res = await api.get<IResponse<IUser[]>>('/users');
-  const userData = res.data;
+const isMock = process.env.MOCK;
+const mockTimeout = 500;
 
-  if (userData.result) {
-    return {
-      type: 'GET_USERS',
-      users: userData.data,
-    } as types.IGetUsersResponse;
+class User extends BaseApi {
+  constructor(api: AxiosInstance, deviceId: string) {
+    super(api, deviceId);
   }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as INetworkError;
-};
 
-const getUser = async (userId: string) => {
-  const res = await api.get<IResponse<IUser>>(`/users/${userId}`);
-  const userData = res.data;
+  addUser = async (user: NewUser) => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
-  if (userData.result) {
+      return {
+        type: 'ADD_USER',
+        user: { ...user, id: uuid(), creator: mockUser, role: 'User' },
+      } as types.IAddUserResponse;
+    }
+
+    const res = await this.api.post<IResponse<IUser>>('/users', user);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'ADD_USER',
+        user: resData.data,
+      } as types.IAddUserResponse;
+    }
+
     return {
-      type: 'GET_USER',
-      user: userData.data,
-    } as types.IGetUserResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const updateUser = async (user: Partial<IUser>) => {
-  const res = await api.patch<IResponse<string>>(`/users/${user.id}`, user);
-  const userData = res.data;
+  getUsers = async () => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
-  if (userData.result) {
+      if (mockUsers) {
+        return {
+          type: 'GET_USERS',
+          users: mockUsers,
+        } as types.IGetUsersResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: 'Пользователи не найдены',
+      } as error.INetworkError;
+    }
+
+    const res = await this.api.get<IResponse<IUser[]>>('/users');
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'GET_USERS',
+        users: resData.data,
+      } as types.IGetUsersResponse;
+    }
+
     return {
-      type: 'UPDATE_USER',
-      userId: userData.data,
-    } as types.IUpdateUserResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const removeUser = async (userId: string) => {
-  const res = await api.delete<IResponse<void>>(`/users/${userId}`);
-  const userData = res.data;
+  getUser = async (userId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+      const user = mockUsers.find((item) => item.id === userId);
 
-  if (userData.result) {
+      if (user) {
+        return {
+          type: 'GET_USER',
+          user,
+        } as types.IGetUserResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: 'Пользователь не найден',
+      } as error.INetworkError;
+    }
+
+    const res = await this.api.get<IResponse<IUser>>(`/users/${userId}`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'GET_USER',
+        user: resData.data,
+      } as types.IGetUserResponse;
+    }
+
     return {
-      type: 'REMOVE_USER',
-    } as types.IRemoveUserResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: userData.error,
-  } as INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-export default { getUsers, getUser, updateUser, removeUser };
+  updateUser = async (user: Partial<IUser>) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+      const updatedUser = mockUsers.find((item) => item.id === user.id);
+
+      if (updatedUser) {
+        return {
+          type: 'UPDATE_USER',
+          user: updatedUser,
+        } as types.IUpdateUserResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: 'Пользоватль не найден',
+      } as error.INetworkError;
+    }
+
+    const res = await this.api.patch<IResponse<IUser>>(`/users/${user.id}`, user);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'UPDATE_USER',
+        user: resData.data,
+      } as types.IUpdateUserResponse;
+    }
+    return {
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
+
+  removeUser = async (userId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'REMOVE_USER',
+      } as types.IRemoveUserResponse;
+    }
+
+    const res = await this.api.delete<IResponse<void>>(`/users/${userId}`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'REMOVE_USER',
+      } as types.IRemoveUserResponse;
+    }
+
+    return {
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
+}
+
+export default User;

@@ -1,0 +1,4 @@
+#config
+src/*
+!src/index.ts
+!src/config.sample

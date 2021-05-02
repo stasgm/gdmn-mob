@@ -1,6 +1,6 @@
 module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  plugins: ['import', 'promise', '@typescript-eslint' /* , "sonarjs" */],
+  plugins: ['import', 'promise', '@typescript-eslint', 'prettier' /* , "sonarjs" */],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',

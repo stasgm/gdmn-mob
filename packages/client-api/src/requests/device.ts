@@ -1,140 +1,183 @@
-import { IDevice, IDeviceInfo, IResponse } from '@lib/types';
+import { AxiosInstance } from 'axios';
+import { IDevice, IResponse, NewDevice } from '@lib/types';
+import { device as mockDevice, devices as mockDevices } from '@lib/mock';
 
-import { INetworkError, deviceTypes } from '../types';
+import { BaseApi } from '../requests/baseApi';
+import { error, device as types } from '../types';
+import { sleep } from '../utils';
 
-import { api } from '../config';
+const isMock = process.env.MOCK;
+const mockTimeout = 500;
 
-const addDevice = async (deviceName: string, userId: string) => {
-  const body = {
-    deviceName,
-    userId,
-  };
-  const res = await api.post<IResponse<string>>('/devices', body);
-  const resData = res.data;
-
-  if (resData.result) {
-    return {
-      type: 'ADD_DEVICE',
-      uid: resData.data,
-    } as deviceTypes.IAddDeviceResponse;
+class Device extends BaseApi {
+  constructor(api: AxiosInstance, deviceId: string) {
+    super(api, deviceId);
   }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
-};
-/**
-  * Получить
-    - все устройства;
-    - все устройства по пользователю;
-  * @param userId
-  * @returns
-  */
-const getDevices = async (userId?: string) => {
-  const res = await api.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
-  const resData = res.data;
 
-  if (resData.result) {
-    return {
-      type: 'GET_DEVICES',
-      devices: resData.data,
-    } as deviceTypes.IGetDevicesResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
-};
+  addDevice = async (newDevice: NewDevice) => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
-/**
-  * Получить устройство (IDevice)
-    - устройство по uid;
-    - устройство по uid и по пользователю;
-  * @param string deviceId
-  * @param string userId
-  * @returns IDevice
-  */
-const getDevice = async (deviceId: string, userId?: string) => {
-  let res;
-  try {
-    const paramQuery = userId ? `?userId=${userId}` : '';
+      return {
+        type: 'ADD_DEVICE',
+        device: mockDevice,
+      } as types.IAddDeviceResponse;
+    }
 
-    res = await api.get<IResponse<IDevice>>(`/devices/${deviceId}${paramQuery}`);
-
-    console.log(res);
+    const res = await this.api.post<IResponse<IDevice>>('/devices', newDevice);
     const resData = res.data;
 
     if (resData.result) {
       return {
-        type: 'GET_DEVICE',
+        type: 'ADD_DEVICE',
         device: resData.data,
-      } as deviceTypes.IGetDeviceResponse;
+      } as types.IAddDeviceResponse;
     }
-
     return {
       type: 'ERROR',
       message: resData.error,
-    } as INetworkError;
-  } catch (err) {
+    } as error.INetworkError;
+  };
+
+  /**
+    * Получить
+      - все устройства;
+      - все устройства по пользователю;
+    * @param userId
+    * @returns
+    */
+  getDevices = async (userId?: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'GET_DEVICES',
+        devices: mockDevices,
+      } as types.IGetDevicesResponse;
+    }
+
+    const res = await this.api.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'GET_DEVICES',
+        devices: resData.data,
+      } as types.IGetDevicesResponse;
+    }
     return {
       type: 'ERROR',
-      message: err.response.data.error,
-    } as INetworkError;
-  }
-};
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const getUsersByDevice = async (deviceId: string) => {
-  const res = await api.get<IResponse<IDeviceInfo[]>>(`/devices/${deviceId}/users`);
-  const resData = res.data;
+  /**
+    * Получить устройство (IDevice)
+      - устройство по uid;
+      - устройство по uid и по пользователю;
+    * @param string deviceId
+    * @param string userId
+    * @returns IDevice
+    */
+  getDevice = async (deviceId: string, userId?: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
-  if (resData.result) {
+      return {
+        type: 'GET_DEVICE',
+        device: mockDevice,
+      } as types.IGetDeviceResponse;
+    }
+
+    try {
+      const paramQuery = userId ? `?userId=${userId}` : '';
+
+      const res = await this.api.get<IResponse<IDevice>>(`/devices/${deviceId || this.deviceId}${paramQuery}`);
+
+      const resData = res?.data;
+
+      if (resData?.result) {
+        return {
+          type: 'GET_DEVICE',
+          device: resData.data,
+        } as types.IGetDeviceResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка подключения',
+      } as error.INetworkError;
+    }
+  };
+
+  getUsersByDevice = async (deviceId: string) => {
+    const res = await this.api.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'GET_USERS_BY_DEVICE',
+        userList: resData.data,
+      } as types.IGetUsersByDeviceResponse;
+    }
     return {
-      type: 'GET_USERS_BY_DEVICE',
-      userList: resData.data,
-    } as deviceTypes.IGetUsersByDeviceResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const updateDevice = async (device: Partial<IDevice>) => {
-  const res = await api.patch<IResponse<string>>(`/devices/${device.id}`, device);
-  const resData = res.data;
+  updateDevice = async (device: Partial<IDevice>) => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
-  if (resData.result) {
+      return {
+        type: 'UPDATE_DEVICE',
+        device,
+      } as types.IUpdateDeviceResponse;
+    }
+
+    const res = await this.api.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'UPDATE_DEVICE',
+        device: resData.data,
+      } as types.IUpdateDeviceResponse;
+    }
     return {
-      type: 'UPDATE_DEVICE',
-      deviceId: resData.data,
-    } as deviceTypes.IUpdateDeviceResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
 
-const removeDevice = async (deviceId: string) => {
-  const res = await api.delete<IResponse<void>>(`/devices/${deviceId}`);
-  const resData = res.data;
+  removeDevice = async (deviceId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
-  if (resData.result) {
+      return {
+        type: 'REMOVE_DEVICE',
+      } as types.IRemoveDeviceResponse;
+    }
+
+    const res = await this.api.delete<IResponse<void>>(`/devices/${deviceId}`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'REMOVE_DEVICE',
+      } as types.IRemoveDeviceResponse;
+    }
     return {
-      type: 'REMOVE_DEVICE',
-    } as deviceTypes.IRemoveDeviceResponse;
-  }
-  return {
-    type: 'ERROR',
-    message: resData.error,
-  } as INetworkError;
-};
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
+}
 
-export default {
-  addDevice,
-  getDevices,
-  getDevice,
-  getUsersByDevice,
-  updateDevice,
-  removeDevice,
-};
+export default Device;

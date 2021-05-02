@@ -1,8 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": false,
+    "declaration": true,
+    "outDir": "dist",
+    "sourceMap": true
   },
-  "include": ["src/**/*.ts*", ".eslintrc.js", "index.ts", "mock/index.ts", "config"],
-  "exclude": ["node_modules"]
+  "include": ["src", "index.ts"],
+  "exclude": ["node_modules", "dist"]
 }

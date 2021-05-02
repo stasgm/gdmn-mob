@@ -1,4 +1,4 @@
-import { IDevice, IDeviceInfo } from '@lib/types';
+import { IDevice } from '@lib/types';
 
 export interface IDeviceQueryResponse {
   type:
@@ -13,7 +13,7 @@ export interface IDeviceQueryResponse {
 
 export interface IAddDeviceResponse extends IDeviceQueryResponse {
   type: 'ADD_DEVICE';
-  uid: string;
+  device: IDevice;
 }
 
 export interface IGetDevicesResponse extends IDeviceQueryResponse {
@@ -28,12 +28,12 @@ export interface IGetDeviceResponse extends IDeviceQueryResponse {
 
 export interface IGetUsersByDeviceResponse extends IDeviceQueryResponse {
   type: 'GET_USERS_BY_DEVICE';
-  userList: IDeviceInfo[];
+  userList: IDevice[];
 }
 
 export interface IUpdateDeviceResponse extends IDeviceQueryResponse {
   type: 'UPDATE_DEVICE';
-  deviceId: string;
+  device: IDevice;
 }
 
 export interface IRemoveDeviceResponse extends IDeviceQueryResponse {

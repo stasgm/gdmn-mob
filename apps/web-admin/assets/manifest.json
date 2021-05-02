@@ -1,0 +1,11 @@
+{
+    "name": "GDMN Web-admin",
+    "short_name": " Web-admin",
+    "icons": [{
+        "src": "favicon.ico",
+        "sizes": "512x512"
+    }],
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "display": "fullscreen"
+}

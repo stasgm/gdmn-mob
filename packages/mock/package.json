@@ -1,0 +1,34 @@
+{
+  "name": "@lib/mock",
+  "version": "1.0.0",
+  "description": "Mock for api",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "yarn clean-dist && tsc",
+    "clean-dist": "rimraf dist/*",
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "prettier": "@config/prettier-config",
+  "dependencies": {
+    "@lib/client-types": "*",
+    "@lib/types": "*"
+  },
+  "devDependencies": {
+    "@config/eslint-config": "*",
+    "@config/prettier-config": "*",
+    "lint-staged": "^10.5.4",
+    "typescript": "^4.2.4"
+  }
+}

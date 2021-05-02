@@ -1,27 +1,29 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { enableScreens } from 'react-native-screens';
+import { PersistGate } from 'redux-persist/integration/react';
 
-import { configureStore, authSelectors } from '@lib/store';
+import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
-// import config from './src/config';
 
-enableScreens();
-
-const Router = () => (authSelectors.isLogged() ? <RootNavigator /> : <AuthNavigator />);
+import { store, persistor } from './src/store';
 
 const App = () => {
+  const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
+  // const Router = () => <RootNavigator />;
+
   return (
-    <Provider store={configureStore}>
-      <UIProvider theme={defaultTheme}>
-        <NavigationContainer>
-          <Router />
-        </NavigationContainer>
-      </UIProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <UIProvider theme={defaultTheme}>
+          <NavigationContainer>
+            <Router />
+          </NavigationContainer>
+        </UIProvider>
+      </PersistGate>
     </Provider>
   );
 };

@@ -1,70 +1,53 @@
-export interface IUserProfile {
-  id?: string;
-  userName: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  creatorId: string;
-}
-
-export type userRole = 'Admin' | 'User';
-
-export interface IUser {
-  id?: string;
-  externalId?: string;
-  userName: string;
-  password: string;
-  activationCode?: string;
-  companies?: string[];
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
-  creatorId: string;
-  role: userRole;
-}
-
-export interface IActivationCode {
-  id?: string;
-  code: string;
-  date: string;
-  deviceId: string;
-}
-
-export interface ICompany {
+// Базовые типы
+export interface IEntity {
   id: string;
+  creationDate?: string;
+  editionDate?: string;
+}
+
+export interface INamedEntity extends IEntity {
+  name: string;
+}
+
+export interface IExternalSystemProps {
   externalId?: string;
-  title: string;
-  admin: string;
 }
 
 export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
-export interface IDevice {
-  id?: string;
+export type UserRole = 'Admin' | 'User';
+
+// Типы для хранения данных в бд
+export interface IDBUser extends INamedEntity, IExternalSystemProps {
+  password: string;
+  creatorId: string;
+  role: UserRole;
+  companies: string[]; // по умолчанию пустой массив
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
+export interface IDBCompany extends INamedEntity, IExternalSystemProps {
+  adminId: string;
+}
+
+export interface IDBDevice extends INamedEntity {
+  id: string;
   name: string;
   userId: string;
   uid: string;
   state: DeviceState;
 }
 
-export interface IDeviceInfo {
-  id: string;
+export interface IDBActivationCode {
+  id?: string;
+  code: string;
+  date: string;
   deviceId: string;
-  deviceName: string;
-  user: {
-    id: string;
-    name: string;
-  };
-  state: DeviceState;
 }
 
-export interface IMessageInfo {
-  uid: string;
-  date: Date;
-}
-
-export interface IMessage<T = any> {
+export interface IDBMessage<T = any> {
   id?: string;
   head: {
     id: string;
@@ -80,14 +63,49 @@ export interface IMessage<T = any> {
   };
 }
 
+// Типы для передачи и хранения данных на клиенте
+export interface IUser extends INamedEntity, IExternalSystemProps {
+  role: UserRole;
+  firstName?: string;
+  lastName?: string;
+  surName?: string;
+  email?: string;
+  phoneNumber?: string;
+  creator?: INamedEntity;
+  companies: INamedEntity[];
+}
+
+// export type NewUser = Pick<IUser, 'name' | 'externalId'>;
+export type NewUser = Omit<IUser, 'role' | 'id'> & { password: string };
+
+export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
+
+export interface ICompany extends Omit<IDBCompany, 'adminId'> {
+  admin: INamedEntity;
+}
+
+export type NewCompany = Pick<IDBCompany, 'name' | 'externalId' | 'adminId'>;
+
+export interface IMessageInfo {
+  uid: string;
+  date: Date;
+}
+
+export interface IDevice extends Omit<IDBDevice, 'userId'> {
+  user: INamedEntity;
+}
+
+export type NewDevice = Pick<IDBDevice, 'name' | 'userId'>;
+
+export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
+  device: INamedEntity;
+}
+
+export type IMessage = IDBMessage;
+
 export interface IDataMessage<T = any> {
   id: string;
   name: string;
   type: string;
   data: T;
-}
-
-export interface IUserCredentials {
-  userName: string;
-  password: string;
 }
