@@ -1,17 +1,25 @@
 {
   "name": "@lib/types",
-  "version": "0.0.1",
-  "description": "",
-  "license": "ISC",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "./index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "build:watch": "tsc --watch",
-    "prettier:check": "prettier --check \"src/**/*.ts*\"",
-    "prettier:fix": "prettier --write \"src/**/*.ts*\"",
-    "lint": "eslint \"src/**/*.ts*\"",
-    "lint:fix": "eslint --fix \"src/**/*.ts\""
+    "prettier:check": "prettier --check \"**/*.ts*\"",
+    "prettier:fix": "prettier --write \"**/*.ts*\"",
+    "lint": "eslint \"**/*.ts*\"",
+    "lint:fix": "eslint --fix \"**/*.ts*\"",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "yarn prettier:fix",
+      "yarn lint"
+    ]
+  },
+  "prettier": "@config/prettier-config",
+  "devDependencies": {
+    "@config/eslint-config": "1.0.0",
+    "@config/prettier-config": "1.0.0",
+    "lint-staged": "^10.5.4"
   }
 }

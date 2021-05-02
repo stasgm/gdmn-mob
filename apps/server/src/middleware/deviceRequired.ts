@@ -1,18 +1,18 @@
-import { Context, Next } from "koa";
+import { Context, Next } from 'koa';
 
-import { devices } from "../services/dao/db";
+import { entities } from '../services/dao/db';
 
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
+  console.log('deviceId', ctx.header.deviceid);
+
   if (!ctx.query.deviceId) {
-    ctx.throw(400, "не указан идентификатор устройства");
+    ctx.throw(400, 'Не указан идентификатор устройства');
   }
 
-  const currDevice = await devices.find(
-    (device) => device.uid === ctx.query.deviceId
-  );
+  const currDevice = await entities.devices.find((device) => device.uid === ctx.query.deviceId);
 
   if (!currDevice) {
-    ctx.throw(400, "устройство не найдено");
+    ctx.throw(400, 'Устройство не найдено');
   }
 
   await next();

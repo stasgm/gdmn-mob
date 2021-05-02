@@ -1,99 +1,68 @@
-import { ParameterizedContext } from "koa";
+import { ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, IUserProfile, IDeviceInfo } from "@lib/types";
+import { IDevice, IResponse, IUser, NewUser } from '@lib/types';
 
-import log from "../utils/logger";
-import { userService } from "../services";
-import { hashPassword } from "../utils/crypt";
-import { makeProfile } from "../utils/user";
+import log from '../utils/logger';
+import { userService } from '../services';
 
-const getUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: userId } = ctx.params;
+const addUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { externalId, name, password, firstName, lastName, phoneNumber, companies, creator } = ctx.request
+    .body as NewUser;
 
-  if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+  if (!name) {
+    ctx.throw(400, 'Не указано имя пользователя');
   }
 
+  if (!password) {
+    ctx.throw(400, 'Не указан пароль');
+  }
+
+  const user: NewUser = {
+    externalId,
+    password,
+    name,
+    firstName,
+    lastName,
+    phoneNumber,
+    companies: companies || [],
+    creator,
+  };
+
   try {
-    const profile = await userService.findOne(userId);
+    const newUser = await userService.addOne(user);
 
-    if (!profile) {
-      ctx.throw(404, "пользователь не найден");
-    }
-
-    const result: IResponse<IUserProfile> = {
-      result: true,
-      data: makeProfile(profile),
-    };
+    const result: IResponse<IUser> = { result: true, data: newUser };
 
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getUser: OK");
+    log.info(`signUp: user '${name}' is successfully signed up`);
   } catch (err) {
     ctx.throw(400, err.message);
   }
 };
 
-const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  try {
-    const user = await userService.findAll();
-
-    const result: IResponse<IUserProfile[]> = { result: true, data: user };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info("getUsers: OK");
-  } catch (err) {
-    ctx.throw(400, err);
-  }
-};
-
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-  const user = ctx.request.body as Partial<IUser>;
+  const userData = ctx.request.body as Partial<IUser & { password: string }>;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'Не указан идентификатор пользователя');
   }
 
-  if (!user) {
-    ctx.throw(400, "не указаны данные пользователя");
+  if (!userData) {
+    ctx.throw(400, 'Не указаны данные пользователя');
   }
-
-  const oldUser = await userService.findOne(userId);
-
-  // TODO Проверяем свойство 'companies' => Проверяем что организации существуют
-
-  if (!oldUser) {
-    ctx.throw(400, "пользователь не найден");
-  }
-
-  let passwordHash: string | undefined = undefined;
-
-  if (user.password) {
-    passwordHash = await hashPassword(user.password);
-  }
-
-  //Удаляем поля, которые нелья менять
-  delete user.creatorId;
-  delete user.role;
 
   try {
-    const id = await userService.updateOne({
-      ...oldUser,
-      ...user,
-      id: userId,
-      password: passwordHash ?? oldUser.password,
-    });
+    const updatedUser = await userService.updateOne(userId, userData);
 
-    const result: IResponse<string> = { result: true, data: id };
+    const result: IResponse<IUser> = { result: true, data: updatedUser };
 
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("updateUser: OK");
+    log.info('updateUser: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -103,7 +72,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'Не указан идентификатор пользователя');
   }
 
   // TODO пользовате
@@ -113,9 +82,52 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
     const result: IResponse<void> = { result: true };
 
     ctx.status = 200;
-    ctx.body = result; //TODO передавать только код 204 без body
+    ctx.body = result; // TODO передавать только код 204 без body
 
-    log.info("removeUser: OK");
+    log.info('removeUser: OK');
+  } catch (err) {
+    ctx.throw(400, err);
+  }
+};
+
+const getUser = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: userId } = ctx.params;
+
+  if (!userId) {
+    ctx.throw(400, 'не указан идентификатор пользователя');
+  }
+
+  try {
+    const user = await userService.findOne(userId);
+
+    if (!user) {
+      ctx.throw(404, 'пользователь не найден');
+    }
+
+    const result: IResponse<IUser> = {
+      result: true,
+      data: user,
+    };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUser: OK');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
+const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
+  try {
+    const users = await userService.findAll();
+
+    const result: IResponse<IUser[]> = { result: true, data: users };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsers: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
@@ -125,23 +137,21 @@ const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
   if (!userId) {
-    ctx.throw(400, "не указан идентификатор пользователя");
+    ctx.throw(400, 'не указан идентификатор пользователя');
   }
 
   try {
-    const deviceIfno = ((await userService.findDevices(
-      userId
-    )) as unknown) as IDeviceInfo[];
+    const deviceIfno = await userService.findDevices(userId);
 
-    const result: IResponse<IDeviceInfo[]> = { result: true, data: deviceIfno };
+    const result: IResponse<IDevice[]> = { result: true, data: deviceIfno };
 
     ctx.status = 200;
     ctx.body = result;
 
-    log.info("getDevicesByUser: OK");
+    log.info('getDevicesByUser: OK');
   } catch (err) {
     ctx.throw(400, err);
   }
 };
 
-export { getDevicesByUser, getUsers, getUser, removeUser, updateUser };
+export { addUser, getUsers, getUser, removeUser, updateUser, getDevicesByUser };

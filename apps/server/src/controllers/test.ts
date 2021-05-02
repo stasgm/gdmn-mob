@@ -1,8 +1,8 @@
 // import { readFile } from '../utils/workWithFile';
 // import dev from '../../config/dev';
-import { ParameterizedContext } from "koa";
+import { ParameterizedContext } from 'koa';
 
-import log from "../utils/logger";
+import log from '../utils/logger';
 // import { IGood, IContact, IDocument, IRemain, IResponse, IRefData } from '../../../common';
 
 /* const PATH_GOODS = `${dev.FILES_PATH}\\Goods.json`;
@@ -27,8 +27,8 @@ const getAllData = (ctx: ParameterizedContext) => {
   const remains: IRemain[] | undefined = await readFile(PATH_REMAINS);
   const result: IResponse<IAllData> = { result: true, data: { goods, remains, documenttypes, contacts, docs } }; */
   ctx.status = 200;
-  ctx.body = { result: "ok" };
-  log.info("get all data");
+  ctx.body = { result: 'ok' };
+  log.info('get all data');
 };
 
 export { getAllData };

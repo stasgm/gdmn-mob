@@ -1,19 +1,13 @@
-import Koa from "koa";
+import Koa from 'koa';
 
-import { init } from "./server";
+import { init } from './server';
 
-const run = async (): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
-  return await init();
-};
+const run = async (): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => init();
 
-if (!module.parent) {
+if (module.children) {
   run().catch((err) => {
-    console.error("!!! SERVER DROPPED BY ERROR !!!");
-    console.error(
-      err instanceof Error || typeof err !== "object"
-        ? err
-        : "!!! undefined error !!!"
-    );
+    console.error('!!! SERVER DROPPED BY ERROR !!!');
+    console.error(err instanceof Error || typeof err !== 'object' ? err : '!!! undefined error !!!');
     process.exit(1);
   });
 }

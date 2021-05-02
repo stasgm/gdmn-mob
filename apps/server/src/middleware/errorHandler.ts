@@ -1,4 +1,4 @@
-import { Context, Next } from "koa";
+import { Context, Next } from 'koa';
 
 export const errorHandler = async (ctx: Context, next: Next) => {
   try {
@@ -9,13 +9,13 @@ export const errorHandler = async (ctx: Context, next: Next) => {
 
     switch (true) {
       case ctx.status >= 400 && ctx.status < 500:
-        ctx.app.emit("user-error", err, ctx);
+        ctx.app.emit('user-error', err, ctx);
         break;
       case ctx.status >= 500:
-        ctx.app.emit("error", err, ctx);
+        ctx.app.emit('error', err, ctx);
         break;
       default:
-        ctx.app.emit("error", err, ctx);
+        ctx.app.emit('error', err, ctx);
     }
   }
 };

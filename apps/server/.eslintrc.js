@@ -3,9 +3,9 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ["@config/eslint-config"],
+  extends: ['@config/eslint-config'],
   parserOptions: {
-    project: ["./tsconfig.eslint.json"],
+    project: ['./tsconfig.eslint.json'],
     tsconfigRootDir: __dirname,
   },
 };

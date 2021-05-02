@@ -10,10 +10,10 @@
     "checkJs": false,
     "jsx": "react-native",
     "lib": ["dom", "esnext"],
+    "typeRoots": ["./src/types"],
     "noEmit": true,
-    "rootDir": ".",
-    "outDir": "./dist"
+    "rootDir": "."
   },
-  "include": ["src/**/*", "test/**/*", "config/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*", "__tests__/**/*", "./App.tsx"],
+  "exclude": ["dist", "node_modules", "*.sample"]
 }

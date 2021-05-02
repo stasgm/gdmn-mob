@@ -1,9 +1,9 @@
-import Router from "koa-router";
+import Router from 'koa-router';
 
-import { getAllData } from "../controllers/test";
+import { getAllData } from '../controllers/test';
 
-const router = new Router({ prefix: "/test" });
+const router = new Router({ prefix: '/test' });
 
-router.get("/all", getAllData);
+router.get('/all', getAllData);
 
 export default router;

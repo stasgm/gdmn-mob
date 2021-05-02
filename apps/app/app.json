@@ -1,17 +1,20 @@
 {
   "expo": {
-    "name": "app-1",
+    "name": "gdmn-mobile",
     "slug": "app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-	"packagerOpts": {
-      "config": "metro.config.js"
+    "packagerOpts": {
+      "config": "metro.config.js",
+      "sourceExts": [
+        "svg"
+      ]
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -21,6 +24,9 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.gs.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

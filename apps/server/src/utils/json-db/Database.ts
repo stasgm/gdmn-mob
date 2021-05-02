@@ -1,24 +1,22 @@
-import fs from "fs";
-import path from "path";
-import os from "os";
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
-import config from "../../../config";
+import config from '../../../config';
 
-import Collection from "./Collection";
+import Collection from './Collection';
 
-import { CollectionItem } from "./CollectionItem";
+import { CollectionItem } from './CollectionItem';
 
 class Database {
   private dbPath: string;
+
   /**
    *
    * @param {string} name
    */
   constructor(name: string) {
-    this.dbPath = path.join(
-      config.FILES_PATH || os.userInfo().homedir,
-      `/.${name}/`
-    );
+    this.dbPath = path.join(config.FILES_PATH || os.userInfo().homedir, `/.${name}/`);
     this.ensureStorage();
   }
 

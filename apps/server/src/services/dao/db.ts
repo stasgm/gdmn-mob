@@ -1,19 +1,19 @@
-import {
-  IUser,
-  IMessage,
-  IDevice,
-  IActivationCode,
-  ICompany,
-} from "@lib/types";
+import { IDBUser, IDBMessage, IDBDevice, IDBActivationCode, IDBCompany, INamedEntity } from '@lib/types';
 
-import { Database } from "../../utils/json-db";
+import { Collection, Database } from '../../utils/json-db';
 
-const db = new Database("mob-app");
+const db = new Database('mob-app');
 
-const users = db.collection<IUser>("user");
-const codes = db.collection<IActivationCode>("activation-codes");
-const companies = db.collection<ICompany>("companies");
-const messages = db.collection<IMessage>("messages");
-const devices = db.collection<IDevice>("devices");
+const users = db.collection<IDBUser>('user');
+const devices = db.collection<IDBDevice>('devices');
+const companies = db.collection<IDBCompany>('companies');
+const codes = db.collection<IDBActivationCode>('activation-codes');
+const messages = db.collection<IDBMessage>('messages');
 
-export { users, codes, companies, messages, devices };
+// export type NamedDBEntities = typeof users | typeof devices | typeof companies;
+
+export const entities = { users, codes, companies, messages, devices };
+
+type ExtractTypes<P> = P extends Collection<infer T> ? T : never;
+
+export type NamedDBEntities = Collection<Extract<ExtractTypes<typeof entities[keyof typeof entities]>, INamedEntity>>;
