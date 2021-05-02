@@ -24,12 +24,13 @@ class Api {
 
   constructor(config: IApiConfig, deviceId: string) {
     this.config = config;
-    this.deviceId = deviceId || 'WEB';
+    this.deviceId = deviceId || 'WEB'; // TODO убрать web
 
     this.axios = axios.create({
       baseURL: `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`,
       url: this.config.apiPath,
       timeout: config.timeout,
+      withCredentials: true,
     });
 
     this.auth = new Auth(this.axios, this.deviceId);
