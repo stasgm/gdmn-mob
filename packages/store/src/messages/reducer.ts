@@ -22,6 +22,9 @@ const reducer: Reducer<IMessagesState, MsgActionType> = (state = initialState, a
     case getType(actions.deleteMessage):
       return { ...state, data: [...state.data.filter((i) => i.id !== action.payload)] };
 
+    case getType(actions.clearError):
+      return { ...state, errorMessage: '' };
+
     // Loading
     case getType(actions.fetchMsgAsync.request):
       return { ...state, loading: true, data: [] };
