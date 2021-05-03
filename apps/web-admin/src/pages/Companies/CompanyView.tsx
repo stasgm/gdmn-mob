@@ -8,14 +8,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { users } from '@lib/mock';
+// import { users } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 
-// import userActions from '../../store/user';
+import userActions from '../../store/user';
 
 import CompanyUsers from '../../components/company/CompanyUsers';
 
@@ -35,7 +35,7 @@ const CompanyView = () => {
   const { loading } = useSelector((state) => state.companies);
   //TODO Вынести в селекторы
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
-  // const users = useSelector((state) => state.users);
+  const users = useSelector((state) => state.users.list);
 
   const handleCancel = () => {
     //navigate('/app/companies');
@@ -48,7 +48,7 @@ const CompanyView = () => {
 
   const handleRefresh = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
-    //dispatch(userActions.fetchUsers());
+    dispatch(userActions.fetchUsers(companyId));
   }, [dispatch, companyId]);
 
   useEffect(() => {
@@ -129,7 +129,7 @@ const CompanyView = () => {
       </Box>
       <Box>
         <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users.filter((u) => u.companies.find((c) => c.id === companyId))} />
+        <CompanyUsers users={users?.filter((u) => u.companies.find((c) => c.id === companyId))} />
       </Box>
     </>
   );
