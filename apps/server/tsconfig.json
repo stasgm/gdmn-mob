@@ -9,6 +9,7 @@
     "sourceMap": true,
     "module": "CommonJS",
     "target": "ES6",
+    "lib": ["es2019"],
 
   },
   "exclude": ["node_modules", "dist"],
