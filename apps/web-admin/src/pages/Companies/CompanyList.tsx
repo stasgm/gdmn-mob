@@ -12,22 +12,23 @@ import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/company/actions.async';
+import actions from '../../store/company';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
 import { IToolBarButton } from '../../types';
+
+import SnackBar from '../../components/SnackBar';
 
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.companies);
+  const { list, loading, errorMessage } = useSelector((state) => state.companies);
 
   const fetchCompanies = useCallback(async () => {
     const res = await dispatch(actions.fetchCompanies());
-
     if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCCES') {
       console.log(res.payload);
     }
@@ -40,6 +41,10 @@ const CompanyList = () => {
     // Загружаем данные при загрузке компонента.
     fetchCompanies();
   }, [fetchCompanies]);
+
+  const handleClearError = () => {
+    dispatch(actions.companyActions.clearError());
+  };
 
   const buttons: IToolBarButton[] = [
     {
@@ -94,6 +99,7 @@ const CompanyList = () => {
           )}
         </Container>
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

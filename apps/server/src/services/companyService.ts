@@ -121,10 +121,8 @@ type Param = {
 
 const findAll = async (param?: Param): Promise<ICompany[]> => {
   log.info(param);
-  console.log('service findAll');
   const companyList = await companies.read();
   const pr = companyList.map(async (i) => await makeCompany(i));
-  console.log('service findAll', pr);
   return Promise.all(pr);
 };
 

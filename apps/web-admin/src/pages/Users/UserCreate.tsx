@@ -5,13 +5,13 @@ import { IUser, NewUser } from '@lib/types';
 import UserDetails from '../../components/user/UserDetails';
 import SnackBar from '../../components/SnackBar';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/user';
 
 const UserCreate = () => {
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
@@ -23,8 +23,11 @@ const UserCreate = () => {
     dispatch(actions.userActions.clearError());
   };
 
-  const handleSubmit = (values: IUser | NewUser) => {
-    dispatch(actions.addUser(values as NewUser, handleGoToUsers));
+  const handleSubmit = async (values: IUser | NewUser) => {
+    const res = await dispatch(actions.addUser(values as NewUser));
+    if (res.type === 'USER/ADD_SUCCCES') {
+      handleGoToUsers();
+    }
   };
 
   return (
