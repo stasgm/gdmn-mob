@@ -12,8 +12,11 @@ import { users } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
+
+// import userActions from '../../store/user';
+
 import CompanyUsers from '../../components/company/CompanyUsers';
 
 import { IToolBarButton } from '../../types';
@@ -22,25 +25,21 @@ import ToolBarAction from '../../components/ToolBarActions';
 
 import CompanyDetailsView from '../../components/company/CompanyDetailsView';
 
-// interface IProps {
-//   navigatePath: string;
-// }
-
 const CompanyView = () => {
   const { id: companyId } = useParams();
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.companies);
   //TODO Вынести в селекторы
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
-  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по companyId
+  // const users = useSelector((state) => state.users);
 
   const handleCancel = () => {
-    navigate('/app/companies');
-    //avigate(navigatePath);
+    //navigate('/app/companies');
+    navigate(-1);
   };
 
   const handleEdit = () => {
@@ -49,6 +48,7 @@ const CompanyView = () => {
 
   const handleRefresh = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
+    //dispatch(userActions.fetchUsers());
   }, [dispatch, companyId]);
 
   useEffect(() => {
@@ -107,7 +107,7 @@ const CompanyView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список компаний'} />
+            <CardHeader title={'Назад'} />
             {loading && <CircularProgress size={40} />}
           </Box>
           <Box

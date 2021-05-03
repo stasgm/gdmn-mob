@@ -20,7 +20,8 @@ const CompanyEdit = () => {
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
 
   const handleGoToCompanyView = () => {
-    navigate(`/app/companies/${companyId}`);
+    //navigate(`/app/companies/${companyId}`);
+    navigate(-1);
   };
 
   const handleClearError = () => {
