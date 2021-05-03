@@ -36,11 +36,11 @@ const fetchUserById = (id: string): AppThunk => {
   };
 };
 
-const fetchUsers = (): AppThunk => {
+const fetchUsers = (companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.fetchUsersAsync.request(''));
 
-    const response = await api.user.getUsers();
+    const response = await api.user.getUsers(companyId);
 
     if (response.type === 'GET_USERS') {
       return dispatch(userActions.fetchUsersAsync.success(response.users));

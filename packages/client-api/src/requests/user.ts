@@ -1,7 +1,7 @@
 // import { AxiosInstance } from 'axios';
 import { v4 as uuid } from 'uuid';
 
-import { IResponse, IUser, NewUser } from '@lib/types';
+import { IResponse, IUser, NewUser, UserRole } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
 import { error, user as types } from '../types';
@@ -43,31 +43,55 @@ class User extends BaseRequest {
     } as error.INetworkError;
   };
 
-  getUsers = async () => {
+  updateUser = async (user: Partial<IUser>) => {
     if (isMock) {
       await sleep(mockTimeout);
+      const updatedUser = mockUsers.find((item) => item.id === user.id);
 
-      if (mockUsers) {
+      if (updatedUser) {
         return {
-          type: 'GET_USERS',
-          users: mockUsers,
-        } as types.IGetUsersResponse;
+          type: 'UPDATE_USER',
+          user: updatedUser,
+        } as types.IUpdateUserResponse;
       }
 
       return {
         type: 'ERROR',
-        message: 'Пользователи не найдены',
+        message: 'Пользоватль не найден',
       } as error.INetworkError;
     }
 
-    const res = await this.api.axios.get<IResponse<IUser[]>>('/users');
+    const res = await this.api.patch<IResponse<IUser>>(`/users/${user.id}`, user);
     const resData = res.data;
 
     if (resData.result) {
       return {
-        type: 'GET_USERS',
-        users: resData.data,
-      } as types.IGetUsersResponse;
+        type: 'UPDATE_USER',
+        user: resData.data,
+      } as types.IUpdateUserResponse;
+    }
+    return {
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+  };
+
+  removeUser = async (userId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'REMOVE_USER',
+      } as types.IRemoveUserResponse;
+    }
+
+    const res = await this.api.delete<IResponse<void>>(`/users/${userId}`);
+    const resData = res.data;
+
+    if (resData.result) {
+      return {
+        type: 'REMOVE_USER',
+      } as types.IRemoveUserResponse;
     }
 
     return {
@@ -110,55 +134,47 @@ class User extends BaseRequest {
     } as error.INetworkError;
   };
 
-  updateUser = async (user: Partial<IUser>) => {
+  getUsers = async (params: Record<string, string>) => {
     if (isMock) {
       await sleep(mockTimeout);
-      const updatedUser = mockUsers.find((item) => item.id === user.id);
 
-      if (updatedUser) {
+      if (mockUsers) {
         return {
-          type: 'UPDATE_USER',
-          user: updatedUser,
-        } as types.IUpdateUserResponse;
+          type: 'GET_USERS',
+          users: mockUsers,
+        } as types.IGetUsersResponse;
       }
 
       return {
         type: 'ERROR',
-        message: 'Пользоватль не найден',
+        message: 'Пользователи не найдены',
       } as error.INetworkError;
     }
 
-    const res = await this.api.axios.patch<IResponse<IUser>>(`/users/${user.id}`, user);
+    const getParams = (params: Record<string, string>) => {
+      return Object.entries(params).reduce((acc, [field, value]) => {
+        let curParam = '';
+        if (acc > '') {
+          curParam = `${acc}&`;
+        }
+        return `${curParam}${field}=${value}`;
+      }, '');
+    };
+
+    let paramText = getParams(params);
+
+    if (paramText > '') {
+      paramText = `?${paramText}`;
+    }
+
+    const res = await this.api.get<IResponse<IUser[]>>(`/users${paramText}`);
     const resData = res.data;
 
     if (resData.result) {
       return {
-        type: 'UPDATE_USER',
-        user: resData.data,
-      } as types.IUpdateUserResponse;
-    }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-  };
-
-  removeUser = async (userId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
-
-      return {
-        type: 'REMOVE_USER',
-      } as types.IRemoveUserResponse;
-    }
-
-    const res = await this.api.axios.delete<IResponse<void>>(`/users/${userId}`);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'REMOVE_USER',
-      } as types.IRemoveUserResponse;
+        type: 'GET_USERS',
+        users: resData.data,
+      } as types.IGetUsersResponse;
     }
 
     return {
@@ -167,5 +183,4 @@ class User extends BaseRequest {
     } as error.INetworkError;
   };
 }
-
 export default User;
