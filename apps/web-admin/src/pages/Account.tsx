@@ -7,7 +7,7 @@ import AccountProfileDetails from '../components/account/AccountProfileDetails';
 const Account = () => (
   <>
     <Helmet>
-      <title>Account | Material Kit</title>
+      <title>Account</title>
     </Helmet>
     <Box
       sx={{

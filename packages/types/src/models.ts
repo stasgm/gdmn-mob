@@ -1,8 +1,8 @@
 // Базовые типы
 export interface IEntity {
   id: string;
-  createDate?: string;
-  updateDate?: string;
+  creationDate?: string;
+  editionDate?: string;
 }
 
 export interface INamedEntity extends IEntity {
@@ -32,7 +32,7 @@ export interface IDBCompany extends INamedEntity, IExternalSystemProps {
   adminId: string;
 }
 
-export interface IDBDevice {
+export interface IDBDevice extends INamedEntity {
   id: string;
   name: string;
   userId: string;
@@ -68,6 +68,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   role: UserRole;
   firstName?: string;
   lastName?: string;
+  surName?: string;
   email?: string;
   phoneNumber?: string;
   creator?: INamedEntity;
@@ -83,7 +84,7 @@ export interface ICompany extends Omit<IDBCompany, 'adminId'> {
   admin: INamedEntity;
 }
 
-export type NewCompany = Pick<IDBCompany, 'name' | 'externalId'>;
+export type NewCompany = Pick<IDBCompany, 'name' | 'externalId' | 'adminId'>;
 
 export interface IMessageInfo {
   uid: string;
@@ -93,6 +94,8 @@ export interface IMessageInfo {
 export interface IDevice extends Omit<IDBDevice, 'userId'> {
   user: INamedEntity;
 }
+
+export type NewDevice = Pick<IDBDevice, 'name' | 'userId'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

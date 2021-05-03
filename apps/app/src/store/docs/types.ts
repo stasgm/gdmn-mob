@@ -1,14 +1,14 @@
 export interface IDocument {
-  number: number;
+  number: string;
+  documentdate: string;
 }
+// export interface ILoadingState {
+//   readonly loading: boolean;
+//   readonly errorMessage: string;
+// }
 
 export type IDocState = {
-  readonly docData: IDocument[] | undefined;
+  readonly docData: IDocument[];
   readonly loading: boolean;
   readonly errorMessage: string;
 };
-
-export type IDocPayload = Partial<{
-  errorMessage: string;
-  docData: IDocument[];
-}>;

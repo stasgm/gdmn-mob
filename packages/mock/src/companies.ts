@@ -1,23 +1,27 @@
 import { ICompany, INamedEntity } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
-export const admin: INamedEntity = {
-  id: '1',
+const user1: INamedEntity = {
+  id: '123',
   name: 'Stas',
 };
 
-export const admin2: INamedEntity = {
-  id: '1',
+const user2: INamedEntity = {
+  id: '345',
   name: 'Ina',
 };
 
 const companies: ICompany[] = [
-  { id: uuid(), name: 'ОДО Золотые Программы', admin },
-  { id: uuid(), name: 'ОДО Амперсант', admin: admin2 },
-  { id: uuid(), name: 'Company 1', admin },
-  { id: uuid(), name: 'Company 2', admin },
-  { id: uuid(), name: 'Company 3', admin },
-  { id: uuid(), name: 'Company 4', admin },
+  { id: '789', name: 'ОДО Золотые Программы', admin: user1 },
+  { id: '654', name: 'ОДО Амперсант', admin: user2 },
+  { id: uuid(), name: 'Company 1', admin: user2 },
+  { id: uuid(), name: 'Company 2', admin: user2 },
+  { id: uuid(), name: 'Company 3', admin: user1 },
+  { id: uuid(), name: 'Company 4', admin: user2 },
 ];
 
-export default companies;
+const company = companies[0];
+
+const company2 = companies[1];
+
+export { companies, company, company2 };

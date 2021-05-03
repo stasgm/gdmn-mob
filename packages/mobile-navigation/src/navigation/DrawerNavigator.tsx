@@ -14,11 +14,9 @@ import SettingsNavigator from './Root/SettingsNavigator';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
-  Documents: undefined;
   References: undefined;
   Settings: undefined;
   Profile: undefined;
-  Map: undefined;
   [itemName: string]: undefined;
 };
 

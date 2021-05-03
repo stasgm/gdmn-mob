@@ -1,23 +1,38 @@
 import { AxiosInstance } from 'axios';
+
 import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
+import { device as mockDevice, user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
 import { BaseApi } from '../requests/baseApi';
+import { sleep } from '../utils';
+
+const isMock = process.env.MOCK;
+const mockTimeout = 500;
 
 class Auth extends BaseApi {
   constructor(api: AxiosInstance, deviceId: string) {
     super(api, deviceId);
   }
 
-  signup = async (name: string, password: string, companyId?: string, creatorId?: string) => {
-    const body = {
-      name: name,
-      password,
-      companies: companyId ? [companyId] : undefined,
-      creatorId: creatorId ?? name,
-    };
-    const res = await this.api.post<IResponse<IUser>>('/auth/signup', body);
+  signup = async (userCredentials: IUserCredentials) => {
+    if (isMock) {
+      await sleep(mockTimeout);
 
+      return {
+        type: 'SIGNUP',
+        user: { ...mockUser, name: userCredentials.name },
+      } as types.ISignUpResponse;
+    }
+
+    const body = {
+      name: userCredentials.name,
+      password: userCredentials.name,
+      // companies: companyId ? [companyId] : undefined,
+      // creatorId: creatorId ?? name,
+    };
+
+    const res = await this.api.post<IResponse<IUser>>('/auth/signup', body);
     const resData = res.data;
 
     if (resData.result) {
@@ -34,6 +49,21 @@ class Auth extends BaseApi {
   };
 
   login = async (userCredentials: IUserCredentials) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      if (userCredentials.name === 'Stas' && userCredentials.password === '@123!') {
+        return {
+          type: 'LOGIN',
+          user: mockUser,
+        } as types.ILoginResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: 'Неверные данные',
+      } as error.INetworkError;
+    }
+
     const body = {
       name: userCredentials.name,
       password: userCredentials.password,
@@ -63,6 +93,14 @@ class Auth extends BaseApi {
   };
 
   logout = async () => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'LOGOUT',
+      } as types.ILogOutResponse;
+    }
+
     const res = await this.api.get<IResponse<undefined>>('/auth/logout');
     const resData = res.data;
 
@@ -115,11 +153,25 @@ class Auth extends BaseApi {
   };
 
   verifyCode = async (code: string) => {
-    let res;
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      if (code === '1234') {
+        return {
+          type: 'VERIFY_CODE',
+          device: mockDevice,
+        } as types.IVerifyCodeResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: 'Неверный код',
+      } as error.INetworkError;
+    }
+
     try {
       const body = { uid: this.deviceId, code };
 
-      res = await this.api.post<IResponse<IDevice>>('/auth/device/code', body);
+      const res = await this.api.post<IResponse<IDevice>>('/auth/device/code', body);
 
       const resData = res?.data;
 
@@ -137,7 +189,7 @@ class Auth extends BaseApi {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
+        message: err?.response?.data?.error || 'Ошибка подключения',
       } as error.INetworkError;
     }
   };

@@ -1,27 +1,36 @@
 import { AxiosInstance } from 'axios';
-import { IDevice, IResponse } from '@lib/types';
+import { IDevice, IResponse, NewDevice } from '@lib/types';
+import { device as mockDevice, devices as mockDevices } from '@lib/mock';
 
 import { BaseApi } from '../requests/baseApi';
-
 import { error, device as types } from '../types';
+import { sleep } from '../utils';
+
+const isMock = process.env.MOCK;
+const mockTimeout = 500;
 
 class Device extends BaseApi {
   constructor(api: AxiosInstance, deviceId: string) {
     super(api, deviceId);
   }
 
-  addDevice = async (deviceName: string, userId: string) => {
-    const body = {
-      deviceName,
-      userId,
-    };
-    const res = await this.api.post<IResponse<string>>('/devices', body);
+  addDevice = async (newDevice: NewDevice) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'ADD_DEVICE',
+        device: mockDevice,
+      } as types.IAddDeviceResponse;
+    }
+
+    const res = await this.api.post<IResponse<IDevice>>('/devices', newDevice);
     const resData = res.data;
 
     if (resData.result) {
       return {
         type: 'ADD_DEVICE',
-        id: resData.data,
+        device: resData.data,
       } as types.IAddDeviceResponse;
     }
     return {
@@ -38,6 +47,15 @@ class Device extends BaseApi {
     * @returns
     */
   getDevices = async (userId?: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'GET_DEVICES',
+        devices: mockDevices,
+      } as types.IGetDevicesResponse;
+    }
+
     const res = await this.api.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
     const resData = res.data;
 
@@ -62,6 +80,15 @@ class Device extends BaseApi {
     * @returns IDevice
     */
   getDevice = async (deviceId: string, userId?: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'GET_DEVICE',
+        device: mockDevice,
+      } as types.IGetDeviceResponse;
+    }
+
     try {
       const paramQuery = userId ? `?userId=${userId}` : '';
 
@@ -105,13 +132,22 @@ class Device extends BaseApi {
   };
 
   updateDevice = async (device: Partial<IDevice>) => {
-    const res = await this.api.patch<IResponse<string>>(`/devices/${device.id}`, device);
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'UPDATE_DEVICE',
+        device,
+      } as types.IUpdateDeviceResponse;
+    }
+
+    const res = await this.api.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
     const resData = res.data;
 
     if (resData.result) {
       return {
         type: 'UPDATE_DEVICE',
-        deviceId: resData.data,
+        device: resData.data,
       } as types.IUpdateDeviceResponse;
     }
     return {
@@ -121,6 +157,14 @@ class Device extends BaseApi {
   };
 
   removeDevice = async (deviceId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'REMOVE_DEVICE',
+      } as types.IRemoveDeviceResponse;
+    }
+
     const res = await this.api.delete<IResponse<void>>(`/devices/${deviceId}`);
     const resData = res.data;
 

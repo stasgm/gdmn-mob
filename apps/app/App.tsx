@@ -1,17 +1,15 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { useAddReducer, configureStore, authSelectors } from '@lib/store';
+import { PersistGate } from 'redux-persist/integration/react';
+
+import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
 
-import { setStore } from './src/store';
-
-const store = setStore();
-
-console.log('MOCK:', process.env.MOCK);
+import { store, persistor } from './src/store';
 
 const App = () => {
   const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
@@ -19,11 +17,13 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <UIProvider theme={defaultTheme}>
-        <NavigationContainer>
-          <Router />
-        </NavigationContainer>
-      </UIProvider>
+      <PersistGate loading={null} persistor={persistor}>
+        <UIProvider theme={defaultTheme}>
+          <NavigationContainer>
+            <Router />
+          </NavigationContainer>
+        </UIProvider>
+      </PersistGate>
     </Provider>
   );
 };

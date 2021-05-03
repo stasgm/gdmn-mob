@@ -7,12 +7,12 @@ import { VerifyFunction } from 'passport-local';
 
 import bcrypt from 'bcrypt';
 
-import { IUser } from '@lib/types';
+import { IUser, NewUser } from '@lib/types';
 
-import { devices, users, codes } from './dao/db';
-
-// eslint-disable-next-line import/no-cycle
+import { entities } from './dao/db';
 import * as userService from './userService';
+
+const { devices, users, codes } = entities;
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
   const { deviceId } = ctx.query;
@@ -50,7 +50,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   })(ctx, next);
 };
 
-const signUp = async ({ user }: { user: Omit<IUser, 'role' | 'id'> & { password: string } }): Promise<IUser> => {
+const signUp = async (user: NewUser): Promise<IUser> => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
   const userCount = (await users.read()).length;

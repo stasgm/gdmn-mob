@@ -25,6 +25,9 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "package": "com.gs.app"
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     }

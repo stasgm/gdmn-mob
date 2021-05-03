@@ -8,19 +8,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-// import { users } from '@lib/mock';
+import { device } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
-// import CompanyUsers from '../../components/user/CompanyUsers';
 
 import { IToolBarButton } from '../../types';
 
 import ToolBarAction from '../../components/ToolBarActions';
 
 import UserDetailsView from '../../components/user/UserDetailsView';
+
+import UserDevices from '../../components/user/UserDevices';
 
 const UserView = () => {
   const { id: userId } = useParams();
@@ -122,6 +123,10 @@ const UserView = () => {
         >
           <UserDetailsView user={user} />
         </Box>
+      </Box>
+      <Box>
+        <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
+        <UserDevices devices={[device]} />
       </Box>
     </>
   );
