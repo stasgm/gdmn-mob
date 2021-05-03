@@ -22,15 +22,15 @@ interface props {
 }
 
 const CompanyListTable = ({ companies = [], ...rest }: props) => {
-  const [selectedCompanyIds, setSelectedCompanyIds] = useState<any>([]);
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
   const handleSelectAll = (event: any) => {
-    let newSelectedCompanyIds;
+    let newSelectedCompanyIds: string[] = [];
 
     if (event.target.checked) {
-      newSelectedCompanyIds = companies.map((company: any) => company.id);
+      newSelectedCompanyIds = companies.map((company: ICompany) => company.id);
     } else {
       newSelectedCompanyIds = [];
     }
@@ -38,7 +38,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
     setSelectedCompanyIds(newSelectedCompanyIds);
   };
 
-  const handleSelectOne = (_event: any, id: any) => {
+  const handleSelectOne = (_event: any, id: string) => {
     const selectedIndex = selectedCompanyIds.indexOf(id);
     let newSelectedCompanyIds: any = [];
 
@@ -104,6 +104,30 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
             </NavLink>
           </Box>
         </TableCell>
+        <TableCell>
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+            }}
+          >
+            <Typography color="textPrimary" variant="body1" key={company.admin.id}>
+              {company.creationDate}
+            </Typography>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Box
+            sx={{
+              alignItems: 'center',
+              display: 'flex',
+            }}
+          >
+            <Typography color="textPrimary" variant="body1" key={company.admin.id}>
+              {company.editionDate}
+            </Typography>
+          </Box>
+        </TableCell>
       </TableRow>
     ));
     return <>{companyList}</>;
@@ -126,6 +150,8 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
                 </TableCell>
                 <TableCell>Наименование</TableCell>
                 <TableCell>Администратор</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

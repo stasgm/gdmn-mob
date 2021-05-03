@@ -20,19 +20,15 @@ const Register = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  // const handleGoToMain = () => {
-  //   navigate('/app');
-  // };
-
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signUp(values));
     if (res.type === 'AUTH/SIGNUP_SUCCCES') {
-      navigate('/app');
+      navigate('/login');
     }
   };
 
   useEffect(() => {
-    //dispatch(authActions.authActions.clearError());
+    // dispatch(authActions.authActions.clearError());
   }, [dispatch]);
 
   const formik = useFormik<IUserCredentials>({

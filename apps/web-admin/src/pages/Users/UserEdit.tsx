@@ -5,7 +5,7 @@ import { IUser, NewUser } from '@lib/types';
 
 import UserDetails from '../../components/user/UserDetails';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/user';
 import SnackBar from '../../components/SnackBar';
 
@@ -14,7 +14,7 @@ const UserEdit = () => {
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.users);
   const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
@@ -27,8 +27,11 @@ const UserEdit = () => {
     dispatch(actions.userActions.clearError());
   };
 
-  const handleSubmit = (values: IUser | NewUser) => {
-    dispatch(actions.updateUser(values as IUser, handleGoToUserView));
+  const handleSubmit = async (values: IUser | NewUser) => {
+    const res = await dispatch(actions.updateUser(values as IUser));
+    if (res.type === 'USER/UPDATE_SUCCCES') {
+      handleGoToUserView();
+    }
   };
 
   if (!user) {

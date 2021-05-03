@@ -30,6 +30,7 @@ class Api {
       baseURL: `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`,
       url: this.config.apiPath,
       timeout: config.timeout,
+      withCredentials: true,
     });
 
     this.auth = new Auth(this.axios, this.deviceId);
