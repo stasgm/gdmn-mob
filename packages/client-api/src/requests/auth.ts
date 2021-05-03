@@ -1,18 +1,19 @@
-import { AxiosInstance } from 'axios';
+// import { AxiosInstance } from 'axios';
 
 import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
-import { BaseApi } from '../requests/baseApi';
+import { BaseRequest } from '../requests/baseApi';
 import { sleep } from '../utils';
+import { BaseApi } from '../types/types';
 
 const isMock = process.env.MOCK;
 const mockTimeout = 500;
 
-class Auth extends BaseApi {
-  constructor(api: AxiosInstance, deviceId: string) {
-    super(api, deviceId);
+class Auth extends BaseRequest {
+  constructor(api: BaseApi) {
+    super(api);
   }
 
   signup = async (userCredentials: IUserCredentials) => {
@@ -32,7 +33,7 @@ class Auth extends BaseApi {
       // creatorId: creatorId ?? name,
     };
 
-    const res = await this.api.post<IResponse<IUser>>('/auth/signup', body);
+    const res = await this.api.axios.post<IResponse<IUser>>('/auth/signup', body);
     const resData = res.data;
 
     if (resData.result) {
@@ -70,7 +71,7 @@ class Auth extends BaseApi {
     };
 
     try {
-      const res = await this.api.post<IResponse<IUser>>('/auth/login', body);
+      const res = await this.api.axios.post<IResponse<IUser>>('/auth/login', body);
       const resData = res?.data;
 
       if (resData?.result) {
@@ -101,7 +102,7 @@ class Auth extends BaseApi {
       } as types.ILogOutResponse;
     }
 
-    const res = await this.api.get<IResponse<undefined>>('/auth/logout');
+    const res = await this.api.axios.get<IResponse<undefined>>('/auth/logout');
     const resData = res.data;
 
     if (resData.result) {
@@ -116,7 +117,7 @@ class Auth extends BaseApi {
   };
 
   getCurrentUser = async () => {
-    const res = await this.api.get<IResponse<IUser>>('/auth/user');
+    const res = await this.api.axios.get<IResponse<IUser>>('/auth/user');
 
     const resData = res.data;
     if (resData.result) {
@@ -137,7 +138,7 @@ class Auth extends BaseApi {
   };
 
   getActivationCode = async () => {
-    const res = await this.api.get<IResponse<string>>(`/auth/device/${this.deviceId}/code`);
+    const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
     const resData = res.data;
 
     if (resData.result) {
@@ -169,9 +170,9 @@ class Auth extends BaseApi {
     }
 
     try {
-      const body = { uid: this.deviceId, code };
+      const body = { uid: this.api.deviceId, code };
 
-      const res = await this.api.post<IResponse<IDevice>>('/auth/device/code', body);
+      const res = await this.api.axios.post<IResponse<IDevice>>('/auth/device/code', body);
 
       const resData = res?.data;
 

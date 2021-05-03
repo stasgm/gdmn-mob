@@ -1,6 +1,6 @@
-import React from 'react';
+// import React from 'react';
 
-import { config } from '@lib/client-config';
+/* import { config } from '@lib/client-config';
 
 import Api from '../api';
 
@@ -28,3 +28,4 @@ export const useApi = () => {
 
   return context;
 };
+ */
