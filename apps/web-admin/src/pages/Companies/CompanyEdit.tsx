@@ -1,11 +1,11 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { ICompany } from '@lib/types';
+import { ICompany, NewCompany } from '@lib/types';
 
 import CompanyDetails from '../../components/company/CompanyDetails';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 import SnackBar from '../../components/SnackBar';
 
@@ -14,7 +14,7 @@ const CompanyEdit = () => {
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
@@ -27,8 +27,11 @@ const CompanyEdit = () => {
     dispatch(actions.companyActions.clearError());
   };
 
-  const handleSubmit = (values: ICompany) => {
-    dispatch(actions.updateCompany(values, handleGoToCompanyView));
+  const handleSubmit = async (values: ICompany | NewCompany) => {
+    const res = await dispatch(actions.updateCompany(values as ICompany));
+    if (res.type === 'COMPANY/UPDATE_SUCCCES') {
+      handleGoToCompanyView();
+    }
   };
 
   if (!company) {

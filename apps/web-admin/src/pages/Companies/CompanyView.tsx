@@ -22,6 +22,10 @@ import ToolBarAction from '../../components/ToolBarActions';
 
 import CompanyDetailsView from '../../components/company/CompanyDetailsView';
 
+// interface IProps {
+//   navigatePath: string;
+// }
+
 const CompanyView = () => {
   const { id: companyId } = useParams();
 
@@ -36,6 +40,7 @@ const CompanyView = () => {
 
   const handleCancel = () => {
     navigate('/app/companies');
+    //avigate(navigatePath);
   };
 
   const handleEdit = () => {
@@ -44,7 +49,6 @@ const CompanyView = () => {
 
   const handleRefresh = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
-    //обновить пользователей
   }, [dispatch, companyId]);
 
   useEffect(() => {

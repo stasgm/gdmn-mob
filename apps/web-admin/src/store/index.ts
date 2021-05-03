@@ -7,6 +7,8 @@ import companyReducer from './company/reducer';
 import { CompanyActionType } from './company/actions';
 import userReducer from './user/reducer';
 import deviceReducer from './device/reducer';
+import { DeviceActionType } from './device/actions';
+import { UserActionType } from './user/actions';
 
 export const combinedReducer = {
   companies: companyReducer,
@@ -14,7 +16,7 @@ export const combinedReducer = {
   devices: deviceReducer,
 };
 
-type TActions = CompanyActionType;
+type TActions = CompanyActionType | DeviceActionType | UserActionType;
 
 const rootReducer = combineReducers(combinedReducer);
 
