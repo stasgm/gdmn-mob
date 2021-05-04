@@ -1,6 +1,7 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
 import { hashPassword } from '../utils/crypt';
+import { extraPredicate } from '../utils/helpers';
 
 import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
@@ -116,8 +117,20 @@ const getUserPassword = async (userId: string): Promise<string> => {
   return (await users.find(userId)).password;
 };
 
-const findAll = async (): Promise<IUser[]> => {
-  const userList = await users.read();
+const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
+  const userList = await users.read((item) => {
+    const newParams = Object.assign({}, params);
+
+    let companyFound = true;
+
+    if ('companyId' in newParams) {
+      companyFound = item.companies.includes(newParams.companyId);
+      delete newParams['companyId'];
+    }
+
+    return companyFound && extraPredicate(item, newParams);
+  });
+
   const pr = userList.map(async (i) => await makeUser(i));
 
   return Promise.all(pr);
