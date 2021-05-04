@@ -2,15 +2,14 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import React, { useRef } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button, useTheme } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import refActions from '../store/references';
-import { useSelector } from '../store';
-import { IReference } from '../store/references/types';
+/*import refActions from '../store/references';
+import { useSelector, useDispatch } from '../store';
+import { IReference } from '../store/references/types';*/
 
-const ReferenceItem = ({ item }: { item: IReference }) => {
+/*const ReferenceItem = ({ item }: { item: IReference }) => {
   const { colors } = useTheme();
 
   return (
@@ -32,10 +31,10 @@ const ReferenceItem = ({ item }: { item: IReference }) => {
       </View>
     </TouchableOpacity>
   );
-};
+};*/
 
 const ReferencesScreen = () => {
-  const { data, loading } = useSelector((state) => state.refs);
+  /*const { data, loading } = useSelector((state) => state.refs);
 
   const dispatch = useDispatch();
 
@@ -49,12 +48,12 @@ const ReferencesScreen = () => {
 
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
-  const ref = useRef<FlatList<IReference>>(null);
+  const ref = useRef<FlatList<IReference>>(null);*/
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Справочники приложения</Text>
-      <Button compact={false} onPress={handleLoad}>
+      {/*<Button compact={false} onPress={handleLoad}>
         Загрузить
       </Button>
       <Button compact={false} onPress={handleReset}>
@@ -71,7 +70,7 @@ const ReferencesScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-      />
+  />*/}
     </View>
   );
 };

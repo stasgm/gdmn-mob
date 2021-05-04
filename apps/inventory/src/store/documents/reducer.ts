@@ -1,59 +1,59 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IReferenceState } from './types';
-import { ReferenceActionType, actions } from './actions';
+import { IDocumentState } from './types';
+import { DocumentActionType, actions } from './actions';
 
-const initialState: Readonly<IReferenceState> = {
+const initialState: Readonly<IDocumentState> = {
   list: [],
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<IReferenceState, ReferenceActionType> = (state = initialState, action): IReferenceState => {
+const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialState, action): IDocumentState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.deleteReference):
-      return { ...state, list: state.list?.filter(({ name }) => name.toString() !== action.payload) };
+    case getType(actions.deleteDocument):
+      return { ...state, list: state.list?.filter(({ number }) => number.toString() !== action.payload) };
 
-    case getType(actions.deleteAllReferences):
+    case getType(actions.deleteAllDocuments):
       return { ...state, list: [] };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
 
-    //Добавление нескольких справочников
-    case getType(actions.addReferencesAsync.request):
+    //Добавление нескольких документов
+    case getType(actions.addDocumentsAsync.request):
       return { ...state, loading: true };
 
-    case getType(actions.addReferencesAsync.success):
+    case getType(actions.addDocumentsAsync.success):
       return {
         ...state,
         loading: false,
         list: [...state.list, ...action.payload],
       };
 
-    case getType(actions.addReferencesAsync.failure):
+    case getType(actions.addDocumentsAsync.failure):
       return {
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
       };
 
-    //Добавление одного справочника
-    case getType(actions.addReferenceAsync.request):
+    //Добавление одного документа
+    case getType(actions.addDocumentAsync.request):
       return { ...state, loading: true };
 
-    case getType(actions.addReferenceAsync.success):
+    case getType(actions.addDocumentAsync.success):
       return {
         ...state,
         loading: false,
         list: [...state.list, action.payload],
       };
 
-    case getType(actions.addReferenceAsync.failure):
+    case getType(actions.addDocumentAsync.failure):
       return {
         ...state,
         loading: false,

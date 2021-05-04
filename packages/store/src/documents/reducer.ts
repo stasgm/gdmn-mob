@@ -5,7 +5,7 @@ import { IDocumentState } from './types';
 import { DocumentActionType, actions } from './actions';
 
 const initialState: Readonly<IDocumentState> = {
-  list: [{ number: 1 }, { number: 3 }, { number: 6 }, { number: 10 }],
+  list: [{ number: 1 }],
   loading: false,
   errorMessage: '',
 };

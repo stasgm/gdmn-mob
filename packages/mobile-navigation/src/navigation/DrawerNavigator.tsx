@@ -12,6 +12,8 @@ import { DrawerContent } from './drawerContent';
 //import ReferencesNavigator from "./Root/ReferencesNavigator";
 import SettingsNavigator from './Root/SettingsNavigator';
 import MessagesNavigator from './Root/MessagesNavigator';
+import ReferencesNavigator from './Root/ReferencesNavigator';
+import DocumentsNavigator from './Root/DocumentsNavigator';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
@@ -83,6 +85,22 @@ const DrawerNavigator = (props: IProps) => {
         options={{
           title: 'Сообщения',
           drawerIcon: (props) => <Icon name="message-text-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="References"
+        component={ReferencesNavigator}
+        options={{
+          title: 'Справочники',
+          drawerIcon: (props) => <Icon name="file-search-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Documents"
+        component={DocumentsNavigator}
+        options={{
+          title: 'Документы',
+          drawerIcon: (props) => <Icon name="file-document-outline" {...props} />,
         }}
       />
       <Drawer.Screen

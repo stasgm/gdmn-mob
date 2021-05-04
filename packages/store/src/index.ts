@@ -8,10 +8,14 @@ import { StateType } from 'typesafe-actions';
 
 import { reducer as authReducer, AuthActionType } from './auth';
 import { reducer as msgReducer, MsgActionType } from './messages';
+import { reducer as referenceReducer, ReferenceActionType } from './references';
+import { reducer as documentReducer, DocumentActionType } from './documents';
 
 const rootReducer = {
   auth: authReducer,
   messages: msgReducer,
+  references: referenceReducer,
+  documents: documentReducer,
 };
 
 type AppReducers = { [key: string]: Reducer };
@@ -35,7 +39,7 @@ const defaultPersistConfig: IPersostConfig = {
   whitelist: ['auth'],
 };
 
-type TActions = AuthActionType | MsgActionType;
+type TActions = AuthActionType | MsgActionType | ReferenceActionType | DocumentActionType;
 
 export default function configureStore(appReducers: AppReducers, persistConfig: IPersostConfig = defaultPersistConfig) {
   const middleware = [thunkMiddleware];

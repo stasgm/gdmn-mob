@@ -6,13 +6,10 @@ import { useTheme, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
+import { IDocument } from '@lib/store/dist/src/documents/types';
+import { useDispatch, useSelector, documentActions } from '@lib/store';
 
-/*import docActions from '../store/documents';
-import { useSelector, useDispatch } from '../store';
-import { IDocument } from '../store/documents/types';*/
-// import { IAppState } from '../store';
-
-/*const DocumentItem = ({ item }: { item: IDocument }) => {
+const DocumentItem = ({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
 
   return (
@@ -34,29 +31,29 @@ import { IDocument } from '../store/documents/types';*/
       </View>
     </TouchableOpacity>
   );
-};*/
+};
 
 const DocumentsScreen = () => {
-  /*const { docData, loading } = useSelector((state) => state.docs);
+  const { list, loading } = useSelector((state) => state.documents);
 
   const dispatch = useDispatch();
 
   const handleLoad = () => {
-    dispatch(docActions.fetchDoc());
+    //dispatch(documentActions.fetchDoc());
   };
 
   const handleReset = () => {
-    dispatch(docActions.docActions.init());
+    dispatch(documentActions.init());
   };
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
-  const ref = useRef<FlatList<IDocument>>(null);*/
+  const ref = useRef<FlatList<IDocument>>(null);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Документы приложения</Text>
-      {/*<Button compact={false} onPress={handleLoad}>
+      <Button compact={false} onPress={handleLoad}>
         Загрузить
       </Button>
       <Button compact={false} onPress={handleReset}>
@@ -64,7 +61,7 @@ const DocumentsScreen = () => {
       </Button>
       <FlatList
         ref={ref}
-        data={docData}
+        data={list}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -73,7 +70,7 @@ const DocumentsScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-  />*/}
+      />
     </View>
   );
 };

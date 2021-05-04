@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
-import { useSelector, msgActions, useDispatch } from '@lib/store';
+import { useSelector, messageActions, useDispatch } from '@lib/store';
 // import colors from '@lib/mobile-ui/src/styles/colors';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
@@ -72,7 +72,13 @@ const handleSend = async () => {
 
   const handleLoad = useCallback(() => {
     //TODO systemId из конфига
-    company && dispatch(msgActions.fetchMsg({ companyId: company.id, systemId: 'Inventory' }));
+    company &&
+      dispatch(
+        messageActions.fetchMsg({
+          companyId: company.id,
+          systemId: 'Inventory',
+        }),
+      );
   }, [company, dispatch]);
 
   const handleProcessAll = useCallback(async () => {
@@ -82,11 +88,11 @@ const handleSend = async () => {
   }, [data]);
 
   const handleReset = useCallback(() => {
-    dispatch(msgActions.init());
+    dispatch(messageActions.init());
   }, [dispatch]);
 
   const handleDeleteAll = useCallback(() => {
-    dispatch(msgActions.deleteAllMessages());
+    dispatch(messageActions.deleteAllMessages());
   }, [dispatch]);
 
   const actionsMenu = useCallback(() => {

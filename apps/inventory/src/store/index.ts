@@ -5,17 +5,12 @@ import { configureStore, RootState } from '@lib/store';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 import ExpoFileSystemStorage from 'redux-persist-expo-filesystem';
 
-import docsReducer from './documents/reducer';
-import refsReducer from './references/reducer';
+import { reducer as docsReducer, DocActionType } from './documents';
 
-import { DocActionType } from './documents/actions';
-import { RefActionType } from './references/actions';
-
-type TActions = DocActionType | RefActionType;
+type TActions = DocActionType;
 
 export const combinedReducer = {
   docs: docsReducer,
-  refs: refsReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
