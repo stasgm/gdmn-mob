@@ -1,6 +1,6 @@
 import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
 
-import log from '../utils/logger';
+import { extraPredicate } from '../utils/helpers';
 
 import { entities } from './dao/db';
 import { addCompanyToUser } from './userService';
@@ -115,14 +115,22 @@ const findOneByName = async (name: string): Promise<ICompany> => {
  * @return company[], компании
  * */
 
-type Param = {
-  [key in keyof Pick<IDBCompany, 'adminId'>]: string;
-};
+const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => {
+  const companyList = await companies.read((item) => {
+    const newParams = Object.assign({}, params);
 
-const findAll = async (param?: Param): Promise<ICompany[]> => {
-  log.info(param);
-  const companyList = await companies.read();
+    let adminFound = true;
+
+    if ('adminId' in newParams) {
+      adminFound = item.adminId.includes(newParams.adminId);
+      delete newParams['adminId'];
+    }
+
+    return adminFound && extraPredicate(item, newParams);
+  });
+
   const pr = companyList.map(async (i) => await makeCompany(i));
+
   return Promise.all(pr);
 };
 

@@ -124,9 +124,15 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 }; */
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
+  const { adminId } = ctx.query;
+
+  const params: Record<string, string> = {};
+
+  if (typeof adminId === 'string') {
+    params.adminId = adminId;
+  }
   try {
-    console.log('controller getCompanies');
-    const companyList = await companyService.findAll();
+    const companyList = await companyService.findAll(params);
 
     const result: IResponse<ICompany[]> = { result: true, data: companyList };
 
