@@ -2,8 +2,8 @@ export interface IReference {
   name: string;
 }
 
-export type IRefState = {
-  readonly data: IReference[] | undefined;
+export type IReferenceState = {
+  readonly list: IReference[];
   readonly loading: boolean;
   readonly errorMessage: string;
 };
