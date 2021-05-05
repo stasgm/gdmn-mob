@@ -107,41 +107,19 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId, name }: { id: string; name: string } = ctx.params;
-
-  if (!deviceId) {
-    ctx.throw(400, 'не указан uid устройства');
-  }
-
-  if (!name) {
-    ctx.throw(400, 'не указано имя пользователя');
-  }
-
-  try {
-    const device = await deviceService.findOneByUidAndUser({
-      deviceId,
-      name,
-    });
-
-    if (!device) {
-      ctx.throw(404, 'устройство не найдено');
-    }
-
-    const result: IResponse<IDevice> = { result: true, data: device };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getDevice: OK');
-  } catch (err) {
-    ctx.throw(404, err.message);
-  }
-};
-
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
+  console.log(ctx.query);
+  const { userId } = ctx.query;
+  console.log(userId);
+
+  const params: Record<string, string> = {};
+
+  if (typeof userId === 'string') {
+    params.userId = userId;
+  }
+
   try {
-    const deviceList = await deviceService.findAll();
+    const deviceList = await deviceService.findAll(params);
 
     const result: IResponse<IDevice[]> = { result: true, data: deviceList };
 
@@ -154,6 +132,58 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
+const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: deviceId }: { id: string } = ctx.params;
+
+  if (!deviceId) {
+    ctx.throw(400, 'не указан идентификатор устройства');
+  }
+
+  try {
+    const userList = await deviceService.findUsers(deviceId);
+
+    const result: IResponse<IDevice[]> = { result: true, data: userList };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info('getUsersByDevice: ok');
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
+// const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
+//   const { id: deviceId, name }: { id: string; name: string } = ctx.params;
+
+//   if (!deviceId) {
+//     ctx.throw(400, 'не указан uid устройства');
+//   }
+
+//   if (!name) {
+//     ctx.throw(400, 'не указано имя пользователя');
+//   }
+
+//   try {
+//     const device = await deviceService.findOneByUidAndUser({
+//       deviceId,
+//       name,
+//     });
+
+//     if (!device) {
+//       ctx.throw(404, 'устройство не найдено');
+//     }
+
+//     const result: IResponse<IDevice> = { result: true, data: device };
+
+//     ctx.status = 200;
+//     ctx.body = result;
+
+//     log.info('getDevice: OK');
+//   } catch (err) {
+//     ctx.throw(404, err.message);
+//   }
+// };
 /* const getDeviceByCurrentUser = async (ctx: Context): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
   const { id: userId }: { id: string } = ctx.state.user;
@@ -179,27 +209,6 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
     ctx.throw(400, err.message);
   }
 }; */
-
-const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId }: { id: string } = ctx.params;
-
-  if (!deviceId) {
-    ctx.throw(400, 'не указан идентификатор устройства');
-  }
-
-  try {
-    const userList = await deviceService.findUsers(deviceId);
-
-    const result: IResponse<IDevice[]> = { result: true, data: userList };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUsersByDevice: ok');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
-};
 
 /* const lockDevice = async (ctx: ParameterizedContext): Promise<void> => {
   if (ctx.isAuthenticated()) {
@@ -228,4 +237,4 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 */
-export { getDevice, getDevices, getUsersByDevice, addDevice, updateDevice, removeDevice, getDeviceByUser };
+export { addDevice, updateDevice, removeDevice, getDevice, getDevices, getUsersByDevice };

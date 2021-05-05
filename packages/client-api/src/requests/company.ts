@@ -1,12 +1,11 @@
-// import { AxiosInstance } from 'axios';
 import { v4 as uuid } from 'uuid';
 
-import { NewCompany, IResponse, IUser, ICompany } from '@lib/types';
+import { NewCompany, IResponse, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
 import { error, company as types } from '../types';
 import { BaseRequest } from '../requests/baseApi';
-import { sleep } from '../utils';
+import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/types';
 
 const isMock = process.env.MOCK;
@@ -27,41 +26,87 @@ class Company extends BaseRequest {
       } as types.IAddCompanyResponse;
     }
 
-    const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'ADD_COMPANY',
-        company: resData.data,
-      } as types.IAddCompanyResponse;
-    }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-  };
-
-  getCompanies = async () => {
-    if (isMock) {
-      await sleep(mockTimeout);
-
-      return {
-        type: 'GET_COMPANIES',
-        companies: mockCompanies,
-      } as types.IGetCompaniesResponse;
-    }
-
     try {
-      const res = await this.api.axios.get<IResponse<ICompany[]>>('/companies');
+      const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
       const resData = res.data;
 
       if (resData.result) {
         return {
-          type: 'GET_COMPANIES',
-          companies: resData.data,
-        } as types.IGetCompaniesResponse;
+          type: 'ADD_COMPANY',
+          company: resData.data,
+        } as types.IAddCompanyResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
+    }
+  };
+
+  updateCompany = async (company: Partial<ICompany>) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+      const updatedCompany = mockCompanies.find((item) => item.id === company.id);
+
+      if (updatedCompany) {
+        return {
+          type: 'UPDATE_COMPANY',
+          company: updatedCompany,
+        } as types.IUpdateCompanyResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: 'Компания не найдена',
+      } as error.INetworkError;
+    }
+
+    try {
+      const res = await this.api.axios.patch<IResponse<ICompany>>(`/companies/${company.id}`, company);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'UPDATE_COMPANY',
+          company: resData.data,
+        } as types.IUpdateCompanyResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
+    }
+  };
+
+  removeCompany = async (companyId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'REMOVE_COMPANY',
+      } as types.IRemoveCompanyResponse;
+    }
+
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>(`/companies/${companyId}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'REMOVE_COMPANY',
+        } as types.IRemoveCompanyResponse;
       }
 
       return {
@@ -93,96 +138,83 @@ class Company extends BaseRequest {
         message: 'Компания не найдена',
       } as error.INetworkError;
     }
+    try {
+      const res = await this.api.axios.get<IResponse<ICompany>>(`/companies/${companyId}`);
+      const resData = res.data;
 
-    const res = await this.api.axios.get<IResponse<ICompany>>(`/companies/${companyId}`);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'GET_COMPANY',
-        company: resData.data,
-      } as types.IGetCompanyResponse;
-    }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-  };
-
-  updateCompany = async (company: Partial<ICompany>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
-      const updatedCompany = mockCompanies.find((item) => item.id === company.id);
-
-      if (updatedCompany) {
+      if (resData.result) {
         return {
-          type: 'UPDATE_COMPANY',
-          company: updatedCompany,
-        } as types.IUpdateCompanyResponse;
+          type: 'GET_COMPANY',
+          company: resData.data,
+        } as types.IGetCompanyResponse;
       }
 
       return {
         type: 'ERROR',
-        message: 'Компания не найдена',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
       } as error.INetworkError;
     }
-
-    const res = await this.api.axios.patch<IResponse<ICompany>>(`/companies/${company.id}`, company);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'UPDATE_COMPANY',
-        company: resData.data,
-      } as types.IUpdateCompanyResponse;
-    }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
-  getUsersByCompany = async (companyId: string) => {
-    const res = await this.api.axios.get<IResponse<IUser[]>>(`/companies/${companyId}/users`);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'GET_USERS_BY_COMPANY',
-        users: resData.data,
-      } as types.IGetCompanyUsersResponse;
-    }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-  };
-
-  removeCompany = async (companyId: string) => {
+  getCompanies = async (params?: Record<string, string>) => {
     if (isMock) {
       await sleep(mockTimeout);
 
       return {
-        type: 'REMOVE_COMPANY',
-      } as types.IRemoveCompanyResponse;
+        type: 'GET_COMPANIES',
+        companies: mockCompanies,
+      } as types.IGetCompaniesResponse;
     }
 
-    const res = await this.api.axios.delete<IResponse<void>>(`/companies/${companyId}`);
-    const resData = res.data;
+    let paramText = params ? getParams(params) : '';
 
-    if (resData.result) {
+    if (paramText > '') {
+      paramText = `?${paramText}`;
+    }
+
+    try {
+      const res = await this.api.axios.get<IResponse<ICompany[]>>(`/companies${paramText}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'GET_COMPANIES',
+          companies: resData.data,
+        } as types.IGetCompaniesResponse;
+      }
+
       return {
-        type: 'REMOVE_COMPANY',
-      } as types.IRemoveCompanyResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
+
+  // getUsersByCompany = async (companyId: string) => {
+  //   const res = await this.api.axios.get<IResponse<IUser[]>>(`/companies/${companyId}/users`);
+  //   const resData = res.data;
+
+  //   if (resData.result) {
+  //     return {
+  //       type: 'GET_USERS_BY_COMPANY',
+  //       users: resData.data,
+  //     } as types.IGetCompanyUsersResponse;
+  //   }
+  //   return {
+  //     type: 'ERROR',
+  //     message: resData.error,
+  //   } as error.INetworkError;
+  // };
 }
 
 export default Company;

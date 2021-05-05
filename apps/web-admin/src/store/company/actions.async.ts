@@ -40,26 +40,17 @@ const fetchCompanyById = (id: string): AppThunk => {
 const fetchCompanies = (): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.fetchCompaniesAsync.request(''));
+    const response = await api.company.getCompanies();
 
-    try {
-      const response = await api.company.getCompanies();
-
-      if (response.type === 'GET_COMPANIES') {
-        return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
-      }
-
-      if (response.type === 'ERROR') {
-        dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
-        throw new Error(response.message);
-      }
-
-      dispatch(companyActions.fetchCompaniesAsync.failure('Oops, Something Went Wrong'));
-      throw new Error('Oops, Something Went Wrong');
-    } catch (err) {
-      return dispatch(companyActions.fetchCompaniesAsync.failure(err || 'Oops, Something Went Wrong'));
-      // return dispatch(companyActions.fetchCompaniesAsync.failure('Oops, Something Went Wrong'));
-      // throw new Error(err);
+    if (response.type === 'GET_COMPANIES') {
+      return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));
     }
+
+    if (response.type === 'ERROR') {
+      return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
+    }
+
+    return dispatch(companyActions.fetchCompaniesAsync.failure('Oops, Something Went Wrong'));
   };
 };
 

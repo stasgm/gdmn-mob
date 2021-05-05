@@ -1,12 +1,12 @@
 // import { AxiosInstance } from 'axios';
 import { v4 as uuid } from 'uuid';
 
-import { IResponse, IUser, NewUser, UserRole } from '@lib/types';
+import { IResponse, IUser, NewUser } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
 import { error, user as types } from '../types';
 import { BaseRequest } from '../requests/baseApi';
-import { sleep } from '../utils';
+import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/types';
 
 const isMock = process.env.MOCK;
@@ -27,20 +27,27 @@ class User extends BaseRequest {
       } as types.IAddUserResponse;
     }
 
-    const res = await this.api.axios.post<IResponse<IUser>>('/users', user);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.post<IResponse<IUser>>('/users', user);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'ADD_USER',
+          user: resData.data,
+        } as types.IAddUserResponse;
+      }
+
       return {
-        type: 'ADD_USER',
-        user: resData.data,
-      } as types.IAddUserResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   updateUser = async (user: Partial<IUser>) => {
@@ -61,19 +68,26 @@ class User extends BaseRequest {
       } as error.INetworkError;
     }
 
-    const res = await this.api.patch<IResponse<IUser>>(`/users/${user.id}`, user);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.patch<IResponse<IUser>>(`/users/${user.id}`, user);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'UPDATE_USER',
+          user: resData.data,
+        } as types.IUpdateUserResponse;
+      }
       return {
-        type: 'UPDATE_USER',
-        user: resData.data,
-      } as types.IUpdateUserResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   removeUser = async (userId: string) => {
@@ -85,19 +99,26 @@ class User extends BaseRequest {
       } as types.IRemoveUserResponse;
     }
 
-    const res = await this.api.delete<IResponse<void>>(`/users/${userId}`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>(`/users/${userId}`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'REMOVE_USER',
+        } as types.IRemoveUserResponse;
+      }
+
       return {
-        type: 'REMOVE_USER',
-      } as types.IRemoveUserResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   getUser = async (userId: string) => {
@@ -118,23 +139,30 @@ class User extends BaseRequest {
       } as error.INetworkError;
     }
 
-    const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'GET_USER',
+          user: resData.data,
+        } as types.IGetUserResponse;
+      }
+
       return {
-        type: 'GET_USER',
-        user: resData.data,
-      } as types.IGetUserResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
-  getUsers = async (params: Record<string, string>) => {
+  getUsers = async (params?: Record<string, string>) => {
     if (isMock) {
       await sleep(mockTimeout);
 
@@ -151,36 +179,33 @@ class User extends BaseRequest {
       } as error.INetworkError;
     }
 
-    const getParams = (params: Record<string, string>) => {
-      return Object.entries(params).reduce((acc, [field, value]) => {
-        let curParam = '';
-        if (acc > '') {
-          curParam = `${acc}&`;
-        }
-        return `${curParam}${field}=${value}`;
-      }, '');
-    };
-
-    let paramText = getParams(params);
+    let paramText = params ? getParams(params) : '';
 
     if (paramText > '') {
       paramText = `?${paramText}`;
     }
 
-    const res = await this.api.get<IResponse<IUser[]>>(`/users${paramText}`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'GET_USERS',
+          users: resData.data,
+        } as types.IGetUsersResponse;
+      }
+
       return {
-        type: 'GET_USERS',
-        users: resData.data,
-      } as types.IGetUsersResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 }
 export default User;

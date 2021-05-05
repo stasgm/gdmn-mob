@@ -40,7 +40,7 @@ const fetchUsers = (companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.fetchUsersAsync.request(''));
 
-    const response = await api.user.getUsers(companyId);
+    const response = await api.user.getUsers(companyId ? { companyId: companyId } : undefined);
 
     if (response.type === 'GET_USERS') {
       return dispatch(userActions.fetchUsersAsync.success(response.users));

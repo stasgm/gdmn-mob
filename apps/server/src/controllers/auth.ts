@@ -5,6 +5,38 @@ import { IResponse, IUser, IUserCredentials, NewUser } from '@lib/types';
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
 
+/**Регистрация пользователя */
+const signUp = async (ctx: ParameterizedContext): Promise<void> => {
+  const { name, password } = ctx.request.body as IUserCredentials;
+
+  if (!name) {
+    ctx.throw(400, 'Не указано имя пользователя');
+  }
+
+  if (!password) {
+    ctx.throw(400, 'Не указан пароль');
+  }
+
+  const user: NewUser = {
+    password,
+    name,
+    companies: [],
+  };
+
+  try {
+    const newUser = await authService.signUp(user);
+
+    const result: IResponse<IUser> = { result: true, data: newUser };
+
+    ctx.status = 200;
+    ctx.body = result;
+
+    log.info(`signUp: user '${name}' is successfully signed up`);
+  } catch (err) {
+    ctx.throw(400, err.message);
+  }
+};
+
 /** Вход пользователя */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { deviceId } = ctx.query;
@@ -63,38 +95,6 @@ const logOut = (ctx: Context): void => {
   ctx.body = res;
 
   log.info(`logOut: user '${user.name}' successfully logged out`);
-};
-
-const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  // const { deviceId } = ctx.query;
-  const { name, password } = ctx.request.body as IUserCredentials;
-
-  if (!name) {
-    ctx.throw(400, 'Не указано имя пользователя');
-  }
-
-  if (!password) {
-    ctx.throw(400, 'Не указан пароль');
-  }
-
-  const user: NewUser = {
-    password,
-    name,
-    companies: [],
-  };
-
-  try {
-    const newUser = await authService.signUp(user);
-
-    const result: IResponse<IUser> = { result: true, data: newUser };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info(`signUp: user '${name}' is successfully signed up`);
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {

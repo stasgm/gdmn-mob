@@ -140,21 +140,6 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
  * @return users, пользователи
  * */
 
-// TODO: Перенести  в userServiuce
-/*
-const findUsers = async (id: string): Promise<IUser[]> => {
-  const company = await companies.find(id);
-
-  if (!company) {
-    throw new Error('Компания не найдена');
-  }
-
-  // TODO заменить на company.title на companyId
-  return (await users.read())
-    .filter((el) => el.companies?.some((i: string) => i === company.name))
-    .map((el) => makeUser(el));
-}; */
-
 export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
   const admin = await users.find(company.adminId);
 

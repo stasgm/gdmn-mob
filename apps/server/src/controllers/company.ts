@@ -8,11 +8,11 @@ import { companyService } from '../services';
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, externalId } = ctx.request.body;
 
-  const { id: userId } = ctx.state.user;
-
   if (!name) {
     ctx.throw(400, 'Не указано название компании');
   }
+
+  const { id: userId } = ctx.state.user;
 
   const company: NewCompany = { name, adminId: userId, externalId };
 
@@ -102,27 +102,6 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-/* const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: companyId } = ctx.params;
-
-  if (!companyId) {
-    ctx.throw(400, 'не указан идентификатор организации');
-  }
-
-  try {
-    const userList = await companyService.findUsers(companyId);
-
-    const result: IResponse<IUserProfile[]> = { result: true, data: userList };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUsersByCompany: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
-}; */
-
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   const { adminId } = ctx.query;
 
@@ -131,6 +110,7 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   if (typeof adminId === 'string') {
     params.adminId = adminId;
   }
+
   try {
     const companyList = await companyService.findAll(params);
 
@@ -145,4 +125,4 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { addCompany, updateCompany, getCompany, getCompanies, removeCompany };
+export { addCompany, updateCompany, removeCompany, getCompany, getCompanies };

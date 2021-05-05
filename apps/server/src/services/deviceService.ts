@@ -1,5 +1,7 @@
 import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
+import { extraPredicate } from '../utils/helpers';
+
 import { entities } from './dao/db';
 
 const { devices, codes, users } = entities;
@@ -27,75 +29,6 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
   const createdDevice = await devices.find(await devices.insert(newDevice));
 
   return makeDevice(createdDevice);
-};
-
-const findOne = async (id: string) => {
-  return makeDevice(await devices.find(id));
-};
-
-const findAll = async () => {
-  const deviceList = await devices.read();
-  const pr = deviceList.map(async (i) => await makeDevice(i));
-
-  return Promise.all(pr);
-  //return devices.read();
-};
-
-const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name: string }) => {
-  const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
-
-  if (!user) {
-    throw new Error('Пользователь не найден');
-  }
-
-  return makeDevice(await devices.find((i) => i.uid === deviceId && i.userId === user.id));
-};
-
-const findOneByUid = async (uid: string) => {
-  return makeDevice(await devices.find((i) => i.uid === uid));
-};
-
-/**
- * Возвращает список пользователей по устройству
- * @param {string} id - идентификатор устройства
- * */
-const findUsers = async (deviceId: string) => {
-  if (!(await devices.find(deviceId))) {
-    throw new Error('Устройство не найдено');
-  }
-
-  // const deviceList = await devices.read();
-  // const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
-
-  // return Promise.all(pr);
-
-  return Promise.all(
-    (await devices.read())
-      .filter((i) => i.uid === deviceId)
-      .map(async (i) => {
-        const device = await devices.find(deviceId);
-
-        if (!device) {
-          throw new Error('Устройство не найдено');
-        }
-
-        const user = await users.find(i.userId);
-
-        if (!user) {
-          throw new Error('Пользователь не найден');
-        }
-
-        return await makeDevice(i);
-
-        // return {
-        //   id: i.id,
-        //   userId: i.userId,
-        //   uId: i.uid,
-        //   name: device.name,
-        //   state: i.state,
-        // };
-      }),
-  );
 };
 
 /**
@@ -159,6 +92,73 @@ const genActivationCode = async (deviceId: string) => {
   return code;
 };
 
+const findOne = async (id: string) => {
+  return makeDevice(await devices.find(id));
+};
+
+const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
+  const deviceList = await devices.read((item) => {
+    const newParams = Object.assign({}, params);
+
+    let userFound = true;
+
+    if ('userId' in newParams) {
+      userFound = item.userId.includes(newParams.userId);
+      delete newParams['userId'];
+    }
+
+    return userFound && extraPredicate(item, newParams);
+  });
+
+  const pr = deviceList.map(async (i) => await makeDevice(i));
+
+  return Promise.all(pr);
+};
+
+/**
+ * Возвращает список пользователей по устройству
+ * @param {string} id - идентификатор устройства
+ * */
+const findUsers = async (deviceId: string) => {
+  if (!(await devices.find(deviceId))) {
+    throw new Error('Устройство не найдено');
+  }
+
+  return Promise.all(
+    (await devices.read())
+      .filter((i) => i.uid === deviceId)
+      .map(async (i) => {
+        const device = await devices.find(deviceId);
+
+        if (!device) {
+          throw new Error('Устройство не найдено');
+        }
+
+        const user = await users.find(i.userId);
+
+        if (!user) {
+          throw new Error('Пользователь не найден');
+        }
+
+        return await makeDevice(i);
+      }),
+  );
+};
+
+// const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name: string }) => {
+//   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
+
+//   if (!user) {
+//     throw new Error('Пользователь не найден');
+//   }
+
+//   return makeDevice(await devices.find((i) => i.uid === deviceId && i.userId === user.id));
+// };
+
+const findOneByUid = async (uid: string) => {
+  return makeDevice(await devices.find((i) => i.uid === uid));
+};
+
 export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
   const user = await users.find(device.userId);
 
@@ -174,14 +174,4 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
   };
 };
 
-export {
-  findOne,
-  findAll,
-  findUsers,
-  addOne,
-  deleteOne,
-  updateOne,
-  findOneByUidAndUser,
-  findOneByUid,
-  genActivationCode,
-};
+export { addOne, updateOne, deleteOne, findOne, findOneByUid, findAll, findUsers, genActivationCode };

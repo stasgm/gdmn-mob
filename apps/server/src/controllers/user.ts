@@ -1,6 +1,6 @@
 import { ParameterizedContext } from 'koa';
 
-import { IDevice, IResponse, IUser, NewUser } from '@lib/types';
+import { IResponse, IUser, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
@@ -141,25 +141,25 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: userId } = ctx.params;
+// const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
+//   const { id: userId } = ctx.params;
 
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
-  }
+//   if (!userId) {
+//     ctx.throw(400, 'не указан идентификатор пользователя');
+//   }
 
-  try {
-    const deviceIfno = await userService.findDevices(userId);
+//   try {
+//     const deviceIfno = await userService.findDevices(userId);
 
-    const result: IResponse<IDevice[]> = { result: true, data: deviceIfno };
+//     const result: IResponse<IDevice[]> = { result: true, data: deviceIfno };
 
-    ctx.status = 200;
-    ctx.body = result;
+//     ctx.status = 200;
+//     ctx.body = result;
 
-    log.info('getDevicesByUser: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
-};
+//     log.info('getDevicesByUser: OK');
+//   } catch (err) {
+//     ctx.throw(400, err);
+//   }
+// };
 
-export { addUser, getUsers, getUser, removeUser, updateUser, getDevicesByUser };
+export { addUser, updateUser, removeUser, getUser, getUsers };
