@@ -33,7 +33,7 @@ class Api extends BaseApi {
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
       url: this._config.apiPath,
       timeout: config.timeout,
-      // withCredentials: true,
+      withCredentials: true,
     });
 
     this.auth = new Auth(this);
