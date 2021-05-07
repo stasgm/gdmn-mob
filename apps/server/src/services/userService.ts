@@ -24,7 +24,7 @@ const addOne = async (user: NewUser): Promise<IUser> => {
   const newUser: IDBUser = {
     id: '',
     name: user.name,
-    companies: user.companies.map((i) => i.id),
+    companies: user.companies?.map((i) => i.id),
     password: passwordHash,
     role: !user.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
     creatorId: user.creator?.id || '',
@@ -105,16 +105,28 @@ const deleteOne = async (id: string): Promise<void> => {
   await users.delete(id);
 };
 
-const findOne = async (userId: string): Promise<IUser> => {
-  return makeUser(await users.find(userId));
+const findOne = async (id: string): Promise<IUser | undefined> => {
+  const user = await users.find(id);
+
+  if (!user) return;
+
+  return makeUser(user);
 };
 
-const findByName = async (name: string): Promise<IUser> => {
-  return makeUser(await users.find((user) => user.name.toUpperCase() === name.toUpperCase()));
+const findByName = async (name: string): Promise<IUser | undefined> => {
+  const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
+
+  if (!user) return;
+
+  return makeUser(user);
 };
 
-const getUserPassword = async (userId: string): Promise<string> => {
-  return (await users.find(userId)).password;
+const getUserPassword = async (id: string): Promise<string | undefined> => {
+  const user = await users.find(id);
+
+  if (!user) return;
+
+  return user.password;
 };
 
 const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
@@ -124,7 +136,7 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
     let companyFound = true;
 
     if ('companyId' in newParams) {
-      companyFound = item.companies.includes(newParams.companyId);
+      companyFound = item.companies?.includes(newParams.companyId);
       delete newParams['companyId'];
     }
 
@@ -152,20 +164,26 @@ const findDevices = async (userId: string) => {
   return Promise.all(pr);
 };
 
-const addCompanyToUser = async (userId: string, companyName: string) => {
+const addCompanyToUser = async (userId: string, companyId: string) => {
   const user = await users.find(userId);
 
   if (!user) {
     throw new Error('Пользователь не найден');
   }
 
-  if (user.companies?.some((i) => companyName === i)) {
+  const company = await companies.find(companyId);
+
+  if (!company) {
+    throw new Error('Компания не найдена');
+  }
+
+  if (user.companies?.some((i) => companyId === i)) {
     throw new Error('Компания уже привязана к пользователю');
   }
 
-  const companies = [...(user.companies || []), companyName];
+  const companyList = [...(user.companies || []), company.id];
 
-  return users.update({ ...user, companies });
+  return users.update({ ...user, companies: companyList });
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {

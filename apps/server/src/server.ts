@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import Koa from 'koa';
-import koaCors from '@koa/cors';
+import cors from '@koa/cors';
 
 import session from 'koa-session';
 import passport from 'koa-passport';
@@ -25,7 +25,7 @@ import router from './routes';
 // 7 days for session cookie lifetime
 const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
 const CONFIG = {
-  key: 'koa:sess' /** (string) cookie key (default is koa:sess) */,
+  key: 'koa:sess-' /** (string) cookie key (default is koa:sess) */,
   maxAge: SESSION_COOKIE_LIFETIME /** (number) maxAge in ms (default is 1 days) */,
   overwrite: true /** (boolean) can overwrite or not (default true) */,
   httpOnly: true /** (boolean) httpOnly or not (default true) */,
@@ -73,7 +73,13 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(errorHandler)
     .use(passport.initialize())
     .use(passport.session())
-    .use(koaCors({ credentials: true }))
+    .use(
+      cors({
+        credentials: true,
+        origin: 'http://localhost:8080',
+      }),
+    )
+    // .use(koaCors({ credentials: true }))
     .use(router.routes())
     .use(router.allowedMethods());
 

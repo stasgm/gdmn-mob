@@ -92,8 +92,20 @@ const genActivationCode = async (deviceId: string) => {
   return code;
 };
 
-const findOne = async (id: string) => {
-  return makeDevice(await devices.find(id));
+const findOne = async (id: string): Promise<IDevice | undefined> => {
+  const device = await devices.find(id);
+
+  if (!device) return;
+
+  return makeDevice(device);
+};
+
+const findOneByUid = async (uid: string) => {
+  const device = await devices.find((i) => i.uid === uid);
+
+  if (!device) return;
+
+  return makeDevice(device);
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
@@ -103,7 +115,7 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
     let userFound = true;
 
     if ('userId' in newParams) {
-      userFound = item.userId.includes(newParams.userId);
+      userFound = item.userId?.includes(newParams.userId);
       delete newParams['userId'];
     }
 
@@ -155,12 +167,8 @@ const findUsers = async (deviceId: string) => {
 //   return makeDevice(await devices.find((i) => i.uid === deviceId && i.userId === user.id));
 // };
 
-const findOneByUid = async (uid: string) => {
-  return makeDevice(await devices.find((i) => i.uid === uid));
-};
-
 export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
-  const user = await users.find(device.userId);
+  const user = await users.find(device?.userId);
 
   const userEntity: INamedEntity = user && { id: user.id, name: user.name };
 

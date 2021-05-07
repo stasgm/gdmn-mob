@@ -103,13 +103,11 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
-  const { adminId } = ctx.query;
-
   const params: Record<string, string> = {};
 
-  if (typeof adminId === 'string') {
-    params.adminId = adminId;
-  }
+  const { id: adminId } = ctx.state.user;
+
+  params.adminId = adminId;
 
   try {
     const companyList = await companyService.findAll(params);

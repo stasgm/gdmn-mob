@@ -98,9 +98,16 @@ const signUp = async (user: NewUser): Promise<IUser> => {
 const validateAuthCreds: VerifyFunction = async (name: string, password: string, done) => {
   const user = await userService.findByName(name);
 
+  if (!user) {
+    done(null, false);
+    return;
+  }
+
   const hashedPassword = await userService.getUserPassword(user.id);
 
-  if (!user) done(null, false);
+  if (!hashedPassword) {
+    return;
+  }
 
   if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
