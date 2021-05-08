@@ -4,17 +4,22 @@ import { IResponse, IUser, IUserCredentials, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
+import { InvalidParameterException } from '../exceptions';
 
-/**Регистрация пользователя */
+/**
+ * Регистрация нового пользователя
+ * */
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password } = ctx.request.body as IUserCredentials;
 
   if (!name) {
-    ctx.throw(400, 'Не указано имя пользователя');
+    throw new InvalidParameterException('Не указано имя пользователя');
+    // ctx.throw(400, 'Не указано имя пользователя');
   }
 
   if (!password) {
-    ctx.throw(400, 'Не указан пароль');
+    throw new InvalidParameterException('Не указан пароль');
+    // ctx.throw(400, 'Не указан пароль');
   }
 
   const user: NewUser = {
@@ -37,21 +42,26 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-/** Вход пользователя */
+/**
+ * Вход пользователя
+ * */
 const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { deviceId } = ctx.query;
   const { name, password } = ctx.request.body as IUserCredentials;
 
   if (!name) {
-    ctx.throw(400, 'Не указано имя пользователя');
+    throw new InvalidParameterException('Не указано имя пользователя');
+    // ctx.throw(400, 'Не указано имя пользователя');
   }
 
   if (!password) {
-    ctx.throw(400, 'Не указан пароль');
+    throw new InvalidParameterException('Не указан пароль');
+    // ctx.throw(400, 'Не указан пароль');
   }
 
   if (!deviceId) {
-    ctx.throw(400, 'Не указан идентификатор устройства');
+    throw new InvalidParameterException('Не указан идентификатор устройства');
+    // ctx.throw(400, 'Не указан идентификатор устройства');
   }
 
   try {
@@ -70,7 +80,9 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   }
 };
 
-/** Проверка текущего пользователя в сессии koa */
+/**
+ * Проверка текущего пользователя в сессии koa
+ * */
 const getCurrentUser = (ctx: ParameterizedContext): void => {
   const { user } = ctx.state;
 
@@ -104,41 +116,34 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   log.info(`code: ${code}`);
 
   if (!code) {
-    ctx.throw(400, 'не указан код');
+    throw new InvalidParameterException('Не указан код активации');
+    // ctx.throw(400, 'не указан код');
   }
 
-  try {
-    const deviceUid = await authService.verifyCode({ code, uid });
+  const deviceUid = await authService.verifyCode({ code, uid });
 
-    const result: IResponse<string> = { result: true, data: deviceUid };
+  const result: IResponse<string> = { result: true, data: deviceUid };
 
-    ctx.status = 200;
-    ctx.body = result;
+  ctx.status = 200;
+  ctx.body = result;
 
-    log.info('verifyCode: ok');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('verifyCode: ok');
 };
 
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { deviceId } = ctx.params;
 
   if (!deviceId) {
-    ctx.throw(400, 'не указан идентификатор устройства');
+    throw new InvalidParameterException('Не указан идентификатор устройства');
   }
 
-  try {
-    const code = await deviceService.genActivationCode(deviceId);
-    const result: IResponse<string> = { result: true, data: code };
+  const code = await deviceService.genActivationCode(deviceId);
+  const result: IResponse<string> = { result: true, data: code };
 
-    ctx.status = 200;
-    ctx.body = result;
+  ctx.status = 200;
+  ctx.body = result;
 
-    log.info('getActivationCode: ativation code generated successfully');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('getActivationCode: ativation code generated successfully');
 };
 
 export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };

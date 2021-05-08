@@ -1,5 +1,7 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
+import { DataNotFoundException, InnerErrorException, InvalidParameterException } from '../exceptions';
+
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate } from '../utils/helpers';
 
@@ -14,29 +16,41 @@ const { users, companies, devices } = entities;
  * @param {IUser} user - пользователь
  * @return id, идентификатор пользователя
  * */
-const addOne = async (user: NewUser): Promise<IUser> => {
-  if (await users.find((i) => i.name.toUpperCase() === user.name.toUpperCase())) {
-    throw new Error('Пользователь с таким именем уже существует');
+const addOne = async (newUser: NewUser): Promise<IUser> => {
+  const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
+
+  if (user) {
+    throw new InvalidParameterException('Пользователь с таким именем уже существует');
   }
 
-  const passwordHash = await hashPassword(user.password);
+  const passwordHash = await hashPassword(newUser.password);
 
-  const newUser: IDBUser = {
+  const newUserObj: IDBUser = {
     id: '',
-    name: user.name,
-    companies: user.companies?.map((i) => i.id),
+    name: newUser.name,
+    companies: newUser.companies?.map((i) => i.id),
     password: passwordHash,
-    role: !user.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
-    creatorId: user.creator?.id || '',
-    externalId: user.externalId,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
+    role: !newUser.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
+    creatorId: newUser.creator?.id || '',
+    externalId: newUser.externalId,
+    firstName: newUser.firstName,
+    lastName: newUser.lastName,
+    phoneNumber: newUser.phoneNumber,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   };
 
-  const createdUser = await users.find(await users.insert(newUser));
+  const userId = await users.insert(newUserObj);
+
+  if (!userId) {
+    throw new InnerErrorException('Ошбка при создании пользователя');
+  }
+
+  const createdUser = await users.find(userId);
+
+  if (!createdUser) {
+    throw new InnerErrorException('Ошбка при создании пользователя');
+  }
 
   return makeUser(createdUser);
 };
@@ -96,8 +110,10 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
  * @param {string} id - идентификатор пользователя
  * */
 const deleteOne = async (id: string): Promise<void> => {
-  if (!(await users.find(id))) {
-    throw new Error('Пользователь не найден');
+  const user = await users.find(id);
+
+  if (!user) {
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   // TODO Если пользователь является админом организации то прерывать
@@ -108,23 +124,29 @@ const deleteOne = async (id: string): Promise<void> => {
 const findOne = async (id: string): Promise<IUser | undefined> => {
   const user = await users.find(id);
 
-  if (!user) return;
+  if (!user) {
+    throw new DataNotFoundException('Пользователь не найден');
+  }
 
   return makeUser(user);
 };
 
-const findByName = async (name: string): Promise<IUser | undefined> => {
+const findByName = async (name: string): Promise<IUser> => {
   const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
 
-  if (!user) return;
+  if (!user) {
+    throw new DataNotFoundException('Пользователь не найден');
+  }
 
   return makeUser(user);
 };
 
-const getUserPassword = async (id: string): Promise<string | undefined> => {
+const getUserPassword = async (id: string): Promise<string> => {
   const user = await users.find(id);
 
-  if (!user) return;
+  if (!user) {
+    throw new DataNotFoundException('Пароль пользователя не найден');
+  }
 
   return user.password;
 };
@@ -154,8 +176,9 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
  * */
 const findDevices = async (userId: string) => {
   const user = await users.find(userId);
+
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   const deviceList = await devices.read();

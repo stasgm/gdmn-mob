@@ -60,6 +60,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
   app
+    .use(errorHandler)
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(CONFIG, app))
     .use(
@@ -70,7 +71,7 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
         enableTypes: ['json', 'form', 'text'],
       }),
     )
-    .use(errorHandler)
+    // .use(errorHandler)
     .use(passport.initialize())
     .use(passport.session())
     .use(
@@ -83,14 +84,14 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
     .use(router.routes())
     .use(router.allowedMethods());
 
-  app.on('error', (err) => {
-    log.error(err);
-  });
+  /*   app.on('error', (err) => {
+      log.error(err);
+    });
 
-  app.on('user-error', (err) => {
-    log.warn(err);
-  });
-
+    app.on('user-error', (err) => {
+      log.warn(err);
+    });
+   */
   log.info('Starting listener ...');
 
   await new Promise((resolve) => app.listen(config.PORT, () => resolve('')));
