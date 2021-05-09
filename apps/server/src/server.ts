@@ -6,6 +6,7 @@ import cors from '@koa/cors';
 
 import session from 'koa-session';
 import passport from 'koa-passport';
+import helmet from 'koa-helmet';
 import { Strategy as LocalStrategy, IStrategyOptions } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
@@ -13,26 +14,14 @@ import morganlogger from 'koa-morgan';
 import { IUser } from '@lib/types';
 
 import config from '../config';
+import koaConfig from '../config/koa';
 
 import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
-
 import router from './routes';
-
-// 7 days for session cookie lifetime
-const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
-const CONFIG = {
-  key: 'koa:sess-' /** (string) cookie key (default is koa:sess) */,
-  maxAge: SESSION_COOKIE_LIFETIME /** (number) maxAge in ms (default is 1 days) */,
-  overwrite: true /** (boolean) can overwrite or not (default true) */,
-  httpOnly: true /** (boolean) httpOnly or not (default true) */,
-  signed: true /** (boolean) signed or not (default true) */,
-  sameSite: true /** (string) lets require that a cookie shouldn't
-    be sent with cross-origin requests (default undefined) */,
-};
 
 export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
@@ -60,9 +49,10 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
   app
+    .use(helmet())
     .use(errorHandler)
     .use(morganlogger('combined', { stream: accessLogStream }))
-    .use(session(CONFIG, app))
+    .use(session(koaConfig, app))
     .use(
       bodyParser({
         formLimit: '10mb',

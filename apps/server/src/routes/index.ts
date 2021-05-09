@@ -9,11 +9,12 @@ import Test from './test.router';
 
 const rootRouter = new Router({ prefix: '/api' });
 
-rootRouter.use(Auth.routes());
-rootRouter.use(Company.routes());
-rootRouter.use(Device.routes());
-rootRouter.use(User.routes());
-rootRouter.use(Message.routes());
-rootRouter.use(Test.routes());
+rootRouter
+  .use(Auth.middleware())
+  .use(Company.routes())
+  .use(Device.routes())
+  .use(User.routes())
+  .use(Message.routes())
+  .use(Test.routes());
 
 export default rootRouter;
