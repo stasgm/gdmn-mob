@@ -10,19 +10,16 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   }
 
   if (!ctx.query.deviceId) {
-    // ctx.throw(400, 'ID устройства не указано');
     throw new InvalidParameterException('Не указан идентификатор устройства');
   }
 
   if (ctx.query.deviceId instanceof Array) {
-    // ctx.throw(400, 'ID устройства должно быть строкой');
     throw new InvalidParameterException('Устройство должно быть строкой');
   }
 
   const device = await entities.devices.find(ctx.query.deviceId);
 
   if (!device) {
-    // ctx.throw(400, 'Устройство не найдено');
     throw new DataNotFoundException('Устройство не найдено');
   }
 

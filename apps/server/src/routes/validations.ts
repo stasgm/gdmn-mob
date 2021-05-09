@@ -4,6 +4,9 @@ import { InvalidParameterException } from '../exceptions';
 
 const login: Config = {
   validate: {
+    query: {
+      deviceId: Joi.string().required().error(new InvalidParameterException('не указано устройство')),
+    },
     type: 'json',
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('не заполнено имя пользователя')),
@@ -22,6 +25,24 @@ const signup: Config = {
   },
 };
 
-const authValidation = { login, signup };
+const verifyCode: Config = {
+  validate: {
+    type: 'json',
+    params: Joi.object({
+      code: Joi.string().required().error(new InvalidParameterException('не указан код активации')),
+    }),
+  },
+};
+
+const getActivationCode: Config = {
+  validate: {
+    type: 'json',
+    params: Joi.object({
+      deviceId: Joi.string().required().error(new InvalidParameterException('не указано устройство')),
+    }),
+  },
+};
+
+const authValidation = { login, signup, verifyCode, getActivationCode };
 
 export default { authValidation };

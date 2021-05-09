@@ -10,7 +10,7 @@ const router = new Router({ prefix: '/devices' });
 
 router.post('/', compose([deviceMiddleware, authMiddleware]), addDevice);
 router.get('/', compose([deviceMiddleware, authMiddleware]), getDevices);
-router.get('/:id', getDevice);
+router.get('/:id', getDevice); //TODO - без доп проверки даёт возможность получить доступ по любому  устройству
 // router.get('/:id/user/:name', getDeviceByUser);
 // router.get('/:id/user/', getDeviceByUser);
 // router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);

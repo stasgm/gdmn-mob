@@ -157,4 +157,9 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   return deviceId;
 };
 
-export { authenticate, validateAuthCreds, signUp, verifyCode };
+const logout = async (userId: string) => {
+  console.log('logout', userId);
+  // делаем что надо
+};
+
+export { authenticate, validateAuthCreds, signUp, verifyCode, logout };

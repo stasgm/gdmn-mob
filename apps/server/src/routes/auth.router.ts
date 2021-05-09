@@ -18,8 +18,8 @@ router.post('/signup', authValidation.signup, signUp);
 router.post('/login', authValidation.login, logIn);
 router.post('/logout', authMiddleware, logOut);
 router.get('/user', compose([authMiddleware, deviceMiddleware]), getCurrentUser);
-router.get('/device/:deviceId/code', getActivationCode);
-router.post('/device/code', verifyCode);
+router.get('/device/:deviceId/code', authValidation.getActivationCode, getActivationCode);
+router.post('/device/code', authValidation.verifyCode, verifyCode);
 
 // router.post('/login', logIn); // В методе logIn идёт проверка связи устройства с пользователем
 
