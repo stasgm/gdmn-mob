@@ -15,6 +15,12 @@ const reducer: Reducer<IReferenceState, ReferenceActionType> = (state = initialS
     case getType(actions.init):
       return initialState;
 
+    case getType(actions.updateList):
+      return {
+        ...state,
+        list: action.payload,
+      };
+
     case getType(actions.deleteReference):
       return { ...state, list: state.list?.filter(({ name }) => name.toString() !== action.payload) };
 

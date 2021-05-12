@@ -3,6 +3,7 @@ import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 import { IDocument } from './types';
 
 const init = createAction('DOCUMENTS/INIT')();
+const updateList = createAction('DOCUMENTS/UPDATE_LIST')<IDocument[]>();
 const deleteDocument = createAction('DOCUMENTS/DELETE')<string>();
 const deleteAllDocuments = createAction('DOCUMENTS/DELETE_ALL')();
 const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
@@ -22,6 +23,7 @@ const addDocumentAsync = createAsyncAction(
 export const actions = {
   addDocumentsAsync,
   addDocumentAsync,
+  updateList,
   deleteDocument,
   deleteAllDocuments,
   clearError,

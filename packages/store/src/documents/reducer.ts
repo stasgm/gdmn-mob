@@ -15,6 +15,12 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
     case getType(actions.init):
       return initialState;
 
+    case getType(actions.updateList):
+      return {
+        ...state,
+        list: action.payload,
+      };
+
     case getType(actions.deleteDocument):
       return { ...state, list: state.list?.filter(({ number }) => number.toString() !== action.payload) };
 
