@@ -29,7 +29,9 @@
   "dependencies": {
     "@koa/cors": "^3.1",
     "@lib/types": "*",
+    "@types/inquirer": "^7.3.1",
     "bcrypt": "^5.0.1",
+    "inquirer": "^8.0.0",
     "koa": "^2.13",
     "koa-bodyparser": "^4.3",
     "koa-compose": "^4.1.0",
