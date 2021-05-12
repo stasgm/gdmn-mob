@@ -108,11 +108,15 @@ interface IHeadMessage {
   dateTime: string;
 }
 
+export type TStatusMessage = 'recd' | 'procd';
+type TBodyType = 'cmd' | 'refs' | 'docs';
+
 export interface IMessage<T = any> {
   id: string;
+  status: TStatusMessage;
   head: IHeadMessage;
   body: {
-    type: string;
+    type: TBodyType;
     payload: T;
   };
 }

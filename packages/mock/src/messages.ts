@@ -1,5 +1,7 @@
 import { ICompany, IMessage, INamedEntity, NewMessage } from '@lib/types';
 import { v4 as uuid } from 'uuid';
+import { IDocument } from '@lib/store/dist/src/documents/types';
+import { IReference } from '@lib/store/dist/src/references/types';
 
 const user1: INamedEntity = {
   id: '123',
@@ -28,7 +30,7 @@ const companies: ICompany[] = [
 export const newMessage: NewMessage<string> = {
   head: {
     appSystem: 'Inventory',
-    company: companies[0],
+    company: companies[0] as INamedEntity,
     consumer: user1,
   },
   body: {
@@ -37,12 +39,14 @@ export const newMessage: NewMessage<string> = {
   },
 };
 
-export const messages: IMessage<string>[] = [
+//export const messages: Omit<IMessage<string>, 'status'>[] = [
+export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
   {
     id: '14',
+    status: 'recd',
     head: {
       appSystem: 'Inventory',
-      company: companies[0],
+      company: companies[0] as INamedEntity,
       producer: user3,
       consumer: user1,
       dateTime: '2021-04-15T10:47:33.376Z',
@@ -54,37 +58,40 @@ export const messages: IMessage<string>[] = [
   },
   {
     id: '19',
+    status: 'recd',
     head: {
       appSystem: 'Inventory',
-      company: companies[0],
-      producer: user3,
-      consumer: user1,
+      company: companies[0] as INamedEntity,
+      consumer: user3,
+      producer: user1,
       dateTime: '2021-04-21T10:52:33.376Z',
     },
     body: {
-      type: 'data',
-      payload: 'Reference: goods',
+      type: 'refs',
+      payload: [{ name: 'goods' }, { name: 'contacts' }, { name: 'barcodes' }],
     },
   },
   {
     id: '21',
+    status: 'recd',
     head: {
       appSystem: 'Inventory',
-      company: companies[0],
-      producer: user3,
-      consumer: user1,
+      company: companies[0] as INamedEntity,
+      consumer: user3,
+      producer: user1,
       dateTime: '2021-04-21T18:03:33.376Z',
     },
     body: {
-      type: 'data',
-      payload: 'Documents',
+      type: 'docs',
+      payload: [{ number: 1 }, { number: 3 }],
     },
   },
   {
     id: '35',
+    status: 'recd',
     head: {
       appSystem: 'Inventory',
-      company: companies[0],
+      company: companies[0] as INamedEntity,
       producer: user2,
       consumer: user3,
       dateTime: '2021-04-25T09:21:33.376Z',
@@ -96,9 +103,10 @@ export const messages: IMessage<string>[] = [
   },
   {
     id: '48',
+    status: 'recd',
     head: {
       appSystem: 'Inventory',
-      company: companies[0],
+      company: companies[0] as INamedEntity,
       producer: user3,
       consumer: user2,
       dateTime: '2021-04-28T14:10:33.376Z',
