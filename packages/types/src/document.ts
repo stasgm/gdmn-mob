@@ -4,7 +4,7 @@ import { IEntity, INamedEntity } from './models';
 type statusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
 interface IDocumentStatus {
   type: statusType;
-  errorMessage: string;
+  errorMessage?: string;
 }
 
 interface IDocument extends IEntity {
