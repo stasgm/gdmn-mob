@@ -2,6 +2,6 @@
 . "$(dirname "$0")/_/husky.sh"
 . "$(dirname "$0")/common.sh"
 
-yarn commitlint --edit $1
-yarn lint-staged
-yarn lint-staged-project
+# yarn commitlint --edit $1
+# yarn lint-staged
+# yarn lint-staged-project
