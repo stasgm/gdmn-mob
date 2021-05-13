@@ -12,8 +12,6 @@ import morganlogger from 'koa-morgan';
 
 import { IUser } from '@lib/types';
 
-import config from '../config';
-
 import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
@@ -21,6 +19,8 @@ import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 
 import router from './routes';
+
+import { IItemDatabase } from './utils/databaseMenu';
 
 // 7 days for session cookie lifetime
 const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
@@ -34,7 +34,7 @@ const CONFIG = {
     be sent with cross-origin requests (default undefined) */,
 };
 
-export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
+export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
@@ -87,9 +87,9 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
 
   log.info('Starting listener ...');
 
-  await new Promise((resolve) => app.listen(config.PORT, () => resolve('')));
+  await new Promise((resolve) => app.listen(db.port, () => resolve('')));
 
-  log.info(`Server is running on http://localhost:${config.PORT}`);
+  log.info(`Server is running on http://localhost:${db.port}`);
 
   return app;
 }

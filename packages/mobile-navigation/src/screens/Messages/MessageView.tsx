@@ -5,8 +5,7 @@ import { useTheme, FAB } from 'react-native-paper';
 import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IDocument } from '@lib/store/dist/src/documents/types';
-import { IReference } from '@lib/store/src/references/types';
+import { IDocument, IReference } from '@lib/types';
 
 type MessagesStackParamList = {
   Messages: undefined;

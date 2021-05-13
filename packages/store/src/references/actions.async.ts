@@ -2,8 +2,10 @@ import { ThunkAction } from 'redux-thunk';
 
 import { sleep } from '@lib/client-api';
 
+import { IReference } from '@lib/types';
+
 import { actions, ReferenceActionType } from './actions';
-import { IReference, IReferenceState } from './types';
+import { IReferenceState } from './types';
 
 export type AppThunk = ThunkAction<Promise<ReferenceActionType>, IReferenceState, null, ReferenceActionType>;
 

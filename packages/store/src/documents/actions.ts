@@ -1,6 +1,5 @@
+import { IDocument } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
-
-import { IDocument } from './types';
 
 const init = createAction('DOCUMENTS/INIT')();
 const updateList = createAction('DOCUMENTS/UPDATE_LIST')<IDocument[]>();

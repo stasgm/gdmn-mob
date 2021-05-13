@@ -17,7 +17,6 @@ import DocumentsNavigator from './Root/DocumentsNavigator';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
-  Documents: undefined;
   References: undefined;
   Settings: undefined;
   Profile: undefined;

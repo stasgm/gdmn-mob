@@ -2,7 +2,9 @@ import { ThunkAction } from 'redux-thunk';
 
 import { sleep } from '@lib/client-api';
 
-import { IDocument, IDocumentState } from './types';
+import { IDocument } from '@lib/types';
+
+import { IDocumentState } from './types';
 
 import { DocumentActionType, actions } from './actions';
 

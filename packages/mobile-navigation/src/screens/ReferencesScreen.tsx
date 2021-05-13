@@ -4,7 +4,7 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useDispatch, useSelector, referenceActions } from '@lib/store';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button, useTheme } from 'react-native-paper';
-import { IReference } from '@lib/store/src/references/types';
+import { IReference } from '@lib/types';
 
 const ReferenceItem = ({ item }: { item: IReference }) => {
   const { colors } = useTheme();

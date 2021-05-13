@@ -1,6 +1,4 @@
-export interface IDocument {
-  number: number;
-}
+import { IDocument } from '@lib/types';
 
 export type IDocumentState = {
   readonly list: IDocument[];

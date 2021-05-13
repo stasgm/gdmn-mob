@@ -25,11 +25,11 @@
     "@lib/client-types": "*",
     "@lib/mock": "*",
     "@lib/types": "*",
-    "@types/node": "^14.14.41",
+    "@types/node": "^15.0.3",
     "@types/redux": "^3.6.31",
     "@types/redux-actions": "2.6.1",
     "@types/redux-logger": "3.0.8",
-    "redux": "4.0.5",
+    "redux": "4.1.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "3.0.6",
     "redux-persist": "^6.0.0",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^10.5.4",
+    "lint-staged": "^11.0.0",
     "typescript": "^4.2.4"
   }
 }

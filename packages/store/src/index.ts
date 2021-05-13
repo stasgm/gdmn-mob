@@ -6,10 +6,11 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { StateType } from 'typesafe-actions';
 
+import { reducer as documentReducer, DocumentActionType } from './documents';
+
 import { reducer as authReducer, AuthActionType } from './auth';
 import { reducer as msgReducer, MsgActionType } from './messages';
 import { reducer as referenceReducer, ReferenceActionType } from './references';
-import { reducer as documentReducer, DocumentActionType } from './documents';
 
 const rootReducer = {
   auth: authReducer,

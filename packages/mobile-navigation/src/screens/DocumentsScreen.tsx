@@ -6,7 +6,7 @@ import { useTheme, Button } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { IDocument } from '@lib/store/dist/src/documents/types';
+import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {

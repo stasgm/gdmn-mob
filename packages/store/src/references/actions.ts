@@ -1,6 +1,5 @@
+import { IReference } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
-
-import { IReference } from './types';
 
 const init = createAction('REFERENCES/INIT')();
 const updateList = createAction('REFERENCES/UPDATE_LIST')<IReference[]>();

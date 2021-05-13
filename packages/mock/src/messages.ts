@@ -1,7 +1,5 @@
-import { ICompany, IMessage, INamedEntity, NewMessage } from '@lib/types';
+import { ICompany, IDocument, IMessage, INamedEntity, IReference, NewMessage } from '@lib/types';
 import { v4 as uuid } from 'uuid';
-import { IDocument } from '@lib/store/dist/src/documents/types';
-import { IReference } from '@lib/store/dist/src/references/types';
 
 const user1: INamedEntity = {
   id: '123',
@@ -68,7 +66,11 @@ export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
     },
     body: {
       type: 'refs',
-      payload: [{ name: 'goods' }, { name: 'contacts' }, { name: 'barcodes' }],
+      payload: [
+        { id: '111', name: 'goods' },
+        { id: '222', name: 'contacts' },
+        { id: '333', name: 'barcodes' },
+      ],
     },
   },
   {
@@ -83,7 +85,28 @@ export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
     },
     body: {
       type: 'docs',
-      payload: [{ number: 1 }, { number: 3 }],
+      payload: [
+        {
+          id: '222',
+          number: '1',
+          documentType: {
+            id: '1',
+            name: 'Inventory',
+          },
+          documentDate: '2021-04-25T09:21:33.376Z',
+          status: 'DRAFT',
+        },
+        {
+          id: '333',
+          number: '2',
+          documentType: {
+            id: '1',
+            name: 'Inventory',
+          },
+          documentDate: '2021-04-30T09:20:13.376Z',
+          status: 'READY',
+        },
+      ],
     },
   },
   {

@@ -1,6 +1,4 @@
-export interface IReference {
-  name: string;
-}
+import { IReference } from '@lib/types';
 
 export type IReferenceState = {
   readonly list: IReference[];
