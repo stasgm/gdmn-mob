@@ -1,17 +1,20 @@
 import { v4 as uuid } from 'uuid';
 
-import { IDocument } from './types';
+import { IOrderDocument, IRouteDocument } from './types';
 
-export const documentData: IDocument[] = [
+export const documentData: IOrderDocument[] = [
   {
     id: uuid(),
+    number: '225',
+    documentDate: '25.04.2021',
+    documentType: { id: uuid(), name: 'Заявка1 (организация)' },
+    status: {
+      type: 'DRAFT',
+      errorMessage: '',
+    },
     head: {
-      number: '225',
-      doctype: { id: uuid(), name: 'Заявка1 (организация)' },
       contact: { id: uuid(), name: 'ОАО "Веста" г.Витебск' },
       outlet: { id: uuid(), name: 'ОАО "Веста" г.Витебск, магазин №82' },
-      date: '25.04.2021',
-      status: 1,
       ondate: '25.04.2021',
     },
     lines: [
@@ -21,13 +24,16 @@ export const documentData: IDocument[] = [
   },
   {
     id: uuid(),
+    number: '226',
+    documentDate: '25.04.2021',
+    documentType: { id: uuid(), name: 'Заявка1 (организация)' },
+    status: {
+      type: 'DRAFT',
+      errorMessage: '',
+    },
     head: {
-      number: '226',
-      doctype: { id: uuid(), name: 'Заявка1 (организация)' },
       contact: { id: uuid(), name: 'ОАО "Веста" г.Витебск' },
       outlet: { id: uuid(), name: 'ОАО "Веста" г. Витебск маг.№61 ул.К.Маркса,15' },
-      date: '25.04.2021',
-      status: 1,
       ondate: '25.04.2021',
     },
     lines: [
@@ -42,13 +48,16 @@ export const documentData: IDocument[] = [
   },
   {
     id: uuid(),
+    number: '227',
+    documentDate: '25.04.2021',
+    documentType: { id: uuid(), name: 'Заявка1 (организация)' },
+    status: {
+      type: 'DRAFT',
+      errorMessage: '',
+    },
     head: {
-      number: '227',
-      doctype: { id: uuid(), name: 'Заявка1 (организация)' },
       contact: { id: uuid(), name: 'ЧТУП "Сионград"' },
       outlet: { id: uuid(), name: 'Сионград 31 ЧТУП "Сионград" Бобруйский район' },
-      date: '25.04.2021',
-      status: 1,
       ondate: '25.04.2021',
     },
     lines: [
@@ -63,19 +72,55 @@ export const documentData: IDocument[] = [
   },
   {
     id: uuid(),
+    number: '228',
+    documentDate: '25.04.2021',
+    documentType: { id: uuid(), name: 'Заявка1 (организация)' },
+    status: {
+      type: 'DRAFT',
+      errorMessage: '',
+    },
     head: {
-      number: '228',
-      doctype: { id: uuid(), name: 'Заявка1 (организация)' },
       contact: { id: uuid(), name: 'ЧУТПП "Батя" г.п.Ушачи' },
       outlet: { id: uuid(), name: 'ЧУТПП "Батя" магазин "Батя" г.п.Ушачи' },
-      date: '25.04.2021',
-      status: 1,
       ondate: '25.04.2021',
     },
     lines: [
       { id: uuid(), good: { id: uuid(), name: 'Пр. из св. к/в Ребра "Селянские" (газ)' }, quantity: 8.32 },
       { id: uuid(), good: { id: uuid(), name: 'Мяс.п/ф в тес.зам.Пельмени "Знатные новые" кат.В вес.' }, quantity: 9 },
       { id: uuid(), good: { id: uuid(), name: 'Консервы мясные из св."Свинина тушеная пряная" 338 г' }, quantity: 45 },
+    ],
+  },
+];
+//  Route
+export const documenRouteData: IRouteDocument[] = [
+  {
+    id: '30506',
+    number: '34',
+    documentDate: '9579457',
+    documentType: {
+      id: '33',
+      name: 'route',
+    },
+    status: {
+      type: 'DRAFT',
+      errorMessage: '',
+    },
+    head: {
+      agent: {
+        id: '111111',
+        name: 'петров',
+      },
+    },
+    lines: [
+      {
+        id: '468',
+        outlet: {
+          id: '5839',
+          name: 'рога и копыта маг № 89',
+        },
+        ordNumber: 3,
+        visited: true,
+      },
     ],
   },
 ];

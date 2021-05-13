@@ -10,10 +10,10 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
 import docActions from '../store/docs';
 import { useSelector } from '../store';
-import { IDocument } from '../store/docs/types';
+import { IOrderDocument } from '../store/docs/types';
 // import { IAppState } from '../store';
 
-const DocumentItem = ({ item }: { item: IDocument }) => {
+const DocumentItem = ({ item }: { item: IOrderDocument }) => {
   const { colors } = useTheme();
 
   return (
@@ -28,7 +28,9 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={[styles.name, { color: colors.text }]}>{item.head.number}</Text>
+            <Text style={[styles.name, { color: colors.text }]}>
+              № {item.number} от {item.documentDate}
+            </Text>
           </View>
           <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.head.outlet.name}</Text>
         </View>
@@ -50,9 +52,9 @@ const DocumentsScreen = () => {
     dispatch(docActions.docActions.init());
   };
 
-  const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
+  const renderItem = ({ item }: { item: IOrderDocument }) => <DocumentItem item={item} />;
 
-  const ref = useRef<FlatList<IDocument>>(null);
+  const ref = useRef<FlatList<IOrderDocument>>(null);
 
   return (
     <View style={styles.container}>

@@ -1,6 +1,8 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
+import { v4 as uuid } from 'uuid';
+
 import { IDocState } from './types';
 import { DocActionType, docActions } from './actions';
 
@@ -8,13 +10,16 @@ const initialState: Readonly<IDocState> = {
   docData: [
     {
       id: '1',
+      number: '6225',
+      documentDate: '13.05.2021',
+      documentType: { id: uuid(), name: 'Заявка1 (организация)' },
+      status: {
+        type: 'DRAFT',
+        errorMessage: '',
+      },
       head: {
-        number: '225',
-        doctype: { id: '1111456', name: 'Заявка1 (организация)' },
         contact: { id: '1', name: 'Рога и копыта' },
         outlet: { id: '11', name: 'Рога и копыта № 123' },
-        date: '25.04.2021',
-        status: 1,
         ondate: '25.04.2021',
       },
       lines: [{ id: '1', good: { id: '14', name: 'Сосиски докторские' }, quantity: 12 }],
