@@ -8,10 +8,9 @@ import { IItemDatabase, databaseMenu } from './utils/databaseMenu';
 
 import { readFile } from './utils/workWithFile';
 
-console.log('1');
 const run = async (): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
   const templateName: IItemDatabase[] | undefined = await readFile(config.TEMPLATE_CONFIG_NAME);
-  const chosenDatabase = await databaseMenu(templateName);
+  const chosenDatabase = !templateName || templateName.length === 0 ? undefined : await databaseMenu(templateName);
   const defaultDatabase = {
     name: 'DB',
     database: config.FILES_PATH,
