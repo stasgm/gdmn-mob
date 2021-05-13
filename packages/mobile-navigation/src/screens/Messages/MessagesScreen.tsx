@@ -7,15 +7,17 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
 import { useSelector, messageActions, useDispatch } from '@lib/store';
+import { useNavigation } from '@react-navigation/core';
 // import colors from '@lib/mobile-ui/src/styles/colors';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        // navigation.navigate('DocumentView', { docId: item?.id });
+        navigation.navigate('MessageView', { id: item.id });
       }}
     >
       <View style={[styles.item, { backgroundColor: colors.background }]}>
@@ -37,7 +39,8 @@ const MessageItem = ({ item }: { item: IMessage }) => {
 
 const MessagesScreen = () => {
   const { data, loading } = useSelector((state) => state.messages);
-  const { company } = useSelector((state) => state.auth);
+  const { company } = { company: { id: '654', name: 'ОДО Амперсант', admin: 'Stas' } };
+  //useSelector((state) => state.auth);
   const { colors } = useTheme();
 
   const dispatch = useDispatch();
@@ -72,13 +75,13 @@ const handleSend = async () => {
 
   const handleLoad = useCallback(() => {
     //TODO systemId из конфига
-    company &&
-      dispatch(
-        messageActions.fetchMsg({
-          companyId: company.id,
-          systemId: 'Inventory',
-        }),
-      );
+    //company &&
+    dispatch(
+      messageActions.fetchMsg({
+        companyId: company.id,
+        systemId: 'Inventory',
+      }),
+    );
   }, [company, dispatch]);
 
   const handleProcessAll = useCallback(async () => {
