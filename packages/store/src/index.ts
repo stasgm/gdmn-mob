@@ -4,19 +4,22 @@ import { Action, Reducer, createStore, combineReducers, applyMiddleware } from '
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-
 import { StateType } from 'typesafe-actions';
 
-import authReducer from './auth/reducer';
-import { AuthActionType } from './auth/actions';
+import { reducer as documentReducer, DocumentActionType } from './documents';
+
+import { reducer as authReducer, AuthActionType } from './auth';
+import { reducer as msgReducer, MsgActionType } from './messages';
+import { reducer as referenceReducer, ReferenceActionType } from './references';
 
 const rootReducer = {
   auth: authReducer,
+  messages: msgReducer,
+  references: referenceReducer,
+  documents: documentReducer,
 };
 
 type AppReducers = { [key: string]: Reducer };
-
-//const rootReducer = combinedReducer; //combineReducers(combinedReducer);
 
 const createReducer = (asyncReducers: AppReducers = {}) => {
   return combineReducers<any, any>({
@@ -25,29 +28,37 @@ const createReducer = (asyncReducers: AppReducers = {}) => {
   });
 };
 
-const persistConfig = {
+interface IPersostConfig {
+  key: string;
+  storage: any;
+  whitelist: string[];
+}
+
+const defaultPersistConfig: IPersostConfig = {
   key: 'auth',
-  storage: storage,
+  storage: storage, //TODO для react native надо использовать AsyncStorage  https://github.com/rt2zz/redux-persist
   whitelist: ['auth'],
 };
 
-export default function configureStore(appReducers: AppReducers) {
+type TActions = AuthActionType | MsgActionType | ReferenceActionType | DocumentActionType;
+
+export default function configureStore(appReducers: AppReducers, persistConfig: IPersostConfig = defaultPersistConfig) {
   const middleware = [thunkMiddleware];
   const middleWareEnhancer = applyMiddleware(...middleware);
 
   const pReducer = persistReducer(persistConfig, createReducer(appReducers));
 
   const store = createStore(pReducer, composeWithDevTools(middleWareEnhancer));
-  // return persistStore(store);
 
   const persistor = persistStore(store);
-  return { store, persistor };
 
-  // return createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
+  return { store, persistor };
 }
 
 export type RootState = StateType<typeof rootReducer>;
 export type AppThunk = ThunkAction<void, RootState, null, Action<any>>;
-export type AppDispatch = ThunkDispatch<RootState, any, AuthActionType>;
+export type AppDispatch = ThunkDispatch<RootState, any, TActions>;
+
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
+export const useThunkDispatch = () => useReduxDispatch<AppDispatch>();

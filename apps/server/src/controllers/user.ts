@@ -119,12 +119,16 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId } = ctx.query;
+  const { companyId, name } = ctx.query;
 
   const params: Record<string, string> = {};
 
   if (typeof companyId === 'string') {
     params.companyId = companyId;
+  }
+
+  if (typeof name === 'string') {
+    params.name = name;
   }
 
   try {

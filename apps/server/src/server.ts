@@ -13,7 +13,6 @@ import morganlogger from 'koa-morgan';
 
 import { IUser } from '@lib/types';
 
-import config from '../config';
 import koaConfig from '../config/koa';
 
 import log from './utils/logger';
@@ -23,7 +22,9 @@ import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
 
-export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
+import { IItemDatabase } from './utils/databaseMenu';
+
+export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
   app.keys = ['super-secret-key'];
 
@@ -84,9 +85,9 @@ export async function init(): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>>
    */
   log.info('Starting listener ...');
 
-  await new Promise((resolve) => app.listen(config.PORT, () => resolve('')));
+  await new Promise((resolve) => app.listen(db.port, () => resolve('')));
 
-  log.info(`Server is running on http://localhost:${config.PORT}`);
+  log.info(`Server is running on http://localhost:${db.port}`);
 
   return app;
 }
