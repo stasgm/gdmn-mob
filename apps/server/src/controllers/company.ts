@@ -8,10 +8,6 @@ import { companyService } from '../services';
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, externalId } = ctx.request.body;
 
-  if (!name) {
-    ctx.throw(400, 'Не указано название компании');
-  }
-
   const { id: userId } = ctx.state.user;
 
   const company: NewCompany = { name, adminId: userId, externalId };

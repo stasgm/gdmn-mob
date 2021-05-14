@@ -43,6 +43,17 @@ const getActivationCode: Config = {
   },
 };
 
+const addCompany: Config = {
+  validate: {
+    type: 'json',
+    body: Joi.object({
+      name: Joi.string().required().error(new InvalidParameterException('не указано название компании')),
+    }),
+  },
+};
+
 const authValidation = { login, signup, verifyCode, getActivationCode };
 
-export default { authValidation };
+const companyValidation = { addCompany };
+
+export default { authValidation, companyValidation };
