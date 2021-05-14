@@ -1,13 +1,12 @@
 import { Next, Context } from 'koa';
-
 import koaPassport from 'koa-passport';
 import { v1 as uuidv1 } from 'uuid';
-
 import { VerifyFunction } from 'passport-local';
-
 import bcrypt from 'bcrypt';
 
 import { IUser, NewUser } from '@lib/types';
+
+import { UnauthorizedException } from '../exceptions';
 
 import { entities } from './dao/db';
 import * as userService from './userService';
@@ -21,27 +20,31 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new Error('Неверное имя пользователя или пароль');
+    throw new UnauthorizedException('Неверные данные');
+    // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
   const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
 
   if (!device) {
-    throw new Error('Cвязанное с пользователем устройство не найдено');
+    throw new UnauthorizedException('Cвязанное с пользователем устройство не найдено');
+    // throw new Error('Cвязанное с пользователем устройство не найдено');
   }
 
   if (device.state === 'BLOCKED') {
-    throw new Error('устройство заблокировано');
+    throw new UnauthorizedException('Устройство заблокировано');
+    // throw new Error('устройство заблокировано');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return koaPassport.authenticate('local', async (err: Error, usr: IUser) => {
     if (err) {
-      throw new Error(err.message);
+      throw new UnauthorizedException(err.message);
+      // throw new Error(err.message);
     }
 
     if (!usr) {
-      throw new Error('Неверное имя пользователя или пароль');
+      throw new UnauthorizedException('Неверные данные');
+      // throw new Error('Неверное имя пользователя или пароль');
     }
 
     await ctx.login(usr);
@@ -98,9 +101,16 @@ const signUp = async (user: NewUser): Promise<IUser> => {
 const validateAuthCreds: VerifyFunction = async (name: string, password: string, done) => {
   const user = await userService.findByName(name);
 
+  if (!user) {
+    return done(null, false);
+  }
+
   const hashedPassword = await userService.getUserPassword(user.id);
 
-  if (!user) done(null, false);
+  if (!hashedPassword) {
+    throw new UnauthorizedException('Неверные данные');
+    // throw new DataNotFoundException('имя пользователя или пароль')
+  }
 
   if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
@@ -147,4 +157,9 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   return deviceId;
 };
 
-export { authenticate, validateAuthCreds, signUp, verifyCode };
+const logout = async (userId: string) => {
+  console.log('logout', userId);
+  // делаем что надо
+};
+
+export { authenticate, validateAuthCreds, signUp, verifyCode, logout };

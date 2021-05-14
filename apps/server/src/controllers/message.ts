@@ -71,9 +71,17 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   const company = await companyService.findOneByName(companyName);
 
-  const { name } = await userService.findOne(userId);
+  if (!company) {
+    ctx.throw(400, 'компания не найдена');
+  }
 
-  if (name === 'gdmn') {
+  const user = await userService.findOne(userId);
+
+  if (!user) {
+    ctx.throw(400, 'пользователь не найден');
+  }
+
+  if (user.name === 'gdmn') {
     // TODO переделать
     userId = 'gdmn';
   }
@@ -107,14 +115,18 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   try {
-    let userId = ctx.state.user.id;
+    const userId = ctx.state.user.id;
 
-    const { name } = await userService.findOne(userId);
+    // const user = await userService.findOne(userId);
 
-    if (name === 'gdmn') {
-      // TODO переделать
-      userId = 'gdmn';
-    }
+    // if (!user) {
+    //   ctx.throw(400, 'пользователь не найден');
+    // }
+
+    // if (user.name === 'gdmn') {
+    //   // TODO переделать
+    //   userId = 'gdmn';
+    // }
 
     await messageService.deleteByUid({ companyId, uid, userId });
 

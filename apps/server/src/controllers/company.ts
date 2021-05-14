@@ -10,10 +10,6 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   const { id: userId } = ctx.state.user;
 
-  if (!name) {
-    ctx.throw(400, 'Не указано название компании');
-  }
-
   const company: NewCompany = { name, adminId: userId, externalId };
 
   try {
@@ -102,31 +98,15 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-/* const getUsersByCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: companyId } = ctx.params;
-
-  if (!companyId) {
-    ctx.throw(400, 'не указан идентификатор организации');
-  }
-
-  try {
-    const userList = await companyService.findUsers(companyId);
-
-    const result: IResponse<IUserProfile[]> = { result: true, data: userList };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUsersByCompany: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
-}; */
-
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
+  const params: Record<string, string> = {};
+
+  const { id: adminId } = ctx.state.user;
+
+  params.adminId = adminId;
+
   try {
-    console.log('controller getCompanies');
-    const companyList = await companyService.findAll();
+    const companyList = await companyService.findAll(params);
 
     const result: IResponse<ICompany[]> = { result: true, data: companyList };
 
@@ -139,4 +119,4 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   }
 };
 
-export { addCompany, updateCompany, getCompany, getCompanies, removeCompany };
+export { addCompany, updateCompany, removeCompany, getCompany, getCompanies };

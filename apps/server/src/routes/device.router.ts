@@ -2,15 +2,7 @@ import Router from 'koa-router';
 
 import compose from 'koa-compose';
 
-import {
-  addDevice,
-  getDevices,
-  updateDevice,
-  removeDevice,
-  getDevice,
-  getUsersByDevice,
-  getDeviceByUser,
-} from '../controllers/device';
+import { addDevice, getDevices, updateDevice, removeDevice, getDevice, getUsersByDevice } from '../controllers/device';
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 
@@ -18,10 +10,11 @@ const router = new Router({ prefix: '/devices' });
 
 router.post('/', compose([deviceMiddleware, authMiddleware]), addDevice);
 router.get('/', compose([deviceMiddleware, authMiddleware]), getDevices);
-router.get('/:id', getDevice);
-router.get('/:id/user/:name', getDeviceByUser);
-router.get('/:id/user/', getDeviceByUser);
+router.get('/:id', getDevice); //TODO - без доп проверки даёт возможность получить доступ по любому  устройству
+// router.get('/:id/user/:name', getDeviceByUser);
+// router.get('/:id/user/', getDeviceByUser);
 // router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
+//getUsersByDevice - поиск пользователей по таблице устройств
 router.get('/:id/users', compose([deviceMiddleware, authMiddleware]), getUsersByDevice);
 router.patch('/:id', compose([deviceMiddleware, authMiddleware]), updateDevice);
 router.delete('/:id', compose([deviceMiddleware, authMiddleware]), removeDevice);

@@ -33,20 +33,27 @@ class Auth extends BaseRequest {
       // creatorId: creatorId ?? name,
     };
 
-    const res = await this.api.axios.post<IResponse<IUser>>('/auth/signup', body);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.post<IResponse<IUser>>('/auth/signup', body);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'SIGNUP',
+          user: resData.data,
+        } as types.ISignUpResponse;
+      }
+
       return {
-        type: 'SIGNUP',
-        user: resData.data,
-      } as types.ISignUpResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   login = async (userCredentials: IUserCredentials) => {
@@ -102,55 +109,76 @@ class Auth extends BaseRequest {
       } as types.ILogOutResponse;
     }
 
-    const res = await this.api.axios.get<IResponse<undefined>>('/auth/logout');
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.get<IResponse<undefined>>('/auth/logout');
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'LOGOUT',
+        } as types.ILogOutResponse;
+      }
       return {
-        type: 'LOGOUT',
-      } as types.ILogOutResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   getCurrentUser = async () => {
-    const res = await this.api.axios.get<IResponse<IUser>>('/auth/user');
+    try {
+      const res = await this.api.axios.get<IResponse<IUser>>('/auth/user');
 
-    const resData = res.data;
-    if (resData.result) {
+      const resData = res.data;
+      if (resData.result) {
+        return {
+          type: 'GET_CURRENT_USER',
+          user: resData.data,
+        } as types.IUserResponse;
+      }
+      if (!resData.result) {
+        return {
+          type: 'USER_NOT_AUTHENTICATED',
+        } as types.IUserNotAuthResponse;
+      }
       return {
-        type: 'GET_CURRENT_USER',
-        user: resData.data,
-      } as types.IUserResponse;
-    }
-    if (!resData.result) {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
       return {
-        type: 'USER_NOT_AUTHENTICATED',
-      } as types.IUserNotAuthResponse;
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   getActivationCode = async () => {
-    const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'GET_CODE',
+          code: resData.data,
+        } as types.ICreateCodeResponse;
+      }
       return {
-        type: 'GET_CODE',
-        code: resData.data,
-      } as types.ICreateCodeResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   verifyCode = async (code: string) => {

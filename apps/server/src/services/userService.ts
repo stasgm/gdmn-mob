@@ -1,5 +1,7 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
+import { DataNotFoundException, InnerErrorException, InvalidParameterException } from '../exceptions';
+
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate } from '../utils/helpers';
 
@@ -14,29 +16,41 @@ const { users, companies, devices } = entities;
  * @param {IUser} user - пользователь
  * @return id, идентификатор пользователя
  * */
-const addOne = async (user: NewUser): Promise<IUser> => {
-  if (await users.find((i) => i.name.toUpperCase() === user.name.toUpperCase())) {
-    throw new Error('Пользователь с таким именем уже существует');
+const addOne = async (newUser: NewUser): Promise<IUser> => {
+  const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
+
+  if (user) {
+    throw new InvalidParameterException('Пользователь с таким именем уже существует');
   }
 
-  const passwordHash = await hashPassword(user.password);
+  const passwordHash = await hashPassword(newUser.password);
 
-  const newUser: IDBUser = {
+  const newUserObj: IDBUser = {
     id: '',
-    name: user.name,
-    companies: user.companies.map((i) => i.id),
+    name: newUser.name,
+    companies: newUser.companies?.map((i) => i.id),
     password: passwordHash,
-    role: !user.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
-    creatorId: user.creator?.id || '',
-    externalId: user.externalId,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    phoneNumber: user.phoneNumber,
+    role: !newUser.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
+    creatorId: newUser.creator?.id || '',
+    externalId: newUser.externalId,
+    firstName: newUser.firstName,
+    lastName: newUser.lastName,
+    phoneNumber: newUser.phoneNumber,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   };
 
-  const createdUser = await users.find(await users.insert(newUser));
+  const userId = await users.insert(newUserObj);
+
+  if (!userId) {
+    throw new InnerErrorException('Ошбка при создании пользователя');
+  }
+
+  const createdUser = await users.find(userId);
+
+  if (!createdUser) {
+    throw new InnerErrorException('Ошбка при создании пользователя');
+  }
 
   return makeUser(createdUser);
 };
@@ -96,8 +110,10 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
  * @param {string} id - идентификатор пользователя
  * */
 const deleteOne = async (id: string): Promise<void> => {
-  if (!(await users.find(id))) {
-    throw new Error('Пользователь не найден');
+  const user = await users.find(id);
+
+  if (!user) {
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   // TODO Если пользователь является админом организации то прерывать
@@ -105,16 +121,34 @@ const deleteOne = async (id: string): Promise<void> => {
   await users.delete(id);
 };
 
-const findOne = async (userId: string): Promise<IUser> => {
-  return makeUser(await users.find(userId));
+const findOne = async (id: string): Promise<IUser | undefined> => {
+  const user = await users.find(id);
+
+  if (!user) {
+    throw new DataNotFoundException('Пользователь не найден');
+  }
+
+  return makeUser(user);
 };
 
 const findByName = async (name: string): Promise<IUser> => {
-  return makeUser(await users.find((user) => user.name.toUpperCase() === name.toUpperCase()));
+  const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
+
+  if (!user) {
+    throw new DataNotFoundException('Пользователь не найден');
+  }
+
+  return makeUser(user);
 };
 
-const getUserPassword = async (userId: string): Promise<string> => {
-  return (await users.find(userId)).password;
+const getUserPassword = async (id: string): Promise<string> => {
+  const user = await users.find(id);
+
+  if (!user) {
+    throw new DataNotFoundException('Пароль пользователя не найден');
+  }
+
+  return user.password;
 };
 
 const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
@@ -124,7 +158,7 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
     let companyFound = true;
 
     if ('companyId' in newParams) {
-      companyFound = item.companies.includes(newParams.companyId);
+      companyFound = item.companies?.includes(newParams.companyId);
       delete newParams['companyId'];
     }
 
@@ -142,8 +176,9 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
  * */
 const findDevices = async (userId: string) => {
   const user = await users.find(userId);
+
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   const deviceList = await devices.read();
@@ -152,20 +187,26 @@ const findDevices = async (userId: string) => {
   return Promise.all(pr);
 };
 
-const addCompanyToUser = async (userId: string, companyName: string) => {
+const addCompanyToUser = async (userId: string, companyId: string) => {
   const user = await users.find(userId);
 
   if (!user) {
     throw new Error('Пользователь не найден');
   }
 
-  if (user.companies?.some((i) => companyName === i)) {
+  const company = await companies.find(companyId);
+
+  if (!company) {
+    throw new Error('Компания не найдена');
+  }
+
+  if (user.companies?.some((i) => companyId === i)) {
     throw new Error('Компания уже привязана к пользователю');
   }
 
-  const companies = [...(user.companies || []), companyName];
+  const companyList = [...(user.companies || []), company.id];
 
-  return users.update({ ...user, companies });
+  return users.update({ ...user, companies: companyList });
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {

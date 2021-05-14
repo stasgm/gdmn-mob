@@ -4,7 +4,7 @@ import { device as mockDevice, devices as mockDevices } from '@lib/mock';
 
 import { BaseRequest } from '../requests/baseApi';
 import { error, device as types } from '../types';
-import { sleep } from '../utils';
+import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/types';
 
 const isMock = process.env.MOCK;
@@ -25,51 +25,88 @@ class Device extends BaseRequest {
       } as types.IAddDeviceResponse;
     }
 
-    const res = await this.api.axios.post<IResponse<IDevice>>('/devices', newDevice);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.post<IResponse<IDevice>>('/devices', newDevice);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'ADD_DEVICE',
+          device: resData.data,
+        } as types.IAddDeviceResponse;
+      }
       return {
-        type: 'ADD_DEVICE',
-        device: resData.data,
-      } as types.IAddDeviceResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
-  /**
-    * Получить
-      - все устройства;
-      - все устройства по пользователю;
-    * @param userId
-    * @returns
-    */
-  getDevices = async (userId?: string) => {
+  updateDevice = async (device: Partial<IDevice>) => {
     if (isMock) {
       await sleep(mockTimeout);
 
       return {
-        type: 'GET_DEVICES',
-        devices: mockDevices,
-      } as types.IGetDevicesResponse;
+        type: 'UPDATE_DEVICE',
+        device,
+      } as types.IUpdateDeviceResponse;
     }
 
-    const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'UPDATE_DEVICE',
+          device: resData.data,
+        } as types.IUpdateDeviceResponse;
+      }
       return {
-        type: 'GET_DEVICES',
-        devices: resData.data,
-      } as types.IGetDevicesResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
+  };
+
+  removeDevice = async (deviceId: string) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'REMOVE_DEVICE',
+      } as types.IRemoveDeviceResponse;
+    }
+
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>(`/devices/${deviceId}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'REMOVE_DEVICE',
+        } as types.IRemoveDeviceResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
+    }
   };
 
   /**
@@ -80,7 +117,7 @@ class Device extends BaseRequest {
     * @param string userId
     * @returns IDevice
     */
-  getDevice = async (deviceId: string, userId?: string) => {
+  getDevice = async (deviceId: string) => {
     if (isMock) {
       await sleep(mockTimeout);
 
@@ -91,11 +128,8 @@ class Device extends BaseRequest {
     }
 
     try {
-      const paramQuery = userId ? `?userId=${userId}` : '';
-
-      const res = await this.api.axios.get<IResponse<IDevice>>(
-        `/devices/${deviceId || this.api.deviceId}${paramQuery}`,
-      );
+      // || this.api.deviceId
+      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId}`);
 
       const resData = res?.data;
 
@@ -118,68 +152,72 @@ class Device extends BaseRequest {
     }
   };
 
+  /**
+    * Получить
+      - все устройства;
+      - все устройства по параметрам;
+    * @param params
+    * @returns
+    */
+  getDevices = async (params?: Record<string, string>) => {
+    if (isMock) {
+      await sleep(mockTimeout);
+
+      return {
+        type: 'GET_DEVICES',
+        devices: mockDevices,
+      } as types.IGetDevicesResponse;
+    }
+
+    let paramText = params ? getParams(params) : '';
+
+    if (paramText > '') {
+      paramText = `?${paramText}`;
+    }
+
+    try {
+      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'GET_DEVICES',
+          devices: resData.data,
+        } as types.IGetDevicesResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
+    }
+  };
+
   getUsersByDevice = async (deviceId: string) => {
-    const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'GET_USERS_BY_DEVICE',
+          userList: resData.data,
+        } as types.IGetUsersByDeviceResponse;
+      }
       return {
-        type: 'GET_USERS_BY_DEVICE',
-        userList: resData.data,
-      } as types.IGetUsersByDeviceResponse;
-    }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-  };
-
-  updateDevice = async (device: Partial<IDevice>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
-
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
       return {
-        type: 'UPDATE_DEVICE',
-        device,
-      } as types.IUpdateDeviceResponse;
+        type: 'ERROR',
+        message: err?.response?.data || 'Oops, Something Went Wrong',
+      } as error.INetworkError;
     }
-
-    const res = await this.api.axios.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'UPDATE_DEVICE',
-        device: resData.data,
-      } as types.IUpdateDeviceResponse;
-    }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-  };
-
-  removeDevice = async (deviceId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
-
-      return {
-        type: 'REMOVE_DEVICE',
-      } as types.IRemoveDeviceResponse;
-    }
-
-    const res = await this.api.axios.delete<IResponse<void>>(`/devices/${deviceId}`);
-    const resData = res.data;
-
-    if (resData.result) {
-      return {
-        type: 'REMOVE_DEVICE',
-      } as types.IRemoveDeviceResponse;
-    }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 }
 
