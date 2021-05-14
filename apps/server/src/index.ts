@@ -16,9 +16,12 @@ const run = async (): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
     database: config.FILES_PATH,
     port: config.PORT,
   };
+
   const db: IItemDatabase = chosenDatabase ? JSON.parse(chosenDatabase) : defaultDatabase;
+
   return init(db);
 };
+
 if (module.children) {
   run().catch((err) => {
     console.error('!!! SERVER DROPPED BY ERROR !!!');

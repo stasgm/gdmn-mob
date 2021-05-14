@@ -8,10 +8,7 @@ export const documentData: IOrderDocument[] = [
     number: '225',
     documentDate: '25.04.2021',
     documentType: { id: uuid(), name: 'Заявка1 (организация)' },
-    status: {
-      type: 'DRAFT',
-      errorMessage: '',
-    },
+    status: 'DRAFT',
     head: {
       contact: { id: uuid(), name: 'ОАО "Веста" г.Витебск' },
       outlet: { id: uuid(), name: 'ОАО "Веста" г.Витебск, магазин №82' },
@@ -27,10 +24,7 @@ export const documentData: IOrderDocument[] = [
     number: '226',
     documentDate: '25.04.2021',
     documentType: { id: uuid(), name: 'Заявка1 (организация)' },
-    status: {
-      type: 'DRAFT',
-      errorMessage: '',
-    },
+    status: 'DRAFT',
     head: {
       contact: { id: uuid(), name: 'ОАО "Веста" г.Витебск' },
       outlet: { id: uuid(), name: 'ОАО "Веста" г. Витебск маг.№61 ул.К.Маркса,15' },
@@ -51,10 +45,7 @@ export const documentData: IOrderDocument[] = [
     number: '227',
     documentDate: '25.04.2021',
     documentType: { id: uuid(), name: 'Заявка1 (организация)' },
-    status: {
-      type: 'DRAFT',
-      errorMessage: '',
-    },
+    status: 'DRAFT',
     head: {
       contact: { id: uuid(), name: 'ЧТУП "Сионград"' },
       outlet: { id: uuid(), name: 'Сионград 31 ЧТУП "Сионград" Бобруйский район' },
@@ -75,10 +66,7 @@ export const documentData: IOrderDocument[] = [
     number: '228',
     documentDate: '25.04.2021',
     documentType: { id: uuid(), name: 'Заявка1 (организация)' },
-    status: {
-      type: 'DRAFT',
-      errorMessage: '',
-    },
+    status: 'DRAFT',
     head: {
       contact: { id: uuid(), name: 'ЧУТПП "Батя" г.п.Ушачи' },
       outlet: { id: uuid(), name: 'ЧУТПП "Батя" магазин "Батя" г.п.Ушачи' },
@@ -101,10 +89,7 @@ export const documenRouteData: IRouteDocument[] = [
       id: '33',
       name: 'route',
     },
-    status: {
-      type: 'DRAFT',
-      errorMessage: '',
-    },
+    status: 'DRAFT',
     head: {
       agent: {
         id: '111111',
