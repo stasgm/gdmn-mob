@@ -23,9 +23,10 @@ const AuthNavigator: React.FC = () => {
   const { device, settings, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const saveSettings = useCallback((newSettings: IApiConfig) => dispatch(authActions.setSettings(newSettings)), [
-    dispatch,
-  ]);
+  const saveSettings = useCallback(
+    (newSettings: IApiConfig) => dispatch(authActions.setSettings(newSettings)),
+    [dispatch],
+  );
 
   const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
 
@@ -39,30 +40,30 @@ const AuthNavigator: React.FC = () => {
 
   const setCompany = useCallback((company: ICompany) => dispatch(authActions.setCompany(company)), [dispatch]);
 
-  const CongfigWithParams = useCallback(() => <ConfigScreen onSetSettings={saveSettings} settings={settings} />, [
-    saveSettings,
-    settings,
-  ]);
+  const CongfigWithParams = useCallback(
+    () => <ConfigScreen onSetSettings={saveSettings} settings={settings} />,
+    [saveSettings, settings],
+  );
 
-  const SplashWithParams = useCallback(() => <SplashScreen settings={settings} onCheckDevice={checkDevice} />, [
-    checkDevice,
-    settings,
-  ]);
+  const SplashWithParams = useCallback(
+    () => <SplashScreen settings={settings} onCheckDevice={checkDevice} />,
+    [checkDevice, settings],
+  );
 
-  const SignInWithParams = useCallback(() => <SignInScreen onDisconnect={disconnect} onSignIn={signIn} />, [
-    signIn,
-    disconnect,
-  ]);
+  const SignInWithParams = useCallback(
+    () => <SignInScreen onDisconnect={disconnect} onSignIn={signIn} />,
+    [signIn, disconnect],
+  );
 
   const ActivateWithParams = useCallback(
     () => <ActivationScreen onDisconnect={disconnect} onActivate={activateDevice} />,
     [activateDevice, disconnect],
   );
 
-  const CompaniesWithParams = useCallback(() => <CompaniesScreen onLogout={logout} onSetCompany={setCompany} />, [
-    logout,
-    setCompany,
-  ]);
+  const CompaniesWithParams = useCallback(
+    () => <CompaniesScreen onLogout={logout} onSetCompany={setCompany} />,
+    [logout, setCompany],
+  );
 
   useEffect(() => {
     console.log('mount nav');
