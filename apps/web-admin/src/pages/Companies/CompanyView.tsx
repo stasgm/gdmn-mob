@@ -8,12 +8,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { users } from '@lib/mock';
+// import { users } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
+
+import userActions from '../../store/user';
+
 import CompanyUsers from '../../components/company/CompanyUsers';
 
 import { IToolBarButton } from '../../types';
@@ -27,15 +30,16 @@ const CompanyView = () => {
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.companies);
   //TODO Вынести в селекторы
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
-  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по companyId
+  const users = useSelector((state) => state.users.list);
 
   const handleCancel = () => {
-    navigate('/app/companies');
+    //navigate('/app/companies');
+    navigate(-1);
   };
 
   const handleEdit = () => {
@@ -44,7 +48,7 @@ const CompanyView = () => {
 
   const handleRefresh = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
-    //обновить пользователей
+    dispatch(userActions.fetchUsers(companyId));
   }, [dispatch, companyId]);
 
   useEffect(() => {
@@ -103,7 +107,7 @@ const CompanyView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список компаний'} />
+            <CardHeader title={'Назад'} />
             {loading && <CircularProgress size={40} />}
           </Box>
           <Box
@@ -125,7 +129,7 @@ const CompanyView = () => {
       </Box>
       <Box>
         <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users.filter((u) => u.companies.find((c) => c.id === companyId))} />
+        <CompanyUsers users={users?.filter((u) => u.companies.find((c) => c.id === companyId))} />
       </Box>
     </>
   );

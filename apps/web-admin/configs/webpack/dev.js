@@ -28,7 +28,7 @@ module.exports = merge(commonConfig, {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
   // devtool: 'cheap-module-source-map',
-  devtool: 'eval-source-map',
+  devtool: 'inline-source-map',
   plugins: [
     new webpack.HotModuleReplacementPlugin(), // enable HMR globally
     new webpack.DefinePlugin({

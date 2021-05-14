@@ -5,13 +5,13 @@ import { IDevice, NewDevice } from '@lib/types';
 import DeviceDetails from '../../components/device/DeviceDetails';
 import SnackBar from '../../components/SnackBar';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/device';
 
 const DeviceCreate = () => {
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
 
@@ -23,8 +23,11 @@ const DeviceCreate = () => {
     dispatch(actions.deviceActions.clearError());
   };
 
-  const handleSubmit = (values: IDevice | NewDevice) => {
-    dispatch(actions.addDevice(values as NewDevice, handleGoToDevices));
+  const handleSubmit = async (values: IDevice | NewDevice) => {
+    const res = await dispatch(actions.addDevice(values as NewDevice));
+    if (res.type === 'DEVICE/ADD_SUCCCES') {
+      handleGoToDevices();
+    }
   };
 
   return (

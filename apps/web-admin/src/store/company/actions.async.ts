@@ -1,22 +1,21 @@
-import Api from '@lib/client-api';
-import { config } from '@lib/client-config';
+import { ThunkAction } from 'redux-thunk';
+import api from '@lib/client-api';
+// import { config } from '@lib/client-config';
 
 import { NewCompany, ICompany } from '@lib/types';
-
-import { ThunkAction } from 'redux-thunk';
 
 import { AppState } from '../';
 
 import { companyActions, CompanyActionType } from './actions';
-
+/*
 const {
   debug: { deviceId },
   server: { name, port, protocol },
   timeout,
   apiPath,
-} = config;
+} = config; */
 
-const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+// const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 export type AppThunk = ThunkAction<Promise<CompanyActionType>, AppState, null, CompanyActionType>;
 

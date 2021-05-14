@@ -1,4 +1,4 @@
-import Api, { types, sleep } from '@lib/client-api';
+import api, { types, sleep } from '@lib/client-api';
 import { devices, device2 } from '@lib/mock';
 import { config } from '@lib/client-config';
 import { IDevice, NewDevice } from '@lib/types';
@@ -10,13 +10,13 @@ import { AppState } from '..';
 import { deviceActions, DeviceActionType } from './actions';
 
 const {
-  debug: { useMockup: isMock, deviceId },
-  server: { name, port, protocol },
-  timeout,
-  apiPath,
+  debug: { useMockup: isMock },
+  /*   server: { name, port, protocol },
+    timeout,
+    apiPath, */
 } = config;
 
-const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+// const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 export type AppThunk = ThunkAction<Promise<DeviceActionType>, AppState, null, DeviceActionType>;
 

@@ -1,11 +1,13 @@
-import { AxiosInstance } from 'axios';
+// import { AxiosInstance } from 'axios';
+// import Api from '../api';
+import { BaseApi } from '../types/types';
 
-export abstract class BaseApi {
-  protected deviceId: string;
-  protected readonly api: AxiosInstance;
+export abstract class BaseRequest {
+  // protected deviceId: string;
+  protected readonly api: BaseApi;
 
-  constructor(api: AxiosInstance, deviceId: string) {
+  constructor(api: BaseApi) {
     this.api = api;
-    this.deviceId = deviceId;
+    // this.deviceId = deviceId;
   }
 }

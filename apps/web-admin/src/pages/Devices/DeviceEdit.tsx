@@ -5,7 +5,7 @@ import { IDevice, NewDevice } from '@lib/types';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
 
-import { useSelector, useDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/device';
 import SnackBar from '../../components/SnackBar';
 
@@ -14,7 +14,7 @@ const DeviceEdit = () => {
 
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
   const device = useSelector((state) => state.devices.list.find((i) => i.id === deviceId));
@@ -27,8 +27,11 @@ const DeviceEdit = () => {
     dispatch(actions.deviceActions.clearError());
   };
 
-  const handleSubmit = (values: IDevice | NewDevice) => {
-    dispatch(actions.updateDevice(values as IDevice, handleGoToDeviceView));
+  const handleSubmit = async (values: IDevice | NewDevice) => {
+    const res = await dispatch(actions.updateDevice(values as IDevice));
+    if (res.type === 'DEVICE/UPDATE_SUCCCES') {
+      handleGoToDeviceView();
+    }
   };
 
   if (!device) {

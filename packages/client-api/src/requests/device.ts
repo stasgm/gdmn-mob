@@ -1,17 +1,18 @@
-import { AxiosInstance } from 'axios';
+// import { AxiosInstance } from 'axios';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
 import { device as mockDevice, devices as mockDevices } from '@lib/mock';
 
-import { BaseApi } from '../requests/baseApi';
+import { BaseRequest } from '../requests/baseApi';
 import { error, device as types } from '../types';
 import { sleep } from '../utils';
+import { BaseApi } from '../types/types';
 
 const isMock = process.env.MOCK;
 const mockTimeout = 500;
 
-class Device extends BaseApi {
-  constructor(api: AxiosInstance, deviceId: string) {
-    super(api, deviceId);
+class Device extends BaseRequest {
+  constructor(api: BaseApi) {
+    super(api);
   }
 
   addDevice = async (newDevice: NewDevice) => {
@@ -24,7 +25,7 @@ class Device extends BaseApi {
       } as types.IAddDeviceResponse;
     }
 
-    const res = await this.api.post<IResponse<IDevice>>('/devices', newDevice);
+    const res = await this.api.axios.post<IResponse<IDevice>>('/devices', newDevice);
     const resData = res.data;
 
     if (resData.result) {
@@ -56,7 +57,7 @@ class Device extends BaseApi {
       } as types.IGetDevicesResponse;
     }
 
-    const res = await this.api.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
+    const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices?${userId ? `userId=${userId}` : ''}`);
     const resData = res.data;
 
     if (resData.result) {
@@ -92,7 +93,9 @@ class Device extends BaseApi {
     try {
       const paramQuery = userId ? `?userId=${userId}` : '';
 
-      const res = await this.api.get<IResponse<IDevice>>(`/devices/${deviceId || this.deviceId}${paramQuery}`);
+      const res = await this.api.axios.get<IResponse<IDevice>>(
+        `/devices/${deviceId || this.api.deviceId}${paramQuery}`,
+      );
 
       const resData = res?.data;
 
@@ -116,7 +119,7 @@ class Device extends BaseApi {
   };
 
   getUsersByDevice = async (deviceId: string) => {
-    const res = await this.api.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
+    const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices/${deviceId}/users`);
     const resData = res.data;
 
     if (resData.result) {
@@ -141,7 +144,7 @@ class Device extends BaseApi {
       } as types.IUpdateDeviceResponse;
     }
 
-    const res = await this.api.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
+    const res = await this.api.axios.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
     const resData = res.data;
 
     if (resData.result) {
@@ -165,7 +168,7 @@ class Device extends BaseApi {
       } as types.IRemoveDeviceResponse;
     }
 
-    const res = await this.api.delete<IResponse<void>>(`/devices/${deviceId}`);
+    const res = await this.api.axios.delete<IResponse<void>>(`/devices/${deviceId}`);
     const resData = res.data;
 
     if (resData.result) {
