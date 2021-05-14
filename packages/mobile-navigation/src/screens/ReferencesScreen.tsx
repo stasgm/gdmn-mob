@@ -5,6 +5,7 @@ import { useDispatch, useSelector, referenceActions } from '@lib/store';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button, useTheme } from 'react-native-paper';
 import { IReference } from '@lib/types';
+import { peopleRefMock, depRefMock, companyRefMock } from '@lib/mock';
 
 const ReferenceItem = ({ item }: { item: IReference }) => {
   const { colors } = useTheme();
@@ -36,7 +37,7 @@ const ReferencesScreen = () => {
   const dispatch = useDispatch();
 
   const handleLoad = () => {
-    //dispatch(referenceActions.addReference());
+    dispatch(referenceActions.addReferences([peopleRefMock, depRefMock, companyRefMock]));
   };
 
   const handleReset = () => {

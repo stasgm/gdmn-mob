@@ -8,6 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
+// import {  } from '@lib/mock';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {
   const { colors } = useTheme();
@@ -39,7 +40,7 @@ const DocumentsScreen = () => {
   const dispatch = useDispatch();
 
   const handleLoad = () => {
-    //dispatch(documentActions.fetchDoc());
+    // dispatch(documentActions.addDocuments());
   };
 
   const handleReset = () => {

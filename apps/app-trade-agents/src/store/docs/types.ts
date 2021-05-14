@@ -1,6 +1,4 @@
-import { INamedEntity, IEntity, IUserDocument, IDocument } from '@lib/types';
-
-//  orders
+import { INamedEntity, IEntity, IUserDocument } from '@lib/types';
 
 interface IOrderHead {
   contact: INamedEntity; //организация-плательщик
@@ -36,8 +34,3 @@ export type IDocState = {
   readonly loading: boolean;
   readonly errorMessage: string;
 };
-
-export type IDocPayload = Partial<{
-  errorMessage: string;
-  docData: IDocument[];
-}>;

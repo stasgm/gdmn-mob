@@ -8,7 +8,7 @@ import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-const isMock = process.env.MOCK;
+const isMock = process.env.MOCK || true;
 const mockTimeout = 500;
 
 class Company extends BaseRequest {
