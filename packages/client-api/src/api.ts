@@ -1,20 +1,22 @@
 import axios, { AxiosInstance } from 'axios';
 
+import { config } from '@lib/client-config';
 import { IApiConfig } from '@lib/client-types';
 
 import { error } from './types';
 
 import Auth from './requests/auth';
+import { BaseApi } from './types/types';
 import Company from './requests/company';
 import Device from './requests/device';
 import Message from './requests/message';
 import User from './requests/user';
 
-class Api {
-  private config: IApiConfig;
-  private deviceId: string;
+class Api extends BaseApi {
+  protected _config: IApiConfig;
+  protected _deviceId: string;
 
-  private readonly axios: AxiosInstance;
+  protected readonly _axios: AxiosInstance;
   // Классы запросов
   public auth: Auth;
   public company: Company;
@@ -23,28 +25,30 @@ class Api {
   public user: User;
 
   constructor(config: IApiConfig, deviceId: string) {
-    this.config = config;
-    this.deviceId = deviceId || 'WEB';
+    super();
+    this._config = config;
+    this._deviceId = deviceId || 'WEB'; // TODO убрать web
 
-    this.axios = axios.create({
-      baseURL: `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`,
-      url: this.config.apiPath,
+    this._axios = axios.create({
+      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
+      url: this._config.apiPath,
       timeout: config.timeout,
+      withCredentials: true,
     });
 
-    this.auth = new Auth(this.axios, this.deviceId);
-    this.company = new Company(this.axios, this.deviceId);
-    this.device = new Device(this.axios, this.deviceId);
-    this.message = new Message(this.axios, this.deviceId);
-    this.user = new User(this.axios, this.deviceId);
+    this.auth = new Auth(this);
+    this.company = new Company(this);
+    this.device = new Device(this);
+    this.message = new Message(this);
+    this.user = new User(this);
 
-    this.axios.defaults.params = {};
+    this._axios.defaults.params = {};
 
-    this.axios.interceptors.request.use(
+    this._axios.interceptors.request.use(
       (request) => {
         // Добавляем device_ID
-        request.params.deviceId = this.deviceId;
-        // console.info('✉️ request', request);
+        request.params.deviceId = this._deviceId;
+        console.info('✉️ request', request);
         return request;
       },
       (error) => {
@@ -57,7 +61,7 @@ class Api {
       },
     );
 
-    this.axios.interceptors.response.use(
+    this._axios.interceptors.response.use(
       (response) => {
         console.info('✉️ response', response);
         return response;
@@ -69,17 +73,37 @@ class Api {
     );
   }
 
-  setConfig = (config: IApiConfig) => {
-    this.config = config;
-  };
+  set config(config: IApiConfig) {
+    this._config = config;
+  }
 
-  setDeviceId = (deviceId: string) => {
-    this.deviceId = deviceId;
-  };
+  get config() {
+    this._axios.defaults = { ...this._axios.defaults, ...this._config };
+    return this._config;
+  }
 
-  getUrl = () => {
-    return `${this.config.protocol}${this.config.server}:${this.config.port}/${this.config.apiPath}`;
-  };
+  set deviceId(deviceId: string) {
+    this._deviceId = deviceId;
+  }
+
+  get deviceId() {
+    return this._deviceId;
+  }
+
+  get axios() {
+    return this._axios;
+  }
+
+  /*   getUrl = () => {
+      return `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`;
+    }; */
 }
 
-export default Api;
+const {
+  debug: { deviceId },
+  server: { name, port, protocol },
+  timeout,
+  apiPath,
+} = config;
+
+export default new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);

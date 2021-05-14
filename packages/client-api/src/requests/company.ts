@@ -1,20 +1,21 @@
-import { AxiosInstance } from 'axios';
+// import { AxiosInstance } from 'axios';
 import { v4 as uuid } from 'uuid';
 import { NewCompany, IResponse, IUser, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
 import { error, company as types } from '../types';
-
+import { BaseRequest } from '../requests/baseApi';
 import { sleep } from '../utils';
+import { BaseApi } from '../types/types';
 
 import { BaseApi } from './baseApi';
 
 const isMock = process.env.MOCK;
 const mockTimeout = 500;
 
-class Company extends BaseApi {
-  constructor(api: AxiosInstance, deviceId: string) {
-    super(api, deviceId);
+class Company extends BaseRequest {
+  constructor(api: BaseApi) {
+    super(api);
   }
 
   addCompany = async (company: NewCompany) => {
@@ -27,7 +28,7 @@ class Company extends BaseApi {
       } as types.IAddCompanyResponse;
     }
 
-    const res = await this.api.post<IResponse<ICompany>>('/companies', company);
+    const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
     const resData = res.data;
 
     if (resData.result) {
@@ -54,7 +55,7 @@ class Company extends BaseApi {
     }
 
     try {
-      const res = await this.api.get<IResponse<ICompany[]>>('/companies');
+      const res = await this.api.axios.get<IResponse<ICompany[]>>('/companies');
       const resData = res.data;
 
       if (resData.result) {
@@ -94,7 +95,7 @@ class Company extends BaseApi {
       } as error.INetworkError;
     }
 
-    const res = await this.api.get<IResponse<ICompany>>(`/companies/${companyId}`);
+    const res = await this.api.axios.get<IResponse<ICompany>>(`/companies/${companyId}`);
     const resData = res.data;
 
     if (resData.result) {
@@ -128,7 +129,7 @@ class Company extends BaseApi {
       } as error.INetworkError;
     }
 
-    const res = await this.api.patch<IResponse<ICompany>>(`/companies/${company.id}`, company);
+    const res = await this.api.axios.patch<IResponse<ICompany>>(`/companies/${company.id}`, company);
     const resData = res.data;
 
     if (resData.result) {
@@ -145,7 +146,7 @@ class Company extends BaseApi {
   };
 
   getUsersByCompany = async (companyId: string) => {
-    const res = await this.api.get<IResponse<IUser[]>>(`/companies/${companyId}/users`);
+    const res = await this.api.axios.get<IResponse<IUser[]>>(`/companies/${companyId}/users`);
     const resData = res.data;
 
     if (resData.result) {
@@ -169,7 +170,7 @@ class Company extends BaseApi {
       } as types.IRemoveCompanyResponse;
     }
 
-    const res = await this.api.delete<IResponse<void>>(`/companies/${companyId}`);
+    const res = await this.api.axios.delete<IResponse<void>>(`/companies/${companyId}`);
     const resData = res.data;
 
     if (resData.result) {
@@ -190,7 +191,7 @@ export default Company;
 // const mapDtoToObject = async (companyDto: CompanyDto): Promise<ICompany> => {
 //   let user = {} as IUser;
 
-//   const res = await this.api.get<IResponse<IUser>>(`/users/${companyDto.adminId}`);
+//   const res = await this.api.axios.get<IResponse<IUser>>(`/users/${companyDto.adminId}`);
 //   const adminDto = res.data;
 
 //   if (adminDto.data) {

@@ -1,23 +1,20 @@
-import Api from '@lib/client-api';
-
-import { config } from '@lib/client-config';
-
 import { ThunkAction } from 'redux-thunk';
-
+import api from '@lib/client-api';
+// import { config } from '@lib/client-config';
 import { IUser, NewUser } from '@lib/types';
 
 import { AppState } from '../';
 
 import { userActions, UserActionType } from './actions';
 
-const {
+/* const {
   debug: { deviceId },
   server: { name, port, protocol },
   timeout,
   apiPath,
 } = config;
-
-const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+ */
+// const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 export type AppThunk = ThunkAction<Promise<UserActionType>, AppState, null, UserActionType>;
 
@@ -39,11 +36,11 @@ const fetchUserById = (id: string): AppThunk => {
   };
 };
 
-const fetchUsers = (): AppThunk => {
+const fetchUsers = (companyId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.fetchUsersAsync.request(''));
 
-    const response = await api.user.getUsers();
+    const response = await api.user.getUsers(companyId);
 
     if (response.type === 'GET_USERS') {
       return dispatch(userActions.fetchUsersAsync.success(response.users));

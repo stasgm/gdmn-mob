@@ -3,11 +3,13 @@ import { IEntity, INamedEntity } from './models';
 
 type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
 
-/* interface IDocumentStatus {
-  type: statusType;
-  errorMessage?: string;
-}
- */
+// todo вынести в отдельный интерфейс состояние обработки документа
+// со ссылкой на него
+// interface IDocumentStatus {
+//   type: statusType;
+//   errorMessage?: string;
+// }
+
 interface IDocument extends IEntity {
   number: string;
   documentDate: string;

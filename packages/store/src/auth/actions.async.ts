@@ -1,7 +1,7 @@
 import { ThunkAction } from 'redux-thunk';
 
 import { IUserCredentials } from '@lib/types';
-import Api from '@lib/client-api';
+import api from '@lib/client-api';
 import { config } from '@lib/client-config';
 
 import { AuthState } from './types';
@@ -10,12 +10,12 @@ import { actions, AuthActionType } from './actions';
 
 const {
   debug: { deviceId },
-  server: { name, port, protocol },
-  timeout,
-  apiPath,
+  /*   server: { name, port, protocol },
+    timeout,
+    apiPath, */
 } = config;
 
-const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+// const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 export type AppThunk = ThunkAction<Promise<AuthActionType>, AuthState, null, AuthActionType>;
 

@@ -13,10 +13,7 @@ const initialState: Readonly<IDocState> = {
       number: '6225',
       documentDate: '13.05.2021',
       documentType: { id: uuid(), name: 'Заявка1 (организация)' },
-      status: {
-        type: 'DRAFT',
-        errorMessage: '',
-      },
+      status: 'DRAFT',
       head: {
         contact: { id: '1', name: 'Рога и копыта' },
         outlet: { id: '11', name: 'Рога и копыта № 123' },

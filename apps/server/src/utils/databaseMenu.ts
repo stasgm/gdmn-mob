@@ -12,6 +12,7 @@ interface IItemAnswer {
 export const databaseMenu = async (dataBases: IItemDatabase[] | undefined): Promise<string | undefined> => {
   if (!dataBases) return undefined;
   if (dataBases.length === 1) return JSON.stringify(dataBases[0], null, '  ');
+
   const choiseArray = dataBases.map((i) => i.database);
   return inquirer
     .prompt([
@@ -28,7 +29,7 @@ export const databaseMenu = async (dataBases: IItemDatabase[] | undefined): Prom
     .then((answers: IItemAnswer) => {
       const answerDB = answers.db;
       const db = dataBases.find((i) => i.database.toUpperCase() === answerDB.toUpperCase());
-      console.log('Working database ' + db?.database);
+      console.log('Working database ' + db?.name);
       return JSON.stringify(db, null, '  ');
     })
     .catch((error) => {
