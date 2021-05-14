@@ -1,8 +1,8 @@
 import { ThunkAction } from 'redux-thunk';
 
-import { sleep } from '@lib/client-api';
-
 import { IDocument } from '@lib/types';
+
+import { sleep } from '@lib/client-api';
 
 import { IDocumentState } from './types';
 
@@ -15,7 +15,6 @@ export const addDocuments = (documents: IDocument[]): AppThunk => {
     dispatch(actions.addDocumentsAsync.request(''));
 
     await sleep(1000);
-
     //TODO: проверка
     if (documents) {
       return dispatch(actions.addDocumentsAsync.success(documents));
@@ -30,7 +29,6 @@ export const addDocument = (document: IDocument): AppThunk => {
     dispatch(actions.addDocumentAsync.request(''));
 
     await sleep(1000);
-
     //TODO: проверка
     if (document) {
       return dispatch(actions.addDocumentAsync.success(document));

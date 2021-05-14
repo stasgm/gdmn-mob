@@ -1,6 +1,4 @@
-// import { AxiosInstance } from 'axios';
-// import Api from '../api';
-import { BaseApi } from '../types/types';
+import { BaseApi } from './BaseApi';
 
 export abstract class BaseRequest {
   // protected deviceId: string;

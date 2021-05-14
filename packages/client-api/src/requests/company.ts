@@ -4,9 +4,9 @@ import { NewCompany, IResponse, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
 import { error, company as types } from '../types';
-import { BaseRequest } from '../requests/baseApi';
 import { getParams, sleep } from '../utils';
-import { BaseApi } from '../types/types';
+import { BaseApi } from '../types/BaseApi';
+import { BaseRequest } from '../types/BaseRequest';
 
 const isMock = process.env.MOCK;
 const mockTimeout = 500;

@@ -6,7 +6,7 @@ import { IApiConfig } from '@lib/client-types';
 import { error } from './types';
 
 import Auth from './requests/auth';
-import { BaseApi } from './types/types';
+import { BaseApi } from './types/BaseApi';
 import Company from './requests/company';
 import Device from './requests/device';
 import Message from './requests/message';
