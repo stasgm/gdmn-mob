@@ -48,13 +48,12 @@ export interface IDBActivationCode {
 }
 
 export interface IDBMessage<T = any> {
-  id?: string;
+  id: string;
   head: {
-    id: string;
     appSystem: string;
-    companyid: string;
-    producer: string;
-    consumer: string;
+    companyId: string;
+    producerId: string;
+    consumerId: string;
     dateTime: string;
   };
   body: {
@@ -101,7 +100,34 @@ export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;
 }
 
-export type IMessage = IDBMessage;
+interface IHeadMessage {
+  appSystem: string;
+  company: INamedEntity;
+  producer: INamedEntity;
+  consumer: INamedEntity;
+  dateTime: string;
+}
+
+export type TStatusMessage = 'recd' | 'procd';
+type TBodyType = 'cmd' | 'refs' | 'docs';
+
+export interface IMessage<T = any> {
+  id: string;
+  status: TStatusMessage;
+  head: IHeadMessage;
+  body: {
+    type: TBodyType;
+    payload: T;
+  };
+}
+
+export type NewMessage<T = any> = {
+  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+  body: {
+    type: string;
+    payload: T;
+  };
+};
 
 export interface IDataMessage<T = any> {
   id: string;

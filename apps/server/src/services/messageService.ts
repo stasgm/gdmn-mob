@@ -1,15 +1,20 @@
-import { IMessage } from '@lib/types';
+import { IDBMessage, IMessage, NewMessage } from '@lib/types';
+import { v1 as uuidv1 } from 'uuid';
 
 import { entities } from './dao/db';
+import { getNamedEntity } from './dao/utils';
 
-const { messages } = entities;
+const { messages, users, companies } = entities;
 
 const findOne = async (id: string) => {
-  return messages.find(id);
+  return makeMessage(await messages.find(id));
 };
 
 const findAll = async () => {
-  return messages.read();
+  const messageList = await messages.read();
+  const pr = messageList.map(async (i) => await makeMessage(i));
+
+  return Promise.all(pr);
 };
 
 /**
@@ -20,9 +25,12 @@ const findAll = async () => {
  * @return массив сообщений
  * */
 const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
-  return (await messages.read()).filter(
-    (i) => i.head.appSystem === appSystem && i.head.companyid === companyId && i.head.consumer === userId,
+  const messageList = (await messages.read()).filter(
+    (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === userId,
   );
+  const pr = messageList.map(async (i) => await makeMessage(i));
+
+  return Promise.all(pr);
 };
 
 /**
@@ -32,12 +40,12 @@ const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; c
  * @return id, идентификатор сообщения
  * */
 
-const addOne = async (msgObject: IMessage): Promise<string> => {
-  if (await messages.find((i) => i.head.id === msgObject.head.id)) {
+const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; producerId: string }): Promise<string> => {
+  /*if (await messages.find((i) => i.id === msgObject.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
-  }
+  }*/
 
-  return messages.insert(msgObject);
+  return messages.insert(makeDBNewMessage(msgObject, producerId));
 };
 
 /**
@@ -54,9 +62,9 @@ const updateOne = async (message: IMessage): Promise<string> => {
 
   // Удаляем поля которые нельзя перезаписывать
   // eslint-disable-next-line no-param-reassign
-  delete message.id;
+  //delete message.head.id;
 
-  await messages.update({ ...oldMessage, ...message });
+  await messages.update({ ...oldMessage, ...makeDBMessage(message) });
 
   return message.id!;
 };
@@ -88,7 +96,7 @@ const deleteByUid = async ({
   userId: string;
 }): Promise<void> => {
   const messageObj = await messages.find(
-    (message) => message.head.companyid === companyId && message.head.consumer === userId && message.head.id === uid,
+    (message) => message.head.companyId === companyId && message.head.consumerId === userId && message.id === uid,
   );
 
   if (!messageObj) {
@@ -100,5 +108,51 @@ const deleteByUid = async ({
 };
 
 const deleteAll = async (): Promise<void> => messages.deleteAll();
+
+export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
+  const consumer = await getNamedEntity(message.head.consumerId, users);
+  const producer = await getNamedEntity(message.head.producerId, users);
+  const company = await getNamedEntity(message.head.companyId, companies);
+
+  return {
+    id: message.id,
+    head: {
+      appSystem: message.head.appSystem,
+      company,
+      consumer,
+      producer,
+      dateTime: message.head.dateTime,
+    },
+    body: message.body,
+  };
+};
+
+export const makeDBMessage = (message: IMessage): IDBMessage => {
+  return {
+    id: message.id,
+    head: {
+      appSystem: message.head.appSystem,
+      companyId: message.head.company.id,
+      consumerId: message.head.consumer.id,
+      producerId: message.head.producer.id,
+      dateTime: message.head.dateTime,
+    },
+    body: message.body,
+  };
+};
+
+export const makeDBNewMessage = (message: NewMessage, producerId: string): IDBMessage => {
+  return {
+    id: uuidv1(),
+    head: {
+      appSystem: message.head.appSystem,
+      companyId: message.head.company.id,
+      consumerId: message.head.consumer.id,
+      producerId: producerId,
+      dateTime: new Date().toISOString(),
+    },
+    body: message.body,
+  };
+};
 
 export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid, deleteAll };

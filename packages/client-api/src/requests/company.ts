@@ -1,6 +1,5 @@
 // import { AxiosInstance } from 'axios';
 import { v4 as uuid } from 'uuid';
-
 import { NewCompany, IResponse, IUser, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
@@ -8,6 +7,8 @@ import { error, company as types } from '../types';
 import { BaseRequest } from '../requests/baseApi';
 import { sleep } from '../utils';
 import { BaseApi } from '../types/types';
+
+import { BaseApi } from './baseApi';
 
 const isMock = process.env.MOCK;
 const mockTimeout = 500;

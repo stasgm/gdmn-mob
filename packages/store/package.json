@@ -1,7 +1,7 @@
 {
   "name": "@lib/store",
   "version": "1.0.0",
-  "description": "common store package",
+  "description": "common client store package",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,8 +23,9 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@lib/client-types": "*",
+    "@lib/mock": "*",
     "@lib/types": "*",
-    "@types/node": "^15.0.1",
+    "@types/node": "^15.0.3",
     "@types/redux": "^3.6.31",
     "@types/redux-actions": "2.6.1",
     "@types/redux-logger": "3.0.8",
@@ -39,7 +40,7 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^10.5.4",
+    "lint-staged": "^11.0.0",
     "typescript": "^4.2.4"
   }
 }

@@ -42,7 +42,7 @@ const SignInScreen = (props: Props) => {
 
   const [credential, setCredentials] = useState<IUserCredentials>({
     name: 'Stas',
-    password: '123',
+    password: '@123!',
   });
 
   console.log('signIn');

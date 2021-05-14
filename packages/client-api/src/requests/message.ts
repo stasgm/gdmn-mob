@@ -1,22 +1,34 @@
-// import { AxiosInstance } from 'axios';
-import { IMessage, IMessageInfo, IResponse } from '@lib/types';
+import { AxiosInstance } from 'axios';
+import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
+import { messages as mockMessages } from '@lib/mock';
 
 import { error, message as types } from '../types';
-import { BaseRequest } from '../requests/baseApi';
-import { BaseApi } from '../types/types';
+
+import { sleep } from '../utils';
+
+import { BaseApi } from './baseApi';
+
+const isMock = process.env.MOCK || true;
+const mockTimeout = 500;
 
 class Message extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
-  sendMessages = async (systemName: string, companyId: string, consumer: string, message: IMessage['body']) => {
-    const body = {
-      head: { companyId, consumer, appSystem: systemName },
-      message,
+  sendMessages = async (
+    systemName: string,
+    company: INamedEntity,
+    consumer: INamedEntity,
+    message: IMessage['body'],
+  ) => {
+    const body: NewMessage = {
+      head: { company, consumer, appSystem: systemName },
+      body: message,
     };
     const res = await this.api.axios.post<IResponse<IMessageInfo>>('/messages', body);
     const resData = res.data;
+
     if (resData.result) {
       return {
         type: 'SEND_MESSAGE',
@@ -24,6 +36,7 @@ class Message extends BaseRequest {
         date: resData.data?.date,
       } as types.ISendMessageResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,
@@ -40,9 +53,10 @@ class Message extends BaseRequest {
         messageList: resData.data,
       } as types.IGetMessagesResponse;
     }
+
     return {
       type: 'ERROR',
-      message: resData.error,
+      message: resData.error || 'Oops, Something Went Wrong',
     } as error.INetworkError;
   };
 
@@ -70,6 +84,7 @@ class Message extends BaseRequest {
         type: 'CLEAR_MESSAGES',
       } as types.IClearMessagesResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,
@@ -86,6 +101,7 @@ class Message extends BaseRequest {
         messageList: resData.data,
       } as types.ISubscribeResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,
@@ -104,6 +120,7 @@ class Message extends BaseRequest {
         date: resData.data?.date,
       } as types.IPublishResponse;
     }
+
     return {
       type: 'ERROR',
       message: resData.error,

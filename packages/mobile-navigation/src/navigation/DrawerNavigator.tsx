@@ -9,27 +9,32 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 import { DrawerContent } from './drawerContent';
 
-import ReferencesNavigator from './Root/ReferencesNavigator';
+//import ReferencesNavigator from "./Root/ReferencesNavigator";
 import SettingsNavigator from './Root/SettingsNavigator';
+import MessagesNavigator from './Root/MessagesNavigator';
+import ReferencesNavigator from './Root/ReferencesNavigator';
+import DocumentsNavigator from './Root/DocumentsNavigator';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
   References: undefined;
   Settings: undefined;
   Profile: undefined;
+  Messages: undefined;
   [itemName: string]: undefined;
 };
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
 const Header = ({ scene }: DrawerHeaderProps) => {
-  const { options } = scene.descriptor;
+  const { options, navigation } = scene.descriptor;
   const title = options.headerTitle ?? options.title ?? scene.route.name;
 
   return (
     <Appbar.Header>
-      <Appbar.Action icon="menu" onPress={() => scene.descriptor.navigation.dispatch(DrawerActions.openDrawer())} />
+      <Appbar.Action icon="menu" onPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
       <Appbar.Content title={title} />
+      {/* <Appbar.Action icon="dots-vertical" /> */}
     </Appbar.Header>
   );
 };
@@ -52,9 +57,15 @@ const DrawerNavigator = (props: IProps) => {
 
   return (
     <Drawer.Navigator
-      drawerContentOptions={{ activeBackgroundColor: colors.primary, activeTintColor: '#ffffff' }}
+      drawerContentOptions={{
+        activeBackgroundColor: colors.primary,
+        activeTintColor: '#ffffff',
+      }}
       drawerContent={(props) => <DrawerContent {...props} />}
-      screenOptions={{ headerShown: true, header: (props) => <Header {...props} /> }}
+      screenOptions={{
+        headerShown: true,
+        header: (props) => <Header {...props} />,
+      }}
     >
       {props?.items?.map((item) => (
         <Drawer.Screen
@@ -68,11 +79,27 @@ const DrawerNavigator = (props: IProps) => {
         />
       ))}
       <Drawer.Screen
+        name="Messages"
+        component={MessagesNavigator}
+        options={{
+          title: 'Сообщения',
+          drawerIcon: (props) => <Icon name="message-text-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
         name="References"
         component={ReferencesNavigator}
         options={{
           title: 'Справочники',
-          drawerIcon: (props) => <Icon name="book-multiple-outline" {...props} />,
+          drawerIcon: (props) => <Icon name="file-search-outline" {...props} />,
+        }}
+      />
+      <Drawer.Screen
+        name="Documents"
+        component={DocumentsNavigator}
+        options={{
+          title: 'Документы',
+          drawerIcon: (props) => <Icon name="file-document-outline" {...props} />,
         }}
       />
       <Drawer.Screen

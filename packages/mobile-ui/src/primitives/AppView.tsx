@@ -63,7 +63,7 @@ type AppViewPropsBase = Omit<View['props'], 'accessibilityRole'> & {
   ref?: (c: any) => void;
 };
 
-const ViewBase = (View as any) as React.ComponentType<AppViewPropsBase>;
+const ViewBase = View as any as React.ComponentType<AppViewPropsBase>;
 
 export interface AppViewProps extends AppViewPropsBase {
   type?: LayerType;

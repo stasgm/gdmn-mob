@@ -6,10 +6,11 @@ import { AuthState } from './types';
 
 const init = createAction('AUTH/INIT')<AuthState>();
 const clearError = createAction('AUTH/CLEAR_ERROR')();
-export const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
-export const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
-export const disconnect = createAction('AUTH/DISCONNECT')();
-export const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
+
+const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
+const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
+const disconnect = createAction('AUTH/DISCONNECT')();
+const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
 
 const checkDeviceAsync = createAsyncAction(
   'AUTH/CHECK_DEVICE',
@@ -35,7 +36,7 @@ const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCCES', 'AUT
   string
 >();
 
-export const authActions = {
+export const actions = {
   init,
   clearError,
   setSettings,
@@ -48,4 +49,4 @@ export const authActions = {
   activateDeviceAsync,
 };
 
-export type AuthActionType = ActionType<typeof authActions>;
+export type AuthActionType = ActionType<typeof actions>;

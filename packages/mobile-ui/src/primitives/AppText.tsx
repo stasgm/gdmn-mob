@@ -30,7 +30,7 @@ export interface AppTextProps extends AppTextPropsBase {
   target?: HTMLAnchorElement['target'];
 }
 
-const TextBase = (Text as any) as React.ComponentType<AppTextProps>;
+const TextBase = Text as any as React.ComponentType<AppTextProps>;
 
 const BaseStyle = StyleSheet.create({
   defaultStyle: {
