@@ -7,9 +7,7 @@ import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
 
-import { setStore } from './src/store';
-
-const store = setStore();
+import { store } from './src/store';
 
 const App = () => {
   //  const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);

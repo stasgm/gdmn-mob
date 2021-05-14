@@ -3,21 +3,22 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore, RootState } from '@lib/store';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
-import ExpoFileSystemStorage from 'redux-persist-expo-filesystem';
+// import ExpoFileSystemStorage from 'redux-persist-expo-filesystem';
 
-type TActions = any;
+type TActions = Action<any>;
 
 export const combinedReducer = {};
 
 const rootReducer = combineReducers(combinedReducer);
 
-const persistConfig = {
+/* const persistConfig = {
   key: 'auth',
   storage: ExpoFileSystemStorage,
   whitelist: ['auth'],
-};
+}; */
 
-export const { store, persistor } = configureStore(combinedReducer, persistConfig);
+export const { store } = configureStore(combinedReducer);
+// export const { store, persistor } = configureStore(combinedReducer, persistConfig);
 
 export type AppState = ReturnType<typeof rootReducer> & RootState;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

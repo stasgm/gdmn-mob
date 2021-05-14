@@ -1,6 +1,8 @@
 import { ICompany, IDocument, IMessage, INamedEntity, IReference, NewMessage } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
+import { companyRefMock, depRefMock, peopleRefMock } from './references';
+
 const user1: INamedEntity = {
   id: '123',
   name: 'Stas',
@@ -67,9 +69,11 @@ export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
     body: {
       type: 'refs',
       payload: [
-        { id: '111', name: 'goods' },
-        { id: '222', name: 'contacts' },
-        { id: '333', name: 'barcodes' },
+        { id: '11', name: 'goods', data: [] },
+        depRefMock,
+        peopleRefMock,
+        companyRefMock,
+        { id: '55', name: 'barcodes', data: [] },
       ],
     },
   },

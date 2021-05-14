@@ -21,7 +21,6 @@ const companies: ICompany[] = [
 ];
 
 const company = companies[0];
-
 const company2 = companies[1];
 
 export { companies, company, company2 };

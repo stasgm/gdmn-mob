@@ -1,31 +1,14 @@
-export interface IRefData {
-  id: number;
-  name?: string;
-  [fieldName: string]: unknown;
-}
+// export interface IContact extends IRefData {
+//   contactType: number;
+// }
 
-export interface IReference<T = IRefData> {
-  id: number;
-  name: string;
-  type: string;
-  data: T[];
-}
-
-export interface IReferences {
-  [name: string]: IReference;
-}
-
-export interface IContact extends IRefData {
-  contactType: number;
-}
-
-export interface IGood extends IRefData {
-  value?: string;
-  // alias?: string;
-  // barcode?: string;
-  // weightCode?: string;
-  // idFrac?: boolean;
-}
+// export interface IGood extends IRefData {
+//   value?: string;
+// alias?: string;
+// barcode?: string;
+// weightCode?: string;
+// idFrac?: boolean;
+// }
 
 // export interface IRem extends IGood {
 //   remains?: number;
