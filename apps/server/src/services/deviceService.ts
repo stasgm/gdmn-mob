@@ -110,7 +110,7 @@ const findOneByUid = async (uid: string) => {
 
 const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
   const deviceList = await devices.read((item) => {
-    const newParams = Object.assign({}, params);
+    const newParams = { ...params };
 
     let userFound = true;
 

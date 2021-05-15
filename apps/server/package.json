@@ -17,7 +17,7 @@
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
     "precommit": "lint-staged",
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles"
+    "test": "cross-env NODE_ENV=test jest"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
