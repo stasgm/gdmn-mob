@@ -41,7 +41,7 @@ const getConfig = () => {
       deviceId: (process.env.DEVICE_ID || config.debug.deviceId || '').toUpperCase(),
     },
   };
-  console.log('config', configWithDebug);
+  // console.log('config from init', configWithDebug);
 
   return configWithDebug;
 };

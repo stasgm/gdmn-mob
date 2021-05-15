@@ -1,6 +1,4 @@
-import api, { types, sleep } from '@lib/client-api';
-import { devices, device2 } from '@lib/mock';
-import { config } from '@lib/client-config';
+import api from '@lib/client-api';
 import { IDevice, NewDevice } from '@lib/types';
 
 import { ThunkAction } from 'redux-thunk';
@@ -9,35 +7,13 @@ import { AppState } from '..';
 
 import { deviceActions, DeviceActionType } from './actions';
 
-const {
-  debug: { useMockup: isMock },
-  /*   server: { name, port, protocol },
-    timeout,
-    apiPath, */
-} = config;
-
-// const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
-
 export type AppThunk = ThunkAction<Promise<DeviceActionType>, AppState, null, DeviceActionType>;
 
 const fetchDeviceById = (id: string): AppThunk => {
   return async (dispatch) => {
-    let response: types.device.IGetDeviceResponse | types.error.INetworkError;
-
     dispatch(deviceActions.fetchDeviceAsync.request(''));
 
-    if (isMock) {
-      await sleep(1000);
-      const device = devices.find((item) => item.id === id);
-
-      if (device) {
-        response = { device: { ...device2, id }, type: 'GET_DEVICE' };
-      } else {
-        response = { message: 'Устройство не найдено', type: 'ERROR' };
-      }
-    } else {
-      response = await api.device.getDevice(id);
-    }
+    const response = await api.device.getDevice(id);
 
     if (response.type === 'GET_DEVICE') {
       return dispatch(deviceActions.fetchDeviceAsync.success(response.device));

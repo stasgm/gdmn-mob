@@ -108,9 +108,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  console.log(ctx.query);
   const { userId } = ctx.query;
-  console.log(userId);
 
   const params: Record<string, string> = {};
 
