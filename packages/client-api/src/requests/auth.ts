@@ -6,17 +6,14 @@ import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-const isMock = process.env.MOCK || true;
-const mockTimeout = 500;
-
 class Auth extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
   signup = async (userCredentials: IUserCredentials) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'SIGNUP',
@@ -55,8 +52,9 @@ class Auth extends BaseRequest {
   };
 
   login = async (userCredentials: IUserCredentials) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    console.log('login', JSON.stringify(this.api.config));
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       if (userCredentials.name === 'Stas' && userCredentials.password === '@123!') {
         return {
@@ -99,8 +97,8 @@ class Auth extends BaseRequest {
   };
 
   logout = async () => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'LOGOUT',
@@ -180,8 +178,8 @@ class Auth extends BaseRequest {
   };
 
   verifyCode = async (code: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       if (code === '1234') {
         return {

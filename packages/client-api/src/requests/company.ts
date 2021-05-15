@@ -8,17 +8,14 @@ import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-const isMock = process.env.MOCK || true;
-const mockTimeout = 500;
-
 class Company extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
   addCompany = async (company: NewCompany) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'ADD_COMPANY',
@@ -50,8 +47,9 @@ class Company extends BaseRequest {
   };
 
   updateCompany = async (company: Partial<ICompany>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
       const updatedCompany = mockCompanies.find((item) => item.id === company.id);
 
       if (updatedCompany) {
@@ -91,8 +89,8 @@ class Company extends BaseRequest {
   };
 
   removeCompany = async (companyId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'REMOVE_COMPANY',
@@ -122,8 +120,9 @@ class Company extends BaseRequest {
   };
 
   getCompany = async (companyId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
       const company = mockCompanies.find((item) => item.id === companyId);
 
       if (company) {
@@ -162,8 +161,8 @@ class Company extends BaseRequest {
   };
 
   getCompanies = async (params?: Record<string, string>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_COMPANIES',

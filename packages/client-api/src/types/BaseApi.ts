@@ -8,4 +8,5 @@ export abstract class BaseApi {
   abstract readonly axios: AxiosInstance;
 
   abstract get deviceId(): string;
+  abstract get config(): IApiConfig;
 }

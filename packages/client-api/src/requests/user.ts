@@ -9,17 +9,14 @@ import { BaseApi } from '../types/BaseApi';
 
 import { BaseRequest } from '../types/BaseRequest';
 
-const isMock = process.env.MOCK || true;
-const mockTimeout = 500;
-
 class User extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
   addUser = async (user: NewUser) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'ADD_USER',
@@ -51,8 +48,8 @@ class User extends BaseRequest {
   };
 
   updateUser = async (user: Partial<IUser>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
       const updatedUser = mockUsers.find((item) => item.id === user.id);
 
       if (updatedUser) {
@@ -91,8 +88,8 @@ class User extends BaseRequest {
   };
 
   removeUser = async (userId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'REMOVE_USER',
@@ -122,8 +119,8 @@ class User extends BaseRequest {
   };
 
   getUser = async (userId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
       const user = mockUsers.find((item) => item.id === userId);
 
       if (user) {
@@ -163,8 +160,8 @@ class User extends BaseRequest {
   };
 
   getUsers = async (params?: Record<string, string>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       if (mockUsers) {
         return {

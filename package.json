@@ -25,7 +25,8 @@
     "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
     "update": "yarn upgrade-interactive --latest",
     "lint-staged-project": "lerna run --scope=@lib/* --scope=@apps/* --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "prepare": "husky install"
   },
   "lint-staged": {
     "package.json": [
