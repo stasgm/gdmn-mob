@@ -1,6 +1,6 @@
 import { extraPredicate } from './helpers';
 
-describe('extraPredicate test suit', () => {
+describe('Helpers.extraPredicate test suite', () => {
   it('should return true ', () => {
     const item = { name: 'Stas', sex: 'male' };
     const param = { sex: 'male' };
