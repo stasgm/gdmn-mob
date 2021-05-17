@@ -33,6 +33,7 @@ export const newMessage: NewMessage<string> = {
     company: companies[0] as INamedEntity,
     consumer: user1,
   },
+  status: 'recd',
   body: {
     type: 'cmd',
     payload: 'get documents',
