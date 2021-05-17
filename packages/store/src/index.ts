@@ -40,7 +40,6 @@ interface IPersostConfig {
   whitelist: ['auth'],
 };
  */
-type TActions = AuthActionType | MsgActionType | ReferenceActionType | DocumentActionType;
 
 //configureStore(appReducers: AppReducers, persistConfig: IPersostConfig = defaultPersistConfig)
 export default function configureStore(appReducers: AppReducers) {
@@ -58,8 +57,9 @@ export default function configureStore(appReducers: AppReducers) {
   return { store };
 }
 
+export type TActions = AuthActionType | MsgActionType | ReferenceActionType | DocumentActionType;
 export type RootState = StateType<typeof rootReducer>;
-export type AppThunk = ThunkAction<void, RootState, null, Action<any>>;
+// export type AppThunk = ThunkAction<void, RootState, null, Action<any>>;
 export type AppDispatch = ThunkDispatch<RootState, any, TActions>;
 
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
-import { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { ThunkDispatch } from 'redux-thunk';
 import { RootState, configureStore } from '@lib/store';
 
 import companyReducer from './company/reducer';
@@ -24,7 +24,7 @@ const rootReducer = combineReducers(combinedReducer);
 export const { store } = configureStore(combinedReducer);
 
 export type AppState = ReturnType<typeof rootReducer> & RootState;
-export type AppThunk = ThunkAction<void, AppState, null, TActions>;
+// export type AppThunk = ThunkAction<Promise<void>, AppState, null, TActions>; TODO: make generic
 // export type AppDispatch2 = typeof store.dispatch;
 
 export type AppDispatch = ThunkDispatch<AppState, any, TActions>;
