@@ -62,10 +62,10 @@ const DrawerNavigator = (props: IProps) => {
         activeTintColor: '#ffffff',
       }}
       drawerContent={(props) => <DrawerContent {...props} />}
-      screenOptions={{
-        headerShown: true,
-        header: (props) => <Header {...props} />,
-      }}
+      /*       screenOptions={{
+            headerShown: true,
+            header: (props) => <Header {...props} />,
+          }} */
     >
       {props?.items?.map((item) => (
         <Drawer.Screen

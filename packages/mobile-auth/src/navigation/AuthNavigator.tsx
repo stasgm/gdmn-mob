@@ -1,8 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useCallback, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 
-import { authActions, useSelector } from '@lib/store';
+import { authActions, useSelector, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 

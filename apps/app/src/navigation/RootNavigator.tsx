@@ -13,19 +13,19 @@ console.log('RootNavigator');
 
 const navItems: INavItem[] = [
   {
-    name: 'Dashboard',
+    name: 'MyDashboard',
     title: 'Дашборд',
     icon: 'view-dashboard-outline',
     component: DashboardNavigator,
   },
   {
-    name: 'Documents',
+    name: 'MyDocuments',
     title: 'Документы',
     icon: 'file-document-outline',
     component: DocumentsNavigator,
   },
   {
-    name: 'Map',
+    name: 'MyMap',
     title: 'Карта',
     icon: 'map-outline',
     component: MapScreen,
