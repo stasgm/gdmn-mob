@@ -1,17 +1,53 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useTheme, Button } from 'react-native-paper';
+import { useTheme, /*Button,*/ FAB } from 'react-native-paper';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 // import {  } from '@lib/mock';
 
-const DocumentItem = ({ item }: { item: IDocument }) => {
+interface IField {
+  name: keyof IDocument;
+  type: typeValue;
+}
+
+interface IFields {
+  typeDoc?: IField;
+  number: IField;
+  important?: IField;
+  addition1?: IField;
+  addition2?: IField;
+}
+
+type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
+
+//вынести к компонентам
+const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) => {
   const { colors } = useTheme();
+
+  //вынести в отдельное место от компонента
+  //функция для приведения других типов к строке
+  const toString = ({ value, type }: { value: any; type: typeValue }) => {
+    if (type === 'number') {
+      return value.toString();
+    }
+    if (type === 'date') {
+      const date = new Date(value);
+      return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(
+        -2,
+        3,
+      )}.${date.getFullYear()}`;
+    }
+    if (type === 'INamedEntity') {
+      return value.name;
+    }
+    return value;
+  };
 
   return (
     <TouchableOpacity
@@ -25,9 +61,25 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={[styles.name, { color: colors.text }]}>{item.number}</Text>
+            <Text style={[styles.name, { color: colors.text }]}>
+              {`${
+                fields.typeDoc ? toString({ value: item[fields.typeDoc.name], type: fields.typeDoc.type }) : ''
+              } №${toString({ value: item[fields.number.name], type: fields.number.type })}`}
+            </Text>
+            {fields.important ? (
+              <Text style={[styles.name, { color: colors.text }]}>
+                {toString({ value: item[fields.important.name], type: fields.important.type })}
+              </Text>
+            ) : null}
           </View>
-          <Text style={[styles.number, styles.field, { color: colors.text }]}>Документ</Text>
+          <View style={styles.directionRow}>
+            <Text style={[styles.number, styles.field, { color: colors.text }]}>
+              {fields.addition1 && toString({ value: item[fields.addition1.name], type: fields.addition1.type })}
+            </Text>
+            <Text style={[styles.number, styles.field, { color: colors.text, alignItems: 'flex-end' }]}>
+              {fields.addition2 && toString({ value: item[fields.addition2.name], type: fields.addition2.type })}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -36,7 +88,9 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
 
 const DocumentsScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
+  const { colors } = useTheme();
 
+  const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
   const handleLoad = () => {
@@ -47,19 +101,50 @@ const DocumentsScreen = () => {
     dispatch(documentActions.init());
   };
 
-  const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Удалить все',
+        type: 'destructive',
+        onPress: handleReset,
+      },
+      /*       {
+              title: 'Сбросить',
+              onPress: handleReset,
+            }, */
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleLoad, handleReset, showActionSheet]);
+
+  const renderItem = ({ item }: { item: IDocument }) => (
+    <DocumentItem
+      item={item}
+      fields={{
+        number: { name: 'number', type: 'string' },
+        typeDoc: { name: 'documentType', type: 'INamedEntity' },
+        important: { name: 'status', type: 'string' },
+        addition1: { name: 'documentDate', type: 'date' },
+      }}
+    />
+  );
 
   const ref = useRef<FlatList<IDocument>>(null);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Документы приложения</Text>
-      <Button compact={false} onPress={handleLoad}>
+    <>
+      {/*<Button compact={false} onPress={handleLoad}>
         Загрузить
       </Button>
       <Button compact={false} onPress={handleReset}>
         Сбросить
-      </Button>
+  </Button>*/}
       <FlatList
         ref={ref}
         data={list}
@@ -72,7 +157,8 @@ const DocumentsScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+      <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
+    </>
   );
 };
 
@@ -96,6 +182,12 @@ const styles = StyleSheet.create({
     margin: 8,
     marginRight: 0,
     flex: 1,
+  },
+  fabAdd: {
+    bottom: 0,
+    margin: 20,
+    position: 'absolute',
+    right: 0,
   },
   title: {
     fontSize: 20,

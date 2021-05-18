@@ -5,7 +5,7 @@ import { useTheme, FAB } from 'react-native-paper';
 import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IDocument, IReference } from '@lib/types';
+import { IDocument, IReferences } from '@lib/types';
 
 type MessagesStackParamList = {
   Messages: undefined;
@@ -33,7 +33,7 @@ const MessageViewScreen = () => {
 
       case 'refs':
         //TODO: проверка данных, приведение к типу
-        dispatch(referenceActions.updateList(msg.body.payload as IReference[]));
+        dispatch(referenceActions.updateList(msg.body.payload as IReferences));
         dispatch(messageActions.updateStatusMessage({ id: msg.id, newStatus: 'procd' }));
         break;
 
