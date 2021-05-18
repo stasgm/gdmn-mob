@@ -1,9 +1,11 @@
+import React from 'react';
+//import React, { useRef } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+//import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+/*import { Button, useTheme } from 'react-native-paper';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import React, { useRef } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Button, useTheme } from 'react-native-paper';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';*/
 
 /*import refActions from '../store/references';
 import { useSelector, useDispatch } from '../store';
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     margin: 5,
     // alignItems: 'center',
   },
-  icon: {
+  /*icon: {
     alignItems: 'center',
     backgroundColor: '#e91e63',
     borderRadius: 18,
@@ -95,13 +97,13 @@ const styles = StyleSheet.create({
     margin: 8,
     marginRight: 0,
     flex: 1,
-  },
+  },*/
   title: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
   },
-  item: {
+  /*item: {
     alignItems: 'center',
     flexDirection: 'row',
     padding: 8,
@@ -123,5 +125,5 @@ const styles = StyleSheet.create({
   },
   field: {
     opacity: 0.5,
-  },
+  },*/
 });
