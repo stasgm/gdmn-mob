@@ -1,4 +1,4 @@
-import { ICompany, IDocument, IMessage, INamedEntity, IReference, NewMessage } from '@lib/types';
+import { ICompany, IDocument, IMessage, INamedEntity, IReferences, NewMessage } from '@lib/types';
 import { v4 as uuid } from 'uuid';
 
 import { companyRefMock, depRefMock, peopleRefMock } from './references';
@@ -33,6 +33,7 @@ export const newMessage: NewMessage<string> = {
     company: companies[0] as INamedEntity,
     consumer: user1,
   },
+  status: 'recd',
   body: {
     type: 'cmd',
     payload: 'get documents',
@@ -40,7 +41,7 @@ export const newMessage: NewMessage<string> = {
 };
 
 //export const messages: Omit<IMessage<string>, 'status'>[] = [
-export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
+export const messages: IMessage<string | IDocument[] | IReferences>[] = [
   {
     id: '14',
     status: 'recd',
@@ -68,13 +69,30 @@ export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
     },
     body: {
       type: 'refs',
-      payload: [
-        { id: '11', name: 'goods', data: [] },
+      payload: {
+        goods: { id: '11', name: 'goods', data: [] },
         depRefMock,
         peopleRefMock,
         companyRefMock,
-        { id: '55', name: 'barcodes', data: [] },
-      ],
+        docTypes: {
+          id: '55',
+          name: 'Типы документов',
+          data: [
+            {
+              id: '154',
+              name: 'Заявка',
+            },
+            {
+              id: '523',
+              name: 'Отвес',
+            },
+            {
+              id: '712',
+              name: 'Приход',
+            },
+          ],
+        },
+      },
     },
   },
   {
@@ -94,8 +112,8 @@ export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
           id: '222',
           number: '1',
           documentType: {
-            id: '1',
-            name: 'Inventory',
+            id: '154',
+            name: 'Заявка',
           },
           documentDate: '2021-04-25T09:21:33.376Z',
           status: 'DRAFT',
@@ -104,8 +122,8 @@ export const messages: IMessage<string | IDocument[] | IReference[]>[] = [
           id: '333',
           number: '2',
           documentType: {
-            id: '1',
-            name: 'Inventory',
+            id: '154',
+            name: 'Заявка',
           },
           documentDate: '2021-04-30T09:20:13.376Z',
           status: 'READY',
