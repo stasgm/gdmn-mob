@@ -2,13 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme, Button } from 'react-native-paper';
 
-import { authActions, RootState } from '@lib/store';
-import { useDispatch, useSelector } from 'react-redux';
+import { authActions, useSelector, useDispatch } from '@lib/store';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
-  const { user, company, device } = useSelector((state: RootState) => state.auth);
+  const { user, company, device } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const handleLogout = () => dispatch(authActions.logout());

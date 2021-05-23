@@ -62,7 +62,7 @@
     "react-native-paper": "^4.8.1",
     "react-native-reanimated": "~2.1.0",
     "react-native-safe-area-context": "3.2.0",
-    "react-native-screens": "~3.2.0",
+    "react-native-screens": "3.0.0",
     "react-native-web": "~0.16.2",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",

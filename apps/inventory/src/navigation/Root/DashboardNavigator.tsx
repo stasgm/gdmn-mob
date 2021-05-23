@@ -1,3 +1,4 @@
+import { Header } from '@lib/mobile-navigation';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
@@ -11,7 +12,10 @@ const DashboardStack = createStackNavigator<DashboardStackParamList>();
 
 const DashboardNavigator = () => {
   return (
-    <DashboardStack.Navigator initialRouteName="Dashboard" screenOptions={{ headerShown: false }}>
+    <DashboardStack.Navigator
+      initialRouteName="Dashboard"
+      screenOptions={{ headerShown: true, header: (props) => <Header {...props} /> }}
+    >
       <DashboardStack.Screen name="Dashboard" component={TabsNavigator} />
     </DashboardStack.Navigator>
   );

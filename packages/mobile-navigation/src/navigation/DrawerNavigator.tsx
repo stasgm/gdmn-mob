@@ -1,19 +1,15 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
-import { DrawerHeaderProps } from '@react-navigation/drawer/lib/typescript/src/types';
-import { DrawerActions } from '@react-navigation/native';
 import React from 'react';
-import { Appbar, useTheme } from 'react-native-paper';
-
-import ProfileScreen from '../screens/ProfileScreen';
+import { useTheme } from 'react-native-paper';
 
 import { DrawerContent } from './drawerContent';
 
-//import ReferencesNavigator from "./Root/ReferencesNavigator";
 import SettingsNavigator from './Root/SettingsNavigator';
 import MessagesNavigator from './Root/MessagesNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
 import DocumentsNavigator from './Root/DocumentsNavigator';
+import ProfileNavigator from './Root/ProfileNavigator';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
@@ -25,19 +21,6 @@ export type RootDrawerParamList = {
 };
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
-
-const Header = ({ scene }: DrawerHeaderProps) => {
-  const { options, navigation } = scene.descriptor;
-  const title = options.headerTitle ?? options.title ?? scene.route.name;
-
-  return (
-    <Appbar.Header>
-      <Appbar.Action icon="menu" onPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
-      <Appbar.Content title={title} />
-      {/* <Appbar.Action icon="dots-vertical" /> */}
-    </Appbar.Header>
-  );
-};
 
 console.log('DrawerNavigator');
 
@@ -62,10 +45,6 @@ const DrawerNavigator = (props: IProps) => {
         activeTintColor: '#ffffff',
       }}
       drawerContent={(props) => <DrawerContent {...props} />}
-      /*       screenOptions={{
-            headerShown: true,
-            header: (props) => <Header {...props} />,
-          }} */
     >
       {props?.items?.map((item) => (
         <Drawer.Screen
@@ -112,7 +91,7 @@ const DrawerNavigator = (props: IProps) => {
       />
       <Drawer.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileNavigator}
         options={{
           title: 'Профиль',
           drawerIcon: (props) => <Icon name="account-circle-outline" {...props} />,

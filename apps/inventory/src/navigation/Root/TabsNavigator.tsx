@@ -1,7 +1,9 @@
 import { FontAwesome5 } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import { IconButton } from 'react-native-paper';
 
 import Home from '../../screens/HomeScreen';
 
@@ -13,6 +15,15 @@ export type TabsStackParams = {
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 
 const TabsNavigator = () => {
+  const navigation = useNavigation();
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <IconButton icon="menu" size={26} onPress={() => console.log('nav')} />,
+      headerRight: () => <IconButton icon="menu" size={28} onPress={() => console.log('click')} />,
+    });
+  }, [navigation]);
+
   return (
     <TabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Main">
       <TabsStack.Screen
