@@ -29,6 +29,7 @@ class Message extends BaseRequest {
 
     const body: NewMessage = {
       head: { company, consumer, appSystem: systemName },
+      status: 'recd',
       body: message,
     };
 

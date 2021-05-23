@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
-import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { RootState, configureStore } from '@lib/store';
+import { ThunkDispatch } from 'redux-thunk';
+import { configureStore } from '@lib/store';
 
 import companyReducer from './company/reducer';
 import { CompanyActionType } from './company/actions';
@@ -10,7 +10,7 @@ import deviceReducer from './device/reducer';
 import { DeviceActionType } from './device/actions';
 import { UserActionType } from './user/actions';
 
-export const combinedReducer = {
+export const reducers = {
   companies: companyReducer,
   users: userReducer,
   devices: deviceReducer,
@@ -18,16 +18,13 @@ export const combinedReducer = {
 
 type TActions = CompanyActionType | DeviceActionType | UserActionType;
 
-const rootReducer = combineReducers(combinedReducer);
+const rootReducer = combineReducers(reducers);
 
-// export const { store, persistor } = configureStore(combinedReducer);
-export const { store } = configureStore(combinedReducer);
-
+export type RootState = ReturnType<typeof store.getState>;
 export type AppState = ReturnType<typeof rootReducer> & RootState;
-export type AppThunk = ThunkAction<void, AppState, null, TActions>;
-// export type AppDispatch2 = typeof store.dispatch;
+export const { store } = configureStore(reducers);
 
-export type AppDispatch = ThunkDispatch<AppState, any, TActions>;
+export type AppDispatch = ThunkDispatch<AppState & RootState, any, TActions>;
 
 export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
-export const useDispatch = useReduxDispatch;
+export const useDispatch = () => useReduxDispatch<AppDispatch>();
