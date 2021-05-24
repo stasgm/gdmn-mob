@@ -170,22 +170,22 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
   return Promise.all(pr);
 };
 
-/**
- * Возвращает список устройств пользователя
- * @param {string} id - идентификатор пользователя
- * */
-const findDevices = async (userId: string) => {
-  const user = await users.find(userId);
+// /**
+//  * Возвращает список устройств пользователя
+//  * @param {string} id - идентификатор пользователя
+//  * */
+// const findDevices = async (userId: string) => {
+//   const user = await users.find(userId);
 
-  if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
-  }
+//   if (!user) {
+//     throw new DataNotFoundException('Пользователь не найден');
+//   }
 
-  const deviceList = await devices.read();
-  const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
+//   const deviceList = await devices.read();
+//   const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
 
-  return Promise.all(pr);
-};
+//   return Promise.all(pr);
+// };
 
 const addCompanyToUser = async (userId: string, companyId: string) => {
   const user = await users.find(userId);
@@ -257,5 +257,4 @@ export {
   addCompanyToUser,
   removeCompanyFromUser,
   getUserPassword,
-  findDevices,
 };
