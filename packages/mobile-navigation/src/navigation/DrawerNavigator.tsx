@@ -31,12 +31,47 @@ export interface INavItem {
   component: any;
 }
 
+const baseNavList: INavItem[] = [
+  {
+    name: 'Documents',
+    component: DocumentsNavigator,
+    icon: 'file-document-outline',
+    title: 'Документы',
+  },
+  {
+    name: 'References',
+    component: ReferencesNavigator,
+    icon: 'file-search-outline',
+    title: 'Справочники',
+  },
+  {
+    name: 'Messages',
+    component: MessagesNavigator,
+    icon: 'message-text-outline',
+    title: 'Сообщения',
+  },
+  {
+    name: 'Settings',
+    component: SettingsNavigator,
+    icon: 'tune',
+    title: 'Настройки',
+  },
+  {
+    name: 'Profile',
+    component: ProfileNavigator,
+    icon: 'account-circle-outline',
+    title: 'Профиль',
+  },
+];
+
 export interface IProps {
   items?: INavItem[];
 }
 
 const DrawerNavigator = (props: IProps) => {
   const { colors } = useTheme();
+
+  const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
 
   return (
     <Drawer.Navigator
@@ -46,7 +81,7 @@ const DrawerNavigator = (props: IProps) => {
       }}
       drawerContent={(props) => <DrawerContent {...props} />}
     >
-      {props?.items?.map((item) => (
+      {navList.map((item) => (
         <Drawer.Screen
           name={item.name}
           key={item.name}
@@ -57,46 +92,6 @@ const DrawerNavigator = (props: IProps) => {
           }}
         />
       ))}
-      <Drawer.Screen
-        name="Messages"
-        component={MessagesNavigator}
-        options={{
-          title: 'Сообщения',
-          drawerIcon: (props) => <Icon name="message-text-outline" {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="References"
-        component={ReferencesNavigator}
-        options={{
-          title: 'Справочники',
-          drawerIcon: (props) => <Icon name="file-search-outline" {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Documents"
-        component={DocumentsNavigator}
-        options={{
-          title: 'Документы',
-          drawerIcon: (props) => <Icon name="file-document-outline" {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Settings"
-        component={SettingsNavigator}
-        options={{
-          title: 'Настройки',
-          drawerIcon: (props) => <Icon name="tune" {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Profile"
-        component={ProfileNavigator}
-        options={{
-          title: 'Профиль',
-          drawerIcon: (props) => <Icon name="account-circle-outline" {...props} />,
-        }}
-      />
     </Drawer.Navigator>
   );
 };

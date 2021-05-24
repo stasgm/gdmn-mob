@@ -2,7 +2,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import SettingsSceen from '../../screens/SettingsScreen';
-import Header from '../Header';
 
 type SettingsStackParamList = {
   Settings: undefined;
@@ -12,11 +11,8 @@ const Stack = createStackNavigator<SettingsStackParamList>();
 
 const SettingsNavigator = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="Settings"
-      screenOptions={{ headerShown: true, header: (props) => <Header {...props} /> }}
-    >
-      <Stack.Screen key="Settings" name="Settings" component={SettingsSceen} />
+    <Stack.Navigator initialRouteName="Settings" screenOptions={{ headerShown: true }}>
+      <Stack.Screen key="Settings" name="Settings" component={SettingsSceen} options={{ title: 'Настройки' }} />
     </Stack.Navigator>
   );
 };

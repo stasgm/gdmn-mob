@@ -1,13 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useTheme, Button } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import { useNavigation } from '@react-navigation/native';
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 // import {  } from '@lib/mock';
 
 const DocumentItem = ({ item }: { item: IDocument }) => {
@@ -36,16 +40,51 @@ const DocumentItem = ({ item }: { item: IDocument }) => {
 
 const DocumentsScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
 
   const dispatch = useDispatch();
 
   const handleLoad = () => {
-    // dispatch(documentActions.addDocuments());
+    dispatch(documentActions.addDocuments([]));
+  };
+
+  const handleDeleteAll = () => {
+    dispatch(documentActions.deleteAllDocuments());
   };
 
   const handleReset = () => {
     dispatch(documentActions.init());
   };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Сбросить',
+        onPress: handleReset,
+      },
+      {
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDeleteAll,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
 
   const renderItem = ({ item }: { item: IDocument }) => <DocumentItem item={item} />;
 
@@ -53,13 +92,6 @@ const DocumentsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Документы приложения</Text>
-      <Button compact={false} onPress={handleLoad}>
-        Загрузить
-      </Button>
-      <Button compact={false} onPress={handleReset}>
-        Сбросить
-      </Button>
       <FlatList
         ref={ref}
         data={list}

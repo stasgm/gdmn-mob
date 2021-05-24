@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme, Button } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/core';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
+
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
   const { user, company, device } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+    });
+  }, [navigation]);
 
   const handleLogout = () => dispatch(authActions.logout());
   const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));

@@ -1,11 +1,19 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { useDispatch, useSelector, referenceActions } from '@lib/store';
+
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Button, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
+
+import { useNavigation } from '@react-navigation/core';
+
 import { IReference } from '@lib/types';
 import { peopleRefMock, depRefMock, companyRefMock } from '@lib/mock';
+import { ItemSeparator } from '@lib/mobile-ui/src/components';
+import { useDispatch, useSelector, referenceActions } from '@lib/store';
+
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
 const ReferenceItem = ({ item }: { item: IReference }) => {
   const { colors } = useTheme();
@@ -34,6 +42,8 @@ const ReferenceItem = ({ item }: { item: IReference }) => {
 const ReferencesScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
 
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
   const handleLoad = () => {
@@ -44,19 +54,45 @@ const ReferencesScreen = () => {
     dispatch(referenceActions.init());
   };
 
+  const handleDeleteAll = () => {
+    dispatch(referenceActions.deleteAllReferences());
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Сбросить',
+        onPress: handleReset,
+      },
+      {
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDeleteAll,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
+
   const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   const ref = useRef<FlatList<IReference>>(null);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Справочники приложения</Text>
-      <Button compact={false} onPress={handleLoad}>
-        Загрузить
-      </Button>
-      <Button compact={false} onPress={handleReset}>
-        Сбросить
-      </Button>
       <FlatList
         ref={ref}
         data={list}

@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { View } from 'react-native';
 
 import MapView from 'react-native-maps';
@@ -14,6 +18,37 @@ interface Region {
 
 const MapScreen = () => {
   const [region, setRegion] = useState<Region>();
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+
+  const handleGetLocation = useCallback(() => {
+    setRegion({
+      latitude: -12.960978,
+      longitude: 27.4970895,
+      latitudeDelta: 0.0027,
+      longitudeDelta: 0.0015,
+    });
+  }, []);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Текущая локация',
+        onPress: handleGetLocation,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleGetLocation, showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [actionsMenu, navigation]);
 
   useEffect(() => {
     setRegion({
@@ -26,7 +61,7 @@ const MapScreen = () => {
 
   return (
     <View style={styles.container}>
-      <MapView initialRegion={region} style={styles.mapView} />
+      <MapView initialRegion={region} style={styles.mapView} region={region} />
     </View>
   );
 };

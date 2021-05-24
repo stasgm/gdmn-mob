@@ -3,13 +3,11 @@ import { DrawerActions } from '@react-navigation/native';
 import { StackHeaderProps } from '@react-navigation/stack';
 import { Appbar } from 'react-native-paper';
 
-interface IHeaderProps extends StackHeaderProps {
-  rightButton?: {
-    onPress: () => void;
-  };
+interface IHeaderListProps extends StackHeaderProps {
+  menuAction?: () => void;
 }
 
-const Header = ({ scene, rightButton }: IHeaderProps) => {
+const HeaderList = ({ scene, menuAction }: IHeaderListProps) => {
   const { options, navigation } = scene.descriptor;
   const title = options.headerTitle ?? options.title ?? scene.route.name;
 
@@ -17,9 +15,9 @@ const Header = ({ scene, rightButton }: IHeaderProps) => {
     <Appbar.Header>
       <Appbar.Action icon="menu" onPress={() => navigation.dispatch(DrawerActions.openDrawer())} />
       <Appbar.Content title={title} />
-      {rightButton && <Appbar.Action icon="dots-vertical" />}
+      {menuAction && <Appbar.Action icon="dots-vertical" onPress={menuAction} />}
     </Appbar.Header>
   );
 };
 
-export default Header;
+export default HeaderList;
