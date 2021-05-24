@@ -52,7 +52,7 @@ class Auth extends BaseRequest {
   };
 
   login = async (userCredentials: IUserCredentials) => {
-    console.log('login', JSON.stringify(this.api.config));
+    // console.log('login', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 

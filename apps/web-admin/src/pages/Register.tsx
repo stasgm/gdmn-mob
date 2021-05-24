@@ -7,7 +7,9 @@ import { IUserCredentials } from '@lib/types';
 
 import { useEffect } from 'react';
 
-import { authActions, useSelector, useDispatch } from '@lib/store';
+import { authActions, useThunkDispatch, useSelector } from '@lib/store';
+
+// import { useDispatch, useSelector } from '../store';
 
 import Logo from '../components/Logo';
 
@@ -16,10 +18,12 @@ const Register = () => {
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch();
+  const dispatch = useThunkDispatch();
 
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signUp(values));
+
+    console.log('res.type', res.type);
     if (res.type === 'AUTH/SIGNUP_SUCCCES') {
       navigate('/login');
     }

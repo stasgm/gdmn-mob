@@ -113,8 +113,8 @@ class Device extends BaseRequest {
     * @param string userId
     * @returns IDevice
     */
-  getDevice = async (deviceId: string) => {
-    console.log('getDevice', JSON.stringify(this.api.config));
+  getDevice = async (deviceId?: string) => {
+    // console.log('getDevice', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -126,7 +126,7 @@ class Device extends BaseRequest {
 
     try {
       // || this.api.deviceId
-      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId}`);
+      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.deviceId}`);
 
       const resData = res?.data;
 
