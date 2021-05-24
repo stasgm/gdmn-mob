@@ -1,6 +1,4 @@
-import Router from 'koa-router';
-
-import compose from 'koa-compose';
+import Router from 'koa-joi-router';
 
 import {
   addCompany,
@@ -13,13 +11,15 @@ import {
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 
-const router = new Router({ prefix: '/companies' });
+import { companyValidation } from './validations';
 
-router.post('/', addCompany); // TODO добавить compose([authMiddleware, deviceMiddleware])
-router.get('/:id', compose([authMiddleware, deviceMiddleware]), getCompany);
-router.get('/', compose([authMiddleware, deviceMiddleware]), getCompanies);
-router.patch('/:id', compose([authMiddleware, deviceMiddleware]), updateCompany);
-// router.get('/:id/users', compose([authMiddleware, deviceMiddleware]), getUsersByCompany);
-router.delete('/:id', compose([authMiddleware, deviceMiddleware]), removeCompany);
+const router = Router();
+
+router.prefix('/companies');
+router.post('/', companyValidation.addCompany, addCompany); // TODO добавить compose([authMiddleware, deviceMiddleware])
+router.get('/:id', companyValidation.updateCompany, authMiddleware, deviceMiddleware, getCompany);
+router.get('/', authMiddleware, deviceMiddleware, getCompanies);
+router.patch('/:id', [authMiddleware, deviceMiddleware], updateCompany);
+router.delete('/:id', [authMiddleware, deviceMiddleware], removeCompany);
 
 export default router;

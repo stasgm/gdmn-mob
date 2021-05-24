@@ -13,7 +13,7 @@ import * as userService from './userService';
 
 const { devices, users, codes } = entities;
 
-const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined> => {
+const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const { deviceId } = ctx.query;
   const { name }: { name: string } = ctx.request.body;
 
@@ -42,6 +42,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser | undefined
       // throw new Error(err.message);
     }
 
+    //TODO посмотреть как обработать правильно
     if (!usr) {
       throw new UnauthorizedException('Неверные данные');
       // throw new Error('Неверное имя пользователя или пароль');
@@ -115,7 +116,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    done(null, false);
+    done(null, false); //TODO возвращать ошибку вместо null
   }
 };
 
