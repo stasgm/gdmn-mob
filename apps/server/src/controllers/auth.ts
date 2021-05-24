@@ -80,7 +80,7 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
 
   ok(ctx as Context, code);
 
-  log.info('getActivationCode: ativation code generated successfully');
+  log.info('getActivationCode: activation code generated successfully');
 };
 
 export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };

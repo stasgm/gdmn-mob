@@ -1,6 +1,6 @@
 import { Joi, Config } from 'koa-joi-router';
 
-import { InvalidParameterException } from '../exceptions';
+import { InvalidParameterException } from '../../exceptions';
 
 const login: Config = {
   validate: {
@@ -27,7 +27,6 @@ const signup: Config = {
 
 const verifyCode: Config = {
   validate: {
-    type: 'json',
     params: Joi.object({
       code: Joi.string().required().error(new InvalidParameterException('не указан код активации')),
     }),
@@ -36,24 +35,18 @@ const verifyCode: Config = {
 
 const getActivationCode: Config = {
   validate: {
-    type: 'json',
     params: Joi.object({
       deviceId: Joi.string().required().error(new InvalidParameterException('не указано устройство')),
     }),
   },
 };
 
-const addCompany: Config = {
+const checkDevice: Config = {
   validate: {
-    type: 'json',
-    body: Joi.object({
-      name: Joi.string().required().error(new InvalidParameterException('не указано название компании')),
-    }),
+    query: {
+      deviceId: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
+    },
   },
 };
 
-const authValidation = { login, signup, verifyCode, getActivationCode };
-
-const companyValidation = { addCompany };
-
-export default { authValidation, companyValidation };
+export { login, signup, verifyCode, getActivationCode, checkDevice };

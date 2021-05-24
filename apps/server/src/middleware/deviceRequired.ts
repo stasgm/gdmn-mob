@@ -1,8 +1,6 @@
 import { Context, Next } from 'koa';
 
-import { DataNotFoundException } from '../exceptions';
-import { InvalidParameterException } from '../exceptions/invalidparameter.exception';
-
+import { DataNotFoundException, InvalidParameterException } from '../exceptions';
 import { entities } from '../services/dao/db';
 
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
