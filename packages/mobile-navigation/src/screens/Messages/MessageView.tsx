@@ -1,11 +1,15 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { StyleSheet, View, Text, Alert } from 'react-native';
 import { useTheme, FAB } from 'react-native-paper';
 
 import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IDocument, IReferences } from '@lib/types';
+import { IDocument, IReference } from '@lib/types';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
 
 type MessagesStackParamList = {
   Messages: undefined;
@@ -20,6 +24,7 @@ const MessageViewScreen = () => {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
+  const showActionSheet = useActionSheet();
 
   const handleTransform = useCallback(async () => {
     if (!msg) {
@@ -55,6 +60,35 @@ const MessageViewScreen = () => {
       navigation.goBack();
     }
   }, [dispatch]);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        // onPress: handleLoad,
+      },
+      {
+        title: 'Обработать',
+        onPress: handleTransform,
+      },
+      {
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleTransform, handleDelete, showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
 
   return msg ? (
     <>

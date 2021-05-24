@@ -17,7 +17,7 @@ const rootReducer = combineReducers(combinedReducer);
 // export const { store, persistor } = configureStore(combinedReducer);
 export const { store } = configureStore(combinedReducer);
 
-export type AppState = ReturnType<typeof rootReducer> & RootState;
+export type AppState = ReturnType<typeof rootReducer>; // & RootState;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
 // export type AppDispatch = typeof store.dispatch;
 export type AppDispatch = ThunkDispatch<AppState, any, TActions>;

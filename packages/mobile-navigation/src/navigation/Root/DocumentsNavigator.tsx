@@ -21,11 +21,12 @@ const DocumentsNavigator = () => {
   const types = useSelector((state) => state.references).list.docTypes;
 
   return (
-    <Stack.Navigator initialRouteName="Documents" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="Documents" screenOptions={{ headerShown: true }}>
       <Stack.Screen
         key="Documents"
         name="Documents"
         component={types && types.data.length !== 0 ? TabsNavigator : DocumentsScreen}
+        options={{ title: 'Документы' }}
       />
       <Stack.Screen key="DocumentView" name="DocumentView" component={DocumentViewScreen} />
     </Stack.Navigator>

@@ -11,8 +11,13 @@ const Stack = createStackNavigator<ReferenceStackParamList>();
 
 const ReferencesNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="References" screenOptions={{ headerShown: false }}>
-      <Stack.Screen key="References" name="References" component={ReferencesScreen} />
+    <Stack.Navigator initialRouteName="References" screenOptions={{ headerShown: true }}>
+      <Stack.Screen
+        key="References"
+        name="References"
+        component={ReferencesScreen}
+        options={{ title: 'Справочники' }}
+      />
     </Stack.Navigator>
   );
 };

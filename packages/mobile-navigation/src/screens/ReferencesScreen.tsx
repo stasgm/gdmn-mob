@@ -1,13 +1,19 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { useDispatch, useSelector, referenceActions } from '@lib/store';
+
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { FAB, useTheme } from 'react-native-paper';
-//import { Button, FAB, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
+
+import { useNavigation } from '@react-navigation/core';
+
 import { IReference } from '@lib/types';
 import { peopleRefMock, depRefMock, companyRefMock } from '@lib/mock';
+import { ItemSeparator } from '@lib/mobile-ui/src/components';
+import { useDispatch, useSelector, referenceActions } from '@lib/store';
+
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
 interface IRef {
   name: string;
@@ -42,6 +48,7 @@ const ReferencesScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
   const { colors } = useTheme();
 
+  const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
@@ -55,6 +62,10 @@ const ReferencesScreen = () => {
     dispatch(referenceActions.init());
   };
 
+  const handleDeleteAll = () => {
+    dispatch(referenceActions.deleteAllReferences());
+  };
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -62,33 +73,34 @@ const ReferencesScreen = () => {
         onPress: handleLoad,
       },
       {
-        title: 'Удалить все',
-        type: 'destructive',
+        title: 'Сбросить',
         onPress: handleReset,
       },
-      /*       {
-              title: 'Сбросить',
-              onPress: handleReset,
-            }, */
+      {
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDeleteAll,
+      },
       {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [handleLoad, handleReset, showActionSheet]);
+  }, [showActionSheet]);
 
-  const renderItem = ({ item }: { item: IRef }) => <ReferenceItem item={item} />;
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
+
+  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
 
   const ref = useRef<FlatList<IRef>>(null);
 
   return (
-    <>
-      {/*<Button compact={false} onPress={handleLoad}>
-        Загрузить
-      </Button>
-      <Button compact={false} onPress={handleReset}>
-        Сбросить
-  </Button>*/}
+    <View style={styles.container}>
       <FlatList
         ref={ref}
         data={Object.keys(list).map((key) => {
@@ -103,7 +115,7 @@ const ReferencesScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-      <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
+      {/* <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} /> */}
     </>
   );
 };

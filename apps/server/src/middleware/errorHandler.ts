@@ -10,7 +10,7 @@ const errorHandler = async (ctx: Context, next: Next) => {
   } catch (error) {
     const result: IResponse<string> = {
       result: false,
-      error: error.name,
+      error: error.data,
       data: error.message || 'unknown error',
     };
 

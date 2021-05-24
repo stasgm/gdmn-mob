@@ -1,6 +1,10 @@
 import { FontAwesome5 } from '@expo/vector-icons';
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
 
 import Home from '../../screens/HomeScreen';
@@ -13,6 +17,33 @@ export type TabsStackParams = {
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 
 const TabsNavigator = () => {
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+
+  const handleAddTask = () => {
+    console.log('new Task');
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Добавить задачу',
+        onPress: handleAddTask,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [actionsMenu, navigation]);
+
   return (
     <TabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Main">
       <TabsStack.Screen
