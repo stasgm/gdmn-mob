@@ -47,17 +47,20 @@ export interface IDBActivationCode {
   deviceId: string;
 }
 
+interface IDBHeadMessage {
+  appSystem: string;
+  companyId: string;
+  producerId: string;
+  consumerId: string;
+  dateTime: string;
+}
+
 export interface IDBMessage<T = any> {
   id: string;
-  head: {
-    appSystem: string;
-    companyId: string;
-    producerId: string;
-    consumerId: string;
-    dateTime: string;
-  };
+  status: TStatusMessage;
+  head: IDBHeadMessage;
   body: {
-    type: string;
+    type: TBodyType;
     payload: T;
   };
 }
@@ -123,8 +126,9 @@ export interface IMessage<T = any> {
 
 export type NewMessage<T = any> = {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+  status: TStatusMessage;
   body: {
-    type: string;
+    type: TBodyType;
     payload: T;
   };
 };

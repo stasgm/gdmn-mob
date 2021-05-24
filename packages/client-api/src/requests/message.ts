@@ -6,9 +6,6 @@ import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-const isMock = process.env.MOCK || true;
-const mockTimeout = 500;
-
 class Message extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
@@ -20,8 +17,8 @@ class Message extends BaseRequest {
     consumer: INamedEntity,
     message: IMessage['body'],
   ) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'SEND_MESSAGE',
@@ -32,6 +29,7 @@ class Message extends BaseRequest {
 
     const body: NewMessage = {
       head: { company, consumer, appSystem: systemName },
+      status: 'recd',
       body: message,
     };
 
@@ -53,8 +51,8 @@ class Message extends BaseRequest {
   };
 
   getMessages = async ({ systemName, companyId }: { systemName: string; companyId: string }) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_MESSAGES',
@@ -79,8 +77,8 @@ class Message extends BaseRequest {
   };
 
   removeMessage = async (companyId: string, uid: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'REMOVE_MESSAGE',
@@ -102,8 +100,8 @@ class Message extends BaseRequest {
   };
 
   clear = async () => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'CLEAR_MESSAGES',

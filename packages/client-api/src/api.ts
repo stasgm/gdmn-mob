@@ -24,7 +24,7 @@ class Api extends BaseApi {
   public message: Message;
   public user: User;
 
-  constructor(config: IApiConfig, deviceId: string) {
+  constructor(config: IApiConfig) {
     super();
     this._config = config;
     this._deviceId = deviceId || 'WEB'; // TODO убрать web
@@ -100,10 +100,21 @@ class Api extends BaseApi {
 }
 
 const {
-  debug: { deviceId },
+  debug: { deviceId, useMockup },
   server: { name, port, protocol },
   timeout,
   apiPath,
 } = config;
 
-export default new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
+export default new Api({
+  apiPath,
+  timeout,
+  protocol,
+  port,
+  server: name,
+  debug: {
+    isMock: useMockup,
+    mockDelay: 500,
+    mockDeviceId: deviceId,
+  },
+});

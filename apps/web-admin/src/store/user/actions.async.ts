@@ -1,20 +1,10 @@
 import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
-// import { config } from '@lib/client-config';
 import { IUser, NewUser } from '@lib/types';
 
 import { AppState } from '../';
 
 import { userActions, UserActionType } from './actions';
-
-/* const {
-  debug: { deviceId },
-  server: { name, port, protocol },
-  timeout,
-  apiPath,
-} = config;
- */
-// const api = new Api({ apiPath, timeout, protocol, port, server: name }, deviceId);
 
 export type AppThunk = ThunkAction<Promise<UserActionType>, AppState, null, UserActionType>;
 

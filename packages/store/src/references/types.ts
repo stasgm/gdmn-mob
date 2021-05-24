@@ -1,7 +1,7 @@
-import { IReference } from '@lib/types';
+import { IReferences } from '@lib/types';
 
 export type IReferenceState = {
-  readonly list: IReference[];
+  readonly list: IReferences;
   readonly loading: boolean;
   readonly errorMessage: string;
 };

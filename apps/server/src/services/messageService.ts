@@ -123,6 +123,7 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
       producer,
       dateTime: message.head.dateTime,
     },
+    status: message.status,
     body: message.body,
   };
 };
@@ -137,6 +138,7 @@ export const makeDBMessage = (message: IMessage): IDBMessage => {
       producerId: message.head.producer.id,
       dateTime: message.head.dateTime,
     },
+    status: message.status,
     body: message.body,
   };
 };
@@ -151,6 +153,7 @@ export const makeDBNewMessage = (message: NewMessage, producerId: string): IDBMe
       producerId: producerId,
       dateTime: new Date().toISOString(),
     },
+    status: message.status,
     body: message.body,
   };
 };

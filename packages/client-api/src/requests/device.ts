@@ -6,17 +6,14 @@ import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-const isMock = process.env.MOCK || true;
-const mockTimeout = 500;
-
 class Device extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
 
   addDevice = async (newDevice: NewDevice) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'ADD_DEVICE',
@@ -47,8 +44,8 @@ class Device extends BaseRequest {
   };
 
   updateDevice = async (device: Partial<IDevice>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'UPDATE_DEVICE',
@@ -79,8 +76,8 @@ class Device extends BaseRequest {
   };
 
   removeDevice = async (deviceId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'REMOVE_DEVICE',
@@ -117,8 +114,9 @@ class Device extends BaseRequest {
     * @returns IDevice
     */
   getDevice = async (deviceId: string) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    console.log('getDevice', JSON.stringify(this.api.config));
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_DEVICE',
@@ -159,8 +157,8 @@ class Device extends BaseRequest {
     * @returns
     */
   getDevices = async (params?: Record<string, string>) => {
-    if (isMock) {
-      await sleep(mockTimeout);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_DEVICES',

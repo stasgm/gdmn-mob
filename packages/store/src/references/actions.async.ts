@@ -2,14 +2,14 @@ import { ThunkAction } from 'redux-thunk';
 
 import { sleep } from '@lib/client-api';
 
-import { IReference } from '@lib/types';
+import { IReferences } from '@lib/types';
 
 import { actions, ReferenceActionType } from './actions';
 import { IReferenceState } from './types';
 
 export type AppThunk = ThunkAction<Promise<ReferenceActionType>, IReferenceState, null, ReferenceActionType>;
 
-export const addReferences = (references: IReference[]): AppThunk => {
+export const addReferences = (references: IReferences): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.addReferencesAsync.request(''));
 
@@ -24,7 +24,7 @@ export const addReferences = (references: IReference[]): AppThunk => {
   };
 };
 
-export const addReference = (reference: IReference): AppThunk => {
+/*export const addReference = (reference: IReference): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.addReferenceAsync.request(''));
 
@@ -37,6 +37,6 @@ export const addReference = (reference: IReference): AppThunk => {
 
     return dispatch(actions.addReferenceAsync.failure('something wrong'));
   };
-};
+};*/
 
-export default { addReferences, addReference };
+export default { addReferences /*, addReference*/ };

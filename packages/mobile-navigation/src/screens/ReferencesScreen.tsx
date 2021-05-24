@@ -1,13 +1,20 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useDispatch, useSelector, referenceActions } from '@lib/store';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Button, useTheme } from 'react-native-paper';
+import { FAB, useTheme } from 'react-native-paper';
+//import { Button, FAB, useTheme } from 'react-native-paper';
 import { IReference } from '@lib/types';
 import { peopleRefMock, depRefMock, companyRefMock } from '@lib/mock';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
-const ReferenceItem = ({ item }: { item: IReference }) => {
+interface IRef {
+  name: string;
+  ref: IReference;
+}
+
+const ReferenceItem = ({ item }: { item: IRef }) => {
   const { colors } = useTheme();
 
   return (
@@ -22,9 +29,9 @@ const ReferenceItem = ({ item }: { item: IReference }) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+            <Text style={[styles.name, { color: colors.text }]}>{item.ref.name}</Text>
           </View>
-          <Text style={[styles.number, styles.field, { color: colors.text }]}>Справочник</Text>
+          <Text style={[styles.number, styles.field, { color: colors.text }]}>Размер: {item.ref.data.length}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -33,33 +40,60 @@ const ReferenceItem = ({ item }: { item: IReference }) => {
 
 const ReferencesScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
+  const { colors } = useTheme();
 
+  const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
   const handleLoad = () => {
-    dispatch(referenceActions.addReferences([peopleRefMock, depRefMock, companyRefMock]));
+    dispatch(
+      referenceActions.addReferences({ people: peopleRefMock, departmens: depRefMock, companies: companyRefMock }),
+    );
   };
 
   const handleReset = () => {
     dispatch(referenceActions.init());
   };
 
-  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Удалить все',
+        type: 'destructive',
+        onPress: handleReset,
+      },
+      /*       {
+              title: 'Сбросить',
+              onPress: handleReset,
+            }, */
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleLoad, handleReset, showActionSheet]);
 
-  const ref = useRef<FlatList<IReference>>(null);
+  const renderItem = ({ item }: { item: IRef }) => <ReferenceItem item={item} />;
+
+  const ref = useRef<FlatList<IRef>>(null);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Справочники приложения</Text>
-      <Button compact={false} onPress={handleLoad}>
+    <>
+      {/*<Button compact={false} onPress={handleLoad}>
         Загрузить
       </Button>
       <Button compact={false} onPress={handleReset}>
         Сбросить
-      </Button>
+  </Button>*/}
       <FlatList
         ref={ref}
-        data={list}
+        data={Object.keys(list).map((key) => {
+          return { name: key, ref: list[key] } as IRef;
+        })}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -69,7 +103,8 @@ const ReferencesScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+      <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
+    </>
   );
 };
 
@@ -93,6 +128,12 @@ const styles = StyleSheet.create({
     margin: 8,
     marginRight: 0,
     flex: 1,
+  },
+  fabAdd: {
+    bottom: 0,
+    margin: 20,
+    position: 'absolute',
+    right: 0,
   },
   title: {
     fontSize: 20,
