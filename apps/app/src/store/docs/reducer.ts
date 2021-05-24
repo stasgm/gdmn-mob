@@ -5,8 +5,8 @@ import { IDocState } from './types';
 import { DocActionType, docActions } from './actions';
 
 const initialState: Readonly<IDocState> = {
-  docData: [{ number: 1 }, { number: 3 }, { number: 6 }, { number: 10 }],
-  filter: [{ orderNum: 0, name: 'number', sortOrder: 'ASC' }],
+  docData: [],
+  //filter: [{ orderNum: 0, name: 'number', sortOrder: 'ASC' }],
   loading: false,
   errorMessage: '',
 };

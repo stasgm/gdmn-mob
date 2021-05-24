@@ -1,14 +1,18 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme, FAB } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { useNavigation } from '@react-navigation/core';
+// import { DrawerActions } from '@react-navigation/native';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
 import { useSelector, messageActions, useDispatch } from '@lib/store';
-import { useNavigation } from '@react-navigation/core';
-// import colors from '@lib/mobile-ui/src/styles/colors';
+
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
   const { colors } = useTheme();
@@ -37,11 +41,11 @@ const MessageItem = ({ item }: { item: IMessage }) => {
   );
 };
 
-const MessagesScreen = () => {
+const MessagesListScreen = () => {
   const { data, loading } = useSelector((state) => state.messages);
   const { company } = { company: { id: '654', name: 'ОДО Амперсант', admin: 'Stas' } };
-  //useSelector((state) => state.auth);
-  const { colors } = useTheme();
+  // const { company } = useSelector((state) => state.auth);
+  // const { colors } = useTheme();
 
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
@@ -72,6 +76,15 @@ const handleSend = async () => {
   Alert.alert("Ошибка!", "something wrong", [{ text: "Закрыть" }]);
 
 }; */
+
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
 
   const handleLoad = useCallback(() => {
     //TODO systemId из конфига
@@ -113,10 +126,6 @@ const handleSend = async () => {
         type: 'destructive',
         onPress: handleDeleteAll,
       },
-      /*       {
-              title: 'Сбросить',
-              onPress: handleReset,
-            }, */
       {
         title: 'Отмена',
         type: 'cancel',
@@ -143,12 +152,14 @@ const handleSend = async () => {
           ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
         />
       </View>
+      {/*
       <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
+      */}
     </>
   );
 };
 
-export default MessagesScreen;
+export default MessagesListScreen;
 
 const styles = StyleSheet.create({
   container: {

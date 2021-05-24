@@ -4,6 +4,12 @@
     "jsx": "react-native",
     "noEmit": true
   },
-  "include": ["src", "index.ts"],
+  "include": [
+    "src",
+    "index.ts",
+    "../mobile-ui/src/components/AppBar/HeaderList.tsx",
+    "../mobile-ui/src/components/AppBar/DrawerButton.tsx",
+    "../mobile-ui/src/components/AppBar/HeaderView.tsx"
+  ],
   "exclude": ["node_modules"]
 }

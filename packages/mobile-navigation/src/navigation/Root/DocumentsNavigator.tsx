@@ -11,8 +11,8 @@ const Stack = createStackNavigator<DocumentsStackParamList>();
 
 const DocumentsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Documents" screenOptions={{ headerShown: false }}>
-      <Stack.Screen key="Documents" name="Documents" component={DocumentsSceen} />
+    <Stack.Navigator initialRouteName="Documents" screenOptions={{ headerShown: true }}>
+      <Stack.Screen key="Documents" name="Documents" component={DocumentsSceen} options={{ title: 'Документы' }} />
     </Stack.Navigator>
   );
 };
