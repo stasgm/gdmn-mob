@@ -5,7 +5,7 @@ import { useTheme, FAB } from 'react-native-paper';
 import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IDocument, IReference } from '@lib/types';
+import { IDocument, IReferences } from '@lib/types';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
@@ -63,10 +63,10 @@ const MessageViewScreen = () => {
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Загрузить',
-        // onPress: handleLoad,
-      },
+      /*       {
+              title: 'Загрузить',
+              // onPress: handleLoad,
+            }, */
       {
         title: 'Обработать',
         onPress: handleTransform,

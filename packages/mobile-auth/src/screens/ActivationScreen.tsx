@@ -105,22 +105,6 @@ const ActivationScreen = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-  buttons: {
-    width: '100%',
-  },
-  codeText: {
-    borderColor: '#000000',
-    fontSize: 22,
-    fontWeight: 'bold',
-    height: 30,
-    marginTop: 15,
-    textAlign: 'center',
-  },
-  /*   container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    }, */
   contentWidthKbd: {
     justifyContent: 'flex-start',
     paddingTop: 60,

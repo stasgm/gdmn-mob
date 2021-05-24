@@ -142,17 +142,6 @@ const localStyles = StyleSheet.create({
   buttonView: {
     flexDirection: 'row',
   },
-  item: {
-    borderRadius: 4,
-    justifyContent: 'center',
-  },
-  row: {
-    alignItems: 'center',
-    borderRadius: 15,
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 5,
-  },
   scroll: {
     marginVertical: 10,
     maxHeight: 150,

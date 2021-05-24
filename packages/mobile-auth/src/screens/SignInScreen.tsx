@@ -126,13 +126,6 @@ const SignInScreen = (props: Props) => {
 };
 
 const style = StyleSheet.create({
-  buttons: {
-    width: '100%',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
   contentWidthKbd: {
     justifyContent: 'flex-start',
     paddingTop: 60,
@@ -145,9 +138,6 @@ const style = StyleSheet.create({
     alignItems: 'center',
     // height: 100,
     // flex: 1,
-  },
-  title: {
-    textAlign: 'center',
   },
 });
 

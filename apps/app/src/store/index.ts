@@ -1,7 +1,7 @@
 import { combineReducers, Action } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { configureStore, RootState } from '@lib/store';
+import { configureStore /* , RootState */ } from '@lib/store';
 
 import docsReducer from './docs/reducer';
 import { DocActionType } from './docs/actions';

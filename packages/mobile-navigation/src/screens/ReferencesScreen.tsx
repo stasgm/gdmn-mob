@@ -46,7 +46,7 @@ const ReferenceItem = ({ item }: { item: IRef }) => {
 
 const ReferencesScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
-  const { colors } = useTheme();
+  // const { colors } = useTheme();
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
@@ -95,7 +95,7 @@ const ReferencesScreen = () => {
     });
   }, [navigation]);
 
-  const renderItem = ({ item }: { item: IReference }) => <ReferenceItem item={item} />;
+  const renderItem = ({ item }: { item: IRef }) => <ReferenceItem item={item} />;
 
   const ref = useRef<FlatList<IRef>>(null);
 
@@ -103,9 +103,8 @@ const ReferencesScreen = () => {
     <View style={styles.container}>
       <FlatList
         ref={ref}
-        data={Object.keys(list).map((key) => {
-          return { name: key, ref: list[key] } as IRef;
-        })}
+        data={Object.keys(list).map((key) => ({ name: key, ref: list[key] } as IRef))}
+        // data={list}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -115,8 +114,7 @@ const ReferencesScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-      {/* <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} /> */}
-    </>
+    </View>
   );
 };
 

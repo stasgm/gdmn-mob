@@ -1,7 +1,7 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useTheme, /*Button,*/ FAB } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -10,6 +10,8 @@ import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 // import {  } from '@lib/mock';
 
 interface IField {
@@ -90,9 +92,10 @@ const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) =>
 
 const DocumentsScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
-  const { colors } = useTheme();
+  // const { colors } = useTheme();
 
   const showActionSheet = useActionSheet();
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const handleLoad = () => {
@@ -125,6 +128,13 @@ const DocumentsScreen = () => {
     ]);
   }, [handleLoad, handleReset, showActionSheet]);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
+
   const renderItem = ({ item }: { item: IDocument }) => (
     <DocumentItem
       item={item}
@@ -141,12 +151,6 @@ const DocumentsScreen = () => {
 
   return (
     <>
-      {/*<Button compact={false} onPress={handleLoad}>
-        Загрузить
-      </Button>
-      <Button compact={false} onPress={handleReset}>
-        Сбросить
-  </Button>*/}
       <FlatList
         ref={ref}
         data={list}
@@ -159,7 +163,6 @@ const DocumentsScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-      <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
     </>
   );
 };

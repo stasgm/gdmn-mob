@@ -7,9 +7,8 @@ import { extraPredicate } from '../utils/helpers';
 
 import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
-import { makeDevice } from './deviceService';
 
-const { users, companies, devices } = entities;
+const { users, companies } = entities;
 
 /**
  * Добавляет одного пользователя

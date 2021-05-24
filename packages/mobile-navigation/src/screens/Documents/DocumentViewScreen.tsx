@@ -1,4 +1,4 @@
-import React, { useMemo, useRef /*, { useCallback }*/ } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef /*, { useCallback }*/ } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from 'react-native-paper';
@@ -6,9 +6,14 @@ import { useTheme } from 'react-native-paper';
 import { IDocument } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
+
+// eslint-disable-next-line import/no-cycle
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
+import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
 // eslint-disable-next-line import/no-cycle
 import { DocumentsStackParamList } from '../../navigation/Root/DocumentsNavigator';
@@ -44,19 +49,20 @@ const DocumentViewScreen = () => {
   const docId = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
   const document = useMemo(() => list.find((item: { id: string }) => item.id === docId), [docId, list]);
 
-  //const showActionSheet = useActionSheet();
-  //const dispatch = useDispatch();
+  const showActionSheet = useActionSheet();
+  const navigation = useNavigation();
+  // const dispatch = useDispatch();
 
-  /*const actionsMenu = useCallback(() => {
+  const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Загрузить',
-        onPress: () => {},
+        // onPress: () => { },
       },
       {
         title: 'Удалить все',
         type: 'destructive',
-        onPress: () => {},
+        // onPress: () => { },
       },
       // {
       //   title: 'Сбросить',
@@ -67,7 +73,14 @@ const DocumentViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet]);*/
+  }, [showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
 
   const renderItem = ({ item }: { item: any }) => <ContentItem item={item} />;
 
