@@ -3,12 +3,16 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
 
-import DocumentsScreen from '../../screens/DocumentsScreen';
+import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
+
+// eslint-disable-next-line import/no-cycle
+import DocumentViewScreen from '../../screens/Documents/DocumentViewScreen';
 
 import TabsNavigator from './TabsNavigation';
 
-type DocumentsStackParamList = {
+export type DocumentsStackParamList = {
   Documents: undefined;
+  DocumentView: { id: string };
 };
 
 const Stack = createStackNavigator<DocumentsStackParamList>();
@@ -23,6 +27,7 @@ const DocumentsNavigator = () => {
         name="Documents"
         component={types && types.data.length !== 0 ? TabsNavigator : DocumentsScreen}
       />
+      <Stack.Screen key="DocumentView" name="DocumentView" component={DocumentViewScreen} />
     </Stack.Navigator>
   );
 };

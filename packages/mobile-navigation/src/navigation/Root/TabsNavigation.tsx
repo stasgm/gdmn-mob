@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useSelector } from '@lib/store';
 
-import DocumentsScreen from '../../screens/DocumentsScreen';
+import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
 
 export type TabsStackParams = {
   //OtherTypes: undefined;

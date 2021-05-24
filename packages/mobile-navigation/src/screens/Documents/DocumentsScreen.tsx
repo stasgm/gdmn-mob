@@ -9,6 +9,7 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import { useNavigation } from '@react-navigation/core';
 // import {  } from '@lib/mock';
 
 interface IField {
@@ -29,6 +30,7 @@ type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 //вынести к компонентам
 const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   //вынести в отдельное место от компонента
   //функция для приведения других типов к строке
@@ -52,7 +54,7 @@ const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) =>
   return (
     <TouchableOpacity
       onPress={() => {
-        // navigation.navigate('DocumentView', { docId: item?.id });
+        navigation.navigate('DocumentView', { id: item.id });
       }}
     >
       <View style={[styles.item, { backgroundColor: colors.background }]}>
