@@ -8,6 +8,11 @@ import Message from './message.router';
 
 const rootRouter = new Router({ prefix: '/api' });
 
-rootRouter.use(Auth.middleware()).use(Company.routes()).use(Device.routes()).use(User.routes()).use(Message.routes());
+rootRouter
+  .use(Auth.middleware())
+  .use(Company.middleware())
+  .use(Device.middleware())
+  .use(User.middleware())
+  .use(Message.routes());
 
 export default rootRouter;
