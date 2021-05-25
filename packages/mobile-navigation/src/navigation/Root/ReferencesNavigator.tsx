@@ -3,9 +3,7 @@ import React from 'react';
 
 import ReferencesScreen from '../../screens/ReferencesScreen';
 
-type ReferenceStackParamList = {
-  References: undefined;
-};
+import { ReferenceStackParamList } from './types';
 
 const Stack = createStackNavigator<ReferenceStackParamList>();
 

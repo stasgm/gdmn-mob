@@ -9,11 +9,7 @@ import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
 import DocumentViewScreen from '../../screens/Documents/DocumentViewScreen';
 
 import TabsNavigator from './TabsNavigation';
-
-export type DocumentsStackParamList = {
-  Documents: undefined;
-  DocumentView: { id: string };
-};
+import { DocumentsStackParamList } from './types';
 
 const Stack = createStackNavigator<DocumentsStackParamList>();
 
