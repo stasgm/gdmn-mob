@@ -8,10 +8,7 @@ import { useSelector } from '@lib/store';
 
 import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
 
-export type TabsStackParams = {
-  //OtherTypes: undefined;
-  [itemName: string]: { type: string };
-};
+import { TabsStackParams } from './types';
 
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
 

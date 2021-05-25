@@ -15,8 +15,7 @@ import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
-// eslint-disable-next-line import/no-cycle
-import { DocumentsStackParamList } from '../../navigation/Root/DocumentsNavigator';
+import { DocumentsStackParamList } from '../../navigation/Root/types';
 
 type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 

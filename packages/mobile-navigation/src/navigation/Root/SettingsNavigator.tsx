@@ -3,9 +3,7 @@ import React from 'react';
 
 import SettingsSceen from '../../screens/SettingsScreen';
 
-type SettingsStackParamList = {
-  Settings: undefined;
-};
+import { SettingsStackParamList } from './types';
 
 const Stack = createStackNavigator<SettingsStackParamList>();
 
