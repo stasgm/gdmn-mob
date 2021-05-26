@@ -11,8 +11,8 @@ const rootRouter = new Router({ prefix: '/api' });
 rootRouter
   .use(Auth.middleware())
   .use(Company.middleware())
-  .use(Device.routes())
-  .use(User.routes())
+  .use(Device.middleware())
+  .use(User.middleware())
   .use(Message.routes());
 
 export default rootRouter;

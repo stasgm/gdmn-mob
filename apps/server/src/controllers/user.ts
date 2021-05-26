@@ -1,21 +1,17 @@
-import { ParameterizedContext } from 'koa';
+import { Context, ParameterizedContext } from 'koa';
 
-import { IResponse, IUser, NewUser } from '@lib/types';
+import { IUser, NewUser } from '@lib/types';
 
 import log from '../utils/logger';
 import { userService } from '../services';
 
+import { created, ok } from '../utils/apiHelpers';
+
+import { DataNotFoundException } from '../exceptions';
+
 const addUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { externalId, name, password, firstName, lastName, phoneNumber, companies, creator } = ctx.request
     .body as NewUser;
-
-  if (!name) {
-    ctx.throw(400, 'Не указано имя пользователя');
-  }
-
-  if (!password) {
-    ctx.throw(400, 'Не указан пароль');
-  }
 
   const user: NewUser = {
     externalId,
@@ -28,94 +24,47 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
     creator,
   };
 
-  try {
-    const newUser = await userService.addOne(user);
+  const newUser = await userService.addOne(user);
 
-    const result: IResponse<IUser> = { result: true, data: newUser };
+  created(ctx as Context, newUser);
 
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info(`signUp: user '${name}' is successfully signed up`);
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info(`signUp: user '${name}' is successfully signed up`);
 };
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
   const userData = ctx.request.body as Partial<IUser & { password: string }>;
 
-  if (!userId) {
-    ctx.throw(400, 'Не указан идентификатор пользователя');
-  }
+  const updatedUser = await userService.updateOne(userId, userData);
 
-  if (!userData) {
-    ctx.throw(400, 'Не указаны данные пользователя');
-  }
+  ok(ctx as Context, updatedUser);
 
-  try {
-    const updatedUser = await userService.updateOne(userId, userData);
-
-    const result: IResponse<IUser> = { result: true, data: updatedUser };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('updateUser: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
+  log.info(`updatedUser: user '${updatedUser.name}' is successfully updated`);
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-
-  if (!userId) {
-    ctx.throw(400, 'Не указан идентификатор пользователя');
-  }
-
   // TODO пользовате
-  try {
-    await userService.deleteOne(userId);
+  await userService.deleteOne(userId);
 
-    const result: IResponse<void> = { result: true };
+  ok(ctx as Context, removeUser);
 
-    ctx.status = 200;
-    ctx.body = result; // TODO передавать только код 204 без body
-
-    log.info('removeUser: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
+  log.info(`removeUser: user '${removeUser.name}' is successfully removed `);
 };
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
 
-  if (!userId) {
-    ctx.throw(400, 'не указан идентификатор пользователя');
+  const user = await userService.findOne(userId);
+
+  if (!user) {
+    throw new DataNotFoundException('пользователь не найден');
+    //ctx.throw(404, 'пользователь не найден');
   }
 
-  try {
-    const user = await userService.findOne(userId);
+  ok(ctx as Context, user);
 
-    if (!user) {
-      ctx.throw(404, 'пользователь не найден');
-    }
-
-    const result: IResponse<IUser> = {
-      result: true,
-      data: user,
-    };
-
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUser: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info(`getUser: device '${user.name}' is successfully received'`);
 };
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
@@ -131,18 +80,11 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
     params.name = name;
   }
 
-  try {
-    const users = await userService.findAll(params);
+  const users = await userService.findAll(params);
 
-    const result: IResponse<IUser[]> = { result: true, data: users };
+  ok(ctx as Context, users);
 
-    ctx.status = 200;
-    ctx.body = result;
-
-    log.info('getUsers: OK');
-  } catch (err) {
-    ctx.throw(400, err);
-  }
+  log.info('getUsers: users are successfully received');
 };
 
 // const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
