@@ -63,7 +63,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
   const oldUser = await users.find(userId);
 
   if (!oldUser) {
-    throw new Error('Пользователь не найден');
+    throw new Error('пльзователь не найден');
   }
   // Если передан новый пароль то хешируем и заменяем
   const passwordHash = userData.password ? await hashPassword(userData.password) : oldUser.password;
@@ -112,7 +112,7 @@ const deleteOne = async (id: string): Promise<void> => {
   const user = await users.find(id);
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException('пользователь не найден');
   }
 
   // TODO Если пользователь является админом организации то прерывать
@@ -124,7 +124,7 @@ const findOne = async (id: string): Promise<IUser | undefined> => {
   const user = await users.find(id);
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException('пользователь не найден');
   }
 
   return makeUser(user);
@@ -134,7 +134,7 @@ const findByName = async (name: string): Promise<IUser> => {
   const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException('пользователь не найден');
   }
 
   return makeUser(user);
@@ -190,7 +190,7 @@ const addCompanyToUser = async (userId: string, companyId: string) => {
   const user = await users.find(userId);
 
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new Error('пользователь не найден');
   }
 
   const company = await companies.find(companyId);
@@ -212,7 +212,7 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
   const user = await users.find(userId);
 
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new Error('пользователь не найден');
   }
 
   if (user.companies?.some((i) => companyName === i)) {

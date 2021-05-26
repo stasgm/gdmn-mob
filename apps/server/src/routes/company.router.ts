@@ -12,7 +12,7 @@ router.prefix('/companies');
 router.post('/', companyValidation.addCompany, addCompany); // TODO добавить compose([authMiddleware, deviceMiddleware])
 router.get('/:id', companyValidation.updateCompany, authMiddleware, deviceMiddleware, getCompany);
 router.get('/', authMiddleware, deviceMiddleware, getCompanies);
-router.patch('/:id', [authMiddleware, deviceMiddleware], updateCompany);
-router.delete('/:id', [authMiddleware, deviceMiddleware], removeCompany);
+router.patch('/:id', authMiddleware, deviceMiddleware, updateCompany);
+router.delete('/:id', authMiddleware, deviceMiddleware, removeCompany);
 
 export default router;

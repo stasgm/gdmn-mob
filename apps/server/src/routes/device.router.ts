@@ -8,9 +8,10 @@ import { deviceValidation } from '../validations';
 
 const router = Router();
 
+router.prefix('/devices');
 router.post('/', deviceValidation.addDevice, deviceMiddleware, authMiddleware, addDevice);
 router.get('/', deviceMiddleware, authMiddleware, getDevices);
-router.get('/:id', deviceValidation.getDevice, getDevice);
+router.get('/:id', getDevice); //deviceValidation.getDevice
 //TODO - без доп проверки даёт возможность получить доступ по любому  устройству
 // router.get('/:id/user/:name', getDeviceByUser);
 // router.get('/:id/user/', getDeviceByUser);

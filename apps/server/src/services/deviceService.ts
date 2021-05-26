@@ -40,7 +40,7 @@ const updateOne = async (deviceId: string, deviceData: Partial<IDevice>) => {
   const oldDevice = await devices.find(deviceId);
 
   if (!oldDevice) {
-    throw new Error('Устройство не найдено');
+    throw new Error('устройство не найдено');
   }
 
   // Проверяем есть ли в базе переданный пользователь
@@ -133,7 +133,7 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
  * */
 const findUsers = async (deviceId: string) => {
   if (!(await devices.find(deviceId))) {
-    throw new Error('Устройство не найдено');
+    throw new Error('устройство не найдено');
   }
 
   return Promise.all(
@@ -143,13 +143,13 @@ const findUsers = async (deviceId: string) => {
         const device = await devices.find(deviceId);
 
         if (!device) {
-          throw new Error('Устройство не найдено');
+          throw new Error('устройство не найдено');
         }
 
         const user = await users.find(i.userId);
 
         if (!user) {
-          throw new Error('Пользователь не найден');
+          throw new Error('пользователь не найден');
         }
 
         return await makeDevice(i);

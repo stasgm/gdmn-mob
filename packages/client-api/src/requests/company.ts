@@ -23,27 +23,29 @@ class Company extends BaseRequest {
       } as types.IAddCompanyResponse;
     }
 
-    try {
-      const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-      const resData = res.data;
+    //  try {
+    console.log('company', company);
+    const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
+    console.log('res', res);
+    const resData = res.data;
 
-      if (resData?.result) {
-        return {
-          type: 'ADD_COMPANY',
-          company: resData?.data,
-        } as types.IAddCompanyResponse;
-      }
-
+    if (resData?.result) {
       return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка создания компании',
-      } as error.INetworkError;
+        type: 'ADD_COMPANY',
+        company: resData?.data,
+      } as types.IAddCompanyResponse;
     }
+
+    return {
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err?.response?.data?.error || 'ошибка создания компании',
+    //   } as error.INetworkError;
+    // }
   };
 
   updateCompany = async (company: Partial<ICompany>) => {

@@ -32,26 +32,34 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     editionDate: new Date().toISOString(),
   };
 
-  try {
-    const newCompany = await companies.insert(newCompanyObj);
+  // try {
+  const newCompany = await companies.insert(newCompanyObj);
 
-    const createdCompany = await companies.find(newCompany);
+  console.log(1, newCompany);
 
-    // Добавляем к текущему
-    await addCompanyToUser(createdCompany.adminId, createdCompany.id);
-    //TODO переделать на updateCompany
+  const createdCompany = await companies.find(newCompany);
 
-    // Добавляем к пользователю gdmn
-    const user = await users.find((i) => i.name === 'gdmn');
+  console.log(2, createdCompany);
+  // Добавляем к текущему
+  await addCompanyToUser(createdCompany.adminId, createdCompany.id);
+  //TODO переделать на updateCompany
 
-    if (user) {
-      await addCompanyToUser(user.id, createdCompany.id);
-    }
+  console.log(3);
 
-    return makeCompany(createdCompany);
-  } catch (err) {
-    throw new Error('Ошибка при добавлении компании');
+  // Добавляем к пользователю gdmn
+  const user = await users.find((i) => i.name === 'gdmn');
+
+  console.log(4, user);
+
+  if (user) {
+    await addCompanyToUser(user.id, createdCompany.id);
+    console.log(5);
   }
+
+  return makeCompany(createdCompany);
+  // } catch (err) {
+  //   throw new Error('Ошибка при добавлении компании');
+  // }
 };
 
 /**
