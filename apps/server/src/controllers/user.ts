@@ -47,7 +47,7 @@ const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   // TODO пользовате
   await userService.deleteOne(userId);
 
-  ok(ctx as Context, removeUser);
+  ok(ctx as Context);
 
   log.info(`removeUser: user '${removeUser.name}' is successfully removed `);
 };
