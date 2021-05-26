@@ -13,6 +13,6 @@ rootRouter
   .use(Company.middleware())
   .use(Device.middleware())
   .use(User.middleware())
-  .use(Message.routes());
+  .use(Message.middleware());
 
 export default rootRouter;
