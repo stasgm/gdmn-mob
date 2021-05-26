@@ -37,7 +37,7 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   await deviceService.deleteOne({ deviceId });
 
-  ok(ctx as Context, removeDevice);
+  ok(ctx as Context);
 
   // TODO передавать только код 204 без body
 

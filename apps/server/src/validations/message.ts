@@ -6,10 +6,46 @@ const newMessage: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
-      head: Joi.string().required().error(new InvalidParameterException('отсутствует заголовок сообщения')),
-      body: Joi.string().required().error(new InvalidParameterException('отсутствует сообщение')),
+      head: Joi.object({
+        company: Joi.string().required().error(new InvalidParameterException('некорректный формат сообщения')),
+      }),
+      body: Joi.object({
+        type: Joi.string().required().error(new InvalidParameterException('некорректный формат сообщения')),
+        payload: Joi.string().required().error(new InvalidParameterException('некорректный формат сообщения')),
+      }),
     }),
   },
 };
 
-export { newMessage };
+const getMessage: Config = {
+  validate: {
+    params: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('не указана органиазция')),
+    }),
+  },
+};
+
+const removeMessage: Config = {
+  validate: {
+    params: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('не указана органиазция')),
+      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор сообщения')),
+    }),
+  },
+};
+
+const publish: Config = {
+  validate: {
+    type: 'json',
+    body: Joi.object({
+      head: Joi.object({
+        company: Joi.string().required().error(new InvalidParameterException('некорректный формат сообщения')),
+      }),
+      body: Joi.object({
+        type: Joi.string().required().error(new InvalidParameterException('некорректный формат сообщения')),
+        payload: Joi.string().required().error(new InvalidParameterException('некорректный формат сообщения')),
+      }),
+    }),
+  },
+};
+export { newMessage, getMessage, removeMessage, publish };
