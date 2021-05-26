@@ -10,7 +10,7 @@ describe('testing /api/auth/', () => {
   describe('POST /api/auth/signup', () => {
     it('should return 201 & valid response if a new user was added', async () => {
       const response = await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
-        name: '3',
+        name: '5',
         password: '3',
       });
       expect(response.status).toEqual(201);

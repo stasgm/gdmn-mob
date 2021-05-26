@@ -2,6 +2,8 @@ import Koa from 'koa';
 
 import config from '../config';
 
+import log from './utils/logger';
+
 import { init } from './server';
 
 import { IItemDatabase, databaseMenu } from './utils/databaseMenu';
@@ -26,7 +28,11 @@ const run = async (dbase?: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.Def
     db = chosenDatabase ? JSON.parse(chosenDatabase) : defaultDatabase;
   }
 
-  return init(db);
+  const app = await init(db);
+  app.listen(db.port);
+  log.info(`Server is running on http://localhost:${db.port}`);
+
+  return app;
 };
 
 if (module.children) {

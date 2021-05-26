@@ -1,6 +1,6 @@
 import Koa from 'koa';
 
-import run from '../..';
+import { init } from '../../server';
 
 let app: Koa<Koa.DefaultState, Koa.DefaultContext> | null = null;
 
@@ -11,7 +11,7 @@ const testDb = {
 };
 
 export async function initEnvironment(): Promise<void> {
-  app = await run(testDb);
+  app = await init(testDb);
 }
 
 export function getApp(): Koa<Koa.DefaultState, Koa.DefaultContext> {

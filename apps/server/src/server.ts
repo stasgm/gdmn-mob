@@ -15,7 +15,7 @@ import { IUser } from '@lib/types';
 
 import koaConfig from '../config/koa';
 
-import log from './utils/logger';
+// import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
@@ -26,7 +26,9 @@ import { IItemDatabase } from './utils/databaseMenu';
 
 export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
   const app = new Koa();
-  app.keys = ['super-secret-key'];
+  app.keys = ['super-secret-key-web1215'];
+
+  // TODO db не используется!!!
 
   passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -83,11 +85,13 @@ export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa
       log.warn(err);
     });
    */
-  log.info('Starting listener ...');
 
-  await new Promise((resolve) => app.listen(db.port, () => resolve('')));
+  /*   log.info('Starting listener ...');
 
-  log.info(`Server is running on http://localhost:${db.port}`);
+    await new Promise((resolve) => app.listen(db.port, () => resolve('')));
+
+    log.info(`Server is running on http://localhost:${db.port}`);
+   */
 
   return app;
 }
