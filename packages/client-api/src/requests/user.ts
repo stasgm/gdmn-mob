@@ -42,7 +42,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка добавления пользователя',
       } as error.INetworkError;
     }
   };
@@ -82,7 +82,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка обновления пользователя',
       } as error.INetworkError;
     }
   };
@@ -113,7 +113,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка удаления пользователя',
       } as error.INetworkError;
     }
   };
@@ -154,7 +154,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data || 'ошибка получения данных о пользователе',
       } as error.INetworkError;
     }
   };
@@ -200,7 +200,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения данных о пользователях',
       } as error.INetworkError;
     }
   };

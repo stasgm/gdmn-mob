@@ -23,7 +23,7 @@ const fetchCompanyById = (id: string): AppThunk => {
       return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.fetchCompaniesAsync.failure('Oops, Something Went Wrong'));
+    return dispatch(companyActions.fetchCompaniesAsync.failure('ошибка получения данных о компании'));
   };
 };
 
@@ -40,7 +40,7 @@ const fetchCompanies = (): AppThunk => {
       return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.fetchCompaniesAsync.failure('Oops, Something Went Wrong'));
+    return dispatch(companyActions.fetchCompaniesAsync.failure('ошибка получения данных о компаниях'));
   };
 };
 
@@ -58,7 +58,7 @@ const addCompany = (company: NewCompany): AppThunk => {
       return dispatch(companyActions.addCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.addCompanyAsync.failure('Oops, Something Went Wrong'));
+    return dispatch(companyActions.addCompanyAsync.failure('ошибка добавления компании'));
   };
 };
 
@@ -76,7 +76,7 @@ const updateCompany = (company: ICompany): AppThunk => {
       return dispatch(companyActions.updateCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.updateCompanyAsync.failure('Oops, Something Went Wrong'));
+    return dispatch(companyActions.updateCompanyAsync.failure('ошибка обновления компании'));
   };
 };
 

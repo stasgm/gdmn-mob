@@ -1,6 +1,6 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
-import { DataNotFoundException, InnerErrorException, InvalidParameterException } from '../exceptions';
+import { DataNotFoundException, InnerErrorException, ConflictException } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate } from '../utils/helpers';
@@ -19,7 +19,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
 
   if (user) {
-    throw new InvalidParameterException('Пользователь с таким именем уже существует');
+    throw new ConflictException('пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(newUser.password);

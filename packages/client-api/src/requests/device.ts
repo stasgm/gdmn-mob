@@ -38,7 +38,7 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка добавления устройства',
       } as error.INetworkError;
     }
   };
@@ -70,7 +70,7 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка обновления устройства',
       } as error.INetworkError;
     }
   };
@@ -100,7 +100,7 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка удаления устройства',
       } as error.INetworkError;
     }
   };
@@ -189,7 +189,7 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
       } as error.INetworkError;
     }
   };
@@ -212,7 +212,7 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения пользователей по устройству',
       } as error.INetworkError;
     }
   };

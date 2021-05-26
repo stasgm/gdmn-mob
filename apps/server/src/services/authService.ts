@@ -20,19 +20,19 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException('неверные данные');
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
   const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
 
   if (!device) {
-    throw new UnauthorizedException('Cвязанное с пользователем устройство не найдено');
+    throw new UnauthorizedException('связанное с пользователем устройство не найдено');
     // throw new Error('Cвязанное с пользователем устройство не найдено');
   }
 
   if (device.state === 'BLOCKED') {
-    throw new UnauthorizedException('Устройство заблокировано');
+    throw new UnauthorizedException('устройство заблокировано');
     // throw new Error('устройство заблокировано');
   }
 
@@ -44,7 +44,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
 
     //TODO посмотреть как обработать правильно
     if (!usr) {
-      throw new UnauthorizedException('Неверные данные');
+      throw new UnauthorizedException('неверные данные');
       // throw new Error('Неверное имя пользователя или пароль');
     }
 
@@ -103,20 +103,20 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   const user = await userService.findByName(name);
 
   if (!user) {
-    return done(null, false);
+    return done(new Error('неверные данные'));
   }
 
   const hashedPassword = await userService.getUserPassword(user.id);
 
   if (!hashedPassword) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException('неверные данные');
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    done(null, false); //TODO возвращать ошибку вместо null
+    done(new Error('неверные данные')); //TODO возвращать ошибку вместо null
   }
 };
 

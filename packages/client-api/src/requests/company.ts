@@ -27,10 +27,10 @@ class Company extends BaseRequest {
       const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
       const resData = res.data;
 
-      if (resData.result) {
+      if (resData?.result) {
         return {
           type: 'ADD_COMPANY',
-          company: resData.data,
+          company: resData?.data,
         } as types.IAddCompanyResponse;
       }
 
@@ -41,7 +41,7 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка создания компании',
       } as error.INetworkError;
     }
   };
@@ -83,7 +83,7 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка обновления компании',
       } as error.INetworkError;
     }
   };
@@ -114,7 +114,7 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка удаления компании',
       } as error.INetworkError;
     }
   };
@@ -155,7 +155,7 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения данных о компании',
       } as error.INetworkError;
     }
   };
@@ -194,42 +194,10 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения данных о компаниях',
       } as error.INetworkError;
     }
   };
-
-  // getUsersByCompany = async (companyId: string) => {
-  //   const res = await this.api.axios.get<IResponse<IUser[]>>(`/companies/${companyId}/users`);
-  //   const resData = res.data;
-
-  //   if (resData.result) {
-  //     return {
-  //       type: 'GET_USERS_BY_COMPANY',
-  //       users: resData.data,
-  //     } as types.IGetCompanyUsersResponse;
-  //   }
-  //   return {
-  //     type: 'ERROR',
-  //     message: resData.error,
-  //   } as error.INetworkError;
-  // };
 }
 
 export default Company;
-
-// const mapDtoToObject = async (companyDto: CompanyDto): Promise<ICompany> => {
-//   let user = {} as IUser;
-
-//   const res = await this.api.axios.get<IResponse<IUser>>(`/users/${companyDto.adminId}`);
-//   const adminDto = res.data;
-
-//   if (adminDto.data) {
-//     user = adminDto.data;
-//   }
-
-//   return {
-//     ...companyDto,
-//     admin: user,
-//   };
-// };

@@ -24,7 +24,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   }
 
   //TODO перенести в службу
-  const currDevice = await entities.devices.find((i) => i.uid === device.id && i.userId === ctx.state.user.id);
+  const currDevice = await entities.devices.find((i) => i.uid === device.id && i.userId === ctx.state.user?.id);
 
   if (!currDevice) {
     // ctx.throw(400, 'Устройство для пользователя не найдено');

@@ -20,6 +20,8 @@ const Login = () => {
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
+  console.log(error, loading, status);
+
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {
@@ -36,7 +38,7 @@ const Login = () => {
   });
 
   useEffect(() => {
-    //dispatch(authActions.authActions.clearError());
+    dispatch(authActions.clearError());
   }, [dispatch]);
 
   // useEffect(() => {
