@@ -11,6 +11,7 @@ import { readFile } from './utils/workWithFile';
 const run = async (dbase?: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> => {
   // TODO
   let db: IItemDatabase;
+  console.log(dbase);
   if (dbase) {
     db = dbase;
   } else {

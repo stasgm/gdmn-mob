@@ -1,14 +1,17 @@
-// eslint-disable-next-line import/no-unresolved
 import request from 'supertest';
 
-import { getApp } from './test-environment';
+import { getApp, initEnvironment } from './test-environment';
+
+beforeAll(async () => {
+  await initEnvironment();
+});
 
 describe('testing /api/auth/', () => {
   describe('POST /api/auth/signup', () => {
-    test('SUCCESS: new user was added', async () => {
+    it('should return 201 & valid response if a new user was added', async () => {
       const response = await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
-        name: '1',
-        password: '1',
+        name: '3',
+        password: '3',
       });
       expect(response.status).toEqual(201);
       expect(response.type).toEqual('application/json');
