@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from 'react-native-paper';
 
-import { IDocument } from '@lib/types';
+import { IDocument, IEntity } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -38,14 +38,27 @@ const toString = ({ value, type }: { value: any; type: typeValue }) => {
   return value;
 };
 
-const ContentItem = ({ item }: { item: any }) => {
-  return <View>{item}</View>;
+const ContentItem = ({ item }: { item: IEntity }) => {
+  return <View>{item.id}</View>;
+};
+
+const Header = ({ titles }: { titles: string[] }) => {
+  return (
+    <>
+      {titles.map((title) => (
+        <Text>{title}</Text>
+      ))}
+    </>
+  );
 };
 
 const DocumentViewScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
   const docId = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
+  const CustomItem = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.componentItem;
+  const titles = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.titles;
+  const styleHeader = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.styleHeader;
   const document = useMemo(() => list.find((item: { id: string }) => item.id === docId), [docId, list]);
 
   const showActionSheet = useActionSheet();
@@ -81,7 +94,8 @@ const DocumentViewScreen = () => {
     });
   }, [navigation]);
 
-  const renderItem = ({ item }: { item: any }) => <ContentItem item={item} />;
+  const renderItem = ({ item }: { item: any }) =>
+    CustomItem ? <CustomItem item={item} /> : <ContentItem item={item as IEntity} />;
 
   const ref = useRef<FlatList<IDocument>>(null);
 
@@ -95,6 +109,7 @@ const DocumentViewScreen = () => {
       </View>
       <FlatList
         ref={ref}
+        //TODO: данные из документа
         data={[]}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
@@ -104,6 +119,8 @@ const DocumentViewScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListHeaderComponent={() => Header({ titles: titles ?? ['Идентификатор'] })}
+        ListHeaderComponentStyle={styleHeader ?? styles.header}
       />
     </>
   );
@@ -116,6 +133,12 @@ const styles = StyleSheet.create({
   emptyList: {
     marginTop: 20,
     textAlign: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    backgroundColor: '#CC6',
+    justifyContent: 'space-around',
+    paddingVertical: 6,
   },
   textDescription: {
     fontSize: 11,
