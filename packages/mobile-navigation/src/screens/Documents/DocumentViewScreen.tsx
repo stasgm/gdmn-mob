@@ -1,5 +1,5 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef /*, { useCallback }*/ } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { useTheme } from 'react-native-paper';
 
@@ -16,6 +16,10 @@ import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
 import { DocumentsStackParamList } from '../../navigation/Root/types';
+
+import { styles } from './styles';
+import Header from './components/Header';
+import DocumentLine from './components/DocumentLine';
 
 type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 
@@ -36,20 +40,6 @@ const toString = ({ value, type }: { value: any; type: typeValue }) => {
     return value.name;
   }
   return value;
-};
-
-const ContentItem = ({ item }: { item: IEntity }) => {
-  return <View>{item.id}</View>;
-};
-
-const Header = ({ titles }: { titles: string[] }) => {
-  return (
-    <>
-      {titles.map((title) => (
-        <Text>{title}</Text>
-      ))}
-    </>
-  );
 };
 
 const DocumentViewScreen = () => {
@@ -95,7 +85,7 @@ const DocumentViewScreen = () => {
   }, [navigation]);
 
   const renderItem = ({ item }: { item: any }) =>
-    CustomItem ? <CustomItem item={item} /> : <ContentItem item={item as IEntity} />;
+    CustomItem ? <CustomItem item={item} /> : <DocumentLine item={item as IEntity} />;
 
   const ref = useRef<FlatList<IDocument>>(null);
 
@@ -127,20 +117,3 @@ const DocumentViewScreen = () => {
 };
 
 export default DocumentViewScreen;
-
-const styles = StyleSheet.create({
-  description: {},
-  emptyList: {
-    marginTop: 20,
-    textAlign: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    backgroundColor: '#CC6',
-    justifyContent: 'space-around',
-    paddingVertical: 6,
-  },
-  textDescription: {
-    fontSize: 11,
-  },
-});
