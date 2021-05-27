@@ -1,7 +1,8 @@
 import inquirer from 'inquirer';
+
 export interface IItemDatabase {
   name: string;
-  database: string;
+  path: string;
   port: number;
 }
 
@@ -13,7 +14,7 @@ export const databaseMenu = async (dataBases: IItemDatabase[] | undefined): Prom
   if (!dataBases) return undefined;
   if (dataBases.length === 1) return JSON.stringify(dataBases[0], null, '  ');
 
-  const choiseArray = dataBases.map((i) => i.database);
+  const choiseArray = dataBases.map((i) => i.path);
   return inquirer
     .prompt([
       {
@@ -28,7 +29,7 @@ export const databaseMenu = async (dataBases: IItemDatabase[] | undefined): Prom
     ])
     .then((answers: IItemAnswer) => {
       const answerDB = answers.db;
-      const db = dataBases.find((i) => i.database.toUpperCase() === answerDB.toUpperCase());
+      const db = dataBases.find((i) => i.path.toUpperCase() === answerDB.toUpperCase());
       console.log('Working database ' + db?.name);
       return JSON.stringify(db, null, '  ');
     })

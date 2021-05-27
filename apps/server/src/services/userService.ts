@@ -5,10 +5,13 @@ import { DataNotFoundException, InnerErrorException, ConflictException } from '.
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
 
-const { users, companies } = entities;
+import { getDb } from './dao/db';
+
+const db = getDb();
+
+const { users, companies } = db;
 
 /**
  * Добавляет одного пользователя

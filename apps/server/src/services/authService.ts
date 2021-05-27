@@ -8,10 +8,12 @@ import { IUser, NewUser } from '@lib/types';
 
 import { UnauthorizedException } from '../exceptions';
 
-import { entities } from './dao/db';
 import * as userService from './userService';
+import { getDb } from './dao/db';
 
-const { devices, users, codes } = entities;
+const db = getDb();
+
+const { devices, users, codes } = db;
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const { deviceId } = ctx.query;

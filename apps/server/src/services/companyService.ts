@@ -2,10 +2,13 @@ import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
 import { addCompanyToUser } from './userService';
 
-const { companies, users } = entities;
+import { getDb } from './dao/db';
+
+const db = getDb();
+
+const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации

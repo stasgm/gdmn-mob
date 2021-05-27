@@ -1,10 +1,13 @@
 import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
-import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
 
-const { messages, users, companies } = entities;
+import { getDb } from './dao/db';
+
+const db = getDb();
+
+const { messages, users, companies } = db;
 
 const findOne = async (id: string) => {
   return makeMessage(await messages.find(id));

@@ -2,9 +2,11 @@ import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
+import { getDb } from './dao/db';
 
-const { devices, codes, users } = entities;
+const db = getDb();
+
+const { devices, codes, users } = db;
 
 /**
  * Добавляет одно устройство
