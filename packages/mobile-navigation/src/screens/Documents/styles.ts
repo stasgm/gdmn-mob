@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    backgroundColor: '#CC6',
+    backgroundColor: '#e1e1e1',
     justifyContent: 'space-around',
     paddingVertical: 6,
   },

@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { useTheme } from 'react-native-paper';
 
-import { IDocument, IEntity } from '@lib/types';
+import { IEntity } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -81,22 +81,35 @@ const DocumentViewScreen = () => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      title: Title,
     });
   }, [navigation]);
 
-  const renderItem = ({ item }: { item: any }) =>
-    CustomItem ? <CustomItem item={item} /> : <DocumentLine item={item as IEntity} />;
-
-  const ref = useRef<FlatList<IDocument>>(null);
-
-  return (
-    <>
-      <View style={{ backgroundColor: colors.background }}>
+  const Title = () => {
+    return (
+      <View>
+        <Text>{document?.documentType.name}</Text>
         <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
           value: document?.documentDate,
           type: 'date',
         })}`}</Text>
       </View>
+    );
+  };
+
+  const renderItem = ({ item }: { item: IEntity }) =>
+    CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+
+  const ref = useRef<FlatList<IEntity>>(null);
+
+  return (
+    <>
+      {/*<View style={{ backgroundColor: colors.background }}>
+        <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
+          value: document?.documentDate,
+          type: 'date',
+        })}`}</Text>
+      </View>*/}
       <FlatList
         ref={ref}
         //TODO: данные из документа

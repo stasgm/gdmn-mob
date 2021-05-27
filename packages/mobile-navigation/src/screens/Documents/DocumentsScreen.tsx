@@ -60,6 +60,7 @@ const DocumentsScreen = () => {
 
   const renderItem = ({ item }: { item: IDocument }) => (
     <DocumentItem
+      key={item.id}
       item={item}
       fields={{
         number: { name: 'number', type: 'string' },
