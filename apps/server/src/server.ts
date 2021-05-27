@@ -15,20 +15,36 @@ import { IUser } from '@lib/types';
 
 import koaConfig from '../config/koa';
 
-// import log from './utils/logger';
+import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
+import { createDb, dbtype } from './services/dao/db';
 
-import { IItemDatabase } from './utils/databaseMenu';
+interface IServer {
+  name: string;
+  port: number;
+  dbName: string;
+  dbPath: string;
+}
 
-export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
-  const app = new Koa();
+interface IAppContext extends Koa.DefaultStateExtends {
+  db: dbtype;
+  port: number;
+  name: string;
+}
+
+export type KoaApp = Koa<Koa.DefaultState, IAppContext>;
+
+export async function createServer(server: IServer): Promise<KoaApp> {
+  const app: KoaApp = new Koa();
   app.keys = ['super-secret-key-web1215'];
 
-  // TODO db не используется!!!
+  app.context.db = createDb(server.dbPath, server.dbName);
+  app.context.port = server.port;
+  app.context.name = server.name;
 
   passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -77,21 +93,11 @@ export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa
     .use(router.routes())
     .use(router.allowedMethods());
 
-  /*   app.on('error', (err) => {
-      log.error(err);
-    });
-
-    app.on('user-error', (err) => {
-      log.warn(err);
-    });
-   */
-
-  /*   log.info('Starting listener ...');
-
-    await new Promise((resolve) => app.listen(db.port, () => resolve('')));
-
-    log.info(`Server is running on http://localhost:${db.port}`);
-   */
-
   return app;
 }
+
+export const startServer = (app: KoaApp) => {
+  app.listen(app.context.port);
+
+  log.info(`Server '${app.context.name}' is running on http://localhost:${app.context.port}`);
+};

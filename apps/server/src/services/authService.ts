@@ -8,14 +8,14 @@ import { IUser, NewUser } from '@lib/types';
 
 import { UnauthorizedException } from '../exceptions';
 
-import { entities } from './dao/db';
 import * as userService from './userService';
-
-const { devices, users, codes } = entities;
+import { dbtype } from './dao/db';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const { deviceId } = ctx.query;
   const { name }: { name: string } = ctx.request.body;
+
+  const { devices, users } = ctx.db as dbtype;
 
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 

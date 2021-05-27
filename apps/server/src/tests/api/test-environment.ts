@@ -1,6 +1,6 @@
 import Koa from 'koa';
 
-import { init } from '../../server';
+import { createServer } from '../../server';
 
 let app: Koa<Koa.DefaultState, Koa.DefaultContext> | null = null;
 
@@ -11,7 +11,7 @@ const testDb = {
 };
 
 export async function initEnvironment(): Promise<void> {
-  app = await init(testDb);
+  app = await createServer({ name: 'testServer', dbName: testDb.name, dbPath: testDb.database, port: testDb.port });
 }
 
 export function getApp(): Koa<Koa.DefaultState, Koa.DefaultContext> {

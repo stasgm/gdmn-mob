@@ -2,18 +2,20 @@ import { IDBUser, IDBMessage, IDBDevice, IDBActivationCode, IDBCompany, INamedEn
 
 import { Collection, Database } from '../../utils/json-db';
 
-const db = new Database('mob-app');
+export const createDb = (dir: string, name: string) => {
+  const db = new Database(dir, name);
 
-const users = db.collection<IDBUser>('user');
-const devices = db.collection<IDBDevice>('devices');
-const companies = db.collection<IDBCompany>('companies');
-const codes = db.collection<IDBActivationCode>('activation-codes');
-const messages = db.collection<IDBMessage>('messages');
+  const users = db.collection<IDBUser>('user');
+  const devices = db.collection<IDBDevice>('devices');
+  const companies = db.collection<IDBCompany>('companies');
+  const codes = db.collection<IDBActivationCode>('activation-codes');
+  const messages = db.collection<IDBMessage>('messages');
 
-// export type NamedDBEntities = typeof users | typeof devices | typeof companies;
-
-export const entities = { users, codes, companies, messages, devices };
+  return { users, codes, companies, messages, devices };
+};
 
 type ExtractTypes<P> = P extends Collection<infer T> ? T : never;
 
-export type NamedDBEntities = Collection<Extract<ExtractTypes<typeof entities[keyof typeof entities]>, INamedEntity>>;
+export type dbtype = ReturnType<typeof createDb>;
+
+export type NamedDBEntities = Collection<Extract<ExtractTypes<dbtype[keyof dbtype]>, INamedEntity>>;
