@@ -1,12 +1,12 @@
 [
   {
     "name": "DB_Agents",
-    "database": "C:\\DB_Agents",
+    "path": "C:\\DB_Agents",
     "port": 3649
   },
   {
     "name": "DB_OTVES",
-    "database": "C:\\DB_OTVES",
+    "path": "C:\\DB_OTVES",
     "port": 3649
   }
 ]

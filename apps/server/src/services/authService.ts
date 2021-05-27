@@ -11,11 +11,11 @@ import { UnauthorizedException } from '../exceptions';
 import * as userService from './userService';
 import { getDb } from './dao/db';
 
-const db = getDb();
-
-const { devices, users, codes } = db;
-
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
+  const db = getDb();
+
+  const { devices, users } = db;
+
   const { deviceId } = ctx.query;
   const { name }: { name: string } = ctx.request.body;
 
@@ -59,6 +59,10 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
 const signUp = async (user: NewUser): Promise<IUser> => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
+  const db = getDb();
+
+  const { devices, users } = db;
+
   const userCount = (await users.read()).length;
 
   if (!userCount) {
@@ -123,6 +127,9 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
 };
 
 const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
+  const db = getDb();
+  const { devices, codes } = db;
+
   const rec = await codes.find((i) => i.code === code);
 
   if (!rec) {

@@ -6,9 +6,8 @@ import { addCompanyToUser } from './userService';
 
 import { getDb } from './dao/db';
 
-const db = getDb();
-
-const { companies, users } = db;
+// const db = getDb();
+// const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
@@ -21,6 +20,9 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
+
+  const db = getDb();
+  const { companies, users } = db;
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new Error('Компания уже существует');
@@ -71,6 +73,9 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
+  const db = getDb();
+  const { companies, users } = db;
+
   try {
     const oldCompany = await companies.find(id);
 
@@ -106,6 +111,9 @@ const deleteOne = async (id: string): Promise<void> => {
     2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
+  const db = getDb();
+  const { companies } = db;
+
   try {
     const companyObj = await companies.find(id);
 
@@ -125,6 +133,9 @@ const deleteOne = async (id: string): Promise<void> => {
  * @return company, организация
  * */
 const findOne = async (id: string): Promise<ICompany | undefined> => {
+  const db = getDb();
+  const { companies } = db;
+
   const company = await companies.find(id);
 
   if (!company) return;
@@ -138,6 +149,9 @@ const findOne = async (id: string): Promise<ICompany | undefined> => {
  * @return company, организация
  * */
 const findOneByName = async (name: string): Promise<ICompany | undefined> => {
+  const db = getDb();
+  const { companies } = db;
+
   const company = await companies.find((i) => i.name === name);
 
   if (!company) return;
@@ -151,6 +165,9 @@ const findOneByName = async (name: string): Promise<ICompany | undefined> => {
  * @return company[], компании
  * */
 const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => {
+  const db = getDb();
+  const { companies } = db;
+
   const companyList = await companies?.read((item) => {
     const newParams = Object.assign({}, params);
 
@@ -176,6 +193,9 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
  * */
 
 export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
+  const db = getDb();
+  const { users } = db;
+
   const admin = await users.find(company.adminId);
 
   const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };

@@ -15,7 +15,6 @@ const defaultDatabase: IItemDatabase = {
 const run = async (dbase?: IItemDatabase): Promise<KoaApp> => {
   // TODO
   let db: IItemDatabase;
-  console.log(dbase);
 
   if (dbase) {
     db = dbase;
@@ -26,7 +25,7 @@ const run = async (dbase?: IItemDatabase): Promise<KoaApp> => {
     db = chosenDatabase ? JSON.parse(chosenDatabase) : defaultDatabase;
   }
 
-  const app = await createServer({ name: 'Server', dbName: db.name, dbPath: db.path, port: db.port });
+  const app = await createServer({ name: 'WS-Server', dbName: db.name, dbPath: db.path, port: db.port });
 
   startServer(app);
 

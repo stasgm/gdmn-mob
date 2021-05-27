@@ -4,8 +4,6 @@ import { DataNotFoundException, InvalidParameterException, UnauthorizedException
 
 import { getDb } from '../services/dao/db';
 
-const db = getDb();
-
 export const deviceMiddleware = async (ctx: Context, next: Next) => {
   if (ctx.query.deviceId === 'WEB') {
     return await next();
@@ -18,6 +16,8 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   if (ctx.query.deviceId instanceof Array) {
     throw new InvalidParameterException('Устройство должно быть строкой');
   }
+
+  const db = getDb();
 
   const device = await db.devices.find(ctx.query.deviceId);
 

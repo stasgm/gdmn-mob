@@ -1,15 +1,20 @@
 import { createServer, KoaApp } from '../../server';
+import { IItemDatabase } from '../../utils/databaseMenu';
 
 let app: KoaApp | null = null;
 
-const testDb = {
+const testDb: IItemDatabase = {
   name: 'TEST_BASE',
-  database: 'C:\\DB',
+  path: 'C:\\Work\\_develop\\',
   port: 3649,
 };
 
 export async function initEnvironment(): Promise<void> {
-  app = await createServer({ name: 'testServer', dbName: testDb.name, dbPath: testDb.database, port: testDb.port });
+  app = await createServer({ name: 'testServer', dbName: testDb.name, dbPath: testDb.path, port: testDb.port });
+}
+
+export function cleanUp(): void {
+  //
 }
 
 export function getApp(): KoaApp {

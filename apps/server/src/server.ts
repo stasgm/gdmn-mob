@@ -17,9 +17,9 @@ import koaConfig from '../config/koa';
 
 import log from './utils/logger';
 
-// import { validateAuthCreds } from './services/authService';
+import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
-// import { userService } from './services';
+import { userService } from './services';
 import router from './routes';
 import { createDb } from './services/dao/db';
 
@@ -43,18 +43,16 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
-    /* try {
+    try {
       const user = await userService.findOne(id);
       done(null, user);
     } catch (err) {
       done(err);
-    } */
+    }
   });
 
   const strategy: IStrategyOptions = { usernameField: 'name' };
-  const validateAuthCreds = () => {
-    console.log('ss');
-  };
+
   passport.use(new LocalStrategy(strategy, validateAuthCreds));
 
   // Логи для Morgan
@@ -86,15 +84,20 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         origin: 'http://localhost:8080',
       }),
     )
-    // .use(koaCors({ credentials: true }))
     .use(router.routes())
     .use(router.allowedMethods());
 
   return app;
 }
 
+process.on('SIGINT', () => {
+  console.log('Ctrl-C...');
+  console.log('Finished all requests');
+  process.exit(2);
+});
+
 export const startServer = (app: KoaApp) => {
   app.listen(app.context.port);
 
-  log.info(`Server '${app.context.name}' is running on http://localhost:${app.context.port}`);
+  log.info(`${app.context.name} is running on http://localhost:${app.context.port}`);
 };
