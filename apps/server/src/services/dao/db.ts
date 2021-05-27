@@ -2,6 +2,16 @@ import { IDBUser, IDBMessage, IDBDevice, IDBActivationCode, IDBCompany, INamedEn
 
 import { Collection, Database } from '../../utils/json-db';
 
+type dbtype = {
+  users: Collection<IDBUser>;
+  codes: Collection<IDBActivationCode>;
+  companies: Collection<IDBCompany>;
+  messages: Collection<IDBMessage>;
+  devices: Collection<IDBDevice>;
+};
+
+let database: dbtype | null = null;
+
 export const createDb = (dir: string, name: string) => {
   const db = new Database(dir, name);
 
@@ -11,11 +21,18 @@ export const createDb = (dir: string, name: string) => {
   const codes = db.collection<IDBActivationCode>('activation-codes');
   const messages = db.collection<IDBMessage>('messages');
 
-  return { users, codes, companies, messages, devices };
+  database = { users, codes, companies, messages, devices };
+
+  return database;
 };
 
 type ExtractTypes<P> = P extends Collection<infer T> ? T : never;
 
-export type dbtype = ReturnType<typeof createDb>;
-
 export type NamedDBEntities = Collection<Extract<ExtractTypes<dbtype[keyof dbtype]>, INamedEntity>>;
+
+export function getDb(): dbtype {
+  if (!database) {
+    throw new Error('Database is not initialized');
+  }
+  return database;
+}

@@ -21,7 +21,7 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb, dbtype } from './services/dao/db';
+import { createDb } from './services/dao/db';
 
 interface IServer {
   name: string;
@@ -30,13 +30,7 @@ interface IServer {
   dbPath: string;
 }
 
-interface IAppContext extends Koa.DefaultStateExtends {
-  db: dbtype;
-  port: number;
-  name: string;
-}
-
-export type KoaApp = Koa<Koa.DefaultState, IAppContext>;
+export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();

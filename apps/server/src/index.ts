@@ -1,5 +1,3 @@
-import Koa from 'koa';
-
 import config from '../config';
 
 import { createServer, KoaApp, startServer } from './server';
