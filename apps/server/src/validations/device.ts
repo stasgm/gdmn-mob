@@ -18,7 +18,7 @@ const updateDevice: Config = {
       id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
     }),
     type: 'json',
-    body: Joi.string().required().error(new InvalidParameterException('не указана информация об устройстве')),
+    body: Joi.object().required().error(new InvalidParameterException('не указана информация об устройстве')),
   },
 };
 

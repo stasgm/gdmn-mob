@@ -8,6 +8,6 @@ export class ConflictException extends ApplicationException {
    * @param context Request context and more details
    */
   constructor(context: string) {
-    super('Conflict', 409, `Client error: ${context}`);
+    super('Conflict', 409, context);
   }
 }

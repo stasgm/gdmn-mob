@@ -18,7 +18,7 @@ const updateUser: Config = {
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
     type: 'json',
-    body: Joi.string().required().error(new InvalidParameterException('Не указаны данные пользователя')),
+    body: Joi.object().required().error(new InvalidParameterException('Не указаны данные пользователя')),
   },
 };
 

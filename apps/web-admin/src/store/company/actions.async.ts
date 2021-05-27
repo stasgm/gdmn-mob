@@ -80,4 +80,22 @@ const updateCompany = (company: ICompany): AppThunk => {
   };
 };
 
-export default { fetchCompanies, fetchCompanyById, addCompany, updateCompany };
+const removeCompany = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(companyActions.removeCompanyAsync.request('удаление компании'));
+
+    const response = await api.company.removeCompany(id);
+
+    if (response.type === 'REMOVE_COMPANY') {
+      return dispatch(companyActions.removeCompanyAsync.success());
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(companyActions.removeCompanyAsync.failure(response.message));
+    }
+
+    return dispatch(companyActions.removeCompanyAsync.failure('ошибка удаления компании'));
+  };
+};
+
+export default { fetchCompanies, fetchCompanyById, addCompany, updateCompany, removeCompany };

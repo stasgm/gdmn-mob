@@ -34,9 +34,9 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
 const removeCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
-  await companyService.deleteOne(companyId);
+  const res = await companyService.deleteOne(companyId);
 
-  ok(ctx as Context);
+  ok(ctx as Context, res);
 
   log.info(`removeCompany: company '${companyId}' is successfully removed`);
 };
