@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import { getApp, initEnvironment } from './test-environment';
+import { getApp, initEnvironment, cleanUp } from './test-environment';
 
 beforeAll(async () => {
   await initEnvironment();
@@ -8,6 +8,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // Clean up
+  await cleanUp();
 });
 
 describe('testing /api/auth/', () => {
@@ -34,6 +35,18 @@ describe('testing /api/auth/', () => {
       expect(keys).not.toContain('password');
       expect(response.body.data.userName).toEqual(userName);
       expect(response.body.data.creatorId).toEqual(loginUserName); */
+    });
+  });
+
+  describe('POST /api/auth/signup', () => {
+    it('should return 409 - conflict', async () => {
+      const response = await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
+        name: '5',
+        password: '3',
+      });
+      expect(response.status).toEqual(409);
+      expect(response.type).toEqual('application/json');
+      expect(response.body.result).toBeFalsy();
     });
   });
   /*   describe('POST /api/auth/login?deviceId', () => {
