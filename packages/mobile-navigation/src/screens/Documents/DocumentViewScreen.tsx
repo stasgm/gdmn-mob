@@ -58,7 +58,7 @@ const DocumentViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Загрузить',
+        title: 'Добавить',
         // onPress: () => { },
       },
       {
@@ -66,10 +66,6 @@ const DocumentViewScreen = () => {
         type: 'destructive',
         // onPress: () => { },
       },
-      // {
-      //   title: 'Сбросить',
-      //   onPress: () => {},
-      // },
       {
         title: 'Отмена',
         type: 'cancel',
@@ -97,8 +93,9 @@ const DocumentViewScreen = () => {
     );
   };
 
-  const renderItem = ({ item }: { item: IEntity }) =>
-    CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+  const renderItem = <T extends IEntity>({ item }: { item: T }) => {
+    return CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+  };
 
   const ref = useRef<FlatList<IEntity>>(null);
 
@@ -122,7 +119,7 @@ const DocumentViewScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        ListHeaderComponent={() => Header({ titles: titles ?? ['Идентификатор'] })}
+        ListHeaderComponent={() => <Header titles={titles ?? ['Идентификатор']} />}
         ListHeaderComponentStyle={styleHeader ?? styles.header}
       />
     </>

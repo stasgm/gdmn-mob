@@ -1,49 +1,56 @@
-import { ICompany, IDocument, INamedEntity, IReferences, IUserDocument } from '@lib/types';
+import { IEntity, INamedEntity, IUserDocument } from '@lib/types';
 
-import { companyRefMock, depRefMock, peopleRefMock } from './references';
-
-// const user1: INamedEntity = {
-//   id: '123',
-//   name: 'Stas',
-// };
-
-// const user2: INamedEntity = {
-//   id: '345',
-//   name: 'Ina',
-// };
-
-// const user3: INamedEntity = {
-//   id: '654',
-//   name: 'Gedemin',
-// };
-
-// const companies: ICompany[] = [
-//   { id: '789', name: 'ОДО Золотые Программы', admin: user1 },
-//   { id: '654', name: 'ОДО Амперсант', admin: user2 },
-//   { id: '34', name: 'Company 1', admin: user2 },
-//   { id: '154', name: 'Company 2', admin: user2 },
-//   { id: '644', name: 'Company 3', admin: user1 },
-//   { id: '954', name: 'Company 4', admin: user2 },
-// ];
+// import { companyRefMock, depRefMock, peopleRefMock } from './references';
 
 const inventType = { id: '11', name: 'Инвентаризация' };
 const newcostType = { id: '33', name: 'Переоценка' };
 
-const documentTypeMock = [inventType, newcostType];
+// const documentTypeMock = [inventType, newcostType];
 
 const good1: INamedEntity = { id: '333', name: 'Молоко 1л.' };
 const good2: INamedEntity = { id: '999', name: 'Сметана 25% 250 гр.' };
 
-export const documents: IUserDocument[] = [
+const dep1: INamedEntity = {
+  id: '1',
+  name: 'Склад',
+};
+
+interface DocHeader {
+  department: INamedEntity;
+}
+
+interface DocLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+}
+
+export const documentsMock: IUserDocument<DocHeader, DocLine[]>[] = [
   {
     id: '9',
     number: '225',
-    documentDate: '25.04.2021',
+    documentDate: '2021-05-15T10:47:33.376Z',
     documentType: inventType,
     status: 'DRAFT',
-    /*     lines: [
-      { id: '10', good: good1, quantity: 12 },
-      { id: '11', good: good2, quantity: 10 },
-    ], */
+    head: {
+      department: dep1,
+    },
+    lines: [
+      { id: '1', good: good1, quantity: 12.3 },
+      { id: '2', good: good2, quantity: 2.21 },
+    ],
+  },
+  {
+    id: '9',
+    number: '225',
+    documentDate: '2021-05-12T10:40:33.376Z',
+    documentType: newcostType,
+    status: 'PROCESSED',
+    head: {
+      department: dep1,
+    },
+    lines: [
+      { id: '1', good: good1, quantity: 10 },
+      { id: '2', good: good2, quantity: 5 },
+    ],
   },
 ];

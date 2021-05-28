@@ -1,11 +1,15 @@
 import React from 'react';
 import { Text } from 'react-native';
 
-const Header = ({ titles }: { titles: string[] }) => {
+interface IProps {
+  titles: string[];
+}
+
+const Header = ({ titles }: IProps) => {
   return (
     <>
       {titles.map((title) => (
-        <Text>{title}</Text>
+        <Text key={title}>{title}</Text>
       ))}
     </>
   );

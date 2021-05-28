@@ -26,7 +26,7 @@ const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) =>
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  //вынести в отдельное место от компонента
+  //TODO вынести в отдельное место от компонента
   //функция для приведения других типов к строке
   const toString = ({ value, type }: { value: any; type: typeValue }) => {
     if (type === 'number') {
@@ -45,6 +45,12 @@ const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) =>
     return value;
   };
 
+  const docInfo = () => {
+    const res = fields.typeDoc ? toString({ value: item[fields.typeDoc.name], type: fields.typeDoc.type }) : '';
+
+    return `${res} №${toString({ value: item[fields.number.name], type: fields.number.type })}`;
+  };
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -57,11 +63,7 @@ const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) =>
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={[styles.name, { color: colors.text }]}>
-              {`${
-                fields.typeDoc ? toString({ value: item[fields.typeDoc.name], type: fields.typeDoc.type }) : ''
-              } №${toString({ value: item[fields.number.name], type: fields.number.type })}`}
-            </Text>
+            <Text style={[styles.name, { color: colors.text }]}>{docInfo()}</Text>
             {fields.important ? (
               <Text style={[styles.name, { color: colors.text }]}>
                 {toString({ value: item[fields.important.name], type: fields.important.type })}

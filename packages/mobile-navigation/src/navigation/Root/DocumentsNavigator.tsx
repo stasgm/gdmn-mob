@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
 
-import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
+import DocumentListScreen from '../../screens/Documents/DocumentListScreen';
 
 import DocumentViewScreen from '../../screens/Documents/DocumentViewScreen';
 
@@ -20,7 +20,7 @@ const DocumentsNavigator = () => {
       <Stack.Screen
         key="Documents"
         name="Documents"
-        component={types && types.data.length !== 0 ? TabsNavigator : DocumentsScreen}
+        component={types && types.data.length !== 0 ? TabsNavigator : DocumentListScreen}
         options={{ title: 'Документы' }}
       />
       <Stack.Screen key="DocumentView" name="DocumentView" component={DocumentViewScreen} />

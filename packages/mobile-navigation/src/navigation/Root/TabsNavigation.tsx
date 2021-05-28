@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { useSelector } from '@lib/store';
 
-import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
+import DocumentListScreen from '../../screens/Documents/DocumentListScreen';
 
 import { TabsStackParams } from './types';
 
@@ -21,7 +21,7 @@ const TabsNavigator = () => {
         <TabsStack.Screen
           key={typeDoc.id}
           name={typeDoc.id}
-          component={DocumentsScreen}
+          component={DocumentListScreen}
           initialParams={{ type: typeDoc.name as string }}
           options={{
             title: (typeDoc.name || '') as string,
