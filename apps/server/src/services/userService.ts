@@ -98,7 +98,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     firstName: userData.firstName || oldUser.firstName,
     lastName: userData.lastName || oldUser.lastName,
     phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
-    creationDate: oldUser.creationDate ? new Date(oldUser.creationDate).toJSON() : '',
+    creationDate: oldUser.creationDate,
     editionDate: new Date().toJSON(),
   };
 
@@ -270,8 +270,8 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
     externalId: user.externalId,
-    creationDate: user.creationDate ? new Date(user.creationDate).toUTCString() : '',
-    editionDate: user.editionDate ? new Date(user.editionDate).toUTCString() : '',
+    creationDate: user.creationDate,
+    editionDate: user.editionDate,
   };
 };
 

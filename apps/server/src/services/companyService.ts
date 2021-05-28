@@ -207,8 +207,8 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
     name: company.name,
     admin: adminEntity,
     externalId: company.externalId,
-    creationDate: company.creationDate ? new Date(company.creationDate).toUTCString() : '',
-    editionDate: company.editionDate ? new Date(company.editionDate).toUTCString() : '',
+    creationDate: company.creationDate,
+    editionDate: company.editionDate,
   };
 };
 

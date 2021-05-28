@@ -1,12 +1,17 @@
 [
   {
-    "name": "DB_Agents",
-    "path": "C:\\DB_Agents",
+    "name": "Trade-agents",
+    "path": "C:\\DB",
+    "port": 3650
+  },
+  {
+    "name": "Otves",
+    "path": "C:\\DB",
     "port": 3649
   },
   {
-    "name": "DB_OTVES",
-    "path": "C:\\DB_OTVES",
+    "name": "Inventory",
+    "path": "C:\\DB",
     "port": 3649
   }
 ]
