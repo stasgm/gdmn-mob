@@ -1,13 +1,15 @@
 import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
 
-import { ConflictException, DataNotFoundException } from '../exceptions';
-
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
+import { ConflictException, DataNotFoundException } from '../exceptions';
+
 import { addCompanyToUser } from './userService';
 
-const { companies, users } = entities;
+import { getDb } from './dao/db';
+
+// const db = getDb();
+// const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
@@ -20,7 +22,10 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  console.log('begin');
+
+  const db = getDb();
+  const { companies, users } = db;
+
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
   }
@@ -34,31 +39,28 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     editionDate: new Date().toJSON(),
   };
 
-  console.log('0', newCompanyObj);
-
   const newCompany = await companies.insert(newCompanyObj);
 
-  console.log('1', newCompany);
+  console.log(1, newCompany);
 
   const createdCompany = await companies.find(newCompany);
 
-  console.log('2', createdCompany);
-
-  // Добавляем компанию к текущему пользователю
+  console.log(2, createdCompany);
+  // Добавляем к текущему
   await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   //TODO переделать на updateCompany
 
-  console.log('3');
+  console.log(3);
 
-  // Добавляем компанию к пользователю gdmn
+  // Добавляем к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
-  console.log('4', user);
+
+  console.log(4, user);
 
   if (user) {
     await addCompanyToUser(user.id, createdCompany.id);
+    console.log(5);
   }
-
-  console.log('5', createdCompany);
 
   return makeCompany(createdCompany);
 };
@@ -69,6 +71,9 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
+  const db = getDb();
+  const { companies, users } = db;
+
   console.log('1', companyData);
   const companyObj = await companies.find(id);
   console.log('2', companyObj);
@@ -77,7 +82,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  // Проверяем есть ли в базе переданный админ TODO: если переданный администратор не существует - то ошибка
+  // Проверяем есть ли в базе переданный админ
   const adminId = companyData?.admin ? (await users.find(companyData.admin.id))?.id : companyObj.adminId;
 
   const newCompany: IDBCompany = {
@@ -86,18 +91,12 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     creationDate: companyObj.creationDate,
-    editionDate: new Date().toJSON(),
+    editionDate: new Date().toISOString(),
   };
-
-  console.log('3', newCompany);
 
   await companies.update(newCompany);
 
-  console.log('4', newCompany);
-
   const updatedCompany = await companies.find(id);
-
-  console.log('5', updatedCompany);
 
   return makeCompany(updatedCompany);
 };
@@ -112,6 +111,9 @@ const deleteOne = async (id: string): Promise<string> => {
     2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
+  const db = getDb();
+  const { companies } = db;
+
   const companyObj = await companies.find(id);
 
   if (!companyObj) {
@@ -119,7 +121,6 @@ const deleteOne = async (id: string): Promise<string> => {
   }
 
   await companies.delete(id);
-
   return 'Компания удалена';
 };
 
@@ -129,6 +130,9 @@ const deleteOne = async (id: string): Promise<string> => {
  * @return company, организация
  * */
 const findOne = async (id: string): Promise<ICompany> => {
+  const db = getDb();
+  const { companies } = db;
+
   const company = await companies.find(id);
 
   if (!company) {
@@ -144,6 +148,9 @@ const findOne = async (id: string): Promise<ICompany> => {
  * @return company, организация
  * */
 const findOneByName = async (name: string): Promise<ICompany> => {
+  const db = getDb();
+  const { companies } = db;
+
   const company = await companies.find((i) => i.name === name);
 
   if (!company) {
@@ -159,6 +166,9 @@ const findOneByName = async (name: string): Promise<ICompany> => {
  * @return company[], компании
  * */
 const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => {
+  const db = getDb();
+  const { companies } = db;
+
   const companyList = await companies?.read((item) => {
     const newParams = Object.assign({}, params);
 
@@ -171,7 +181,7 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
 
     return adminFound && extraPredicate(item, newParams);
   });
-
+  console.log('companyList', companyList);
   const pr = companyList?.map(async (i) => await makeCompany(i));
 
   return Promise.all(pr);
@@ -184,25 +194,21 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
  * */
 
 export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
+  const db = getDb();
+  const { users } = db;
+
   const admin = await users.find(company.adminId);
 
   const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };
-  console.log({
-    id: company.id,
-    name: company.name,
-    admin: adminEntity,
-    externalId: company.externalId,
-    creationDate: company.creationDate,
-    editionDate: company.editionDate,
-  });
+
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: company.id,
     name: company.name,
     admin: adminEntity,
     externalId: company.externalId,
-    creationDate: company.creationDate ? new Date(company.creationDate).toUTCString() : '',
-    editionDate: company.editionDate ? new Date(company.editionDate).toUTCString() : '',
+    creationDate: company.creationDate,
+    editionDate: company.editionDate,
   };
 };
 
