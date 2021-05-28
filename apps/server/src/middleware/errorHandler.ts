@@ -10,8 +10,8 @@ const errorHandler = async (ctx: Context, next: Next) => {
   } catch (error) {
     const result: IResponse<string> = {
       result: false,
-      error: error.name || 'InnerErrorException',
-      data: error.message || 'unknown error',
+      error: error.message || 'unknown error',
+      data: error.name || 'InnerErrorException',
     };
 
     ctx.status = error.status || 500;

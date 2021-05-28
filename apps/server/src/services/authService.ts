@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 
 import { IUser, NewUser } from '@lib/types';
 
-import { UnauthorizedException } from '../exceptions';
+import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
 import { entities } from './dao/db';
 import * as userService from './userService';
@@ -27,25 +27,21 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
 
   if (!device) {
-    throw new UnauthorizedException('связанное с пользователем устройство не найдено');
-    // throw new Error('Cвязанное с пользователем устройство не найдено');
+    throw new UnauthorizedException('Связанное с пользователем Устройство не найдено');
   }
 
   if (device.state === 'BLOCKED') {
-    throw new UnauthorizedException('устройство заблокировано');
-    // throw new Error('устройство заблокировано');
+    throw new UnauthorizedException('Устройство заблокировано');
   }
 
   return koaPassport.authenticate('local', async (err: Error, usr: IUser) => {
     if (err) {
       throw new UnauthorizedException(err.message);
-      // throw new Error(err.message);
     }
 
     //TODO посмотреть как обработать правильно
     if (!usr) {
-      throw new UnauthorizedException('неверные данные');
-      // throw new Error('Неверное имя пользователя или пароль');
+      throw new UnauthorizedException('Неверные данные');
     }
 
     await ctx.login(usr);
@@ -124,7 +120,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   const rec = await codes.find((i) => i.code === code);
 
   if (!rec) {
-    throw new Error('код не найден');
+    throw new DataNotFoundException('Код не найден');
   }
 
   const date: Date = new Date(rec.date);
@@ -138,7 +134,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
 
   if (diffDays < 0) {
     // await codes.delete(i => i.code === code);
-    throw new Error('срок действия кода истёк');
+    throw new UnauthorizedException('Срок действия кода истёк');
   }
 
   // обновляем uid у устройства
@@ -146,7 +142,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   const device = await devices.find(rec.deviceId);
 
   if (!device) {
-    throw new Error('код не соответствует заданному устройству');
+    throw new DataNotFoundException('Код не соответствует заданному устройству');
   }
 
   await devices.update({ ...device, uid: deviceId, state: 'ACTIVE' });

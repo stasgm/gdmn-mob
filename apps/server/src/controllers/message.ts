@@ -65,8 +65,8 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const user = await userService.findOne(userId);
 
   if (!user) {
-    // ctx.throw(400, 'пользователь не найден');
-    throw new InvalidParameterException('пользователь не найден');
+    // ctx.throw(400, 'Пользователь не найден');
+    throw new InvalidParameterException('Пользователь не найден');
   }
 
   if (user.name === 'gdmn') {
@@ -93,7 +93,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   // const user = await userService.findOne(userId);
 
   // if (!user) {
-  //   ctx.throw(400, 'пользователь не найден');
+  //   ctx.throw(400, 'Пользователь не найден');
   // }
 
   // if (user.name === 'gdmn') {

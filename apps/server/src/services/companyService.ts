@@ -20,7 +20,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-
+  console.log('begin');
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
   }
@@ -30,24 +30,35 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     name: company.name,
     adminId: company.adminId,
     externalId: company.externalId,
-    creationDate: new Date().toISOString(),
-    editionDate: new Date().toISOString(),
+    creationDate: new Date().toJSON(),
+    editionDate: new Date().toJSON(),
   };
+
+  console.log('0', newCompanyObj);
 
   const newCompany = await companies.insert(newCompanyObj);
 
+  console.log('1', newCompany);
+
   const createdCompany = await companies.find(newCompany);
+
+  console.log('2', createdCompany);
 
   // Добавляем компанию к текущему пользователю
   await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   //TODO переделать на updateCompany
 
+  console.log('3');
+
   // Добавляем компанию к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
+  console.log('4', user);
 
   if (user) {
     await addCompanyToUser(user.id, createdCompany.id);
   }
+
+  console.log('5', createdCompany);
 
   return makeCompany(createdCompany);
 };
@@ -58,7 +69,9 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
+  console.log('1', companyData);
   const companyObj = await companies.find(id);
+  console.log('2', companyObj);
 
   if (!companyObj) {
     throw new DataNotFoundException('Компания не найдена');
@@ -73,12 +86,18 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     creationDate: companyObj.creationDate,
-    editionDate: new Date().toISOString(),
+    editionDate: new Date().toJSON(),
   };
+
+  console.log('3', newCompany);
 
   await companies.update(newCompany);
 
+  console.log('4', newCompany);
+
   const updatedCompany = await companies.find(id);
+
+  console.log('5', updatedCompany);
 
   return makeCompany(updatedCompany);
 };
@@ -168,15 +187,22 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
   const admin = await users.find(company.adminId);
 
   const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };
-
-  /* TODO В звависимости от прав возвращать разный набор полей */
-  return {
+  console.log({
     id: company.id,
     name: company.name,
     admin: adminEntity,
     externalId: company.externalId,
     creationDate: company.creationDate,
     editionDate: company.editionDate,
+  });
+  /* TODO В звависимости от прав возвращать разный набор полей */
+  return {
+    id: company.id,
+    name: company.name,
+    admin: adminEntity,
+    externalId: company.externalId,
+    creationDate: company.creationDate ? new Date(company.creationDate).toUTCString() : '',
+    editionDate: company.editionDate ? new Date(company.editionDate).toUTCString() : '',
   };
 };
 

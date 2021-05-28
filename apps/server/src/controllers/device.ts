@@ -50,8 +50,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const device = await deviceService.findOneByUid(deviceId);
 
   if (!device) {
-    throw new DataNotFoundException('устройство не найдено');
-    // ctx.throw(404, 'устройство не найдено');
+    throw new DataNotFoundException('Устройство не найдено');
   }
 
   ok(ctx as Context, device);
@@ -102,7 +101,7 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 //     });
 
 //     if (!device) {
-//       ctx.throw(404, 'устройство не найдено');
+//       ctx.throw(404, 'Устройство не найдено');
 //     }
 
 //     const result: IResponse<IDevice> = { result: true, data: device };

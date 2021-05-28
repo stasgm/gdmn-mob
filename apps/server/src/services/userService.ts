@@ -35,8 +35,8 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     firstName: newUser.firstName,
     lastName: newUser.lastName,
     phoneNumber: newUser.phoneNumber,
-    creationDate: new Date().toISOString(),
-    editionDate: new Date().toISOString(),
+    creationDate: new Date().toJSON(),
+    editionDate: new Date().toJSON(),
   };
 
   const userId = await users.insert(newUserObj);
@@ -63,7 +63,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
   const oldUser = await users.find(userId);
 
   if (!oldUser) {
-    throw new Error('пльзователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
   // Если передан новый пароль то хешируем и заменяем
   const passwordHash = userData.password ? await hashPassword(userData.password) : oldUser.password;
@@ -93,8 +93,8 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     firstName: userData.firstName || oldUser.firstName,
     lastName: userData.lastName || oldUser.lastName,
     phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
-    creationDate: oldUser.creationDate,
-    editionDate: new Date().toISOString(),
+    creationDate: oldUser.creationDate ? new Date(oldUser.creationDate).toJSON() : '',
+    editionDate: new Date().toJSON(),
   };
 
   await users.update(newUser);
@@ -112,7 +112,7 @@ const deleteOne = async (id: string): Promise<void> => {
   const user = await users.find(id);
 
   if (!user) {
-    throw new DataNotFoundException('пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   // TODO Если пользователь является админом организации то прерывать
@@ -124,7 +124,7 @@ const findOne = async (id: string): Promise<IUser | undefined> => {
   const user = await users.find(id);
 
   if (!user) {
-    throw new DataNotFoundException('пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   return makeUser(user);
@@ -134,7 +134,7 @@ const findByName = async (name: string): Promise<IUser> => {
   const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new DataNotFoundException('пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   return makeUser(user);
@@ -190,17 +190,17 @@ const addCompanyToUser = async (userId: string, companyId: string) => {
   const user = await users.find(userId);
 
   if (!user) {
-    throw new Error('пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   const company = await companies.find(companyId);
 
   if (!company) {
-    throw new Error('Компания не найдена');
+    throw new DataNotFoundException('Компания не найдена');
   }
 
   if (user.companies?.some((i) => companyId === i)) {
-    throw new Error('Компания уже привязана к пользователю');
+    throw new DataNotFoundException('Компания уже привязана к пользователю');
   }
 
   const companyList = [...(user.companies || []), company.id];
@@ -212,11 +212,11 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
   const user = await users.find(userId);
 
   if (!user) {
-    throw new Error('пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   if (user.companies?.some((i) => companyName === i)) {
-    throw new Error('Компания не привязана к пользователю');
+    throw new DataNotFoundException('Компания не привязана к пользователю');
   }
 
   return users.update({
@@ -241,8 +241,8 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
     externalId: user.externalId,
-    creationDate: user.creationDate,
-    editionDate: user.editionDate,
+    creationDate: user.creationDate ? new Date(user.creationDate).toUTCString() : '',
+    editionDate: user.editionDate ? new Date(user.editionDate).toUTCString() : '',
   };
 };
 

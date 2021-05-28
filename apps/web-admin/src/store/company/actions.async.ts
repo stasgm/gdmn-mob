@@ -23,7 +23,7 @@ const fetchCompanyById = (id: string): AppThunk => {
       return dispatch(companyActions.fetchCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.fetchCompaniesAsync.failure('ошибка получения данных о компании'));
+    return dispatch(companyActions.fetchCompaniesAsync.failure('Ошибка получения данных о компании'));
   };
 };
 
@@ -40,7 +40,7 @@ const fetchCompanies = (): AppThunk => {
       return dispatch(companyActions.fetchCompaniesAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.fetchCompaniesAsync.failure('ошибка получения данных о компаниях'));
+    return dispatch(companyActions.fetchCompaniesAsync.failure('Ошибка получения данных о компаниях'));
   };
 };
 
@@ -58,13 +58,13 @@ const addCompany = (company: NewCompany): AppThunk => {
       return dispatch(companyActions.addCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.addCompanyAsync.failure('ошибка добавления компании'));
+    return dispatch(companyActions.addCompanyAsync.failure('Ошибка добавления компании'));
   };
 };
 
 const updateCompany = (company: ICompany): AppThunk => {
   return async (dispatch) => {
-    dispatch(companyActions.updateCompanyAsync.request('обновление компании'));
+    dispatch(companyActions.updateCompanyAsync.request('Обновление компании'));
 
     const response = await api.company.updateCompany(company);
 
@@ -76,13 +76,13 @@ const updateCompany = (company: ICompany): AppThunk => {
       return dispatch(companyActions.updateCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.updateCompanyAsync.failure('ошибка обновления компании'));
+    return dispatch(companyActions.updateCompanyAsync.failure('Ошибка обновления компании'));
   };
 };
 
 const removeCompany = (id: string): AppThunk => {
   return async (dispatch) => {
-    dispatch(companyActions.removeCompanyAsync.request('удаление компании'));
+    dispatch(companyActions.removeCompanyAsync.request('Удаление компании'));
 
     const response = await api.company.removeCompany(id);
 
@@ -94,7 +94,7 @@ const removeCompany = (id: string): AppThunk => {
       return dispatch(companyActions.removeCompanyAsync.failure(response.message));
     }
 
-    return dispatch(companyActions.removeCompanyAsync.failure('ошибка удаления компании'));
+    return dispatch(companyActions.removeCompanyAsync.failure('Ошибка удаления компании'));
   };
 };
 

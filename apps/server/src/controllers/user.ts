@@ -58,8 +58,7 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
   const user = await userService.findOne(userId);
 
   if (!user) {
-    throw new DataNotFoundException('пользователь не найден');
-    //ctx.throw(404, 'пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   ok(ctx as Context, user);

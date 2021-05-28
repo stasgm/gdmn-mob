@@ -5,6 +5,7 @@ import { ICompany, NewCompany } from '@lib/types';
 import log from '../utils/logger';
 import { companyService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
+import { DataNotFoundException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, externalId } = ctx.request.body;
@@ -47,7 +48,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const company = await companyService.findOne(companyId);
 
   if (!company) {
-    ctx.throw(404, 'компания не найдена');
+    throw new DataNotFoundException('Компания не найдена');
   }
 
   ok(ctx as Context, company);
