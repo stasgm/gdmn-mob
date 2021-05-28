@@ -91,7 +91,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     creationDate: companyObj.creationDate,
-    editionDate: new Date().toISOString(),
+    editionDate: new Date().toJSON(),
   };
 
   await companies.update(newCompany);
@@ -207,8 +207,8 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
     name: company.name,
     admin: adminEntity,
     externalId: company.externalId,
-    creationDate: company.creationDate,
-    editionDate: company.editionDate,
+    creationDate: company.creationDate ? new Date(company.creationDate).toUTCString() : '',
+    editionDate: company.editionDate ? new Date(company.editionDate).toUTCString() : '',
   };
 };
 

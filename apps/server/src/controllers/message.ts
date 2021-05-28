@@ -8,7 +8,7 @@ import { messageService, companyService, userService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
-import { InvalidParameterException } from '../exceptions';
+import { DataNotFoundException } from '../exceptions';
 
 let clients: ((result: IMessage[]) => void)[] = [];
 
@@ -59,14 +59,14 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (!company) {
     //ctx.throw(400, 'компания не найдена');
-    throw new InvalidParameterException('компания не найдена');
+    throw new DataNotFoundException('Компания не найдена');
   }
 
   const user = await userService.findOne(userId);
 
   if (!user) {
     // ctx.throw(400, 'Пользователь не найден');
-    throw new InvalidParameterException('Пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   if (user.name === 'gdmn') {

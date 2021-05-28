@@ -1,17 +1,17 @@
 [
   {
     "name": "Trade-agents",
-    "path": "C:\\Work\\_develop",
+    "path": "C:\\DB",
     "port": 3650
   },
   {
     "name": "Otves",
-    "path": "C:\\Work\\_develop",
+    "path": "C:\\DB",
     "port": 3649
   },
   {
     "name": "Inventory",
-    "path": "C:\\Work\\_develop",
+    "path": "C:\\DB",
     "port": 3649
   }
 ]

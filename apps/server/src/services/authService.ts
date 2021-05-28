@@ -22,7 +22,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new UnauthorizedException('неверные данные');
+    throw new UnauthorizedException('Неверные данные');
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
@@ -105,20 +105,20 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   const user = await userService.findByName(name);
 
   if (!user) {
-    return done(new Error('неверные данные'));
+    return done(new Error('Неверные данные'));
   }
 
   const hashedPassword = await userService.getUserPassword(user.id);
 
   if (!hashedPassword) {
-    throw new UnauthorizedException('неверные данные');
+    throw new UnauthorizedException('Неверные данные');
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    done(new Error('неверные данные')); //TODO возвращать ошибку вместо null
+    done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
   }
 };
 
@@ -151,7 +151,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   const device = await devices.find(rec.deviceId);
 
   if (!device) {
-    throw new DataNotFoundException('Код не соответствует заданному устройству');
+    throw new UnauthorizedException('Код не соответствует заданному устройству');
   }
 
   await devices.update({ ...device, uid: deviceId, state: 'ACTIVE' });
