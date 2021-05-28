@@ -1,9 +1,9 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef /*, { useCallback }*/ } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { useTheme } from 'react-native-paper';
 
-import { IDocument } from '@lib/types';
+import { IEntity } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -16,6 +16,10 @@ import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
 import { DocumentsStackParamList } from '../../navigation/Root/types';
+
+import { styles } from './styles';
+import Header from './components/Header';
+import DocumentLine from './components/DocumentLine';
 
 type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 
@@ -38,14 +42,13 @@ const toString = ({ value, type }: { value: any; type: typeValue }) => {
   return value;
 };
 
-const ContentItem = ({ item }: { item: any }) => {
-  return <View>{item}</View>;
-};
-
 const DocumentViewScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
   const docId = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
+  const CustomItem = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.componentItem;
+  const titles = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.titles;
+  const styleHeader = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.styleHeader;
   const document = useMemo(() => list.find((item: { id: string }) => item.id === docId), [docId, list]);
 
   const showActionSheet = useActionSheet();
@@ -78,23 +81,38 @@ const DocumentViewScreen = () => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      title: Title,
     });
   }, [navigation]);
 
-  const renderItem = ({ item }: { item: any }) => <ContentItem item={item} />;
-
-  const ref = useRef<FlatList<IDocument>>(null);
-
-  return (
-    <>
-      <View style={{ backgroundColor: colors.background }}>
+  const Title = () => {
+    return (
+      <View>
+        <Text>{document?.documentType.name}</Text>
         <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
           value: document?.documentDate,
           type: 'date',
         })}`}</Text>
       </View>
+    );
+  };
+
+  const renderItem = ({ item }: { item: IEntity }) =>
+    CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+
+  const ref = useRef<FlatList<IEntity>>(null);
+
+  return (
+    <>
+      {/*<View style={{ backgroundColor: colors.background }}>
+        <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
+          value: document?.documentDate,
+          type: 'date',
+        })}`}</Text>
+      </View>*/}
       <FlatList
         ref={ref}
+        //TODO: данные из документа
         data={[]}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
@@ -104,20 +122,11 @@ const DocumentViewScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListHeaderComponent={() => Header({ titles: titles ?? ['Идентификатор'] })}
+        ListHeaderComponentStyle={styleHeader ?? styles.header}
       />
     </>
   );
 };
 
 export default DocumentViewScreen;
-
-const styles = StyleSheet.create({
-  description: {},
-  emptyList: {
-    marginTop: 20,
-    textAlign: 'center',
-  },
-  textDescription: {
-    fontSize: 11,
-  },
-});

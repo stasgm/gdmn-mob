@@ -5,7 +5,6 @@ import { useSelector } from '@lib/store';
 
 import DocumentsScreen from '../../screens/Documents/DocumentsScreen';
 
-// eslint-disable-next-line import/no-cycle
 import DocumentViewScreen from '../../screens/Documents/DocumentViewScreen';
 
 import TabsNavigator from './TabsNavigation';
