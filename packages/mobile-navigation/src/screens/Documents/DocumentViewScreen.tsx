@@ -15,7 +15,7 @@ import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
-import { DocumentsStackParamList } from '../../navigation/Root/types';
+import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
 import Header from './components/Header';
@@ -45,10 +45,10 @@ const toString = ({ value, type }: { value: any; type: typeValue }) => {
 const DocumentViewScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
-  const docId = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
-  const CustomItem = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.componentItem;
-  const titles = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.titles;
-  const styleHeader = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.styleHeader;
+  const docId = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.id;
+  const CustomItem = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.componentItem;
+  const titles = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.titles;
+  const styleHeader = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.styleHeader;
   const document = useMemo(() => list.find((item: { id: string }) => item.id === docId), [docId, list]);
 
   const showActionSheet = useActionSheet();
@@ -58,7 +58,7 @@ const DocumentViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Загрузить',
+        title: 'Добавить',
         // onPress: () => { },
       },
       {
@@ -66,10 +66,6 @@ const DocumentViewScreen = () => {
         type: 'destructive',
         // onPress: () => { },
       },
-      // {
-      //   title: 'Сбросить',
-      //   onPress: () => {},
-      // },
       {
         title: 'Отмена',
         type: 'cancel',
@@ -97,8 +93,9 @@ const DocumentViewScreen = () => {
     );
   };
 
-  const renderItem = ({ item }: { item: IEntity }) =>
-    CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+  const renderItem = <T extends IEntity>({ item }: { item: T }) => {
+    return CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+  };
 
   const ref = useRef<FlatList<IEntity>>(null);
 
@@ -122,7 +119,7 @@ const DocumentViewScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        ListHeaderComponent={() => Header({ titles: titles ?? ['Идентификатор'] })}
+        ListHeaderComponent={() => <Header titles={titles ?? ['Идентификатор']} />}
         ListHeaderComponentStyle={styleHeader ?? styles.header}
       />
     </>

@@ -1,16 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-const Home = () => {
+const TaskListScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Дела на сегодня:</Text>
-      <Text style={styles.text}>На сегодня дел нет</Text>
+      <Text style={styles.title}>Задачи на сегодня:</Text>
+      <Text style={styles.text}>На сегодня задач нет</Text>
     </View>
   );
 };
 
-export default Home;
+export default TaskListScreen;
 
 const styles = StyleSheet.create({
   container: {

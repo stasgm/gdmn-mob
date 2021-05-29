@@ -9,25 +9,25 @@ import { useNavigation } from '@react-navigation/core';
 import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
+import { documentsMock } from '@lib/mock';
+
 import { styles } from './styles';
 import DocumentItem from './components/DocumentItem';
-// import {  } from '@lib/mock';
 
-const DocumentsScreen = () => {
+const RouteListScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
-  // const { colors } = useTheme();
 
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const handleLoad = () => {
-    // dispatch(documentActions.addDocuments());
-  };
+  const handleLoad = useCallback(() => {
+    dispatch(documentActions.addDocuments(documentsMock));
+  }, [dispatch]);
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     dispatch(documentActions.init());
-  };
+  }, [dispatch]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -40,10 +40,6 @@ const DocumentsScreen = () => {
         type: 'destructive',
         onPress: handleReset,
       },
-      /*       {
-              title: 'Сбросить',
-              onPress: handleReset,
-            }, */
       {
         title: 'Отмена',
         type: 'cancel',
@@ -56,7 +52,7 @@ const DocumentsScreen = () => {
       headerLeft: () => <DrawerButton />,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
-  }, [navigation]);
+  }, [actionsMenu, navigation]);
 
   const renderItem = ({ item }: { item: IDocument }) => (
     <DocumentItem
@@ -66,7 +62,7 @@ const DocumentsScreen = () => {
         number: { name: 'number', type: 'string' },
         typeDoc: { name: 'documentType', type: 'INamedEntity' },
         important: { name: 'status', type: 'string' },
-        addition1: { name: 'documentDate', type: 'date' },
+        addition1: { name: 'documentDate', type: 'string' },
       }}
     />
   );
@@ -91,4 +87,4 @@ const DocumentsScreen = () => {
   );
 };
 
-export default DocumentsScreen;
+export default RouteListScreen;

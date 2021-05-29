@@ -8,6 +8,7 @@ import React, { useCallback, useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
 
 import Home from '../../screens/HomeScreen';
+import TaskListScreen from '../../screens/TaskListScreen';
 
 export type TabsStackParams = {
   Main: undefined;
@@ -57,7 +58,7 @@ const TabsNavigator = () => {
       />
       <TabsStack.Screen
         name="Tasks"
-        component={Home}
+        component={TaskListScreen}
         options={{
           title: 'Задачи',
           tabBarLabel: 'Задачи',

@@ -1,4 +1,4 @@
-import { IDocumentStatus } from './document';
+/* import { IDocumentStatus } from './document';
 
 const statusColors = ['#4575D4', '#FFA700', '#80B12C', '#06567D'];
 
@@ -22,3 +22,4 @@ const docStates: IDocumentStatus[] = [
 ];
 
 export { statusColors, docStates };
+ */
