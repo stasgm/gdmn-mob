@@ -6,22 +6,27 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 
 import MapScreen from '../screens/Maps';
 
-import DashboardNavigator from './Root/DashboardNavigator';
-import DocumentsNavigator from './Root/DocumentsNavigator';
-
-console.log('RootNavigator');
+// import DashboardNavigator from './Root/DashboardNavigator';
+import DocumentsNavigator from './Root/OrdersNavigator';
+// import DocumentsNavigator from './Root/';
 
 const navItems: INavItem[] = [
+  /*   {
+      name: 'Dashboard',
+      title: 'Дашборд',
+      icon: 'view-dashboard-outline',
+      component: DashboardNavigator,
+    }, */
   {
-    name: 'Dashboard',
-    title: 'Дашборд',
-    icon: 'view-dashboard-outline',
-    component: DashboardNavigator,
+    name: 'Routes',
+    title: 'Маршруты',
+    icon: 'routes',
+    component: DocumentsNavigator,
   },
   {
-    name: 'Documents',
-    title: 'Документы',
-    icon: 'file-document-outline',
+    name: 'Orders',
+    title: 'Заявки',
+    icon: 'clipboard-list-outline',
     component: DocumentsNavigator,
   },
   {

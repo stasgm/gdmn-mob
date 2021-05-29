@@ -7,7 +7,7 @@ import { useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import { IReference } from '@lib/types';
-import { peopleRefMock, depRefMock, companyRefMock } from '@lib/mock';
+import { peopleRefMock, depRefMock, companyRefMock, docTypeRefMock } from '@lib/mock';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useDispatch, useSelector, referenceActions } from '@lib/store';
 
@@ -54,7 +54,12 @@ const ReferencesScreen = () => {
 
   const handleLoad = () => {
     dispatch(
-      referenceActions.addReferences({ people: peopleRefMock, departmens: depRefMock, companies: companyRefMock }),
+      referenceActions.addReferences({
+        people: peopleRefMock,
+        departmens: depRefMock,
+        companies: companyRefMock,
+        docTypes: docTypeRefMock,
+      }),
     );
   };
 

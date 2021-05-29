@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { Text, TextInput, IconButton, Button, ActivityIndicator, useTheme } from 'react-native-paper';
+import { Text, TextInput, IconButton, Button, useTheme } from 'react-native-paper';
 
 import { IUserCredentials } from '@lib/types';
 
@@ -96,6 +96,7 @@ const SignInScreen = (props: Props) => {
               mode="contained"
               disabled={request.isLoading}
               icon="login"
+              loading={request.isLoading}
               onPress={handleLogIn}
               style={globalStyles.rectangularButton}
             >
@@ -104,7 +105,7 @@ const SignInScreen = (props: Props) => {
           </View>
           <View style={style.statusBox}>
             {request.isError && <Text style={style.errorText}>Ошибка: {request.status}</Text>}
-            {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+            {/* {request.isLoading && <ActivityIndicator size="large" color="#70667D" />} */}
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -135,6 +136,8 @@ const style = StyleSheet.create({
     fontSize: 18,
   },
   statusBox: {
+    flexDirection: 'row',
+    alignSelf: 'center',
     alignItems: 'center',
     // height: 100,
     // flex: 1,

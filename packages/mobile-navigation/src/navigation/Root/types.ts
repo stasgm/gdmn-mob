@@ -1,7 +1,11 @@
 import { ViewStyle } from 'react-native';
 
 type DocumentsStackParamList = {
-  Documents: undefined;
+  TabsNavigator: undefined;
+};
+
+type DocumentsTabsStackParamsList = {
+  DocumentList: { type: string } | undefined;
   DocumentView: {
     id: string;
     view?: { componentItem?: ({ item }: { item: any }) => JSX.Element; titles?: string[]; styleHeader?: ViewStyle };
@@ -31,6 +35,7 @@ type TabsStackParams = {
 };
 
 export {
+  DocumentsTabsStackParamsList,
   DocumentsStackParamList,
   MessagesStackParamList,
   ProfileStackParamList,

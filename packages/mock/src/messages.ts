@@ -1,7 +1,6 @@
 import { ICompany, IDocument, IMessage, INamedEntity, IReferences, NewMessage } from '@lib/types';
-import { v4 as uuid } from 'uuid';
 
-import { companyRefMock, depRefMock, peopleRefMock } from './references';
+import { companyRefMock, depRefMock, docTypeRefMock, peopleRefMock, goodsRefMock } from './references';
 
 const user1: INamedEntity = {
   id: '123',
@@ -19,12 +18,12 @@ const user3: INamedEntity = {
 };
 
 const companies: ICompany[] = [
-  { id: '789', name: 'ОДО Золотые Программы', admin: user1 },
-  { id: '654', name: 'ОДО Амперсант', admin: user2 },
-  { id: uuid(), name: 'Company 1', admin: user2 },
-  { id: uuid(), name: 'Company 2', admin: user2 },
-  { id: uuid(), name: 'Company 3', admin: user1 },
-  { id: uuid(), name: 'Company 4', admin: user2 },
+  { id: '1', name: 'ОДО Золотые Программы', admin: user1 },
+  { id: '2', name: 'ОДО Амперсант', admin: user2 },
+  { id: '3', name: 'Company 1', admin: user2 },
+  { id: '4', name: 'Company 2', admin: user2 },
+  { id: '5', name: 'Company 3', admin: user1 },
+  { id: '6', name: 'Company 4', admin: user2 },
 ];
 
 export const newMessage: NewMessage<string> = {
@@ -41,8 +40,25 @@ export const newMessage: NewMessage<string> = {
 };
 
 //export const messages: Omit<IMessage<string>, 'status'>[] = [
-export const messages: IMessage<string | IDocument[] | IReferences>[] = [
+export const messages: IMessage<string | IDocument[] | IReferences[]>[] = [
   {
+    id: '14',
+    status: 'recd',
+    head: {
+      appSystem: 'Inventory',
+      company: companies[0] as INamedEntity,
+      producer: user3,
+      consumer: user1,
+      dateTime: '2021-04-15T10:47:33.376Z',
+    },
+    body: {
+      type: 'cmd',
+      payload: 'get documents',
+    },
+  },
+];
+
+/* {
     id: '14',
     status: 'recd',
     head: {
@@ -70,28 +86,11 @@ export const messages: IMessage<string | IDocument[] | IReferences>[] = [
     body: {
       type: 'refs',
       payload: {
-        goods: { id: '11', name: 'goods', data: [] },
+        goodsRefMock,
         depRefMock,
         peopleRefMock,
         companyRefMock,
-        docTypes: {
-          id: '55',
-          name: 'Типы документов',
-          data: [
-            {
-              id: '154',
-              name: 'Заявка',
-            },
-            {
-              id: '523',
-              name: 'Отвес',
-            },
-            {
-              id: '712',
-              name: 'Приход',
-            },
-          ],
-        },
+        docTypeRefMock,
       },
     },
   },
@@ -161,4 +160,4 @@ export const messages: IMessage<string | IDocument[] | IReferences>[] = [
       payload: 'get references, documents',
     },
   },
-];
+];*/

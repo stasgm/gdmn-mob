@@ -15,7 +15,7 @@ import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
 import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
 
-import { DocumentsStackParamList } from '../../navigation/Root/types';
+import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
 import Header from './components/Header';
@@ -45,10 +45,10 @@ const toString = ({ value, type }: { value: any; type: typeValue }) => {
 const DocumentViewScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
-  const docId = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
-  const CustomItem = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.componentItem;
-  const titles = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.titles;
-  const styleHeader = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.view?.styleHeader;
+  const docId = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.id;
+  const CustomItem = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.componentItem;
+  const titles = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.titles;
+  const styleHeader = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.styleHeader;
   const document = useMemo(() => list.find((item: { id: string }) => item.id === docId), [docId, list]);
 
   const showActionSheet = useActionSheet();
