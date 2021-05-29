@@ -1,6 +1,11 @@
+import { ViewStyle } from 'react-native';
+
 type DocumentsStackParamList = {
   Documents: undefined;
-  DocumentView: { id: string };
+  DocumentView: {
+    id: string;
+    view?: { componentItem?: ({ item }: { item: any }) => JSX.Element; titles?: string[]; styleHeader?: ViewStyle };
+  };
 };
 
 type MessagesStackParamList = {
