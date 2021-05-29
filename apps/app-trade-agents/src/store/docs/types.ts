@@ -75,9 +75,11 @@ export type IOrderDocument = IUserDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead {
   agent: INamedEntity;
+  externalId: IEntity;
 }
 
 interface IRouteLine extends IEntity {
+  externalId: IEntity;
   outlet: INamedEntity;
   ordNumber: number; // порядковый номер
   comment?: string;
