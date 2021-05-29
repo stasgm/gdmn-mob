@@ -8,31 +8,33 @@ import { IUser, NewUser } from '@lib/types';
 
 import { UnauthorizedException } from '../exceptions';
 
-import { entities } from './dao/db';
 import * as userService from './userService';
-
-const { devices, users, codes } = entities;
+import { getDb } from './dao/db';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
+  const db = getDb();
+
+  const { devices, users } = db;
+
   const { deviceId } = ctx.query;
   const { name }: { name: string } = ctx.request.body;
 
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException('неверные данные');
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
   const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
 
   if (!device) {
-    throw new UnauthorizedException('Cвязанное с пользователем устройство не найдено');
+    throw new UnauthorizedException('связанное с пользователем устройство не найдено');
     // throw new Error('Cвязанное с пользователем устройство не найдено');
   }
 
   if (device.state === 'BLOCKED') {
-    throw new UnauthorizedException('Устройство заблокировано');
+    throw new UnauthorizedException('устройство заблокировано');
     // throw new Error('устройство заблокировано');
   }
 
@@ -44,7 +46,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
 
     //TODO посмотреть как обработать правильно
     if (!usr) {
-      throw new UnauthorizedException('Неверные данные');
+      throw new UnauthorizedException('неверные данные');
       // throw new Error('Неверное имя пользователя или пароль');
     }
 
@@ -57,6 +59,10 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
 const signUp = async (user: NewUser): Promise<IUser> => {
   // Если в базе нет пользователей
   // добавляем пользователя gdmn
+  const db = getDb();
+
+  const { devices, users } = db;
+
   const userCount = (await users.read()).length;
 
   if (!userCount) {
@@ -103,24 +109,27 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   const user = await userService.findByName(name);
 
   if (!user) {
-    return done(null, false);
+    return done(new Error('неверные данные'));
   }
 
   const hashedPassword = await userService.getUserPassword(user.id);
 
   if (!hashedPassword) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException('неверные данные');
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    done(null, false); //TODO возвращать ошибку вместо null
+    done(new Error('неверные данные')); //TODO возвращать ошибку вместо null
   }
 };
 
 const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
+  const db = getDb();
+  const { devices, codes } = db;
+
   const rec = await codes.find((i) => i.code === code);
 
   if (!rec) {

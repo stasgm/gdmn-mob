@@ -1,6 +1,6 @@
 import { Joi, Config } from 'koa-joi-router';
 
-import { InvalidParameterException } from '../../exceptions';
+import { InvalidParameterException } from '../exceptions';
 
 const addCompany: Config = {
   validate: {

@@ -2,10 +2,12 @@ import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
 import { addCompanyToUser } from './userService';
 
-const { companies, users } = entities;
+import { getDb } from './dao/db';
+
+// const db = getDb();
+// const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
@@ -18,6 +20,9 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
+
+  const db = getDb();
+  const { companies, users } = db;
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new Error('Компания уже существует');
@@ -32,26 +37,34 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     editionDate: new Date().toISOString(),
   };
 
-  try {
-    const newCompany = await companies.insert(newCompanyObj);
+  // try {
+  const newCompany = await companies.insert(newCompanyObj);
 
-    const createdCompany = await companies.find(newCompany);
+  console.log(1, newCompany);
 
-    // Добавляем к текущему
-    await addCompanyToUser(createdCompany.adminId, createdCompany.id);
-    //TODO переделать на updateCompany
+  const createdCompany = await companies.find(newCompany);
 
-    // Добавляем к пользователю gdmn
-    const user = await users.find((i) => i.name === 'gdmn');
+  console.log(2, createdCompany);
+  // Добавляем к текущему
+  await addCompanyToUser(createdCompany.adminId, createdCompany.id);
+  //TODO переделать на updateCompany
 
-    if (user) {
-      await addCompanyToUser(user.id, createdCompany.id);
-    }
+  console.log(3);
 
-    return makeCompany(createdCompany);
-  } catch (err) {
-    throw new Error('Ошибка при добавлении компании');
+  // Добавляем к пользователю gdmn
+  const user = await users.find((i) => i.name === 'gdmn');
+
+  console.log(4, user);
+
+  if (user) {
+    await addCompanyToUser(user.id, createdCompany.id);
+    console.log(5);
   }
+
+  return makeCompany(createdCompany);
+  // } catch (err) {
+  //   throw new Error('Ошибка при добавлении компании');
+  // }
 };
 
 /**
@@ -60,6 +73,9 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
+  const db = getDb();
+  const { companies, users } = db;
+
   try {
     const oldCompany = await companies.find(id);
 
@@ -95,6 +111,9 @@ const deleteOne = async (id: string): Promise<void> => {
     2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
+  const db = getDb();
+  const { companies } = db;
+
   try {
     const companyObj = await companies.find(id);
 
@@ -114,6 +133,9 @@ const deleteOne = async (id: string): Promise<void> => {
  * @return company, организация
  * */
 const findOne = async (id: string): Promise<ICompany | undefined> => {
+  const db = getDb();
+  const { companies } = db;
+
   const company = await companies.find(id);
 
   if (!company) return;
@@ -127,6 +149,9 @@ const findOne = async (id: string): Promise<ICompany | undefined> => {
  * @return company, организация
  * */
 const findOneByName = async (name: string): Promise<ICompany | undefined> => {
+  const db = getDb();
+  const { companies } = db;
+
   const company = await companies.find((i) => i.name === name);
 
   if (!company) return;
@@ -140,6 +165,9 @@ const findOneByName = async (name: string): Promise<ICompany | undefined> => {
  * @return company[], компании
  * */
 const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => {
+  const db = getDb();
+  const { companies } = db;
+
   const companyList = await companies?.read((item) => {
     const newParams = Object.assign({}, params);
 
@@ -165,6 +193,9 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
  * */
 
 export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
+  const db = getDb();
+  const { users } = db;
+
   const admin = await users.find(company.adminId);
 
   const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };

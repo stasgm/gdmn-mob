@@ -16,14 +16,17 @@ import Logo from '../components/Logo';
 const Register = () => {
   const navigate = useNavigate();
 
-  const { error, loading, status } = useSelector((state) => state.auth);
+  const { error, loading, status } = useSelector((state) => state.auth); //{ error: false, loading: false, status: '' };
 
   const dispatch = useThunkDispatch();
+
+  console.log(error, loading, status);
 
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signUp(values));
 
     console.log('res.type', res.type);
+    console.log(res);
     if (res.type === 'AUTH/SIGNUP_SUCCCES') {
       navigate('/login');
     }

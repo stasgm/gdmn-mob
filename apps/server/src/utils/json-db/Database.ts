@@ -2,8 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-import config from '../../../config';
-
 import Collection from './Collection';
 
 import { CollectionItem } from './CollectionItem';
@@ -15,8 +13,8 @@ class Database {
    *
    * @param {string} name
    */
-  constructor(name: string) {
-    this.dbPath = path.join(config.FILES_PATH || os.userInfo().homedir, `/.${name}/`);
+  constructor(dir: string, name: string) {
+    this.dbPath = path.join(dir || os.userInfo().homedir, `/.${name}/`);
     this.ensureStorage();
   }
 

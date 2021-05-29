@@ -35,7 +35,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
           <Card sx={{ p: 1 }}>
             <CardContent>
               <Grid container spacing={3} lg={8} md={6} xs={12}>
-                <Grid item md={12} xs={12}>
+                <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
@@ -50,6 +50,22 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
+                {user && (
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                      fullWidth
+                      label="Имя"
+                      name="firstName"
+                      variant="outlined"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="firstName"
+                      disabled={loading}
+                      value={formik.values.firstName}
+                    />
+                  </Grid>
+                )}
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.firstName && Boolean(formik.errors.firstName)}

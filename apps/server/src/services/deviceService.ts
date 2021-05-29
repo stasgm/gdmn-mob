@@ -2,9 +2,7 @@ import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
-
-const { devices, codes, users } = entities;
+import { getDb } from './dao/db';
 
 /**
  * Добавляет одно устройство
@@ -14,6 +12,9 @@ const { devices, codes, users } = entities;
  * */
 
 const addOne = async (device: NewDevice): Promise<IDevice> => {
+  const db = getDb();
+  const { devices } = db;
+
   if (await devices.find((i) => i.name === device.userId && i.userId === device.userId)) {
     throw new Error('устройство с таким названием уже добавлено пользователю');
   }
@@ -37,10 +38,13 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
  * @return uid, идентификатор устройства
  * */
 const updateOne = async (deviceId: string, deviceData: Partial<IDevice>) => {
+  const db = getDb();
+  const { devices, users } = db;
+
   const oldDevice = await devices.find(deviceId);
 
   if (!oldDevice) {
-    throw new Error('Устройство не найдено');
+    throw new Error('устройство не найдено');
   }
 
   // Проверяем есть ли в базе переданный пользователь
@@ -66,6 +70,9 @@ const updateOne = async (deviceId: string, deviceData: Partial<IDevice>) => {
  * @param {string} id - идентификатор устройства
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
+  const db = getDb();
+  const { devices } = db;
+
   if (!(await devices.find((device) => device.id === deviceId))) {
     throw new Error('устройство не найдено');
   }
@@ -74,6 +81,9 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
 };
 
 const genActivationCode = async (deviceId: string) => {
+  const db = getDb();
+  const { devices, codes } = db;
+
   const device = await devices.find(deviceId);
 
   if (!device) {
@@ -93,6 +103,9 @@ const genActivationCode = async (deviceId: string) => {
 };
 
 const findOne = async (id: string): Promise<IDevice | undefined> => {
+  const db = getDb();
+  const { devices } = db;
+
   const device = await devices.find(id);
 
   if (!device) return;
@@ -101,6 +114,9 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
 };
 
 const findOneByUid = async (uid: string) => {
+  const db = getDb();
+  const { devices } = db;
+
   const device = await devices.find((i) => i.uid === uid);
 
   if (!device) return;
@@ -109,6 +125,9 @@ const findOneByUid = async (uid: string) => {
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
+  const db = getDb();
+  const { devices } = db;
+
   const deviceList = await devices.read((item) => {
     const newParams = { ...params };
 
@@ -132,8 +151,11 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
  * @param {string} id - идентификатор устройства
  * */
 const findUsers = async (deviceId: string) => {
+  const db = getDb();
+  const { devices, users } = db;
+
   if (!(await devices.find(deviceId))) {
-    throw new Error('Устройство не найдено');
+    throw new Error('устройство не найдено');
   }
 
   return Promise.all(
@@ -143,13 +165,13 @@ const findUsers = async (deviceId: string) => {
         const device = await devices.find(deviceId);
 
         if (!device) {
-          throw new Error('Устройство не найдено');
+          throw new Error('устройство не найдено');
         }
 
         const user = await users.find(i.userId);
 
         if (!user) {
-          throw new Error('Пользователь не найден');
+          throw new Error('пользователь не найден');
         }
 
         return await makeDevice(i);
@@ -168,6 +190,9 @@ const findUsers = async (deviceId: string) => {
 // };
 
 export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find(device?.userId);
 
   const userEntity: INamedEntity = user && { id: user.id, name: user.name };

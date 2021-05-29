@@ -1,7 +1,6 @@
-/* eslint-disable import/no-cycle */
-import * as userService from './userService';
-import * as authService from './authService';
 import * as companyService from './companyService';
+import * as authService from './authService';
+import * as userService from './userService';
 import * as deviceService from './deviceService';
 import * as messageService from './messageService';
 

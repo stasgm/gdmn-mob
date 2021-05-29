@@ -1,14 +1,13 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
-import { DataNotFoundException, InnerErrorException, InvalidParameterException } from '../exceptions';
+import { DataNotFoundException, InnerErrorException, ConflictException } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate } from '../utils/helpers';
 
-import { entities } from './dao/db';
 import { getNamedEntity } from './dao/utils';
 
-const { users, companies } = entities;
+import { getDb } from './dao/db';
 
 /**
  * Добавляет одного пользователя
@@ -16,10 +15,13 @@ const { users, companies } = entities;
  * @return id, идентификатор пользователя
  * */
 const addOne = async (newUser: NewUser): Promise<IUser> => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
 
   if (user) {
-    throw new InvalidParameterException('Пользователь с таким именем уже существует');
+    throw new ConflictException('пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(newUser.password);
@@ -60,10 +62,13 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
  * @return id, идентификатор пользователя
  * */
 const updateOne = async (userId: string, userData: Partial<IUser & { password: string }>): Promise<IUser> => {
+  const db = getDb();
+  const { users, companies } = db;
+
   const oldUser = await users.find(userId);
 
   if (!oldUser) {
-    throw new Error('Пользователь не найден');
+    throw new Error('пльзователь не найден');
   }
   // Если передан новый пароль то хешируем и заменяем
   const passwordHash = userData.password ? await hashPassword(userData.password) : oldUser.password;
@@ -109,10 +114,13 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
  * @param {string} id - идентификатор пользователя
  * */
 const deleteOne = async (id: string): Promise<void> => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find(id);
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException('пользователь не найден');
   }
 
   // TODO Если пользователь является админом организации то прерывать
@@ -121,26 +129,35 @@ const deleteOne = async (id: string): Promise<void> => {
 };
 
 const findOne = async (id: string): Promise<IUser | undefined> => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find(id);
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException('пользователь не найден');
   }
 
   return makeUser(user);
 };
 
 const findByName = async (name: string): Promise<IUser> => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException('пользователь не найден');
   }
 
   return makeUser(user);
 };
 
 const getUserPassword = async (id: string): Promise<string> => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find(id);
 
   if (!user) {
@@ -151,6 +168,9 @@ const getUserPassword = async (id: string): Promise<string> => {
 };
 
 const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
+  const db = getDb();
+  const { users } = db;
+
   const userList = await users.read((item) => {
     const newParams = Object.assign({}, params);
 
@@ -187,10 +207,13 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
 // };
 
 const addCompanyToUser = async (userId: string, companyId: string) => {
+  const db = getDb();
+  const { users, companies } = db;
+
   const user = await users.find(userId);
 
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new Error('пользователь не найден');
   }
 
   const company = await companies.find(companyId);
@@ -209,10 +232,13 @@ const addCompanyToUser = async (userId: string, companyId: string) => {
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {
+  const db = getDb();
+  const { users } = db;
+
   const user = await users.find(userId);
 
   if (!user) {
-    throw new Error('Пользователь не найден');
+    throw new Error('пользователь не найден');
   }
 
   if (user.companies?.some((i) => companyName === i)) {
@@ -226,6 +252,9 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
 };
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
+  const db = getDb();
+  const { companies, users } = db;
+
   const companyList = await getNamedEntity(user.companies, companies);
 
   const creator = await getNamedEntity(user.creatorId, users);
