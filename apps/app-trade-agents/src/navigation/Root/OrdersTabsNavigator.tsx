@@ -63,7 +63,14 @@ const TabsNavigator = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight: () => {
+        return (
+          <>
+            <MenuButton actionsMenu={actionsMenu} />
+            <MenuButton actionsMenu={actionsMenu} />
+          </>
+        );
+      },
     });
   }, [actionsMenu, navigation]);
 

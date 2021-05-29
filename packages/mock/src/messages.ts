@@ -1,6 +1,6 @@
 import { ICompany, IDocument, IMessage, INamedEntity, IReferences, NewMessage } from '@lib/types';
 
-import { companyRefMock, depRefMock, docTypeRefMock, peopleRefMock, goodsRefMock } from './references';
+// import { companyRefMock, depRefMock, docTypeRefMock, peopleRefMock, goodsRefMock } from './references';
 
 const user1: INamedEntity = {
   id: '123',
