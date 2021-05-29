@@ -1,4 +1,5 @@
-import { IReference } from '@lib/types';
+import { IReference, ICompany, IUser } from '@lib/types';
+import { superAdmin, user } from '@lib/mock';
 
 import { IOrderDocument, IRouteDocument } from './types';
 
@@ -7,29 +8,106 @@ const routeType = { id: '33', name: 'route' };
 
 const documentTypeMock = [orderType, routeType];
 
+//companys
+
+const companies: ICompany[] = [{ id: '855', name: 'Бройлерная птицефабрика', admin: user }];
+
+const company = companies[0];
+
+//users
+const users: IUser[] = [
+  {
+    id: '15',
+    externalId: '147012274',
+    name: 'ГОЦЕЛЮК Н. А.',
+    firstName: 'НАТАЛЬЯ',
+    lastName: 'ГОЦЕЛЮК',
+    phoneNumber: '8-044-788-86-44',
+    creator: superAdmin,
+    companies: [company],
+    role: 'Admin',
+  },
+  {
+    id: '16',
+    externalId: '147022858',
+    name: 'ПАВЛОВСКАЯ А. Н.',
+    firstName: 'АЛЁНА',
+    lastName: 'ПАВЛОВСКАЯ',
+    phoneNumber: '8-02238-22-209',
+    creator: superAdmin,
+    companies: [company],
+    role: 'Admin',
+  },
+  {
+    id: '17',
+    externalId: '147022859',
+    name: 'ЧЕРНЫШОВ Ю. А.',
+    firstName: 'ЮРИЙ',
+    lastName: 'ЧЕРНЫШОВ',
+    phoneNumber: '+37529-7820427',
+    creator: superAdmin,
+    companies: [company],
+    role: 'Admin',
+  },
+];
+
+const agent1 = users[0];
+const agent2 = users[1];
+const agent3 = users[2];
+
 // Организации
 const contactMock = [
   {
     id: '2',
-    name: 'ОАО "Веста" г.Витебск',
-    externalId: '16354637',
-    contractNumber: '245/20',
-    contractDate: '12.05.2020',
+    name: 'ЗАО "Раница"',
+    externalId: '147012312',
+    contractNumber: '20/20',
+    contractDate: '01.12.2020',
     paycond: 'отсрочка 14 к/д_поручение',
     phoneNumber: '(29) 437-23-67',
   },
   {
     id: '4',
-    name: 'ЧУТПП "Батя" г.п.Ушачи',
-    externalId: '1476843456',
-    contractNumber: '423/19',
-    contractDate: '15.02.2019',
-    paycond: 'отсрочка 10 к/д_поручение',
+    name: 'Иностранное унитарное предприятие "БелВиллесден',
+    externalId: '147022850',
+    contractNumber: '405/12',
+    contractDate: '01.12.2020',
+    paycond: 'отсрочка 35 к/д_поручение',
+    phoneNumber: '(29) 522-23-18',
+  },
+  {
+    id: '5',
+    name: 'ООО "ГРИНрозница"',
+    externalId: '147012270',
+    contractNumber: '11/20',
+    contractDate: '01.12.2020',
+    paycond: 'отсрочка 15 к/д_поручение',
+    phoneNumber: '(29) 522-23-18',
+  },
+  {
+    id: '6',
+    name: 'ООО "Евроторг"',
+    externalId: '147012306',
+    contractNumber: '1/2001',
+    contractDate: '01.12.2020',
+    paycond: 'отсрочка 15 б/д_требование',
+    phoneNumber: '(29) 522-23-18',
+  },
+  {
+    id: '7',
+    name: 'ООО "ПРОСТОРИТЕЙЛ"',
+    externalId: '147004044',
+    contractNumber: '1/21',
+    contractDate: '01.12.2020',
+    paycond: 'отсрочка 50 к/д_поручение',
     phoneNumber: '(29) 522-23-18',
   },
 ];
 const contact1 = { id: contactMock[0].id, name: contactMock[0].name };
 const contact2 = { id: contactMock[1].id, name: contactMock[1].name };
+const contact3 = { id: contactMock[2].id, name: contactMock[2].name };
+const contact4 = { id: contactMock[3].id, name: contactMock[3].name };
+const contact5 = { id: contactMock[4].id, name: contactMock[4].name };
 
 const contactRefMock: IReference = {
   id: '47',
@@ -40,34 +118,106 @@ const contactRefMock: IReference = {
 // Магазины
 const outletMock = [
   {
-    id: '5',
-    name: 'ОАО "Веста" г.Витебск, магазин №82',
-    externalId: '14745603',
+    id: '71',
+    name: 'м-н центральный',
+    externalId: '147012318',
     company: contact1,
-    address: 'г. Витебск, ул. Семенова, 1',
+    address: ' г. Орша , ул.Ленина, 63',
     phoneNumber: '(29) 115-23-19',
   },
   {
-    id: '6',
-    name: 'ОАО "Веста" г. Витебск маг.№61 ул.К.Маркса,15',
-    externalId: '147227894',
+    id: '72',
+    name: 'ЗАО "Раница"',
+    externalId: '147012314',
     company: contact1,
-    address: 'г. Витебск, ул.К.Маркса, 15',
+    address: 'г. Орша ,  ул.Ленина, 63 ',
     phoneNumber: '(29) 522-28-24',
   },
   {
-    id: '8',
-    name: 'ЧУТПП "Батя" магазин "Батя" г.п.Ушачи',
-    externalId: '147249054',
+    id: '74',
+    name: 'ЗАО "Раница"  - универсам Раница цех',
+    externalId: '147012316',
     company: contact1,
-    address: 'г.п.Ушачи, ул. Таранова, 1',
+    address: 'г. Орша , ул Могилевская,35',
     phoneNumber: '(29) 372-17-18',
+  },
+  {
+    id: '75',
+    name: 'ГИППО на Горецкого',
+    externalId: '147022852',
+    company: contact2,
+    address: 'г. Минск , ул. Горецкого, 2',
+    phoneNumber: '(29) 115-23-19',
+  },
+  {
+    id: '76',
+    name: 'ГИППО Игуменский тракт',
+    externalId: '147022851',
+    company: contact2,
+    address: 'г. Минск , Игуменский тракт, 30',
+    phoneNumber: '(29) 522-28-24',
+  },
+  {
+    id: '78',
+    name: 'ООО "ГРИНРозница" магазин "ГРИН"-АРЕНА, Минск, пр.Поб-лей,84',
+    externalId: '147012302',
+    company: contact3,
+    address: 'г. Минск , пр.Победителей,84',
+    phoneNumber: '(29) 372-17-18',
+  },
+  {
+    id: '79',
+    name: 'ООО "ГРИНрозница" Магазин "ГРИН-12" Чижовка',
+    externalId: '147012300',
+    company: contact3,
+    address: 'г. Минск , ул. Уборевича, 176',
+    phoneNumber: '(29) 115-23-19',
+  },
+  {
+    id: '80',
+    name: 'Магазин "Евроторг" № 6183',
+    externalId: '147012308',
+    company: contact4,
+    address: 'г. Минск , ул. Асаналиева, 44',
+    phoneNumber: '(29) 522-28-24',
+  },
+  {
+    id: '81',
+    name: 'Магазин "Евроторг" № 488 ул. Воронянского',
+    externalId: '147022948',
+    company: contact4,
+    address: 'г. Минск , ул. Воронянского, 17',
+    phoneNumber: '(29) 372-17-18',
+  },
+  {
+    id: '82',
+    name: 'ООО "ПРОСТОРИТЕЙЛ" ул. Каменногорская, 3',
+    externalId: '147022849',
+    company: contact5,
+    address: 'г. Минск , ул. Каменногорская, 3',
+    phoneNumber: '(29) 115-23-19',
+  },
+  {
+    id: '83',
+    name: 'ООО "ПРОСТОРИТЕЙЛ" пр-т Дзержинского, 126',
+    externalId: '147004046',
+    company: contact5,
+    address: 'г. Минск , пр-т Дзержинского, 126',
+    phoneNumber: '(29) 522-28-24',
   },
 ];
 
 const outlet1 = { id: outletMock[0].id, name: outletMock[0].name };
 const outlet2 = { id: outletMock[1].id, name: outletMock[1].name };
 const outlet3 = { id: outletMock[2].id, name: outletMock[2].name };
+const outlet4 = { id: outletMock[3].id, name: outletMock[3].name };
+const outlet5 = { id: outletMock[4].id, name: outletMock[4].name };
+const outlet6 = { id: outletMock[5].id, name: outletMock[5].name };
+const outlet7 = { id: outletMock[6].id, name: outletMock[6].name };
+const outlet8 = { id: outletMock[7].id, name: outletMock[7].name };
+const outlet9 = { id: outletMock[8].id, name: outletMock[8].name };
+const outlet10 = { id: outletMock[9].id, name: outletMock[9].name };
+const outlet11 = { id: outletMock[10].id, name: outletMock[10].name };
 
 const outletRefMock: IReference = {
   id: '48',
@@ -287,6 +437,50 @@ const routeMock: IRouteDocument[] = [
       },
     ],
   },
+  {
+    id: '30506',
+    number: '34',
+    documentDate: '9579457',
+    documentType: routeType,
+    status: 'DRAFT',
+    head: {
+      agent: {
+        id: '111111',
+        name: 'петров',
+      },
+    },
+    lines: [
+      {
+        id: '468',
+        outlet: outlet3,
+        ordNumber: 3,
+        visited: true,
+        result: 'ORDER',
+      },
+    ],
+  },
+  {
+    id: '30506',
+    number: '34',
+    documentDate: '9579457',
+    documentType: routeType,
+    status: 'DRAFT',
+    head: {
+      agent: {
+        id: '111111',
+        name: 'петров',
+      },
+    },
+    lines: [
+      {
+        id: '468',
+        outlet: outlet3,
+        ordNumber: 3,
+        visited: true,
+        result: 'ORDER',
+      },
+    ],
+  },
 ];
 
 export {
@@ -296,10 +490,21 @@ export {
   contactRefMock,
   contact1,
   contact2,
+  contact3,
+  contact4,
+  contact5,
   outletRefMock,
   outlet1,
   outlet2,
   outlet3,
+  outlet4,
+  outlet5,
+  outlet6,
+  outlet7,
+  outlet8,
+  outlet9,
+  outlet10,
+  outlet11,
   debtRefMock,
   goodGroupRefMock,
   goodGroup1,
@@ -311,4 +516,10 @@ export {
   good3,
   good4,
   netPriceRefMock,
+  users,
+  agent1,
+  agent2,
+  agent3,
+  companies,
+  company,
 };
