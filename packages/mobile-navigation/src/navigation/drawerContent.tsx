@@ -4,13 +4,23 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
-import { useSelector } from '@lib/store';
-// import { globalStyles } from '@lib/mobile-ui';
+import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
+
+import {
+  routeMock,
+  orderMock,
+  netPriceRefMock,
+  goodRefMock,
+  contactRefMock,
+  outletRefMock,
+  debtRefMock,
+  goodGroupRefMock,
+} from '../../../../apps/app-trade-agents/src/store/docs/mock';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
@@ -18,9 +28,31 @@ export function DrawerContent(props: Props) {
   const paperTheme = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
-  const handleUpdate = () => {
-    // Загрузка сообщений
+  const [isLoading, setLoading] = useState(false);
+
+  const handleUpdate = async () => {
+    // Загрузка данных
+    setLoading(true);
+
+    await dispatch(referenceActions.deleteAllReferences());
+    await dispatch(documentActions.deleteAllDocuments());
+
+    await dispatch(
+      referenceActions.addReferences({
+        netPrice: netPriceRefMock,
+        contact: contactRefMock,
+        outlet: outletRefMock,
+        debt: debtRefMock,
+        goodGroup: goodGroupRefMock,
+        good: goodRefMock,
+      }),
+    );
+    await dispatch(documentActions.addDocuments(orderMock));
+    await dispatch(documentActions.addDocuments(routeMock));
+
+    setLoading(false);
   };
 
   const translateX = Animated.interpolateNode(props.progress, {
@@ -76,7 +108,10 @@ export function DrawerContent(props: Props) {
         <TouchableOpacity onPress={handleUpdate}>
           <Avatar.Icon size={50} icon="cloud-refresh" />
         </TouchableOpacity>
-        <Caption style={styles.caption}>Версия программы: 0.0.1</Caption>
+        <View style={styles.updateSection}>
+          <Caption style={styles.caption}>{isLoading ? 'загрузка данных...' : ''}</Caption>
+          <Caption style={styles.caption}>Версия программы: 0.0.1</Caption>
+        </View>
       </View>
     </>
   );
@@ -113,21 +148,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 14,
   },
-  /*   updateSection: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row',
-      paddingRight: 10,
-      paddingBottom: 5,
-    }, */
+  updateSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingRight: 10,
+    paddingBottom: 5,
+  },
   systemInfo: {
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     flexDirection: 'row',
     paddingHorizontal: 5,
     paddingVertical: 5,
-    // paddingLeft: 10,
-    // paddingTop: 30,
   },
   drawerSection: {
     marginTop: 0,

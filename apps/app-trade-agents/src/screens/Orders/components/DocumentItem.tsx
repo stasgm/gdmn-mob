@@ -22,15 +22,10 @@ const DocumentItem = ({ item }: { item: IOrderDocument }) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          {/* <View style={styles.directionRow}> */}
           <Text style={[styles.name, { color: colors.text }]}>{`№ ${item.number} от ${item.documentDate}`}</Text>
-          {/* </View> */}
-          {/* <View style={styles.directionRow}> */}
-          {/* <Text style={[styles.field, { color: colors.text }]}>{item.head.contact.name}</Text> */}
           <Text style={[styles.field, { color: colors.text }]}>
             {`${item.head.outlet.name} (${item.head.contact.name})`}
           </Text>
-          {/* </View> */}
         </View>
       </View>
     </TouchableOpacity>

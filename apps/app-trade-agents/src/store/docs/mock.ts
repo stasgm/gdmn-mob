@@ -316,7 +316,7 @@ const goodMock = [
 
 const goodRefMock: IReference<INamedEntity> = {
   id: '50',
-  name: 'Группы товаров',
+  name: 'Товары',
   data: goodMock,
 };
 
@@ -502,7 +502,7 @@ const routeMock: IRouteDocument[] = [
     number: '3',
     documentDate: '28.05.2021',
     documentType: routeType,
-    status: 'DRAFT',
+    status: 'PROCESSED',
     head: {
       externalId: { id: '147022891' },
       agent: agent2,

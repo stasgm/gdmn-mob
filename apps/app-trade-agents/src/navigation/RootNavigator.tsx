@@ -4,11 +4,10 @@ import { DrawerNavigator } from '@lib/mobile-navigation';
 
 import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator';
 
-import MapScreen from '../screens/Maps';
-
 // import DashboardNavigator from './Root/DashboardNavigator';
 import OrdersNavigator from './Root/OrdersNavigator';
 import RoutesNavigator from './Root/RoutesNavigator';
+import MapNavigator from './Root/MapNavigator';
 // import DocumentsNavigator from './Root/';
 
 const navItems: INavItem[] = [
@@ -34,7 +33,7 @@ const navItems: INavItem[] = [
     name: 'Map',
     title: 'Карта',
     icon: 'map-outline',
-    component: MapScreen,
+    component: MapNavigator,
   },
 ];
 

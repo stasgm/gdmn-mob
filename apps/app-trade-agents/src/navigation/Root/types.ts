@@ -1,23 +1,14 @@
 export type OrdersStackParamList = {
-  Tabs: undefined;
-};
-
-export type OrdersTabStackParamList = {
   OrderList: undefined;
-  OrderArchList: undefined;
-  OrderView: {
-    id: string;
-  };
+  OrderView: { id: string } | undefined;
 };
 
 export type RoutesStackParamList = {
-  Tabs: undefined;
+  RouteList: undefined;
+  RouteView: { id: string } | undefined;
 };
 
-export type RoutesTabStackParamList = {
-  RouteList: undefined;
-  RouteArchList: undefined;
-  RouteView: {
-    id: string;
-  };
+export type MapStackParamList = {
+  MapGeoView: undefined;
+  ListGeoView: undefined;
 };

@@ -1,15 +1,18 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import RouteListScreen from '../../screens/Routes/RouteListScreen';
+import RouteViewScreen from '../../screens/Routes/RouteViewScreen';
+
 import { RoutesStackParamList } from './types';
-import RoutsTabsNavigator from './RoutesTabsNavigator';
 
 const Stack = createStackNavigator<RoutesStackParamList>();
 
 const RoutesNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Tabs" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Tabs" component={RoutsTabsNavigator} options={{ title: 'Маршруты' }} />
+    <Stack.Navigator initialRouteName="RouteList" screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="RouteList" component={RouteListScreen} options={{ title: 'Маршруты' }} />
+      <Stack.Screen name="RouteView" component={RouteViewScreen} options={{ title: 'Маршрут' }} />
     </Stack.Navigator>
   );
 };

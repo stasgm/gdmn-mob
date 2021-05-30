@@ -6,7 +6,7 @@ import { useTheme } from 'react-native-paper';
 import { DrawerContent } from './drawerContent';
 
 import SettingsNavigator from './Root/SettingsNavigator';
-import MessagesNavigator from './Root/MessagesNavigator';
+// import MessagesNavigator from './Root/MessagesNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
 // import DocumentsNavigator from './Root/DocumentsNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
@@ -44,12 +44,12 @@ const baseNavList: INavItem[] = [
     icon: 'file-cabinet',
     title: 'Справочники',
   },
-  {
-    name: 'Messages',
-    component: MessagesNavigator,
-    icon: 'message-text-outline',
-    title: 'Сообщения',
-  },
+  /*   {
+      name: 'Messages',
+      component: MessagesNavigator,
+      icon: 'message-text-outline',
+      title: 'Сообщения',
+    }, */
   {
     name: 'Settings',
     component: SettingsNavigator,
