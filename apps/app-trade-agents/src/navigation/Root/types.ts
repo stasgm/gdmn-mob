@@ -11,7 +11,12 @@ export type OrdersTabStackParamList = {
 };
 
 export type RoutesStackParamList = {
+  Tabs: undefined;
+};
+
+export type RoutesTabStackParamList = {
   RouteList: undefined;
+  RouteArchList: undefined;
   RouteView: {
     id: string;
   };

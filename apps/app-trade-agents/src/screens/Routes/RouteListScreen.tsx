@@ -3,26 +3,26 @@ import { FlatList, RefreshControl, Text } from 'react-native';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { IDocument } from '@lib/types';
-import { useDispatch, useSelector, documentActions } from '@lib/store';
+import { useDispatch, useSelector, documentActions, docSelectors } from '@lib/store';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
-import { documentsMock } from '@lib/mock';
+import { routeMock } from '../../store/docs/mock';
 
 import { styles } from './styles';
 import DocumentItem from './components/DocumentItem';
 
 const RouteListScreen = () => {
-  const { list, loading } = useSelector((state) => state.documents);
+  const { loading } = useSelector((state) => state.documents);
+  const list = docSelectors.selectByDocType('route');
 
-  const showActionSheet = useActionSheet();
   const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
   const handleLoad = useCallback(() => {
-    dispatch(documentActions.addDocuments(documentsMock));
+    dispatch(documentActions.addDocuments(routeMock));
   }, [dispatch]);
 
   const handleReset = useCallback(() => {

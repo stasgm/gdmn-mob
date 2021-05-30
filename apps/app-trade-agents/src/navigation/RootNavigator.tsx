@@ -7,7 +7,8 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 import MapScreen from '../screens/Maps';
 
 // import DashboardNavigator from './Root/DashboardNavigator';
-import DocumentsNavigator from './Root/OrdersNavigator';
+import OrdersNavigator from './Root/OrdersNavigator';
+import RoutesNavigator from './Root/RoutesNavigator';
 // import DocumentsNavigator from './Root/';
 
 const navItems: INavItem[] = [
@@ -21,13 +22,13 @@ const navItems: INavItem[] = [
     name: 'Routes',
     title: 'Маршруты',
     icon: 'routes',
-    component: DocumentsNavigator,
+    component: RoutesNavigator,
   },
   {
     name: 'Orders',
     title: 'Заявки',
     icon: 'clipboard-list-outline',
-    component: DocumentsNavigator,
+    component: OrdersNavigator,
   },
   {
     name: 'Map',

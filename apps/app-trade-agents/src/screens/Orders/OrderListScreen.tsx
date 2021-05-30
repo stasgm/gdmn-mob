@@ -1,60 +1,44 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { FlatList, RefreshControl, Text } from 'react-native';
 
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
-import { IDocument } from '@lib/types';
-import { useSelector } from '@lib/store';
-
+import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { RouteProp, useRoute } from '@react-navigation/native';
+
+import { docSelectors, useSelector } from '@lib/store';
 
 import { OrdersTabStackParamList } from '../../navigation/Root/types';
 
-import DocumentItem from './components/DocumentItem';
+import { IOrderDocument } from '../../store/docs/types';
 
+import DocumentItem from './components/DocumentItem';
 import { styles } from './styles';
 
 const OrderListScreen = () => {
   const route = useRoute<RouteProp<OrdersTabStackParamList, 'OrderList' | 'OrderArchList'>>();
-  const { list, loading } = useSelector((state) => state.documents);
+  const { loading } = useSelector((state) => state.documents);
+  const list = docSelectors.selectByDocType('order') as unknown as IOrderDocument[];
 
-  const [filtredList, setFiltredList] = useState<IDocument[]>([]);
-  const [title, setTitle] = useState('');
-
-  useEffect(() => {
+  const filtredList = useMemo(() => {
     if (route?.name === 'OrderList') {
-      setFiltredList(list.filter((i) => i.status !== 'PROCESSED'));
-      return;
+      return list.filter((i) => i.status !== 'PROCESSED');
     }
+
     if (route?.name === 'OrderArchList') {
-      setFiltredList(list.filter((i) => i.status === 'PROCESSED'));
-      return;
+      return list.filter((i) => i.status === 'PROCESSED');
     }
+
+    return [];
   }, [list, route?.name]);
 
-  useEffect(() => {
-    setTitle(route?.name === 'OrderList' ? 'Новые' : route?.name === 'OrderArchList' ? 'Архив' : '');
-  }, [route?.name]);
-
-  const renderItem = ({ item }: { item: IDocument }) => (
-    <DocumentItem
-      key={item.id}
-      item={item}
-      fields={{
-        number: { name: 'number', type: 'string' },
-        typeDoc: { name: 'documentType', type: 'INamedEntity' },
-        important: { name: 'status', type: 'string' },
-        addition1: { name: 'documentDate', type: 'string' },
-      }}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: IOrderDocument }) => <DocumentItem key={item.id} item={item} />,
+    [],
   );
 
-  const ref = useRef<FlatList<IDocument>>(null);
+  const ref = useRef<FlatList<IOrderDocument>>(null);
 
   return (
     <>
-      <View>
-        <SubTitle>{title}</SubTitle>
-      </View>
       <FlatList
         ref={ref}
         data={filtredList}

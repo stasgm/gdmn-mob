@@ -6,8 +6,7 @@ import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { documentsMock } from '@lib/mock';
 

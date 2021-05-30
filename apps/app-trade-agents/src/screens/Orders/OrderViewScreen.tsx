@@ -1,8 +1,13 @@
+import { SubTitle } from '@lib/mobile-ui/src/components';
 import React from 'react';
 import { View } from 'react-native';
 
 const OrderViewScreen = () => {
-  return <View>Просмотр маршурута</View>;
+  return (
+    <View>
+      <SubTitle>Просмотр заявки</SubTitle>
+    </View>
+  );
 };
 
 export default OrderViewScreen;

@@ -10,18 +10,18 @@ import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-
 import Animated from 'react-native-reanimated';
 
 import { useSelector } from '@lib/store';
-// import { user, company } from '@lib/mock';
-// import { useSelector } from 'react-redux';
+// import { globalStyles } from '@lib/mobile-ui';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
 export function DrawerContent(props: Props) {
   const paperTheme = useTheme();
 
-  // const theme = 'dark';
-  // const navigation = useNavigation();
-
   const { user, company } = useSelector((state) => state.auth);
+
+  const handleUpdate = () => {
+    // Загрузка сообщений
+  };
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -32,11 +32,7 @@ export function DrawerContent(props: Props) {
     <>
       <View style={styles.userProfile}>
         <View style={styles.userInfoSection}>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.toggleDrawer();
-            }}
-          >
+          <TouchableOpacity onPress={props.navigation.toggleDrawer}>
             <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
@@ -77,6 +73,9 @@ export function DrawerContent(props: Props) {
         </Animated.View>
       </DrawerContentScrollView>
       <View style={styles.systemInfo}>
+        <TouchableOpacity onPress={handleUpdate}>
+          <Avatar.Icon size={50} icon="cloud-refresh" />
+        </TouchableOpacity>
         <Caption style={styles.caption}>Версия программы: 0.0.1</Caption>
       </View>
     </>
@@ -114,10 +113,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 14,
   },
+  /*   updateSection: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      paddingRight: 10,
+      paddingBottom: 5,
+    }, */
   systemInfo: {
     alignItems: 'flex-end',
-    paddingRight: 10,
-    paddingBottom: 5,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    // paddingLeft: 10,
+    // paddingTop: 30,
   },
   drawerSection: {
     marginTop: 0,
