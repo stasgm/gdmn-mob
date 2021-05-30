@@ -1,9 +1,9 @@
-import { IReference, ICompany, IUser } from '@lib/types';
+import { IReference, ICompany, IUser, INamedEntity } from '@lib/types';
 import { superAdmin, user } from '@lib/mock';
 
 import { IOrderDocument, IRouteDocument } from './types';
 
-const orderType = { id: '1', name: 'Заявка1 (организация)' };
+const orderType = { id: '1', name: 'order' };
 const routeType = { id: '33', name: 'route' };
 
 const documentTypeMock = [orderType, routeType];
@@ -314,9 +314,9 @@ const goodMock = [
   },
 ];
 
-const goodRefMock: IReference = {
+const goodRefMock: IReference<INamedEntity> = {
   id: '50',
-  name: 'Группы товаров',
+  name: 'Товары',
   data: goodMock,
 };
 
@@ -365,11 +365,11 @@ const orderMock: IOrderDocument[] = [
     number: '226',
     documentDate: '25.04.2021',
     documentType: orderType,
-    status: 'DRAFT',
+    status: 'SENT',
     head: {
-      contact: contact1,
+      contact: contact2,
       outlet: outlet2,
-      ondate: '25.04.2021',
+      ondate: '28.04.2021',
     },
     lines: [
       { id: '13', good: good3, quantity: 3 },
@@ -381,11 +381,11 @@ const orderMock: IOrderDocument[] = [
     number: '227',
     documentDate: '25.04.2021',
     documentType: orderType,
-    status: 'DRAFT',
+    status: 'PROCESSED',
     head: {
-      contact: contact2,
+      contact: contact3,
       outlet: outlet3,
-      ondate: '25.04.2021',
+      ondate: '27.04.2021',
       depart: { id: '87', name: 'Склад-магазин Полоцк' },
     },
     lines: [
@@ -397,11 +397,11 @@ const orderMock: IOrderDocument[] = [
   {
     id: '25',
     number: '228',
-    documentDate: '25.04.2021',
+    documentDate: '25.01.2021',
     documentType: orderType,
     status: 'DRAFT',
     head: {
-      contact: contact1,
+      contact: contact4,
       outlet: outlet1,
       ondate: '25.04.2021',
     },
@@ -502,7 +502,7 @@ const routeMock: IRouteDocument[] = [
     number: '3',
     documentDate: '28.05.2021',
     documentType: routeType,
-    status: 'DRAFT',
+    status: 'PROCESSED',
     head: {
       externalId: { id: '147022891' },
       agent: agent2,

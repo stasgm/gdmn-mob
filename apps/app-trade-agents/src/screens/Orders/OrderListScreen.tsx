@@ -1,60 +1,99 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
-import { IDocument } from '@lib/types';
-import { useSelector } from '@lib/store';
+import { FilterButtons, ItemSeparator, Status } from '@lib/mobile-ui/src/components';
+import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { AddButton, DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 
-import { OrdersTabStackParamList } from '../../navigation/Root/types';
+import { useNavigation } from '@react-navigation/native';
+
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+
+import { IOrderDocument } from '../../store/docs/types';
+
+import { orderMock } from '../../store/docs/mock';
 
 import DocumentItem from './components/DocumentItem';
-
 import { styles } from './styles';
 
 const OrderListScreen = () => {
-  const route = useRoute<RouteProp<OrdersTabStackParamList, 'OrderList' | 'OrderArchList'>>();
-  const { list, loading } = useSelector((state) => state.documents);
+  const { loading } = useSelector((state) => state.documents);
+  const list = docSelectors.selectByDocType('order') as unknown as IOrderDocument[];
 
-  const [filtredList, setFiltredList] = useState<IDocument[]>([]);
-  const [title, setTitle] = useState('');
+  const [status, setStatus] = useState<Status>('all');
 
-  useEffect(() => {
-    if (route?.name === 'OrderList') {
-      setFiltredList(list.filter((i) => i.status !== 'PROCESSED'));
-      return;
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+  const dispatch = useDispatch();
+
+  const filtredList = useMemo(() => {
+    if (status === 'all') {
+      return list;
+    } else if (status === 'active') {
+      return list.filter((e) => e.status !== 'PROCESSED');
+    } else if (status === 'archive') {
+      return list.filter((e) => e.status === 'PROCESSED');
     }
-    if (route?.name === 'OrderArchList') {
-      setFiltredList(list.filter((i) => i.status === 'PROCESSED'));
-      return;
-    }
-  }, [list, route?.name]);
+    return [];
+  }, [status, list]);
 
-  useEffect(() => {
-    setTitle(route?.name === 'OrderList' ? 'Новые' : route?.name === 'OrderArchList' ? 'Архив' : '');
-  }, [route?.name]);
-
-  const renderItem = ({ item }: { item: IDocument }) => (
-    <DocumentItem
-      key={item.id}
-      item={item}
-      fields={{
-        number: { name: 'number', type: 'string' },
-        typeDoc: { name: 'documentType', type: 'INamedEntity' },
-        important: { name: 'status', type: 'string' },
-        addition1: { name: 'documentDate', type: 'string' },
-      }}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: IOrderDocument }) => <DocumentItem key={item.id} item={item} />,
+    [],
   );
 
-  const ref = useRef<FlatList<IDocument>>(null);
+  const handleAddDocument = useCallback(() => {
+    navigation.navigate('OrderView');
+  }, [navigation]);
+
+  const handleLoad = useCallback(() => {
+    dispatch(documentActions.addDocuments(orderMock));
+  }, [dispatch]);
+
+  const handleDelete = useCallback(() => {
+    dispatch(documentActions.deleteAllDocuments());
+  }, [dispatch]);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Добавить',
+        onPress: handleAddDocument,
+      },
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Удалить все',
+        type: 'destructive',
+        onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [showActionSheet, handleAddDocument, handleLoad, handleDelete]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <AddButton onPress={handleAddDocument} />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
+    });
+  }, [actionsMenu, handleAddDocument, navigation]);
+
+  const ref = useRef<FlatList<IOrderDocument>>(null);
 
   return (
     <>
-      <View>
-        <SubTitle>{title}</SubTitle>
-      </View>
+      <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
         data={filtredList}

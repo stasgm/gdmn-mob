@@ -10,10 +10,8 @@ import { RouteProp, useNavigation } from '@react-navigation/native';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
-// eslint-disable-next-line import/no-cycle
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
 

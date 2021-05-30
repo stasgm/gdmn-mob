@@ -1,17 +1,19 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import OrderListScreen from '../../screens/Orders/OrderListScreen';
+import OrderViewScreen from '../../screens/Orders/OrderViewScreen';
+
 import { OrdersStackParamList } from './types';
-import TabsNavigator from './OrdersTabsNavigator';
 
 const Stack = createStackNavigator<OrdersStackParamList>();
 
 const OrdersNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Tabs" screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="Tabs" component={TabsNavigator} options={{ title: 'Заявки' }} />
+    <Stack.Navigator initialRouteName="OrderList" screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="OrderList" component={OrderListScreen} options={{ title: 'Заявки' }} />
+      <Stack.Screen name="OrderView" component={OrderViewScreen} options={{ title: 'Заявка' }} />
     </Stack.Navigator>
   );
 };
-
 export default OrdersNavigator;

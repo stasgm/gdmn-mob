@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+// import { useDispatch } from '@lib/store';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import { View } from 'react-native';
 
 import MapView from 'react-native-maps';
@@ -14,6 +18,42 @@ interface Region {
 
 const MapScreen = () => {
   const [region, setRegion] = useState<Region>();
+
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+
+  const handleLoad = useCallback(() => {
+    // dispatch(documentActions.addDocuments(routeMock));
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    // dispatch(documentActions.deleteAllDocuments());
+  }, []);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Загрузить',
+        onPress: handleLoad,
+      },
+      {
+        title: 'Удалить все',
+        type: 'destructive',
+        onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [showActionSheet, handleLoad, handleDelete]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [actionsMenu, navigation]);
 
   useEffect(() => {
     setRegion({

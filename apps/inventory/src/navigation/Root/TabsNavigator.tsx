@@ -1,6 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { useNavigation } from '@react-navigation/native';

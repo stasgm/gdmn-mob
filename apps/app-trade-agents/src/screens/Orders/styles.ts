@@ -63,4 +63,10 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
   },
+  buttons: {
+    margin: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

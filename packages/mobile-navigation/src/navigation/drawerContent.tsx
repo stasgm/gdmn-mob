@@ -4,24 +4,56 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
-import { useSelector } from '@lib/store';
-// import { user, company } from '@lib/mock';
-// import { useSelector } from 'react-redux';
+import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
+
+import {
+  routeMock,
+  orderMock,
+  netPriceRefMock,
+  goodRefMock,
+  contactRefMock,
+  outletRefMock,
+  debtRefMock,
+  goodGroupRefMock,
+} from '../../../../apps/app-trade-agents/src/store/docs/mock';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
 export function DrawerContent(props: Props) {
   const paperTheme = useTheme();
 
-  // const theme = 'dark';
-  // const navigation = useNavigation();
-
   const { user, company } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const [isLoading, setLoading] = useState(false);
+
+  const handleUpdate = async () => {
+    // Загрузка данных
+    setLoading(true);
+
+    await dispatch(referenceActions.deleteAllReferences());
+    await dispatch(documentActions.deleteAllDocuments());
+
+    await dispatch(
+      referenceActions.addReferences({
+        netPrice: netPriceRefMock,
+        contact: contactRefMock,
+        outlet: outletRefMock,
+        debt: debtRefMock,
+        goodGroup: goodGroupRefMock,
+        good: goodRefMock,
+      }),
+    );
+    await dispatch(documentActions.addDocuments(orderMock));
+    await dispatch(documentActions.addDocuments(routeMock));
+
+    setLoading(false);
+  };
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -32,11 +64,7 @@ export function DrawerContent(props: Props) {
     <>
       <View style={styles.userProfile}>
         <View style={styles.userInfoSection}>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.toggleDrawer();
-            }}
-          >
+          <TouchableOpacity onPress={props.navigation.toggleDrawer}>
             <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
@@ -77,7 +105,13 @@ export function DrawerContent(props: Props) {
         </Animated.View>
       </DrawerContentScrollView>
       <View style={styles.systemInfo}>
-        <Caption style={styles.caption}>Версия программы: 0.0.1</Caption>
+        <TouchableOpacity onPress={handleUpdate}>
+          <Avatar.Icon size={50} icon="cloud-refresh" />
+        </TouchableOpacity>
+        <View style={styles.updateSection}>
+          <Caption style={styles.caption}>{isLoading ? 'загрузка данных...' : ''}</Caption>
+          <Caption style={styles.caption}>Версия программы: 0.0.1</Caption>
+        </View>
       </View>
     </>
   );
@@ -114,10 +148,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 14,
   },
-  systemInfo: {
-    alignItems: 'flex-end',
+  updateSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingRight: 10,
     paddingBottom: 5,
+  },
+  systemInfo: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
   },
   drawerSection: {
     marginTop: 0,

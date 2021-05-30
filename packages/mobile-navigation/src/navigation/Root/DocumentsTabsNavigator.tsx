@@ -6,8 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/native';
 

@@ -11,8 +11,7 @@ import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
 import { useSelector, messageActions, useDispatch } from '@lib/store';
 
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
   const { colors } = useTheme();

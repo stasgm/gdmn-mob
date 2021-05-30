@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -62,5 +62,19 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
+  },
+  buttons: {
+    margin: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnTab: {
+    width: Dimensions.get('window').width / 3.2,
+    // margin: 3,
+    flexDirection: 'row',
+    borderWidth: 0.5,
+    padding: 10,
+    justifyContent: 'center',
   },
 });

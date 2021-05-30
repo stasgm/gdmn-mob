@@ -8,8 +8,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { IDocument, IReferences } from '@lib/types';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
-import BackButton from '@lib/mobile-ui/src/components/AppBar/BackButton';
+import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 
 type MessagesStackParamList = {
   Messages: undefined;

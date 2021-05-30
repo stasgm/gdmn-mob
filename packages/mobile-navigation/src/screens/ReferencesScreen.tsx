@@ -12,8 +12,7 @@ import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { useDispatch, useSelector, referenceActions } from '@lib/store';
 
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
 interface IRef {
   name: string;

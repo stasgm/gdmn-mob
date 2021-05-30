@@ -1,32 +1,51 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { IDocument } from '@lib/types';
-import { useDispatch, useSelector, documentActions } from '@lib/store';
+import { ItemSeparator, FilterButtons, Status } from '@lib/mobile-ui/src/components';
+import { useDispatch, useSelector, documentActions, docSelectors } from '@lib/store';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
-import { documentsMock } from '@lib/mock';
+import { routeMock } from '../../store/docs/mock';
+
+import { IRouteDocument } from '../../store/docs/types';
 
 import { styles } from './styles';
 import DocumentItem from './components/DocumentItem';
 
 const RouteListScreen = () => {
-  const { list, loading } = useSelector((state) => state.documents);
+  const { loading } = useSelector((state) => state.documents);
+  const list = docSelectors.selectByDocType('route') as unknown as IRouteDocument[];
 
-  const showActionSheet = useActionSheet();
   const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
+  const [status, setStatus] = useState<Status>('all');
+
+  const renderItem = useCallback(
+    ({ item }: { item: IRouteDocument }) => <DocumentItem key={item.id} item={item} />,
+    [],
+  );
+
+  const filtredList = useMemo(() => {
+    if (status === 'all') {
+      return list;
+    } else if (status === 'active') {
+      return list.filter((e) => e.status !== 'PROCESSED');
+    } else if (status === 'archive') {
+      return list.filter((e) => e.status === 'PROCESSED');
+    }
+    return [];
+  }, [status, list]);
+
   const handleLoad = useCallback(() => {
-    dispatch(documentActions.addDocuments(documentsMock));
+    dispatch(documentActions.addDocuments(routeMock));
   }, [dispatch]);
 
-  const handleReset = useCallback(() => {
-    dispatch(documentActions.init());
+  const handleDelete = useCallback(() => {
+    dispatch(documentActions.deleteAllDocuments());
   }, [dispatch]);
 
   const actionsMenu = useCallback(() => {
@@ -38,14 +57,14 @@ const RouteListScreen = () => {
       {
         title: 'Удалить все',
         type: 'destructive',
-        onPress: handleReset,
+        onPress: handleDelete,
       },
       {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [handleLoad, handleReset, showActionSheet]);
+  }, [handleLoad, handleDelete, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -54,26 +73,14 @@ const RouteListScreen = () => {
     });
   }, [actionsMenu, navigation]);
 
-  const renderItem = ({ item }: { item: IDocument }) => (
-    <DocumentItem
-      key={item.id}
-      item={item}
-      fields={{
-        number: { name: 'number', type: 'string' },
-        typeDoc: { name: 'documentType', type: 'INamedEntity' },
-        important: { name: 'status', type: 'string' },
-        addition1: { name: 'documentDate', type: 'string' },
-      }}
-    />
-  );
-
-  const ref = useRef<FlatList<IDocument>>(null);
+  const ref = useRef<FlatList<IRouteDocument>>(null);
 
   return (
     <>
+      <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
-        data={list}
+        data={filtredList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
