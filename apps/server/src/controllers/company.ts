@@ -23,9 +23,11 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
+  console.log(1, companyId);
   const companyData = ctx.request.body as Partial<ICompany>;
-
+  console.log(2, companyData);
   const updatedCompany = await companyService.updateOne(companyId, companyData);
+  console.log(3, updatedCompany);
 
   ok(ctx as Context, updatedCompany);
 

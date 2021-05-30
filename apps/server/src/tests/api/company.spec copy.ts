@@ -4,6 +4,14 @@ import { getApp, initEnvironment, cleanUp } from './test-environment';
 
 beforeAll(async () => {
   await initEnvironment();
+  // await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
+  //   name: '5',
+  //   password: '3',
+  // });
+  await request(getApp().callback()).post('/api/auth/login').query('deviceId=WEB').send({
+    name: '5',
+    password: '3',
+  });
 });
 
 afterAll(async () => {
@@ -12,29 +20,29 @@ afterAll(async () => {
 });
 
 describe('testing /api/company/', () => {
-  describe('POST /api/auth/signup', () => {
-    it('should return 201 & valid response if a new user was created', async () => {
-      const response = await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
-        name: '5',
-        password: '3',
-      });
-      expect(response.status).toEqual(201);
-      expect(response.type).toEqual('application/json');
-      expect(response.body.result).toBeTruthy();
-    });
-  });
+  // describe('POST /api/auth/signup', () => {
+  //   it('should return 201 & valid response if a new user was created', async () => {
+  //     const response = await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
+  //       name: '5',
+  //       password: '3',
+  //     });
+  //     expect(response.status).toEqual(201);
+  //     expect(response.type).toEqual('application/json');
+  //     expect(response.body.result).toBeTruthy();
+  //   });
+  // });
 
-  describe('POST /api/auth/login', () => {
-    it('should return 201 & valid response if a user was logined', async () => {
-      const response = await request(getApp().callback()).post('/api/auth/login').query('deviceId=WEB').send({
-        name: '5',
-        password: '3',
-      });
-      expect(response.status).toEqual(200);
-      expect(response.type).toEqual('application/json');
-      expect(response.body.result).toBeTruthy();
-    });
-  });
+  // describe('POST /api/auth/login', () => {
+  //   it('should return 201 & valid response if a user was logined', async () => {
+  //     const response = await request(getApp().callback()).post('/api/auth/login').query('deviceId=WEB').send({
+  //       name: '5',
+  //       password: '3',
+  //     });
+  //     expect(response.status).toEqual(200);
+  //     expect(response.type).toEqual('application/json');
+  //     expect(response.body.result).toBeTruthy();
+  //   });
+  // });
 
   describe('POST /api/companies', () => {
     it('should return 201 & valid response if a company was created', async () => {
@@ -47,15 +55,15 @@ describe('testing /api/company/', () => {
     });
   });
 
-  describe('PUT /api/companies:id', () => {
+  describe('PATCH /api/companies:id', () => {
     it('should return 201 & valid response if a company was updated', async () => {
       const response = await request(getApp().callback())
-        .put('/api/companies/7a2a1330-bfac-11eb-97d8-874cd5e31e18')
+        .patch('/api/companies/7a2a1330-bfac-11eb-97d8-874cd5e31e18')
         .query('deviceId=WEB')
         .send({
           name: 'Company2',
         });
-      expect(response.status).toEqual(200);
+      expect(response.status).toEqual(2000);
       expect(response.type).toEqual('application/json');
       expect(response.body.result).toBeTruthy();
     });

@@ -33,7 +33,7 @@ const removeUser: Config = {
 const getUser: Config = {
   validate: {
     params: Joi.object({
-      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор пользователя')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },
 };

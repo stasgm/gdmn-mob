@@ -22,47 +22,42 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-
+  console.log('0');
   const db = getDb();
   const { companies, users } = db;
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
   }
-
   const newCompanyObj: IDBCompany = {
     id: '',
     name: company.name,
     adminId: company.adminId,
     externalId: company.externalId,
-    creationDate: new Date().toJSON(),
-    editionDate: new Date().toJSON(),
+    creationDate: new Date().toString(),
+    editionDate: new Date().toString(),
   };
 
   const newCompany = await companies.insert(newCompanyObj);
-
-  console.log(1, newCompany);
+  // console.log(1, newCompany);
 
   const createdCompany = await companies.find(newCompany);
-
-  console.log(2, createdCompany);
+  // console.log(2, createdCompany);
   // Добавляем к текущему
   await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   //TODO переделать на updateCompany
 
-  console.log(3);
-
+  // console.log(3);
   // Добавляем к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
 
-  console.log(4, user);
-
+  // console.log(4, user);
   if (user) {
     await addCompanyToUser(user.id, createdCompany.id);
-    console.log(5);
+    // console.log(5);
   }
-
-  return makeCompany(createdCompany);
+  const retCompany = await makeCompany(createdCompany);
+  return retCompany;
 };
 
 /**
@@ -71,19 +66,25 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
  * @return id, идентификатор организации
  * */
 const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
+  console.log('0000');
   const db = getDb();
   const { companies, users } = db;
 
-  console.log('1', companyData);
   const companyObj = await companies.find(id);
-  console.log('2', companyObj);
 
   if (!companyObj) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
   // Проверяем есть ли в базе переданный админ
-  const adminId = companyData?.admin ? (await users.find(companyData.admin.id))?.id : companyObj.adminId;
+  let adminId = companyObj.adminId;
+  if (companyData?.admin) {
+    adminId = (await users.find(companyData.admin.id))?.id;
+  }
+
+  // const today = new Date().toString();
+
+  // console.log(today);
 
   const newCompany: IDBCompany = {
     id,
@@ -91,14 +92,16 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     creationDate: companyObj.creationDate,
-    editionDate: new Date().toJSON(),
+    editionDate: new Date().toString(),
   };
+  // console.log(newCompany);
 
   await companies.update(newCompany);
 
+  console.log(4444);
   const updatedCompany = await companies.find(id);
 
-  return makeCompany(updatedCompany);
+  return await makeCompany(updatedCompany);
 };
 
 /**
@@ -139,7 +142,7 @@ const findOne = async (id: string): Promise<ICompany> => {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  return makeCompany(company);
+  return await makeCompany(company);
 };
 
 /**
@@ -157,7 +160,7 @@ const findOneByName = async (name: string): Promise<ICompany> => {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  return makeCompany(company);
+  return await makeCompany(company);
 };
 
 /**
@@ -184,7 +187,7 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
   console.log('companyList', companyList);
   const pr = companyList?.map(async (i) => await makeCompany(i));
 
-  return Promise.all(pr);
+  return await Promise.all(pr);
 };
 
 /**

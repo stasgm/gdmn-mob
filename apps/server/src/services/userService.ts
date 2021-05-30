@@ -37,8 +37,8 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     firstName: newUser.firstName,
     lastName: newUser.lastName,
     phoneNumber: newUser.phoneNumber,
-    creationDate: new Date().toJSON(),
-    editionDate: new Date().toJSON(),
+    creationDate: new Date().toString(),
+    editionDate: new Date().toString(),
   };
 
   const userId = await users.insert(newUserObj);
@@ -99,7 +99,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     lastName: userData.lastName || oldUser.lastName,
     phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
     creationDate: oldUser.creationDate,
-    editionDate: new Date().toJSON(),
+    editionDate: new Date().toString(),
   };
 
   await users.update(newUser);
@@ -228,7 +228,7 @@ const addCompanyToUser = async (userId: string, companyId: string) => {
 
   const companyList = [...(user.companies || []), company.id];
 
-  return users.update({ ...user, companies: companyList });
+  return await users.update({ ...user, companies: companyList });
 };
 
 const removeCompanyFromUser = async (userId: string, companyName: string) => {
