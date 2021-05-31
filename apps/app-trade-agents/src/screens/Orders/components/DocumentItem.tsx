@@ -4,7 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import { styles } from '../styles';
+import styles from '@lib/mobile-ui/src/styles/global';
+
 import { IOrderDocument } from '../../../store/docs/types';
 
 const DocumentItem = ({ item }: { item: IOrderDocument }) => {

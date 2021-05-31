@@ -10,9 +10,12 @@ const Stack = createStackNavigator<RoutesStackParamList>();
 
 const RoutesNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="RouteList" screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="RouteList" component={RouteListScreen} options={{ title: 'Маршруты' }} />
-      <Stack.Screen name="RouteView" component={RouteViewScreen} options={{ title: 'Маршрут' }} />
+    <Stack.Navigator
+      initialRouteName="RouteList"
+      screenOptions={{ headerShown: true, headerBackTitleVisible: false, title: 'Маршруты' }}
+    >
+      <Stack.Screen name="RouteList" component={RouteListScreen} />
+      <Stack.Screen name="RouteView" component={RouteViewScreen} />
     </Stack.Navigator>
   );
 };

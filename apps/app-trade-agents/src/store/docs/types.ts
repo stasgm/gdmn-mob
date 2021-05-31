@@ -78,7 +78,7 @@ interface IRouteHead {
   externalId: IEntity;
 }
 
-interface IRouteLine extends IEntity {
+export interface IRouteLine extends IEntity {
   externalId: IEntity;
   outlet: INamedEntity;
   ordNumber: number; // порядковый номер
@@ -88,9 +88,3 @@ interface IRouteLine extends IEntity {
 }
 
 export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
-
-export type IDocState = {
-  readonly docData: IOrderDocument[] | undefined;
-  readonly loading: boolean;
-  readonly errorMessage: string;
-};

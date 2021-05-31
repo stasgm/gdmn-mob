@@ -22,7 +22,9 @@ type ProfileStackParamList = {
 };
 
 type ReferenceStackParamList = {
-  References: undefined;
+  ReferenceList: undefined;
+  ReferenceView: { name: string };
+  ReferenceDetals: { name: string; id: string };
 };
 
 type SettingsStackParamList = {
@@ -30,7 +32,6 @@ type SettingsStackParamList = {
 };
 
 type TabsStackParams = {
-  //OtherTypes: undefined;
   [itemName: string]: { type: string };
 };
 

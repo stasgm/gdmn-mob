@@ -56,7 +56,7 @@ class Auth extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (userCredentials.name === 'Stas' && userCredentials.password === '@123!') {
+      if (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') {
         return {
           type: 'LOGIN',
           user: mockUser,

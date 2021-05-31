@@ -5,7 +5,7 @@ import { Button, IconButton, useTheme } from 'react-native-paper';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle, RadioGroup } from '@lib/mobile-ui/src/components';
 import { ICompany, IResponse } from '@lib/types';
-import { company, company2 } from '@lib/mock';
+import { company3 } from '@lib/mock';
 
 type Props = {
   onLogout: () => void;
@@ -19,12 +19,6 @@ const CompaniesScreen = (props: Props) => {
   const [companies, setCompanies] = useState<ICompany[]>([]);
 
   const { colors } = useTheme();
-  // const { apiService } = useServiceStore();
-
-  // const {
-  //   state: { userID },
-  //   actions,
-  // } = useAuthStore();
 
   // TODO 1. Загрузка списка компаний
   useEffect(() => {
@@ -32,7 +26,7 @@ const CompaniesScreen = (props: Props) => {
       // const response = await apiService.auth.getUserStatus();
       const response: IResponse<ICompany[]> = {
         result: true,
-        data: [company, company2],
+        data: [company3],
       };
 
       if (response.result) {
