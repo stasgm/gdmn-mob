@@ -3,7 +3,6 @@ import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import SnackBar from '../../components/SnackBar';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -12,6 +11,8 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 // import { users } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
+
+import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';

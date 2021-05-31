@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
-import { AppBar, Badge, Box, Hidden, IconButton, Toolbar } from '@material-ui/core';
+import { AppBar, Badge, Box, IconButton, Toolbar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import LogoutIcon from '@material-ui/icons/ExitToAppOutlined';
@@ -26,7 +26,10 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
           <Logo />
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />
-        <Hidden lgDown>
+        <Box
+          component="button"
+          sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}
+        >
           <IconButton color="inherit">
             <Badge badgeContent={notifications.length} color="primary" variant="dot">
               <NotificationsIcon />
@@ -35,12 +38,15 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
           <IconButton color="inherit" onClick={() => dispatch(authActions.logout())}>
             <LogoutIcon />
           </IconButton>
-        </Hidden>
-        <Hidden lgUp>
+        </Box>
+        <Box
+          component="button"
+          sx={{ background: 'transparent', border: 'none', display: { xs: 'block', md: 'none' } }}
+        >
           <IconButton color="inherit" onClick={onMobileNavOpen}>
             <MenuIcon />
           </IconButton>
-        </Hidden>
+        </Box>
       </Toolbar>
     </AppBar>
   );
