@@ -5,12 +5,12 @@ import { InvalidParameterException } from '../exceptions';
 const login: Config = {
   validate: {
     query: {
-      deviceId: Joi.string().required().error(new InvalidParameterException('не указано устройство')),
+      deviceId: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
     },
     type: 'json',
     body: Joi.object({
-      name: Joi.string().required().error(new InvalidParameterException('не заполнено имя пользователя')),
-      password: Joi.string().required().error(new InvalidParameterException('не заполнен пароль')),
+      name: Joi.string().required().error(new InvalidParameterException('Не заполнено имя пользователя')),
+      password: Joi.string().required().error(new InvalidParameterException('Не заполнен пароль')),
     }),
   },
 };
@@ -19,8 +19,8 @@ const signup: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
-      name: Joi.string().required().error(new InvalidParameterException('не заполнено имя пользователя')),
-      password: Joi.string().required().error(new InvalidParameterException('не заполнен пароль')),
+      name: Joi.string().required().error(new InvalidParameterException('Не заполнено имя пользователя')),
+      password: Joi.string().required().error(new InvalidParameterException('Не заполнен пароль')),
     }),
   },
 };
@@ -28,7 +28,7 @@ const signup: Config = {
 const verifyCode: Config = {
   validate: {
     params: Joi.object({
-      code: Joi.string().required().error(new InvalidParameterException('не указан код активации')),
+      code: Joi.string().required().error(new InvalidParameterException('Не указан код активации')),
     }),
   },
 };
@@ -36,7 +36,7 @@ const verifyCode: Config = {
 const getActivationCode: Config = {
   validate: {
     params: Joi.object({
-      deviceId: Joi.string().required().error(new InvalidParameterException('не указано устройство')),
+      deviceId: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
     }),
   },
 };
@@ -44,7 +44,7 @@ const getActivationCode: Config = {
 const checkDevice: Config = {
   validate: {
     query: {
-      deviceId: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
+      deviceId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     },
   },
 };

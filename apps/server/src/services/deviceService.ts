@@ -1,4 +1,5 @@
 import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
+import { ConflictException, DataNotFoundException } from '../exceptions';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -16,7 +17,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
   const { devices } = db;
 
   if (await devices.find((i) => i.name === device.userId && i.userId === device.userId)) {
-    throw new Error('устройство с таким названием уже добавлено пользователю');
+    throw new ConflictException('устройство с таким названием уже добавлено пользователю');
   }
 
   const newDevice: IDBDevice = {
@@ -44,7 +45,7 @@ const updateOne = async (deviceId: string, deviceData: Partial<IDevice>) => {
   const oldDevice = await devices.find(deviceId);
 
   if (!oldDevice) {
-    throw new Error('устройство не найдено');
+    throw new DataNotFoundException('Устройство не найдено');
   }
 
   // Проверяем есть ли в базе переданный пользователь
@@ -74,7 +75,7 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
   const { devices } = db;
 
   if (!(await devices.find((device) => device.id === deviceId))) {
-    throw new Error('устройство не найдено');
+    throw new DataNotFoundException('Устройство не найдено');
   }
 
   await devices.delete((device) => device.id === deviceId);
@@ -87,7 +88,7 @@ const genActivationCode = async (deviceId: string) => {
   const device = await devices.find(deviceId);
 
   if (!device) {
-    throw new Error('устройство не найдено');
+    throw new DataNotFoundException('Устройство не найдено');
   }
 
   // const code = Math.random()
@@ -155,7 +156,7 @@ const findUsers = async (deviceId: string) => {
   const { devices, users } = db;
 
   if (!(await devices.find(deviceId))) {
-    throw new Error('устройство не найдено');
+    throw new DataNotFoundException('Устройство не найдено');
   }
 
   return Promise.all(
@@ -165,13 +166,13 @@ const findUsers = async (deviceId: string) => {
         const device = await devices.find(deviceId);
 
         if (!device) {
-          throw new Error('устройство не найдено');
+          throw new DataNotFoundException('Устройство не найдено');
         }
 
         const user = await users.find(i.userId);
 
         if (!user) {
-          throw new Error('пользователь не найден');
+          throw new DataNotFoundException('Пользователь не найден');
         }
 
         return await makeDevice(i);

@@ -1,17 +1,1 @@
-[
-  {
-    "name": "Trade-agents",
-    "path": "C:\\Work\\_develop",
-    "port": 3650
-  },
-  {
-    "name": "Otves",
-    "path": "C:\\Work\\_develop",
-    "port": 3649
-  },
-  {
-    "name": "Inventory",
-    "path": "C:\\Work\\_develop",
-    "port": 3649
-  }
-]
+[]

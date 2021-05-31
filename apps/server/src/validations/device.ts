@@ -6,8 +6,8 @@ const addDevice: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
-      deviceName: Joi.string().required().error(new InvalidParameterException('не указано наименование устройства')),
-      userId: Joi.string().required().error(new InvalidParameterException('не указан идентификатор пользователя')),
+      deviceName: Joi.string().required().error(new InvalidParameterException('Не указано наименование устройства')),
+      userId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },
 };
@@ -15,17 +15,17 @@ const addDevice: Config = {
 const updateDevice: Config = {
   validate: {
     params: Joi.object({
-      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
     type: 'json',
-    body: Joi.string().required().error(new InvalidParameterException('не указана информация об устройстве')),
+    body: Joi.object().required().error(new InvalidParameterException('Не указана информация об устройстве')),
   },
 };
 
 const removeDevice: Config = {
   validate: {
     params: Joi.object({
-      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
   },
 };
@@ -33,7 +33,7 @@ const removeDevice: Config = {
 const getDevice: Config = {
   validate: {
     params: Joi.object({
-      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
   },
 };
@@ -41,7 +41,7 @@ const getDevice: Config = {
 const getUsersByDevice: Config = {
   validate: {
     params: Joi.object({
-      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
   },
 };

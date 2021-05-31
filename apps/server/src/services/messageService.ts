@@ -1,5 +1,6 @@
 import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
+import { DataNotFoundException } from '../exceptions';
 
 import { getNamedEntity } from './dao/utils';
 
@@ -71,7 +72,7 @@ const updateOne = async (message: IMessage): Promise<string> => {
   const oldMessage = await messages.find((i) => i.id === message.id);
 
   if (!oldMessage) {
-    throw new Error('сообщение не найдено');
+    throw new DataNotFoundException('Сообщение не найдено');
   }
 
   // Удаляем поля которые нельзя перезаписывать
@@ -92,7 +93,7 @@ const deleteOne = async (messageId: string): Promise<void> => {
   const { messages } = db;
 
   if (!(await messages.find(messageId))) {
-    throw new Error('сообщение не найдено');
+    throw new DataNotFoundException('Сообщение не найдено');
   }
 
   await messages.delete(messageId);
@@ -122,7 +123,7 @@ const deleteByUid = async ({
   );
 
   if (!messageObj) {
-    throw new Error('сообщение не найдено');
+    throw new DataNotFoundException('Сообщение не найдено');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

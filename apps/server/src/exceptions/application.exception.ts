@@ -2,8 +2,6 @@
  * Parent application exception
  */
 export class ApplicationException extends Error {
-  /** Name of the exception */
-  public name: string;
   /** Status, code of the exception */
   public status: number;
 

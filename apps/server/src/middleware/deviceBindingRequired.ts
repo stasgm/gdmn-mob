@@ -29,12 +29,10 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   const currDevice = await db.devices.find((i) => i.uid === device.id && i.userId === ctx.state.user?.id);
 
   if (!currDevice) {
-    // ctx.throw(400, 'Устройство для пользователя не найдено');
     throw new DataNotFoundException('Не указано имя пользователя');
   }
 
   if (currDevice.state !== 'ACTIVE') {
-    // ctx.throw(400, 'Устройство заблокировано');
     throw new UnauthorizedException('Не указано имя пользователя');
   }
 

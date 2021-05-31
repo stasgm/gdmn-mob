@@ -12,6 +12,8 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { useCallback, useEffect } from 'react';
 
+import SnackBar from '../../components/SnackBar';
+
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
 
@@ -32,10 +34,16 @@ const CompanyView = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { loading } = useSelector((state) => state.companies);
+  const { loading, errorMessage } = useSelector((state) => state.companies);
+
+  console.log('errorMessage', errorMessage);
   //TODO Вынести в селекторы
   const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
   const users = useSelector((state) => state.users.list);
+
+  const handleClearError = () => {
+    dispatch(actions.companyActions.clearError());
+  };
 
   const handleCancel = () => {
     //navigate('/app/companies');
@@ -44,6 +52,13 @@ const CompanyView = () => {
 
   const handleEdit = () => {
     navigate(`/app/companies/edit/${companyId}`);
+  };
+
+  const handleDelete = async () => {
+    const res = await dispatch(actions.removeCompany(companyId));
+    if (res.type === 'COMPANY/REMOVE_SUCCCES') {
+      navigate(-1);
+    }
   };
 
   const handleRefresh = useCallback(() => {
@@ -82,9 +97,7 @@ const CompanyView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => {
-        return;
-      },
+      onClick: () => handleDelete(),
       icon: <DeleteIcon />,
     },
   ];
@@ -131,6 +144,7 @@ const CompanyView = () => {
         <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
         <CompanyUsers users={users?.filter((u) => u.companies.find((c) => c.id === companyId))} />
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

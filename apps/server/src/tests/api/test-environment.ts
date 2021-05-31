@@ -7,7 +7,7 @@ let app: KoaApp | null = null;
 
 const testDb: IItemDatabase = {
   name: 'TEST_BASE',
-  path: 'C:\\Work\\_develop\\',
+  path: 'C:\\DB\\',
   port: 3649,
 };
 

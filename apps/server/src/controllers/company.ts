@@ -5,6 +5,7 @@ import { ICompany, NewCompany } from '@lib/types';
 import log from '../utils/logger';
 import { companyService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
+import { DataNotFoundException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, externalId } = ctx.request.body;
@@ -22,9 +23,11 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
+  console.log(1, companyId);
   const companyData = ctx.request.body as Partial<ICompany>;
-
+  console.log(2, companyData);
   const updatedCompany = await companyService.updateOne(companyId, companyData);
+  console.log(3, updatedCompany);
 
   ok(ctx as Context, updatedCompany);
 
@@ -34,9 +37,9 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
 const removeCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
-  await companyService.deleteOne(companyId);
+  const res = await companyService.deleteOne(companyId);
 
-  ok(ctx as Context);
+  ok(ctx as Context, res);
 
   log.info(`removeCompany: company '${companyId}' is successfully removed`);
 };
@@ -47,7 +50,7 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const company = await companyService.findOne(companyId);
 
   if (!company) {
-    ctx.throw(404, 'компания не найдена');
+    throw new DataNotFoundException('Компания не найдена');
   }
 
   ok(ctx as Context, company);

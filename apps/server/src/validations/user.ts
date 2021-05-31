@@ -18,7 +18,7 @@ const updateUser: Config = {
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
     type: 'json',
-    body: Joi.string().required().error(new InvalidParameterException('Не указаны данные пользователя')),
+    body: Joi.object().required().error(new InvalidParameterException('Не указаны данные пользователя')),
   },
 };
 
@@ -33,7 +33,7 @@ const removeUser: Config = {
 const getUser: Config = {
   validate: {
     params: Joi.object({
-      id: Joi.string().required().error(new InvalidParameterException('не указан идентификатор пользователя')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },
 };
