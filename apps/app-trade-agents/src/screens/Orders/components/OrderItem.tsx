@@ -6,11 +6,22 @@ import { useTheme } from 'react-native-paper';
 
 import styles from '@lib/mobile-ui/src/styles/global';
 
-import { IOrderDocument } from '../../../store/docs/types';
+// import { refSelectors } from '@lib/store';
 
-const DocumentItem = ({ item }: { item: IOrderDocument }) => {
+// import { IReference } from '@lib/types';
+
+import { IOrderLine } from '../../../store/docs/types';
+
+const OrderItem = ({ item }: { item: IOrderLine }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
+
+  // //Получить адрес item.outlet.id
+  // const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
+  //   (e) => e.id === item.,
+  // );
+
+  // const address = outlet ? outlet.address : '';
 
   return (
     <TouchableOpacity
@@ -23,14 +34,12 @@ const DocumentItem = ({ item }: { item: IOrderDocument }) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{`№ ${item.number} от ${item.documentDate}`}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>
-            {`${item.head.outlet.name} (${item.head.contact.name})`}
-          </Text>
+          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
+          <Text style={[styles.field, { color: colors.text }]}>{item.quantity} x 5.80 р.</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 };
 
-export default DocumentItem;
+export default OrderItem;

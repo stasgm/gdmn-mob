@@ -66,7 +66,7 @@ interface IOrderHead {
   takenOrder?: typeTakeOrder; //тип взятия заявки
 }
 
-interface IOrderLine extends IEntity {
+export interface IOrderLine extends IEntity {
   good: INamedEntity;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки

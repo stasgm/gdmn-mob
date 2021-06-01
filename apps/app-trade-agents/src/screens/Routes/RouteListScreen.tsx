@@ -21,7 +21,7 @@ import RouteListItem from './components/RouteListItem';
 
 const RouteListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
-  const list = docSelectors.selectByDocType('route') as unknown as IRouteDocument[];
+  const list = docSelectors.selectByDocType('route') as IRouteDocument[];
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();

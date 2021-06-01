@@ -24,6 +24,7 @@ const RouteItem = ({ item }: { item: IRouteLine }) => {
   const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
     (e) => e.id === item.outlet.id,
   );
+
   const address = outlet ? outlet.address : '';
 
   return (
