@@ -87,7 +87,7 @@ const localStyles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    justifyContent: 'center',
+    margin: 10,
   },
   errorText: {
     color: '#cc5933',
