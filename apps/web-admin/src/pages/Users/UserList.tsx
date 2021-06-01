@@ -29,8 +29,8 @@ const UserList = () => {
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    !list?.length && fetchUsers();
-  }, [fetchUsers, list.length]);
+    fetchUsers();
+  }, [fetchUsers]);
 
   const buttons: IToolBarButton[] = [
     {

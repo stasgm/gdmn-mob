@@ -26,6 +26,7 @@ export interface IDBUser extends INamedEntity, IExternalSystemProps {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  email?: string;
 }
 
 export interface IDBCompany extends INamedEntity, IExternalSystemProps {

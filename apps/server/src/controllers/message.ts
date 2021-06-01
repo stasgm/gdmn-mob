@@ -28,7 +28,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   // }
 
   if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
-    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
+    ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   // try {
@@ -186,7 +186,7 @@ const publish = async (ctx: ParameterizedContext): Promise<void> => {
   // }
 
   if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
-    ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
+    ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   //try {

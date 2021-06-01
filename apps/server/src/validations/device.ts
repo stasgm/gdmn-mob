@@ -6,7 +6,7 @@ const addDevice: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
-      deviceName: Joi.string().required().error(new InvalidParameterException('Не указано наименование устройства')),
+      name: Joi.string().required().error(new InvalidParameterException('Не указано наименование устройства')),
       userId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },
