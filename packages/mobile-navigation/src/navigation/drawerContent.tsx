@@ -14,7 +14,6 @@ import { useDispatch, useSelector, documentActions, referenceActions } from '@li
 import {
   routeMock,
   orderMock,
-  netPriceRefMock,
   goodRefMock,
   contactRefMock,
   outletRefMock,
@@ -41,7 +40,6 @@ export function DrawerContent(props: Props) {
 
     await dispatch(
       referenceActions.addReferences({
-        netPrice: netPriceRefMock,
         contact: contactRefMock,
         outlet: outletRefMock,
         debt: debtRefMock,
@@ -104,6 +102,7 @@ export function DrawerContent(props: Props) {
           </Drawer.Section> */}
         </Animated.View>
       </DrawerContentScrollView>
+      {/* <Divider /> */}
       <View style={styles.systemInfo}>
         <TouchableOpacity onPress={handleUpdate}>
           <Avatar.Icon size={50} icon="cloud-refresh" />

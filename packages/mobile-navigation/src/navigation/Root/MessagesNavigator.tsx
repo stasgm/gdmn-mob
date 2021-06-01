@@ -2,7 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import MessageListScreen from '../../screens/Messages/MessagesListScreen';
-import MessageViewScreen from '../../screens/Messages/MessageView';
+import MessageViewScreen from '../../screens/Messages/MessageViewScreen';
 
 import { MessagesStackParamList } from './types';
 

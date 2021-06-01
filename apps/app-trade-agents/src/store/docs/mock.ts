@@ -390,7 +390,7 @@ const goodMock = [
 ];
 
 const goodRefMock: IReference<INamedEntity> = {
-  id: '50',
+  id: '51',
   name: 'Товары',
   data: goodMock,
 };
@@ -413,8 +413,8 @@ const netPriceMock = [
 ];
 
 const netPriceRefMock: IReference = {
-  id: '50',
-  name: 'Группы товаров',
+  id: '55',
+  name: 'Цены',
   data: netPriceMock,
 };
 
@@ -497,7 +497,7 @@ const routeMock: IRouteDocument[] = [
     status: 'DRAFT',
     head: {
       externalId: { id: '147019506' },
-      agent: agent3,
+      agent: agent1,
     },
     lines: [
       {
@@ -537,7 +537,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '30506',
     number: '2',
-    documentDate: '01.06.2021',
+    documentDate: '27.05.2021',
     documentType: routeType,
     status: 'DRAFT',
     head: {
@@ -579,7 +579,7 @@ const routeMock: IRouteDocument[] = [
     status: 'PROCESSED',
     head: {
       externalId: { id: '147022891' },
-      agent: agent2,
+      agent: agent1,
     },
     lines: [
       {

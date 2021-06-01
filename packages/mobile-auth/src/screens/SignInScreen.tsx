@@ -41,11 +41,11 @@ const SignInScreen = (props: Props) => {
   );
 
   const [credential, setCredentials] = useState<IUserCredentials>({
-    name: 'Stas',
+    name: 'ГОЦЕЛЮК',
     password: '@123!',
   });
 
-  console.log('signIn');
+  // console.log('signIn');
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -54,9 +54,9 @@ const SignInScreen = (props: Props) => {
 
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
-    console.log('mount signin');
+    // console.log('mount signin');
     return () => {
-      console.log('unmount signin');
+      // console.log('unmount signin');
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
