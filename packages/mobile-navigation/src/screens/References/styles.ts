@@ -4,30 +4,28 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 5,
-    // alignItems: 'center',
+  },
+  content: {
+    height: '100%',
+    padding: 3,
   },
   directionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  description: {},
   details: {
-    margin: 8,
-    marginRight: 0,
     flex: 1,
+    margin: 5,
   },
   emptyList: {
     marginTop: 20,
     textAlign: 'center',
   },
-  fabAdd: {
-    bottom: 0,
-    margin: 20,
-    position: 'absolute',
-    right: 0,
+  flexDirectionRow: {
+    flexDirection: 'row',
   },
-  field: {
-    opacity: 0.5,
+  flexGrow: {
+    flexGrow: 10,
   },
   header: {
     flexDirection: 'row',
@@ -46,7 +44,7 @@ export const styles = StyleSheet.create({
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 8,
+    margin: 3,
   },
   name: {
     fontSize: 14,
@@ -55,18 +53,19 @@ export const styles = StyleSheet.create({
   number: {
     fontSize: 12,
   },
+  searchBar: {
+    elevation: 0,
+    shadowOpacity: 0,
+  },
   textDescription: {
     fontSize: 11,
   },
   title: {
     fontSize: 20,
     textAlign: 'center',
-    margin: 10,
+    padding: 10,
   },
-  buttons: {
-    margin: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  field: {
+    opacity: 0.5,
   },
 });

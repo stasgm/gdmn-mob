@@ -1,6 +1,6 @@
 import { IEntity, INamedEntity } from './models';
 
-type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
+export type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
 
 interface IDocument extends IEntity {
   number: string;

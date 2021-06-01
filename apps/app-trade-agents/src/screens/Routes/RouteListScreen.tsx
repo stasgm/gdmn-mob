@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, RefreshControl, Text } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { ItemSeparator, FilterButtons, Status } from '@lib/mobile-ui/src/components';
 import { useDispatch, useSelector, documentActions, docSelectors } from '@lib/store';
@@ -7,12 +7,17 @@ import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
 import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
+import styles from '@lib/mobile-ui/src/styles/global';
+
+import { useTheme } from 'react-native-paper';
+
+import { useScrollToTop } from '@react-navigation/native';
+
 import { routeMock } from '../../store/docs/mock';
 
 import { IRouteDocument } from '../../store/docs/types';
 
-import { styles } from './styles';
-import DocumentItem from './components/DocumentItem';
+import RouteListItem from './components/RouteListItem';
 
 const RouteListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
@@ -22,14 +27,11 @@ const RouteListScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
+  const { colors } = useTheme();
+
   const [status, setStatus] = useState<Status>('all');
 
-  const renderItem = useCallback(
-    ({ item }: { item: IRouteDocument }) => <DocumentItem key={item.id} item={item} />,
-    [],
-  );
-
-  const filtredList = useMemo(() => {
+  const filteredList = useMemo(() => {
     if (status === 'all') {
       return list;
     } else if (status === 'active') {
@@ -74,23 +76,27 @@ const RouteListScreen = () => {
   }, [actionsMenu, navigation]);
 
   const ref = useRef<FlatList<IRouteDocument>>(null);
+  useScrollToTop(ref);
+
+  const renderItem = useCallback(
+    ({ item }: { item: IRouteDocument }) => <RouteListItem key={item.id} item={item} />,
+    [],
+  );
 
   return (
-    <>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
-        data={filtredList}
+        data={filteredList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
-        onEndReached={() => ({})}
-        // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </>
+    </View>
   );
 };
 

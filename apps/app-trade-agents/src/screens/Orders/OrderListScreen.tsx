@@ -10,12 +10,15 @@ import { useNavigation } from '@react-navigation/native';
 
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
+import styles from '@lib/mobile-ui/src/styles/global';
+
+import { useTheme } from 'react-native-paper';
+
 import { IOrderDocument } from '../../store/docs/types';
 
 import { orderMock } from '../../store/docs/mock';
 
 import DocumentItem from './components/DocumentItem';
-import { styles } from './styles';
 
 const OrderListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
@@ -23,11 +26,13 @@ const OrderListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
+  const { colors } = useTheme();
+
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
 
-  const filtredList = useMemo(() => {
+  const filteredList = useMemo(() => {
     if (status === 'all') {
       return list;
     } else if (status === 'active') {
@@ -92,11 +97,11 @@ const OrderListScreen = () => {
   const ref = useRef<FlatList<IOrderDocument>>(null);
 
   return (
-    <>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
-        data={filtredList}
+        data={filteredList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
@@ -106,7 +111,7 @@ const OrderListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </>
+    </View>
   );
 };
 
