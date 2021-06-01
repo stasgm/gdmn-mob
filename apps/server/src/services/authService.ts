@@ -14,7 +14,7 @@ import { getDb } from './dao/db';
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const db = getDb();
 
-  const { devices, users } = db;
+  const { devices, users, devicebinding } = db;
 
   const { deviceId } = ctx.query;
   const { name }: { name: string } = ctx.request.body;
@@ -26,7 +26,8 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
-  const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
+  // const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
+  const device = await devices.find((el) => el.uid === deviceId);
 
   if (!device) {
     throw new UnauthorizedException('Связанное с пользователем Устройство не найдено');
@@ -81,7 +82,7 @@ const signUp = async (user: NewUser): Promise<IUser> => {
       name: 'GDMN-WEB',
       uid: 'WEB',
       state: 'ACTIVE',
-      userId: gdmnUser.id,
+      // userId: gdmnUser.id,
     });
   }
 
