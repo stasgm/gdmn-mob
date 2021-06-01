@@ -1,4 +1,12 @@
-import { IDBUser, IDBMessage, IDBDevice, IDBActivationCode, IDBCompany, INamedEntity } from '@lib/types';
+import {
+  IDBUser,
+  IDBMessage,
+  IDBDevice,
+  IDBActivationCode,
+  IDBCompany,
+  INamedEntity,
+  IDBDeviceBinding,
+} from '@lib/types';
 
 import { Collection, Database } from '../../utils/json-db';
 
@@ -8,6 +16,7 @@ type dbtype = {
   companies: Collection<IDBCompany>;
   messages: Collection<IDBMessage>;
   devices: Collection<IDBDevice>;
+  devicebinding: Collection<IDBDeviceBinding>;
 };
 
 let database: dbtype | null = null;
@@ -20,8 +29,9 @@ export const createDb = (dir: string, name: string) => {
   const companies = db.collection<IDBCompany>('companies');
   const codes = db.collection<IDBActivationCode>('activation-codes');
   const messages = db.collection<IDBMessage>('messages');
+  const devicebinding = db.collection<IDBDeviceBinding>('device-binding');
 
-  database = { users, codes, companies, messages, devices };
+  database = { users, codes, companies, messages, devices, devicebinding };
 
   return database;
 };

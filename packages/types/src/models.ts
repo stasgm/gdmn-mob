@@ -36,9 +36,15 @@ export interface IDBCompany extends INamedEntity, IExternalSystemProps {
 export interface IDBDevice extends INamedEntity {
   id: string;
   name: string;
-  userId: string;
+  // userId: string;
   uid: string;
   state: DeviceState;
+}
+
+export interface IDBDeviceBinding {
+  id?: string;
+  userId: string;
+  deviceId: string;
 }
 
 export interface IDBActivationCode {
@@ -98,7 +104,7 @@ export interface IDevice extends Omit<IDBDevice, 'userId'> {
   user: INamedEntity;
 }
 
-export type NewDevice = Pick<IDBDevice, 'name' | 'userId'>;
+export type NewDevice = Pick<IDBDevice, 'name'>; // | 'userId'
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

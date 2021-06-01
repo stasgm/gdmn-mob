@@ -25,7 +25,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     name: device.name,
     uid: '',
     state: 'NEW',
-    userId: device.userId,
+    // userId: device.userId,
   };
 
   const createdDevice = await devices.find(await devices.insert(newDevice));
