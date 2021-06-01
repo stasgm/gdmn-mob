@@ -18,7 +18,7 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log(item.id);
+        // console.log(item.id);
         navigation.navigate('RouteView', { id: item.id });
       }}
     >

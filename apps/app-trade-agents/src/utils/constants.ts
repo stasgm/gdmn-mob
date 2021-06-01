@@ -27,7 +27,6 @@ const getStatusColor = (status: StatusType) => {
       break;
   }
 
-  console.log(statusColor);
   return statusColor;
 };
 

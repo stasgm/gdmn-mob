@@ -14,7 +14,7 @@ import RouteItem from './components/RouteItem';
 
 const RouteViewScreen = () => {
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
-  console.log(id);
+  // console.log(id);
   const list = (docSelectors.selectByDocType('route') as IRouteDocument[])?.find((e) => e.id === id);
 
   if (!list) {
