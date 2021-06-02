@@ -6,15 +6,14 @@ const globalstyles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   buttons: {
-    // margin: 5,
     flexDirection: 'row',
-    // alignItems: 'center',
     justifyContent: 'center',
   },
   btnTab: {
     width: Dimensions.get('window').width / 3.2,
     flexDirection: 'row',
     borderWidth: 0.5,
+    borderRadius: 0,
     padding: 10,
     justifyContent: 'center',
   },
@@ -39,7 +38,6 @@ const globalstyles = StyleSheet.create({
     fontSize: 18,
     height: 50,
     marginTop: 15,
-    // padding: 2,
   },
   rectangularButton: {
     borderRadius: 5,
@@ -70,10 +68,6 @@ const globalstyles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-  /*   container: {
-      flex: 1,
-      margin: 5,
-    }, */
   content: {
     height: '100%',
     padding: 3,
@@ -107,9 +101,9 @@ const globalstyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#e91e63',
     borderRadius: 18,
-    height: 36,
+    height: 30,
     justifyContent: 'center',
-    width: 36,
+    width: 30,
   },
   item: {
     alignItems: 'center',
@@ -126,13 +120,12 @@ const globalstyles = StyleSheet.create({
   textDescription: {
     fontSize: 11,
   },
-  /*   title: {
-      fontSize: 20,
-      textAlign: 'center',
-      padding: 10,
-    }, */
   field: {
     opacity: 0.5,
+  },
+  lightField: {
+    fontSize: 15,
+    color: '#fff',
   },
 });
 

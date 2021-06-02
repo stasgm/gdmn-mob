@@ -69,8 +69,10 @@ const SignInScreen = (props: Props) => {
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <KeyboardAvoidingView style={[globalStyles.container, isKeyboardVisible && style.contentWidthKbd]}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={[globalStyles.container, styles.container, isKeyboardVisible && styles.contentWidthKbd]}
+        >
           <View>
             <SubTitle>Вход пользователя</SubTitle>
             <TextInput
@@ -103,8 +105,8 @@ const SignInScreen = (props: Props) => {
               Войти
             </Button>
           </View>
-          <View style={style.statusBox}>
-            {request.isError && <Text style={style.errorText}>Ошибка: {request.status}</Text>}
+          <View style={styles.statusBox}>
+            {request.isError && <Text style={styles.errorText}>Ошибка: {request.status}</Text>}
             {/* {request.isLoading && <ActivityIndicator size="large" color="#70667D" />} */}
           </View>
         </KeyboardAvoidingView>
@@ -126,7 +128,11 @@ const SignInScreen = (props: Props) => {
   );
 };
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+  container: {
+    // alignItems: 'center',
+    margin: 10,
+  },
   contentWidthKbd: {
     justifyContent: 'flex-start',
     paddingTop: 60,
@@ -139,8 +145,6 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'center',
     alignItems: 'center',
-    // height: 100,
-    // flex: 1,
   },
 });
 

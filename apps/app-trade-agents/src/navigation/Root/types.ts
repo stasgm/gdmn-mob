@@ -6,6 +6,7 @@ export type OrdersStackParamList = {
 export type RoutesStackParamList = {
   RouteList: undefined;
   RouteView: { id: string };
+  RouteDetails: { routeId: string; id: string };
 };
 
 export type MapStackParamList = {
