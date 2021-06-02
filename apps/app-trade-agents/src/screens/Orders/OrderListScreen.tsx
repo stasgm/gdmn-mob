@@ -4,7 +4,7 @@ import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { FilterButtons, ItemSeparator, Status } from '@lib/mobile-ui/src/components';
 import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 
-import { AddButton, BackButton, DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+import { AddButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { useNavigation } from '@react-navigation/native';
 

@@ -6,27 +6,21 @@ import { useTheme } from 'react-native-paper';
 
 import styles from '@lib/mobile-ui/src/styles/global';
 
-// import { refSelectors } from '@lib/store';
-
-// import { IReference } from '@lib/types';
-
 import { IOrderLine } from '../../../store/docs/types';
 
-const OrderItem = ({ item }: { item: IOrderLine }) => {
+interface IProps {
+  docId: string;
+  item: IOrderLine;
+}
+
+const OrderItem = ({ docId, item }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-
-  // //Получить адрес item.outlet.id
-  // const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
-  //   (e) => e.id === item.,
-  // );
-
-  // const address = outlet ? outlet.address : '';
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('OrderView', { id: item.id });
+        navigation.navigate('OrderLine', { docId, item });
       }}
     >
       <View style={[styles.item, { backgroundColor: colors.background }]}>
