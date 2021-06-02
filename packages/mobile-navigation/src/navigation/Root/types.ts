@@ -1,6 +1,15 @@
+import { ViewStyle } from 'react-native';
+
 type DocumentsStackParamList = {
-  Documents: undefined;
-  DocumentView: { id: string };
+  TabsNavigator: undefined;
+};
+
+type DocumentsTabsStackParamsList = {
+  DocumentList: { type: string } | undefined;
+  DocumentView: {
+    id: string;
+    view?: { componentItem?: ({ item }: { item: any }) => JSX.Element; titles?: string[]; styleHeader?: ViewStyle };
+  };
 };
 
 type MessagesStackParamList = {
@@ -13,7 +22,9 @@ type ProfileStackParamList = {
 };
 
 type ReferenceStackParamList = {
-  References: undefined;
+  ReferenceList: undefined;
+  ReferenceView: { name: string };
+  ReferenceDetals: { name: string; id: string };
 };
 
 type SettingsStackParamList = {
@@ -21,11 +32,11 @@ type SettingsStackParamList = {
 };
 
 type TabsStackParams = {
-  //OtherTypes: undefined;
   [itemName: string]: { type: string };
 };
 
 export {
+  DocumentsTabsStackParamsList,
   DocumentsStackParamList,
   MessagesStackParamList,
   ProfileStackParamList,

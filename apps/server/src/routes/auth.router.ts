@@ -7,7 +7,7 @@ import { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode } 
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 
-import { authValidation } from './validations';
+import { authValidation } from '../validations';
 
 const router = Router();
 

@@ -19,7 +19,7 @@ const reducer: Reducer<IDeviceState, DeviceActionType> = (state = initialState, 
       return { ...state, errorMessage: '' };
 
     case getType(deviceActions.fetchDevicesAsync.request):
-      return { ...state, loading: true, list: [] };
+      return { ...state, loading: true, list: [], errorMessage: '' };
 
     case getType(deviceActions.fetchDevicesAsync.success):
       return {
@@ -36,7 +36,7 @@ const reducer: Reducer<IDeviceState, DeviceActionType> = (state = initialState, 
       };
 
     case getType(deviceActions.addDeviceAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(deviceActions.addDeviceAsync.success):
       return {
@@ -54,7 +54,7 @@ const reducer: Reducer<IDeviceState, DeviceActionType> = (state = initialState, 
 
     // Обновление компании
     case getType(deviceActions.updateDeviceAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(deviceActions.updateDeviceAsync.success):
       return {
@@ -72,7 +72,7 @@ const reducer: Reducer<IDeviceState, DeviceActionType> = (state = initialState, 
 
     // Получение компании
     case getType(deviceActions.fetchDeviceAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(deviceActions.fetchDeviceAsync.success):
       return {

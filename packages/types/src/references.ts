@@ -11,8 +11,8 @@ interface IReference<T = IReferenceData> {
   data: T[];
 }
 
-interface IReferences {
-  [name: string]: IReference;
+interface IReferences<T = any> {
+  [name: string]: IReference<T>;
 }
 
 export { IReference, IReferenceData, IReferences };

@@ -1,4 +1,4 @@
-import { Hidden, Button } from '@material-ui/core';
+import { Box, Button } from '@material-ui/core';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 
 interface IProps {
@@ -8,7 +8,7 @@ interface IProps {
 
 const NavToggle = ({ compact, setCompact }: IProps) => {
   return (
-    <Hidden lgDown>
+    <Box component="button" sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
       <Button
         // component={RouterLink}
         sx={{
@@ -29,7 +29,7 @@ const NavToggle = ({ compact, setCompact }: IProps) => {
           }}
         />
       </Button>
-    </Hidden>
+    </Box>
   );
 };
 

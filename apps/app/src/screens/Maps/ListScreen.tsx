@@ -12,11 +12,13 @@ import { useNavigation } from '@react-navigation/core';
 
 import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
 
+import { globalStyles as styles } from '@lib/mobile-ui';
+
 import { useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
 
-import styles from './styles';
+// import styles from './styles';
 
 // import { AppState } from '../store';
 

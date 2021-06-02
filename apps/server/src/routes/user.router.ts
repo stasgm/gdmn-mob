@@ -1,18 +1,19 @@
-import Router from 'koa-router';
-
-import compose from 'koa-compose';
+import Router from 'koa-joi-router';
 
 import { addUser, getUsers, getUser, removeUser, updateUser } from '../controllers/user';
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 
-const router = new Router({ prefix: '/users' });
+import { userValidation } from '../validations';
 
-router.post('/', compose([authMiddleware, deviceMiddleware]), addUser);
-router.get('/:id', compose([authMiddleware, deviceMiddleware]), getUser);
-router.get('/', compose([authMiddleware, deviceMiddleware]), getUsers);
+const router = Router();
+
+router.prefix('/users');
+router.post('/', userValidation.addUser, authMiddleware, deviceMiddleware, addUser);
+router.get('/:id', userValidation.getUser, authMiddleware, deviceMiddleware, getUser);
+router.get('/', authMiddleware, deviceMiddleware, getUsers);
 // router.get('/:id/devices', compose([authMiddleware, deviceMiddleware]), getDevicesByUser);
-router.patch('/:id', compose([authMiddleware, deviceMiddleware]), updateUser);
-router.delete('/:id', compose([authMiddleware, deviceMiddleware]), removeUser);
+router.patch('/:id', userValidation.updateUser, authMiddleware, deviceMiddleware, updateUser);
+router.delete('/:id', userValidation.removeUser, authMiddleware, deviceMiddleware, removeUser);
 
 export default router;

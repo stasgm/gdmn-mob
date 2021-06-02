@@ -28,11 +28,18 @@ const updateCompanyAsync = createAsyncAction('COMPANY/UPDATE', 'COMPANY/UPDATE_S
   string
 >();
 
+const removeCompanyAsync = createAsyncAction('COMPANY/REMOVE', 'COMPANY/REMOVE_SUCCCES', 'COMPANY/REMOVE_FAILURE')<
+  string | undefined,
+  undefined,
+  string
+>();
+
 export const companyActions = {
   fetchCompaniesAsync,
   fetchCompanyAsync,
   addCompanyAsync,
   updateCompanyAsync,
+  removeCompanyAsync,
   clearError,
   init,
 };

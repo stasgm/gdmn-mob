@@ -39,6 +39,7 @@ export interface IGood extends INamedEntity {
   vat: string; //НДС
   goodgroup: INamedEntity; // группа товаров
   valuename: string; // Наименование ед. изм.
+  invWeight: number; // Вес единицы товара
   priceFso: number; // цена ФСО
   priceFsn: number; // цена ФСН
   priceFsoSklad: number; // цена ФСО склад
@@ -65,7 +66,7 @@ interface IOrderHead {
   takenOrder?: typeTakeOrder; //тип взятия заявки
 }
 
-interface IOrderLine extends IEntity {
+export interface IOrderLine extends IEntity {
   good: INamedEntity;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
@@ -75,9 +76,11 @@ export type IOrderDocument = IUserDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead {
   agent: INamedEntity;
+  externalId: IEntity;
 }
 
-interface IRouteLine extends IEntity {
+export interface IRouteLine extends IEntity {
+  externalId: IEntity;
   outlet: INamedEntity;
   ordNumber: number; // порядковый номер
   comment?: string;
@@ -86,9 +89,3 @@ interface IRouteLine extends IEntity {
 }
 
 export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
-
-export type IDocState = {
-  readonly docData: IOrderDocument[] | undefined;
-  readonly loading: boolean;
-  readonly errorMessage: string;
-};

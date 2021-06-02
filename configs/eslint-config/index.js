@@ -57,6 +57,12 @@ module.exports = {
     // "sonarjs/no-duplicate-string": "off",
     'padded-blocks': ['error', 'never'],
     'no-await-in-loop': 'error',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
   overrides: [
     {
@@ -84,6 +90,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       node: {
+        paths: ['src'],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
       'eslint-import-resolver-typescript': true,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { Text, TextInput, IconButton, Button, ActivityIndicator, useTheme } from 'react-native-paper';
+import { Text, TextInput, IconButton, Button, useTheme } from 'react-native-paper';
 
 import { IUserCredentials } from '@lib/types';
 
@@ -41,11 +41,11 @@ const SignInScreen = (props: Props) => {
   );
 
   const [credential, setCredentials] = useState<IUserCredentials>({
-    name: 'Stas',
+    name: 'ГОЦЕЛЮК',
     password: '@123!',
   });
 
-  console.log('signIn');
+  // console.log('signIn');
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -54,9 +54,9 @@ const SignInScreen = (props: Props) => {
 
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
-    console.log('mount signin');
+    // console.log('mount signin');
     return () => {
-      console.log('unmount signin');
+      // console.log('unmount signin');
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
@@ -69,8 +69,10 @@ const SignInScreen = (props: Props) => {
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <KeyboardAvoidingView style={[globalStyles.container, isKeyboardVisible && style.contentWidthKbd]}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={[globalStyles.container, styles.container, isKeyboardVisible && styles.contentWidthKbd]}
+        >
           <View>
             <SubTitle>Вход пользователя</SubTitle>
             <TextInput
@@ -96,15 +98,16 @@ const SignInScreen = (props: Props) => {
               mode="contained"
               disabled={request.isLoading}
               icon="login"
+              loading={request.isLoading}
               onPress={handleLogIn}
               style={globalStyles.rectangularButton}
             >
               Войти
             </Button>
           </View>
-          <View style={style.statusBox}>
-            {request.isError && <Text style={style.errorText}>Ошибка: {request.status}</Text>}
-            {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+          <View style={styles.statusBox}>
+            {request.isError && <Text style={styles.errorText}>Ошибка: {request.status}</Text>}
+            {/* {request.isLoading && <ActivityIndicator size="large" color="#70667D" />} */}
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -125,7 +128,11 @@ const SignInScreen = (props: Props) => {
   );
 };
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+  container: {
+    // alignItems: 'center',
+    margin: 10,
+  },
   contentWidthKbd: {
     justifyContent: 'flex-start',
     paddingTop: 60,
@@ -135,9 +142,9 @@ const style = StyleSheet.create({
     fontSize: 18,
   },
   statusBox: {
+    flexDirection: 'row',
+    alignSelf: 'center',
     alignItems: 'center',
-    // height: 100,
-    // flex: 1,
   },
 });
 

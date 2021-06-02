@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/core';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
 
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();

@@ -1,84 +1,72 @@
 //import { v1 as uuidv1 } from 'uuid';
-import { ParameterizedContext } from 'koa';
+import { Context, ParameterizedContext } from 'koa';
 
 import { IResponse, IMessage, NewMessage } from '@lib/types';
 
 import log from '../utils/logger';
 import { messageService, companyService, userService } from '../services';
 
+import { created, ok } from '../utils/apiHelpers';
+
+import { DataNotFoundException } from '../exceptions';
+
 let clients: ((result: IMessage[]) => void)[] = [];
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const message = ctx.request.body as NewMessage;
 
-  if (!message.head) {
-    ctx.throw(400, 'отсутствует заголовок сообщения');
-  }
+  // if (!message.head) {
+  //   ctx.throw(400, 'отсутствует заголовок сообщения');
+  // }
 
-  if (!message.body) {
-    ctx.throw(400, 'отсутствует сообщение');
-  }
+  // if (!message.body) {
+  //   ctx.throw(400, 'отсутствует сообщение');
+  //  }
 
-  if (!(message.body.type && message.body.payload && message.head.company)) {
-    ctx.throw(400, 'некорректный формат сообщения');
-  }
+  // if (!(message.body.type && message.body.payload && message.head.company)) {
+  //   ctx.throw(400, 'некорректный формат сообщения');
+  // }
 
   if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
     ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
-  try {
-    /*const msgObject: IMessage = {
-      id: uuidv1(),
-      head: {
-        companyId: head.company.id,
-        consumerId: head.consumer.id || 'gdmn',
-        //producer: ctx.state.user.id,
-        producerId: '3',
-        dateTime: new Date().toISOString(),
-        appSystem: head.appSystem,
-      },
-      body,
-    };*/
+  // try {
+  const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
 
-    /*clients.forEach((resolve) => {
-      resolve([message]);
-    });*/
+  // const result: IResponse<{ uid: string; date: Date }> = {
+  //   result: true,
+  //   data: { uid: messageId, date: new Date() },
+  // };
 
-    const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
+  const resultData = { uid: messageId, date: new Date() };
+  created(ctx as Context, resultData);
+  // ctx.status = 201;
+  // ctx.body = result;
 
-    const result: IResponse<{ uid: string; date: Date }> = {
-      result: true,
-      data: { uid: messageId, date: new Date() },
-    };
+  log.info('newMessage: message is successfully created');
 
-    ctx.status = 201;
-    ctx.body = result;
-
-    log.info('newMessage: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  // } catch (err) {
+  //   ctx.throw(400, err.message);
+  // }
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId: companyName, appSystem } = ctx.params;
   let userId = ctx.state.user.id;
 
-  if (!companyName) {
-    ctx.throw(400, 'не указана органиазция');
-  }
-
   const company = await companyService.findOneByName(companyName);
 
   if (!company) {
-    ctx.throw(400, 'компания не найдена');
+    //ctx.throw(400, 'компания не найдена');
+    throw new DataNotFoundException('Компания не найдена');
   }
 
   const user = await userService.findOne(userId);
 
   if (!user) {
-    ctx.throw(400, 'пользователь не найден');
+    // ctx.throw(400, 'Пользователь не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   if (user.name === 'gdmn') {
@@ -86,74 +74,46 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
     userId = 'gdmn';
   }
 
-  try {
-    const messageList = await messageService.FindMany({
-      appSystem,
-      companyId: company.id,
-      userId,
-    });
+  const messageList = await messageService.FindMany({
+    appSystem,
+    companyId: company.id,
+    userId,
+  });
 
-    const result: IResponse<IMessage[]> = { result: true, data: messageList };
-    ctx.status = 200;
-    ctx.body = result;
+  ok(ctx as Context, messageList);
 
-    log.info('get message');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('getMessage: message is successfully received');
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, id: uid } = ctx.params;
 
-  if (!companyId) {
-    ctx.throw(400, 'не указана органиазция');
-  }
+  const userId = ctx.state.user.id;
 
-  if (!uid) {
-    ctx.throw(400, 'не указан идентификатор сообщения');
-  }
+  // const user = await userService.findOne(userId);
 
-  try {
-    const userId = ctx.state.user.id;
+  // if (!user) {
+  //   ctx.throw(400, 'Пользователь не найден');
+  // }
 
-    // const user = await userService.findOne(userId);
+  // if (user.name === 'gdmn') {
+  //   // TODO переделать
+  //   userId = 'gdmn';
+  // }
 
-    // if (!user) {
-    //   ctx.throw(400, 'пользователь не найден');
-    // }
+  await messageService.deleteByUid({ companyId, uid, userId });
 
-    // if (user.name === 'gdmn') {
-    //   // TODO переделать
-    //   userId = 'gdmn';
-    // }
+  ok(ctx as Context);
 
-    await messageService.deleteByUid({ companyId, uid, userId });
-
-    const result: IResponse<void> = { result: true };
-
-    ctx.status = 200;
-    ctx.body = result; // TODO передавать только код 204 без body
-
-    log.info('removeMessage: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('removeDevice: message is successfully removed');
 };
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {
-  try {
-    await messageService.deleteAll();
+  await messageService.deleteAll();
 
-    const result: IResponse<void> = { result: true };
+  ok(ctx as Context);
 
-    ctx.status = 200;
-    ctx.body = result; // TODO передавать только код 204 без body
-
-    log.info('clear messages: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('clear: all messages are successfully removed');
 };
 
 const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
@@ -161,22 +121,16 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
 
   ctx.set('Cache-Control', 'no-cache,must-revalidate');
 
-  try {
-    const userId = ctx.state.user.id;
-    const messageList = await messageService.FindMany({
-      appSystem,
-      companyId,
-      userId,
-    });
+  const userId = ctx.state.user.id;
+  const messageList = await messageService.FindMany({
+    appSystem,
+    companyId,
+    userId,
+  });
 
-    const result: IResponse<IMessage[]> = { result: true, data: messageList };
-    ctx.status = 200;
-    ctx.body = result;
+  ok(ctx as Context, messageList);
 
-    log.info('get message');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('get message');
 
   const promise = new Promise<IMessage[]>((resolve, reject) => {
     clients.push(resolve);
@@ -219,24 +173,24 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
 const publish = async (ctx: ParameterizedContext): Promise<void> => {
   const message = ctx.request.body as NewMessage;
 
-  if (!message.head) {
-    ctx.throw(400, 'отсутствует заголовок сообщения');
-  }
+  // if (!message.head) {
+  //   ctx.throw(400, 'отсутствует заголовок сообщения');
+  // }
 
-  if (!message.body) {
-    ctx.throw(400, 'отсутствует сообщение');
-  }
+  // if (!message.body) {
+  //   ctx.throw(400, 'отсутствует сообщение');
+  // }
 
-  if (!(message.body.type && message.body.payload && message.head.company.id)) {
-    ctx.throw(400, 'некорректный формат сообщения');
-  }
+  // if (!(message.body.type && message.body.payload && message.head.company.id)) {
+  //   ctx.throw(400, 'некорректный формат сообщения');
+  // }
 
   if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
     ctx.throw(403, 'пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
-  try {
-    /*const msgObject: IDBMessage = {
+  //try {
+  /*const msgObject: IDBMessage = {
       id: uuidv1(),
       head: {
         companyId: head.company.id,
@@ -248,20 +202,23 @@ const publish = async (ctx: ParameterizedContext): Promise<void> => {
       body,
     };*/
 
-    const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
+  const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
 
-    const result: IResponse<{ uid: string; date: Date }> = {
-      result: true,
-      data: { uid: messageId, date: new Date() },
-    };
+  // const result: IResponse<{ uid: string; date: Date }> = {
+  //   result: true,
+  //   data: { uid: messageId, date: new Date() },
+  // };
 
-    ctx.status = 201;
-    ctx.body = result;
+  // ctx.status = 201;
+  // ctx.body = result;
+  const resultData = { uid: messageId, date: new Date() };
+  created(ctx as Context, resultData);
 
-    log.info('newMessage: OK');
-  } catch (err) {
-    ctx.throw(400, err.message);
-  }
+  log.info('newMessage: message is successfully created');
+
+  // } catch (err) {
+  //   ctx.throw(400, err.message);
+  // }
 };
 
 export { newMessage, removeMessage, getMessage, publish, subscribe, clear };

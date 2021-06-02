@@ -9,6 +9,6 @@ export class UnauthorizedException extends ApplicationException {
    * @param context Request context and more details
    */
   constructor(context: string) {
-    super('UnauthorizedException', 401, `Unauthorized : ${context}`);
+    super('UnauthorizedException', 401, context);
   }
 }

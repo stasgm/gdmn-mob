@@ -46,7 +46,7 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка создания пользователя',
       } as error.INetworkError;
     }
   };
@@ -56,7 +56,7 @@ class Auth extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (userCredentials.name === 'Stas' && userCredentials.password === '@123!') {
+      if (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') {
         return {
           type: 'LOGIN',
           user: mockUser,
@@ -121,7 +121,7 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка выхода',
       } as error.INetworkError;
     }
   };
@@ -149,7 +149,7 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения данных о пользователе',
       } as error.INetworkError;
     }
   };
@@ -172,7 +172,7 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'Oops, Something Went Wrong',
+        message: err?.response?.data?.error || 'ошибка получения кода',
       } as error.INetworkError;
     }
   };
@@ -214,7 +214,7 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'Ошибка подключения',
+        message: err?.response?.data?.error || 'ошибка подключения',
       } as error.INetworkError;
     }
   };
