@@ -4,8 +4,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5FCFF',
+  },
+  containerMap: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
   },
   icon: {
     alignItems: 'center',
@@ -21,23 +25,23 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   details: {
-    margin: 8,
-    marginRight: 0,
     flex: 1,
   },
   directionRow: {
-    flexDirection: 'row',
+    //justifyContent: 'flex-end',
     justifyContent: 'space-between',
+    //bottom: 0,
+    position: 'absolute',
   },
   emptyList: {
     marginTop: 20,
     textAlign: 'center',
   },
   fabAdd: {
-    bottom: 0,
     margin: 20,
+    /*bottom: 0,
     position: 'absolute',
-    right: 0,
+    right: 0,*/
   },
   field: {
     opacity: 0.5,

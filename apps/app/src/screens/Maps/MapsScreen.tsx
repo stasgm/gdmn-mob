@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, View } from 'react-native';
+import { View } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+
+import { FAB } from 'react-native-paper';
+import { useTheme } from '@react-navigation/native';
 
 import { useDispatch, useSelector } from '../../store';
 
@@ -20,6 +23,7 @@ interface Region {
 const MapScreen = () => {
   const [region, setRegion] = useState<Region>();
   const { list } = useSelector((state) => state.geo);
+  const { colors } = useTheme();
 
   const dispatch = useDispatch();
 
@@ -33,31 +37,40 @@ const MapScreen = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Button
-        onPress={async () => {
-          const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
-          dispatch(geoActions.addOne({ name: 'Моё местоположение', coords: location.coords }));
-          /*setRegion({
-            ...location.coords,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          });*/
-        }}
-        title={'Добавить моё местоположение'}
-      />
+    <View style={styles.containerMap}>
       <MapView initialRegion={region} style={styles.mapView}>
         {list !== [] &&
           list.map((point) => (
             <Marker key={point.id} coordinate={point.coords} title={`${point.name}`} description={point.id} />
           ))}
       </MapView>
-      <Button
-        onPress={() => {
-          dispatch(geoActions.init());
-        }}
-        title={'Сбросить'}
-      />
+      <View style={[styles.directionRow]}>
+        <FAB
+          onPress={async () => {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+              return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
+            dispatch(geoActions.addOne({ name: 'Моё местоположение', coords: location.coords }));
+            /*setRegion({
+              ...location.coords,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+            });*/
+          }}
+          icon="navigation"
+          style={[styles.fabAdd, { backgroundColor: colors.primary }]}
+        />
+        <FAB
+          onPress={() => {
+            dispatch(geoActions.init());
+          }}
+          icon="backup-restore"
+          style={[styles.fabAdd, { backgroundColor: colors.primary }]}
+        />
+      </View>
     </View>
   );
 };

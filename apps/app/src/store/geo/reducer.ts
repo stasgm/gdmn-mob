@@ -30,7 +30,7 @@ const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action
     }
 
     case getType(geoActions.deleteOne):
-      return { ...state, list: [...state.list.filter((item) => item.id === action.payload)] };
+      return { ...state, list: [...state.list.filter((item) => item.id !== action.payload)] };
 
     case getType(geoActions.deleteAll):
       return { ...state, list: [] };

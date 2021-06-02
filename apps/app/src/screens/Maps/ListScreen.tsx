@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
@@ -8,11 +8,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
+import { useNavigation } from '@react-navigation/core';
+
+import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
+
 import { useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
 
 import styles from './styles';
+
 // import { AppState } from '../store';
 
 const Item = ({ item }: { item: ILocation }) => {
@@ -41,10 +46,18 @@ const ListScreen = () => {
   const { colors } = useTheme();
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const handleReset = () => {
     dispatch(geoActions.deleteAll());
   };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      //headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
 
   const renderItem = ({ item }: { item: ILocation }) => <Item item={item} />;
 
