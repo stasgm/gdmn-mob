@@ -506,7 +506,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet11,
         ordNumber: 1,
         visited: true,
-        result: undefined,
+        // result: undefined,
       },
       {
         id: '461',
@@ -514,7 +514,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet10,
         ordNumber: 2,
         visited: true,
-        result: undefined,
+        // result: undefined,
       },
       {
         id: '462',
@@ -522,7 +522,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet9,
         ordNumber: 3,
         visited: true,
-        result: undefined,
+        // result: undefined,
       },
       {
         id: '463',
@@ -530,7 +530,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet8,
         ordNumber: 4,
         visited: true,
-        result: undefined,
+        // result: undefined,
       },
     ],
   },
@@ -551,7 +551,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet2,
         ordNumber: 1,
         visited: true,
-        result: undefined,
+        // result: undefined,
       },
       {
         externalId: { id: '147022904' },
@@ -559,7 +559,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet3,
         ordNumber: 2,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
       {
         externalId: { id: '147022905' },
@@ -567,7 +567,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet1,
         ordNumber: 3,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
     ],
   },
@@ -588,7 +588,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet4,
         ordNumber: 1,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
       {
         externalId: { id: '147022900' },
@@ -596,7 +596,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet5,
         ordNumber: 2,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
       {
         externalId: { id: '147022901' },
@@ -604,7 +604,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet7,
         ordNumber: 3,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
       {
         externalId: { id: '147022902' },
@@ -612,7 +612,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet6,
         ordNumber: 4,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
       {
         externalId: { id: '147022903' },
@@ -620,7 +620,7 @@ const routeMock: IRouteDocument[] = [
         outlet: outlet8,
         ordNumber: 5,
         visited: true,
-        result: undefined,
+        //  result: undefined,
       },
     ],
   },
