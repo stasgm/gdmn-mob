@@ -17,7 +17,7 @@ const RoutesNavigator = () => {
     >
       <Stack.Screen name="RouteList" component={RouteListScreen} />
       <Stack.Screen name="RouteView" component={RouteViewScreen} />
-      <Stack.Screen name="RouteDetails" component={RouteDetailScreen} />
+      <Stack.Screen name="RouteDetails" component={RouteDetailScreen} options={{ title: 'Визит' }} />
     </Stack.Navigator>
   );
 };
