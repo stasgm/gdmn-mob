@@ -4,7 +4,7 @@ import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { FilterButtons, ItemSeparator, Status } from '@lib/mobile-ui/src/components';
 import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 
-import { AddButton, DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+import { AddButton, BackButton, DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -18,7 +18,7 @@ import { IOrderDocument } from '../../store/docs/types';
 
 import { orderMock } from '../../store/docs/mock';
 
-import DocumentItem from './components/DocumentItem';
+import OrderListItem from './components/OrderListItem';
 
 const OrderListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
@@ -44,7 +44,7 @@ const OrderListScreen = () => {
   }, [status, list]);
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderDocument }) => <DocumentItem key={item.id} item={item} />,
+    ({ item }: { item: IOrderDocument }) => <OrderListItem key={item.id} item={item} />,
     [],
   );
 
@@ -84,7 +84,7 @@ const OrderListScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: () => <BackButton />,
       headerRight: () => (
         <View style={styles.buttons}>
           <AddButton onPress={handleAddDocument} />

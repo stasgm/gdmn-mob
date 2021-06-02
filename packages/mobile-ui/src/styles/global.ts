@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import colors from './colors';
 
 const globalstyles = StyleSheet.create({
   bottomButtons: {
@@ -74,6 +75,7 @@ const globalstyles = StyleSheet.create({
   directionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   details: {
     flex: 1,
