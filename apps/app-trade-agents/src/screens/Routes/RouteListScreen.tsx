@@ -13,7 +13,6 @@ const RouteListScreen = () => {
   const navigation = useNavigation();
 
   const { loading } = useSelector((state) => state.documents);
-  // eslint-disable-next-line prettier/prettier
   const list = (docSelectors.selectByDocType('route') as IRouteDocument[]).sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
   );

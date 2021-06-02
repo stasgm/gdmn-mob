@@ -239,9 +239,45 @@ const debtRefMock: IReference = {
 
 // Группы товаров
 const goodGroupMock = [
-  { id: '8', name: 'Готовая продукция', externalId: '147249053' },
-  { id: '67', name: 'Колбасные изделия', externalId: '1472490541', parent: { id: 8, name: 'Готовая продукция' } },
-  { id: '69', name: 'Копченности', externalId: '147249054', parent: { id: 8, name: 'Готовая продукция' } },
+  { id: '6', name: '01. Цех по производству готовой продукции', externalId: '147011905' },
+  {
+    id: '61',
+    name: '35. Колбасы вареные ЦГП',
+    externalId: '147011924',
+    parent: { id: 6, name: '01. Цех по производству готовой продукции' },
+  },
+  {
+    id: '62',
+    name: '36. Сосиски ЦГП',
+    externalId: '1470119264',
+    parent: { id: 6, name: '01. Цех по производству готовой продукции' },
+  },
+  { id: '7', name: '02. Цех убоя и переработки №2', externalId: '147011905' },
+  {
+    id: '71',
+    name: '01. Тушки цыпл.бр 1 сорта цех убоя 2(охл. продукция)',
+    externalId: '147012040',
+    parent: { id: 7, name: '02. Цех убоя и переработки №2' },
+  },
+  {
+    id: '72',
+    name: '02. Тушки цыпл.бр 1 сорта цех убоя 2 (зам. продукция)',
+    externalId: '147012044',
+    parent: { id: 7, name: '02. Цех убоя и переработки №2' },
+  },
+  { id: '8', name: '03. Цех убоя и переработки №1', externalId: '147012056' },
+  {
+    id: '81',
+    name: '03. Тушки кур  цех убоя 1 (охл. продукция)',
+    externalId: '147012058',
+    parent: { id: 8, name: '03. Цех убоя и переработки №1' },
+  },
+  {
+    id: '82',
+    name: '11. Разделка цех убоя 1 (углубленная)(заморозка)',
+    externalId: '147012062',
+    parent: { id: 8, name: '03. Цех убоя и переработки №1' },
+  },
 ];
 
 const goodGroupRefMock: IReference = {
@@ -253,17 +289,23 @@ const goodGroupRefMock: IReference = {
 const goodGroup1 = { id: goodGroupMock[0].id, name: goodGroupMock[0].name };
 const goodGroup2 = { id: goodGroupMock[1].id, name: goodGroupMock[1].name };
 const goodGroup3 = { id: goodGroupMock[2].id, name: goodGroupMock[2].name };
+const goodGroup4 = { id: goodGroupMock[3].id, name: goodGroupMock[3].name };
+const goodGroup5 = { id: goodGroupMock[4].id, name: goodGroupMock[4].name };
+const goodGroup6 = { id: goodGroupMock[5].id, name: goodGroupMock[5].name };
+const goodGroup7 = { id: goodGroupMock[6].id, name: goodGroupMock[6].name };
+const goodGroup8 = { id: goodGroupMock[7].id, name: goodGroupMock[7].name };
+const goodGroup9 = { id: goodGroupMock[8].id, name: goodGroupMock[8].name };
 
 // Товары
 const goodMock = [
   {
     id: '34',
-    name: 'Пр. из св. к/в Ребра "Селянские" (газ)',
-    externalId: '1576094048',
+    name: 'Сосиски из м.п."Банзай" в/с групп.уп. газ.ср.',
+    externalId: '147012192',
     alias: '5087',
-    barcode: '12346789',
+    barcode: '4810173017073',
     vat: 20,
-    goodgroup: goodGroup3,
+    goodgroup: goodGroup2,
     valuename: 'кг',
     priceFso: 15.6,
     priceFsn: 15.9,
@@ -272,41 +314,74 @@ const goodMock = [
   },
   {
     id: '35',
-    name: 'К-са вар. из м/птицы "Свислочская" в/с',
-    externalId: '1576094049',
+    name: 'Колбаса вар. из м/пт "Сочная" б/с 0,45',
+    externalId: '147012186',
     alias: '5088',
-    barcode: '12346789',
+    barcode: '4810173012931',
     vat: 10,
     goodgroup: goodGroup2,
-    valuename: 'кг',
-    priceFso: 10,
-    priceFsn: 12,
-    priceFsoSklad: 10,
-    priceFsnSklad: 12,
+    valuename: 'шт',
+    invWeight: 0.45,
+    priceFso: 3,
+    priceFsn: 3.7,
+    priceFsoSklad: 3,
+    priceFsnSklad: 3.7,
   },
   {
-    id: '15',
-    name: 'С-ки вар. из м/птицы "Боярские" в/с (газ)',
-    externalId: '1576094050',
+    id: '36',
+    name: 'Мясо птицы. Тушка цыпл. бр. потрошеная 1с (12кг) охл ',
+    externalId: '147012224',
     alias: '5089',
+    barcode: '4810173011514',
+    vat: 10,
+    goodgroup: goodGroup4,
+    valuename: 'кг',
+    invWeight: 12,
+    priceFso: 17.3,
+    priceFsn: 17.9,
+    priceFsoSklad: 17.3,
+    priceFsnSklad: 17.9,
+  },
+  {
+    id: '37',
+    name: 'Тушка цып. бр. 1 сорта зам.',
+    externalId: '147012166',
+    alias: '5090',
+    barcode: '12346789',
+    vat: 20,
+    goodgroup: goodGroup5,
+    valuename: 'кг',
+    invWeight: 1,
+    priceFso: 12.6,
+    priceFsn: 12.9,
+    priceFsoSklad: 12.6,
+    priceFsnSklad: 12.9,
+  },
+  {
+    id: '38',
+    name: 'Мясо птицы. Тушка кур потрошеная 2с охл.',
+    externalId: '147012174',
+    alias: '5091',
     barcode: '12346789',
     vat: 10,
-    goodgroup: goodGroup2,
+    goodgroup: goodGroup7,
     valuename: 'кг',
+    invWeight: 1,
     priceFso: 7.3,
     priceFsn: 7.9,
     priceFsoSklad: 7.3,
     priceFsnSklad: 7.9,
   },
   {
-    id: '15',
-    name: 'Пр. из св. к/в "Буженинка "Фаворит" (вакуум, трансп. уп)',
-    externalId: '1576094051',
-    alias: '5090',
+    id: '39',
+    name: 'П-кт разд и обвал м.п. Мясо бескост. окороч. с кожей лот.зам',
+    externalId: '147012176',
+    alias: '5092',
     barcode: '12346789',
     vat: 20,
-    goodgroup: goodGroup3,
+    goodgroup: goodGroup8,
     valuename: 'кг',
+    invWeight: 1,
     priceFso: 12.6,
     priceFsn: 12.9,
     priceFsoSklad: 12.6,
@@ -324,6 +399,8 @@ const good1 = { id: goodMock[0].id, name: goodMock[0].name };
 const good2 = { id: goodMock[1].id, name: goodMock[1].name };
 const good3 = { id: goodMock[2].id, name: goodMock[2].name };
 const good4 = { id: goodMock[3].id, name: goodMock[3].name };
+const good5 = { id: goodMock[4].id, name: goodMock[4].name };
+const good6 = { id: goodMock[5].id, name: goodMock[5].name };
 
 // Матрица номенклатур с ценами
 
@@ -347,68 +424,65 @@ const orderMock: IOrderDocument[] = [
   {
     id: '9',
     number: '225',
-    documentDate: '25.04.2021',
+    documentDate: '01.06.2021',
     documentType: orderType,
     status: 'DRAFT',
     head: {
       contact: contact1,
       outlet: outlet1,
-      ondate: '25.04.2021',
+      ondate: '02.06.2021',
     },
     lines: [
-      { id: '10', good: good1, quantity: 12 },
-      { id: '11', good: good2, quantity: 10 },
+      { id: '10', good: good3, quantity: 4 },
+      { id: '11', good: good6, quantity: 2 },
     ],
   },
   {
     id: '12',
     number: '226',
-    documentDate: '25.04.2021',
+    documentDate: '01.06.2021',
     documentType: orderType,
     status: 'SENT',
     head: {
-      contact: contact2,
-      outlet: outlet2,
-      ondate: '28.04.2021',
+      contact: contact1,
+      outlet: outlet3,
+      ondate: '02.06.2021',
     },
     lines: [
-      { id: '13', good: good3, quantity: 3 },
-      { id: '14', good: good4, quantity: 1.2 },
+      { id: '13', good: good5, quantity: 23 },
+      { id: '14', good: good1, quantity: 1 },
     ],
   },
   {
     id: '18',
     number: '227',
-    documentDate: '25.04.2021',
+    documentDate: '01.06.2021',
     documentType: orderType,
     status: 'PROCESSED',
     head: {
-      contact: contact3,
-      outlet: outlet3,
-      ondate: '27.04.2021',
-      depart: { id: '87', name: 'Склад-магазин Полоцк' },
+      contact: contact1,
+      outlet: outlet2,
+      ondate: '02.06.2021',
     },
     lines: [
-      { id: '19', good: good2, quantity: 7.3 },
-      { id: '21', good: good3, quantity: 4 },
-      { id: '23', good: good1, quantity: 12 },
+      { id: '19', good: good2, quantity: 45 },
+      { id: '21', good: good4, quantity: 2 },
     ],
   },
   {
     id: '25',
     number: '228',
-    documentDate: '25.01.2021',
+    documentDate: '01.06.2021',
     documentType: orderType,
     status: 'DRAFT',
     head: {
-      contact: contact4,
-      outlet: outlet1,
-      ondate: '25.04.2021',
+      contact: contact3,
+      outlet: outlet6,
+      ondate: '02.06.2021',
     },
     lines: [
-      { id: '26', good: good3, quantity: 8.32 },
-      { id: '28', good: good4, quantity: 9 },
-      { id: '30', good: good1, quantity: 45 },
+      { id: '26', good: good4, quantity: 10 },
+      { id: '28', good: good6, quantity: 5 },
     ],
   },
 ];
@@ -579,11 +653,19 @@ export {
   goodGroup1,
   goodGroup2,
   goodGroup3,
+  goodGroup4,
+  goodGroup5,
+  goodGroup6,
+  goodGroup7,
+  goodGroup8,
+  goodGroup9,
   goodRefMock,
   good1,
   good2,
   good3,
   good4,
+  good5,
+  good6,
   netPriceRefMock,
   users,
   agent1,
