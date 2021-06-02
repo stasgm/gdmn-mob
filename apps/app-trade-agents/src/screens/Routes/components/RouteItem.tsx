@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -16,11 +15,15 @@ import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
 
-const RouteItem = ({ item }: { item: IRouteLine }) => {
-  const { colors } = useTheme();
+export interface IItem {
+  routeId: string;
+  item: IRouteLine;
+}
+
+const RouteItem = ({ item, routeId }: IItem) => {
   const navigation = useNavigation<RouteLineProp>();
 
-  // Получить адрес item.outlet.id
+  //TODO получить адрес item.outlet.id
   const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
     (e) => e.id === item.outlet.id,
   );
@@ -29,21 +32,21 @@ const RouteItem = ({ item }: { item: IRouteLine }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('RouteView', { id: item.id });
+        navigation.navigate('RouteDetails', { routeId, id: item.id });
       }}
     >
       <View style={styles.item}>
         <View style={styles.icon}>
-          <Text style={[styles.name, { color: colors.background }]}>{item.ordNumber}</Text>
+          <Text style={styles.lightField}>{item.ordNumber}</Text>
         </View>
         <View style={styles.details}>
-          <View style={[styles.directionRow]}>
-            <Text style={[styles.name, { color: colors.text }]}>{item.outlet.name}</Text>
+          <View style={styles.directionRow}>
+            <Text style={styles.name}>{item.outlet.name}</Text>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{address}</Text>
-            <View style={[styles.directionRow]}>
-              <Text style={[styles.field, { color: colors.text }]}>{item.result}</Text>
+            <Text style={styles.field}>{address}</Text>
+            <View style={styles.directionRow}>
+              <Text style={styles.field}>{item.result}</Text>
             </View>
           </View>
         </View>

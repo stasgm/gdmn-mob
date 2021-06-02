@@ -85,20 +85,20 @@ const CompaniesScreen = (props: Props) => {
 
   return (
     <>
-      <View style={globalStyles.container}>
+      <View style={[globalStyles.container, styles.container]}>
         <SubTitle>Выбор организации</SubTitle>
-        <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
           <RadioGroup
             onChange={(value) => setSelectedCompany(companies.find((i) => i.id === value.id))}
             options={companies.map((i) => ({ id: i.id, value: i.name }))}
             activeButtonId={selectedCompany?.id}
           />
         </ScrollView>
-        <View style={localStyles.buttonView}>
+        <View style={styles.buttonView}>
           <Button
             mode="contained"
             icon="check-circle-outline"
-            style={[globalStyles.rectangularButton, localStyles.button]}
+            style={[globalStyles.rectangularButton, styles.button]}
             disabled={!selectedCompany}
             onPress={() => {
               selectedCompany && onSetCompany(selectedCompany);
@@ -129,9 +129,12 @@ const CompaniesScreen = (props: Props) => {
 
 export { CompaniesScreen };
 
-const localStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   button: {
     flex: 1,
+  },
+  container: {
+    margin: 10,
   },
   buttonView: {
     flexDirection: 'row',

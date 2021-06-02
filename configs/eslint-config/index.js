@@ -57,6 +57,12 @@ module.exports = {
     // "sonarjs/no-duplicate-string": "off",
     'padded-blocks': ['error', 'never'],
     'no-await-in-loop': 'error',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
   overrides: [
     {

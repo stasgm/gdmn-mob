@@ -492,7 +492,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '30506',
     number: '1',
-    documentDate: '01.06.2021',
+    documentDate: '2021-06-01',
     documentType: routeType,
     status: 'DRAFT',
     head: {
@@ -535,9 +535,9 @@ const routeMock: IRouteDocument[] = [
     ],
   },
   {
-    id: '30506',
+    id: '30507',
     number: '2',
-    documentDate: '27.05.2021',
+    documentDate: '2021-05-27',
     documentType: routeType,
     status: 'DRAFT',
     head: {
@@ -572,9 +572,9 @@ const routeMock: IRouteDocument[] = [
     ],
   },
   {
-    id: '30506',
+    id: '30508',
     number: '3',
-    documentDate: '01.06.2021',
+    documentDate: '2021-05-31',
     documentType: routeType,
     status: 'PROCESSED',
     head: {
@@ -592,7 +592,7 @@ const routeMock: IRouteDocument[] = [
       },
       {
         externalId: { id: '147022900' },
-        id: '468',
+        id: '469',
         outlet: outlet5,
         ordNumber: 2,
         visited: true,
@@ -600,7 +600,7 @@ const routeMock: IRouteDocument[] = [
       },
       {
         externalId: { id: '147022901' },
-        id: '468',
+        id: '470',
         outlet: outlet7,
         ordNumber: 3,
         visited: true,
@@ -608,9 +608,17 @@ const routeMock: IRouteDocument[] = [
       },
       {
         externalId: { id: '147022902' },
-        id: '468',
+        id: '471',
         outlet: outlet6,
         ordNumber: 4,
+        visited: true,
+        result: undefined,
+      },
+      {
+        externalId: { id: '147022903' },
+        id: '472',
+        outlet: outlet8,
+        ordNumber: 5,
         visited: true,
         result: undefined,
       },
