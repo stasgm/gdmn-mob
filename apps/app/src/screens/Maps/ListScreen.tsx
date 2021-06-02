@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/core';
@@ -10,32 +10,34 @@ import { useScrollToTop } from '@react-navigation/native';
 
 import { useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
-import { geoActions } from '../../store/geo/actions';
+// import { geoActions } from '../../store/geo/actions';
 
 const Item = ({ item }: { item: ILocation }) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   return (
-    <View style={styles.item}>
-      <View style={styles.icon}>
-        <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
-      </View>
-      <View style={styles.details}>
-        <View>
-          <Text style={styles.name}>{item.name}</Text>
+    <TouchableOpacity>
+      <View style={styles.item}>
+        <View style={styles.icon}>
+          <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
+        </View>
+        <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+          <View style={styles.flexDirectionRow}>
             <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
+            <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
           </View>
         </View>
-      </View>
-      {/*       <View style={styles.directionRow}>
+        {/*       <View style={styles.directionRow}>
         <Text style={styles.field}>{item.name}</Text>
       </View> */}
-      {/* <TouchableOpacity style={[styles.icon]} onPress={() => dispatch(geoActions.deleteOne(item.id))}>
+        {/* <TouchableOpacity style={[styles.icon]} onPress={() => dispatch(geoActions.deleteOne(item.id))}>
         <MaterialCommunityIcons name="delete" size={20} color={'#FFF'} />
       </TouchableOpacity> */}
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
