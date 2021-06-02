@@ -11,7 +11,7 @@ const LocationStack = createStackNavigator<LocationStackParamList>();
 
 const LocationNavigator = () => {
   return (
-    <LocationStack.Navigator initialRouteName="Location" screenOptions={{ headerShown: true }}>
+    <LocationStack.Navigator initialRouteName="Location" screenOptions={{ headerShown: true, title: 'Карта' }}>
       <LocationStack.Screen name="Location" component={MapTabsStack} />
     </LocationStack.Navigator>
   );

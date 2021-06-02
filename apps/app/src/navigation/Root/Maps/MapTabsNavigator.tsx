@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
 import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { DrawerButton } from '@lib/mobile-ui';
+
+import { useNavigation } from '@react-navigation/native';
 
 import MapScreen from '../../../screens/Maps/MapsScreen';
 import ListScreen from '../../../screens/Maps/ListScreen';
@@ -15,6 +19,15 @@ type MapTabsStackParams = {
 const MapTabsStack = createMaterialBottomTabNavigator<MapTabsStackParams>();
 
 const MapTabsNavigator = () => {
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      // headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation]);
+
   return (
     <MapTabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Maps">
       <MapTabsStack.Screen
