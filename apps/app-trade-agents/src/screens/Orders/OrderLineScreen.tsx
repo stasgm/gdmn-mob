@@ -5,7 +5,9 @@ import { View } from 'react-native';
 
 import styles from '@lib/mobile-ui/src/styles/global';
 
-import { SaveButton, BackButton } from '@lib/mobile-ui/src/components/AppBar';
+import { SaveButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -20,6 +22,7 @@ const OrderLineScreen = () => {
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const showActionSheet = useActionSheet();
 
   const handleSave = useCallback(() => {
     if (mode === 0) {
@@ -31,12 +34,32 @@ const OrderLineScreen = () => {
     navigation.navigate('OrderView', { id: docId });
   }, [navigation, line, docId, dispatch, mode]);
 
+  const handleDelete = useCallback(() => {
+    dispatch(documentActions.deleteDocumentLine({ docId, lineId: line.id }));
+    navigation.navigate('OrderView', { id: docId });
+  }, [dispatch, docId, line.id, navigation]);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDelete,
+      },
+    ]);
+  }, [handleDelete, showActionSheet]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => <SaveButton onPress={handleSave} />,
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <SaveButton onPress={handleSave} />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
     });
-  }, [navigation, handleSave]);
+  }, [navigation, handleSave, actionsMenu]);
 
   return (
     <View style={[styles.container]}>
@@ -44,5 +67,4 @@ const OrderLineScreen = () => {
     </View>
   );
 };
-
 export default OrderLineScreen;
