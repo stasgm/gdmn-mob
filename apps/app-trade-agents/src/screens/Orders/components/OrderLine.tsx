@@ -31,7 +31,7 @@ const OrderLine = ({ item }: { item: IOrderLine | undefined }) => {
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.card }]}>
+    <SafeAreaView style={[styles.container]}>
       <ScrollView>
         <View style={[styles.content]}>
           <View style={[styles.item]}>

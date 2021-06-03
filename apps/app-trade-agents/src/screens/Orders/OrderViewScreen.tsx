@@ -1,6 +1,6 @@
 import { ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { View, FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
@@ -35,8 +35,9 @@ const OrderViewScreen = () => {
   const handleDelete = useCallback(() => {
     if (id) {
       dispatch(documentActions.deleteDocument(id));
+      navigation.navigate('OrderList');
     }
-  }, [dispatch, id]);
+  }, [dispatch, id, navigation]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([

@@ -28,7 +28,7 @@ const OrderItem = ({ docId, item }: IProps) => {
         navigation.navigate('OrderLine', { docId, item });
       }}
     >
-      <View style={[styles.item, { backgroundColor: 'transparent' }]}>
+      <View style={[styles.item]}>
         <View style={[styles.icon]}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>

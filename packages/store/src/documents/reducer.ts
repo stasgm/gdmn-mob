@@ -37,7 +37,7 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
       };
 
     case getType(actions.deleteDocument):
-      return { ...state, list: state.list.filter((document) => document.head.id !== action.payload) };
+      return { ...state, list: state.list.filter((document) => document.id !== action.payload) };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
