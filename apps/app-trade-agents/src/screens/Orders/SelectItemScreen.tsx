@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { documentActions, refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
@@ -57,6 +57,7 @@ const SelectItemScreen = () => {
     return (
       <TouchableOpacity
         onPress={() => {
+          // dispatch(documentActions.);
           navigation.navigate('OrderLine', {
             docId,
             item: { id: 1, good: { id: item.id, name: item.name }, quantity: 1 },

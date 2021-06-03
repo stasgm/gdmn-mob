@@ -82,7 +82,7 @@ const OrderViewScreen = () => {
   const renderItem = ({ item }: { item: IOrderLine }) => <OrderItem docId={order.id} item={item} />;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       {/* <SubTitle style={styles.title}>{list.documentDate}</SubTitle> */}
       <Header item={order} />
       <Divider />

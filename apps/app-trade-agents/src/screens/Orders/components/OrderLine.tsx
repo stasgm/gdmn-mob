@@ -1,11 +1,13 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
+import { IReference } from '@lib/types';
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { SafeAreaView, ScrollView, TextInput, View, Text } from 'react-native';
 
-import { IOrderLine } from '../../../store/docs/types';
+import { IGood, IOrderLine } from '../../../store/docs/types';
 
 const OrderLine = ({ item }: { item: IOrderLine | undefined }) => {
   const [goodQty, setGoodQty] = useState<string>('1');
@@ -25,16 +27,14 @@ const OrderLine = ({ item }: { item: IOrderLine | undefined }) => {
     });
   }, []);
 
-  const priceFSN = useMemo(() => {
-    return 2;
-    // return ((state.references?.goods?.data as unknown) as IGood[])?.find((item) => item.id === prodId)?.pricefsn || 0;
-  }, []);
+  const priceFSN =
+    (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.card }]}>
       <ScrollView>
-        <View style={[styles.content, { backgroundColor: colors.background }]}>
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
+        <View style={[styles.content]}>
+          <View style={[styles.item]}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Наименование</Text>
               <Text style={[styles.number, styles.field, { color: colors.text }]}>
