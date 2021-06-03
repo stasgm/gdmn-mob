@@ -4,12 +4,15 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 
 import docsReducer from './docs/reducer';
+import visitsReducer from './visits/reducer';
 import { DocActionType } from './docs/actions';
+import { VisitActionType } from './visits/actions';
 
-type TActions = DocActionType;
+type TActions = DocActionType | VisitActionType;
 
 export const combinedReducer = {
   docs: docsReducer,
+  visits: visitsReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
