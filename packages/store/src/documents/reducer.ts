@@ -12,20 +12,29 @@ const initialState: Readonly<IDocumentState> = {
 
 const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialState, action): IDocumentState => {
   switch (action.type) {
-    case getType(actions.init):
-      return initialState;
-
-    case getType(actions.updateList):
+    case getType(actions.setDocuments):
       return {
         ...state,
         list: action.payload,
       };
 
-    case getType(actions.deleteDocument):
-      return { ...state, list: state.list?.filter(({ number }) => number.toString() !== action.payload) };
-
-    case getType(actions.deleteAllDocuments):
+    case getType(actions.deleteDocuments):
       return { ...state, list: [] };
+
+    case getType(actions.addDocument):
+      return {
+        ...state,
+        list: [...(state.list || []), action.payload],
+      };
+
+    case getType(actions.updateDocument):
+      return {
+        ...state,
+        list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...doc, head: action.payload.head } : doc)),
+      };
+
+    case getType(actions.deleteDocument):
+      return { ...state, list: state.list.filter((document) => document.head.id !== action.payload) };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
@@ -48,22 +57,43 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
         errorMessage: action.payload || 'error',
       };
 
-    //Добавление одного документа
-    case getType(actions.addDocumentAsync.request):
-      return { ...state, loading: true };
-
-    case getType(actions.addDocumentAsync.success):
+    //Позиции документа
+    case getType(actions.addDocumentLine): {
+      const nextId = '1';
       return {
         ...state,
-        loading: false,
-        list: [...state.list, action.payload],
+        list: state.list.map((doc) =>
+          doc.id === action.payload.docId
+            ? { ...doc, lines: [...doc.lines, { ...action.payload.line, id: nextId }] }
+            : doc,
+        ),
+      };
+    }
+
+    case getType(actions.updateDocumentLine):
+      return {
+        ...state,
+        list: state.list.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: doc.lines.map((line) => (line.id === action.payload.line.id ? action.payload.line : line)),
+              }
+            : doc,
+        ),
       };
 
-    case getType(actions.addDocumentAsync.failure):
+    case getType(actions.deleteDocumentLine):
       return {
         ...state,
-        loading: false,
-        errorMessage: action.payload || 'error',
+        list: state.list.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: doc.lines.filter((line) => line.id !== action.payload.lineId),
+              }
+            : doc,
+        ),
       };
 
     default:

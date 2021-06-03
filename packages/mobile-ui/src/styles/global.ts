@@ -1,5 +1,4 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import colors from './colors';
 
 const globalstyles = StyleSheet.create({
   bottomButtons: {

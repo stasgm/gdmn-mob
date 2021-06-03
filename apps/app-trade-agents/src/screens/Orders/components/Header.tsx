@@ -15,10 +15,13 @@ interface IProps {
 const Header = ({ item }: IProps) => {
   return (
     <View style={[styles.item]}>
+      <View style={[styles.icon]}>
+        <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+      </View>
       <View style={styles.details}>
         <View style={[styles.directionRow]}>
           <View style={[styles.directionRow]}>
-            <Text style={[{ color: colors.text }]}>{item.head.ondate}</Text>
+            <Text style={[styles.field, { color: colors.text }]}>{item.head.ondate}</Text>
             <MaterialCommunityIcons name="calendar-check-outline" size={15} />
           </View>
         </View>

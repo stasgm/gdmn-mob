@@ -1,6 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 
-import { IDocument } from '@lib/types';
+import { IUserDocument } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -10,7 +10,7 @@ import { DocumentActionType, actions } from './actions';
 
 export type AppThunk = ThunkAction<Promise<DocumentActionType>, IDocumentState, null, DocumentActionType>;
 
-export const addDocuments = (documents: IDocument[]): AppThunk => {
+export const addDocuments = (documents: IUserDocument[]): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.addDocumentsAsync.request(''));
 
@@ -24,21 +24,7 @@ export const addDocuments = (documents: IDocument[]): AppThunk => {
   };
 };
 
-export const addDocument = (document: IDocument): AppThunk => {
-  return async (dispatch) => {
-    dispatch(actions.addDocumentAsync.request(''));
-
-    await sleep(1000);
-    //TODO: проверка
-    if (document) {
-      return dispatch(actions.addDocumentAsync.success(document));
-    }
-
-    return dispatch(actions.addDocumentAsync.failure('something wrong'));
-  };
-};
-
-// export const addDocumentLine = (documentLine: IDocLine): AppThunk => {
+// export const addDocument = (document: IDocument): AppThunk => {
 //   return async (dispatch) => {
 //     dispatch(actions.addDocumentAsync.request(''));
 
@@ -52,4 +38,4 @@ export const addDocument = (document: IDocument): AppThunk => {
 //   };
 // };
 
-export default { addDocuments, addDocument };
+export default { addDocuments };
