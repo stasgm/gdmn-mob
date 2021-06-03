@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TouchableOpacity, View, ActivityIndicator } from 'react-native';
 
-import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 
 import * as Location from 'expo-location';
 
@@ -145,6 +145,7 @@ const MapScreen = () => {
               pinColor={point.id === 'current' ? 'blue' : 'red'}
             />
           ))}
+        <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
