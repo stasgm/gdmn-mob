@@ -53,11 +53,11 @@ const OrderListScreen = () => {
   }, [navigation]);
 
   const handleLoad = useCallback(() => {
-    dispatch(documentActions.addDocuments(orderMock));
+    dispatch(documentActions.setDocuments(orderMock));
   }, [dispatch]);
 
   const handleDelete = useCallback(() => {
-    dispatch(documentActions.deleteAllDocuments());
+    dispatch(documentActions.deleteDocuments());
   }, [dispatch]);
 
   const actionsMenu = useCallback(() => {

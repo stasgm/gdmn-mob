@@ -23,7 +23,6 @@ const OrderViewScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
   const ref = useRef<FlatList<IOrderLine>>(null);
 
   const handleAddOrderLine = useCallback(() => {

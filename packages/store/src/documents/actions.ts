@@ -1,7 +1,7 @@
 import { IDocument, IEntity, IUserDocument } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-// const init = createAction('DOCUMENTS/INIT')();
+const init = createAction('DOCUMENT/INIT')();
 const setDocuments = createAction('DOCUMENT/SET_ALL')<IUserDocument[]>();
 const deleteDocuments = createAction('DOCUMENT/DELETE_ALL')();
 
@@ -28,6 +28,7 @@ const addDocumentsAsync = createAsyncAction(
 // )<string | undefined, IDocument, string>();
 
 export const actions = {
+  init,
   addDocumentsAsync,
   deleteDocuments,
   setDocuments,

@@ -12,6 +12,9 @@ const initialState: Readonly<IDocumentState> = {
 
 const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialState, action): IDocumentState => {
   switch (action.type) {
+    case getType(actions.init):
+      return initialState;
+
     case getType(actions.setDocuments):
       return {
         ...state,
@@ -59,13 +62,10 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
 
     //Позиции документа
     case getType(actions.addDocumentLine): {
-      const nextId = '1';
       return {
         ...state,
         list: state.list.map((doc) =>
-          doc.id === action.payload.docId
-            ? { ...doc, lines: [...doc.lines, { ...action.payload.line, id: nextId }] }
-            : doc,
+          doc.id === action.payload.docId ? { ...doc, lines: [...doc.lines, action.payload.line] } : doc,
         ),
       };
     }

@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { documentActions, refSelectors } from '@lib/store';
+import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
@@ -80,7 +80,7 @@ const SelectItemScreen = () => {
 
   return (
     <View style={[styles.content, { backgroundColor: colors.background }]}>
-      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list.name}</SubTitle>
+      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
       <ItemSeparator />
       {filterVisible && (
         <>

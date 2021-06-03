@@ -61,7 +61,7 @@ const ReferenceDetailScreen = () => {
 
   return (
     <View style={[styles.content, { backgroundColor: colors.background }]}>
-      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list.name}</SubTitle>
+      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
       <ItemSeparator />
       <FlatList
         ref={ref}

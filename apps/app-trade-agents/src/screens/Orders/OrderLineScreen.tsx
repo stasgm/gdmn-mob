@@ -1,4 +1,4 @@
-import { useDispatch } from '@lib/store';
+import { documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { View } from 'react-native';
@@ -19,12 +19,10 @@ const OrderLineScreen = () => {
 
   const handleSave = useCallback(() => {
     if (item) {
-      // dispatch(documentActions.updateDocumentLine(id, doc));
-    } else {
-      // dispatch(documentActions.addDocumentLine(id, doc));
+      dispatch(documentActions.addDocumentLine({ docId, line: item }));
     }
     navigation.navigate('OrderView', { id: docId });
-  }, [navigation, item, docId]);
+  }, [navigation, item, docId, dispatch]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
