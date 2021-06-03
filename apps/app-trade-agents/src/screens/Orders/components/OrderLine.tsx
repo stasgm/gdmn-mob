@@ -4,13 +4,18 @@ import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
-import React, { useCallback, useState } from 'react';
-import { SafeAreaView, ScrollView, TextInput, View, Text } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, TextInput, View, Text, Keyboard } from 'react-native';
 
 import { IGood, IOrderLine } from '../../../store/docs/types';
 
-const OrderLine = ({ item }: { item: IOrderLine | undefined }) => {
-  const [goodQty, setGoodQty] = useState<string>('1');
+interface IProps {
+  item: IOrderLine;
+  onSetLine: (value: IOrderLine) => void;
+}
+
+const OrderLine = ({ item, onSetLine }: IProps) => {
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '1');
   const isFocused = useIsFocused();
 
   const { colors } = useTheme();
@@ -26,6 +31,26 @@ const OrderLine = ({ item }: { item: IOrderLine | undefined }) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
+
+  useEffect(() => {
+    onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goodQty]);
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    if (isFocused) {
+      const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+
+      const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+
+      return () => {
+        keyboardDidHideListener.remove();
+        keyboardDidShowListener.remove();
+      };
+    }
+  }, [isFocused]);
 
   const priceFSN =
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;

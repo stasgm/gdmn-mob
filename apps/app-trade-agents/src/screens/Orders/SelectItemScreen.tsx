@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
@@ -59,8 +60,9 @@ const SelectItemScreen = () => {
         onPress={() => {
           // dispatch(documentActions.);
           navigation.navigate('OrderLine', {
+            mode: 0,
             docId,
-            item: { id: 1, good: { id: item.id, name: item.name }, quantity: 1 },
+            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 1 },
           });
         }}
       >

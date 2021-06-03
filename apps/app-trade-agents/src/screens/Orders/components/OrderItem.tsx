@@ -25,7 +25,7 @@ const OrderItem = ({ docId, item }: IProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('OrderLine', { docId, item });
+        navigation.navigate('OrderLine', { mode: 1, docId, item });
       }}
     >
       <View style={[styles.item]}>
