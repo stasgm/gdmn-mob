@@ -1,10 +1,12 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   containerMap: {
     flex: 1,
     justifyContent: 'flex-end',
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   mapView: {
     zIndex: 0,
@@ -45,7 +47,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     backgroundColor: 'transparent',
   },
-  statusContainer: {
+  loadingContainer: {
     zIndex: 1,
     position: 'absolute',
     right: 0,
@@ -53,7 +55,22 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     justifyContent: 'center',
+    alignContent: 'flex-start',
     backgroundColor: 'transparent',
+  },
+  statusContainer: {
+    zIndex: 2,
+    flex: 1,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    opacity: 0.5,
+    backgroundColor: 'black',
+    width,
+    height: 50,
+  },
+  pointName: {
+    fontSize: 18,
   },
 });
 

@@ -1,6 +1,7 @@
 import { INamedEntity } from '@lib/types';
 
 export interface ILocation extends INamedEntity {
+  number: number;
   coords: {
     latitude: number;
     longitude: number;

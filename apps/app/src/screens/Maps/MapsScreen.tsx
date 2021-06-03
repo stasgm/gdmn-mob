@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableOpacity, View, ActivityIndicator } from 'react-native';
-
+import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
-
 import * as Location from 'expo-location';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
 
 import { mockGeo } from '../../store/geo/mock';
+
+import { ILocation } from '../../store/geo/types';
 
 import localStyles from './styles';
 
@@ -30,9 +31,9 @@ const MapScreen = () => {
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
-  const [currentPoint, setCurrentPoint] = useState<number>(0);
+  const [currentPoint, setCurrentPoint] = useState<ILocation>();
 
-  const { list } = useSelector((state) => state.geo);
+  const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
 
   const refMap = useRef<MapView>(null);
 
@@ -80,6 +81,7 @@ const MapScreen = () => {
     if (!currentPos) {
       return;
     }
+    setCurrentPoint(currentPos);
     moveTo(currentPos.coords);
   }, [loading, list]);
 
@@ -105,9 +107,14 @@ const MapScreen = () => {
       return;
     }
 
-    const curIndex = currentPoint + 1 > listLen - 1 ? 0 : currentPoint + 1;
-    moveTo(list[curIndex].coords);
-    setCurrentPoint(curIndex);
+    let idx = list.findIndex((e) => e.id === currentPoint?.id);
+    idx = idx >= 0 ? idx : -1;
+
+    idx = idx >= listLen - 1 ? 0 : idx + 1;
+    const newPoint = list[idx];
+
+    moveTo(list[idx].coords);
+    setCurrentPoint(newPoint);
   };
 
   const movePrevPoint = () => {
@@ -117,36 +124,62 @@ const MapScreen = () => {
       return;
     }
 
-    const curIndex = currentPoint - 1 < 0 ? listLen - 1 : currentPoint - 1;
-    moveTo(list[curIndex].coords);
-    setCurrentPoint(curIndex);
+    let idx = list.findIndex((e) => e.id === currentPoint?.id);
+
+    idx = idx >= 0 ? idx : 0;
+
+    idx = idx <= 0 ? listLen - 1 : idx - 1;
+    console.log(idx);
+
+    moveTo(list[idx].coords);
+    setCurrentPoint(list[idx]);
+  };
+
+  const handleClickMarker = (props: ILocation) => {
+    // console.log('position', props);
+    setCurrentPoint(props);
+    // console.log('coordinate', props.coordinate);
   };
 
   return (
     <View style={localStyles.containerMap}>
+      <View>
+        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+      </View>
       {loading && (
-        <View style={localStyles.statusContainer}>
+        <View style={localStyles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
+      {/*       <View style={localStyles.statusContainer}>
+        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+      </View> */}
       <MapView
         ref={refMap}
         initialRegion={region}
         style={localStyles.mapView}
         provider={useGoogleMaps ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+        onCalloutPress={() => console.log('sss')}
       >
-        {list !== [] &&
-          list.map((point) => (
-            <Marker
-              key={point.id}
-              coordinate={point.coords}
-              title={point.name}
-              description={point.id}
-              pinColor={point.id === 'current' ? 'blue' : 'red'}
-            />
-          ))}
+        {list.map((point) => (
+          <Marker
+            key={point.id}
+            coordinate={point.coords}
+            title={point.name}
+            description={point.id}
+            pinColor={point.id === 'current' ? 'blue' : 'red'}
+            onPress={() => handleClickMarker(point)}
+          >
+            <View style={[styles.icon, { backgroundColor: point.number !== 0 ? 'red' : 'blue' }]}>
+              <Text style={styles.lightField}>{point.number}</Text>
+            </View>
+          </Marker>
+        ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
+      <View>
+        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+      </View>
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />

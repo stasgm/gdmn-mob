@@ -23,7 +23,10 @@ const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action
     }
 
     case getType(geoActions.addCurrent): {
-      return { ...state, list: [...state.list, { id: 'current', name: 'Моё местоположение', ...action.payload }] };
+      return {
+        ...state,
+        list: [...state.list, { id: 'current', name: 'Моё местоположение', ...action.payload, number: 0 }],
+      };
     }
 
     case getType(geoActions.addMany): {
