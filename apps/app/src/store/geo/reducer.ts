@@ -22,12 +22,19 @@ const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action
       return { ...state, list: [...state.list, { id, ...action.payload }] };
     }
 
+    case getType(geoActions.addCurrent): {
+      return { ...state, list: [...state.list, { id: 'current', name: 'Моё местоположение', ...action.payload }] };
+    }
+
     case getType(geoActions.addMany): {
       return { ...state, list: action.payload };
     }
 
     case getType(geoActions.deleteOne):
-      return { ...state, list: [...state.list.filter((item) => item.id !== action.payload)] };
+      return { ...state, list: state.list.filter((item) => item.id !== action.payload) };
+
+    case getType(geoActions.deleteCurrent):
+      return { ...state, list: state.list.filter((item) => item.id !== 'current') };
 
     case getType(geoActions.deleteAll):
       return { ...state, list: [] };
