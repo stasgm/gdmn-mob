@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
-import * as Location from 'expo-location';
+//import * as Location from 'expo-location';
 
 import { globalStyles } from '@lib/mobile-ui';
 

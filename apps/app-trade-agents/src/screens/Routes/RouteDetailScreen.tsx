@@ -24,7 +24,7 @@ import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
-  const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === routeId);
+  const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === id);
 
   const dispatch = useDispatch();
   //const ref = useRef<FlatList<IRouteLine>>(null);
@@ -75,8 +75,8 @@ const RouteDetailScreen = () => {
 
     dispatch(
       visitActions.addOne({
-        id: `${routeId}${date}`,
-        routeLineId: Number(routeId),
+        id: `${id}${date}`,
+        routeLineId: Number(id),
         dateBegin: date,
         beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
         //beginGeoPoint: (coords as unknown) as ICoords,
