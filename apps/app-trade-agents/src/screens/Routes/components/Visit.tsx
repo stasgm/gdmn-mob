@@ -49,7 +49,7 @@ const Visit = ({
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
   const [process, setProcess] = useState(false);
 
-  const order = ((docSelectors.selectByDocType('order') as unknown) as IOrderDocument[])?.find(
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
     (item) => item.head.road?.id === road.id && item.head.outlet.id === outlet.id,
   );
 
@@ -109,7 +109,7 @@ const Visit = ({
       },
       lines: [],
     };
-    dispatch(documentActions.addDocument((newOrder as unknown) as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
     navigation.navigate('Orders', {
       screen: 'OrderView',
       params: { id: newOrder.id },
@@ -140,7 +140,8 @@ const Visit = ({
                         params: { id: order.id },
                       })
                     : handleNewOrder();
-                }}>
+                }}
+              >
                 {`Заявка (${order ? `${order.lines.length}` : '0'})`}
               </Button>
               <Button
@@ -148,7 +149,8 @@ const Visit = ({
                 style={[globalStyles.rectangularButton, localStyles.buttons]}
                 onPress={() => {
                   //TODO: ссылка на документ
-                }}>
+                }}
+              >
                 Возврат (0)
               </Button>
             </View>
@@ -164,7 +166,8 @@ const Visit = ({
               <Button
                 onPress={handleCloseVisit}
                 mode="contained"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}>
+                style={[globalStyles.rectangularButton, localStyles.buttons]}
+              >
                 Завершить визит
               </Button>
             </>

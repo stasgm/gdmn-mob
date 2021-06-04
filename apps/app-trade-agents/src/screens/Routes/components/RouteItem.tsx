@@ -47,7 +47,8 @@ const RouteItem = ({ item, routeId }: IItem) => {
     <TouchableOpacity
       onPress={() => {
         navigation.navigate('RouteDetails', { routeId, id: item.id });
-      }}>
+      }}
+    >
       <View style={styles.item}>
         <View style={styles.icon}>
           <Text style={styles.lightField}>{item.ordNumber}</Text>

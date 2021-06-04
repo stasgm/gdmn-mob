@@ -41,7 +41,7 @@ const RouteDetailScreen = () => {
 
   const [process, setProcess] = useState(false);
 
-  const point = ((docSelectors.selectByDocType('route') as unknown) as IRouteDocument[])
+  const point = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])
     ?.find((e) => e.id === routeId)
     ?.lines.find((i) => i.id === id);
 
@@ -57,9 +57,9 @@ const RouteDetailScreen = () => {
   /*const outlet = point
     ? (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find((e) => e.id === point.outlet.id)
     : undefined;*/
-  const outlet = ((outletRefMock as unknown) as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
+  const outlet = (outletRefMock as unknown as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
   const contact = outlet
-    ? ((contactRefMock as unknown) as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
+    ? (contactRefMock as unknown as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
     : undefined;
 
   const debt: IDebt = {
@@ -88,7 +88,7 @@ const RouteDetailScreen = () => {
         id: `${id}${date}`,
         routeLineId: Number(id),
         dateBegin: date,
-        beginGeoPoint: (coords as unknown) as ICoords,
+        beginGeoPoint: coords as unknown as ICoords,
         takenType: 'ONPLACE',
       }),
     );
@@ -110,7 +110,8 @@ const RouteDetailScreen = () => {
       </Info>
       <Info
         colorLabel={debt.saldo > 0 ? '#F80012' : '#00C322'}
-        title={`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}>
+        title={`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}
+      >
         <>
           {contact && (
             <>
