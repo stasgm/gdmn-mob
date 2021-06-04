@@ -440,75 +440,6 @@ const netPriceRefMock: IReference = {
   data: netPriceMock,
 };
 
-// Документ Order
-
-const orderMock: IOrderDocument[] = [
-  {
-    id: '9',
-    number: '225',
-    documentDate: '01.06.2021',
-    documentType: orderType,
-    status: 'DRAFT',
-    head: {
-      contact: contact1,
-      outlet: outlet1,
-      ondate: '02.06.2021',
-    },
-    lines: [
-      { id: '10', good: good3, quantity: 4 },
-      { id: '11', good: good6, quantity: 2 },
-    ],
-  },
-  {
-    id: '12',
-    number: '226',
-    documentDate: '01.06.2021',
-    documentType: orderType,
-    status: 'SENT',
-    head: {
-      contact: contact1,
-      outlet: outlet3,
-      ondate: '02.06.2021',
-    },
-    lines: [
-      { id: '13', good: good5, quantity: 23 },
-      { id: '14', good: good1, quantity: 1 },
-    ],
-  },
-  {
-    id: '18',
-    number: '227',
-    documentDate: '01.06.2021',
-    documentType: orderType,
-    status: 'PROCESSED',
-    head: {
-      contact: contact1,
-      outlet: outlet2,
-      ondate: '02.06.2021',
-    },
-    lines: [
-      { id: '19', good: good2, quantity: 45 },
-      { id: '21', good: good4, quantity: 2 },
-    ],
-  },
-  {
-    id: '25',
-    number: '228',
-    documentDate: '01.06.2021',
-    documentType: orderType,
-    status: 'DRAFT',
-    head: {
-      contact: contact3,
-      outlet: outlet6,
-      ondate: '02.06.2021',
-    },
-    lines: [
-      { id: '26', good: good4, quantity: 10 },
-      { id: '28', good: good6, quantity: 5 },
-    ],
-  },
-];
-
 //  Документ Route
 const routeMock: IRouteDocument[] = [
   {
@@ -645,6 +576,90 @@ const routeMock: IRouteDocument[] = [
         //  result: undefined,
       },
     ],
+  },
+];
+
+const route1 = { id: routeMock[0].id, name: routeMock[0].documentDate };
+
+// Документ Order
+const orderMock: IOrderDocument[] = [
+  {
+    id: '9',
+    number: '225',
+    documentDate: '01.06.2021',
+    documentType: orderType,
+    status: 'DRAFT',
+    head: {
+      contact: contact1,
+      outlet: outlet1,
+      ondate: '02.06.2021',
+    },
+    lines: [
+      { id: '10', good: good3, quantity: 4 },
+      { id: '11', good: good6, quantity: 2 },
+    ],
+  },
+  {
+    id: '12',
+    number: '226',
+    documentDate: '01.06.2021',
+    documentType: orderType,
+    status: 'SENT',
+    head: {
+      contact: contact1,
+      outlet: outlet3,
+      ondate: '02.06.2021',
+    },
+    lines: [
+      { id: '13', good: good5, quantity: 23 },
+      { id: '14', good: good1, quantity: 1 },
+    ],
+  },
+  {
+    id: '18',
+    number: '227',
+    documentDate: '01.06.2021',
+    documentType: orderType,
+    status: 'PROCESSED',
+    head: {
+      contact: contact1,
+      outlet: outlet2,
+      ondate: '02.06.2021',
+    },
+    lines: [
+      { id: '19', good: good2, quantity: 45 },
+      { id: '21', good: good4, quantity: 2 },
+    ],
+  },
+  {
+    id: '25',
+    number: '228',
+    documentDate: '01.06.2021',
+    documentType: orderType,
+    status: 'DRAFT',
+    head: {
+      contact: contact3,
+      outlet: outlet6,
+      ondate: '02.06.2021',
+    },
+    lines: [
+      { id: '26', good: good4, quantity: 10 },
+      { id: '28', good: good6, quantity: 5 },
+    ],
+  },
+  {
+    id: '32',
+    number: '229',
+    documentDate: '04.06.2021',
+    documentType: orderType,
+    status: 'DRAFT',
+    head: {
+      contact: outletMock[10].company,
+      outlet: outlet11,
+      road: route1,
+      ondate: '04.06.2021',
+    },
+    lines: [],
   },
 ];
 

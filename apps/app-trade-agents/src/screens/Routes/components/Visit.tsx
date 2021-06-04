@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-//import { useNavigation } from '@react-navigation/native';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
@@ -7,17 +6,42 @@ import { Button } from 'react-native-paper';
 
 import { globalStyles } from '@lib/mobile-ui';
 
+//import { documentActions } from '@lib/store';
+
+import { INamedEntity } from '@lib/types';
+import { useNavigation } from '@react-navigation/native';
+
+import { docSelectors } from '@lib/store';
+
 import { useDispatch } from '../../../store';
 
 import { IVisit, ICoords } from '../../../store/visits/types';
 import { visitActions } from '../../../store/visits/actions';
+//import { IOrderDocument } from '../../../store/docs/types';
+import { IOrderDocument } from '../../../store/docs/types';
 
 //import { StackNavigationProp } from '@react-navigation/stack';
 
-const Visit = ({ item }: { item: IVisit }) => {
+const Visit = ({
+  item,
+  outlet,
+  contact,
+  road,
+}: {
+  item: IVisit;
+  outlet: INamedEntity;
+  contact: INamedEntity;
+  road: INamedEntity;
+}) => {
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
   const [process, setProcess] = useState(false);
+
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+    (item) => item.head.road?.id === road.id && item.head.outlet.id === outlet.id,
+  );
+
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 
@@ -54,6 +78,20 @@ const Visit = ({ item }: { item: IVisit }) => {
     setProcess(false);
   };
 
+  const handleNewOrder = () => {
+    /*const newOrder: IOrderDocument = {
+      head: {
+        contact,
+        outlet,
+        road,
+        ondate: new Date().toISOString(),
+        takenOrder: item.takenType,
+      },
+      lines: [],
+    };
+    dispatch(documentActions.addDocument(newOrder));*/
+  };
+
   const twoDigits = (value: number) => {
     return value >= 10 ? value : `0${value}`;
   };
@@ -75,10 +113,19 @@ const Visit = ({ item }: { item: IVisit }) => {
                 mode="outlined"
                 style={[globalStyles.rectangularButton, localStyles.buttons]}
                 onPress={() => {
-                  //TODO: ссылка на документ
+                  //TODO: узнать есть ли заявка, если есть перейти в заявку, если нет - создать
+                  order
+                    ? navigation.navigate('Orders', {
+                        screen: 'OrderView',
+                        params: { id: order.id },
+                      })
+                    : handleNewOrder();
                 }}
               >
-                Заявка
+                {
+                  //TODO: узнать есть ли заявка, если есть вывести количество строк
+                  `Заявка${order && ` (${order.lines.length})`}`
+                }
               </Button>
               <Button
                 mode="outlined"
