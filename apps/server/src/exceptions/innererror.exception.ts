@@ -9,6 +9,6 @@ export class InnerErrorException extends ApplicationException {
    * @param context Request context and more details
    */
   constructor(context: string) {
-    super('InnerErrorException', 500, `Server error : ${context}`);
+    super('InnerErrorException', 500, context);
   }
 }

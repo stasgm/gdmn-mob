@@ -1,16 +1,23 @@
 import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
-import { entities } from './dao/db';
+import { DataNotFoundException } from '../exceptions';
+
 import { getNamedEntity } from './dao/utils';
 
-const { messages, users, companies } = entities;
+import { getDb } from './dao/db';
 
 const findOne = async (id: string) => {
+  const db = getDb();
+  const { messages } = db;
+
   return makeMessage(await messages.find(id));
 };
 
 const findAll = async () => {
+  const db = getDb();
+  const { messages } = db;
+
   const messageList = await messages.read();
   const pr = messageList.map(async (i) => await makeMessage(i));
 
@@ -25,6 +32,9 @@ const findAll = async () => {
  * @return массив сообщений
  * */
 const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
+  const db = getDb();
+  const { messages } = db;
+
   const messageList = (await messages.read()).filter(
     (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === userId,
   );
@@ -41,6 +51,9 @@ const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; c
  * */
 
 const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; producerId: string }): Promise<string> => {
+  const db = getDb();
+  const { messages } = db;
+
   /*if (await messages.find((i) => i.id === msgObject.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
   }*/
@@ -54,10 +67,13 @@ const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; produc
  * @return id, идентификатор сообщения
  * */
 const updateOne = async (message: IMessage): Promise<string> => {
+  const db = getDb();
+  const { messages } = db;
+
   const oldMessage = await messages.find((i) => i.id === message.id);
 
   if (!oldMessage) {
-    throw new Error('сообщение не найдено');
+    throw new DataNotFoundException('Сообщение не найдено');
   }
 
   // Удаляем поля которые нельзя перезаписывать
@@ -74,11 +90,16 @@ const updateOne = async (message: IMessage): Promise<string> => {
  * @param {string} id - идентификатор сообщения
  * */
 const deleteOne = async (messageId: string): Promise<void> => {
+  const db = getDb();
+  const { messages } = db;
+
   if (!(await messages.find(messageId))) {
-    throw new Error('сообщение не найдено');
+    throw new DataNotFoundException('Сообщение не найдено');
   }
 
   await messages.delete(messageId);
+
+  //TODO ответ возвращать
 };
 
 /**
@@ -95,21 +116,33 @@ const deleteByUid = async ({
   uid: string;
   userId: string;
 }): Promise<void> => {
+  const db = getDb();
+  const { messages } = db;
+
   const messageObj = await messages.find(
     (message) => message.head.companyId === companyId && message.head.consumerId === userId && message.id === uid,
   );
 
   if (!messageObj) {
-    throw new Error('сообщение не найдено');
+    throw new DataNotFoundException('Сообщение не найдено');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return messages.delete(messageObj.id!);
 };
 
-const deleteAll = async (): Promise<void> => messages.deleteAll();
+const deleteAll = async (): Promise<void> => {
+  const db = getDb();
+  const { messages } = db;
+  messages.deleteAll();
+
+  //TODO Ответ возвращать
+};
 
 export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
+  const db = getDb();
+  const { users, companies } = db;
+
   const consumer = await getNamedEntity(message.head.consumerId, users);
   const producer = await getNamedEntity(message.head.producerId, users);
   const company = await getNamedEntity(message.head.companyId, companies);

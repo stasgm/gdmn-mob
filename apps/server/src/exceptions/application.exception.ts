@@ -2,8 +2,6 @@
  * Parent application exception
  */
 export class ApplicationException extends Error {
-  /** Name of the exception */
-  public name: string;
   /** Status, code of the exception */
   public status: number;
 
@@ -14,6 +12,6 @@ export class ApplicationException extends Error {
   }
 
   public toString(): string {
-    return `${this.status} => ${this.message}\n${this.stack || ''}`;
+    return `${this.name} (${this.status}): ${this.message}\n${this.stack || ''}`;
   }
 }

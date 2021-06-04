@@ -42,7 +42,7 @@ const CompanyDetailsView = ({ company }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {company.creationDate}
+                  {new Date(company.creationDate || '').toUTCString()}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>
@@ -52,7 +52,7 @@ const CompanyDetailsView = ({ company }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {company.editionDate}
+                  {new Date(company.editionDate || '').toUTCString()}
                 </Typography>
               </Grid>
             </Grid>

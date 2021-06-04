@@ -1,6 +1,5 @@
 import { FontAwesome5 } from '@expo/vector-icons';
-import DrawerButton from '@lib/mobile-ui/src/components/AppBar/DrawerButton';
-import MenuButton from '@lib/mobile-ui/src/components/AppBar/MenuButton';
+import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +7,7 @@ import React, { useCallback, useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
 
 import Home from '../../screens/HomeScreen';
+import TaskListScreen from '../../screens/TaskListScreen';
 
 export type TabsStackParams = {
   Main: undefined;
@@ -57,7 +57,7 @@ const TabsNavigator = () => {
       />
       <TabsStack.Screen
         name="Tasks"
-        component={Home}
+        component={TaskListScreen}
         options={{
           title: 'Задачи',
           tabBarLabel: 'Задачи',

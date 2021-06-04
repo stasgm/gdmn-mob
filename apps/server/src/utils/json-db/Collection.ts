@@ -111,25 +111,42 @@ class Collection<T extends CollectionItem> {
 
   private _get(): Promise<Array<T>> {
     return new Promise((resolve, reject) => {
-      fs.readFile(this.collectionPath, { encoding: 'utf8' }, (err, data) => {
-        if (err) return reject(err);
-        let result: Array<T> = [];
-        try {
-          result = JSON.parse(data);
-        } catch (jsonErr) {
-          reject(jsonErr);
-        }
+      try {
+        const data = fs.readFileSync(this.collectionPath, { encoding: 'utf8' });
+        const result = JSON.parse(data);
         return resolve(result);
-      });
+      } catch (err) {
+        reject(err);
+      }
     });
+    //try {
+    // const parsed = JSON.parse(fs.readFileSync(this.collectionPath, { encoding: 'utf8' }));
+    // return parsed.data;
+    // } catch (e) {
+    //  throw e;
+    // }
+    // return new Promise((resolve, reject) => {
+    //   fs.readFile(this.collectionPath, { encoding: 'utf8' }, (err, data) => {
+    //     if (err) return reject(err);
+    //     let result: Array<T> = [];
+    //     try {
+    //       result = JSON.parse(data);
+    //     } catch (jsonErr) {
+    //       reject(jsonErr);
+    //     }
+    //     return resolve(result);
+    //   });
+    // });
   }
 
   private _save(data: Array<T>): Promise<void> {
     return new Promise((resolve, reject) => {
-      fs.writeFile(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' }, (err: unknown) => {
-        if (err) return reject(err);
+      try {
+        fs.writeFileSync(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' });
         return resolve();
-      });
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 }

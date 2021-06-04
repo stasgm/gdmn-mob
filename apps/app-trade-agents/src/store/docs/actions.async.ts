@@ -1,15 +1,15 @@
+/*
 import { ThunkAction } from 'redux-thunk';
 import { AnyAction } from 'redux';
 
-import { sleep } from '@lib/store';
+import { sleep } from '@lib/client-api';
 
 import { docActions } from './actions';
-import { IDocPayload, IDocState } from './types';
-import { documentData } from './mock';
+import { IDocState } from './types';
 
-export const fetchDoc = (): ThunkAction<void, IDocState, unknown, AnyAction> => {
+ export const fetchDoc = (): ThunkAction<void, IDocState, unknown, AnyAction> => {
   return async (dispatch) => {
-    const response: IDocPayload = { docData: documentData };
+    let response: ;
 
     dispatch(docActions.fetchDocsAsync.request(''));
 
@@ -27,4 +27,4 @@ export const fetchDoc = (): ThunkAction<void, IDocState, unknown, AnyAction> => 
   };
 };
 
-export default { fetchDoc };
+export default { fetchDoc }; */

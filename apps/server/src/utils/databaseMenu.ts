@@ -1,7 +1,10 @@
 import inquirer from 'inquirer';
+
+import log from './logger';
+
 export interface IItemDatabase {
   name: string;
-  database: string;
+  path: string;
   port: number;
 }
 
@@ -13,7 +16,7 @@ export const databaseMenu = async (dataBases: IItemDatabase[] | undefined): Prom
   if (!dataBases) return undefined;
   if (dataBases.length === 1) return JSON.stringify(dataBases[0], null, '  ');
 
-  const choiseArray = dataBases.map((i) => i.database);
+  const choiseArray = dataBases.map((i) => i.name);
   return inquirer
     .prompt([
       {
@@ -28,13 +31,19 @@ export const databaseMenu = async (dataBases: IItemDatabase[] | undefined): Prom
     ])
     .then((answers: IItemAnswer) => {
       const answerDB = answers.db;
-      const db = dataBases.find((i) => i.database.toUpperCase() === answerDB.toUpperCase());
-      console.log('Working database ' + db?.name);
+      const db = dataBases.find((i) => i.name.toUpperCase() === answerDB.toUpperCase());
+
+      if (!db) {
+        throw new Error('DB is not found');
+      }
+
+      log.info(`Working database path: ${db.path}\\.${db.name}`);
+
       return JSON.stringify(db, null, '  ');
     })
     .catch((error) => {
       if (error.isTtyError) {
-        console.log('Prompt couldnt be rendered in the current environment');
+        console.log("Prompt couldn't be rendered in the current environment");
         return undefined;
       } else {
         console.log('Something else went wrong');

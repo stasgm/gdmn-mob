@@ -19,7 +19,7 @@ const reducer: Reducer<IUserState, UserActionType> = (state = initialState, acti
       return { ...state, errorMessage: '' };
 
     case getType(userActions.fetchUsersAsync.request):
-      return { ...state, loading: true, list: [] };
+      return { ...state, loading: true, list: [], errorMessage: '' };
 
     case getType(userActions.fetchUsersAsync.success):
       return {
@@ -36,7 +36,7 @@ const reducer: Reducer<IUserState, UserActionType> = (state = initialState, acti
       };
 
     case getType(userActions.addUserAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(userActions.addUserAsync.success):
       return {
@@ -54,7 +54,7 @@ const reducer: Reducer<IUserState, UserActionType> = (state = initialState, acti
 
     // Обновление компании
     case getType(userActions.updateUserAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(userActions.updateUserAsync.success):
       return {
@@ -72,7 +72,7 @@ const reducer: Reducer<IUserState, UserActionType> = (state = initialState, acti
 
     // Получение компании
     case getType(userActions.fetchUserAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(userActions.fetchUserAsync.success):
       return {

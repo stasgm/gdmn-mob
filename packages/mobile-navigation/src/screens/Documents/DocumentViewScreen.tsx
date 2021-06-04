@@ -1,17 +1,23 @@
-import React, { useMemo, useRef /*, { useCallback }*/ } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 
 import { useTheme } from 'react-native-paper';
 
-import { IDocument } from '@lib/types';
+import { IEntity } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 
-// eslint-disable-next-line import/no-cycle
-import { DocumentsStackParamList } from '../../navigation/Root/DocumentsNavigator';
+import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+
+import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
+
+import { styles } from './styles';
+import Header from './components/Header';
+import DocumentLine from './components/DocumentLine';
 
 type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 
@@ -34,55 +40,74 @@ const toString = ({ value, type }: { value: any; type: typeValue }) => {
   return value;
 };
 
-const ContentItem = ({ item }: { item: any }) => {
-  return <View>{item}</View>;
-};
-
 const DocumentViewScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
-  const docId = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
+  const docId = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.id;
+  const CustomItem = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.componentItem;
+  const titles = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.titles;
+  const styleHeader = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentView'>>().params?.view?.styleHeader;
   const document = useMemo(() => list.find((item: { id: string }) => item.id === docId), [docId, list]);
 
-  //const showActionSheet = useActionSheet();
-  //const dispatch = useDispatch();
+  const showActionSheet = useActionSheet();
+  const navigation = useNavigation();
+  // const dispatch = useDispatch();
 
-  /*const actionsMenu = useCallback(() => {
+  const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Загрузить',
-        onPress: () => {},
+        title: 'Добавить',
+        // onPress: () => { },
       },
       {
         title: 'Удалить все',
         type: 'destructive',
-        onPress: () => {},
+        // onPress: () => { },
       },
-      // {
-      //   title: 'Сбросить',
-      //   onPress: () => {},
-      // },
       {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet]);*/
+  }, [showActionSheet]);
 
-  const renderItem = ({ item }: { item: any }) => <ContentItem item={item} />;
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      title: Title,
+    });
+  }, [navigation]);
 
-  const ref = useRef<FlatList<IDocument>>(null);
-
-  return (
-    <>
-      <View style={{ backgroundColor: colors.background }}>
+  const Title = () => {
+    return (
+      <View>
+        <Text>{document?.documentType.name}</Text>
         <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
           value: document?.documentDate,
           type: 'date',
         })}`}</Text>
       </View>
+    );
+  };
+
+  const renderItem = <T extends IEntity>({ item }: { item: T }) => {
+    return CustomItem ? <CustomItem key={item.id} item={item} /> : <DocumentLine key={item.id} item={item} />;
+  };
+
+  const ref = useRef<FlatList<IEntity>>(null);
+
+  return (
+    <>
+      {/*<View style={{ backgroundColor: colors.background }}>
+        <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
+          value: document?.documentDate,
+          type: 'date',
+        })}`}</Text>
+      </View>*/}
       <FlatList
         ref={ref}
+        //TODO: данные из документа
         data={[]}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
@@ -92,20 +117,11 @@ const DocumentViewScreen = () => {
         // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListHeaderComponent={() => <Header titles={titles ?? ['Идентификатор']} />}
+        ListHeaderComponentStyle={styleHeader ?? styles.header}
       />
     </>
   );
 };
 
 export default DocumentViewScreen;
-
-const styles = StyleSheet.create({
-  description: {},
-  emptyList: {
-    marginTop: 20,
-    textAlign: 'center',
-  },
-  textDescription: {
-    fontSize: 11,
-  },
-});

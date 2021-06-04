@@ -21,12 +21,24 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
+import { createDb } from './services/dao/db';
 
-import { IItemDatabase } from './utils/databaseMenu';
+interface IServer {
+  name: string;
+  port: number;
+  dbName: string;
+  dbPath: string;
+}
 
-export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa.DefaultContext>> {
-  const app = new Koa();
-  app.keys = ['super-secret-key'];
+export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
+
+export async function createServer(server: IServer): Promise<KoaApp> {
+  const app: KoaApp = new Koa();
+  app.keys = ['super-secret-key-web1215'];
+
+  app.context.db = createDb(server.dbPath, server.dbName);
+  app.context.port = server.port;
+  app.context.name = server.name;
 
   passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -40,6 +52,7 @@ export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa
   });
 
   const strategy: IStrategyOptions = { usernameField: 'name' };
+
   passport.use(new LocalStrategy(strategy, validateAuthCreds));
 
   // Логи для Morgan
@@ -71,23 +84,20 @@ export async function init(db: IItemDatabase): Promise<Koa<Koa.DefaultState, Koa
         origin: 'http://localhost:8080',
       }),
     )
-    // .use(koaCors({ credentials: true }))
     .use(router.routes())
     .use(router.allowedMethods());
 
-  /*   app.on('error', (err) => {
-      log.error(err);
-    });
-
-    app.on('user-error', (err) => {
-      log.warn(err);
-    });
-   */
-  log.info('Starting listener ...');
-
-  await new Promise((resolve) => app.listen(db.port, () => resolve('')));
-
-  log.info(`Server is running on http://localhost:${db.port}`);
-
   return app;
 }
+
+process.on('SIGINT', () => {
+  console.log('Ctrl-C...');
+  console.log('Finished all requests');
+  process.exit(2);
+});
+
+export const startServer = (app: KoaApp) => {
+  app.listen(app.context.port);
+
+  log.info(`${app.context.name} is running on http://localhost:${app.context.port}`);
+};

@@ -1,10 +1,9 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { v4 as uuid } from 'uuid';
-
 import { IDocState } from './types';
 import { DocActionType, docActions } from './actions';
+import { goodRefMock, contact1, outlet1, documentTypeMock } from './mock';
 
 const initialState: Readonly<IDocState> = {
   docData: [
@@ -12,14 +11,14 @@ const initialState: Readonly<IDocState> = {
       id: '1',
       number: '6225',
       documentDate: '13.05.2021',
-      documentType: { id: uuid(), name: 'Заявка1 (организация)' },
+      documentType: documentTypeMock[0],
       status: 'DRAFT',
       head: {
-        contact: { id: '1', name: 'Рога и копыта' },
-        outlet: { id: '11', name: 'Рога и копыта № 123' },
+        contact: contact1,
+        outlet: outlet1,
         ondate: '25.04.2021',
       },
-      lines: [{ id: '1', good: { id: '14', name: 'Сосиски докторские' }, quantity: 12 }],
+      lines: [{ id: '1', good: goodRefMock.data[0], quantity: 12 }],
     },
   ],
   loading: false,

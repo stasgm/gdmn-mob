@@ -1,14 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 import { IEntity, INamedEntity } from './models';
 
-type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
-
-// todo вынести в отдельный интерфейс состояние обработки документа
-// со ссылкой на него
-// interface IDocumentStatus {
-//   type: statusType;
-//   errorMessage?: string;
-// }
+export type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
 
 interface IDocument extends IEntity {
   number: string;
@@ -17,7 +9,7 @@ interface IDocument extends IEntity {
   status: StatusType;
 }
 
-interface IUserDocument<T, K extends IEntity[]> extends IDocument {
+interface IUserDocument<T = IDocument, K extends IEntity[] = IEntity[]> extends IDocument {
   head: T;
   lines: K;
 }

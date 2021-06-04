@@ -23,7 +23,7 @@ const fetchDeviceById = (id: string): AppThunk => {
       return dispatch(deviceActions.fetchDeviceAsync.failure(response.message));
     }
 
-    return dispatch(deviceActions.fetchDevicesAsync.failure('something wrong'));
+    return dispatch(deviceActions.fetchDevicesAsync.failure('Ошибка получения данных об устройстве'));
   };
 };
 
@@ -41,7 +41,7 @@ const fetchDevices = (): AppThunk => {
       return dispatch(deviceActions.fetchDevicesAsync.failure(response.message));
     }
 
-    return dispatch(deviceActions.fetchDevicesAsync.failure('something wrong'));
+    return dispatch(deviceActions.fetchDevicesAsync.failure('Ошибка получения данных об устройствах'));
   };
 };
 
@@ -59,13 +59,13 @@ const addDevice = (device: NewDevice): AppThunk => {
       return dispatch(deviceActions.addDeviceAsync.failure(response.message));
     }
 
-    return dispatch(deviceActions.addDeviceAsync.failure('something wrong'));
+    return dispatch(deviceActions.addDeviceAsync.failure('Ошибка добавления устройства'));
   };
 };
 
 const updateDevice = (device: IDevice): AppThunk => {
   return async (dispatch) => {
-    dispatch(deviceActions.updateDeviceAsync.request('обновление устройства'));
+    dispatch(deviceActions.updateDeviceAsync.request('Обновление устройства'));
 
     const response = await api.device.updateDevice(device);
 
@@ -77,8 +77,26 @@ const updateDevice = (device: IDevice): AppThunk => {
       return dispatch(deviceActions.updateDeviceAsync.failure(response.message));
     }
 
-    return dispatch(deviceActions.updateDeviceAsync.failure('something wrong'));
+    return dispatch(deviceActions.updateDeviceAsync.failure('Ошибка обновления устройства'));
   };
 };
 
-export default { fetchDevices, fetchDeviceById, addDevice, updateDevice };
+const removeDevice = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(deviceActions.removeDeviceAsync.request('Удаление устройства'));
+
+    const response = await api.device.removeDevice(id);
+
+    if (response.type === 'REMOVE_DEVICE') {
+      return dispatch(deviceActions.removeDeviceAsync.success());
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(deviceActions.removeDeviceAsync.failure(response.message));
+    }
+
+    return dispatch(deviceActions.removeDeviceAsync.failure('Ошибка удаления устройства'));
+  };
+};
+
+export default { fetchDevices, fetchDeviceById, addDevice, updateDevice, removeDevice };

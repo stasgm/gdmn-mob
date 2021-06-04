@@ -4,31 +4,36 @@ import { DrawerNavigator } from '@lib/mobile-navigation';
 
 import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator';
 
-import MapScreen from '../screens/Maps';
-
-import DashboardNavigator from './Root/DashboardNavigator';
-import DocumentsNavigator from './Root/DocumentsNavigator';
-
-console.log('RootNavigator');
+// import DashboardNavigator from './Root/DashboardNavigator';
+import OrdersNavigator from './Root/OrdersNavigator';
+import RoutesNavigator from './Root/RoutesNavigator';
+import MapNavigator from './Root/Maps/MapNavigator';
+// import DocumentsNavigator from './Root/';
 
 const navItems: INavItem[] = [
+  /*   {
+      name: 'Dashboard',
+      title: 'Дашборд',
+      icon: 'view-dashboard-outline',
+      component: DashboardNavigator,
+    }, */
   {
-    name: 'Dashboard',
-    title: 'Дашборд',
-    icon: 'view-dashboard-outline',
-    component: DashboardNavigator,
+    name: 'Routes',
+    title: 'Маршруты',
+    icon: 'routes',
+    component: RoutesNavigator,
   },
   {
-    name: 'Documents',
-    title: 'Документы',
-    icon: 'file-document-outline',
-    component: DocumentsNavigator,
+    name: 'Orders',
+    title: 'Заявки',
+    icon: 'clipboard-list-outline',
+    component: OrdersNavigator,
   },
   {
     name: 'Map',
     title: 'Карта',
     icon: 'map-outline',
-    component: MapScreen,
+    component: MapNavigator,
   },
 ];
 

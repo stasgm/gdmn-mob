@@ -72,7 +72,7 @@ class Message extends BaseRequest {
 
     return {
       type: 'ERROR',
-      message: resData.error || 'Oops, Something Went Wrong',
+      message: resData.error || 'ошибка получения данных',
     } as error.INetworkError;
   };
 

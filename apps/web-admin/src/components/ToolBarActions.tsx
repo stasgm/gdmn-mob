@@ -1,4 +1,4 @@
-import { Button, Hidden, IconButton, Toolbar } from '@material-ui/core';
+import { Button, Box, IconButton, Toolbar } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import { IToolBarButton } from '../types';
@@ -30,15 +30,20 @@ const ToolBarActions = ({ buttons }: props) => {
 
   return (
     <Toolbar>
-      <Hidden smUp>
+      <Box component="button" sx={{ background: 'transparent', border: 'none', display: { sm: 'none', xs: 'block' } }}>
         <IconButton color="primary">
           <MoreVertIcon />
         </IconButton>
-      </Hidden>
-      <Hidden mdUp smDown>
+      </Box>
+      <Box
+        component="button"
+        sx={{ background: 'transparent', border: 'none', display: { md: 'none', sm: 'block', xs: 'none' } }}
+      >
         {iconButtonList}
-      </Hidden>
-      <Hidden mdDown>{buttonList}</Hidden>
+      </Box>
+      <Box component="button" sx={{ background: 'transparent', border: 'none', display: { xs: 'none', md: 'block' } }}>
+        {buttonList}
+      </Box>
     </Toolbar>
   );
 };

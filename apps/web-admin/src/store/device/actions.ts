@@ -28,11 +28,18 @@ const updateDeviceAsync = createAsyncAction('DEVICE/UPDATE', 'DEVICE/UPDATE_SUCC
   string
 >();
 
+const removeDeviceAsync = createAsyncAction('DEVICE/REMOVE', 'DEVICE/REMOVE_SUCCCES', 'DEVICE/REMOVE_FAILURE')<
+  string | undefined,
+  undefined,
+  string
+>();
+
 export const deviceActions = {
   fetchDevicesAsync,
   fetchDeviceAsync,
   addDeviceAsync,
   updateDeviceAsync,
+  removeDeviceAsync,
   clearError,
   init,
 };

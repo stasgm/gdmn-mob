@@ -5,7 +5,7 @@ import { Button, IconButton, useTheme } from 'react-native-paper';
 import { globalStyles } from '@lib/mobile-ui';
 import { SubTitle, RadioGroup } from '@lib/mobile-ui/src/components';
 import { ICompany, IResponse } from '@lib/types';
-import { company, company2 } from '@lib/mock';
+import { company3 } from '@lib/mock';
 
 type Props = {
   onLogout: () => void;
@@ -19,12 +19,6 @@ const CompaniesScreen = (props: Props) => {
   const [companies, setCompanies] = useState<ICompany[]>([]);
 
   const { colors } = useTheme();
-  // const { apiService } = useServiceStore();
-
-  // const {
-  //   state: { userID },
-  //   actions,
-  // } = useAuthStore();
 
   // TODO 1. Загрузка списка компаний
   useEffect(() => {
@@ -32,7 +26,7 @@ const CompaniesScreen = (props: Props) => {
       // const response = await apiService.auth.getUserStatus();
       const response: IResponse<ICompany[]> = {
         result: true,
-        data: [company, company2],
+        data: [company3],
       };
 
       if (response.result) {
@@ -91,20 +85,20 @@ const CompaniesScreen = (props: Props) => {
 
   return (
     <>
-      <View style={globalStyles.container}>
+      <View style={[globalStyles.container, styles.container]}>
         <SubTitle>Выбор организации</SubTitle>
-        <ScrollView contentContainerStyle={localStyles.scrollContainer} style={localStyles.scroll}>
+        <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
           <RadioGroup
             onChange={(value) => setSelectedCompany(companies.find((i) => i.id === value.id))}
             options={companies.map((i) => ({ id: i.id, value: i.name }))}
             activeButtonId={selectedCompany?.id}
           />
         </ScrollView>
-        <View style={localStyles.buttonView}>
+        <View style={styles.buttonView}>
           <Button
             mode="contained"
             icon="check-circle-outline"
-            style={[globalStyles.rectangularButton, localStyles.button]}
+            style={[globalStyles.rectangularButton, styles.button]}
             disabled={!selectedCompany}
             onPress={() => {
               selectedCompany && onSetCompany(selectedCompany);
@@ -135,23 +129,15 @@ const CompaniesScreen = (props: Props) => {
 
 export { CompaniesScreen };
 
-const localStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   button: {
     flex: 1,
   },
+  container: {
+    margin: 10,
+  },
   buttonView: {
     flexDirection: 'row',
-  },
-  item: {
-    borderRadius: 4,
-    justifyContent: 'center',
-  },
-  row: {
-    alignItems: 'center',
-    borderRadius: 15,
-    flex: 1,
-    flexDirection: 'row',
-    paddingVertical: 5,
   },
   scroll: {
     marginVertical: 10,

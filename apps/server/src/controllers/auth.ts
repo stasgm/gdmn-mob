@@ -53,8 +53,11 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
 const logOut = async (ctx: Context): Promise<void> => {
   const user = ctx.state.user as IUser;
+  console.log('user', user);
 
   await authService.logout(user.id);
+
+  console.log('user1', user);
 
   ctx.logout();
 

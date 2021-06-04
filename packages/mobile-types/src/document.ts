@@ -1,4 +1,4 @@
-export interface IDocument {
+/* export interface IDocument {
   id: number;
   head: IHead;
   lines: ILine[];
@@ -21,3 +21,4 @@ export interface IDocumentStatus {
   id: number;
   name: string;
 }
+ */

@@ -9,6 +9,6 @@ export class InvalidParameterException extends ApplicationException {
    * @param context Request context and more details
    */
   constructor(context: string) {
-    super('InvalidParameterException', 400, `Bad Request : Invalid parameter value in the request - ${context}`);
+    super('InvalidParameterException', 400, context);
   }
 }

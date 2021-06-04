@@ -36,7 +36,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return initialState;
 
     case getType(actions.clearError):
-      return { ...state, error: false };
+      return { ...state, error: false, status: '' };
 
     case getType(actions.setSettings):
       return { ...state, settings: action.payload };
@@ -66,6 +66,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, user: action.payload, error: false, status: '', loading: false, company: undefined };
 
     case getType(actions.loginUserAsync.failure):
+      return { ...state, error: true, status: action.payload, loading: false, user: null };
+
+    case getType(actions.signUpAsync.request):
+      return { ...state, error: false, status: '', loading: true, user: undefined };
+
+    case getType(actions.signUpAsync.success):
+      return { ...state, user: action.payload, error: false, status: '', loading: false, company: undefined };
+
+    case getType(actions.signUpAsync.failure):
       return { ...state, error: true, status: action.payload, loading: false, user: null };
 
     case getType(actions.logout):
