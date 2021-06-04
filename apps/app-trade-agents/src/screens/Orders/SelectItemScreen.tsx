@@ -28,7 +28,6 @@ const SelectItemScreen = () => {
         .filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list, searchQuery]);
 
   useEffect(() => {
@@ -39,7 +38,7 @@ const SelectItemScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      // headerLeft: () => <BackButton />,
       headerRight: () => (
         <IconButton
           icon="card-search-outline"

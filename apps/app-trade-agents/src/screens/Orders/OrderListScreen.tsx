@@ -1,22 +1,21 @@
 import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
-
-import { FilterButtons, ItemSeparator, Status } from '@lib/mobile-ui/src/components';
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
-
-import { AddButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
-
 import { useNavigation } from '@react-navigation/native';
-
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-
-import styles from '@lib/mobile-ui/src/styles/global';
-
 import { useTheme } from 'react-native-paper';
 
-import { IOrderDocument } from '../../store/docs/types';
+import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import {
+  globalStyles as styles,
+  useActionSheet,
+  AddButton,
+  DrawerButton,
+  MenuButton,
+  FilterButtons,
+  ItemSeparator,
+  Status,
+} from '@lib/mobile-ui';
 
-import { orderMock } from '../../store/docs/mock';
+import { IOrderDocument } from '../../store/docs/types';
 
 import OrderListItem from './components/OrderListItem';
 
@@ -49,25 +48,8 @@ const OrderListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    // const newOrder = {
-    //   id: '9',
-    //   number: '225',
-    //   documentDate: '2021.06.03',
-    //   documentType: orderType,
-    //   status: 'DRAFT',
-    //   head: {
-    //     contact: contact1,
-    //     outlet: outlet1,
-    //     ondate: '02.06.2021',
-    //   },
-    // };
-    // dispatch(documentActions.addDocument());
     navigation.navigate('OrderView');
   }, [navigation]);
-
-  const handleLoad = useCallback(() => {
-    dispatch(documentActions.setDocuments(orderMock));
-  }, [dispatch]);
 
   const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocuments());
@@ -80,10 +62,6 @@ const OrderListScreen = () => {
         onPress: handleAddDocument,
       },
       {
-        title: 'Загрузить',
-        onPress: handleLoad,
-      },
-      {
         title: 'Удалить все',
         type: 'destructive',
         onPress: handleDelete,
@@ -93,15 +71,15 @@ const OrderListScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocument, handleLoad, handleDelete]);
+  }, [showActionSheet, handleAddDocument, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <AddButton onPress={handleAddDocument} />
           <MenuButton actionsMenu={actionsMenu} />
+          <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
@@ -120,7 +98,6 @@ const OrderListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
         onEndReached={() => ({})}
-        // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />

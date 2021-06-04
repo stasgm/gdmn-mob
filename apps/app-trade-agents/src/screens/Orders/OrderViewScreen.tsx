@@ -69,7 +69,7 @@ const OrderViewScreen = () => {
     });
   }, [navigation, handleAddOrderLine, actionsMenu]);
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
 
   if (!order) {
     return (

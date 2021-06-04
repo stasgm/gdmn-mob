@@ -17,8 +17,9 @@ import { ILocation } from '../../store/geo/types';
 
 import { IOutlet, IRouteDocument } from '../../store/docs/types';
 
-import localStyles from './styles';
 import { routeMock } from '../../store/docs/mock';
+
+import localStyles from './styles';
 
 interface Region {
   latitude: number;
@@ -113,7 +114,7 @@ const MapScreen = () => {
     setLoading(true);
 
     dispatch(geoActions.deleteCurrent());
-    const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
+    const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Lowest });
     dispatch(geoActions.addCurrent({ coords: location.coords }));
 
     setLoading(false);

@@ -32,7 +32,7 @@ const RouteDetailScreen = () => {
 
   const [process, setProcess] = useState(false);
 
-  const point = (docSelectors.selectByDocType('route') as IRouteDocument[])
+  const point = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])
     ?.find((e) => e.id === routeId)
     ?.lines.find((i) => i.id === id);
 
@@ -98,7 +98,7 @@ const RouteDetailScreen = () => {
           {outlet && (
             <>
               <Text>{outlet.address}</Text>
-              <Text>{`+375 ${outlet.phoneNumber}`}</Text>
+              <Text>{outlet.phoneNumber}</Text>
             </>
           )}
         </View>

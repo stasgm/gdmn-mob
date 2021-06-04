@@ -6,7 +6,7 @@ const globalstyles = StyleSheet.create({
   },
   buttons: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   btnTab: {
     width: Dimensions.get('window').width / 3.2,

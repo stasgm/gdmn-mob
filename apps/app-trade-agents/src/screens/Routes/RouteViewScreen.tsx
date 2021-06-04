@@ -18,7 +18,7 @@ const RouteViewScreen = () => {
   const dispatch = useDispatch();
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
-  const list = (docSelectors.selectByDocType('route') as IRouteDocument[])?.find((e) => e.id === id);
+  const route = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])?.find((e) => e.id === id);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
@@ -47,7 +47,7 @@ const RouteViewScreen = () => {
     });
   }, [actionsMenu, navigation]);
 
-  if (!list) {
+  if (!route) {
     return (
       <View style={styles.container}>
         <SubTitle style={styles.title}>Маршрут не найден</SubTitle>
@@ -55,15 +55,15 @@ const RouteViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={list.id} />;
+  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />;
 
   return (
     <View style={styles.container}>
-      <SubTitle style={styles.title}>{list.documentDate}</SubTitle>
+      <SubTitle style={styles.title}>{route.documentDate}</SubTitle>
       <Divider />
       <FlatList
         ref={ref}
-        data={list.lines}
+        data={route.lines.sort((a, b) => a.ordNumber - b.ordNumber)}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}

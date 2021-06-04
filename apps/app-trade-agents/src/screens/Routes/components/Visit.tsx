@@ -8,10 +8,10 @@ import { globalStyles } from '@lib/mobile-ui';
 
 //import { documentActions } from '@lib/store';
 
-import { INamedEntity } from '@lib/types';
+import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors } from '@lib/store';
+import { docSelectors, documentActions } from '@lib/store';
 
 import { useDispatch } from '../../../store';
 
@@ -79,7 +79,15 @@ const Visit = ({
   };
 
   const handleNewOrder = () => {
-    /*const newOrder: IOrderDocument = {
+    const newOrder: IOrderDocument = {
+      documentDate: new Date().toISOString(),
+      documentType: {
+        id: '1',
+        name: 'order',
+      },
+      id: '111' + new Date().toISOString(),
+      number: 'б\\н',
+      status: 'DRAFT',
       head: {
         contact,
         outlet,
@@ -89,7 +97,7 @@ const Visit = ({
       },
       lines: [],
     };
-    dispatch(documentActions.addDocument(newOrder));*/
+    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
   };
 
   const twoDigits = (value: number) => {
@@ -98,9 +106,8 @@ const Visit = ({
 
   return (
     <View>
-      <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
-        !dateEnd ? 'тся' : 'лся'
-      } ${timeProcess()})`}</Text>
+      <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'
+        } ${timeProcess()})`}</Text>
       {process ? (
         <ActivityIndicator size="large" color="#3914AF" />
       ) : (
@@ -116,9 +123,9 @@ const Visit = ({
                   //TODO: узнать есть ли заявка, если есть перейти в заявку, если нет - создать
                   order
                     ? navigation.navigate('Orders', {
-                        screen: 'OrderView',
-                        params: { id: order.id },
-                      })
+                      screen: 'OrderView',
+                      params: { id: order.id },
+                    })
                     : handleNewOrder();
                 }}
               >

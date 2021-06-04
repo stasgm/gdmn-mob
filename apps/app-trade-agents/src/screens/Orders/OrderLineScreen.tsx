@@ -22,7 +22,7 @@ const OrderLineScreen = () => {
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const showActionSheet = useActionSheet();
+  // const showActionSheet = useActionSheet();
 
   const handleSave = useCallback(() => {
     if (mode === 0) {
@@ -34,32 +34,32 @@ const OrderLineScreen = () => {
     navigation.navigate('OrderView', { id: docId });
   }, [navigation, line, docId, dispatch, mode]);
 
-  const handleDelete = useCallback(() => {
+  /* const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocumentLine({ docId, lineId: line.id }));
     navigation.navigate('OrderView', { id: docId });
-  }, [dispatch, docId, line.id, navigation]);
+  }, [dispatch, docId, line.id, navigation]); */
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Удалить',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-    ]);
-  }, [handleDelete, showActionSheet]);
+  /*   const actionsMenu = useCallback(() => {
+      showActionSheet([
+        {
+          title: 'Удалить',
+          type: 'destructive',
+          onPress: handleDelete,
+        },
+      ]);
+    }, [handleDelete, showActionSheet]); */
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      // headerLeft: () => <BackButton />,
       headerRight: () => (
         <View style={styles.buttons}>
+          {/* <MenuButton actionsMenu={actionsMenu} /> */}
           <SaveButton onPress={handleSave} />
-          <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
     });
-  }, [navigation, handleSave, actionsMenu]);
+  }, [navigation, handleSave]);
 
   return (
     <View style={[styles.container]}>

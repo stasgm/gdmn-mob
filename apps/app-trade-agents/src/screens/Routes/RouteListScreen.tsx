@@ -13,6 +13,8 @@ import {
 } from '@lib/mobile-ui';
 import { useSelector, docSelectors, useDispatch, documentActions } from '@lib/store';
 
+import { IDocument, IEntity, IUserDocument } from '@lib/types';
+
 import { IRouteDocument } from '../../store/docs/types';
 
 import { routeMock } from '../../store/docs/mock';
@@ -27,7 +29,7 @@ const RouteListScreen = () => {
 
   const { loading } = useSelector((state) => state.documents);
 
-  const list = (docSelectors.selectByDocType('route') as IRouteDocument[]).sort(
+  const list = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[]).sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
   );
 
@@ -45,46 +47,46 @@ const RouteListScreen = () => {
     return [];
   }, [status, list]);
 
-  const handleAddDocument = useCallback(() => {
+  /* const handleAddDocument = useCallback(() => {
     navigation.navigate('OrderView');
   }, [navigation]);
 
   const handleLoad = useCallback(() => {
-    dispatch(documentActions.addDocuments(routeMock));
+    dispatch(documentActions.addDocuments(routeMock as unknown as IUserDocument<IDocument, IEntity[]>[]));
   }, [dispatch]);
 
   const handleDelete = useCallback(() => {
-    dispatch(documentActions.deleteAllDocuments());
-  }, [dispatch]);
+    dispatch(documentActions.deleteDocuments());
+  }, [dispatch]); */
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить',
-        onPress: handleAddDocument,
-      },
-      {
-        title: 'Загрузить',
-        onPress: handleLoad,
-      },
-      {
-        title: 'Удалить все',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddDocument, handleLoad, handleDelete]);
+  /*   const actionsMenu = useCallback(() => {
+      showActionSheet([
+        {
+          title: 'Добавить',
+          onPress: handleAddDocument,
+        },
+        {
+          title: 'Загрузить',
+          onPress: handleLoad,
+        },
+        {
+          title: 'Удалить все',
+          type: 'destructive',
+          onPress: handleDelete,
+        },
+        {
+          title: 'Отмена',
+          type: 'cancel',
+        },
+      ]);
+    }, [showActionSheet, handleAddDocument, handleLoad, handleDelete]); */
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      // headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
-  }, [actionsMenu, navigation]);
+  }, [navigation]);
 
   const renderItem = ({ item }: { item: IRouteDocument }) => <RouteListItem key={item.id} item={item} />;
 
