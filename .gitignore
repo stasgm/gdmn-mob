@@ -103,7 +103,7 @@ npm-debug.*
 web-build/
 
 #config
-config/*.ts
+#config/*.ts
 
 .expo/*
 

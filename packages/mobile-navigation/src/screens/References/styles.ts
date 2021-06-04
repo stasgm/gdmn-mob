@@ -68,4 +68,9 @@ export const styles = StyleSheet.create({
   field: {
     opacity: 0.5,
   },
+  input: {
+    height: 40,
+    marginLeft: 12,
+    // borderWidth: 1,
+  },
 });

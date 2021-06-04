@@ -17,6 +17,8 @@ export interface IOutlet extends INamedEntity {
   company: INamedEntity; //организация-плательщик
   address: string; //Адрес разгрузки
   phoneNumber: string; // Номер телефона
+  lat: number; // широта
+  lon: number; // долгота
 }
 //Задолженности
 export interface IDebt extends IEntity {

@@ -1,5 +1,4 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import colors from './colors';
 
 const globalstyles = StyleSheet.create({
   bottomButtons: {
@@ -26,6 +25,9 @@ const globalstyles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     width: 50,
+  },
+  fabAdd: {
+    margin: 20,
   },
   container: {
     display: 'flex',

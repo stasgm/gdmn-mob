@@ -36,7 +36,7 @@ export function DrawerContent(props: Props) {
     setLoading(true);
 
     await dispatch(referenceActions.deleteAllReferences());
-    await dispatch(documentActions.deleteAllDocuments());
+    await dispatch(documentActions.deleteDocuments());
 
     await dispatch(
       referenceActions.addReferences({
