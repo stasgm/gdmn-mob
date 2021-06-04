@@ -3,13 +3,17 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 
+import geoReducer from './geo/reducer';
 import docsReducer from './docs/reducer';
-import { DocActionType } from './docs/actions';
 
-type TActions = DocActionType;
+import { DocActionType } from './docs/actions';
+import { GeoActionType } from './geo/actions';
+
+type TActions = DocActionType | GeoActionType;
 
 export const combinedReducer = {
   docs: docsReducer,
+  geo: geoReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);

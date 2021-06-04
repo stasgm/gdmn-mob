@@ -7,7 +7,7 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 // import DashboardNavigator from './Root/DashboardNavigator';
 import OrdersNavigator from './Root/OrdersNavigator';
 import RoutesNavigator from './Root/RoutesNavigator';
-import MapNavigator from './Root/MapNavigator';
+import MapNavigator from './Root/Maps/MapNavigator';
 // import DocumentsNavigator from './Root/';
 
 const navItems: INavItem[] = [
