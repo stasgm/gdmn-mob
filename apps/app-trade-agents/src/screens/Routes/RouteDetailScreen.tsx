@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
-import * as Location from 'expo-location';
+//import * as Location from 'expo-location';
 
 import { globalStyles, globalStyles as styles } from '@lib/mobile-ui';
 
@@ -24,7 +24,7 @@ import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
-  const { list: visits } = useSelector((state) => state.visits);
+  const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === routeId);
 
   const dispatch = useDispatch();
   //const ref = useRef<FlatList<IRouteLine>>(null);
@@ -63,14 +63,14 @@ const RouteDetailScreen = () => {
   const handleNewVisit = async () => {
     setProcess(true);
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    /*const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
       setProcess(false);
       return;
     }
 
-    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
+    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });*/
     const date = new Date().toISOString();
 
     dispatch(
@@ -78,7 +78,8 @@ const RouteDetailScreen = () => {
         id: `${routeId}${date}`,
         routeLineId: Number(routeId),
         dateBegin: date,
-        beginGeoPoint: coords as unknown as ICoords,
+        beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
+        //beginGeoPoint: (coords as unknown) as ICoords,
         takenType: 'ONPLACE',
       }),
     );
@@ -126,7 +127,9 @@ const RouteDetailScreen = () => {
         <ActivityIndicator size="large" color="#3914AF" />
       ) : visits.length > 0 ? (
         <>
-          <Visit item={visits[0]} />
+          {visits.map((visit) => (
+            <Visit key={visit.id} item={visit} />
+          ))}
           {/*<SubTitle style={styles.title}>Визиты</SubTitle>
           <Divider />
           <FlatList

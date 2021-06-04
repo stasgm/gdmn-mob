@@ -32,21 +32,22 @@ const Visit = ({ item }: { item: IVisit }) => {
   const handleCloseVisit = async () => {
     setProcess(true);
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    /*const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
       setProcess(false);
       return;
     }
 
-    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
+    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });*/
     const date = new Date().toISOString();
 
     dispatch(
       visitActions.edit({
         id: item.id,
         dateEnd: date,
-        endGeoPoint: coords as unknown as ICoords,
+        endGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
+        //endGeoPoint: coords as unknown as ICoords,
       }),
     );
 
