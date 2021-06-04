@@ -3,6 +3,7 @@ import { IOrderLine } from '../../store/docs/types';
 export type OrdersStackParamList = {
   OrderList: undefined;
   OrderView: { id: string } | undefined;
+  OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectItem: { docId: string; name: string };
 };

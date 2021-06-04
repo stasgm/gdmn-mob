@@ -62,7 +62,7 @@ const OrderListScreen = () => {
     //   },
     // };
     // dispatch(documentActions.addDocument());
-    navigation.navigate('OrderView');
+    navigation.navigate('OrderEdit');
   }, [navigation]);
 
   const handleLoad = useCallback(() => {
