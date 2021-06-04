@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -31,9 +31,13 @@ const MapScreen = () => {
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
-  const [currentPoint, setCurrentPoint] = useState<ILocation>();
+
+  // const [currentPoint, setCurrentPoint] = useState<ILocation>();
 
   const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
+  const currentPoint = useSelector((state) => state.geo.currentPoint);
+
+  const setCurrentPoint = useCallback((point: ILocation) => dispatch(geoActions.setCurrentPoint(point)), [dispatch]);
 
   const refMap = useRef<MapView>(null);
 
@@ -81,9 +85,10 @@ const MapScreen = () => {
     if (!currentPos) {
       return;
     }
+
     setCurrentPoint(currentPos);
     moveTo(currentPos.coords);
-  }, [loading, list]);
+  }, [loading, list, setCurrentPoint]);
 
   const moveToRegion = (coords: LatLng[]) => {
     refMap.current?.fitToCoordinates(coords, {
@@ -91,6 +96,14 @@ const MapScreen = () => {
       animated: true,
     });
   };
+
+  useEffect(() => {
+    if (!currentPoint) {
+      return;
+    }
+
+    moveTo(currentPoint.coords);
+  }, [currentPoint]);
 
   const moveTo = (coords: LatLng) => {
     refMap.current?.animateCamera({ center: coords, zoom: 13 });
@@ -113,7 +126,7 @@ const MapScreen = () => {
     idx = idx >= listLen - 1 ? 0 : idx + 1;
     const newPoint = list[idx];
 
-    moveTo(list[idx].coords);
+    // moveTo(list[idx].coords);
     setCurrentPoint(newPoint);
   };
 
@@ -131,14 +144,12 @@ const MapScreen = () => {
     idx = idx <= 0 ? listLen - 1 : idx - 1;
     console.log(idx);
 
-    moveTo(list[idx].coords);
+    // moveTo(list[idx].coords);
     setCurrentPoint(list[idx]);
   };
 
   const handleClickMarker = (props: ILocation) => {
-    // console.log('position', props);
     setCurrentPoint(props);
-    // console.log('coordinate', props.coordinate);
   };
 
   return (
@@ -151,9 +162,6 @@ const MapScreen = () => {
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
-      {/*       <View style={localStyles.statusContainer}>
-        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-      </View> */}
       <MapView
         ref={refMap}
         initialRegion={region}
@@ -170,7 +178,12 @@ const MapScreen = () => {
             pinColor={point.id === 'current' ? 'blue' : 'red'}
             onPress={() => handleClickMarker(point)}
           >
-            <View style={[styles.icon, { backgroundColor: point.number !== 0 ? 'red' : 'blue' }]}>
+            <View
+              style={[
+                styles.icon,
+                { backgroundColor: point.number === 0 ? 'blue' : point.id === currentPoint?.id ? 'red' : 'green' },
+              ]}
+            >
               <Text style={styles.lightField}>{point.number}</Text>
             </View>
           </Marker>

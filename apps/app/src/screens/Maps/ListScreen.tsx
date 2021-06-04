@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useRef } from 'react';
 // import { useDispatch } from 'react-redux';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,19 +8,20 @@ import { ItemSeparator, globalStyles as styles, DrawerButton } from '@lib/mobile
 
 import { useScrollToTop } from '@react-navigation/native';
 
-import { useSelector } from '../../store';
+import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
-// import { geoActions } from '../../store/geo/actions';
+import { geoActions } from '../../store/geo/actions';
 
-const Item = ({ item }: { item: ILocation }) => {
-  // const dispatch = useDispatch();
-
+const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={onPress}>
       <View style={styles.item}>
-        <View style={styles.icon}>
-          <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
+        <View style={[styles.icon, { backgroundColor: item.number === 0 ? 'blue' : selected ? 'red' : 'green' }]}>
+          <Text style={styles.lightField}>{item.number}</Text>
         </View>
+        {/*         <View style={styles.icon}>
+          <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
+        </View> */}
         <View style={styles.details}>
           <View style={styles.directionRow}>
             <Text style={styles.name}>{item.name}</Text>
@@ -42,11 +43,14 @@ const Item = ({ item }: { item: ILocation }) => {
 };
 
 const ListScreen = () => {
-  // const dispatch = useDispatch();
   const navigation = useNavigation();
   // const { colors } = useTheme();
+  const dispatch = useDispatch();
 
-  const { list } = useSelector((state) => state.geo);
+  const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
+  const currentPoint = useSelector((state) => state.geo.currentPoint);
+
+  const setCurrentPoint = useCallback((point: ILocation) => dispatch(geoActions.setCurrentPoint(point)), [dispatch]);
 
   const ref = useRef<FlatList<ILocation>>(null);
   useScrollToTop(ref);
@@ -57,7 +61,9 @@ const ListScreen = () => {
     });
   }, [navigation]);
 
-  const renderItem = ({ item }: { item: ILocation }) => <Item item={item} />;
+  const renderItem = ({ item }: { item: ILocation }) => (
+    <Item item={item} onPress={() => setCurrentPoint(item)} selected={item.id === currentPoint?.id} />
+  );
 
   return (
     <View style={styles.container}>

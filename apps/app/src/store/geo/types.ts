@@ -10,6 +10,7 @@ export interface ILocation extends INamedEntity {
 
 export type IGeoState = {
   readonly list: ILocation[];
+  readonly currentPoint?: ILocation;
   readonly loading: boolean;
   readonly errorMessage: string;
 };

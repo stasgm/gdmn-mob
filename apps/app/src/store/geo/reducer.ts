@@ -29,6 +29,13 @@ const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action
       };
     }
 
+    case getType(geoActions.setCurrentPoint): {
+      return {
+        ...state,
+        currentPoint: action.payload,
+      };
+    }
+
     case getType(geoActions.addMany): {
       return { ...state, list: action.payload };
     }
