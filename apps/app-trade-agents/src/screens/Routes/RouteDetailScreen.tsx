@@ -18,7 +18,7 @@ import { contactRefMock, outletRefMock } from '../../store/docs/mock';
 import { useDispatch, useSelector } from '../../store';
 
 import { visitActions } from '../../store/visits/actions';
-import { ICoords } from '../../store/visits/types';
+import { ICoords, IVisit } from '../../store/visits/types';
 
 import Visit from './components/Visit';
 
@@ -128,7 +128,13 @@ const RouteDetailScreen = () => {
       ) : visits.length > 0 ? (
         <>
           {visits.map((visit) => (
-            <Visit key={visit.id} item={visit} />
+            <Visit
+              key={visit.id}
+              item={visit}
+              outlet={outlet as INamedEntity}
+              contact={contact as INamedEntity}
+              road={{ id: routeId, name: '' }}
+            />
           ))}
           {/*<SubTitle style={styles.title}>Визиты</SubTitle>
           <Divider />
