@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userProfile: {
+    marginTop: 15,
     flexDirection: 'column',
   },
   profileInfo: {

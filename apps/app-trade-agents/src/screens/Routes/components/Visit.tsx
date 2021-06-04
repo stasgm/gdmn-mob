@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
 //import * as Location from 'expo-location';
 
-import { globalStyles, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles, SubTitle, globalStyles as styles, BackButton } from '@lib/mobile-ui';
 
 //import { documentActions } from '@lib/store';
 
@@ -90,6 +90,12 @@ const Visit = ({
     setProcess(false);
   };
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+    });
+  }, [navigation]);
+
   const handleNewOrder = () => {
     const newOrder: IOrderDocument = {
       documentDate: new Date().toISOString(),
@@ -113,6 +119,7 @@ const Visit = ({
     navigation.navigate('Orders', {
       screen: 'OrderView',
       params: { id: newOrder.id },
+      // initial: false,
     });
   };
 
@@ -138,6 +145,7 @@ const Visit = ({
                     ? navigation.navigate('Orders', {
                         screen: 'OrderView',
                         params: { id: order.id },
+                        // initial: false,
                       })
                     : handleNewOrder();
                 }}
@@ -188,7 +196,7 @@ const localStyles = StyleSheet.create({
   buttons1: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginHorisontal: 10,
+    marginHorizontal: 10,
   },
   box: {
     borderColor: '#8888',
