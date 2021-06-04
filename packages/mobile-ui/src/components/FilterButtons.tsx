@@ -44,7 +44,7 @@ const FilterButtons = ({ status, onPress }: IProps) => {
             style={[styles.btnTab, e.status === status && { backgroundColor: colors.primary }]}
             onPress={() => onPress(e.status)}
           >
-            <Text style={e.status === status ? { color: colors.background } : { color: colors.text }}>{e.name}</Text>
+            <Text style={{ color: e.status === status ? colors.background : colors.text }}>{e.name}</Text>
           </TouchableOpacity>
         );
       })}
