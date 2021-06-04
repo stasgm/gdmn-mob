@@ -11,13 +11,16 @@ import RouteListItem from './components/RouteListItem';
 
 const RouteListScreen = () => {
   const navigation = useNavigation();
+  const [status, setStatus] = useState<Status>('active');
 
   const { loading } = useSelector((state) => state.documents);
+
   const list = (docSelectors.selectByDocType('route') as IRouteDocument[]).sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
   );
 
-  const [status, setStatus] = useState<Status>('active');
+  const ref = useRef<FlatList<IRouteDocument>>(null);
+  useScrollToTop(ref);
 
   const filteredList = useMemo(() => {
     if (status === 'all') {
@@ -35,9 +38,6 @@ const RouteListScreen = () => {
       headerLeft: () => <DrawerButton />,
     });
   }, [navigation]);
-
-  const ref = useRef<FlatList<IRouteDocument>>(null);
-  useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IRouteDocument }) => <RouteListItem key={item.id} item={item} />;
 

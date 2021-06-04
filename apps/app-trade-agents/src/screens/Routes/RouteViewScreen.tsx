@@ -55,7 +55,7 @@ const RouteViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem key={item.id} item={item} routeId={list.id} />;
+  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={list.id} />;
 
   return (
     <View style={styles.container}>

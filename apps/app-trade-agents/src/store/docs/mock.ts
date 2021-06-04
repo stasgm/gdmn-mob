@@ -124,6 +124,8 @@ const outletMock = [
     company: contact1,
     address: ' г. Орша , ул.Ленина, 63',
     phoneNumber: '(29) 115-23-19',
+    lat: 54.51786,
+    lon: 30.434586,
   },
   {
     id: '72',
@@ -132,6 +134,8 @@ const outletMock = [
     company: contact1,
     address: 'г. Орша ,  ул.Ленина, 63 ',
     phoneNumber: '(29) 522-28-24',
+    lat: 54.51786,
+    lon: 30.434586,
   },
   {
     id: '74',
@@ -140,6 +144,8 @@ const outletMock = [
     company: contact1,
     address: 'г. Орша , ул Могилевская,35',
     phoneNumber: '(29) 372-17-18',
+    lat: 54.500542,
+    lon: 30.43622,
   },
   {
     id: '75',
@@ -148,6 +154,8 @@ const outletMock = [
     company: contact2,
     address: 'г. Минск , ул. Горецкого, 2',
     phoneNumber: '(29) 115-23-19',
+    lat: 53.876489,
+    lon: 27.46603,
   },
   {
     id: '76',
@@ -156,14 +164,18 @@ const outletMock = [
     company: contact2,
     address: 'г. Минск , Игуменский тракт, 30',
     phoneNumber: '(29) 522-28-24',
+    lat: 53.840402,
+    lon: 27.573128,
   },
   {
     id: '78',
     name: 'ООО "ГРИНРозница" магазин "ГРИН"-АРЕНА, Минск, пр.Поб-лей,84',
     externalId: '147012302',
     company: contact3,
-    address: 'г. Минск , пр.Победителей,84',
+    address: 'г. Минск , пр.Победителей, 84',
     phoneNumber: '(29) 372-17-18',
+    lat: 53.938014,
+    lon: 27.487857,
   },
   {
     id: '79',
@@ -172,6 +184,8 @@ const outletMock = [
     company: contact3,
     address: 'г. Минск , ул. Уборевича, 176',
     phoneNumber: '(29) 115-23-19',
+    lat: 53.835385,
+    lon: 27.606179,
   },
   {
     id: '80',
@@ -180,6 +194,8 @@ const outletMock = [
     company: contact4,
     address: 'г. Минск , ул. Асаналиева, 44',
     phoneNumber: '(29) 522-28-24',
+    lat: 53.85118,
+    lon: 27.544414,
   },
   {
     id: '81',
@@ -188,6 +204,8 @@ const outletMock = [
     company: contact4,
     address: 'г. Минск , ул. Воронянского, 17',
     phoneNumber: '(29) 372-17-18',
+    lat: 53.87813,
+    lon: 27.547373,
   },
   {
     id: '82',
@@ -196,6 +214,8 @@ const outletMock = [
     company: contact5,
     address: 'г. Минск , ул. Каменногорская, 3',
     phoneNumber: '(29) 115-23-19',
+    lat: 53.911127,
+    lon: 27.415492,
   },
   {
     id: '83',
@@ -204,6 +224,8 @@ const outletMock = [
     company: contact5,
     address: 'г. Минск , пр-т Дзержинского, 126',
     phoneNumber: '(29) 522-28-24',
+    lat: 53.847422,
+    lon: 27.471088,
   },
 ];
 

@@ -26,6 +26,9 @@ const globalstyles = StyleSheet.create({
     justifyContent: 'center',
     width: 50,
   },
+  fabAdd: {
+    margin: 20,
+  },
   container: {
     display: 'flex',
     flex: 1,
