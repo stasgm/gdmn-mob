@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 
 //import * as Location from 'expo-location';
 
-import { globalStyles } from '@lib/mobile-ui';
+import { globalStyles, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 
 //import { documentActions } from '@lib/store';
 
@@ -21,6 +21,18 @@ import { visitActions } from '../../../store/visits/actions';
 import { IOrderDocument } from '../../../store/docs/types';
 
 //import { StackNavigationProp } from '@react-navigation/stack';
+
+const Info = ({ colorLabel, title, children }: { colorLabel: string; title: string; children: any }) => {
+  return (
+    <View style={[styles.flexDirectionRow, localStyles.box]}>
+      <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
+      <View style={localStyles.info}>
+        <SubTitle style={[styles.title]}>{title}</SubTitle>
+        {children}
+      </View>
+    </View>
+  );
+};
 
 const Visit = ({
   item,
@@ -97,7 +109,11 @@ const Visit = ({
       },
       lines: [],
     };
-    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument((newOrder as unknown) as IUserDocument<IDocument, IEntity[]>));
+    navigation.navigate('Orders', {
+      screen: 'OrderView',
+      params: { id: newOrder.id },
+    });
   };
 
   const twoDigits = (value: number) => {
@@ -106,32 +122,26 @@ const Visit = ({
 
   return (
     <View>
-      <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'
-        } ${timeProcess()})`}</Text>
-      {process ? (
-        <ActivityIndicator size="large" color="#3914AF" />
-      ) : (
+      <Info colorLabel="#3914AF" title="Визит">
         <>
-          {dateEnd ? (
-            <Text>{`Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`}</Text>
-          ) : (
-            <>
+          <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+            !dateEnd ? 'тся' : 'лся'
+          } ${timeProcess()})`}</Text>
+          {dateEnd && <Text>{`Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`}</Text>}
+          {!dateEnd && (
+            <View style={localStyles.buttons1}>
               <Button
                 mode="outlined"
                 style={[globalStyles.rectangularButton, localStyles.buttons]}
                 onPress={() => {
-                  //TODO: узнать есть ли заявка, если есть перейти в заявку, если нет - создать
                   order
                     ? navigation.navigate('Orders', {
-                      screen: 'OrderView',
-                      params: { id: order.id },
-                    })
+                        screen: 'OrderView',
+                        params: { id: order.id },
+                      })
                     : handleNewOrder();
                 }}>
-                {
-                  //TODO: узнать есть ли заявка, если есть вывести количество строк
-                  `Заявка${order ? ` (${order.lines.length})` : ''}`
-                }
+                {`Заявка (${order ? `${order.lines.length}` : '0'})`}
               </Button>
               <Button
                 mode="outlined"
@@ -139,8 +149,18 @@ const Visit = ({
                 onPress={() => {
                   //TODO: ссылка на документ
                 }}>
-                Возврат
+                Возврат (0)
               </Button>
+            </View>
+          )}
+        </>
+      </Info>
+      {process ? (
+        <ActivityIndicator size="large" color="#3914AF" />
+      ) : (
+        <>
+          {!dateEnd && (
+            <>
               <Button
                 onPress={handleCloseVisit}
                 mode="contained"
@@ -159,6 +179,28 @@ export default Visit;
 
 const localStyles = StyleSheet.create({
   buttons: {
-    width: '100%',
+    alignItems: 'center',
+    margin: 10,
+  },
+  buttons1: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginHorisontal: 10,
+  },
+  box: {
+    borderColor: '#8888',
+    borderRadius: 10,
+    borderWidth: 0.5,
+    marginBottom: 10,
+  },
+  info: {
+    margin: 5,
+    marginLeft: 15,
+  },
+  label: {
+    width: 10,
+    backgroundColor: '#3914AF',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
   },
 });

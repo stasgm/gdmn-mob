@@ -90,7 +90,7 @@ const RouteDetailScreen = () => {
         routeLineId: Number(id),
         dateBegin: date,
         // beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
-        beginGeoPoint: coords as unknown as ICoords,
+        beginGeoPoint: (coords as unknown) as ICoords,
         takenType: 'ONPLACE',
       }),
     );
@@ -155,7 +155,8 @@ const currStyles = StyleSheet.create({
     marginBottom: 10,
   },
   buttons: {
-    width: '100%',
+    alignItems: 'center',
+    margin: 10,
   },
   content: {
     justifyContent: 'flex-start',
