@@ -38,7 +38,7 @@ const SelectItemScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      // headerLeft: () => <BackButton />,
+      headerLeft: () => <BackButton />,
       headerRight: () => (
         <IconButton
           icon="card-search-outline"

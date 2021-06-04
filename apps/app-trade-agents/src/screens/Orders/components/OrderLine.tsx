@@ -5,7 +5,7 @@ import { IReference } from '@lib/types';
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, TextInput, View, Text, Keyboard } from 'react-native';
+import { SafeAreaView, ScrollView, TextInput, View, Text } from 'react-native';
 
 import { IGood, IOrderLine } from '../../../store/docs/types';
 
@@ -37,20 +37,22 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  /*   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
-  useEffect(() => {
-    if (isFocused) {
-      const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    useEffect(() => {
+      if (isFocused) {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
 
-      const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
 
-      return () => {
-        keyboardDidHideListener.remove();
-        keyboardDidShowListener.remove();
-      };
-    }
-  }, [isFocused]);
+        return () => {
+          keyboardDidHideListener.remove();
+          keyboardDidShowListener.remove();
+        };
+      }
+
+      return;
+    }, [isFocused]); */
 
   const priceFSN =
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
@@ -89,7 +91,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               />
             </View>
           </View>
-          <ItemSeparator />
+          {/* <ItemSeparator /> */}
         </View>
         {
           // <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>

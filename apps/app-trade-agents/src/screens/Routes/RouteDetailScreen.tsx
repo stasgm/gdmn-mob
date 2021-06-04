@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
-//import * as Location from 'expo-location';
+import * as Location from 'expo-location';
 
 import { globalStyles, globalStyles as styles } from '@lib/mobile-ui';
 
@@ -18,7 +18,7 @@ import { contactRefMock, outletRefMock } from '../../store/docs/mock';
 import { useDispatch, useSelector } from '../../store';
 
 import { visitActions } from '../../store/visits/actions';
-import { ICoords, IVisit } from '../../store/visits/types';
+import { ICoords } from '../../store/visits/types';
 
 import Visit from './components/Visit';
 
@@ -35,12 +35,10 @@ const Info = ({ colorLabel, title, children }: { colorLabel: string; title: stri
 };
 
 const RouteDetailScreen = () => {
+  const dispatch = useDispatch();
+
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === id);
-
-  const dispatch = useDispatch();
-  //const ref = useRef<FlatList<IRouteLine>>(null);
-  //useScrollToTop(ref);
 
   const [process, setProcess] = useState(false);
 
@@ -64,10 +62,11 @@ const RouteDetailScreen = () => {
   const contact = outlet
     ? ((contactRefMock as unknown) as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
     : undefined;
+
   const debt: IDebt = {
     id: '1',
     contact: contact as INamedEntity,
-    ondate: '01.12.2020',
+    ondate: '2021-01-01',
     saldo: 1000,
     saldoDebt: 0,
   };
@@ -75,14 +74,14 @@ const RouteDetailScreen = () => {
   const handleNewVisit = async () => {
     setProcess(true);
 
-    /*const { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
       setProcess(false);
       return;
     }
 
-    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });*/
+    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Lowest });
     const date = new Date().toISOString();
 
     dispatch(
@@ -90,16 +89,14 @@ const RouteDetailScreen = () => {
         id: `${id}${date}`,
         routeLineId: Number(id),
         dateBegin: date,
-        beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
-        //beginGeoPoint: (coords as unknown) as ICoords,
+        // beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
+        beginGeoPoint: coords as unknown as ICoords,
         takenType: 'ONPLACE',
       }),
     );
 
     setProcess(false);
   };
-
-  //const renderItem = ({ item }: { item: IVisit }) => <VisitItem key={item.id} item={item} />;
 
   return (
     <View style={[styles.container, currStyles.content]}>
@@ -138,16 +135,6 @@ const RouteDetailScreen = () => {
               road={{ id: routeId, name: '' }}
             />
           ))}
-          {/*<SubTitle style={styles.title}>Визиты</SubTitle>
-          <Divider />
-          <FlatList
-            ref={ref}
-            data={visits}
-            keyExtractor={(_, i) => String(i)}
-            renderItem={renderItem}
-            scrollEventThrottle={400}
-            ItemSeparatorComponent={ItemSeparator}
-          />*/}
         </>
       ) : (
         <Button onPress={handleNewVisit} mode="contained" style={[globalStyles.rectangularButton, currStyles.buttons]}>

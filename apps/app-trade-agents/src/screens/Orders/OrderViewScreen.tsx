@@ -5,11 +5,7 @@ import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { View, FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
 
-import styles from '@lib/mobile-ui/src/styles/global';
-
-import { AddButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
-
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import { AddButton, BackButton, MenuButton, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
@@ -62,8 +58,8 @@ const OrderViewScreen = () => {
       headerLeft: () => <BackButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <AddButton onPress={handleAddOrderLine} />
           <MenuButton actionsMenu={actionsMenu} />
+          <AddButton onPress={handleAddOrderLine} />
         </View>
       ),
     });
@@ -83,7 +79,6 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      {/* <SubTitle style={styles.title}>{list.documentDate}</SubTitle> */}
       <Header item={order} />
       <Divider />
       <FlatList

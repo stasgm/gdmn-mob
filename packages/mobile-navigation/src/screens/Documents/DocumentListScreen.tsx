@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { IDocument } from '@lib/types';
+import { IDocument, IUserDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
@@ -23,7 +23,7 @@ const DocumentListScreen = () => {
   const docType = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().params?.type;
   // const route = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().name;
 
-  console.log('docType', docType);
+  // console.log('docType', docType);
   // console.log('route', route);
 
   const showActionSheet = useActionSheet();
@@ -31,7 +31,7 @@ const DocumentListScreen = () => {
   const dispatch = useDispatch();
 
   const handleLoad = () => {
-    dispatch(documentActions.addDocuments(documentsMock));
+    dispatch(documentActions.addDocuments(documentsMock as unknown as IUserDocument[]));
   };
 
   const handleReset = () => {
