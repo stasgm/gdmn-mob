@@ -87,7 +87,24 @@ export interface IRouteLine extends IEntity {
   ordNumber: number; // порядковый номер
   comment?: string;
   visited: boolean;
-  result?: typeVisit;
+  /* result?: typeVisit; -это убрать в визиты */
 }
 
 export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
+
+export interface ICoords {
+  latitude: number;
+  longitude: number;
+}
+
+export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
+export interface IVisit extends IEntity {
+  routeLineId: number;
+  comment?: string;
+  dateBegin: string; //начало визита
+  dateEnd?: string; // конец визита
+  beginGeoPoint: ICoords; //место начало визита
+  endGeoPoint?: ICoords; // место завершения визита
+  result?: resutVisit;
+  takenType: typeTakeOrder; //тип визита - это поле забрать из заявки
+}

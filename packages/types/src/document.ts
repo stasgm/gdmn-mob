@@ -9,7 +9,7 @@ interface IDocument extends IEntity {
   status: StatusType;
 }
 
-interface IUserDocument<T, K extends IEntity[]> extends IDocument {
+interface IUserDocument<T = IDocument, K extends IEntity[] = IEntity[]> extends IDocument {
   head: T;
   lines: K;
 }

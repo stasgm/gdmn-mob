@@ -5,14 +5,17 @@ import { configureStore } from '@lib/store';
 
 import geoReducer from './geo/reducer';
 import docsReducer from './docs/reducer';
+import visitsReducer from './visits/reducer';
 
 import { DocActionType } from './docs/actions';
 import { GeoActionType } from './geo/actions';
+import { VisitActionType } from './visits/actions';
 
-type TActions = DocActionType | GeoActionType;
+type TActions = DocActionType | GeoActionType | VisitActionType;
 
 export const combinedReducer = {
   docs: docsReducer,
+  visits: visitsReducer,
   geo: geoReducer,
 };
 
