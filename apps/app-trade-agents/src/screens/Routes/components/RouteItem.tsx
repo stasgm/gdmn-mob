@@ -10,8 +10,12 @@ import { IReference } from '@lib/types';
 
 import { refSelectors } from '@lib/store';
 
-import { IOutlet, IRouteLine } from '../../../store/docs/types';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { IOutlet, IRouteLine, IVisit } from '../../../store/docs/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
+import { useSelector } from '../../../store';
+import { getDateString } from '../../../utils/helpers';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
 
@@ -29,6 +33,15 @@ const RouteItem = ({ item, routeId }: IItem) => {
   );
 
   const address = outlet ? outlet.address : '';
+
+  const iconsStatus = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
+  const visits = (useSelector((state) => state.visits)?.list as IVisit[]).filter(
+    (visit) => visit.routeLineId.toString() === item.id,
+  );
+  const lastVisit = visits
+    .filter((visit) => visit.dateEnd)
+    .sort((a, b) => (a.dateEnd === b.dateEnd || !a.dateEnd || !b.dateEnd ? 0 : a.dateEnd > b.dateEnd ? 1 : -1));
+  const status = visits.length === 0 ? 0 : visits.find((visit) => visit.dateEnd) ? 2 : 1;
 
   return (
     <TouchableOpacity
@@ -50,6 +63,12 @@ const RouteItem = ({ item, routeId }: IItem) => {
               <Text style={styles.field}>{item.result}</Text>
             </View>
           </View>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" />
+          <Text style={styles.field}>
+            {status === 2 && lastVisit[0].dateEnd && getDateString(lastVisit[0].dateEnd)}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>

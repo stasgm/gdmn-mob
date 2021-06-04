@@ -1,13 +1,12 @@
-import { SubTitle } from '@lib/mobile-ui/src/components';
-import { docSelectors } from '@lib/store';
-import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
-
 import * as Location from 'expo-location';
 
-import { globalStyles, globalStyles as styles } from '@lib/mobile-ui';
+import { docSelectors } from '@lib/store';
+
+import { SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 
 import { INamedEntity, IReference } from '@lib/types';
 
@@ -21,6 +20,18 @@ import { visitActions } from '../../store/visits/actions';
 import { ICoords } from '../../store/visits/types';
 
 import Visit from './components/Visit';
+
+const Info = ({ colorLabel, title, children }: { colorLabel: string; title: string; children: any }) => {
+  return (
+    <View style={[styles.flexDirectionRow, currStyles.box]}>
+      <View style={[currStyles.label, { backgroundColor: colorLabel }]} />
+      <View style={currStyles.info}>
+        <SubTitle style={[styles.title]}>{title}</SubTitle>
+        {children}
+      </View>
+    </View>
+  );
+};
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
@@ -77,7 +88,6 @@ const RouteDetailScreen = () => {
         id: `${id}${date}`,
         routeLineId: Number(id),
         dateBegin: date,
-        // beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
         beginGeoPoint: coords as unknown as ICoords,
         takenType: 'ONPLACE',
       }),
@@ -88,38 +98,29 @@ const RouteDetailScreen = () => {
 
   return (
     <View style={[styles.container, currStyles.content]}>
-      <View style={[styles.flexDirectionRow, currStyles.box]}>
-        <View style={currStyles.label} />
-        <View style={currStyles.info}>
-          <SubTitle style={[styles.title]}>{point.outlet.name}</SubTitle>
+      <Info colorLabel="#3914AF" title={point.outlet.name}>
+        <>
           {outlet && (
             <>
               <Text>{outlet.address}</Text>
               <Text>{outlet.phoneNumber}</Text>
             </>
           )}
-        </View>
-      </View>
-      <View style={[styles.flexDirectionRow, currStyles.box]}>
-        <View
-          style={[
-            currStyles.label,
-            // eslint-disable-next-line react-native/no-inline-styles
-            {
-              backgroundColor: debt.saldo > 0 ? '#F80012' : '#00C322',
-            },
-          ]}
-        />
-        <View style={currStyles.info}>
-          <SubTitle style={styles.title}>{`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}</SubTitle>
+        </>
+      </Info>
+      <Info
+        colorLabel={debt.saldo > 0 ? '#F80012' : '#00C322'}
+        title={`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}
+      >
+        <>
           {contact && (
             <>
               <Text>{`Условия оплаты: ${contact.paycond}`}</Text>
               <Text>{`Задолженность: ${debt.saldo}`}</Text>
             </>
           )}
-        </View>
-      </View>
+        </>
+      </Info>
       {process ? (
         <ActivityIndicator size="large" color="#3914AF" />
       ) : visits.length > 0 ? (
@@ -135,7 +136,7 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <Button onPress={handleNewVisit} mode="contained" style={[globalStyles.rectangularButton, currStyles.buttons]}>
+        <Button onPress={handleNewVisit} mode="contained" style={[styles.rectangularButton, currStyles.buttons]}>
           Начать визит
         </Button>
       )}
@@ -153,7 +154,8 @@ const currStyles = StyleSheet.create({
     marginBottom: 10,
   },
   buttons: {
-    width: '100%',
+    alignItems: 'center',
+    margin: 10,
   },
   content: {
     justifyContent: 'flex-start',
