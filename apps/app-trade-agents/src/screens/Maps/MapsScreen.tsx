@@ -1,0 +1,259 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
+import * as Location from 'expo-location';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+// import { createSelector } from 'reselect'
+
+import { globalStyles as styles } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
+
+import { useDispatch, useSelector } from '../../store';
+import { geoActions } from '../../store/geo/actions';
+
+// import { mockGeo } from '../../store/geo/mock';
+
+import { ILocation } from '../../store/geo/types';
+
+import { IOutlet, IRouteDocument } from '../../store/docs/types';
+
+import localStyles from './styles';
+import { routeMock } from '../../store/docs/mock';
+
+interface Region {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
+const useGoogleMaps = true;
+
+const DEFAULT_PADDING = { top: 40, right: 40, bottom: 40, left: 40 };
+const DEFAULT_LATITUDE = 53.9;
+const DEFAULT_LONGITUDE = 27.56667;
+
+const MapScreen = () => {
+  const dispatch = useDispatch();
+
+  const [region, setRegion] = useState<Region>();
+  const [loading, setLoading] = useState(false);
+
+  const outlets = refSelectors.selectByName('outlet')?.data as IOutlet[];
+  // const shopItemsSelector = useSelector((state) => state.references);
+
+  // const outletslSelector = createSelector(
+  //   shopItemsSelector, items =>  items.
+  // )
+
+  /*const routeList = (docSelectors.selectByDocType('route') as IRouteDocument[]); ?.sort(
+    (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
+  ); */
+
+  const routeList = routeMock?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const initLocations = useCallback(() => {
+    const getLocations = async () => {
+      const initialList: ILocation[] = routeList[0]?.lines.map((e) => {
+        const outlet = outlets.find((i) => i.id === e.outlet.id);
+        const res: ILocation = {
+          number: e.ordNumber,
+          id: `${e.id}${e.outlet.id}`,
+          name: e.outlet.name,
+          coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
+        };
+        return res;
+      });
+
+      return initialList;
+    };
+
+    console.log(outlets);
+
+    if (routeList && outlets) {
+      getLocations()
+        // .then((e) => console.log(e))
+        .then((e) => dispatch(geoActions.addMany(e)))
+        .catch((err) => console.log(err));
+    }
+  }, [dispatch, outlets, routeList]);
+
+  const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
+  const currentPoint = useSelector((state) => state.geo.currentPoint);
+
+  const setCurrentPoint = useCallback((point: ILocation) => dispatch(geoActions.setCurrentPoint(point)), [dispatch]);
+
+  const refMap = useRef<MapView>(null);
+
+  useEffect(() => {
+    initLocations();
+
+    setRegion({
+      latitude: DEFAULT_LATITUDE,
+      longitude: DEFAULT_LONGITUDE,
+      latitudeDelta: 0.3,
+      longitudeDelta: 0.3,
+    });
+  }, [dispatch, initLocations]);
+
+  const handleGetLocation = async () => {
+    const serviceEnabled = await Location.hasServicesEnabledAsync();
+
+    if (!serviceEnabled) {
+      /// Сервис у пользователя выключен
+      return;
+    }
+
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== 'granted') {
+      return;
+    }
+
+    setLoading(true);
+
+    dispatch(geoActions.deleteCurrent());
+    const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });
+    dispatch(geoActions.addCurrent({ coords: location.coords }));
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!loading && !list) {
+      return;
+    }
+
+    const currentPos = list.find((e) => e.id === 'current');
+
+    if (!currentPos) {
+      return;
+    }
+
+    setCurrentPoint(currentPos);
+    moveTo(currentPos.coords);
+  }, [loading, list, setCurrentPoint]);
+
+  const moveToRegion = (coords: LatLng[]) => {
+    refMap.current?.fitToCoordinates(coords, {
+      edgePadding: DEFAULT_PADDING,
+      animated: true,
+    });
+  };
+
+  useEffect(() => {
+    if (!currentPoint) {
+      return;
+    }
+
+    moveTo(currentPoint.coords);
+  }, [currentPoint]);
+
+  const moveTo = (coords: LatLng) => {
+    refMap.current?.animateCamera({ center: coords, zoom: 13 });
+  };
+
+  const handleFitToCoordinates = () => {
+    moveToRegion(list.map((p) => p.coords));
+  };
+
+  const moveNextPoint = () => {
+    const listLen = list.length;
+
+    if (listLen === 0) {
+      return;
+    }
+
+    let idx = list.findIndex((e) => e.id === currentPoint?.id);
+    idx = idx >= 0 ? idx : -1;
+    idx = idx >= listLen - 1 ? 0 : idx + 1;
+
+    setCurrentPoint(list[idx]);
+  };
+
+  const movePrevPoint = () => {
+    const listLen = list.length;
+
+    if (listLen === 0) {
+      return;
+    }
+
+    let idx = list.findIndex((e) => e.id === currentPoint?.id);
+
+    idx = idx >= 0 ? idx : 0;
+    idx = idx <= 0 ? listLen - 1 : idx - 1;
+
+    setCurrentPoint(list[idx]);
+  };
+
+  const handleClickMarker = (props: ILocation) => {
+    setCurrentPoint(props);
+  };
+
+  return (
+    <View style={localStyles.containerMap}>
+      <View>
+        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+      </View>
+      {loading && (
+        <View style={localStyles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
+      <MapView
+        ref={refMap}
+        initialRegion={region}
+        style={localStyles.mapView}
+        provider={useGoogleMaps ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
+        onCalloutPress={() => console.log('sss')}
+      >
+        {list.map((point) => (
+          <Marker
+            key={point.id}
+            coordinate={point.coords}
+            title={point.name}
+            description={point.id}
+            pinColor={point.id === 'current' ? 'blue' : 'red'}
+            onPress={() => handleClickMarker(point)}
+          >
+            <View
+              style={[
+                styles.icon,
+                { backgroundColor: point.number === 0 ? 'blue' : point.id === currentPoint?.id ? 'red' : 'green' },
+              ]}
+            >
+              <Text style={styles.lightField}>{point.number}</Text>
+            </View>
+          </Marker>
+        ))}
+        <Polyline coordinates={list.map((e) => e.coords)} />
+      </MapView>
+      <View>
+        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+      </View>
+      <View style={[localStyles.buttonContainer]}>
+        <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
+          <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={moveNextPoint} style={[localStyles.bubble, localStyles.button]}>
+          <MaterialCommunityIcons name="chevron-right" size={35} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleFitToCoordinates} style={[localStyles.bubble, localStyles.button]}>
+          <MaterialCommunityIcons name="routes" size={35} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleGetLocation}
+          disabled={loading}
+          style={[localStyles.bubble, localStyles.button]}
+        >
+          <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export default MapScreen;
