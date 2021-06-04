@@ -4,7 +4,7 @@ import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { FilterButtons, ItemSeparator, Status } from '@lib/mobile-ui/src/components';
 import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 
-import { AddButton, BackButton, DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+import { AddButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -49,15 +49,28 @@ const OrderListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
+    // const newOrder = {
+    //   id: '9',
+    //   number: '225',
+    //   documentDate: '2021.06.03',
+    //   documentType: orderType,
+    //   status: 'DRAFT',
+    //   head: {
+    //     contact: contact1,
+    //     outlet: outlet1,
+    //     ondate: '02.06.2021',
+    //   },
+    // };
+    // dispatch(documentActions.addDocument());
     navigation.navigate('OrderView');
   }, [navigation]);
 
   const handleLoad = useCallback(() => {
-    dispatch(documentActions.addDocuments(orderMock));
+    dispatch(documentActions.setDocuments(orderMock));
   }, [dispatch]);
 
   const handleDelete = useCallback(() => {
-    dispatch(documentActions.deleteAllDocuments());
+    dispatch(documentActions.deleteDocuments());
   }, [dispatch]);
 
   const actionsMenu = useCallback(() => {

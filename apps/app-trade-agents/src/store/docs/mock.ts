@@ -119,7 +119,7 @@ const contactRefMock: IReference = {
 const outletMock = [
   {
     id: '71',
-    name: 'м-н центральный',
+    name: 'Магазин центральный',
     externalId: '147012318',
     company: contact1,
     address: ' г. Орша , ул.Ленина, 63',
