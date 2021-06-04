@@ -1,13 +1,12 @@
-import { SubTitle } from '@lib/mobile-ui/src/components';
-import { docSelectors } from '@lib/store';
-import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
-
 import * as Location from 'expo-location';
 
-import { globalStyles, globalStyles as styles } from '@lib/mobile-ui';
+import { docSelectors } from '@lib/store';
+
+import { SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 
 import { INamedEntity, IReference } from '@lib/types';
 
@@ -89,7 +88,6 @@ const RouteDetailScreen = () => {
         id: `${id}${date}`,
         routeLineId: Number(id),
         dateBegin: date,
-        // beginGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
         beginGeoPoint: (coords as unknown) as ICoords,
         takenType: 'ONPLACE',
       }),
@@ -137,7 +135,7 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <Button onPress={handleNewVisit} mode="contained" style={[globalStyles.rectangularButton, currStyles.buttons]}>
+        <Button onPress={handleNewVisit} mode="contained" style={[styles.rectangularButton, currStyles.buttons]}>
           Начать визит
         </Button>
       )}
