@@ -22,6 +22,18 @@ import { ICoords, IVisit } from '../../store/visits/types';
 
 import Visit from './components/Visit';
 
+const Info = ({ colorLabel, title, children }: { colorLabel: string; title: string; children: any }) => {
+  return (
+    <View style={[styles.flexDirectionRow, currStyles.box]}>
+      <View style={[currStyles.label, { backgroundColor: colorLabel }]} />
+      <View style={currStyles.info}>
+        <SubTitle style={[styles.title]}>{title}</SubTitle>
+        {children}
+      </View>
+    </View>
+  );
+};
+
 const RouteDetailScreen = () => {
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === id);
@@ -32,7 +44,7 @@ const RouteDetailScreen = () => {
 
   const [process, setProcess] = useState(false);
 
-  const point = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])
+  const point = ((docSelectors.selectByDocType('route') as unknown) as IRouteDocument[])
     ?.find((e) => e.id === routeId)
     ?.lines.find((i) => i.id === id);
 
@@ -48,9 +60,9 @@ const RouteDetailScreen = () => {
   /*const outlet = point
     ? (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find((e) => e.id === point.outlet.id)
     : undefined;*/
-  const outlet = (outletRefMock as unknown as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
+  const outlet = ((outletRefMock as unknown) as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
   const contact = outlet
-    ? (contactRefMock as unknown as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
+    ? ((contactRefMock as unknown) as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
     : undefined;
   const debt: IDebt = {
     id: '1',
@@ -91,38 +103,28 @@ const RouteDetailScreen = () => {
 
   return (
     <View style={[styles.container, currStyles.content]}>
-      <View style={[styles.flexDirectionRow, currStyles.box]}>
-        <View style={currStyles.label} />
-        <View style={currStyles.info}>
-          <SubTitle style={[styles.title]}>{point.outlet.name}</SubTitle>
+      <Info colorLabel="#3914AF" title={point.outlet.name}>
+        <>
           {outlet && (
             <>
               <Text>{outlet.address}</Text>
               <Text>{outlet.phoneNumber}</Text>
             </>
           )}
-        </View>
-      </View>
-      <View style={[styles.flexDirectionRow, currStyles.box]}>
-        <View
-          style={[
-            currStyles.label,
-            // eslint-disable-next-line react-native/no-inline-styles
-            {
-              backgroundColor: debt.saldo > 0 ? '#F80012' : '#00C322',
-            },
-          ]}
-        />
-        <View style={currStyles.info}>
-          <SubTitle style={styles.title}>{`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}</SubTitle>
+        </>
+      </Info>
+      <Info
+        colorLabel={debt.saldo > 0 ? '#F80012' : '#00C322'}
+        title={`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}>
+        <>
           {contact && (
             <>
               <Text>{`Условия оплаты: ${contact.paycond}`}</Text>
               <Text>{`Задолженность: ${debt.saldo}`}</Text>
             </>
           )}
-        </View>
-      </View>
+        </>
+      </Info>
       {process ? (
         <ActivityIndicator size="large" color="#3914AF" />
       ) : visits.length > 0 ? (
