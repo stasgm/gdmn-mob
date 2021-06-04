@@ -4,7 +4,14 @@ import { View, FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { globalStyles as styles, ItemSeparator, SubTitle, useActionSheet, MenuButton } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  ItemSeparator,
+  SubTitle,
+  useActionSheet,
+  MenuButton,
+  BackButton,
+} from '@lib/mobile-ui';
 import { useDispatch, documentActions, docSelectors } from '@lib/store';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
@@ -42,7 +49,7 @@ const RouteViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      // headerLeft: () => <DrawerButton />,
+      headerLeft: () => <BackButton />,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [actionsMenu, navigation]);

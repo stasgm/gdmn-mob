@@ -20,11 +20,11 @@ const reducer: Reducer<IVisitState, VisitActionType> = (state = initialState, ac
 
     case getType(visitActions.edit): {
       const oldVisit = state.list.find((visit) => visit.id === action.payload.id);
-      console.log('oldVisit', oldVisit);
+      // console.log('oldVisit', oldVisit);
       const newList = !oldVisit
         ? state.list
         : [...state.list.filter((visit) => visit.id !== action.payload.id), { ...oldVisit, ...action.payload }];
-      console.log('newList', newList);
+      // console.log('newList', newList);
       return { ...state, list: newList };
     }
 

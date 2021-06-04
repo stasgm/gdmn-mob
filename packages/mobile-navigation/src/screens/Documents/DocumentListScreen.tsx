@@ -23,7 +23,7 @@ const DocumentListScreen = () => {
   const docType = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().params?.type;
   // const route = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().name;
 
-  console.log('docType', docType);
+  // console.log('docType', docType);
   // console.log('route', route);
 
   const showActionSheet = useActionSheet();

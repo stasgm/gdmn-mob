@@ -3,20 +3,14 @@ import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-// import { createSelector } from 'reselect'
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
-
-// import { mockGeo } from '../../store/geo/mock';
-
 import { ILocation } from '../../store/geo/types';
-
-import { IOutlet, IRouteDocument } from '../../store/docs/types';
-
+import { IOutlet } from '../../store/docs/types';
 import { routeMock } from '../../store/docs/mock';
 
 import localStyles from './styles';
@@ -41,11 +35,6 @@ const MapScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const outlets = refSelectors.selectByName('outlet')?.data as IOutlet[];
-  // const shopItemsSelector = useSelector((state) => state.references);
-
-  // const outletslSelector = createSelector(
-  //   shopItemsSelector, items =>  items.
-  // )
 
   /*const routeList = (docSelectors.selectByDocType('route') as IRouteDocument[]); ?.sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),

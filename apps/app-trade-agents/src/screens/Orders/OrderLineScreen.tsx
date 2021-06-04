@@ -51,10 +51,9 @@ const OrderLineScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      // headerLeft: () => <BackButton />,
+      headerLeft: () => <BackButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          {/* <MenuButton actionsMenu={actionsMenu} /> */}
           <SaveButton onPress={handleSave} />
         </View>
       ),
