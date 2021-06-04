@@ -37,7 +37,7 @@ const Visit = ({
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
   const [process, setProcess] = useState(false);
 
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+  const order = ((docSelectors.selectByDocType('order') as unknown) as IOrderDocument[])?.find(
     (item) => item.head.road?.id === road.id && item.head.outlet.id === outlet.id,
   );
 
@@ -127,11 +127,10 @@ const Visit = ({
                       params: { id: order.id },
                     })
                     : handleNewOrder();
-                }}
-              >
+                }}>
                 {
                   //TODO: узнать есть ли заявка, если есть вывести количество строк
-                  `Заявка${order && ` (${order.lines.length})`}`
+                  `Заявка${order ? ` (${order.lines.length})` : ''}`
                 }
               </Button>
               <Button
@@ -139,15 +138,13 @@ const Visit = ({
                 style={[globalStyles.rectangularButton, localStyles.buttons]}
                 onPress={() => {
                   //TODO: ссылка на документ
-                }}
-              >
+                }}>
                 Возврат
               </Button>
               <Button
                 onPress={handleCloseVisit}
                 mode="contained"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
-              >
+                style={[globalStyles.rectangularButton, localStyles.buttons]}>
                 Завершить визит
               </Button>
             </>
