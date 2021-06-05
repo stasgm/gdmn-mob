@@ -1,21 +1,17 @@
 import { IEntity } from '@lib/types';
 
+import { ICoords } from '../geo/types';
+
 export type IVisitState = {
   readonly list: IVisit[];
   readonly loading: boolean;
   readonly errorMessage: string;
 };
 
-export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
+export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 
-export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
+export type VisitResultType = 'ALL_COMPLETED' | 'NOT_COMPLETED' | 'PARTLY_COMPLETED';
 
-export interface ICoords {
-  latitude: number;
-  longitude: number;
-}
-
-export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
 export interface IVisit extends IEntity {
   routeLineId: number;
   comment?: string;
@@ -23,6 +19,6 @@ export interface IVisit extends IEntity {
   dateEnd?: string; // конец визита
   beginGeoPoint: ICoords; //место начало визита
   endGeoPoint?: ICoords; // место завершения визита
-  result?: resutVisit;
-  takenType: typeTakeOrder; //тип визита - это поле забрать из заявки
+  result?: VisitResultType;
+  takenType: TakeOrderType; //тип визита - это поле забрать из заявки
 }

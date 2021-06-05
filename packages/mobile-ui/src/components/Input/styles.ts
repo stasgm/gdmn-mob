@@ -8,11 +8,12 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    width: '85%',
+    flex: 1,
+    marginHorizontal: 10,
   },
   containerInput: {
     flexDirection: 'row',
-    paddingBottom: 22,
+    paddingBottom: 20,
   },
 });
 

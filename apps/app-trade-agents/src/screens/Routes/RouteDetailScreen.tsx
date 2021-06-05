@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { RouteProp, useRoute } from '@react-navigation/native';
 import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import * as Location from 'expo-location';
 
 import { docSelectors } from '@lib/store';
-
-import { SubTitle, globalStyles as styles } from '@lib/mobile-ui';
-
 import { INamedEntity, IReference } from '@lib/types';
+import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument } from '../../store/docs/types';
@@ -17,21 +15,10 @@ import { contactRefMock, outletRefMock } from '../../store/docs/mock';
 import { useDispatch, useSelector } from '../../store';
 
 import { visitActions } from '../../store/visits/actions';
-import { ICoords } from '../../store/visits/types';
+
+import { ICoords } from '../../store/geo/types';
 
 import Visit from './components/Visit';
-
-const Info = ({ colorLabel, title, children }: { colorLabel: string; title: string; children: any }) => {
-  return (
-    <View style={[styles.flexDirectionRow, currStyles.box]}>
-      <View style={[currStyles.label, { backgroundColor: colorLabel }]} />
-      <View style={currStyles.info}>
-        <SubTitle style={[styles.title]}>{title}</SubTitle>
-        {children}
-      </View>
-    </View>
-  );
-};
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
@@ -80,7 +67,10 @@ const RouteDetailScreen = () => {
       return;
     }
 
-    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Lowest });
+    const coords = (await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Lowest,
+    })) as unknown as ICoords;
+
     const date = new Date().toISOString();
 
     dispatch(
@@ -88,8 +78,8 @@ const RouteDetailScreen = () => {
         id: `${id}${date}`,
         routeLineId: Number(id),
         dateBegin: date,
-        beginGeoPoint: coords as unknown as ICoords,
-        takenType: 'ONPLACE',
+        beginGeoPoint: coords,
+        takenType: 'ON_PLACE',
       }),
     );
 
@@ -98,7 +88,7 @@ const RouteDetailScreen = () => {
 
   return (
     <View style={[styles.container, currStyles.content]}>
-      <Info colorLabel="#3914AF" title={point.outlet.name}>
+      <InfoBlock colorLabel="#3914AF" title={point.outlet.name}>
         <>
           {outlet && (
             <>
@@ -107,8 +97,8 @@ const RouteDetailScreen = () => {
             </>
           )}
         </>
-      </Info>
-      <Info
+      </InfoBlock>
+      <InfoBlock
         colorLabel={debt.saldo > 0 ? '#F80012' : '#00C322'}
         title={`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}
       >
@@ -120,7 +110,7 @@ const RouteDetailScreen = () => {
             </>
           )}
         </>
-      </Info>
+      </InfoBlock>
       {process ? (
         <ActivityIndicator size="large" color="#3914AF" />
       ) : visits.length > 0 ? (
@@ -136,9 +126,9 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <Button onPress={handleNewVisit} mode="contained" style={[styles.rectangularButton, currStyles.buttons]}>
+        <PrimeButton icon="play-box-outline" onPress={handleNewVisit}>
           Начать визит
-        </Button>
+        </PrimeButton>
       )}
     </View>
   );
@@ -147,27 +137,7 @@ const RouteDetailScreen = () => {
 export default RouteDetailScreen;
 
 const currStyles = StyleSheet.create({
-  box: {
-    borderColor: '#8888',
-    borderRadius: 10,
-    borderWidth: 0.5,
-    marginBottom: 10,
-  },
-  buttons: {
-    alignItems: 'center',
-    margin: 10,
-  },
   content: {
     justifyContent: 'flex-start',
-  },
-  info: {
-    margin: 5,
-    marginLeft: 15,
-  },
-  label: {
-    width: 10,
-    backgroundColor: '#3914AF',
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
   },
 });

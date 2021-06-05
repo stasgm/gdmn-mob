@@ -1,5 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 // import { useDispatch } from 'react-redux';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
@@ -64,13 +64,6 @@ const AuthNavigator: React.FC = () => {
     () => <CompaniesScreen onLogout={logout} onSetCompany={setCompany} />,
     [logout, setCompany],
   );
-
-  useEffect(() => {
-    console.log('mount nav');
-    return () => {
-      console.log('unmount nav');
-    };
-  }, []);
 
   /*
     Если device undefined то переходим на окно с подключеним

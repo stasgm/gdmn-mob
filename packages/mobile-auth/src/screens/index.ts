@@ -1,7 +1,7 @@
-import { ConfigScreen } from './ConfigScreen';
+import { default as ConfigScreen } from './ConfigScreen';
 import { ActivationScreen } from './ActivationScreen';
-import { SignInScreen } from './SignInScreen';
-import { SplashScreen } from './SplashScreen';
+import { default as SignInScreen } from './SignInScreen';
+import { default as SplashScreen } from './SplashScreen';
 import { CompaniesScreen } from './CompaniesScreen';
 
 export { ActivationScreen, SplashScreen, CompaniesScreen, ConfigScreen, SignInScreen };

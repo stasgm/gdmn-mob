@@ -1,38 +1,20 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
-
-//import * as Location from 'expo-location';
-
-import { globalStyles, SubTitle, globalStyles as styles, BackButton } from '@lib/mobile-ui';
-
-//import { documentActions } from '@lib/store';
-
-import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
+import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
+
+import { globalStyles, globalStyles as styles, BackButton, InfoBlock } from '@lib/mobile-ui';
+import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
 
 import { docSelectors, documentActions } from '@lib/store';
 
 import { useDispatch } from '../../../store';
 
-import { IVisit, ICoords } from '../../../store/visits/types';
+import { IVisit } from '../../../store/visits/types';
 import { visitActions } from '../../../store/visits/actions';
-//import { IOrderDocument } from '../../../store/docs/types';
 import { IOrderDocument } from '../../../store/docs/types';
-
-//import { StackNavigationProp } from '@react-navigation/stack';
-
-const Info = ({ colorLabel, title, children }: { colorLabel: string; title: string; children: any }) => {
-  return (
-    <View style={[styles.flexDirectionRow, localStyles.box]}>
-      <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
-      <View style={localStyles.info}>
-        <SubTitle style={[styles.title]}>{title}</SubTitle>
-        {children}
-      </View>
-    </View>
-  );
-};
+import { ICoords } from '../../../store/geo/types';
 
 const Visit = ({
   item,
@@ -45,19 +27,20 @@ const Visit = ({
   contact: INamedEntity;
   road: INamedEntity;
 }) => {
-  const dateBegin = new Date(item.dateBegin);
-  const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
-  const [process, setProcess] = useState(false);
-
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
-    (item) => item.head.road?.id === road.id && item.head.outlet.id === outlet.id,
-  );
-
   const navigation = useNavigation();
-
   const dispatch = useDispatch();
 
+  const [process, setProcess] = useState(false);
+
+  const dateBegin = new Date(item.dateBegin);
+  const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
+
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+    (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
+  );
+
   const timeProcess = () => {
+    // TODO Вынести в helpers
     const diffMinutes = Math.floor(
       ((item.dateEnd ? Date.parse(item.dateEnd) : Date.now()) - Date.parse(item.dateBegin)) / 60000,
     );
@@ -65,25 +48,33 @@ const Visit = ({
     return `${hour} часов ${diffMinutes - hour * 60} минут`;
   };
 
+  const twoDigits = (value: number) => {
+    // TODO Вынести в helpers
+    return value >= 10 ? value : `0${value}`;
+  };
+
   const handleCloseVisit = async () => {
+    // TODO Вынести в async actions
     setProcess(true);
 
-    /*const { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
       setProcess(false);
       return;
     }
 
-    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });*/
+    const coords = (await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Lowest,
+    })) as unknown as ICoords;
+
     const date = new Date().toISOString();
 
     dispatch(
       visitActions.edit({
         id: item.id,
         dateEnd: date,
-        endGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
-        //endGeoPoint: coords as unknown as ICoords,
+        endGeoPoint: coords,
       }),
     );
 
@@ -115,7 +106,9 @@ const Visit = ({
       },
       lines: [],
     };
+
     dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+
     navigation.navigate('Orders', {
       screen: 'OrderView',
       params: { id: newOrder.id },
@@ -123,13 +116,9 @@ const Visit = ({
     });
   };
 
-  const twoDigits = (value: number) => {
-    return value >= 10 ? value : `0${value}`;
-  };
-
   return (
-    <View>
-      <Info colorLabel="#3914AF" title="Визит">
+    <View style={styles.container}>
+      <InfoBlock colorLabel="#3914AF" title="Визит">
         <>
           <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
             !dateEnd ? 'тся' : 'лся'
@@ -164,7 +153,7 @@ const Visit = ({
             </View>
           )}
         </>
-      </Info>
+      </InfoBlock>
       {process ? (
         <ActivityIndicator size="large" color="#3914AF" />
       ) : (
@@ -197,21 +186,5 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginHorizontal: 10,
-  },
-  box: {
-    borderColor: '#8888',
-    borderRadius: 10,
-    borderWidth: 0.5,
-    marginBottom: 10,
-  },
-  info: {
-    margin: 5,
-    marginLeft: 15,
-  },
-  label: {
-    width: 10,
-    backgroundColor: '#3914AF',
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
   },
 });

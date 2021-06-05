@@ -1,9 +1,9 @@
 import React from 'react';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import styles from '@lib/mobile-ui/src/styles/global';
+import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IRouteDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';

@@ -1,14 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import { TextInput, useTheme } from 'react-native-paper';
 
-import colors from '../../styles/colors';
+// import colors from '../../styles/colors';
 
 import styles from './styles';
 
 interface Props {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  onChangeText?: (((text: string) => void) & Function) | undefined;
+  onChangeText?: ((text: string) => void) | undefined;
   value?: string;
   label?: string;
   secureText?: boolean;
@@ -43,6 +42,8 @@ const Input: React.FC<Props> = ({
   autoCorrect,
   keyboardType,
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       <View style={styles.containerInput}>
@@ -52,10 +53,10 @@ const Input: React.FC<Props> = ({
           onChangeText={onChangeText}
           theme={{
             colors: {
-              primary: colors.light,
+              primary: colors.primary,
               text: colors.text,
-              placeholder: colors.light,
-              background: colors.primary,
+              placeholder: colors.primary,
+              background: colors.surface,
             },
           }}
           mode="outlined"

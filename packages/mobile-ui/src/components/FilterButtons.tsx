@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import styles from '@lib/mobile-ui/src/styles/global';
+import styles from '../styles/global';
 
 interface StatusTypes {
   name: string;

@@ -36,7 +36,7 @@ const VisitItem = ({ item }: { item: IVisit }) => {
 
   return (
     <View style={localStyles.container}>
-      <View style={[localStyles.info, localStyles.directionRow]}>
+      <View style={[localStyles.InfoBlock, localStyles.directionRow]}>
         <View style={localStyles.directionRow}>
           <Text style={localStyles.text}>
             {dateBegin.getHours()}:{dateBegin.getMinutes()}
@@ -67,7 +67,7 @@ const localStyles = StyleSheet.create({
   directionRow: {
     flexDirection: 'row',
   },
-  info: {
+  InfoBlock: {
     flex: 1,
     justifyContent: 'space-between',
   },

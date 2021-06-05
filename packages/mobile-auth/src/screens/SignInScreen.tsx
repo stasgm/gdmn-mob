@@ -1,13 +1,23 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import {
+  View,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Keyboard,
+  TouchableWithoutFeedback,
+  SafeAreaView,
+  Platform,
+} from 'react-native';
 import { Text, TextInput, IconButton, Button, useTheme } from 'react-native-paper';
 
 import { IUserCredentials } from '@lib/types';
 
 // import { useAuth } from '../context/auth';
-import { globalStyles } from '@lib/mobile-ui';
-import { SubTitle } from '@lib/mobile-ui/src/components';
+import { globalStyles as styles } from '@lib/mobile-ui';
+import { Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui/src/components';
 import { useSelector } from '@lib/store';
+
+import localStyles from './styles';
 
 /*
   Порядок работы:
@@ -27,7 +37,7 @@ type Props = {
 
 const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
-  const { colors } = useTheme(); // TODO Вынести в ui
+  // const { colors } = useTheme(); // TODO Вынести в ui
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
@@ -45,44 +55,42 @@ const SignInScreen = (props: Props) => {
     password: '@123!',
   });
 
-  // console.log('signIn');
-
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-
-    // console.log('mount signin');
-    return () => {
-      // console.log('unmount signin');
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
   const handleLogIn = () => {
     Keyboard.dismiss();
     onSignIn(credential);
   };
 
   return (
-    <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView
-          style={[globalStyles.container, styles.container, isKeyboardVisible && styles.contentWidthKbd]}
-        >
-          <View>
-            <SubTitle>Вход пользователя</SubTitle>
-            <TextInput
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={[styles.container, localStyles.container]}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={localStyles.inner}>
+            <View style={styles.subHeader}>
+              <SubTitle>Вход пользователя</SubTitle>
+            </View>
+            <Input
+              label="Имя пользователя"
+              value={credential.name}
+              autoCorrect={false}
+              onChangeText={(e) => setCredentials({ ...credential, name: e })}
+            />
+            <Input
+              label="Пароль"
+              secureText
+              value={credential.password}
+              onChangeText={(e) => setCredentials({ ...credential, password: e })}
+            />
+            {/*   <TextInput
               returnKeyType="done"
               autoCorrect={false}
               underlineColorAndroid="transparent"
               placeholder="Имя пользователя"
               value={credential.name}
               onChangeText={(val) => setCredentials({ ...credential, name: val })}
-              style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
+              style={[loca.input, { backgroundColor: colors.surface, color: colors.text }]}
             />
             <TextInput
               returnKeyType="done"
@@ -92,42 +100,36 @@ const SignInScreen = (props: Props) => {
               secureTextEntry
               value={credential.password}
               onChangeText={(val) => setCredentials({ ...credential, password: val })}
-              style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
-            />
-            <Button
+              style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+            /> */}
+            {/*             <Button
               mode="contained"
               disabled={request.isLoading}
               icon="login"
               loading={request.isLoading}
               onPress={handleLogIn}
-              style={globalStyles.rectangularButton}
+              style={styles.rectangularButton}
             >
               Войти
-            </Button>
+            </Button> */}
+            <PrimeButton disabled={request.isLoading} icon="login" onPress={handleLogIn}>
+              Войти
+            </PrimeButton>
+            {request.isError && (
+              <View style={localStyles.statusBox}>
+                {<Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
+              </View>
+            )}
           </View>
-          <View style={styles.statusBox}>
-            {request.isError && <Text style={styles.errorText}>Ошибка: {request.status}</Text>}
-            {/* {request.isLoading && <ActivityIndicator size="large" color="#70667D" />} */}
-          </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-      <View style={globalStyles.bottomButtons}>
-        <IconButton
-          icon="server"
-          size={30}
-          onPress={onDisconnect}
-          style={{
-            ...globalStyles.circularButton,
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
-          }}
-          color={colors.background}
-        />
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+      <View style={styles.buttons}>
+        <RoundButton icon="server" onPress={onDisconnect} />
       </View>
-    </>
+    </SafeAreaView>
   );
 };
-
+/*
 const styles = StyleSheet.create({
   container: {
     // alignItems: 'center',
@@ -146,6 +148,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'center',
   },
-});
+}); */
 
-export { SignInScreen };
+export default SignInScreen;
