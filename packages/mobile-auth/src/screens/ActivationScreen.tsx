@@ -1,11 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform, SafeAreaView } from 'react-native';
-import { Text, ActivityIndicator } from 'react-native-paper';
 
 import { globalStyles as styles, Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
-
-import localStyles from './styles';
 
 type Props = {
   onDisconnect: () => void;
@@ -18,15 +15,6 @@ const ActivationScreen = (props: Props) => {
   const { error, loading, status } = useSelector((state) => state.auth);
   const [activationCode, setActivationCode] = useState('');
 
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
-
   const handleActivate = () => {
     Keyboard.dismiss();
     onActivate(activationCode);
@@ -37,7 +25,9 @@ const ActivationScreen = (props: Props) => {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            <SubTitle>Активация устройства</SubTitle>
+            <SubTitle loadIcon={loading} errorText={error ? status : ''}>
+              Активация устройства
+            </SubTitle>
             <Input
               label="Введите код"
               value={activationCode}
@@ -46,13 +36,9 @@ const ActivationScreen = (props: Props) => {
               returnKeyType="done"
               onChangeText={setActivationCode}
             />
-            <PrimeButton icon="login" onPress={handleActivate} disabled={request.isLoading || !activationCode}>
+            <PrimeButton icon="login" onPress={handleActivate} disabled={loading || !activationCode}>
               Отправить
             </PrimeButton>
-            <View style={localStyles.statusBox}>
-              {request.isLoading && <ActivityIndicator size="small" color="#70667D" />}
-              {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
-            </View>
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

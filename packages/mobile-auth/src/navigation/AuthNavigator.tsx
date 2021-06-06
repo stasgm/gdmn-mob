@@ -1,6 +1,5 @@
-import { createStackNavigator } from '@react-navigation/stack';
 import React, { useCallback } from 'react';
-// import { useDispatch } from 'react-redux';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
@@ -66,6 +65,7 @@ const AuthNavigator: React.FC = () => {
     Если device не null и user undefined то переходим на окно входа пользователя
     Если device не null и user не undefined или null то переходим на окно выбора компании
   */
+
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {device ? (
