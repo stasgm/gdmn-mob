@@ -32,21 +32,23 @@ const SplashScreen = (props: Props) => {
 
   return (
     <>
-      <View style={[styles.container, localStyles.container]}>
+      <View style={[styles.container]}>
         <SubTitle>Подключение к серверу</SubTitle>
-        <Text style={localStyles.serverName}>
-          {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
-        </Text>
-        <View style={localStyles.statusBox}>
-          {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
-          {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+        <View style={localStyles.container}>
+          <Text style={localStyles.serverName}>
+            {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
+          </Text>
+          <View style={localStyles.statusBox}>
+            {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
+            {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+          </View>
+          <PrimeButton
+            icon={!request.isLoading ? 'apps' : 'block-helper'}
+            onPress={!request.isLoading ? onCheckDevice : onBreakConnection}
+          >
+            {!request.isLoading ? 'Подключиться' : 'Прервать'}
+          </PrimeButton>
         </View>
-        <PrimeButton
-          icon={!request.isLoading ? 'apps' : 'block-helper'}
-          onPress={!request.isLoading ? onCheckDevice : onBreakConnection}
-        >
-          {!request.isLoading ? 'Подключиться' : 'Прервать'}
-        </PrimeButton>
       </View>
       <View style={styles.buttons}>
         <RoundButton icon="server" onPress={() => navigation.navigate('Config')} />

@@ -2,20 +2,17 @@ import React, { useState, useMemo } from 'react';
 import {
   View,
   KeyboardAvoidingView,
-  StyleSheet,
   Keyboard,
   TouchableWithoutFeedback,
   SafeAreaView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
-import { Text, TextInput, IconButton, Button, useTheme } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 import { IUserCredentials } from '@lib/types';
-
-// import { useAuth } from '../context/auth';
-import { globalStyles as styles } from '@lib/mobile-ui';
-import { Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui/src/components';
 import { useSelector } from '@lib/store';
+import { globalStyles as styles, Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
 
 import localStyles from './styles';
 
@@ -30,14 +27,12 @@ import localStyles from './styles';
 */
 
 type Props = {
-  // request: IDataFetch;
   onDisconnect: () => void;
   onSignIn: (credentials: IUserCredentials) => void;
 };
 
 const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
-  // const { colors } = useTheme(); // TODO Вынести в ui
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
@@ -62,15 +57,10 @@ const SignInScreen = (props: Props) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={[styles.container, localStyles.container]}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={localStyles.inner}>
-            <View style={styles.subHeader}>
-              <SubTitle>Вход пользователя</SubTitle>
-            </View>
+          <View>
+            <SubTitle>Вход пользователя</SubTitle>
             <Input
               label="Имя пользователя"
               value={credential.name}
@@ -83,43 +73,17 @@ const SignInScreen = (props: Props) => {
               value={credential.password}
               onChangeText={(e) => setCredentials({ ...credential, password: e })}
             />
-            {/*   <TextInput
-              returnKeyType="done"
-              autoCorrect={false}
-              underlineColorAndroid="transparent"
-              placeholder="Имя пользователя"
-              value={credential.name}
-              onChangeText={(val) => setCredentials({ ...credential, name: val })}
-              style={[loca.input, { backgroundColor: colors.surface, color: colors.text }]}
-            />
-            <TextInput
-              returnKeyType="done"
-              autoCorrect={false}
-              underlineColorAndroid="transparent"
-              placeholder="Пароль"
-              secureTextEntry
-              value={credential.password}
-              onChangeText={(val) => setCredentials({ ...credential, password: val })}
-              style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-            /> */}
-            {/*             <Button
-              mode="contained"
-              disabled={request.isLoading}
+            <PrimeButton
+              disabled={request.isLoading || !credential.name || !credential.password}
               icon="login"
-              loading={request.isLoading}
               onPress={handleLogIn}
-              style={styles.rectangularButton}
             >
               Войти
-            </Button> */}
-            <PrimeButton disabled={request.isLoading} icon="login" onPress={handleLogIn}>
-              Войти
             </PrimeButton>
-            {request.isError && (
-              <View style={localStyles.statusBox}>
-                {<Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
-              </View>
-            )}
+            <View style={localStyles.statusBox}>
+              {request.isLoading && <ActivityIndicator size="small" color="#70667D" />}
+              {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
+            </View>
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

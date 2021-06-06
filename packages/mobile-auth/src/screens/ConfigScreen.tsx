@@ -40,27 +40,27 @@ const ConfigScreen = (props: Props) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={[styles.container, localStyles.container]}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={localStyles.inner}>
-            <View style={styles.subHeader}>
-              <SubTitle>Настройка подключения</SubTitle>
-            </View>
+          <>
+            <SubTitle>Настройка подключения</SubTitle>
             <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
             <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
             <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
             <View style={localStyles.buttonsView}>
-              <PrimeButton icon="check" onPress={handleSaveSettings} style={localStyles.button}>
+              <PrimeButton
+                icon="check"
+                onPress={handleSaveSettings}
+                style={localStyles.button}
+                disabled={!serverName || !serverPort || !timeout}
+              >
                 Принять
               </PrimeButton>
               <PrimeButton icon="cancel" onPress={navigation.goBack} style={localStyles.button}>
                 Отмена
               </PrimeButton>
             </View>
-          </View>
+          </>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

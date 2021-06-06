@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { ReturnKeyTypeOptions, View } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
 // import colors from '../../styles/colors';
@@ -11,6 +11,7 @@ interface Props {
   value?: string;
   label?: string;
   secureText?: boolean;
+  returnKeyType?: ReturnKeyTypeOptions;
   spellCheck?: boolean;
   maxLength?: number;
   maks?: string | undefined;
@@ -41,6 +42,7 @@ const Input: React.FC<Props> = ({
   maxLength,
   autoCorrect,
   keyboardType,
+  returnKeyType,
 }) => {
   const { colors } = useTheme();
 
@@ -60,6 +62,7 @@ const Input: React.FC<Props> = ({
             },
           }}
           mode="outlined"
+          returnKeyType={returnKeyType}
           keyboardType={keyboardType}
           autoCorrect={autoCorrect}
           style={styles.input}

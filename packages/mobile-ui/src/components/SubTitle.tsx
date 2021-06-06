@@ -1,28 +1,35 @@
 import React from 'react';
 import { Text, View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 
+import styles from '../styles/global';
+
+import { ItemSeparator } from './ItemSeparator';
+
 interface IProps {
   children?: string;
+  line?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-const SubTitle = ({ children, style }: IProps) => {
+const SubTitle = ({ children, style, line = true }: IProps) => {
   return (
-    <View style={[localStyles.titleContainer, style]}>
-      <Text style={localStyles.titleText}>{children?.toUpperCase()}</Text>
+    <View style={[localStyles.container, styles.subHeader, style]}>
+      <Text style={localStyles.text}>{children?.toUpperCase()}</Text>
+      {line && <ItemSeparator />}
     </View>
   );
 };
 
 const localStyles = StyleSheet.create({
-  titleContainer: {
-    marginTop: 0,
+  container: {
+    marginVertical: 5,
   },
-  titleText: {
+  text: {
     color: '#333536',
     fontSize: 16,
     fontWeight: '500',
     textAlign: 'center',
+    marginBottom: 5,
   },
 });
 

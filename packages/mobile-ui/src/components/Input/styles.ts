@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   },
   containerInput: {
     flexDirection: 'row',
-    paddingBottom: 20,
+    paddingBottom: 15,
   },
 });
 

@@ -29,15 +29,10 @@ const AuthNavigator: React.FC = () => {
   );
 
   const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
-
   const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
-
   const disconnect = useCallback(() => dispatch(authActions.disconnect()), [dispatch]);
-
   const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
-
   const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);
-
   const setCompany = useCallback((company: ICompany) => dispatch(authActions.setCompany(company)), [dispatch]);
 
   const CongfigWithParams = useCallback(
@@ -89,7 +84,7 @@ const AuthNavigator: React.FC = () => {
         )
       ) : device === undefined ? (
         <>
-          <AuthStack.Screen name="Splash" component={SplashWithParams} />
+          <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />
         </>
       ) : (

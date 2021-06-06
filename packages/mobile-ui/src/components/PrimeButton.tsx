@@ -22,7 +22,7 @@ const PrimeButton = ({ onPress, style, children, icon, disabled }: IProps) => {
       activeOpacity={0.7}
       onPress={onPress}
       disabled={disabled}
-      style={[styles.rectangularButton, { backgroundColor: colors.primary }, style]}
+      style={[styles.rectangularButton, { backgroundColor: disabled ? colors.disabled : colors.primary }, style]}
     >
       <View style={localStyles.buttons}>
         {icon && <Icon name={icon} size={16} color={colors.background} />}

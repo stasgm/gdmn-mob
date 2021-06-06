@@ -30,6 +30,11 @@ const localStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  scroll: {
+    width: '100%',
+    marginVertical: 10,
+    maxHeight: 200,
+  },
 });
 
 export default localStyles;
