@@ -1,6 +1,5 @@
+import React, { useCallback } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useCallback, useEffect } from 'react';
-// import { useDispatch } from 'react-redux';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
@@ -29,15 +28,10 @@ const AuthNavigator: React.FC = () => {
   );
 
   const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
-
   const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
-
   const disconnect = useCallback(() => dispatch(authActions.disconnect()), [dispatch]);
-
   const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
-
   const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);
-
   const setCompany = useCallback((company: ICompany) => dispatch(authActions.setCompany(company)), [dispatch]);
 
   const CongfigWithParams = useCallback(
@@ -65,19 +59,13 @@ const AuthNavigator: React.FC = () => {
     [logout, setCompany],
   );
 
-  useEffect(() => {
-    console.log('mount nav');
-    return () => {
-      console.log('unmount nav');
-    };
-  }, []);
-
   /*
     Если device undefined то переходим на окно с подключеним
     Если device null то переходим на окно активации устройства
     Если device не null и user undefined то переходим на окно входа пользователя
     Если device не null и user не undefined или null то переходим на окно выбора компании
   */
+
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {device ? (
@@ -96,7 +84,7 @@ const AuthNavigator: React.FC = () => {
         )
       ) : device === undefined ? (
         <>
-          <AuthStack.Screen name="Splash" component={SplashWithParams} />
+          <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />
         </>
       ) : (

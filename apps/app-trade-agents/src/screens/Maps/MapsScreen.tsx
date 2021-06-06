@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -195,7 +195,6 @@ const MapScreen = () => {
         initialRegion={region}
         style={localStyles.mapView}
         provider={useGoogleMaps ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
-        onCalloutPress={() => console.log('sss')}
       >
         {list.map((point) => (
           <Marker
@@ -209,7 +208,11 @@ const MapScreen = () => {
             <View
               style={[
                 styles.icon,
-                { backgroundColor: point.number === 0 ? 'blue' : point.id === currentPoint?.id ? 'red' : 'green' },
+                point.number === 0
+                  ? localStyles.myLocationMark
+                  : point.id === currentPoint?.id
+                  ? localStyles.selectedMark
+                  : localStyles.mark,
               ]}
             >
               <Text style={styles.lightField}>{point.number}</Text>

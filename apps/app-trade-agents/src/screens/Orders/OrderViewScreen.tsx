@@ -1,17 +1,24 @@
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
-import { AddButton, BackButton, MenuButton, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
+import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import {
+  AddButton,
+  BackButton,
+  MenuButton,
+  useActionSheet,
+  globalStyles as styles,
+  InfoBlock,
+  ItemSeparator,
+  SubTitle,
+} from '@lib/mobile-ui';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
 import OrderItem from './components/OrderItem';
-import Info from './components/Info';
 
 const OrderViewScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
@@ -80,12 +87,12 @@ const OrderViewScreen = () => {
   return (
     <View style={[styles.container]}>
       {/* <Header item={order} /> */}
-      <Info colorLabel="#3914AF" title={order?.head.outlet.name}>
+      <InfoBlock colorLabel="#3914AF" title={order?.head.outlet.name}>
         <>
           <Text>{order.number}</Text>
           <Text>{order.head.ondate}</Text>
         </>
-      </Info>
+      </InfoBlock>
       <Divider />
       <FlatList
         ref={ref}

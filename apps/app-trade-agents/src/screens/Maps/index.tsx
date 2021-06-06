@@ -1,2 +1,2 @@
-export * as MapScreen from './MapsScreen';
-export * as ListScreen from './ListScreen';
+export { default as MapScreen } from './MapsScreen';
+export { default as ListScreen } from './ListScreen';

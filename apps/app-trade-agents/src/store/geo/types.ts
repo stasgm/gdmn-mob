@@ -1,11 +1,13 @@
 import { INamedEntity } from '@lib/types';
 
+export interface ICoords {
+  latitude: number;
+  longitude: number;
+}
+
 export interface ILocation extends INamedEntity {
   number: number;
-  coords: {
-    latitude: number;
-    longitude: number;
-  };
+  coords: ICoords;
 }
 
 export type IGeoState = {

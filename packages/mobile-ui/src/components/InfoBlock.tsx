@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
-import { globalStyles as styles, SubTitle } from '@lib/mobile-ui';
+import styles from '../styles/global';
+
+import { SubTitle } from './SubTitle';
 
 interface IProps {
   colorLabel: string;
@@ -9,7 +11,7 @@ interface IProps {
   children: React.ReactElement;
 }
 
-const Info = ({ colorLabel, title, children }: IProps) => {
+const InfoBlock = ({ colorLabel, title, children }: IProps) => {
   return (
     <View style={[styles.flexDirectionRow, currStyles.box]}>
       <View style={[currStyles.label, { backgroundColor: colorLabel }]} />
@@ -21,7 +23,7 @@ const Info = ({ colorLabel, title, children }: IProps) => {
   );
 };
 
-export default Info;
+export default InfoBlock;
 
 const currStyles = StyleSheet.create({
   box: {

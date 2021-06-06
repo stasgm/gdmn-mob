@@ -1,9 +1,7 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, KeyboardAvoidingView, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { Text, Button, ActivityIndicator, IconButton, TextInput, useTheme } from 'react-native-paper';
-import { globalStyles } from '@lib/mobile-ui';
-import { SubTitle } from '@lib/mobile-ui/src/components';
+import React, { useState } from 'react';
+import { View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform, SafeAreaView } from 'react-native';
+
+import { globalStyles as styles, Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 type Props = {
@@ -12,37 +10,10 @@ type Props = {
 };
 
 const ActivationScreen = (props: Props) => {
-  const { colors } = useTheme();
   const { onDisconnect, onActivate } = props;
 
   const { error, loading, status } = useSelector((state) => state.auth);
-
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
-
   const [activationCode, setActivationCode] = useState('');
-  console.log('Activation');
-
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  const isFocused = useIsFocused();
 
   const handleActivate = () => {
     Keyboard.dismiss();
@@ -50,74 +21,32 @@ const ActivationScreen = (props: Props) => {
   };
 
   return (
-    <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView style={[globalStyles.container, isKeyboardVisible && styles.contentWidthKbd]}>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            <SubTitle>Активация устройства</SubTitle>
-            <View
-              style={{
-                ...styles.statusBox,
-                // backgroundColor: colors.background,
-              }}
-            >
-              {request.isError && <Text style={styles.errorText}>Ошибка: {request.status}</Text>}
-              {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
-            </View>
-            <TextInput
-              autoFocus={isFocused}
-              placeholder="Введите код"
+            <SubTitle loadIcon={loading} errorText={error ? status : ''}>
+              Активация устройства
+            </SubTitle>
+            <Input
+              label="Введите код"
+              value={activationCode}
+              autoCorrect={false}
               keyboardType="number-pad"
               returnKeyType="done"
-              autoCorrect={false}
-              underlineColorAndroid="transparent"
-              value={activationCode}
-              style={[globalStyles.input, { backgroundColor: colors.surface, color: colors.text }]}
               onChangeText={setActivationCode}
             />
-            <Button
-              mode="contained"
-              disabled={request.isLoading}
-              icon="login"
-              onPress={handleActivate}
-              style={globalStyles.rectangularButton}
-            >
+            <PrimeButton icon="login" onPress={handleActivate} disabled={loading || !activationCode}>
               Отправить
-            </Button>
+            </PrimeButton>
           </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-      <View style={globalStyles.bottomButtons}>
-        <IconButton
-          icon="server"
-          size={30}
-          onPress={onDisconnect}
-          style={{
-            ...globalStyles.circularButton,
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
-          }}
-          color={colors.background}
-        />
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+      <View style={styles.buttons}>
+        <RoundButton icon="server" onPress={onDisconnect} />
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  contentWidthKbd: {
-    justifyContent: 'flex-start',
-    paddingTop: 60,
-  },
-  errorText: {
-    color: '#cc5933',
-    fontSize: 18,
-  },
-  statusBox: {
-    alignItems: 'center',
-    height: 70,
-    justifyContent: 'center',
-  },
-});
-
-export { ActivationScreen };
+export default ActivationScreen;

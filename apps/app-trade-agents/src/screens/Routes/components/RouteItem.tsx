@@ -1,21 +1,18 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
-
 import { StackNavigationProp } from '@react-navigation/stack';
-
-import styles from '@lib/mobile-ui/src/styles/global';
-
-import { IReference } from '@lib/types';
-
-import { refSelectors } from '@lib/store';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { IOutlet, IRouteLine, IVisit } from '../../../store/docs/types';
+import { globalStyles as styles } from '@lib/mobile-ui';
+import { IReference } from '@lib/types';
+import { refSelectors } from '@lib/store';
+
+import { IOutlet, IRouteLine } from '../../../store/docs/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { useSelector } from '../../../store';
 import { getDateString } from '../../../utils/helpers';
+import { IVisit } from '../../../store/visits/types';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
 
@@ -38,9 +35,11 @@ const RouteItem = ({ item, routeId }: IItem) => {
   const visits = (useSelector((state) => state.visits)?.list as IVisit[]).filter(
     (visit) => visit.routeLineId.toString() === item.id,
   );
+
   const lastVisit = visits
     .filter((visit) => visit.dateEnd)
     .sort((a, b) => (a.dateEnd === b.dateEnd || !a.dateEnd || !b.dateEnd ? 0 : a.dateEnd > b.dateEnd ? 1 : -1));
+
   const status = visits.length === 0 ? 0 : visits.find((visit) => visit.dateEnd) ? 2 : 1;
 
   return (

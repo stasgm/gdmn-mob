@@ -1,10 +1,10 @@
 import React from 'react';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import styles from '@lib/mobile-ui/src/styles/global';
+import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';

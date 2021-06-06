@@ -1,14 +1,13 @@
-import { FontAwesome5 } from '@expo/vector-icons';
-import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
-
-import useActionSheet from '@lib/mobile-ui/src/hooks/useActionSheet';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
 import React, { useCallback, useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
-import Home from '../../screens/HomeScreen';
-import TaskListScreen from '../../screens/TaskListScreen';
+import { MenuButton, DrawerButton, useActionSheet } from '@lib/mobile-ui';
+
+import Home from '../../../screens/Dashboard/HomeScreen';
+import TaskListScreen from '../../../screens/Dashboard/TaskListScreen';
 
 export type TabsStackParams = {
   Main: undefined;

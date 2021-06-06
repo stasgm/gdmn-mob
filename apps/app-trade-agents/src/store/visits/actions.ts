@@ -1,6 +1,6 @@
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IVisit } from '../docs/types';
+import { IVisit } from './types';
 
 const init = createAction('VISIT/INIT')();
 const addOne = createAction('VISIT/ADD_ONE')<IVisit>();
