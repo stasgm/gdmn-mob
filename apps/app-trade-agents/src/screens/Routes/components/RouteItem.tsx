@@ -8,10 +8,11 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { IReference } from '@lib/types';
 import { refSelectors } from '@lib/store';
 
-import { IOutlet, IRouteLine, IVisit } from '../../../store/docs/types';
+import { IOutlet, IRouteLine } from '../../../store/docs/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { useSelector } from '../../../store';
 import { getDateString } from '../../../utils/helpers';
+import { IVisit } from '../../../store/visits/types';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
 
