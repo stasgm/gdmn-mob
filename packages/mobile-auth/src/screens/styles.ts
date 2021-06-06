@@ -11,7 +11,7 @@ const localStyles = StyleSheet.create({
   serverName: {
     color: '#888',
     fontSize: 18,
-    marginVertical: 10,
+    marginBottom: 18,
   },
   statusBox: {
     alignItems: 'center',

@@ -42,7 +42,7 @@ const ConfigScreen = (props: Props) => {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <>
+          <View>
             <SubTitle>Настройка подключения</SubTitle>
             <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
             <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
@@ -60,7 +60,7 @@ const ConfigScreen = (props: Props) => {
                 Отмена
               </PrimeButton>
             </View>
-          </>
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

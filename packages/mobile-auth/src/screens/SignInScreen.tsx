@@ -1,20 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import {
-  View,
-  KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  Platform,
-  ActivityIndicator,
-} from 'react-native';
-import { Text } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, SafeAreaView, Platform } from 'react-native';
 
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { globalStyles as styles, Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
-
-import localStyles from './styles';
 
 /*
   Порядок работы:
@@ -36,15 +25,6 @@ const SignInScreen = (props: Props) => {
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
-
   const [credential, setCredentials] = useState<IUserCredentials>({
     name: 'ГОЦЕЛЮК',
     password: '@123!',
@@ -60,7 +40,9 @@ const SignInScreen = (props: Props) => {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            <SubTitle>Вход пользователя</SubTitle>
+            <SubTitle loadIcon={loading} errorText={error ? status : ''}>
+              Вход пользователя
+            </SubTitle>
             <Input
               label="Имя пользователя"
               value={credential.name}
@@ -74,16 +56,12 @@ const SignInScreen = (props: Props) => {
               onChangeText={(e) => setCredentials({ ...credential, password: e })}
             />
             <PrimeButton
-              disabled={request.isLoading || !credential.name || !credential.password}
+              disabled={loading || !credential.name || !credential.password}
               icon="login"
               onPress={handleLogIn}
             >
               Войти
             </PrimeButton>
-            <View style={localStyles.statusBox}>
-              {request.isLoading && <ActivityIndicator size="small" color="#70667D" />}
-              {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
-            </View>
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -93,25 +71,5 @@ const SignInScreen = (props: Props) => {
     </SafeAreaView>
   );
 };
-/*
-const styles = StyleSheet.create({
-  container: {
-    // alignItems: 'center',
-    margin: 10,
-  },
-  contentWidthKbd: {
-    justifyContent: 'flex-start',
-    paddingTop: 60,
-  },
-  errorText: {
-    color: '#cc5933',
-    fontSize: 18,
-  },
-  statusBox: {
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignItems: 'center',
-  },
-}); */
 
 export default SignInScreen;

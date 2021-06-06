@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
@@ -16,37 +16,23 @@ type Props = {
 };
 
 const SplashScreen = (props: Props) => {
-  const { onCheckDevice, onBreakConnection, settings } = props;
   const navigation = useNavigation();
 
+  const { onCheckDevice, onBreakConnection, settings } = props;
   const { error, loading, status } = useSelector((state) => state.auth);
-
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
 
   return (
     <>
       <View style={[styles.container]}>
-        <SubTitle>Подключение к серверу</SubTitle>
+        <SubTitle loadIcon={loading} errorText={error ? status : ''}>
+          Подключение к серверу
+        </SubTitle>
         <View style={localStyles.container}>
           <Text style={localStyles.serverName}>
             {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
           </Text>
-          <View style={localStyles.statusBox}>
-            {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
-            {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
-          </View>
-          <PrimeButton
-            icon={!request.isLoading ? 'apps' : 'block-helper'}
-            onPress={!request.isLoading ? onCheckDevice : onBreakConnection}
-          >
-            {!request.isLoading ? 'Подключиться' : 'Прервать'}
+          <PrimeButton icon={!loading ? 'apps' : 'block-helper'} onPress={!loading ? onCheckDevice : onBreakConnection}>
+            {!loading ? 'Подключиться' : 'Прервать'}
           </PrimeButton>
         </View>
       </View>
