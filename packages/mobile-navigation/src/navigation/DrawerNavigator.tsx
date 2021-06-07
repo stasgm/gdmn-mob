@@ -6,9 +6,9 @@ import { useTheme } from 'react-native-paper';
 import { DrawerContent } from './drawerContent';
 
 import SettingsNavigator from './Root/SettingsNavigator';
-import MessagesNavigator from './Root/MessagesNavigator';
+// import MessagesNavigator from './Root/MessagesNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
-import DocumentsNavigator from './Root/DocumentsNavigator';
+// import DocumentsNavigator from './Root/DocumentsNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
 
 export type RootDrawerParamList = {
@@ -22,7 +22,7 @@ export type RootDrawerParamList = {
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
-console.log('DrawerNavigator');
+// console.log('DrawerNavigator');
 
 export interface INavItem {
   name: string;
@@ -32,24 +32,24 @@ export interface INavItem {
 }
 
 const baseNavList: INavItem[] = [
-  {
-    name: 'Documents',
-    component: DocumentsNavigator,
-    icon: 'file-document-outline',
-    title: 'Документы',
-  },
+  /*   {
+      name: 'Documents',
+      component: DocumentsNavigator,
+      icon: 'file-document-outline',
+      title: 'Документы',
+    }, */
   {
     name: 'References',
     component: ReferencesNavigator,
-    icon: 'file-search-outline',
+    icon: 'file-cabinet',
     title: 'Справочники',
   },
-  {
-    name: 'Messages',
-    component: MessagesNavigator,
-    icon: 'message-text-outline',
-    title: 'Сообщения',
-  },
+  /*   {
+      name: 'Messages',
+      component: MessagesNavigator,
+      icon: 'message-text-outline',
+      title: 'Сообщения',
+    }, */
   {
     name: 'Settings',
     component: SettingsNavigator,

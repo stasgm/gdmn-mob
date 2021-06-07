@@ -1,8 +1,10 @@
 import { INamedEntity, IEntity, IUserDocument } from '@lib/types';
 
-export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
+import { TakeOrderType } from '../visits/types';
 
-export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
+// export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
+
+// export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
 //Организации
 export interface IContact extends INamedEntity {
   externalId: string;
@@ -17,6 +19,8 @@ export interface IOutlet extends INamedEntity {
   company: INamedEntity; //организация-плательщик
   address: string; //Адрес разгрузки
   phoneNumber: string; // Номер телефона
+  lat: number; // широта
+  lon: number; // долгота
 }
 //Задолженности
 export interface IDebt extends IEntity {
@@ -39,6 +43,7 @@ export interface IGood extends INamedEntity {
   vat: string; //НДС
   goodgroup: INamedEntity; // группа товаров
   valuename: string; // Наименование ед. изм.
+  invWeight: number; // Вес единицы товара
   priceFso: number; // цена ФСО
   priceFsn: number; // цена ФСН
   priceFsoSklad: number; // цена ФСО склад
@@ -62,10 +67,10 @@ interface IOrderHead {
   road?: INamedEntity; // 	Маршрут
   depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
   ondate: string; //  Дата отгрузки
-  takenOrder?: typeTakeOrder; //тип взятия заявки
+  takenOrder?: TakeOrderType; //тип взятия заявки
 }
 
-interface IOrderLine extends IEntity {
+export interface IOrderLine extends IEntity {
   good: INamedEntity;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
@@ -75,20 +80,34 @@ export type IOrderDocument = IUserDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead {
   agent: INamedEntity;
+  externalId: IEntity;
 }
 
-interface IRouteLine extends IEntity {
+export interface IRouteLine extends IEntity {
+  externalId: IEntity;
   outlet: INamedEntity;
   ordNumber: number; // порядковый номер
   comment?: string;
   visited: boolean;
-  result?: typeVisit;
+  /* result?: typeVisit; -это убрать в визиты */
 }
 
 export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
 
-export type IDocState = {
-  readonly docData: IOrderDocument[] | undefined;
-  readonly loading: boolean;
-  readonly errorMessage: string;
-};
+/* export interface ICoords {
+  latitude: number;
+  longitude: number;
+}
+ */
+/* export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
+export interface IVisit extends IEntity {
+  routeLineId: number;
+  comment?: string;
+  dateBegin: string; //начало визита
+  dateEnd?: string; // конец визита
+  beginGeoPoint: ICoords; //место начало визита
+  endGeoPoint?: ICoords; // место завершения визита
+  result?: resutVisit;
+  takenType: typeTakeOrder; //тип визита - это поле забрать из заявки
+}
+*/

@@ -7,8 +7,6 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 import DashboardNavigator from './Root/DashboardNavigator';
 import MapNavigator from './Root/MapNavigator';
 
-console.log('RootNavigator');
-
 const navItems: INavItem[] = [
   {
     name: 'Dashboard',

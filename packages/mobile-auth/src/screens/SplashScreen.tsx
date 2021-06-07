@@ -1,12 +1,13 @@
-import { IApiConfig } from '@lib/client-types';
-import React, { useMemo } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { Text, Button, IconButton, useTheme } from 'react-native-paper';
+import React from 'react';
+import { View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
-import { globalStyles } from '@lib/mobile-ui';
-import { SubTitle } from '@lib/mobile-ui/src/components';
+import { globalStyles as styles, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
+import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
+
+import localStyles from './styles';
 
 type Props = {
   settings: IApiConfig | undefined;
@@ -15,94 +16,31 @@ type Props = {
 };
 
 const SplashScreen = (props: Props) => {
-  const { onCheckDevice, onBreakConnection, settings } = props;
-
-  const { colors } = useTheme();
-
   const navigation = useNavigation();
 
+  const { onCheckDevice, onBreakConnection, settings } = props;
   const { error, loading, status } = useSelector((state) => state.auth);
-
-  const request = useMemo(
-    () => ({
-      isError: error,
-      isLoading: loading,
-      status,
-    }),
-    [error, loading, status],
-  );
 
   return (
     <>
-      <View style={[globalStyles.container, localStyles.container]}>
-        <SubTitle>Подключение к серверу</SubTitle>
-        <Text style={localStyles.serverName}>
-          {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
-        </Text>
-        <View
-          style={{
-            ...localStyles.statusBox,
-            backgroundColor: colors.background,
-          }}
-        >
-          {request.isError && <Text style={localStyles.errorText}>Ошибка: {request.status}</Text>}
-          {request.isLoading && <ActivityIndicator size="large" color="#70667D" />}
+      <View style={[styles.container]}>
+        <SubTitle loadIcon={loading} errorText={error ? status : ''}>
+          Подключение к серверу
+        </SubTitle>
+        <View style={localStyles.container}>
+          <Text style={localStyles.serverName}>
+            {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
+          </Text>
+          <PrimeButton icon={!loading ? 'apps' : 'block-helper'} onPress={!loading ? onCheckDevice : onBreakConnection}>
+            {!loading ? 'Подключиться' : 'Прервать'}
+          </PrimeButton>
         </View>
-        {!request.isLoading ? (
-          <Button
-            onPress={onCheckDevice}
-            icon="apps"
-            mode="contained"
-            style={[globalStyles.rectangularButton, localStyles.buttons]}
-          >
-            Подключиться
-          </Button>
-        ) : (
-          <Button
-            onPress={onBreakConnection}
-            icon="block-helper"
-            mode="contained"
-            style={[globalStyles.rectangularButton, localStyles.buttons]}
-          >
-            Прервать
-          </Button>
-        )}
       </View>
-      <View style={globalStyles.bottomButtons}>
-        <IconButton
-          icon="server"
-          size={30}
-          onPress={() => navigation.navigate('Config')}
-          color={colors.background}
-          style={[globalStyles.circularButton, { backgroundColor: colors.primary }]}
-        />
+      <View style={styles.buttons}>
+        <RoundButton icon="server" onPress={() => navigation.navigate('Config')} />
       </View>
     </>
   );
 };
 
-const localStyles = StyleSheet.create({
-  buttons: {
-    width: '100%',
-  },
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  errorText: {
-    color: '#cc5933',
-    fontSize: 18,
-  },
-  serverName: {
-    color: '#888',
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  statusBox: {
-    alignItems: 'center',
-    height: 70,
-    justifyContent: 'center',
-  },
-});
-
-export { SplashScreen };
+export default SplashScreen;

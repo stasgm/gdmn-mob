@@ -1,5 +1,6 @@
 import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
+
 import { DataNotFoundException } from '../exceptions';
 
 import { getNamedEntity } from './dao/utils';

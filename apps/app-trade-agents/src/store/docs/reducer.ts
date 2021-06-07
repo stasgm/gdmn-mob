@@ -18,7 +18,7 @@ const initialState: Readonly<IDocState> = {
         outlet: outlet1,
         ondate: '25.04.2021',
       },
-      lines: [{ id: '1', good: goodRefMock[0], quantity: 12 }],
+      lines: [{ id: '1', good: goodRefMock.data[0], quantity: 12 }],
     },
   ],
   loading: false,

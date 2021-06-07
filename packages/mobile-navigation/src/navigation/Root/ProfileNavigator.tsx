@@ -3,9 +3,7 @@ import React from 'react';
 
 import ProfileScreen from '../../screens/ProfileScreen';
 
-type ProfileStackParamList = {
-  Profile: undefined;
-};
+import { ProfileStackParamList } from './types';
 
 const Stack = createStackNavigator<ProfileStackParamList>();
 

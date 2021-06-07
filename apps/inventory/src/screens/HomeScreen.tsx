@@ -4,8 +4,8 @@ import { StyleSheet, Text, View } from 'react-native';
 const Home = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Задачи на сегодня:</Text>
-      <Text style={styles.text}>На сегодня задач нет</Text>
+      <Text style={styles.title}>Дела на сегодня:</Text>
+      <Text style={styles.text}>На сегодня дел нет</Text>
     </View>
   );
 };

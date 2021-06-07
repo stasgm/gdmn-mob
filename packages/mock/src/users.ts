@@ -1,5 +1,4 @@
 import { INamedEntity, IUser } from '@lib/types';
-import { v4 as uuid } from 'uuid';
 
 export const superAdmin: INamedEntity = {
   id: 'gdmn',
@@ -8,8 +7,20 @@ export const superAdmin: INamedEntity = {
 
 const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
 const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
+const company3: INamedEntity = { id: '777', name: 'Бройлерная птицефабрика' };
 
 const users: IUser[] = [
+  {
+    id: '15',
+    externalId: '147012274',
+    name: 'ГОЦЕЛЮК Н. А.',
+    firstName: 'НАТАЛЬЯ',
+    lastName: 'ГОЦЕЛЮК',
+    phoneNumber: '8-044-788-86-44',
+    creator: superAdmin,
+    companies: [company3],
+    role: 'Admin',
+  },
   {
     id: '123',
     externalId: '150449124',
@@ -33,7 +44,7 @@ const users: IUser[] = [
     role: 'Admin',
   },
   {
-    id: uuid(),
+    id: '12',
     externalId: '150449124',
     name: 'Peppa',
     firstName: 'Peppa',
@@ -44,7 +55,7 @@ const users: IUser[] = [
     role: 'User',
   },
   {
-    id: uuid(),
+    id: '13',
     externalId: '150449124',
     name: 'Watson',
     firstName: 'Watson',
@@ -55,7 +66,7 @@ const users: IUser[] = [
     role: 'User',
   },
   {
-    id: uuid(),
+    id: '14',
     externalId: '150449124',
     name: 'Bob',
     firstName: 'Bob',
