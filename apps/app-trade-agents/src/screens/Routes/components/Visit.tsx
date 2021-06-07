@@ -112,11 +112,7 @@ const Visit = ({
 
     dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
 
-    /* navigation.navigate('Orders', {
-      screen: 'OrderView',
-      params: { id: newOrder.id },
-      // initial: false,
-    }); */
+    navigation.navigate('OrderView', { id: newOrder.id });
   };
 
   const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
@@ -128,23 +124,10 @@ const Visit = ({
   const handleOrder = () => {
     return order ? navigation.navigate('OrderView', { id: order.id }) : handleNewOrder();
   };
-  /* order ? navigation.navigate('Orders', {
-          screen: 'OrderView',
-          params: { id: order.id },
-          // initial: false,
-        })
-      : handleNewOrder();
-  };*/
 
   const returnText = 'Возврат (0)';
   const handleReturn = () => {
-    /* return order
-      ? navigation.navigate('Orders', {
-          screen: 'OrderView',
-          params: { id: order.id },
-          // initial: false,
-        })
-      : handleNewOrder(); */
+    // return return ? navigation.navigate('ReturnView', { id: return.id }) : handleNewReturn();
   };
 
   return (

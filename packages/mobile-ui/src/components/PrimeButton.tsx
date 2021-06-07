@@ -27,7 +27,7 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IPr
         styles.rectangularButton,
         outlined
           ? {
-              borderWidth: 2,
+              borderWidth: 1,
               borderColor: colors.primary,
               backgroundColor: disabled ? colors.disabled : colors.background,
             }
