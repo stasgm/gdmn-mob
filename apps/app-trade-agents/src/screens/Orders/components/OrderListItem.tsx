@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';
+import { getDateString } from '../../../utils/helpers';
 
 const OrderListItem = ({ item }: { item: IOrderDocument }) => {
   const { colors } = useTheme();
@@ -16,7 +17,6 @@ const OrderListItem = ({ item }: { item: IOrderDocument }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        // console.log(item.id);
         navigation.navigate('OrderView', { id: item.id });
       }}
     >
@@ -28,18 +28,18 @@ const OrderListItem = ({ item }: { item: IOrderDocument }) => {
           <View style={[styles.directionRow]}>
             <View>
               <Text style={[styles.name, { color: colors.text }]}>
-                № {item.number} от {item.documentDate}
+                № {item.number} от {getDateString(item.documentDate)}
               </Text>
             </View>
             <View style={[styles.directionRow]}>
-              <Text style={[styles.field, { color: colors.text }]}>{item.head.ondate}</Text>
+              <Text style={[styles.field, { color: colors.text }]}>{getDateString(item.head.ondate)}</Text>
               <MaterialCommunityIcons name="calendar-check-outline" size={15} />
             </View>
           </View>
-          <View style={[styles.directionRow, { alignItems: 'flex-start' }]}>
-            <Text style={[styles.field, { color: colors.text }, { maxWidth: '90%' }]}>{item.head.outlet.name}</Text>
+          <View style={styles.directionRow}>
+            <Text style={[styles.field, localStyles.line]}>{item.head.outlet.name}</Text>
             <View style={[styles.directionRow]}>
-              <Text style={[styles.field, { color: colors.text }]}>{item.lines.length}</Text>
+              <Text style={styles.field}>{item.lines.length}</Text>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
             </View>
           </View>
@@ -50,3 +50,9 @@ const OrderListItem = ({ item }: { item: IOrderDocument }) => {
 };
 
 export default OrderListItem;
+
+const localStyles = StyleSheet.create({
+  line: {
+    maxWidth: '90%',
+  },
+});

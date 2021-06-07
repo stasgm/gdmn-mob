@@ -19,6 +19,7 @@ import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IRouteDocument, IRouteLine } from '../../store/docs/types';
 
 import RouteItem from './components/RouteItem';
+import { getDateString } from '../../utils/helpers';
 
 const RouteViewScreen = () => {
   const navigation = useNavigation();
@@ -67,7 +68,7 @@ const RouteViewScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{route.documentDate}</SubTitle>
+      <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
       <Divider />
       <FlatList
         ref={ref}

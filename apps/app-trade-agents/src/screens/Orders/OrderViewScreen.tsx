@@ -17,6 +17,8 @@ import {
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
+import { getDateString } from '../../utils/helpers';
+
 import OrderItem from './components/OrderItem';
 
 const OrderViewScreen = () => {
@@ -92,7 +94,7 @@ const OrderViewScreen = () => {
       <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
         <>
           <Text>{order.number}</Text>
-          <Text>{order.head.ondate}</Text>
+          <Text>{getDateString(order.head.ondate)}</Text>
         </>
       </InfoBlock>
       <FlatList
