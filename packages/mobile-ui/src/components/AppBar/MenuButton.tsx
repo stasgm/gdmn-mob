@@ -10,7 +10,7 @@ const MenuButton = ({ actionsMenu }: IProps) => {
   return (
     <IconButton
       icon={Platform.OS === 'android' ? 'dots-vertical' : 'dots-horizontal'}
-      size={26}
+      size={30}
       onPress={actionsMenu}
     />
   );

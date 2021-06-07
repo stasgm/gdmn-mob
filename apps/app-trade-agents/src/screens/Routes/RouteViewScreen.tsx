@@ -11,6 +11,7 @@ import {
   useActionSheet,
   MenuButton,
   BackButton,
+  AppScreen,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, docSelectors } from '@lib/store';
 
@@ -65,7 +66,7 @@ const RouteViewScreen = () => {
   const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />;
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
       <SubTitle style={styles.title}>{route.documentDate}</SubTitle>
       <Divider />
       <FlatList
@@ -76,7 +77,7 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-    </View>
+    </AppScreen>
   );
 };
 

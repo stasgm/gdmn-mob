@@ -1,12 +1,13 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 
+import { docSelectors, documentActions } from '@lib/store';
 import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
 
-import { docSelectors, documentActions } from '@lib/store';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from '../../../store';
 
@@ -14,6 +15,9 @@ import { IVisit } from '../../../store/visits/types';
 import { visitActions } from '../../../store/visits/actions';
 import { IOrderDocument } from '../../../store/docs/types';
 import { ICoords } from '../../../store/geo/types';
+import { RoutesStackParamList } from '../../../navigation/Root/types';
+
+type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
 const Visit = ({
   item,
@@ -26,7 +30,7 @@ const Visit = ({
   contact: INamedEntity;
   road: INamedEntity;
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
 
   const [process, setProcess] = useState(false);
@@ -108,78 +112,56 @@ const Visit = ({
 
     dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
 
-    navigation.navigate('Orders', {
-      screen: 'OrderView',
-      params: { id: newOrder.id },
-      // initial: false,
-    });
+    navigation.navigate('OrderView', { id: newOrder.id });
+  };
+
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+    !dateEnd ? 'тся' : 'лся'
+  } ${timeProcess()})`;
+  const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
+
+  const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;
+  const handleOrder = () => {
+    return order ? navigation.navigate('OrderView', { id: order.id }) : handleNewOrder();
+  };
+
+  const returnText = 'Возврат (0)';
+  const handleReturn = () => {
+    // return return ? navigation.navigate('ReturnView', { id: return.id }) : handleNewReturn();
   };
 
   return (
-    <View style={styles.container}>
-      <InfoBlock colorLabel="#3914AF" title="Визит">
+    <>
+      <InfoBlock colorLabel="#4E9600" title="Визит">
         <>
-          <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
-            !dateEnd ? 'тся' : 'лся'
-          } ${timeProcess()})`}</Text>
-          {dateEnd && <Text>{`Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`}</Text>}
-          {!dateEnd && (
-            <View style={localStyles.buttons}>
-              <PrimeButton
-                outlined
-                style={localStyles.button}
-                onPress={() => {
-                  order
-                    ? navigation.navigate('Orders', {
-                        screen: 'OrderView',
-                        params: { id: order.id },
-                        // initial: false,
-                      })
-                    : handleNewOrder();
-                }}
-              >
-                {`Заявка (${order ? `${order.lines.length}` : '0'})`}
+          <Text>{visitTextBegin}</Text>
+          {dateEnd ? (
+            <Text>{visitTextEnd}</Text>
+          ) : (
+            <View style={styles.flexGrow}>
+              <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
+                {orderText}
               </PrimeButton>
-              <PrimeButton
-                outlined
-                style={localStyles.button}
-                onPress={() => {
-                  //TODO: ссылка на документ
-                }}
-              >
-                Возврат (0)
+              <PrimeButton icon="clipboard-arrow-left-outline" onPress={handleReturn} outlined>
+                {returnText}
               </PrimeButton>
             </View>
           )}
         </>
       </InfoBlock>
       {process ? (
-        <ActivityIndicator size="large" color="#3914AF" />
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
           {!dateEnd && (
-            <>
-              <PrimeButton onPress={handleCloseVisit}>Завершить визит</PrimeButton>
-            </>
+            <PrimeButton icon="stop-circle-outline" onPress={handleCloseVisit}>
+              Завершить визит
+            </PrimeButton>
           )}
         </>
       )}
-    </View>
+    </>
   );
 };
 
 export default Visit;
-
-const localStyles = StyleSheet.create({
-  /*buttons: {
-    alignItems: 'center',
-    margin: 10,
-  },*/
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  button: {
-    flex: 1,
-  },
-});

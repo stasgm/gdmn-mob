@@ -9,8 +9,8 @@ import styles from '../styles/global';
 interface IProps {
   style?: StyleProp<ViewStyle>;
   icon?: keyof typeof Icon.glyphMap;
-  disabled?: boolean;
   outlined?: boolean;
+  disabled?: boolean;
   onPress?: () => void;
   children: React.ReactNode;
 }
@@ -20,13 +20,18 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IPr
 
   return (
     <TouchableOpacity
-      activeOpacity={0.7}
       onPress={onPress}
       disabled={disabled}
+      activeOpacity={0.7}
       style={[
         styles.rectangularButton,
-        { backgroundColor: disabled ? colors.disabled : outlined ? colors.background : colors.primary },
-        outlined && { borderColor: colors.primary, borderWidth: 1 },
+        outlined
+          ? {
+              borderWidth: 1,
+              borderColor: colors.primary,
+              backgroundColor: disabled ? colors.disabled : colors.background,
+            }
+          : { backgroundColor: disabled ? colors.disabled : colors.primary },
         style,
       ]}
     >
@@ -40,6 +45,30 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IPr
     </TouchableOpacity>
   );
 };
+
+/* const CustomButton = ({
+  outlined = true,
+  onPress,
+  children,
+  disabled = false,
+  style,
+}: {
+  onPress?: () => void;
+  disabled?: boolean;
+  outlined: boolean;
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) => {
+  return outlined ? (
+    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPress} disabled={disabled} style={style}>
+      {children}
+    </TouchableHighlight>
+  ) : (
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={style} disabled={disabled}>
+      {children}
+    </TouchableOpacity>
+  );
+}; */
 
 export default PrimeButton;
 

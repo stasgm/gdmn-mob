@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
-import { globalStyles as styles, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
+import { globalStyles as styles, PrimeButton, RoundButton, AppScreen, ScreenTitle } from '@lib/mobile-ui';
 import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
 
@@ -23,10 +23,10 @@ const SplashScreen = (props: Props) => {
 
   return (
     <>
-      <View style={[styles.container]}>
-        <SubTitle loadIcon={loading} errorText={error ? status : ''}>
+      <AppScreen>
+        <ScreenTitle loadIcon={loading} errorText={error ? status : ''}>
           Подключение к серверу
-        </SubTitle>
+        </ScreenTitle>
         <View style={localStyles.container}>
           <Text style={localStyles.serverName}>
             {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
@@ -35,7 +35,7 @@ const SplashScreen = (props: Props) => {
             {!loading ? 'Подключиться' : 'Прервать'}
           </PrimeButton>
         </View>
-      </View>
+      </AppScreen>
       <View style={styles.buttons}>
         <RoundButton icon="server" onPress={() => navigation.navigate('Config')} />
       </View>

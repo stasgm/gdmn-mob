@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, SafeAreaView, Platform } from 'react-native';
+import { View, Keyboard } from 'react-native';
 
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
-import { globalStyles as styles, Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
+import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
 
 /*
   Порядок работы:
@@ -36,39 +36,31 @@ const SignInScreen = (props: Props) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
-            <SubTitle loadIcon={loading} errorText={error ? status : ''}>
-              Вход пользователя
-            </SubTitle>
-            <Input
-              label="Имя пользователя"
-              value={credential.name}
-              autoCorrect={false}
-              onChangeText={(e) => setCredentials({ ...credential, name: e })}
-            />
-            <Input
-              label="Пароль"
-              secureText
-              value={credential.password}
-              onChangeText={(e) => setCredentials({ ...credential, password: e })}
-            />
-            <PrimeButton
-              disabled={loading || !credential.name || !credential.password}
-              icon="login"
-              onPress={handleLogIn}
-            >
-              Войти
-            </PrimeButton>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+    <>
+      <AppInputScreen>
+        <ScreenTitle loadIcon={loading} errorText={error ? status : ''}>
+          Вход пользователя
+        </ScreenTitle>
+        <Input
+          label="Имя пользователя"
+          value={credential.name}
+          autoCorrect={false}
+          onChangeText={(e) => setCredentials({ ...credential, name: e })}
+        />
+        <Input
+          label="Пароль"
+          secureText
+          value={credential.password}
+          onChangeText={(e) => setCredentials({ ...credential, password: e })}
+        />
+        <PrimeButton disabled={loading || !credential.name || !credential.password} icon="login" onPress={handleLogIn}>
+          Войти
+        </PrimeButton>
+      </AppInputScreen>
       <View style={styles.buttons}>
         <RoundButton icon="server" onPress={onDisconnect} />
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 

@@ -5,7 +5,7 @@ import { IconButton } from 'react-native-paper';
 const BackButton = () => {
   const navigation = useNavigation();
 
-  return <IconButton icon="chevron-left" size={26} onPress={navigation.goBack} />;
+  return <IconButton icon="chevron-left" onPress={navigation.goBack} size={30} />;
 };
 
 export default BackButton;

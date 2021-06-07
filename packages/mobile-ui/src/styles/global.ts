@@ -3,6 +3,9 @@ import { Dimensions, StyleSheet } from 'react-native';
 import colors from './colors';
 
 const globalstyles = StyleSheet.create({
+  contentTop: {
+    justifyContent: 'flex-start',
+  },
   bottomButtons: {
     alignItems: 'flex-end',
   },
@@ -136,7 +139,7 @@ const globalstyles = StyleSheet.create({
   field: {
     opacity: 0.5,
   },
-  lightField: {
+  lightText: {
     fontSize: 15,
     color: '#fff',
   },

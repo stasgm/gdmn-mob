@@ -27,6 +27,7 @@ const OrderLineScreen = () => {
       dispatch(documentActions.updateDocumentLine({ docId, line }));
     }
 
+    // navigation.goBack();
     navigation.navigate('OrderView', { id: docId });
   }, [navigation, line, docId, dispatch, mode]);
 

@@ -1,5 +1,14 @@
 import * as React from 'react';
-import { FlexStyle, StyleSheet, View } from 'react-native';
+import {
+  FlexStyle,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 
 import { AppAccessibilityRole } from './AppAccessibilityRole';
 import AppColor from './AppColor';
@@ -27,6 +36,13 @@ const BaseStyle = StyleSheet.create({
   main: {
     maxWidth: 800,
     width: '100%',
+  },
+  container: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: 5,
   },
   box: {
     paddingVertical: 30,
@@ -130,6 +146,18 @@ export const Main = (props: AppViewProps) => (
   <MainContainer>
     <Centered style={[BaseStyle.main, props.style]} {...props} />
   </MainContainer>
+);
+
+export const AppScreen = (props: AppViewProps) => <AppView {...props} style={[BaseStyle.container, props.style]} />;
+
+export const AppInputScreen = (props: AppViewProps) => (
+  <SafeAreaView style={BaseStyle.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[BaseStyle.container]}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <AppView {...props} style={[BaseStyle.container, props.style]} />
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+  </SafeAreaView>
 );
 
 export const MainHead = (props: AppViewProps) => <Centered style={[BaseStyle.mainHead, props.style]} {...props} />;
