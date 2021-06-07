@@ -4,6 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 import { IVisit } from '../../../store/visits/types';
+import { getDateString } from '../../../utils/helpers';
 
 //import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -44,7 +45,7 @@ const VisitItem = ({ item }: { item: IVisit }) => {
           <Text style={localStyles.text}>
             {dateBegin.getHours()}:{dateBegin.getMinutes()}
           </Text>
-          <Text style={localStyles.date}>{dateBegin.toLocaleDateString()}</Text>
+          <Text style={localStyles.date}>{getDateString(dateBegin)}</Text>
         </View>
         {dateEnd && (
           <Text style={localStyles.text}>

@@ -20,7 +20,7 @@ const OrderListItem = ({ item }: { item: IOrderDocument }) => {
         navigation.navigate('OrderView', { id: item.id });
       }}
     >
-      <View style={[styles.item, { backgroundColor: colors.background }]}>
+      <View style={styles.item}>
         <View style={[styles.icon, { backgroundColor: getStatusColor(item?.status || 'DRAFT') }]}>
           <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
         </View>

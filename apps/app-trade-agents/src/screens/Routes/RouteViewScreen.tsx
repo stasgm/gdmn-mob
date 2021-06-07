@@ -18,8 +18,9 @@ import { useDispatch, documentActions, docSelectors } from '@lib/store';
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IRouteDocument, IRouteLine } from '../../store/docs/types';
 
-import RouteItem from './components/RouteItem';
 import { getDateString } from '../../utils/helpers';
+
+import RouteItem from './components/RouteItem';
 
 const RouteViewScreen = () => {
   const navigation = useNavigation();
