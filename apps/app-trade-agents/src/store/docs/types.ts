@@ -7,7 +7,6 @@ import { TakeOrderType } from '../visits/types';
 // export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
 //Организации
 export interface IContact extends INamedEntity {
-  externalId: string;
   contractNumber: string; // Номер договора
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
@@ -15,7 +14,6 @@ export interface IContact extends INamedEntity {
 }
 //Магазины
 export interface IOutlet extends INamedEntity {
-  externalId: string;
   company: INamedEntity; //организация-плательщик
   address: string; //Адрес разгрузки
   phoneNumber: string; // Номер телефона
@@ -32,12 +30,10 @@ export interface IDebt extends IEntity {
 }
 //Группы товаров
 export interface IGoodGroup extends INamedEntity {
-  externalId: string;
   parent?: INamedEntity;
 }
 // Товары
 export interface IGood extends INamedEntity {
-  externalId: string;
   alias: string;
   barcode: string;
   vat: string; //НДС
@@ -51,9 +47,7 @@ export interface IGood extends INamedEntity {
 }
 
 //Подразделения-склады
-export interface IDepartment extends INamedEntity {
-  externalId: string;
-}
+export type IDepartment = INamedEntity;
 // Интерфейс для матрицы номенклатур для организаций
 export interface INetPrice extends IEntity {
   contact: INamedEntity; // организация
@@ -80,11 +74,9 @@ export type IOrderDocument = IUserDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead {
   agent: INamedEntity;
-  externalId: IEntity;
 }
 
 export interface IRouteLine extends IEntity {
-  externalId: IEntity;
   outlet: INamedEntity;
   ordNumber: number; // порядковый номер
   comment?: string;
