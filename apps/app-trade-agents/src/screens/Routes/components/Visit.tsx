@@ -34,7 +34,7 @@ const Visit = ({
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
-  const order = ((docSelectors.selectByDocType('order') as unknown) as IOrderDocument[])?.find(
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
     (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
   );
 
@@ -63,9 +63,9 @@ const Visit = ({
       return;
     }
 
-    const coords = ((await Location.getCurrentPositionAsync({
+    const coords = (await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Lowest,
-    })) as unknown) as ICoords;
+    })) as unknown as ICoords;
 
     const date = new Date().toISOString();
 
@@ -106,7 +106,7 @@ const Visit = ({
       lines: [],
     };
 
-    dispatch(documentActions.addDocument((newOrder as unknown) as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
 
     navigation.navigate('Orders', {
       screen: 'OrderView',
@@ -136,7 +136,8 @@ const Visit = ({
                         // initial: false,
                       })
                     : handleNewOrder();
-                }}>
+                }}
+              >
                 {`Заявка (${order ? `${order.lines.length}` : '0'})`}
               </PrimeButton>
               <PrimeButton
@@ -144,7 +145,8 @@ const Visit = ({
                 style={localStyles.button}
                 onPress={() => {
                   //TODO: ссылка на документ
-                }}>
+                }}
+              >
                 Возврат (0)
               </PrimeButton>
             </View>
