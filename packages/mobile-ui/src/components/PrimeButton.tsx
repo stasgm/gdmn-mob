@@ -10,11 +10,12 @@ interface IProps {
   style?: StyleProp<ViewStyle>;
   icon?: keyof typeof Icon.glyphMap;
   disabled?: boolean;
+  outlined?: boolean;
   onPress?: () => void;
   children: React.ReactNode;
 }
 
-const PrimeButton = ({ onPress, style, children, icon, disabled }: IProps) => {
+const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IProps) => {
   const { colors } = useTheme();
 
   return (
@@ -22,11 +23,16 @@ const PrimeButton = ({ onPress, style, children, icon, disabled }: IProps) => {
       activeOpacity={0.7}
       onPress={onPress}
       disabled={disabled}
-      style={[styles.rectangularButton, { backgroundColor: disabled ? colors.disabled : colors.primary }, style]}
+      style={[
+        styles.rectangularButton,
+        { backgroundColor: disabled ? colors.disabled : outlined ? colors.background : colors.primary },
+        outlined && { borderColor: colors.primary, borderWidth: 1 },
+        style,
+      ]}
     >
       <View style={localStyles.buttons}>
-        {icon && <Icon name={icon} size={16} color={colors.background} />}
-        <Text style={[localStyles.text, { color: colors.background }]}>
+        {icon && <Icon name={icon} size={16} color={outlined ? colors.primary : colors.background} />}
+        <Text style={[localStyles.text, { color: outlined ? colors.primary : colors.background }]}>
           {'  '}
           {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>

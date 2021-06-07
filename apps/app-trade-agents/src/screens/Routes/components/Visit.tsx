@@ -1,10 +1,9 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 
-import { globalStyles, globalStyles as styles, BackButton, InfoBlock } from '@lib/mobile-ui';
+import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
 
 import { docSelectors, documentActions } from '@lib/store';
@@ -125,10 +124,10 @@ const Visit = ({
           } ${timeProcess()})`}</Text>
           {dateEnd && <Text>{`Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`}</Text>}
           {!dateEnd && (
-            <View style={localStyles.buttons1}>
-              <Button
-                mode="outlined"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
+            <View style={localStyles.buttons}>
+              <PrimeButton
+                outlined
+                style={localStyles.button}
                 onPress={() => {
                   order
                     ? navigation.navigate('Orders', {
@@ -140,16 +139,16 @@ const Visit = ({
                 }}
               >
                 {`Заявка (${order ? `${order.lines.length}` : '0'})`}
-              </Button>
-              <Button
-                mode="outlined"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
+              </PrimeButton>
+              <PrimeButton
+                outlined
+                style={localStyles.button}
                 onPress={() => {
                   //TODO: ссылка на документ
                 }}
               >
                 Возврат (0)
-              </Button>
+              </PrimeButton>
             </View>
           )}
         </>
@@ -160,13 +159,7 @@ const Visit = ({
         <>
           {!dateEnd && (
             <>
-              <Button
-                onPress={handleCloseVisit}
-                mode="contained"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
-              >
-                Завершить визит
-              </Button>
+              <PrimeButton onPress={handleCloseVisit}>Завершить визит</PrimeButton>
             </>
           )}
         </>
@@ -178,13 +171,15 @@ const Visit = ({
 export default Visit;
 
 const localStyles = StyleSheet.create({
-  buttons: {
+  /*buttons: {
     alignItems: 'center',
     margin: 10,
-  },
-  buttons1: {
+  },*/
+  buttons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginHorizontal: 10,
+  },
+  button: {
+    flex: 1,
   },
 });
