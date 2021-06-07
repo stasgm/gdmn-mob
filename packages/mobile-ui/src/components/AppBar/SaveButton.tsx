@@ -6,7 +6,7 @@ interface IProps {
 }
 
 const SaveButton = ({ onPress }: IProps) => {
-  return <IconButton icon="check" size={26} onPress={onPress} />;
+  return <IconButton icon="check" size={30} onPress={onPress} />;
 };
 
 export default SaveButton;

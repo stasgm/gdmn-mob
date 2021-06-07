@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 
 import styles from '../styles/global';
 
-import { SubTitle } from './SubTitle';
+import SubTitle from './SubTitle';
 
 interface IProps {
   colorLabel: string;

@@ -1,10 +1,10 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import { useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { ItemSeparator, globalStyles as styles, DrawerButton } from '@lib/mobile-ui';
+import { ItemSeparator, globalStyles as styles, DrawerButton, AppScreen } from '@lib/mobile-ui';
 
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
@@ -13,26 +13,29 @@ import { geoActions } from '../../store/geo/actions';
 import localStyles from './styles';
 
 const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => (
-  <TouchableOpacity onPress={onPress}>
-    <View style={styles.item}>
-      <View
-        style={[
-          styles.icon,
-          item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
-        ]}
-      />
-      <Text style={styles.lightField}>{item.number}</Text>
-    </View>
-    <View style={styles.details}>
-      <View style={styles.directionRow}>
-        <Text style={styles.name}>{item.name}</Text>
+  <TouchableHighlight onPress={onPress} style={styles.flexDirectionRow} activeOpacity={0.4} underlayColor="#DDDDDD">
+    <>
+      <View style={styles.item}>
+        <View
+          style={[
+            styles.icon,
+            item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
+          ]}
+        >
+          <Text style={styles.lightText}>{item.number}</Text>
+        </View>
       </View>
-      <View style={styles.flexDirectionRow}>
-        <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
-        <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+      <View style={styles.details}>
+        <View style={styles.directionRow}>
+          <Text style={styles.name}>{item.name}</Text>
+        </View>
+        <View style={styles.flexDirectionRow}>
+          <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
+          <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+        </View>
       </View>
-    </View>
-  </TouchableOpacity>
+    </>
+  </TouchableHighlight>
 );
 
 const ListScreen = () => {
@@ -58,7 +61,7 @@ const ListScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
       <FlatList
         ref={ref}
         data={list}
@@ -68,7 +71,7 @@ const ListScreen = () => {
         scrollEventThrottle={400}
         ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
       />
-    </View>
+    </AppScreen>
   );
 };
 

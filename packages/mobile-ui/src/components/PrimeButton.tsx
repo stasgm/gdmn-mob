@@ -9,24 +9,35 @@ import styles from '../styles/global';
 interface IProps {
   style?: StyleProp<ViewStyle>;
   icon?: keyof typeof Icon.glyphMap;
+  outlined?: boolean;
   disabled?: boolean;
   onPress?: () => void;
   children: React.ReactNode;
 }
 
-const PrimeButton = ({ onPress, style, children, icon, disabled }: IProps) => {
+const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IProps) => {
   const { colors } = useTheme();
 
   return (
     <TouchableOpacity
-      activeOpacity={0.7}
       onPress={onPress}
       disabled={disabled}
-      style={[styles.rectangularButton, { backgroundColor: disabled ? colors.disabled : colors.primary }, style]}
+      activeOpacity={0.7}
+      style={[
+        styles.rectangularButton,
+        outlined
+          ? {
+              borderWidth: 2,
+              borderColor: colors.primary,
+              backgroundColor: disabled ? colors.disabled : colors.background,
+            }
+          : { backgroundColor: disabled ? colors.disabled : colors.primary },
+        style,
+      ]}
     >
       <View style={localStyles.buttons}>
-        {icon && <Icon name={icon} size={16} color={colors.background} />}
-        <Text style={[localStyles.text, { color: colors.background }]}>
+        {icon && <Icon name={icon} size={16} color={outlined ? colors.primary : colors.background} />}
+        <Text style={[localStyles.text, { color: outlined ? colors.primary : colors.background }]}>
           {'  '}
           {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>
@@ -34,6 +45,30 @@ const PrimeButton = ({ onPress, style, children, icon, disabled }: IProps) => {
     </TouchableOpacity>
   );
 };
+
+/* const CustomButton = ({
+  outlined = true,
+  onPress,
+  children,
+  disabled = false,
+  style,
+}: {
+  onPress?: () => void;
+  disabled?: boolean;
+  outlined: boolean;
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) => {
+  return outlined ? (
+    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPress} disabled={disabled} style={style}>
+      {children}
+    </TouchableHighlight>
+  ) : (
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={style} disabled={disabled}>
+      {children}
+    </TouchableOpacity>
+  );
+}; */
 
 export default PrimeButton;
 

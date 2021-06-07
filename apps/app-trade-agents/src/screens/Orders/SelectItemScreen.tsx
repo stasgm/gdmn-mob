@@ -7,7 +7,7 @@ import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, IconButton } from 'react-native-paper';
+import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -82,7 +82,7 @@ const SelectItemScreen = () => {
   return (
     <View style={[styles.content, { backgroundColor: colors.background }]}>
       <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
-      <ItemSeparator />
+      <Divider />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

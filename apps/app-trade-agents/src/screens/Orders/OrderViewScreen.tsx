@@ -1,6 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -45,17 +44,21 @@ const OrderViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить',
+        title: 'Добавить товар',
         onPress: handleAddOrderLine,
       },
-      {
+      /* {
         title: 'Редактировать',
         // onPress: handleAddOrderLine,
-      },
+      }, */
       {
-        title: 'Удалить',
+        title: 'Удалить заявку',
         type: 'destructive',
         onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
       },
     ]);
   }, [showActionSheet, handleAddOrderLine, handleDelete]);
@@ -86,14 +89,12 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      {/* <Header item={order} /> */}
-      <InfoBlock colorLabel="#3914AF" title={order?.head.outlet.name}>
+      <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
         <>
           <Text>{order.number}</Text>
           <Text>{order.head.ondate}</Text>
         </>
       </InfoBlock>
-      <Divider />
       <FlatList
         ref={ref}
         data={order.lines}

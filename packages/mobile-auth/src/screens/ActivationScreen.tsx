@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform, SafeAreaView } from 'react-native';
+import { View, Keyboard } from 'react-native';
 
-import { globalStyles as styles, Input, PrimeButton, RoundButton, SubTitle } from '@lib/mobile-ui';
+import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 type Props = {
@@ -21,31 +21,27 @@ const ActivationScreen = (props: Props) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
-            <SubTitle loadIcon={loading} errorText={error ? status : ''}>
-              Активация устройства
-            </SubTitle>
-            <Input
-              label="Введите код"
-              value={activationCode}
-              autoCorrect={false}
-              keyboardType="number-pad"
-              returnKeyType="done"
-              onChangeText={setActivationCode}
-            />
-            <PrimeButton icon="login" onPress={handleActivate} disabled={loading || !activationCode}>
-              Отправить
-            </PrimeButton>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+    <>
+      <AppInputScreen>
+        <ScreenTitle loadIcon={loading} errorText={error ? status : ''}>
+          Активация устройства
+        </ScreenTitle>
+        <Input
+          label="Введите код"
+          value={activationCode}
+          autoCorrect={false}
+          keyboardType="number-pad"
+          returnKeyType="done"
+          onChangeText={setActivationCode}
+        />
+        <PrimeButton icon="login" onPress={handleActivate} disabled={loading || !activationCode}>
+          Отправить
+        </PrimeButton>
+      </AppInputScreen>
       <View style={styles.buttons}>
         <RoundButton icon="server" onPress={onDisconnect} />
       </View>
-    </SafeAreaView>
+    </>
   );
 };
 
