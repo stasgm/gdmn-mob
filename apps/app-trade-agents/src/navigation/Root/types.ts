@@ -21,6 +21,9 @@ export type RoutesStackParamList = {
   OrderView: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectItem: { docId: string; name: string };
+  ReturnView: { id: string } | undefined;
+  ReturnLine: { mode: number; docId: string; item: IReturnLine };
+  SelectItemReturn: { docId: string; name: string };
 };
 
 export type MapStackParamList = {

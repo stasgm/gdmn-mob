@@ -31,7 +31,7 @@ const ReturnViewScreen = () => {
   const ref = useRef<FlatList<IReturnLine>>(null);
 
   const handleAddReturnLine = useCallback(() => {
-    navigation.navigate('SelectItem', {
+    navigation.navigate('SelectItemReturn', {
       docId: id,
       name: 'good',
     });
