@@ -1,11 +1,11 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator } from '@lib/mobile-ui';
+import { AppInputScreen, ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, TextInput, View, Text } from 'react-native';
+import { ScrollView, TextInput, View, Text } from 'react-native';
 
 import { IGood, IReturnLine } from '../../../store/docs/types';
 
@@ -58,7 +58,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   return (
-    <SafeAreaView style={[styles.container]}>
+    <AppInputScreen>
       <ScrollView>
         <View style={[styles.content]}>
           <View style={[styles.item]}>
@@ -133,7 +133,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
         </View>*/}
         <ItemSeparator />
       </ScrollView>
-    </SafeAreaView>
+    </AppInputScreen>
   );
 };
 

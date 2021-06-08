@@ -1,6 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -47,12 +46,17 @@ const ReturnViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить',
+        title: 'Добавить товар',
         onPress: handleAddReturnLine,
       },
-      {
+      /*{
         title: 'Редактировать',
         // onPress: handleAddOrderLine,
+      },*/
+      {
+        title: 'Удалить возврат',
+        type: 'destructive',
+        onPress: handleDelete,
       },
       {
         title: 'Удалить',
@@ -74,9 +78,7 @@ const ReturnViewScreen = () => {
     });
   }, [navigation, handleAddReturnLine, actionsMenu]);
 
-  const returnDoc = ((docSelectors.selectByDocType('return') as unknown) as IReturnDocument[])?.find(
-    (e) => e.id === id,
-  );
+  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
 
   if (!returnDoc) {
     return (
@@ -97,7 +99,6 @@ const ReturnViewScreen = () => {
           <Text>{getDateString(returnDoc.documentDate)}</Text>
         </>
       </InfoBlock>
-      <Divider />
       <FlatList
         ref={ref}
         data={returnDoc.lines}

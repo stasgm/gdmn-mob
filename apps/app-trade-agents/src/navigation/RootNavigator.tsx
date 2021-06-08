@@ -33,7 +33,7 @@ const navItems: INavItem[] = [
   {
     name: 'Returns',
     title: 'Возвраты',
-    icon: 'clipboard-list-outline',
+    icon: 'file-restore',
     component: ReturnsNavigator,
   },
   {

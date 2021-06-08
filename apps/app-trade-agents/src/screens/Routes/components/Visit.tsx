@@ -39,11 +39,11 @@ const Visit = ({
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
-  const order = ((docSelectors.selectByDocType('order') as unknown) as IOrderDocument[])?.find(
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
     (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
   );
 
-  const returnDoc = ((docSelectors.selectByDocType('return') as unknown) as IReturnDocument[])?.find(
+  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find(
     (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
   );
 
@@ -72,9 +72,9 @@ const Visit = ({
       return;
     }
 
-    const coords = ((await Location.getCurrentPositionAsync({
+    const coords = (await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Lowest,
-    })) as unknown) as ICoords;
+    })) as unknown as ICoords;
 
     const date = new Date().toISOString();
 
@@ -115,7 +115,7 @@ const Visit = ({
       lines: [],
     };
 
-    dispatch(documentActions.addDocument((newOrder as unknown) as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
 
     navigation.navigate('OrderView', { id: newOrder.id });
   };
@@ -140,7 +140,7 @@ const Visit = ({
       lines: [],
     };
 
-    dispatch(documentActions.addDocument((newReturn as unknown) as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument(newReturn as unknown as IUserDocument<IDocument, IEntity[]>));
 
     navigation.navigate('ReturnView', { id: newReturn.id });
   };

@@ -26,7 +26,8 @@ const ReturnItem = ({ docId, item }: IProps) => {
     <TouchableOpacity
       onPress={() => {
         navigation.navigate('ReturnLine', { mode: 1, docId, item });
-      }}>
+      }}
+    >
       <View style={[styles.item]}>
         <View style={[styles.icon]}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />

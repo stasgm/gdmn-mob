@@ -63,7 +63,8 @@ const SelectItemScreen = () => {
             docId,
             item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 1 },
           });
-        }}>
+        }}
+      >
         <View style={[styles.item, { backgroundColor: colors.background }]}>
           <View style={[styles.icon]}>
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />

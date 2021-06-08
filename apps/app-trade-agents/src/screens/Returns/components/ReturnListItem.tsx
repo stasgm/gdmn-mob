@@ -17,9 +17,9 @@ const ReturnListItem = ({ item }: { item: IReturnDocument }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        // console.log(item.id);
         navigation.navigate('ReturnView', { id: item.id });
-      }}>
+      }}
+    >
       <View style={[styles.item, { backgroundColor: colors.background }]}>
         <View style={[styles.icon, { backgroundColor: getStatusColor(item?.status || 'DRAFT') }]}>
           <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />

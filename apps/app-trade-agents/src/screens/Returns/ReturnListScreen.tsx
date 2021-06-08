@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from 'react-native-paper';
 
 import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 import {
@@ -22,11 +21,9 @@ import ReturnListItem from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
-  const list = (docSelectors.selectByDocType('return') as unknown) as IReturnDocument[];
+  const list = docSelectors.selectByDocType('return') as unknown as IReturnDocument[];
 
   const [status, setStatus] = useState<Status>('all');
-
-  const { colors } = useTheme();
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
