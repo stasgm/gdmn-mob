@@ -91,6 +91,7 @@ interface IReturnHead {
   outlet: INamedEntity;
   depart: INamedEntity;
   reason: string;
+  road?: INamedEntity; // 	Маршрут
 }
 
 export interface IReturnLine extends IEntity {
