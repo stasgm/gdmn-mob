@@ -19,6 +19,7 @@ import {
   outletRefMock,
   debtRefMock,
   goodGroupRefMock,
+  returnDocMock,
 } from '../../../../apps/app-trade-agents/src/store/docs/mock';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
@@ -48,6 +49,7 @@ export function DrawerContent(props: Props) {
       }),
     );
     await dispatch(documentActions.addDocuments(orderMock));
+    await dispatch(documentActions.addDocuments(returnDocMock));
     await dispatch(documentActions.addDocuments(routeMock));
 
     setLoading(false);
@@ -128,6 +130,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userProfile: {
+    marginTop: 15,
     flexDirection: 'column',
   },
   profileInfo: {

@@ -1,11 +1,12 @@
 import { INamedEntity, IEntity, IUserDocument } from '@lib/types';
 
-export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
+import { TakeOrderType } from '../visits/types';
 
-export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
+// export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
+
+// export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
 //Организации
 export interface IContact extends INamedEntity {
-  externalId: string;
   contractNumber: string; // Номер договора
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
@@ -13,7 +14,6 @@ export interface IContact extends INamedEntity {
 }
 //Магазины
 export interface IOutlet extends INamedEntity {
-  externalId: string;
   company: INamedEntity; //организация-плательщик
   address: string; //Адрес разгрузки
   phoneNumber: string; // Номер телефона
@@ -30,12 +30,10 @@ export interface IDebt extends IEntity {
 }
 //Группы товаров
 export interface IGoodGroup extends INamedEntity {
-  externalId: string;
   parent?: INamedEntity;
 }
 // Товары
 export interface IGood extends INamedEntity {
-  externalId: string;
   alias: string;
   barcode: string;
   vat: string; //НДС
@@ -49,9 +47,7 @@ export interface IGood extends INamedEntity {
 }
 
 //Подразделения-склады
-export interface IDepartment extends INamedEntity {
-  externalId: string;
-}
+export type IDepartment = INamedEntity;
 // Интерфейс для матрицы номенклатур для организаций
 export interface INetPrice extends IEntity {
   contact: INamedEntity; // организация
@@ -65,7 +61,7 @@ interface IOrderHead {
   road?: INamedEntity; // 	Маршрут
   depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
   ondate: string; //  Дата отгрузки
-  takenOrder?: typeTakeOrder; //тип взятия заявки
+  takenOrder?: TakeOrderType; //тип взятия заявки
 }
 
 export interface IOrderLine extends IEntity {
@@ -78,11 +74,9 @@ export type IOrderDocument = IUserDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead {
   agent: INamedEntity;
-  externalId: IEntity;
 }
 
 export interface IRouteLine extends IEntity {
-  externalId: IEntity;
   outlet: INamedEntity;
   ordNumber: number; // порядковый номер
   comment?: string;
@@ -92,12 +86,27 @@ export interface IRouteLine extends IEntity {
 
 export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
 
-export interface ICoords {
+interface IReturnHead {
+  contact: INamedEntity;
+  outlet: INamedEntity;
+  depart: INamedEntity;
+  reason: string;
+  road?: INamedEntity; // 	Маршрут
+}
+
+export interface IReturnLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+}
+
+export type IReturnDocument = IUserDocument<IReturnHead, IReturnLine[]>;
+
+/* export interface ICoords {
   latitude: number;
   longitude: number;
 }
-
-export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
+ */
+/* export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
 export interface IVisit extends IEntity {
   routeLineId: number;
   comment?: string;
@@ -108,3 +117,4 @@ export interface IVisit extends IEntity {
   result?: resutVisit;
   takenType: typeTakeOrder; //тип визита - это поле забрать из заявки
 }
+*/

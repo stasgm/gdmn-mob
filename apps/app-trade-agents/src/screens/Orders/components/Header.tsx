@@ -1,10 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-
-import styles from '@lib/mobile-ui/src/styles/global';
-import colors from '@lib/mobile-ui/src/styles/colors';
-
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
+
+import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../../store/docs/types';
 
@@ -21,12 +19,12 @@ const Header = ({ item }: IProps) => {
       <View style={styles.details}>
         <View style={[styles.directionRow]}>
           <View style={[styles.directionRow]}>
-            <Text style={[styles.field, { color: colors.text }]}>{item.head.ondate}</Text>
+            <Text style={styles.field}>{item.head.ondate}</Text>
             <MaterialCommunityIcons name="calendar-check-outline" size={15} />
           </View>
         </View>
-        <View style={[styles.directionRow]}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.head.outlet.name}</Text>
+        <View style={styles.directionRow}>
+          <Text style={styles.name}>{item.head.outlet.name}</Text>
         </View>
       </View>
     </View>

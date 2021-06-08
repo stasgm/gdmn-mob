@@ -1,36 +1,33 @@
 import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
-
-import { FilterButtons, ItemSeparator, Status } from '@lib/mobile-ui/src/components';
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
-
-import { AddButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
-
 import { useNavigation } from '@react-navigation/native';
 
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-
-import styles from '@lib/mobile-ui/src/styles/global';
-
-import { useTheme } from 'react-native-paper';
+import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import {
+  globalStyles as styles,
+  useActionSheet,
+  AddButton,
+  DrawerButton,
+  MenuButton,
+  FilterButtons,
+  ItemSeparator,
+  Status,
+  AppScreen,
+} from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../store/docs/types';
-
-import { orderMock } from '../../store/docs/mock';
 
 import OrderListItem from './components/OrderListItem';
 
 const OrderListScreen = () => {
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+  const dispatch = useDispatch();
+
   const { loading } = useSelector((state) => state.documents);
   const list = docSelectors.selectByDocType('order') as unknown as IOrderDocument[];
 
   const [status, setStatus] = useState<Status>('all');
-
-  const { colors } = useTheme();
-
-  const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
 
   const filteredList = useMemo(() => {
     if (status === 'all') {
@@ -65,10 +62,6 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
-  const handleLoad = useCallback(() => {
-    dispatch(documentActions.setDocuments(orderMock));
-  }, [dispatch]);
-
   const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocuments());
   }, [dispatch]);
@@ -80,10 +73,6 @@ const OrderListScreen = () => {
         onPress: handleAddDocument,
       },
       {
-        title: 'Загрузить',
-        onPress: handleLoad,
-      },
-      {
         title: 'Удалить все',
         type: 'destructive',
         onPress: handleDelete,
@@ -93,15 +82,15 @@ const OrderListScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocument, handleLoad, handleDelete]);
+  }, [showActionSheet, handleAddDocument, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <AddButton onPress={handleAddDocument} />
           <MenuButton actionsMenu={actionsMenu} />
+          <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
@@ -110,7 +99,7 @@ const OrderListScreen = () => {
   const ref = useRef<FlatList<IOrderDocument>>(null);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
@@ -120,11 +109,10 @@ const OrderListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
         onEndReached={() => ({})}
-        // refreshing={loading}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+    </AppScreen>
   );
 };
 

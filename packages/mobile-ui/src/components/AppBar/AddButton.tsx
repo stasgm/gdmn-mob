@@ -6,7 +6,7 @@ interface IProps {
 }
 
 const AddButton = ({ onPress }: IProps) => {
-  return <IconButton icon="plus" size={26} onPress={onPress} />;
+  return <IconButton icon="plus" size={30} onPress={onPress} />;
 };
 
 export default AddButton;

@@ -1,21 +1,25 @@
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { View, FlatList } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Text, View, FlatList } from 'react-native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import styles from '@lib/mobile-ui/src/styles/global';
-
-import { AddButton, BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
-
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
+import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import {
+  AddButton,
+  BackButton,
+  MenuButton,
+  useActionSheet,
+  globalStyles as styles,
+  InfoBlock,
+  ItemSeparator,
+  SubTitle,
+} from '@lib/mobile-ui';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
+import { getDateString } from '../../utils/helpers';
+
 import OrderItem from './components/OrderItem';
-import Header from './components/Header';
 
 const OrderViewScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
@@ -42,17 +46,21 @@ const OrderViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить',
+        title: 'Добавить товар',
         onPress: handleAddOrderLine,
       },
-      {
+      /* {
         title: 'Редактировать',
         // onPress: handleAddOrderLine,
-      },
+      }, */
       {
-        title: 'Удалить',
+        title: 'Удалить заявку',
         type: 'destructive',
         onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
       },
     ]);
   }, [showActionSheet, handleAddOrderLine, handleDelete]);
@@ -62,14 +70,14 @@ const OrderViewScreen = () => {
       headerLeft: () => <BackButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <AddButton onPress={handleAddOrderLine} />
           <MenuButton actionsMenu={actionsMenu} />
+          <AddButton onPress={handleAddOrderLine} />
         </View>
       ),
     });
   }, [navigation, handleAddOrderLine, actionsMenu]);
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
 
   if (!order) {
     return (
@@ -83,9 +91,12 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      {/* <SubTitle style={styles.title}>{list.documentDate}</SubTitle> */}
-      <Header item={order} />
-      <Divider />
+      <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
+        <>
+          <Text>{order.number}</Text>
+          <Text>{getDateString(order.head.ondate)}</Text>
+        </>
+      </InfoBlock>
       <FlatList
         ref={ref}
         data={order.lines}

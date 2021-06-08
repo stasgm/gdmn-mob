@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { Button, IconButton, useTheme } from 'react-native-paper';
+import { View, ScrollView } from 'react-native';
 
-import { globalStyles } from '@lib/mobile-ui';
-import { SubTitle, RadioGroup } from '@lib/mobile-ui/src/components';
+import { globalStyles as styles, ScreenTitle, RadioGroup, PrimeButton, RoundButton, AppScreen } from '@lib/mobile-ui';
 import { ICompany, IResponse } from '@lib/types';
-import { company3 } from '@lib/mock';
+import { company3, company2, company } from '@lib/mock';
+
+import localStyles from './styles';
 
 type Props = {
   onLogout: () => void;
@@ -18,15 +18,13 @@ const CompaniesScreen = (props: Props) => {
   const [selectedCompany, setSelectedCompany] = useState<ICompany | undefined>(undefined);
   const [companies, setCompanies] = useState<ICompany[]>([]);
 
-  const { colors } = useTheme();
-
   // TODO 1. Загрузка списка компаний
   useEffect(() => {
     const loadCompanies = async () => {
       // const response = await apiService.auth.getUserStatus();
       const response: IResponse<ICompany[]> = {
         result: true,
-        data: [company3],
+        data: [company3, company2, company, { ...company2, id: '111', name: 'Новая компания с длинным названием' }],
       };
 
       if (response.result) {
@@ -83,67 +81,30 @@ const CompaniesScreen = (props: Props) => {
     }
   };
 
+  const handleSelectCompany = () => {
+    selectedCompany && onSetCompany(selectedCompany);
+  };
+
   return (
     <>
-      <View style={[globalStyles.container, styles.container]}>
-        <SubTitle>Выбор организации</SubTitle>
-        <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.scroll}>
+      <AppScreen>
+        <ScreenTitle style={styles.subHeader}>Выбор организации</ScreenTitle>
+        <ScrollView showsHorizontalScrollIndicator={true} style={localStyles.scroll}>
           <RadioGroup
             onChange={(value) => setSelectedCompany(companies.find((i) => i.id === value.id))}
             options={companies.map((i) => ({ id: i.id, value: i.name }))}
             activeButtonId={selectedCompany?.id}
           />
         </ScrollView>
-        <View style={styles.buttonView}>
-          <Button
-            mode="contained"
-            icon="check-circle-outline"
-            style={[globalStyles.rectangularButton, styles.button]}
-            disabled={!selectedCompany}
-            onPress={() => {
-              selectedCompany && onSetCompany(selectedCompany);
-              // actions.setCompanyID({ companyId: selectedCompany, companyName: selectedCompany });
-              // await appStorage.setItem(`${userID}/companyId`, selectedCompany);
-            }}
-          >
-            Выбрать
-          </Button>
-        </View>
-      </View>
-      <View style={globalStyles.bottomButtons}>
-        <IconButton
-          icon="account"
-          size={30}
-          onPress={handleLogOut}
-          style={{
-            ...globalStyles.circularButton,
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
-          }}
-          color={colors.background}
-        />
+        <PrimeButton icon="check-circle-outline" disabled={!selectedCompany} onPress={handleSelectCompany}>
+          Выбрать
+        </PrimeButton>
+      </AppScreen>
+      <View style={styles.buttons}>
+        <RoundButton icon="account" onPress={handleLogOut} />
       </View>
     </>
   );
 };
 
-export { CompaniesScreen };
-
-const styles = StyleSheet.create({
-  button: {
-    flex: 1,
-  },
-  container: {
-    margin: 10,
-  },
-  buttonView: {
-    flexDirection: 'row',
-  },
-  scroll: {
-    marginVertical: 10,
-    maxHeight: 150,
-  },
-  scrollContainer: {
-    justifyContent: 'flex-end',
-  },
-});
+export default CompaniesScreen;

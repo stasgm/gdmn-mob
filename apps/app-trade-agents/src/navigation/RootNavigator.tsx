@@ -8,6 +8,7 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 import OrdersNavigator from './Root/OrdersNavigator';
 import RoutesNavigator from './Root/RoutesNavigator';
 import MapNavigator from './Root/Maps/MapNavigator';
+import ReturnsNavigator from './Root/ReturnsNavigator';
 // import DocumentsNavigator from './Root/';
 
 const navItems: INavItem[] = [
@@ -28,6 +29,12 @@ const navItems: INavItem[] = [
     title: 'Заявки',
     icon: 'clipboard-list-outline',
     component: OrdersNavigator,
+  },
+  {
+    name: 'Returns',
+    title: 'Возвраты',
+    icon: 'file-restore',
+    component: ReturnsNavigator,
   },
   {
     name: 'Map',

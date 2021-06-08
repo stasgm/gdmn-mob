@@ -1,50 +1,45 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-// import { useDispatch } from 'react-redux';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
-
-import { ItemSeparator, globalStyles as styles, DrawerButton } from '@lib/mobile-ui';
-
 import { useScrollToTop } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { ItemSeparator, globalStyles as styles, DrawerButton, AppScreen } from '@lib/mobile-ui';
 
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
 
-const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
-  return (
-    <TouchableOpacity onPress={onPress}>
+import localStyles from './styles';
+
+const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => (
+  <TouchableHighlight onPress={onPress} style={styles.flexDirectionRow} activeOpacity={0.4} underlayColor="#DDDDDD">
+    <>
       <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: item.number === 0 ? 'blue' : selected ? 'red' : 'green' }]}>
-          <Text style={styles.lightField}>{item.number}</Text>
+        <View
+          style={[
+            styles.icon,
+            item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
+          ]}
+        >
+          <Text style={styles.lightText}>{item.number}</Text>
         </View>
-        {/*         <View style={styles.icon}>
-          <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
-        </View> */}
-        <View style={styles.details}>
-          <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name}</Text>
-          </View>
-          <View style={styles.flexDirectionRow}>
-            <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
-            <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
-          </View>
-        </View>
-        {/*       <View style={styles.directionRow}>
-        <Text style={styles.field}>{item.name}</Text>
-      </View> */}
-        {/* <TouchableOpacity style={[styles.icon]} onPress={() => dispatch(geoActions.deleteOne(item.id))}>
-        <MaterialCommunityIcons name="delete" size={20} color={'#FFF'} />
-      </TouchableOpacity> */}
       </View>
-    </TouchableOpacity>
-  );
-};
+      <View style={styles.details}>
+        <View style={styles.directionRow}>
+          <Text style={styles.name}>{item.name}</Text>
+        </View>
+        <View style={styles.flexDirectionRow}>
+          <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
+          <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+        </View>
+      </View>
+    </>
+  </TouchableHighlight>
+);
 
 const ListScreen = () => {
   const navigation = useNavigation();
-  // const { colors } = useTheme();
   const dispatch = useDispatch();
 
   const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
@@ -66,7 +61,7 @@ const ListScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
       <FlatList
         ref={ref}
         data={list}
@@ -74,10 +69,9 @@ const ListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
-        onEndReached={() => ({})}
         ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
       />
-    </View>
+    </AppScreen>
   );
 };
 

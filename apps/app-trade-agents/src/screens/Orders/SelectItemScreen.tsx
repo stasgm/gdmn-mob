@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, IconButton } from 'react-native-paper';
+import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -28,7 +28,6 @@ const SelectItemScreen = () => {
         .filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list, searchQuery]);
 
   useEffect(() => {
@@ -66,13 +65,13 @@ const SelectItemScreen = () => {
           });
         }}
       >
-        <View style={[styles.item, { backgroundColor: colors.background }]}>
+        <View style={styles.item}>
           <View style={[styles.icon]}>
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
           <View style={styles.details}>
             <View style={styles.directionRow}>
-              <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
+              <Text style={styles.name}>{item.name || item.id}</Text>
             </View>
           </View>
         </View>
@@ -81,9 +80,9 @@ const SelectItemScreen = () => {
   };
 
   return (
-    <View style={[styles.content, { backgroundColor: colors.background }]}>
-      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
-      <ItemSeparator />
+    <AppScreen>
+      <SubTitle style={styles.title}>{list?.name}</SubTitle>
+      <Divider />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -104,7 +103,7 @@ const SelectItemScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
-    </View>
+    </AppScreen>
   );
 };
 

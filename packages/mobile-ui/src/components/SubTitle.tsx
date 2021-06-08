@@ -26,4 +26,4 @@ const localStyles = StyleSheet.create({
   },
 });
 
-export { SubTitle };
+export default SubTitle;

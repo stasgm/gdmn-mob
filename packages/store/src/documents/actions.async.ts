@@ -14,7 +14,7 @@ export const addDocuments = (documents: IUserDocument[]): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.addDocumentsAsync.request(''));
 
-    await sleep(1000);
+    await sleep(500);
     //TODO: проверка
     if (documents) {
       return dispatch(actions.addDocumentsAsync.success(documents));

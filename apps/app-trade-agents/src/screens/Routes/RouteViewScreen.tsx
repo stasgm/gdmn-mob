@@ -4,11 +4,21 @@ import { View, FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { globalStyles as styles, ItemSeparator, SubTitle, useActionSheet, MenuButton } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  ItemSeparator,
+  SubTitle,
+  useActionSheet,
+  MenuButton,
+  BackButton,
+  AppScreen,
+} from '@lib/mobile-ui';
 import { useDispatch, documentActions, docSelectors } from '@lib/store';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IRouteDocument, IRouteLine } from '../../store/docs/types';
+
+import { getDateString } from '../../utils/helpers';
 
 import RouteItem from './components/RouteItem';
 
@@ -18,7 +28,7 @@ const RouteViewScreen = () => {
   const dispatch = useDispatch();
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
-  const list = (docSelectors.selectByDocType('route') as IRouteDocument[])?.find((e) => e.id === id);
+  const route = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])?.find((e) => e.id === id);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
@@ -42,12 +52,12 @@ const RouteViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      // headerLeft: () => <DrawerButton />,
+      headerLeft: () => <BackButton />,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [actionsMenu, navigation]);
 
-  if (!list) {
+  if (!route) {
     return (
       <View style={styles.container}>
         <SubTitle style={styles.title}>Маршрут не найден</SubTitle>
@@ -55,21 +65,21 @@ const RouteViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={list.id} />;
+  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />;
 
   return (
-    <View style={styles.container}>
-      <SubTitle style={styles.title}>{list.documentDate}</SubTitle>
+    <AppScreen>
+      <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
       <Divider />
       <FlatList
         ref={ref}
-        data={list.lines}
+        data={route.lines.sort((a, b) => a.ordNumber - b.ordNumber)}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-    </View>
+    </AppScreen>
   );
 };
 

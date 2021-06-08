@@ -1,12 +1,17 @@
 import { Dimensions, StyleSheet } from 'react-native';
 
+import colors from './colors';
+
 const globalstyles = StyleSheet.create({
+  contentTop: {
+    justifyContent: 'flex-start',
+  },
   bottomButtons: {
     alignItems: 'flex-end',
   },
   buttons: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   btnTab: {
     width: Dimensions.get('window').width / 3.2,
@@ -42,10 +47,11 @@ const globalstyles = StyleSheet.create({
     marginTop: 15,
   },
   rectangularButton: {
+    alignSelf: 'stretch',
     borderRadius: 5,
     height: 50,
     justifyContent: 'center',
-    marginVertical: 15,
+    margin: 10,
   },
   separator: {
     height: StyleSheet.hairlineWidth,
@@ -107,6 +113,14 @@ const globalstyles = StyleSheet.create({
     justifyContent: 'center',
     width: 30,
   },
+  roundButton: {
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    borderRadius: 50,
+    height: 50,
+    justifyContent: 'center',
+    width: 50,
+  },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -125,7 +139,7 @@ const globalstyles = StyleSheet.create({
   field: {
     opacity: 0.5,
   },
-  lightField: {
+  lightText: {
     fontSize: 15,
     color: '#fff',
   },

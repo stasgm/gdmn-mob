@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { Button } from 'react-native-paper';
-
-//import * as Location from 'expo-location';
-
-import { globalStyles } from '@lib/mobile-ui';
-
-//import { documentActions } from '@lib/store';
-
-import { INamedEntity } from '@lib/types';
+import React, { useLayoutEffect, useState } from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
+import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors } from '@lib/store';
+import { docSelectors, documentActions } from '@lib/store';
+import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
+import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from '../../../store';
 
-import { IVisit, ICoords } from '../../../store/visits/types';
+import { IVisit } from '../../../store/visits/types';
 import { visitActions } from '../../../store/visits/actions';
-//import { IOrderDocument } from '../../../store/docs/types';
-import { IOrderDocument } from '../../../store/docs/types';
+import { IOrderDocument, IReturnDocument } from '../../../store/docs/types';
+import { ICoords } from '../../../store/geo/types';
+import { RoutesStackParamList } from '../../../navigation/Root/types';
+import { deprt1 } from '../../../store/docs/mock';
 
-//import { StackNavigationProp } from '@react-navigation/stack';
+type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
 const Visit = ({
   item,
@@ -33,19 +31,24 @@ const Visit = ({
   contact: INamedEntity;
   road: INamedEntity;
 }) => {
-  const dateBegin = new Date(item.dateBegin);
-  const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
-  const [process, setProcess] = useState(false);
-
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
-    (item) => item.head.road?.id === road.id && item.head.outlet.id === outlet.id,
-  );
-
-  const navigation = useNavigation();
-
+  const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
 
+  const [process, setProcess] = useState(false);
+
+  const dateBegin = new Date(item.dateBegin);
+  const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
+
+  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+    (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
+  );
+
+  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find(
+    (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
+  );
+
   const timeProcess = () => {
+    // TODO Вынести в helpers
     const diffMinutes = Math.floor(
       ((item.dateEnd ? Date.parse(item.dateEnd) : Date.now()) - Date.parse(item.dateBegin)) / 60000,
     );
@@ -53,33 +56,55 @@ const Visit = ({
     return `${hour} часов ${diffMinutes - hour * 60} минут`;
   };
 
+  const twoDigits = (value: number) => {
+    // TODO Вынести в helpers
+    return value >= 10 ? value : `0${value}`;
+  };
+
   const handleCloseVisit = async () => {
+    // TODO Вынести в async actions
     setProcess(true);
 
-    /*const { status } = await Location.requestForegroundPermissionsAsync();
+    const { status } = await Location.requestForegroundPermissionsAsync();
 
     if (status !== 'granted') {
       setProcess(false);
       return;
     }
 
-    const coords = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.BestForNavigation });*/
+    const coords = (await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Lowest,
+    })) as unknown as ICoords;
+
     const date = new Date().toISOString();
 
     dispatch(
       visitActions.edit({
         id: item.id,
         dateEnd: date,
-        endGeoPoint: { latitude: 53.89076, longitude: 27.551006 } as ICoords,
-        //endGeoPoint: coords as unknown as ICoords,
+        endGeoPoint: coords,
       }),
     );
 
     setProcess(false);
   };
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+    });
+  }, [navigation]);
+
   const handleNewOrder = () => {
-    /*const newOrder: IOrderDocument = {
+    const newOrder: IOrderDocument = {
+      documentDate: new Date().toISOString(),
+      documentType: {
+        id: '1',
+        name: 'order',
+      },
+      id: '111' + new Date().toISOString(),
+      number: 'б\\н',
+      status: 'DRAFT',
       head: {
         contact,
         outlet,
@@ -89,72 +114,84 @@ const Visit = ({
       },
       lines: [],
     };
-    dispatch(documentActions.addDocument(newOrder));*/
+
+    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+
+    navigation.navigate('OrderView', { id: newOrder.id });
   };
 
-  const twoDigits = (value: number) => {
-    return value >= 10 ? value : `0${value}`;
+  const handleNewReturn = () => {
+    const newReturn: IReturnDocument = {
+      documentDate: new Date().toISOString(),
+      documentType: {
+        id: '1',
+        name: 'return',
+      },
+      id: '111' + new Date().toISOString(),
+      number: 'б\\н',
+      status: 'DRAFT',
+      head: {
+        contact,
+        outlet,
+        depart: deprt1,
+        road,
+        reason: 'Брак',
+      },
+      lines: [],
+    };
+
+    dispatch(documentActions.addDocument(newReturn as unknown as IUserDocument<IDocument, IEntity[]>));
+
+    navigation.navigate('ReturnView', { id: newReturn.id });
+  };
+
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+    !dateEnd ? 'тся' : 'лся'
+  } ${timeProcess()})`;
+  const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
+
+  const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;
+  const handleOrder = () => {
+    return order ? navigation.navigate('OrderView', { id: order.id }) : handleNewOrder();
+  };
+
+  const returnText = `Возврат (${returnDoc ? `${returnDoc.lines.length}` : '0'})`;
+  const handleReturn = () => {
+    return returnDoc ? navigation.navigate('ReturnView', { id: returnDoc.id }) : handleNewReturn();
   };
 
   return (
-    <View>
-      <Text>{`Визит начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
-        !dateEnd ? 'тся' : 'лся'
-      } ${timeProcess()})`}</Text>
+    <>
+      <InfoBlock colorLabel="#4E9600" title="Визит">
+        <>
+          <Text>{visitTextBegin}</Text>
+          {dateEnd ? (
+            <Text>{visitTextEnd}</Text>
+          ) : (
+            <View style={styles.flexGrow}>
+              <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
+                {orderText}
+              </PrimeButton>
+              <PrimeButton icon="clipboard-arrow-left-outline" onPress={handleReturn} outlined>
+                {returnText}
+              </PrimeButton>
+            </View>
+          )}
+        </>
+      </InfoBlock>
       {process ? (
-        <ActivityIndicator size="large" color="#3914AF" />
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <>
-          {dateEnd ? (
-            <Text>{`Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`}</Text>
-          ) : (
-            <>
-              <Button
-                mode="outlined"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
-                onPress={() => {
-                  //TODO: узнать есть ли заявка, если есть перейти в заявку, если нет - создать
-                  order
-                    ? navigation.navigate('Orders', {
-                        screen: 'OrderView',
-                        params: { id: order.id },
-                      })
-                    : handleNewOrder();
-                }}
-              >
-                {
-                  //TODO: узнать есть ли заявка, если есть вывести количество строк
-                  `Заявка${order && ` (${order.lines.length})`}`
-                }
-              </Button>
-              <Button
-                mode="outlined"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
-                onPress={() => {
-                  //TODO: ссылка на документ
-                }}
-              >
-                Возврат
-              </Button>
-              <Button
-                onPress={handleCloseVisit}
-                mode="contained"
-                style={[globalStyles.rectangularButton, localStyles.buttons]}
-              >
-                Завершить визит
-              </Button>
-            </>
+          {!dateEnd && (
+            <PrimeButton icon="stop-circle-outline" onPress={handleCloseVisit}>
+              Завершить визит
+            </PrimeButton>
           )}
         </>
       )}
-    </View>
+    </>
   );
 };
 
 export default Visit;
-
-const localStyles = StyleSheet.create({
-  buttons: {
-    width: '100%',
-  },
-});
