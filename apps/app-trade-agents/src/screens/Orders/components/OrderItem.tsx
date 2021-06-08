@@ -34,9 +34,14 @@ const OrderItem = ({ docId, item }: IProps) => {
         </View>
         <View style={styles.details}>
           <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>
-            {item.quantity} {good?.valuename} x {(good?.priceFsn || 0).toString()} р.
-          </Text>
+          <View style={[styles.directionRow]}>
+            <Text style={[styles.field, { color: colors.text }]}>
+              {item.quantity} x {(good?.priceFsn || 0).toString()} р.
+            </Text>
+            <Text style={[styles.field, { color: colors.text }]}>
+              {Math.floor(item.quantity * (good?.invWeight ?? 1) * 1000) / 1000} кг
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
