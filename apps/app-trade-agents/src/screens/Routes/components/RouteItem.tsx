@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { View, Text, TouchableHighlight } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -21,6 +21,8 @@ export interface IItem {
   item: IRouteLine;
 }
 
+type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
+
 const RouteItem = ({ item, routeId }: IItem) => {
   const navigation = useNavigation<RouteLineProp>();
 
@@ -31,7 +33,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
 
   const address = outlet ? outlet.address : '';
 
-  const iconsStatus = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
+  const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
   const visits = (useSelector((state) => state.visits)?.list as IVisit[]).filter(
     (visit) => visit.routeLineId.toString() === item.id,
   );
@@ -43,14 +45,16 @@ const RouteItem = ({ item, routeId }: IItem) => {
   const status = visits.length === 0 ? 0 : visits.find((visit) => visit.dateEnd) ? 2 : 1;
 
   return (
-    <TouchableOpacity
+    <TouchableHighlight
+      activeOpacity={0.7}
+      underlayColor="#DDDDDD"
       onPress={() => {
         navigation.navigate('RouteDetails', { routeId, id: item.id });
       }}
     >
       <View style={styles.item}>
         <View style={styles.icon}>
-          <Text style={styles.lightField}>{item.ordNumber}</Text>
+          <Text style={styles.lightText}>{item.ordNumber}</Text>
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
@@ -59,18 +63,18 @@ const RouteItem = ({ item, routeId }: IItem) => {
           <View style={styles.directionRow}>
             <Text style={styles.field}>{address}</Text>
             <View style={styles.directionRow}>
-              <Text style={styles.field}>{item.result}</Text>
+              <Text style={styles.field}>{item.comment}</Text>
             </View>
           </View>
         </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" />
+        <View style={styles.bottomButtons}>
+          {status ? <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" /> : null}
           <Text style={styles.field}>
             {status === 2 && lastVisit[0].dateEnd && getDateString(lastVisit[0].dateEnd)}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 };
 

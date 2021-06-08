@@ -1,11 +1,11 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator } from '@lib/mobile-ui';
+import { AppInputScreen, ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
-import { useIsFocused, useTheme } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, TextInput, View, Text } from 'react-native';
+import { ScrollView, TextInput, View, Text } from 'react-native';
 
 import { IGood, IOrderLine } from '../../../store/docs/types';
 
@@ -17,8 +17,6 @@ interface IProps {
 const OrderLine = ({ item, onSetLine }: IProps) => {
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '1');
   const isFocused = useIsFocused();
-
-  const { colors } = useTheme();
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -58,30 +56,28 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   return (
-    <SafeAreaView style={[styles.container]}>
+    <AppInputScreen>
       <ScrollView>
         <View style={[styles.content]}>
           <View style={[styles.item]}>
             <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>Наименование</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {item ? item.good.name || 'товар не найден' : ''}
-              </Text>
+              <Text style={styles.name}>Наименование</Text>
+              <Text style={[styles.number, styles.field]}>{item ? item.good.name || 'товар не найден' : ''}</Text>
             </View>
           </View>
           <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{priceFSN.toString()}</Text>
+              <Text style={styles.name}>Цена</Text>
+              <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>Количество</Text>
+              <Text style={styles.name}>Количество</Text>
               <TextInput
-                style={[styles.number, styles.field, { color: colors.text }]}
+                style={[styles.number, styles.field]}
                 editable={true}
                 keyboardType="decimal-pad"
                 onChangeText={handelQuantityChange}
@@ -91,7 +87,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               />
             </View>
           </View>
-          {/* <ItemSeparator /> */}
         </View>
         {
           // <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>
@@ -133,7 +128,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
         </View>*/}
         <ItemSeparator />
       </ScrollView>
-    </SafeAreaView>
+    </AppInputScreen>
   );
 };
 

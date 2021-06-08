@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, SafeAreaView } from 'react-native';
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { IApiConfig } from '@lib/client-types';
-import { globalStyles as styles, Input, PrimeButton, SubTitle } from '@lib/mobile-ui';
+import { AppInputScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
 
 import localStyles from './styles';
 
@@ -39,31 +39,25 @@ const ConfigScreen = (props: Props) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container]}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
-            <SubTitle>Настройка подключения</SubTitle>
-            <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
-            <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
-            <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
-            <View style={localStyles.buttonsView}>
-              <PrimeButton
-                icon="check"
-                onPress={handleSaveSettings}
-                style={localStyles.button}
-                disabled={!serverName || !serverPort || !timeout}
-              >
-                Принять
-              </PrimeButton>
-              <PrimeButton icon="cancel" onPress={navigation.goBack} style={localStyles.button}>
-                Отмена
-              </PrimeButton>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+    <AppInputScreen>
+      <ScreenTitle>Настройка подключения</ScreenTitle>
+      <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
+      <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
+      <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
+      <View style={localStyles.buttonsView}>
+        <PrimeButton
+          icon="check"
+          onPress={handleSaveSettings}
+          style={localStyles.button}
+          disabled={!serverName || !serverPort || !timeout}
+        >
+          Принять
+        </PrimeButton>
+        <PrimeButton icon="cancel" onPress={navigation.goBack} style={localStyles.button}>
+          Отмена
+        </PrimeButton>
+      </View>
+    </AppInputScreen>
   );
 };
 

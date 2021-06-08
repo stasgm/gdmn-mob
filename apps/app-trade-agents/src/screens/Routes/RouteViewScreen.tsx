@@ -11,11 +11,14 @@ import {
   useActionSheet,
   MenuButton,
   BackButton,
+  AppScreen,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, docSelectors } from '@lib/store';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IRouteDocument, IRouteLine } from '../../store/docs/types';
+
+import { getDateString } from '../../utils/helpers';
 
 import RouteItem from './components/RouteItem';
 
@@ -65,8 +68,8 @@ const RouteViewScreen = () => {
   const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />;
 
   return (
-    <View style={styles.container}>
-      <SubTitle style={styles.title}>{route.documentDate}</SubTitle>
+    <AppScreen>
+      <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
       <Divider />
       <FlatList
         ref={ref}
@@ -76,7 +79,7 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-    </View>
+    </AppScreen>
   );
 };
 

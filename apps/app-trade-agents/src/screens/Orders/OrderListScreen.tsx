@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTheme } from 'react-native-paper';
 
 import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 import {
@@ -13,6 +12,7 @@ import {
   FilterButtons,
   ItemSeparator,
   Status,
+  AppScreen,
 } from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../store/docs/types';
@@ -20,16 +20,14 @@ import { IOrderDocument } from '../../store/docs/types';
 import OrderListItem from './components/OrderListItem';
 
 const OrderListScreen = () => {
+  const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+  const dispatch = useDispatch();
+
   const { loading } = useSelector((state) => state.documents);
   const list = docSelectors.selectByDocType('order') as unknown as IOrderDocument[];
 
   const [status, setStatus] = useState<Status>('all');
-
-  const { colors } = useTheme();
-
-  const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
 
   const filteredList = useMemo(() => {
     if (status === 'all') {
@@ -88,7 +86,7 @@ const OrderListScreen = () => {
   const ref = useRef<FlatList<IOrderDocument>>(null);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
@@ -101,7 +99,7 @@ const OrderListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+    </AppScreen>
   );
 };
 

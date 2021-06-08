@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 
-import { globalStyles as styles, SubTitle, RadioGroup, PrimeButton, RoundButton } from '@lib/mobile-ui';
+import { globalStyles as styles, ScreenTitle, RadioGroup, PrimeButton, RoundButton, AppScreen } from '@lib/mobile-ui';
 import { ICompany, IResponse } from '@lib/types';
 import { company3, company2, company } from '@lib/mock';
 
@@ -87,8 +87,8 @@ const CompaniesScreen = (props: Props) => {
 
   return (
     <>
-      <View style={[styles.container]}>
-        <SubTitle style={styles.subHeader}>Выбор организации</SubTitle>
+      <AppScreen>
+        <ScreenTitle style={styles.subHeader}>Выбор организации</ScreenTitle>
         <ScrollView showsHorizontalScrollIndicator={true} style={localStyles.scroll}>
           <RadioGroup
             onChange={(value) => setSelectedCompany(companies.find((i) => i.id === value.id))}
@@ -99,7 +99,7 @@ const CompaniesScreen = (props: Props) => {
         <PrimeButton icon="check-circle-outline" disabled={!selectedCompany} onPress={handleSelectCompany}>
           Выбрать
         </PrimeButton>
-      </View>
+      </AppScreen>
       <View style={styles.buttons}>
         <RoundButton icon="account" onPress={handleLogOut} />
       </View>
