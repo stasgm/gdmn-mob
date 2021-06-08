@@ -13,9 +13,10 @@ import { useDispatch } from '../../../store';
 
 import { IVisit } from '../../../store/visits/types';
 import { visitActions } from '../../../store/visits/actions';
-import { IOrderDocument } from '../../../store/docs/types';
+import { IOrderDocument, IReturnDocument } from '../../../store/docs/types';
 import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
+import { deprt1 } from '../../../store/docs/mock';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -38,7 +39,11 @@ const Visit = ({
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+  const order = ((docSelectors.selectByDocType('order') as unknown) as IOrderDocument[])?.find(
+    (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
+  );
+
+  const returnDoc = ((docSelectors.selectByDocType('return') as unknown) as IReturnDocument[])?.find(
     (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
   );
 
@@ -67,9 +72,9 @@ const Visit = ({
       return;
     }
 
-    const coords = (await Location.getCurrentPositionAsync({
+    const coords = ((await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.Lowest,
-    })) as unknown as ICoords;
+    })) as unknown) as ICoords;
 
     const date = new Date().toISOString();
 
@@ -110,9 +115,34 @@ const Visit = ({
       lines: [],
     };
 
-    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument((newOrder as unknown) as IUserDocument<IDocument, IEntity[]>));
 
     navigation.navigate('OrderView', { id: newOrder.id });
+  };
+
+  const handleNewReturn = () => {
+    const newReturn: IReturnDocument = {
+      documentDate: new Date().toISOString(),
+      documentType: {
+        id: '1',
+        name: 'return',
+      },
+      id: '111' + new Date().toISOString(),
+      number: 'б\\н',
+      status: 'DRAFT',
+      head: {
+        contact,
+        outlet,
+        depart: deprt1,
+        road,
+        reason: 'Брак',
+      },
+      lines: [],
+    };
+
+    dispatch(documentActions.addDocument((newReturn as unknown) as IUserDocument<IDocument, IEntity[]>));
+
+    navigation.navigate('ReturnView', { id: newReturn.id });
   };
 
   const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
@@ -125,9 +155,9 @@ const Visit = ({
     return order ? navigation.navigate('OrderView', { id: order.id }) : handleNewOrder();
   };
 
-  const returnText = 'Возврат (0)';
+  const returnText = `Возврат (${returnDoc ? `${returnDoc.lines.length}` : '0'})`;
   const handleReturn = () => {
-    // return return ? navigation.navigate('ReturnView', { id: return.id }) : handleNewReturn();
+    return returnDoc ? navigation.navigate('ReturnView', { id: returnDoc.id }) : handleNewReturn();
   };
 
   return (
