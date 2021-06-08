@@ -16,7 +16,7 @@ type dbtype = {
   companies: Collection<IDBCompany>;
   messages: Collection<IDBMessage>;
   devices: Collection<IDBDevice>;
-  devicebinding: Collection<IDBDeviceBinding>;
+  deviceBindings: Collection<IDBDeviceBinding>;
 };
 
 let database: dbtype | null = null;
@@ -29,9 +29,9 @@ export const createDb = (dir: string, name: string) => {
   const companies = db.collection<IDBCompany>('companies');
   const codes = db.collection<IDBActivationCode>('activation-codes');
   const messages = db.collection<IDBMessage>('messages');
-  const devicebinding = db.collection<IDBDeviceBinding>('device-binding');
+  const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
 
-  database = { users, codes, companies, messages, devices, devicebinding };
+  database = { users, codes, companies, messages, devices, deviceBindings };
 
   return database;
 };

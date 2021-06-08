@@ -15,7 +15,7 @@ export interface IExternalSystemProps {
 
 export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
-export type UserRole = 'Admin' | 'User';
+export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
 
 // Типы для хранения данных в бд
 export interface IDBUser extends INamedEntity, IExternalSystemProps {
@@ -34,17 +34,16 @@ export interface IDBCompany extends INamedEntity, IExternalSystemProps {
 }
 
 export interface IDBDevice extends INamedEntity {
-  id: string;
-  name: string;
-  // userId: string;
   uid: string;
   state: DeviceState;
+  companyId: string;
 }
 
 export interface IDBDeviceBinding {
-  id?: string;
+  id: string;
   userId: string;
   deviceId: string;
+  state: DeviceState;
 }
 
 export interface IDBActivationCode {
@@ -85,7 +84,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;
-export type NewUser = Omit<IUser, 'role' | 'id'> & { password: string };
+export type NewUser = Omit<IDBUser, 'role' | 'id'>;
 
 export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
 
@@ -100,11 +99,19 @@ export interface IMessageInfo {
   date: Date;
 }
 
-export interface IDevice extends Omit<IDBDevice, 'userId'> {
-  user: INamedEntity;
+export interface IDevice extends Omit<IDBDevice, 'companyId'> {
+  company: INamedEntity;
+  // user: INamedEntity;
 }
 
-export type NewDevice = Pick<IDBDevice, 'name'>; // | 'userId'
+export type NewDevice = Pick<IDBDevice, 'name' | 'companyId'>;
+
+export type NewDeviceBinding = Pick<IDBDeviceBinding, 'userId' | 'deviceId'>;
+
+export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'deviceId'> {
+  user: INamedEntity;
+  device: INamedEntity;
+}
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

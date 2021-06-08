@@ -12,7 +12,14 @@ import { DataNotFoundException } from '../exceptions';
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { name } = ctx.request.body;
 
-  const device: NewDevice = { name };
+  const { companies } = ctx.state.user;
+  const companyId = companies[0].id;
+
+  console.log('companyId', companyId);
+
+  const device: NewDevice = { name, companyId };
+
+  console.log('device', device);
 
   const newDevice = await deviceService.addOne(device);
 
@@ -37,7 +44,13 @@ const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId } = ctx.params;
   const deviceData = ctx.request.body as Partial<IDevice>;
 
-  const updatedDevice = await deviceService.updateOne(deviceId, deviceData);
+  const params: Record<string, string> = {};
+
+  const { id: adminId } = ctx.state.user;
+
+  params.adminId = adminId;
+
+  const updatedDevice = await deviceService.updateOne(deviceId, deviceData, params);
 
   ok(ctx as Context, updatedDevice);
 
@@ -53,13 +66,13 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   // TODO передавать только код 204 без body
 
-  log.info(`removeDevice: device '${removeDevice.name}' is successfully removed `);
+  log.info(`removeDevice: device '${deviceId}' is successfully removed `);
 };
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
 
-  const device = await deviceService.findOneByUid(deviceId);
+  const device = await deviceService.findOne(deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -70,12 +83,26 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  const { userId } = ctx.query;
+  const { companyId, uId, state } = ctx.query;
 
   const params: Record<string, string> = {};
 
-  if (typeof userId === 'string') {
-    params.userId = userId;
+  const { id: adminId } = ctx.state.user;
+
+  if (typeof companyId === 'string') {
+    params.companyId = companyId;
+  }
+
+  if (typeof uId === 'string') {
+    params.uId = uId;
+  }
+
+  if (typeof state === 'string') {
+    params.state = state;
+  }
+
+  if (typeof adminId === 'string') {
+    params.adminId = adminId;
   }
 
   const deviceList = await deviceService.findAll(params);
@@ -85,15 +112,15 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getDevices: devises are successfully received');
 };
 
-const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceId }: { id: string } = ctx.params;
+// const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
+//   const { id: deviceId }: { id: string } = ctx.params;
 
-  const userList = await deviceService.findUsers(deviceId);
+//   const userList = await deviceService.findUsers(deviceId);
 
-  ok(ctx as Context, userList);
+//   ok(ctx as Context, userList);
 
-  log.info('getUsersByDevice: user by device is successfully received');
-};
+//   log.info('getUsersByDevice: user by device is successfully received');
+// };
 
 // const getDeviceByUser = async (ctx: ParameterizedContext): Promise<void> => {
 //   const { id: deviceId, name }: { id: string; name: string } = ctx.params;
@@ -179,4 +206,4 @@ const getUsersByDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 */
-export { addDevice, updateDevice, removeDevice, getDevice, getDevices, getUsersByDevice };
+export { addDevice, updateDevice, removeDevice, getDevice, getDevices };

@@ -29,10 +29,10 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   const newUserObj: IDBUser = {
     id: '',
     name: newUser.name,
-    companies: newUser.companies?.map((i) => i.id),
+    companies: newUser.companies.map((i) => i),
     password: passwordHash,
-    role: !newUser.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
-    creatorId: newUser.creator?.id || '',
+    role: !newUser.creatorId ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
+    creatorId: newUser.creatorId || '',
     externalId: newUser.externalId,
     firstName: newUser.firstName,
     lastName: newUser.lastName,

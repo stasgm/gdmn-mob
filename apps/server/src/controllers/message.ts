@@ -55,7 +55,13 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId: companyName, appSystem } = ctx.params;
   let userId = ctx.state.user.id;
 
-  const company = await companyService.findOneByName(companyName);
+  const params: Record<string, string> = {};
+
+  if (typeof companyName === 'string') {
+    params.name = companyName;
+  }
+
+  const company = await companyService.findOne(companyName);
 
   if (!company) {
     //ctx.throw(400, 'компания не найдена');

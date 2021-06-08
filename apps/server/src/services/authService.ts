@@ -4,7 +4,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import bcrypt from 'bcrypt';
 
-import { IUser, NewUser } from '@lib/types';
+import { IUser, NewUser, IDBUser } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -14,7 +14,7 @@ import { getDb } from './dao/db';
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const db = getDb();
 
-  const { devices, users, devicebinding } = db;
+  const { devices, users } = db;
 
   const { deviceId } = ctx.query;
   const { name }: { name: string } = ctx.request.body;
@@ -64,38 +64,42 @@ const signUp = async (user: NewUser): Promise<IUser> => {
 
   if (!userCount) {
     // TODO временно!!! в дальнейшем пользователя внешней системы тоже надо создавать
-    const gdmnUserObj: Omit<IUser, 'id'> & { password: string } = {
+    const gdmnUserObj: IDBUser = {
+      id: '',
       name: 'gdmn',
-      creator: {
-        id: '',
-        name: '',
-      },
+      creatorId: '',
       password: 'gdmn',
       companies: [],
       role: 'Admin',
+      creationDate: new Date().toString(),
+      editionDate: new Date().toString(),
     };
 
-    const gdmnUser = await userService.addOne(gdmnUserObj);
+    await userService.addOne(gdmnUserObj);
 
     await devices.insert({
       id: '',
       name: 'GDMN-WEB',
       uid: 'WEB',
       state: 'ACTIVE',
-      // userId: gdmnUser.id,
+      companyId: '',
+      creationDate: new Date().toString(),
+      editionDate: new Date().toString(),
     });
   }
 
   const newUser = await userService.addOne(user);
 
-  if (!user.creator?.id) {
+  if (!user.creatorId) {
     // TODO временно!!! если создаётся не пользователем то добавляем устройство WEB
     await devices.insert({
       id: '',
       name: 'WEB',
       uid: 'WEB',
       state: 'ACTIVE',
-      userId: newUser.id,
+      companyId: '',
+      creationDate: new Date().toString(),
+      editionDate: new Date().toString(),
     });
   }
 

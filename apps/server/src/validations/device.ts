@@ -45,4 +45,5 @@ const getUsersByDevice: Config = {
     }),
   },
 };
+
 export { addDevice, updateDevice, removeDevice, getDevice, getUsersByDevice };
