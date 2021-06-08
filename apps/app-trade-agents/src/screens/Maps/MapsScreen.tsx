@@ -58,11 +58,8 @@ const MapScreen = () => {
       return initialList;
     };
 
-    console.log(outlets);
-
     if (routeList && outlets) {
       getLocations()
-        // .then((e) => console.log(e))
         .then((e) => dispatch(geoActions.addMany(e)))
         .catch((err) => console.log(err));
     }
@@ -215,7 +212,7 @@ const MapScreen = () => {
                   : localStyles.mark,
               ]}
             >
-              <Text style={styles.lightField}>{point.number}</Text>
+              <Text style={styles.lightText}>{point.number}</Text>
             </View>
           </Marker>
         ))}

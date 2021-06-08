@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import React, { useLayoutEffect, useState } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import * as Location from 'expo-location';
 
 import { docSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
-import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton } from '@lib/mobile-ui';
+import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument } from '../../store/docs/types';
@@ -18,15 +17,24 @@ import { visitActions } from '../../store/visits/actions';
 
 import { ICoords } from '../../store/geo/types';
 
+import { getDateString } from '../../utils/helpers';
+
 import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === id);
 
   const [process, setProcess] = useState(false);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+    });
+  }, [navigation]);
 
   const point = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])
     ?.find((e) => e.id === routeId)
@@ -87,8 +95,8 @@ const RouteDetailScreen = () => {
   };
 
   return (
-    <View style={[styles.container, currStyles.content]}>
-      <InfoBlock colorLabel="#3914AF" title={point.outlet.name}>
+    <AppScreen style={styles.contentTop}>
+      <InfoBlock colorLabel="#4479D4" title={point.outlet.name}>
         <>
           {outlet && (
             <>
@@ -99,8 +107,8 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? '#F80012' : '#00C322'}
-        title={`Договор №${contact?.contractNumber} от ${contact?.contractDate}`}
+        colorLabel={debt.saldo > 0 ? '#FC3F4D' : '#00C322'}
+        title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>
           {contact && (
@@ -112,7 +120,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       {process ? (
-        <ActivityIndicator size="large" color="#3914AF" />
+        <ActivityIndicator size="large" color="#0000ff" />
       ) : visits.length > 0 ? (
         <>
           {visits.map((visit) => (
@@ -126,18 +134,12 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <PrimeButton icon="play-box-outline" onPress={handleNewVisit}>
+        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit}>
           Начать визит
         </PrimeButton>
       )}
-    </View>
+    </AppScreen>
   );
 };
 
 export default RouteDetailScreen;
-
-const currStyles = StyleSheet.create({
-  content: {
-    justifyContent: 'flex-start',
-  },
-});

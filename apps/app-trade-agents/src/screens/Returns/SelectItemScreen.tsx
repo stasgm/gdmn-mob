@@ -9,7 +9,7 @@ import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
-import { OrdersStackParamList } from '../../navigation/Root/types';
+import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 const SelectItemScreen = () => {
   const navigation = useNavigation();
@@ -18,7 +18,7 @@ const SelectItemScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const { docId, name } = useRoute<RouteProp<OrdersStackParamList, 'SelectItem'>>().params;
+  const { docId, name } = useRoute<RouteProp<ReturnsStackParamList, 'SelectItem'>>().params;
 
   const list = refSelectors.selectByName(name) as IReference<INamedEntity>;
 
@@ -58,20 +58,20 @@ const SelectItemScreen = () => {
       <TouchableOpacity
         onPress={() => {
           // dispatch(documentActions.);
-          navigation.navigate('OrderLine', {
+          navigation.navigate('ReturnLine', {
             mode: 0,
             docId,
             item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 1 },
           });
         }}
       >
-        <View style={styles.item}>
+        <View style={[styles.item, { backgroundColor: colors.background }]}>
           <View style={[styles.icon]}>
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
           <View style={styles.details}>
             <View style={styles.directionRow}>
-              <Text style={styles.name}>{item.name || item.id}</Text>
+              <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
             </View>
           </View>
         </View>
@@ -81,7 +81,7 @@ const SelectItemScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{list?.name}</SubTitle>
+      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
       <Divider />
       {filterVisible && (
         <>

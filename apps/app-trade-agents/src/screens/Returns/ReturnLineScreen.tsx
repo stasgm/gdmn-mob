@@ -5,14 +5,14 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { OrdersStackParamList } from '../../navigation/Root/types';
+import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 import { IOrderLine } from '../../store/docs/types';
 
-import OrderLine from './components/OrderLine';
+import ReturnLine from './components/ReturnLine';
 
-const OrderLineScreen = () => {
-  const { mode, docId, item } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
+const ReturnLineScreen = () => {
+  const { mode, docId, item } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
 
   const [line, setLine] = useState<IOrderLine>(item);
 
@@ -27,13 +27,12 @@ const OrderLineScreen = () => {
       dispatch(documentActions.updateDocumentLine({ docId, line }));
     }
 
-    // navigation.goBack();
-    navigation.navigate('OrderView', { id: docId });
+    navigation.navigate('ReturnView', { id: docId });
   }, [navigation, line, docId, dispatch, mode]);
 
   /* const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocumentLine({ docId, lineId: line.id }));
-    navigation.navigate('OrderView', { id: docId });
+    navigation.navigate('ReturnView', { id: docId });
   }, [dispatch, docId, line.id, navigation]); */
 
   /*   const actionsMenu = useCallback(() => {
@@ -59,8 +58,8 @@ const OrderLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <OrderLine item={item} onSetLine={(value: IOrderLine) => setLine(value)} />
+      <ReturnLine item={item} onSetLine={(value: IOrderLine) => setLine(value)} />
     </View>
   );
 };
-export default OrderLineScreen;
+export default ReturnLineScreen;

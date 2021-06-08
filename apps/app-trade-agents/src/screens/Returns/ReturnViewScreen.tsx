@@ -14,23 +14,23 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOrderLine } from '../../store/docs/types';
+import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 
-import OrderItem from './components/OrderItem';
+import ReturnItem from './components/ReturnItem';
 
-const OrderViewScreen = () => {
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
+const ReturnViewScreen = () => {
+  const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.id;
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const ref = useRef<FlatList<IOrderLine>>(null);
+  const ref = useRef<FlatList<IReturnLine>>(null);
 
-  const handleAddOrderLine = useCallback(() => {
-    navigation.navigate('SelectItem', {
+  const handleAddReturnLine = useCallback(() => {
+    navigation.navigate('SelectItemReturn', {
       docId: id,
       name: 'good',
     });
@@ -39,7 +39,7 @@ const OrderViewScreen = () => {
   const handleDelete = useCallback(() => {
     if (id) {
       dispatch(documentActions.deleteDocument(id));
-      navigation.navigate('OrderList');
+      navigation.navigate('ReturnList');
     }
   }, [dispatch, id, navigation]);
 
@@ -47,23 +47,24 @@ const OrderViewScreen = () => {
     showActionSheet([
       {
         title: 'Добавить товар',
-        onPress: handleAddOrderLine,
+        onPress: handleAddReturnLine,
       },
-      /* {
+      /*{
         title: 'Редактировать',
         // onPress: handleAddOrderLine,
-      }, */
+      },*/
       {
-        title: 'Удалить заявку',
+        title: 'Удалить возврат',
         type: 'destructive',
         onPress: handleDelete,
       },
       {
-        title: 'Отмена',
-        type: 'cancel',
+        title: 'Удалить',
+        type: 'destructive',
+        onPress: handleDelete,
       },
     ]);
-  }, [showActionSheet, handleAddOrderLine, handleDelete]);
+  }, [showActionSheet, handleAddReturnLine, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -71,15 +72,15 @@ const OrderViewScreen = () => {
       headerRight: () => (
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />
-          <AddButton onPress={handleAddOrderLine} />
+          <AddButton onPress={handleAddReturnLine} />
         </View>
       ),
     });
-  }, [navigation, handleAddOrderLine, actionsMenu]);
+  }, [navigation, handleAddReturnLine, actionsMenu]);
 
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
+  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
 
-  if (!order) {
+  if (!returnDoc) {
     return (
       <View style={styles.container}>
         <SubTitle style={styles.title}>Заказ не найден</SubTitle>
@@ -87,19 +88,20 @@ const OrderViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IOrderLine }) => <OrderItem docId={order.id} item={item} />;
+  const renderItem = ({ item }: { item: IReturnLine }) => <ReturnItem docId={returnDoc.id} item={item} />;
 
   return (
     <View style={[styles.container]}>
-      <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
+      {/* <Header item={order} /> */}
+      <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
         <>
-          <Text>{order.number}</Text>
-          <Text>{getDateString(order.head.ondate)}</Text>
+          <Text>{returnDoc.number}</Text>
+          <Text>{getDateString(returnDoc.documentDate)}</Text>
         </>
       </InfoBlock>
       <FlatList
         ref={ref}
-        data={order.lines}
+        data={returnDoc.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
@@ -109,4 +111,4 @@ const OrderViewScreen = () => {
   );
 };
 
-export default OrderViewScreen;
+export default ReturnViewScreen;

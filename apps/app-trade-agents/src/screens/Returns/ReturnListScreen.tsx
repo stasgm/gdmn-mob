@@ -15,19 +15,19 @@ import {
   AppScreen,
 } from '@lib/mobile-ui';
 
-import { IOrderDocument } from '../../store/docs/types';
+import { IReturnDocument } from '../../store/docs/types';
 
-import OrderListItem from './components/OrderListItem';
+import ReturnListItem from './components/ReturnListItem';
 
-const OrderListScreen = () => {
+const ReturnListScreen = () => {
+  const { loading } = useSelector((state) => state.documents);
+  const list = docSelectors.selectByDocType('return') as unknown as IReturnDocument[];
+
+  const [status, setStatus] = useState<Status>('all');
+
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-
-  const { loading } = useSelector((state) => state.documents);
-  const list = docSelectors.selectByDocType('order') as unknown as IOrderDocument[];
-
-  const [status, setStatus] = useState<Status>('all');
 
   const filteredList = useMemo(() => {
     if (status === 'all') {
@@ -41,12 +41,12 @@ const OrderListScreen = () => {
   }, [status, list]);
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderDocument }) => <OrderListItem key={item.id} item={item} />,
+    ({ item }: { item: IReturnDocument }) => <ReturnListItem key={item.id} item={item} />,
     [],
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('OrderView');
+    navigation.navigate('ReturnView');
   }, [navigation]);
 
   const handleDelete = useCallback(() => {
@@ -83,7 +83,7 @@ const OrderListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const ref = useRef<FlatList<IOrderDocument>>(null);
+  const ref = useRef<FlatList<IReturnDocument>>(null);
 
   return (
     <AppScreen>
@@ -103,4 +103,4 @@ const OrderListScreen = () => {
   );
 };
 
-export default OrderListScreen;
+export default ReturnListScreen;

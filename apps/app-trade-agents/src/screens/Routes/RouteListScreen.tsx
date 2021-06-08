@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text } from 'react-native';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
 
-import { ItemSeparator, FilterButtons, Status, globalStyles as styles, DrawerButton } from '@lib/mobile-ui';
+import { ItemSeparator, FilterButtons, Status, globalStyles as styles, DrawerButton, AppScreen } from '@lib/mobile-ui';
 import { useSelector, docSelectors } from '@lib/store';
 
 import { IRouteDocument } from '../../store/docs/types';
@@ -42,7 +42,7 @@ const RouteListScreen = () => {
   const renderItem = ({ item }: { item: IRouteDocument }) => <RouteListItem key={item.id} item={item} />;
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
@@ -54,7 +54,7 @@ const RouteListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+    </AppScreen>
   );
 };
 

@@ -1,11 +1,12 @@
 import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Avatar, Divider, useTheme, Button } from 'react-native-paper';
+import { Avatar, Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
 
 import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { PrimeButton } from '@lib/mobile-ui/src/components';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
@@ -54,12 +55,12 @@ const ProfileScreen = () => {
       </View>
       <Divider />
       <View>
-        <Button mode="outlined" style={[styles.button]} onPress={handleLogout}>
+        <PrimeButton outlined onPress={handleLogout}>
           Сменить пользователя
-        </Button>
-        <Button mode="outlined" style={[styles.button]} onPress={handleChangeCompany}>
+        </PrimeButton>
+        <PrimeButton outlined onPress={handleChangeCompany}>
           Сменить организацию
-        </Button>
+        </PrimeButton>
       </View>
     </View>
   );
@@ -96,10 +97,5 @@ const styles = StyleSheet.create({
   profileInfoTextUser: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  button: {
-    height: 50,
-    justifyContent: 'center',
-    margin: 10,
   },
 });
