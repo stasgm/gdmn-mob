@@ -1,4 +1,4 @@
-import { IOrderLine } from '../../store/docs/types';
+import { IOrderLine, IReturnLine } from '../../store/docs/types';
 
 export type OrdersStackParamList = {
   OrderList: undefined;
@@ -10,7 +10,7 @@ export type OrdersStackParamList = {
 export type ReturnsStackParamList = {
   ReturnList: undefined;
   ReturnView: { id: string } | undefined;
-  ReturnLine: { mode: number; docId: string; item: IOrderLine };
+  ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItem: { docId: string; name: string };
 };
 

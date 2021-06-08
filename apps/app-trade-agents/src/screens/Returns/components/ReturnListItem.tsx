@@ -6,10 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IOrderDocument } from '../../../store/docs/types';
+import { IReturnDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';
+import { getDateString } from '../../../utils/helpers';
 
-const ReturnListItem = ({ item }: { item: IOrderDocument }) => {
+const ReturnListItem = ({ item }: { item: IReturnDocument }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -27,11 +28,11 @@ const ReturnListItem = ({ item }: { item: IOrderDocument }) => {
           <View style={[styles.directionRow]}>
             <View>
               <Text style={[styles.name, { color: colors.text }]}>
-                № {item.number} от {item.documentDate}
+                № {item.number} от {getDateString(item.documentDate)}
               </Text>
             </View>
             <View style={[styles.directionRow]}>
-              <Text style={[styles.field, { color: colors.text }]}>{item.head.ondate}</Text>
+              <Text style={[styles.field, { color: colors.text }]}>{getDateString(item.documentDate)}</Text>
               <MaterialCommunityIcons name="calendar-check-outline" size={15} />
             </View>
           </View>

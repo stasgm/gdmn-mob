@@ -7,11 +7,11 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, TextInput, View, Text } from 'react-native';
 
-import { IGood, IOrderLine } from '../../../store/docs/types';
+import { IGood, IReturnLine } from '../../../store/docs/types';
 
 interface IProps {
-  item: IOrderLine;
-  onSetLine: (value: IOrderLine) => void;
+  item: IReturnLine;
+  onSetLine: (value: IReturnLine) => void;
 }
 
 const ReturnLine = ({ item, onSetLine }: IProps) => {

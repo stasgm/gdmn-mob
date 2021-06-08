@@ -16,7 +16,9 @@ import {
 } from '@lib/mobile-ui';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOrderLine } from '../../store/docs/types';
+import { IReturnDocument, IReturnLine } from '../../store/docs/types';
+
+import { getDateString } from '../../utils/helpers';
 
 import ReturnItem from './components/ReturnItem';
 
@@ -26,7 +28,7 @@ const ReturnViewScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const ref = useRef<FlatList<IOrderLine>>(null);
+  const ref = useRef<FlatList<IReturnLine>>(null);
 
   const handleAddReturnLine = useCallback(() => {
     navigation.navigate('SelectItem', {
@@ -72,7 +74,9 @@ const ReturnViewScreen = () => {
     });
   }, [navigation, handleAddReturnLine, actionsMenu]);
 
-  const returnDoc = ((docSelectors.selectByDocType('return') as unknown) as IOrderDocument[])?.find((e) => e.id === id);
+  const returnDoc = ((docSelectors.selectByDocType('return') as unknown) as IReturnDocument[])?.find(
+    (e) => e.id === id,
+  );
 
   if (!returnDoc) {
     return (
@@ -82,7 +86,7 @@ const ReturnViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IOrderLine }) => <ReturnItem docId={returnDoc.id} item={item} />;
+  const renderItem = ({ item }: { item: IReturnLine }) => <ReturnItem docId={returnDoc.id} item={item} />;
 
   return (
     <View style={[styles.container]}>
@@ -90,7 +94,7 @@ const ReturnViewScreen = () => {
       <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
         <>
           <Text>{returnDoc.number}</Text>
-          <Text>{returnDoc.head.ondate}</Text>
+          <Text>{getDateString(returnDoc.documentDate)}</Text>
         </>
       </InfoBlock>
       <Divider />

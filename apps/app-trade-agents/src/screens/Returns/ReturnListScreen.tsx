@@ -15,13 +15,13 @@ import {
   Status,
 } from '@lib/mobile-ui';
 
-import { IOrderDocument } from '../../store/docs/types';
+import { IReturnDocument } from '../../store/docs/types';
 
 import ReturnListItem from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
-  const list = (docSelectors.selectByDocType('return') as unknown) as IOrderDocument[];
+  const list = (docSelectors.selectByDocType('return') as unknown) as IReturnDocument[];
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -43,7 +43,7 @@ const ReturnListScreen = () => {
   }, [status, list]);
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderDocument }) => <ReturnListItem key={item.id} item={item} />,
+    ({ item }: { item: IReturnDocument }) => <ReturnListItem key={item.id} item={item} />,
     [],
   );
 
@@ -85,7 +85,7 @@ const ReturnListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const ref = useRef<FlatList<IOrderDocument>>(null);
+  const ref = useRef<FlatList<IReturnDocument>>(null);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

@@ -1,12 +1,13 @@
 import { IReference, ICompany, IUser, INamedEntity } from '@lib/types';
 import { superAdmin, user } from '@lib/mock';
 
-import { IOrderDocument, IRouteDocument } from './types';
+import { IDepartment, IOrderDocument, IReturnDocument, IRouteDocument } from './types';
 
 const orderType = { id: '147010699', name: 'order' };
 const routeType = { id: '147019291', name: 'route' };
+const returnType = { id: '147019292', name: 'return' };
 
-const documentTypeMock = [orderType, routeType];
+const documentTypeMock = [orderType, routeType, returnType];
 
 //companys
 
@@ -624,7 +625,7 @@ const orderMock: IOrderDocument[] = [
     ],
   },
   {
-    id: '32',
+    id: '147023011',
     number: '229',
     documentDate: '2021-06-04',
     documentType: orderType,
@@ -639,10 +640,74 @@ const orderMock: IOrderDocument[] = [
   },
 ];
 
+const departmetsMock: IDepartment[] = [
+  { id: '147012303', name: 'Склад №1' },
+  { id: '147012304', name: 'Склад №2' },
+  { id: '147012305', name: 'Склад №3' },
+];
+
+const deprt1 = departmetsMock[0];
+const deprt2 = departmetsMock[1];
+const deprt3 = departmetsMock[2];
+
+// Документ Return
+const returnDocMock: IReturnDocument[] = [
+  {
+    id: '147023012',
+    number: '230',
+    documentDate: '2021-06-04',
+    documentType: returnType,
+    status: 'DRAFT',
+    head: {
+      contact: contact1,
+      outlet: outlet1,
+      depart: deprt1,
+      reason: 'Брак',
+    },
+    lines: [
+      { id: '147023073', good: good3, quantity: 4 },
+      { id: '147023074', good: good6, quantity: 2 },
+    ],
+  },
+  {
+    id: '147023013',
+    number: '231',
+    documentDate: '2021-05-31',
+    documentType: returnType,
+    status: 'SENT',
+    head: {
+      contact: contact1,
+      outlet: outlet3,
+      depart: deprt2,
+      reason: 'Брак',
+    },
+    lines: [
+      { id: '147023076', good: good5, quantity: 23 },
+      { id: '147023077', good: good1, quantity: 1 },
+    ],
+  },
+  {
+    id: '147023014',
+    number: '232',
+    documentDate: '2021-06-01',
+    documentType: returnType,
+    status: 'PROCESSED',
+    head: {
+      contact: contact1,
+      outlet: outlet2,
+      depart: deprt3,
+      reason: 'Брак',
+    },
+    lines: [],
+  },
+];
+
 export {
   documentTypeMock,
   routeMock,
   orderMock,
+  returnDocMock,
+  departmetsMock,
   contactRefMock,
   contact1,
   contact2,
