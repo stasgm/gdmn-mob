@@ -13,6 +13,7 @@ import {
   FilterButtons,
   ItemSeparator,
   Status,
+  AppScreen,
 } from '@lib/mobile-ui';
 
 import { IReturnDocument } from '../../store/docs/types';
@@ -88,7 +89,7 @@ const ReturnListScreen = () => {
   const ref = useRef<FlatList<IReturnDocument>>(null);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
         ref={ref}
@@ -101,7 +102,7 @@ const ReturnListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+    </AppScreen>
   );
 };
 
