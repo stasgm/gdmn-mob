@@ -7,6 +7,8 @@ import RouteDetailScreen from '../../screens/Routes/RouteDetailScreen';
 
 import { OrderLineScreen, OrderViewScreen, SelectItemScreen } from '../../screens/Orders';
 
+import { ReturnLineScreen, ReturnViewScreen, SelectItemScreen as SelectItemReturnScreen } from '../../screens/Returns';
+
 import { RoutesStackParamList } from './types';
 
 const Stack = createStackNavigator<RoutesStackParamList>();
@@ -23,6 +25,9 @@ const RoutesNavigator = () => {
       <Stack.Screen name="OrderView" component={OrderViewScreen} options={{ title: 'Заявка' }} />
       <Stack.Screen name="OrderLine" component={OrderLineScreen} options={{ title: 'Заявка' }} />
       <Stack.Screen name="SelectItem" component={SelectItemScreen} options={{ title: 'Заявка' }} />
+      <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возврат' }} />
+      <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возврат' }} />
+      <Stack.Screen name="SelectItemReturn" component={SelectItemReturnScreen} options={{ title: 'Возврат' }} />
     </Stack.Navigator>
   );
 };

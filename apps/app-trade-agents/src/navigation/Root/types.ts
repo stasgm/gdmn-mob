@@ -1,9 +1,16 @@
-import { IOrderLine } from '../../store/docs/types';
+import { IOrderLine, IReturnLine } from '../../store/docs/types';
 
 export type OrdersStackParamList = {
   OrderList: undefined;
   OrderView: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
+  SelectItem: { docId: string; name: string };
+};
+
+export type ReturnsStackParamList = {
+  ReturnList: undefined;
+  ReturnView: { id: string } | undefined;
+  ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItem: { docId: string; name: string };
 };
 
@@ -14,6 +21,9 @@ export type RoutesStackParamList = {
   OrderView: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectItem: { docId: string; name: string };
+  ReturnView: { id: string } | undefined;
+  ReturnLine: { mode: number; docId: string; item: IReturnLine };
+  SelectItemReturn: { docId: string; name: string };
 };
 
 export type MapStackParamList = {

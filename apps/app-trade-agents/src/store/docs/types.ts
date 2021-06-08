@@ -86,6 +86,21 @@ export interface IRouteLine extends IEntity {
 
 export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
 
+interface IReturnHead {
+  contact: INamedEntity;
+  outlet: INamedEntity;
+  depart: INamedEntity;
+  reason: string;
+  road?: INamedEntity; // 	Маршрут
+}
+
+export interface IReturnLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+}
+
+export type IReturnDocument = IUserDocument<IReturnHead, IReturnLine[]>;
+
 /* export interface ICoords {
   latitude: number;
   longitude: number;
