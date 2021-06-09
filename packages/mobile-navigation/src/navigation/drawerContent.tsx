@@ -87,7 +87,8 @@ export function DrawerContent(props: Props) {
               backgroundColor: paperTheme.colors.surface,
               transform: [{ translateX }],
             },
-          ]}>
+          ]}
+        >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />
           </Drawer.Section>
