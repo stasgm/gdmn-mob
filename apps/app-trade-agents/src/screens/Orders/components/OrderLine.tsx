@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { AppInputScreen, ItemSeparator } from '@lib/mobile-ui';
+import { ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { useIsFocused } from '@react-navigation/native';
@@ -21,7 +21,7 @@ interface IProps {
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const OrderLine = ({ item, onSetLine }: IProps) => {
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '1');
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '0');
   const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
@@ -72,93 +72,91 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   return (
-    <AppInputScreen>
-      <ScrollView>
-        <View style={[styles.content]}>
-          <View style={[styles.item]}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={[styles.number, styles.field]}>{item ? item.good.name || 'товар не найден' : ''}</Text>
-            </View>
+    <ScrollView>
+      <View style={[styles.content]}>
+        <View style={[styles.item]}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Наименование</Text>
+            <Text style={[styles.number, styles.field]}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество</Text>
-              <TextInput
-                style={[styles.number, styles.field]}
-                editable={true}
-                keyboardType="decimal-pad"
-                onChangeText={handelQuantityChange}
-                returnKeyType="done"
-                autoFocus={isFocused}
-                value={goodQty}
-              />
-            </View>
-          </View>
-          <ItemSeparator />
-          <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-            </View>
-            <MaterialCommunityIcons
-              name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
-          {isVisiblePackages && (
-            <View>
-              <View>
-                {packages.length > 0 ? (
-                  <View style={localStyles.packages}>
-                    {packages.map((elem) => (
-                      <Checkbox
-                        key={elem.package.id}
-                        title={elem.package.name}
-                        selected={elem.package.id === pack?.id}
-                        onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                      />
-                    ))}
-                  </View>
-                ) : (
-                  <Text>Для данного товара нет</Text>
-                )}
-              </View>
-            </View>
-          )}
         </View>
-        {
-          // <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>
-          //   {listPackageTypes.map((packege) => {
-          //     return (
-          //       <List.Item
-          //         key={packege.id ?? '1'}
-          //         title={packege.value ?? ''}
-          //         onPress={() =>
-          //           actions.setForm({
-          //             ...state.forms?.documentLineParams,
-          //             packagekey: packege.id,
-          //           })
-          //         }
-          //         right={() => (
-          //           <Checkbox color={colors.primary} status={packagekey === packege.id ? 'checked' : 'unchecked'} />
-          //         )}
-          //         style={styles.item}
-          //       />
-          //     );
-          //   })}
-          // </List.Accordion>
-        }
-        {/*<View style={[styles.fieldContainer, { backgroundColor: colors.card }]}>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Цена</Text>
+            <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
+          </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Количество</Text>
+            <TextInput
+              style={[styles.number, styles.field]}
+              editable={true}
+              keyboardType="decimal-pad"
+              onChangeText={handelQuantityChange}
+              returnKeyType="done"
+              autoFocus={isFocused}
+              value={goodQty}
+            />
+          </View>
+        </View>
+        <ItemSeparator />
+        <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Упаковка</Text>
+            <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+          </View>
+          <MaterialCommunityIcons
+            name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
+        {isVisiblePackages && (
+          <View>
+            {packages.length > 0 ? (
+              <View style={localStyles.packages}>
+                {packages.map((elem) => (
+                  <Checkbox
+                    key={elem.package.id}
+                    title={elem.package.name}
+                    selected={elem.package.id === pack?.id}
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <Text style={localStyles.text}>Для данного товара нет</Text>
+            )}
+          </View>
+        )}
+        <ItemSeparator />
+      </View>
+      {
+        // <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>
+        //   {listPackageTypes.map((packege) => {
+        //     return (
+        //       <List.Item
+        //         key={packege.id ?? '1'}
+        //         title={packege.value ?? ''}
+        //         onPress={() =>
+        //           actions.setForm({
+        //             ...state.forms?.documentLineParams,
+        //             packagekey: packege.id,
+        //           })
+        //         }
+        //         right={() => (
+        //           <Checkbox color={colors.primary} status={packagekey === packege.id ? 'checked' : 'unchecked'} />
+        //         )}
+        //         style={styles.item}
+        //       />
+        //     );
+        //   })}
+        // </List.Accordion>
+      }
+      {/*<View style={[styles.fieldContainer, { backgroundColor: colors.card }]}>
           <Text style={styles.inputCaption}>Упаковка:</Text>
           <ReferenceItem
             value={selectedItem(listPackageTypes, packagekey)?.value}
@@ -174,9 +172,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
             }
           />
         </View>*/}
-        <ItemSeparator />
-      </ScrollView>
-    </AppInputScreen>
+    </ScrollView>
   );
 };
 
@@ -184,6 +180,9 @@ const localStyles = StyleSheet.create({
   packages: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  text: {
+    padding: 10,
   },
 });
 

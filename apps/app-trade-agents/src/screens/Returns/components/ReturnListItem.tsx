@@ -31,10 +31,10 @@ const ReturnListItem = ({ item }: { item: IReturnDocument }) => {
                 № {item.number} от {getDateString(item.documentDate)}
               </Text>
             </View>
-            <View style={[styles.directionRow]}>
+            {/*<View style={[styles.directionRow]}>
               <Text style={[styles.field, { color: colors.text }]}>{getDateString(item.documentDate)}</Text>
               <MaterialCommunityIcons name="calendar-check-outline" size={15} />
-            </View>
+            </View>*/}
           </View>
           <View style={[styles.directionRow, localStyles.alignStart]}>
             <Text style={[styles.field, localStyles.maxWidth90, { color: colors.text }]}>{item.head.outlet.name}</Text>

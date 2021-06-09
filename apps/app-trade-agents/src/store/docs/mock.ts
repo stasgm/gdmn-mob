@@ -413,26 +413,17 @@ const netPriceRefMock: IReference = {
 
 // Упаковки
 const packageMock: IPackage[] = [
-  {
-    id: '147012132',
-    name: '2 кг. - 3 кг. (5)',
-  },
-  {
-    id: '147012088',
-    name: 'мал. батон',
-  },
-  {
-    id: '147012092',
-    name: 'большой батон 5',
-  },
-  {
-    id: '147012136',
-    name: '1кг охл',
-  },
-  {
-    id: '147012124',
-    name: '2 кг, п/ёмк',
-  },
+  { id: '400901187', name: 'Мал. подл.' },
+  { id: '400959429', name: 'Больш. подл.' },
+  { id: '514132623', name: 'мал. батон' },
+  { id: '615762858', name: 'большой батон 5' },
+  { id: '1607786773', name: '2 кг. - 3 кг.(5)' },
+  { id: '1607786791', name: '2 кг. - 3 кг.(10)' },
+  { id: '1758284018', name: '1 кг, п/ёмк' },
+  { id: '1758284020', name: '2 кг, п/ёмк' },
+  { id: '1901754964', name: '1кг охл' },
+  { id: '1901775186', name: '2 кг зам' },
+  { id: '1901776044', name: '1кг зам' },
 ];
 
 const packageRefMock: IReference<IPackage> = {
@@ -441,39 +432,23 @@ const packageRefMock: IReference<IPackage> = {
   data: packageMock,
 };
 
-const package1 = { id: packageMock[0].id, name: packageMock[0].name };
-const package2 = { id: packageMock[1].id, name: packageMock[1].name };
-const package3 = { id: packageMock[2].id, name: packageMock[2].name };
-const package4 = { id: packageMock[3].id, name: packageMock[3].name };
-const package5 = { id: packageMock[4].id, name: packageMock[4].name };
-
 // Связка товары - упаковки
 const packageGoodMock: IPackageGood[] = [
-  {
-    id: '147012137',
-    good: good2,
-    package: package2,
-  },
-  {
-    id: '147012138',
-    good: good2,
-    package: package3,
-  },
-  {
-    id: '147012139',
-    good: good5,
-    package: package1,
-  },
-  {
-    id: '147012140',
-    good: good5,
-    package: package4,
-  },
-  {
-    id: '147012141',
-    good: good5,
-    package: package5,
-  },
+  { id: '147012137', good: good2, package: packageMock[2] },
+  { id: '147012138', good: good2, package: packageMock[3] },
+  { id: '147012139', good: good5, package: packageMock[4] },
+  { id: '147012140', good: good5, package: packageMock[8] },
+  { id: '147012141', good: good5, package: packageMock[7] },
+  { id: '147012142', good: good1, package: packageMock[0] },
+  { id: '147012143', good: good1, package: packageMock[1] },
+  { id: '147012144', good: good3, package: packageMock[4] },
+  { id: '147012145', good: good3, package: packageMock[5] },
+  { id: '147012146', good: good3, package: packageMock[7] },
+  { id: '147012147', good: good3, package: packageMock[6] },
+  { id: '147012148', good: good4, package: packageMock[10] },
+  { id: '147012149', good: good4, package: packageMock[9] },
+  { id: '147012150', good: good6, package: packageMock[9] },
+  { id: '147012151', good: good6, package: packageMock[10] },
 ];
 
 const packageGoodRefMock: IReference<IPackageGood> = {
@@ -731,7 +706,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'DRAFT',
     head: {
       contact: contact1,
-      outlet: outlet1,
+      outlet: outlet2,
       depart: deprt1,
       reason: 'Брак',
     },
@@ -748,7 +723,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'SENT',
     head: {
       contact: contact1,
-      outlet: outlet3,
+      outlet: outlet4,
       depart: deprt2,
       reason: 'Брак',
     },
@@ -765,7 +740,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'PROCESSED',
     head: {
       contact: contact1,
-      outlet: outlet2,
+      outlet: outlet5,
       depart: deprt3,
       reason: 'Брак',
     },
@@ -826,10 +801,5 @@ export {
   companies,
   company,
   packageRefMock,
-  package1,
-  package2,
-  package3,
-  package4,
-  package5,
   packageGoodRefMock,
 };
