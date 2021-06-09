@@ -801,10 +801,5 @@ export {
   companies,
   company,
   packageRefMock,
-  package1,
-  package2,
-  package3,
-  package4,
-  package5,
   packageGoodRefMock,
 };
