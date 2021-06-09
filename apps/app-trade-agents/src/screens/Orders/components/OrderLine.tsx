@@ -1,22 +1,33 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { AppInputScreen, ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
-import { IReference } from '@lib/types';
+import { INamedEntity, IReference } from '@lib/types';
 import { useIsFocused } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, TextInput, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View, Text } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import { IGood, IOrderLine } from '../../../store/docs/types';
+import { IGood, IOrderLine, IPackageGood } from '../../../store/docs/types';
+
+import Checkbox from './Checkbox';
 
 interface IProps {
   item: IOrderLine;
   onSetLine: (value: IOrderLine) => void;
 }
 
+type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
+
 const OrderLine = ({ item, onSetLine }: IProps) => {
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '1');
   const isFocused = useIsFocused();
+  const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
+  const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
+  const packages = (refSelectors.selectByName('packageGood') as IReference<IPackageGood>)?.data?.filter(
+    (e) => e.good.id === item.good.id,
+  );
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -34,6 +45,11 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
+
+  useEffect(() => {
+    onSetLine({ ...item, packagekey: pack });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pack]);
 
   /*   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -87,6 +103,38 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               />
             </View>
           </View>
+          <ItemSeparator />
+          <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Упаковка</Text>
+              <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+            </View>
+            <MaterialCommunityIcons
+              name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
+              size={24}
+              color="black"
+            />
+          </TouchableOpacity>
+          {isVisiblePackages && (
+            <View>
+              <View>
+                {packages.length > 0 ? (
+                  <View style={localStyles.packages}>
+                    {packages.map((elem) => (
+                      <Checkbox
+                        key={elem.package.id}
+                        title={elem.package.name}
+                        selected={elem.package.id === pack?.id}
+                        onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                      />
+                    ))}
+                  </View>
+                ) : (
+                  <Text>Для данного товара нет</Text>
+                )}
+              </View>
+            </View>
+          )}
         </View>
         {
           // <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>
@@ -131,5 +179,12 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     </AppInputScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  packages: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+});
 
 export default OrderLine;

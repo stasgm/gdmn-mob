@@ -1,7 +1,7 @@
 import { IReference, ICompany, IUser, INamedEntity } from '@lib/types';
 import { superAdmin, user } from '@lib/mock';
 
-import { IDepartment, IOrderDocument, IReturnDocument, IRouteDocument } from './types';
+import { IDepartment, IOrderDocument, IPackage, IPackageGood, IReturnDocument, IRouteDocument } from './types';
 
 const orderType = { id: '147010699', name: 'order' };
 const routeType = { id: '147019291', name: 'route' };
@@ -411,6 +411,77 @@ const netPriceRefMock: IReference = {
   data: netPriceMock,
 };
 
+// Упаковки
+const packageMock: IPackage[] = [
+  {
+    id: '147012132',
+    name: '2 кг. - 3 кг. (5)',
+  },
+  {
+    id: '147012088',
+    name: 'мал. батон',
+  },
+  {
+    id: '147012092',
+    name: 'большой батон 5',
+  },
+  {
+    id: '147012136',
+    name: '1кг охл',
+  },
+  {
+    id: '147012124',
+    name: '2 кг, п/ёмк',
+  },
+];
+
+const packageRefMock: IReference<IPackage> = {
+  id: '56',
+  name: 'Упаковки',
+  data: packageMock,
+};
+
+const package1 = { id: packageMock[0].id, name: packageMock[0].name };
+const package2 = { id: packageMock[1].id, name: packageMock[1].name };
+const package3 = { id: packageMock[2].id, name: packageMock[2].name };
+const package4 = { id: packageMock[3].id, name: packageMock[3].name };
+const package5 = { id: packageMock[4].id, name: packageMock[4].name };
+
+// Связка товары - упаковки
+const packageGoodMock: IPackageGood[] = [
+  {
+    id: '147012137',
+    good: good2,
+    package: package2,
+  },
+  {
+    id: '147012138',
+    good: good2,
+    package: package3,
+  },
+  {
+    id: '147012139',
+    good: good5,
+    package: package1,
+  },
+  {
+    id: '147012140',
+    good: good5,
+    package: package4,
+  },
+  {
+    id: '147012141',
+    good: good5,
+    package: package5,
+  },
+];
+
+const packageGoodRefMock: IReference<IPackageGood> = {
+  id: '57',
+  name: 'Упаковки-товары',
+  data: packageGoodMock,
+};
+
 //  Документ Route
 const routeMock: IRouteDocument[] = [
   {
@@ -754,4 +825,11 @@ export {
   agent3,
   companies,
   company,
+  packageRefMock,
+  package1,
+  package2,
+  package3,
+  package4,
+  package5,
+  packageGoodRefMock,
 };
