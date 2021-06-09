@@ -15,7 +15,7 @@ interface IProps {
 }
 
 const ReturnLine = ({ item, onSetLine }: IProps) => {
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '1');
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '0');
   const isFocused = useIsFocused();
 
   const { colors } = useTheme();
