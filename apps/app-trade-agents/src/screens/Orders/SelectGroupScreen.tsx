@@ -4,14 +4,18 @@ import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup } from '../../store/docs/types';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
+
+const keyStore = 'Order/GoodGroup';
 
 const Group = ({
   item,
@@ -37,7 +41,7 @@ const Group = ({
   const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id);
 
   const isExpand =
-    expendGroup && expendGroup === item.id && !!nextLevelGroups.find((group) => group.id === expendGroup);
+    !expendGroup || expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
 
   const icon = (nextLevelGroups.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
 
@@ -104,7 +108,33 @@ const SelectGroupScreen = () => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
     });
-  }, [navigation, colors.card]);
+
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem(keyStore);
+        if (value !== null) {
+          const expandGroup = groups.data.find((group) => group.id === value);
+          setExpend(expandGroup);
+        }
+      } catch (e) {
+        // error reading value
+      }
+    };
+
+    getData();
+  }, [navigation, colors.card, groups.data]);
+
+  useEffect(() => {
+    const storeData = async () => {
+      try {
+        expend ? await AsyncStorage.setItem(keyStore, expend.id) : await AsyncStorage.removeItem(keyStore);
+      } catch (e) {
+        // saving error
+      }
+    };
+
+    storeData();
+  }, [expend]);
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
