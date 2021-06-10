@@ -33,6 +33,7 @@ const currStyles = StyleSheet.create({
     marginBottom: 10,
   },
   info: {
+    flex: 1,
     margin: 5,
     marginLeft: 15,
   },
