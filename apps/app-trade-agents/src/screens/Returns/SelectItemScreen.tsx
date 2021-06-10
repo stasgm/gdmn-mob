@@ -54,7 +54,7 @@ const SelectItemScreen = () => {
           navigation.navigate('ReturnLine', {
             mode: 0,
             docId,
-            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 1 },
+            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
           });
         }}
       >

@@ -54,12 +54,12 @@ const SelectItemScreen = () => {
           navigation.navigate('OrderLine', {
             mode: 0,
             docId,
-            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 1 },
+            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
           });
         }}
       >
         <View style={styles.item}>
-          <View style={[styles.icon]}>
+          <View style={styles.icon}>
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
           <View style={styles.details}>
