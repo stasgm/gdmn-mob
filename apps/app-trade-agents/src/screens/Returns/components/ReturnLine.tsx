@@ -90,46 +90,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
             />
           </View>
         </View>
-        {/* <ItemSeparator /> */}
       </View>
-      {
-        // <List.Accordion id={'package'} key={'package'} title={'Упаковка'}>
-        //   {listPackageTypes.map((packege) => {
-        //     return (
-        //       <List.Item
-        //         key={packege.id ?? '1'}
-        //         title={packege.value ?? ''}
-        //         onPress={() =>
-        //           actions.setForm({
-        //             ...state.forms?.documentLineParams,
-        //             packagekey: packege.id,
-        //           })
-        //         }
-        //         right={() => (
-        //           <Checkbox color={colors.primary} status={packagekey === packege.id ? 'checked' : 'unchecked'} />
-        //         )}
-        //         style={styles.item}
-        //       />
-        //     );
-        //   })}
-        // </List.Accordion>
-      }
-      {/*<View style={[styles.fieldContainer, { backgroundColor: colors.card }]}>
-          <Text style={styles.inputCaption}>Упаковка:</Text>
-          <ReferenceItem
-            value={selectedItem(listPackageTypes, packagekey)?.value}
-            disabled={false}
-            onPress={() =>
-              navigation.navigate('SelectItem', {
-                formName: 'documentLineParams',
-                title: 'Упаковка',
-                fieldName: 'packagekey',
-                list: listPackageTypes,
-                value: [packagekey],
-              })
-            }
-          />
-        </View>*/}
       <ItemSeparator />
     </ScrollView>
   );
