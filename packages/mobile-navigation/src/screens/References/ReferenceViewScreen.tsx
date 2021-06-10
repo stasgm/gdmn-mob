@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useLayoutEffect, useEffect } from 'react';
-import { SubTitle, ItemSeparator } from '@lib/mobile-ui/src/components';
+import { SubTitle, ItemSeparator, BackButton, SearchButton } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { useScrollToTop, RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { View, FlatList } from 'react-native';
-import { IconButton, Searchbar, useTheme } from 'react-native-paper';
+import { Searchbar, useTheme } from 'react-native-paper';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -38,14 +38,8 @@ const ReferenceViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.disabled }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-      ),
+      headerLeft: () => <BackButton />,
+      headerRight: () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
     });
   }, [navigation, filterVisible]);
 

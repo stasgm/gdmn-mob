@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, IconButton, Divider } from 'react-native-paper';
+import { Searchbar, Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -39,14 +39,7 @@ const SelectItemScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-      ),
+      headerRight: () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
     });
   }, [navigation, filterVisible, colors.card]);
 
