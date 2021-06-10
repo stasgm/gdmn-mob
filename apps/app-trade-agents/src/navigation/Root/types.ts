@@ -4,6 +4,8 @@ export type OrdersStackParamList = {
   OrderList: undefined;
   OrderView: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
+  SelectGroupItem: { docId: string };
+  SelectGoodItem: { docId: string; groupId: string };
   SelectItem: { docId: string; name: string };
 };
 
