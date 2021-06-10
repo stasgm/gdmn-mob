@@ -1,30 +1,38 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView, TouchableOpacity } from '@gorhom/bottom-sheet';
-import React, { useMemo, Ref, ReactNode } from 'react';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+  TouchableOpacity,
+} from '@gorhom/bottom-sheet';
+import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
+import React, { useMemo, ReactNode } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import { ItemSeparator } from './ItemSeparator';
 
 interface IProps {
-  sheetRef: Ref<BottomSheetModal>;
+  sheetRef?: React.RefObject<BottomSheetModalMethods>;
   children?: ReactNode;
   title?: string;
-  handelDismiss: () => void;
-  handelApply: () => void;
+  onDismiss: () => void;
+  onApply: () => void;
 }
 
-const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply }: IProps) => {
+const BottomSheet = ({ sheetRef, children, title, onDismiss, onApply }: IProps) => {
   const snapPoints = useMemo(() => ['40%', '90%'], []);
+
   return (
-    <View>
+    <BottomSheetModalProvider>
       <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
         <View style={styles.container}>
           <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={handelDismiss}>
+            <TouchableOpacity onPress={onDismiss}>
               <MaterialCommunityIcons name={'close'} color={'#000'} size={24} />
             </TouchableOpacity>
             <Text style={styles.text}>{title}</Text>
-            <TouchableOpacity onPress={handelApply}>
+            <TouchableOpacity onPress={onApply}>
               <MaterialCommunityIcons name={'check'} color={'#000'} size={24} />
             </TouchableOpacity>
           </View>
@@ -34,7 +42,7 @@ const BottomSheet = ({ sheetRef, children, title, handelDismiss, handelApply }: 
           <View>{children}</View>
         </BottomSheetScrollView>
       </BottomSheetModal>
-    </View>
+    </BottomSheetModalProvider>
   );
 };
 

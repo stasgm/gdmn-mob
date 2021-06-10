@@ -27,7 +27,7 @@
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.8.0",
     "@expo/vector-icons": "^12.0.0",
-    "@gorhom/bottom-sheet": "^3.6.3",
+    "@gorhom/bottom-sheet": "^4.0.0-alpha.11",
     "@lib/client-api": "*",
     "@lib/client-types": "*",
     "@lib/mobile-auth": "*",
@@ -37,6 +37,7 @@
     "@lib/store": "*",
     "@lib/types": "*",
     "@react-native-async-storage/async-storage": "^1.13.0",
+    "@react-native-community/datetimepicker": "^3.5.2",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.8",
     "@react-navigation/drawer": "^5.12.4",

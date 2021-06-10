@@ -31,6 +31,8 @@ interface Props {
     | 'twitter'
     | 'web-search'
     | undefined;
+  editable?: boolean;
+  onFocus?: (() => void) | undefined;
 }
 
 const Input: React.FC<Props> = ({
@@ -43,6 +45,8 @@ const Input: React.FC<Props> = ({
   autoCorrect,
   keyboardType,
   returnKeyType,
+  editable,
+  onFocus,
 }) => {
   const { colors } = useTheme();
 
@@ -70,6 +74,8 @@ const Input: React.FC<Props> = ({
           placeholderTextColor={colors.text}
           secureTextEntry={secureText}
           spellCheck={spellCheck}
+          editable={editable}
+          onFocus={onFocus}
         />
       </View>
     </View>
