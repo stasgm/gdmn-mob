@@ -55,6 +55,14 @@ export interface INetPrice extends IEntity {
   pricefso?: number; // цена ФСО
   pricefsn?: number; // цена ФСН
 }
+
+export type IPackage = INamedEntity;
+
+export interface IPackageGood extends IEntity {
+  good: INamedEntity;
+  package: INamedEntity;
+}
+
 interface IOrderHead {
   contact: INamedEntity; //организация-плательщик
   outlet: INamedEntity; // магазин –подразделение организации плательщика
