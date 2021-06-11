@@ -9,10 +9,10 @@ import { useNavigation } from '@react-navigation/core';
 import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { documentsMock } from '@lib/mock';
-
+/*
 import { useRoute, RouteProp } from '@react-navigation/native';
 
-import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
+import { DocumentsTabsStackParamsList } from '../../navigation/Root/types'; */
 
 import { styles } from './styles';
 import DocumentItem from './components/DocumentItem';
@@ -20,7 +20,7 @@ import DocumentItem from './components/DocumentItem';
 const DocumentListScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
   // const { colors } = useTheme();
-  const docType = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().params?.type;
+  // const docType = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().params?.type;
   // const route = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().name;
 
   // console.log('docType', docType);

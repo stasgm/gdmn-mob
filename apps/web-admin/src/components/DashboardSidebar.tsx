@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Avatar, Box, Divider, Drawer, Hidden, List, Typography } from '@material-ui/core';
+import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,

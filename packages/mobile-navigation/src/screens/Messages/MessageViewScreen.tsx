@@ -5,7 +5,7 @@ import { useTheme, FAB } from 'react-native-paper';
 import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IDocument, IReferences, IUserDocument } from '@lib/types';
+import { IReferences, IUserDocument } from '@lib/types';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
 import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';

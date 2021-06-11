@@ -12,12 +12,19 @@ import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
 
+import localStyles from './styles';
+
 const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: item.number === 0 ? 'blue' : selected ? 'red' : 'green' }]}>
-          <Text style={styles.lightField}>{item.number}</Text>
+        <View
+          style={[
+            styles.icon,
+            item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
+          ]}
+        >
+          <Text style={styles.lightText}>{item.number}</Text>
         </View>
         {/*         <View style={styles.icon}>
           <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
