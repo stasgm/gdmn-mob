@@ -72,6 +72,15 @@ const styles = StyleSheet.create({
   pointName: {
     fontSize: 18,
   },
+  mark: {
+    backgroundColor: 'green',
+  },
+  myLocationMark: {
+    backgroundColor: 'blue',
+  },
+  selectedMark: {
+    backgroundColor: 'red',
+  },
 });
 
 export default styles;
