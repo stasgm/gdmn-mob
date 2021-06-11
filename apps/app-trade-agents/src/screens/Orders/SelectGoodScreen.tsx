@@ -26,7 +26,8 @@ const Good = ({ item }: { item: INamedEntity }) => {
           docId,
           item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
         });
-      }}>
+      }}
+    >
       <View style={styles.item}>
         <View style={[styles.icon]}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />

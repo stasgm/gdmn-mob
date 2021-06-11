@@ -63,7 +63,8 @@ const Group = ({
                 docId,
                 groupId: item.id,
               })
-        }>
+        }
+      >
         <View style={styles.details}>
           <Text style={styles.name}>{item.name}</Text>
           {nextLevelGroups.length === 0 && (
