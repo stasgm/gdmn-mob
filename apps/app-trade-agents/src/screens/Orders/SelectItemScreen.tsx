@@ -1,34 +1,63 @@
-import { v4 as uuid } from 'uuid';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import {
+  AppScreen,
+  BackButton,
+  ItemSeparator,
+  SaveButton,
+  SearchButton,
+  SubTitle,
+  globalStyles as styles,
+} from '@lib/mobile-ui';
 import { INamedEntity, IReference } from '@lib/types';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
-import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
+import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
+import { refSelectors } from '@lib/store';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
+import { useDispatch, useSelector } from '../../store';
+import { appActions } from '../../store/app/actions';
+import { IOrderHead } from '../../store/docs/types';
 
 const SelectItemScreen = () => {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const dispatch = useDispatch();
+
+  const { refName, isMulti, fieldName, title, value } =
+    useRoute<RouteProp<OrdersStackParamList, 'SelectItem'>>().params;
+
+  const list = (refSelectors.selectByName(refName) as IReference<INamedEntity>)?.data;
+
+  const formParams = useSelector((state) => state.app.formParams);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
+  const [filteredList, setFilteredList] = useState<INamedEntity[]>();
+  const [checkedItem, setCheckedItem] = useState<INamedEntity[] | INamedEntity>();
 
-  const { docId, name } = useRoute<RouteProp<OrdersStackParamList, 'SelectItem'>>().params;
+  useEffect(() => {
+    setCheckedItem(value);
+  }, [searchQuery, value]);
 
-  const list = refSelectors.selectByName(name) as IReference<INamedEntity>;
-
-  const filteredList = useMemo(() => {
-    return (
-      list?.data
-        .filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
+  useEffect(() => {
+    if (!list) {
+      return;
+    }
+    setFilteredList(
+      list
+        .filter((i) => i?.name?.toUpperCase().includes(searchQuery.toUpperCase()))
+        .sort((a, _b) => {
+          return isMulti
+            ? !(checkedItem as INamedEntity[])?.find((v) => v.id === a.id)
+              ? -1
+              : 1
+            : (checkedItem as INamedEntity)?.id === a.id
+            ? -1
+            : 1;
+        }),
     );
-  }, [list, searchQuery]);
+  }, [checkedItem, isMulti, list, searchQuery, value]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -36,45 +65,66 @@ const SelectItemScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
-    });
-  }, [navigation, filterVisible, colors.card]);
-
   const refList = React.useRef<FlatList<INamedEntity>>(null);
   useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: INamedEntity }) => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          // dispatch(documentActions.);
-          navigation.navigate('OrderLine', {
-            mode: 0,
-            docId,
-            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
-          });
-        }}
-      >
-        <View style={styles.item}>
-          <View style={styles.icon}>
-            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-          </View>
-          <View style={styles.details}>
-            <View style={styles.directionRow}>
-              <Text style={styles.name}>{item.name || item.id}</Text>
-            </View>
-          </View>
+  const handleSelectItem = useCallback(
+    (item: INamedEntity) => {
+      if (isMulti) {
+        setCheckedItem((prev) => [...(prev as INamedEntity[]), { id: item.id, name: item.name }]);
+      } else {
+        dispatch(
+          appActions.setFormParams({
+            ...formParams,
+            [fieldName]: { id: item.id, name: item.name },
+          }),
+        );
+        navigation.goBack();
+      }
+    },
+    [isMulti, dispatch, formParams, fieldName, navigation],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: INamedEntity }) => {
+      const isChecked = isMulti
+        ? !!(checkedItem as INamedEntity[])?.find((i) => i.id === item.id)
+        : item.id === (checkedItem as INamedEntity)?.id;
+      return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
+    },
+    [checkedItem, isMulti, handleSelectItem],
+  );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />
+          {isMulti && (
+            <SaveButton
+              onPress={() => {
+                if (!checkedItem) {
+                  Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
+                  return;
+                }
+                const newFormParams: Partial<IOrderHead> = {
+                  ...formParams,
+                  [fieldName]: checkedItem,
+                };
+                dispatch(appActions.setFormParams(newFormParams));
+                navigation.goBack();
+              }}
+            />
+          )}
         </View>
-      </TouchableOpacity>
-    );
-  };
+      ),
+    });
+  }, [checkedItem, fieldName, isMulti, navigation, formParams, filterVisible, dispatch]);
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{list?.name}</SubTitle>
+      <SubTitle style={styles.title}>{title}</SubTitle>
       <Divider />
       {filterVisible && (
         <>
@@ -99,5 +149,24 @@ const SelectItemScreen = () => {
     </AppScreen>
   );
 };
+
+const LineItem = React.memo(
+  ({ item, isChecked, onCheck }: { item: INamedEntity; isChecked: boolean; onCheck: (id: INamedEntity) => void }) => {
+    const { colors } = useTheme();
+
+    return (
+      <TouchableOpacity onPress={() => onCheck(item)}>
+        <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
+          <View style={styles.details}>
+            <View style={styles.directionRow}>
+              <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  },
+);
 
 export default SelectItemScreen;

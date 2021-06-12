@@ -1,3 +1,5 @@
+import { INamedEntity } from '@lib/types';
+
 import { IOrderLine, IReturnLine } from '../../store/docs/types';
 
 export type OrdersStackParamList = {
@@ -5,7 +7,14 @@ export type OrdersStackParamList = {
   OrderView: { id: string } | undefined;
   OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
-  SelectItem: { docId: string; name: string };
+  SelectItem: {
+    parentScreen: keyof OrdersStackParamList;
+    refName: string;
+    fieldName: string;
+    title: string;
+    isMulti?: boolean;
+    value: INamedEntity[];
+  };
 };
 
 export type ReturnsStackParamList = {

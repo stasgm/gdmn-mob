@@ -63,7 +63,7 @@ export interface IPackageGood extends IEntity {
   package: INamedEntity;
 }
 
-interface IOrderHead {
+export interface IOrderHead {
   contact: INamedEntity; //организация-плательщик
   outlet: INamedEntity; // магазин –подразделение организации плательщика
   road?: INamedEntity; // 	Маршрут
