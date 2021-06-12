@@ -35,7 +35,7 @@ const FilterButtons = ({ status, onPress }: IProps) => {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.buttons}>
+    <View style={styles.containerCenter}>
       {statusTypes.map((e) => {
         return (
           <TouchableHighlight

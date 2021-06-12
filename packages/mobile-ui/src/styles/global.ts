@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import colors from './colors';
 
@@ -14,7 +14,7 @@ const globalstyles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   btnTab: {
-    width: Dimensions.get('window').width / 3.2,
+    flex: 1,
     flexDirection: 'row',
     borderWidth: 0.5,
     borderRadius: 0,
@@ -40,6 +40,10 @@ const globalstyles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     padding: 5,
+  },
+  containerCenter: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   input: {
     fontSize: 18,

@@ -1,8 +1,8 @@
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
+import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
-import { RouteProp, useRoute, useScrollToTop } from '@react-navigation/native';
-import React, { useMemo } from 'react';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
@@ -33,6 +33,7 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
 
 const ReferenceDetailScreen = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   const { name, id } = useRoute<RouteProp<ReferenceStackParamList, 'ReferenceDetals'>>().params;
 
@@ -58,6 +59,12 @@ const ReferenceDetailScreen = () => {
   useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IProperty }) => <LineItem item={item} />;
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+    });
+  }, [navigation]);
 
   return (
     <View style={[styles.content, { backgroundColor: colors.background }]}>
