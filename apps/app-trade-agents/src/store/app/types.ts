@@ -1,7 +1,9 @@
-import { IOrderHead } from '../docs/types';
+export interface IFormParam {
+  [fieldName: string]: unknown;
+}
 
 export interface IAppState {
-  formParams?: Partial<IOrderHead>;
+  formParams?: IFormParam;
 }
 
 // export interface IAppParams extends Partial<

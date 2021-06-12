@@ -19,7 +19,7 @@ const Header = ({ item }: IProps) => {
       <View style={styles.details}>
         <View style={[styles.directionRow]}>
           <View style={[styles.directionRow]}>
-            <Text style={styles.field}>{item.head.ondate}</Text>
+            <Text style={styles.field}>{item.head.onDate}</Text>
             <MaterialCommunityIcons name="calendar-check-outline" size={15} />
           </View>
         </View>

@@ -109,7 +109,7 @@ const Visit = ({
         contact,
         outlet,
         road,
-        ondate: new Date().toISOString(),
+        onDate: new Date().toISOString(),
         takenOrder: item.takenType,
       },
       lines: [],

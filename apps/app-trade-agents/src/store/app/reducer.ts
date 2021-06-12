@@ -19,7 +19,7 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         formParams: { ...state.formParams, ...action.payload },
       };
 
-    case getType(appActions.cleanFormParams):
+    case getType(appActions.clearFormParams):
       return {
         ...state,
         formParams: {},

@@ -1,20 +1,31 @@
 import { v4 as uuid } from 'uuid';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, TouchableOpacity } from 'react-native';
-import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
 import { BackButton, AppInputScreen, Input, ScreenTitle, SaveButton } from '@lib/mobile-ui';
 
+import { INamedEntity } from '@lib/types';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOrderHead } from '../../store/docs/types';
+import { IOrderDocument } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
 import { orderType } from '../../store/docs/mock';
 import { IDocument, IEntity, IUserDocument } from '../../../../../packages/types';
+import { IFormParam } from '../../store/app/types';
+
+interface IOrderFormParam extends IFormParam {
+  contact?: INamedEntity;
+  outlet?: INamedEntity;
+  number?: string;
+  documentDate?: string;
+  onDate?: string;
+}
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
@@ -25,94 +36,97 @@ const OrderEditScreen = () => {
   const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
 
   const [status, setStatus] = useState(order?.status || 0);
-  const [docNumber, setDocNumber] = useState(order?.number);
-  const [docOnDate, setDocOnDate] = useState(order?.head.ondate || new Date().toISOString().slice(0, 10));
-  const [docContact, setDocContact] = useState(order?.head.contact);
-  const [docOutlet, setDocOutlet] = useState(order?.head.outlet);
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  const { contact, outlet } = useMemo(() => {
-    return (formParams || {}) as Partial<IOrderHead>;
+  console.log('formParams', formParams);
+
+  const {
+    contact: docContact,
+    outlet: docOutlet,
+    number: docNumber,
+    documentDate: docDocumentDate,
+    onDate: docOnDate,
+  } = useMemo(() => {
+    return formParams as IOrderFormParam;
   }, [formParams]);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     const cleanFormParams = () => dispatch(appActions.cleanFormParams());
-
-  //     return () => cleanFormParams();
-  //   }, [dispatch]),
-  // );
-
   useEffect(() => {
-    setDocContact(contact);
-  }, [contact]);
+    setStatus(order?.status || 'DRAFT');
 
-  useEffect(() => {
-    setDocOutlet(outlet);
-  }, [outlet]);
-
-  const checkDocument = useCallback(() => {
-    const res = docNumber && docContact && docOutlet;
-    console.log(docNumber, docContact, docOutlet);
-
-    if (!res) {
-      Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+    // Инициализируем параметры
+    if (order) {
+      dispatch(
+        appActions.setFormParams({
+          number: order.number,
+          contact: order.head.contact,
+          outlet: order.head.outlet,
+          onDate: order.head.onDate,
+          documentDate: order.documentDate,
+        }),
+      );
+    } else {
+      dispatch(
+        appActions.setFormParams({
+          number: '',
+          onDate: new Date().toISOString(),
+          documentDate: new Date().toISOString(),
+        }),
+      );
     }
-
-    return res;
-  }, [docContact, docNumber, docOutlet]);
+  }, [dispatch, order]);
 
   const handleSave = useCallback(() => {
-    console.log('id', id);
-    if (!checkDocument()) {
+    if (!docNumber || !docContact || !docOutlet || !docOnDate || !docDocumentDate) {
+      Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
       return;
     }
-    if (!id) {
-      if (docNumber && docContact && docOutlet) {
-        const newOrder: IOrderDocument = {
-          id: uuid(),
-          documentType: orderType,
-          number: docNumber,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          head: {
-            contact: docContact,
-            ondate: docOnDate,
-            outlet: docOutlet,
-          },
-          lines: [],
-          creationDate: new Date().toISOString(),
-          editionDate: new Date().toISOString(),
-        };
-        console.log('newOrder', newOrder);
-        docDispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
-      }
-    } else {
-      if (order && docNumber && docContact && docOnDate && docOutlet) {
-        const updatedHead: IOrderDocument = {
-          id: order.id,
-          documentType: order.documentType,
-          number: docNumber,
-          documentDate: order.documentDate,
-          status: 'DRAFT',
-          head: {
-            contact: docContact,
-            ondate: docOnDate,
-            outlet: docOutlet,
-          },
-          lines: { ...order.lines },
-          creationDate: order.creationDate,
-          editionDate: new Date().toISOString(),
-        };
-        console.log('updatedHead', updatedHead);
-        docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
-      }
-    }
 
+    if (!id) {
+      const newOrder: IOrderDocument = {
+        id: uuid(),
+        documentType: orderType,
+        number: docNumber,
+        documentDate: new Date().toISOString(),
+        status: 'DRAFT',
+        head: {
+          contact: docContact,
+          onDate: docOnDate,
+          outlet: docOutlet,
+        },
+        lines: [],
+        creationDate: new Date().toISOString(),
+        editionDate: new Date().toISOString(),
+      };
+      console.log('newOrder', newOrder);
+      docDispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+    } else {
+      if (!order) {
+        return;
+      }
+      console.log(docOutlet);
+      const updatedHead: IOrderDocument = {
+        id,
+        documentType: orderType,
+        number: docNumber,
+        documentDate: docDocumentDate,
+        status: 'DRAFT',
+        head: {
+          contact: docContact,
+          onDate: docOnDate,
+          outlet: docOutlet,
+        },
+        lines: { ...order.lines },
+        creationDate: order.creationDate || new Date().toISOString(),
+        editionDate: new Date().toISOString(),
+      };
+      console.log('updatedHead', updatedHead);
+      docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
+    }
+    dispatch(appActions.clearFormParams());
     navigation.goBack();
     // navigation.navigate('OrderList');
-  }, [id, checkDocument, navigation, docNumber, docContact, docOutlet, docOnDate, docDispatch, order]);
+  }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, dispatch, navigation, docDispatch, order]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -133,7 +147,7 @@ const OrderEditScreen = () => {
     //Закрываем календарь и записываем выбранную дату
     setShowOnDate(false);
     if (selectedOnDate) {
-      setDocOnDate(selectedOnDate.toISOString().slice(0, 10));
+      dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
     }
   };
 
@@ -162,10 +176,14 @@ const OrderEditScreen = () => {
   return (
     <AppInputScreen>
       <ScreenTitle>{statusName}</ScreenTitle>
-      <Input label="Номер документа" value={docNumber} onChangeText={setDocNumber} />
+      <Input
+        label="Номер документа"
+        value={docNumber as string}
+        onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
+      />
       {/* <Input label="Дата документа" value={getDateString(docDate)} editable={false} /> */}
       <TouchableOpacity onPress={handlePresentOnDate}>
-        <Input label="Дата отгрузки" value={getDateString(docOnDate)} editable={false} />
+        <Input label="Дата отгрузки" value={getDateString(docOnDate || '')} editable={false} />
       </TouchableOpacity>
       <TouchableOpacity onPress={handlePresentContact}>
         <Input label="Организация" value={docContact?.name} editable={false} />
@@ -176,7 +194,7 @@ const OrderEditScreen = () => {
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docOnDate)}
+          value={new Date(docOnDate || '')}
           mode={'date'}
           is24Hour={true}
           display="default"
