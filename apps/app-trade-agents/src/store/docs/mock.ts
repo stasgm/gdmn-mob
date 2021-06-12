@@ -1371,6 +1371,7 @@ const returnDocMock: IReturnDocument[] = [
 
 export {
   documentTypeMock,
+  orderType,
   routeMock,
   orderMock,
   returnDocMock,
