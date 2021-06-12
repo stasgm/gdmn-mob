@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
 import { IUser, NewUser } from '@lib/types';
-import { useFormik } from 'formik';
+import { FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
 
 interface IProps {
@@ -16,7 +16,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     enableReinitialize: true,
     initialValues: user,
     validationSchema: yup.object().shape({
-      name: yup.string().required('Required'),
+      name: yup.string().required('Заполните это поле'),
+      password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values) => {
       onSubmit(values);
@@ -34,7 +35,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container spacing={3} lg={8} md={6} xs={12}>
+              <Grid container spacing={3} item lg={8} md={6} xs={12}>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
@@ -50,19 +51,23 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
-                {user && (
+                {Object.keys(user).length == 0 && (
                   <Grid item md={6} xs={12}>
                     <TextField
-                      error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                      error={
+                        (formik.touched as FormikTouched<NewUser>).password &&
+                        Boolean((formik.errors as NewUser).password)
+                      }
                       fullWidth
-                      label="Имя"
-                      name="firstName"
+                      required
+                      label="Пароль"
+                      name="password"
                       variant="outlined"
                       onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
-                      type="firstName"
+                      type="password"
                       disabled={loading}
-                      value={formik.values.firstName}
+                      value={(formik.values as NewUser).password}
                     />
                   </Grid>
                 )}
@@ -110,14 +115,14 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
-                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
                     fullWidth
                     label="Email"
-                    name="phoneNumber"
+                    name="email"
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="phoneNumber"
+                    type="email"
                     disabled={loading}
                     value={formik.values.email}
                   />

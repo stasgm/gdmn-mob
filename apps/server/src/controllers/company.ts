@@ -5,12 +5,17 @@ import { ICompany, NewCompany } from '@lib/types';
 import log from '../utils/logger';
 import { companyService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
-import { DataNotFoundException } from '../exceptions';
+import { DataNotFoundException, ForbiddenException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
+  //TODO только для админа или суперадмина
   const { name, externalId } = ctx.request.body;
 
-  const { id: userId } = ctx.state.user;
+  const { id: userId, role } = ctx.state.user;
+
+  if (role !== 'Admin' && role !== 'SuperAdmin') {
+    throw new ForbiddenException('Нет прав для создания компании');
+  }
 
   const company: NewCompany = { name, adminId: userId, externalId };
 
@@ -23,11 +28,11 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
-  console.log(1, companyId);
+
+  //TODO редактировать только свои компании
   const companyData = ctx.request.body as Partial<ICompany>;
-  console.log(2, companyData);
+
   const updatedCompany = await companyService.updateOne(companyId, companyData);
-  console.log(3, updatedCompany);
 
   ok(ctx as Context, updatedCompany);
 
@@ -36,7 +41,7 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
-
+  //TODO удалить только свои компании
   const res = await companyService.deleteOne(companyId);
 
   ok(ctx as Context, res);
@@ -59,11 +64,19 @@ const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
+  const { name } = ctx.params;
+
   const params: Record<string, string> = {};
 
   const { id: adminId } = ctx.state.user;
 
-  params.adminId = adminId;
+  if (typeof adminId === 'string') {
+    params.adminId = adminId;
+  }
+
+  if (typeof name === 'string') {
+    params.name = name;
+  }
 
   const companyList = await companyService.findAll(params);
 

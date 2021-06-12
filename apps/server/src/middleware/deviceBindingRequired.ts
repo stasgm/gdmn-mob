@@ -1,6 +1,6 @@
 import { Context, Next } from 'koa';
 
-import { DataNotFoundException, InvalidParameterException, UnauthorizedException } from '../exceptions';
+import { DataNotFoundException, InvalidParameterException } from '../exceptions';
 
 import { getDb } from '../services/dao/db';
 
@@ -25,16 +25,16 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  //TODO перенести в службу
-  const currDevice = await db.devices.find((i) => i.uid === device.id && i.userId === ctx.state.user?.id);
+  // //TODO перенести в службу
+  // const currDevice = await db.devices.find((i) => i.uid === device.id && i.userId === ctx.state.user?.id);
 
-  if (!currDevice) {
-    throw new DataNotFoundException('Не указано имя пользователя');
-  }
+  // if (!currDevice) {
+  //   throw new DataNotFoundException('Не указано имя пользователя');
+  // }
 
-  if (currDevice.state !== 'ACTIVE') {
-    throw new UnauthorizedException('Не указано имя пользователя');
-  }
+  // if (currDevice.state !== 'ACTIVE') {
+  //   throw new UnauthorizedException('Не указано имя пользователя');
+  // }
 
   await next();
 };

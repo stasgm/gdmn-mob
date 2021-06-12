@@ -1,16 +1,12 @@
+import { IUser } from '@lib/types';
 import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@material-ui/core';
 
-const user = {
-  avatar: '/assets/images/avatar1.svg',
-  city: 'Los Angeles',
-  country: 'USA',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith',
-  timezone: 'GTM-7',
-};
+interface IProps {
+  user: IUser;
+}
 
-const AccountProfile = (props: any) => (
-  <Card {...props}>
+const AccountProfile = ({ user }: IProps) => (
+  <Card>
     <CardContent>
       <Box
         sx={{
@@ -20,7 +16,7 @@ const AccountProfile = (props: any) => (
         }}
       >
         <Avatar
-          src={user.avatar}
+          src={'/assets/images/avatar1.svg'}
           sx={{
             height: 100,
             width: 100,
@@ -29,18 +25,18 @@ const AccountProfile = (props: any) => (
         <Typography color="textPrimary" gutterBottom variant="h3">
           {user.name}
         </Typography>
-        <Typography color="textSecondary" variant="body1">
+        {/* <Typography color="textSecondary" variant="body1">
           {`${user.city} ${user.country}`}
         </Typography>
         <Typography color="textSecondary" variant="body1">
           {`${user.timezone}`}
-        </Typography>
+        </Typography>*/}
       </Box>
     </CardContent>
     <Divider />
     <CardActions>
       <Button color="primary" fullWidth variant="text">
-        Upload picture
+        Загрузить картинку
       </Button>
     </CardActions>
   </Card>

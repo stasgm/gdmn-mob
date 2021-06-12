@@ -9,7 +9,7 @@ import { companyValidation } from '../validations';
 const router = Router();
 
 router.prefix('/companies');
-router.post('/', companyValidation.addCompany, addCompany); // TODO добавить compose([authMiddleware, deviceMiddleware])
+router.post('/', companyValidation.addCompany, authMiddleware, deviceMiddleware, addCompany);
 router.get('/:id', companyValidation.getCompany, authMiddleware, deviceMiddleware, getCompany);
 router.get('/', authMiddleware, deviceMiddleware, getCompanies);
 router.patch('/:id', companyValidation.updateCompany, authMiddleware, deviceMiddleware, updateCompany);

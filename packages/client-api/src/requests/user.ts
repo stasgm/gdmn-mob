@@ -28,6 +28,8 @@ class User extends BaseRequest {
       const res = await this.api.axios.post<IResponse<IUser>>('/users', user);
       const resData = res.data;
 
+      console.log('resData', resData);
+
       if (resData.result) {
         return {
           type: 'ADD_USER',
