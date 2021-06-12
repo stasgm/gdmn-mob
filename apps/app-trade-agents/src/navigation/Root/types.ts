@@ -15,6 +15,8 @@ export type OrdersStackParamList = {
     isMulti?: boolean;
     value: INamedEntity[];
   };
+  SelectGroupItem: { docId: string };
+  SelectGoodItem: { docId: string; groupId: string };
 };
 
 export type ReturnsStackParamList = {
@@ -30,6 +32,8 @@ export type RoutesStackParamList = {
   RouteDetails: { routeId: string; id: string };
   OrderView: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
+  SelectGroupItem: { docId: string };
+  SelectGoodItem: { docId: string; groupId: string };
   SelectItem: { docId: string; name: string };
   ReturnView: { id: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };

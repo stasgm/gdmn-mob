@@ -30,9 +30,8 @@ const OrderViewScreen = () => {
   const ref = useRef<FlatList<IOrderLine>>(null);
 
   const handleAddOrderLine = useCallback(() => {
-    navigation.navigate('SelectItem', {
+    navigation.navigate('SelectGroupItem', {
       docId: id,
-      name: 'good',
     });
   }, [navigation, id]);
 

@@ -181,10 +181,14 @@ const MapScreen = () => {
             <View
               style={[
                 styles.icon,
-                { backgroundColor: point.number === 0 ? 'blue' : point.id === currentPoint?.id ? 'red' : 'green' },
+                point.number === 0
+                  ? localStyles.myLocationMark
+                  : point.id === currentPoint?.id
+                  ? localStyles.selectedMark
+                  : localStyles.mark,
               ]}
             >
-              <Text style={styles.lightField}>{point.number}</Text>
+              <Text style={styles.lightText}>{point.number}</Text>
             </View>
           </Marker>
         ))}

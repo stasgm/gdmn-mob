@@ -64,8 +64,8 @@
     "react-native-paper": "^4.9.1",
     "react-native-reanimated": "~2.2.0",
     "react-native-safe-area-context": "3.2.0",
-    "react-native-screens": "3.0.0",
-    "react-native-web": "~0.16.2",
+    "react-native-screens": "3.3.0",
+    "react-native-web": "~0.16.5",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",
     "react-redux": "^7.2.4",
@@ -78,15 +78,15 @@
     "typesafe-actions": "^5.1.0"
   },
   "devDependencies": {
-    "@babel/core": "~7.14.2",
+    "@babel/core": "~7.14.5",
     "@config/eslint-config": "*",
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
-    "@expo/webpack-config": "~0.12.70",
-    "@types/node": "^15.0.3",
-    "@types/react": "~17.0.5",
-    "@types/react-native": "~0.64.5",
+    "@expo/webpack-config": "~0.12.76",
+    "@types/node": "^15.12.2",
+    "@types/react": "~17.0.11",
+    "@types/react-native": "~0.64.10",
     "@types/react-redux": "^7.1.16",
     "@types/redux": "^3.6.31",
     "babel-preset-expo": "8.3.0",
@@ -95,6 +95,6 @@
     "reactotron-react-native": "^5.0.0",
     "reactotron-redux": "^3.1.3",
     "redux-logger": "^3.0.6",
-    "typescript": "~4.2.4"
+    "typescript": "~4.3.2"
   }
 }

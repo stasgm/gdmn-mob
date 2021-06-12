@@ -6,6 +6,8 @@ import {
   OrderListScreen,
   OrderEditScreen,
   OrderViewScreen,
+  SelectGroupScreen,
+  SelectGoodScreen,
   SelectItemScreen,
 } from '../../screens/Orders';
 
@@ -20,6 +22,8 @@ const OrdersNavigator = () => {
       <Stack.Screen name="OrderView" component={OrderViewScreen} />
       <Stack.Screen name="OrderEdit" component={OrderEditScreen} />
       <Stack.Screen name="OrderLine" component={OrderLineScreen} />
+      <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
+      <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
       <Stack.Screen name="SelectItem" component={SelectItemScreen} />
     </Stack.Navigator>
   );
