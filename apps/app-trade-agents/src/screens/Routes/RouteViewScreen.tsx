@@ -34,13 +34,15 @@ const RouteViewScreen = () => {
   useScrollToTop(ref);
 
   const handleDelete = useCallback(() => {
-    dispatch(documentActions.clearError());
-  }, [dispatch]);
+    dispatch(documentActions.deleteDocument(id));
+    navigation.goBack();
+  }, [dispatch, id, navigation]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Распечатать',
+        title: 'Удалить',
+        type: 'destructive',
         onPress: handleDelete,
       },
       {

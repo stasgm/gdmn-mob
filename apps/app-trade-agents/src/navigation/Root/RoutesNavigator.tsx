@@ -33,9 +33,9 @@ const RoutesNavigator = () => {
       <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
       <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
       <Stack.Screen name="SelectItem" component={SelectItemScreen} options={{ title: 'Заявка' }} />
-      <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возврат' }} />
-      <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возврат' }} />
-      <Stack.Screen name="SelectItemReturn" component={SelectItemReturnScreen} options={{ title: 'Возврат' }} />
+      <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возвраты' }} />
+      <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возвраты' }} />
+      <Stack.Screen name="SelectItemReturn" component={SelectItemReturnScreen} options={{ title: 'Возвраты' }} />
     </Stack.Navigator>
   );
 };

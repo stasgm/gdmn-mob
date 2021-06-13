@@ -53,9 +53,10 @@ const ReturnListScreen = () => {
     dispatch(documentActions.deleteDocuments());
   }, [dispatch]);
 
+  /*
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
+       {
         title: 'Добавить',
         onPress: handleAddDocument,
       },
@@ -70,18 +71,19 @@ const ReturnListScreen = () => {
       },
     ]);
   }, [showActionSheet, handleAddDocument, handleDelete]);
+  */
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
-          <AddButton onPress={handleAddDocument} />
-        </View>
-      ),
+      /*  headerRight: () => (
+         <View style={styles.buttons}>
+           <MenuButton actionsMenu={actionsMenu} />
+           <AddButton onPress={handleAddDocument} />
+         </View>
+       ), */
     });
-  }, [actionsMenu, handleAddDocument, navigation]);
+  }, [navigation]);
 
   const ref = useRef<FlatList<IReturnDocument>>(null);
 

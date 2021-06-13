@@ -1070,6 +1070,11 @@ const packageGoodMock: IPackageGood[] = [
     good: goodMock[4],
     package: packageMock[27],
   },
+  {
+    id: '147012264',
+    good: goodMock[4],
+    package: packageMock[27],
+  },
 ];
 
 const packageGoodRefMock: IReference<IPackageGood> = {
@@ -1083,7 +1088,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '147019506',
     number: '1',
-    documentDate: '2021-06-04',
+    documentDate: '2021-06-30',
     documentType: routeType,
     status: 'DRAFT',
     head: {
@@ -1137,7 +1142,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '147022890',
     number: '2',
-    documentDate: '2021-05-27',
+    documentDate: '2021-06-27',
     documentType: routeType,
     status: 'DRAFT',
     head: {
@@ -1177,7 +1182,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '147022891',
     number: '3',
-    documentDate: '2021-05-31',
+    documentDate: '2021-06-14',
     documentType: routeType,
     status: 'PROCESSED',
     head: {

@@ -53,12 +53,12 @@ const OrderViewScreen = () => {
         onPress: handleAddOrderLine,
       },
       {
-        title: 'Редактировать',
-        type: 'destructive',
+        title: 'Редактировать данные',
         onPress: handleEditOrderHead,
       },
       {
         title: 'Удалить заявку',
+        type: 'destructive',
         onPress: handleDelete,
       },
       {

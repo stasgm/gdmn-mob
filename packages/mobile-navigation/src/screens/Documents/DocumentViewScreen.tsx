@@ -60,11 +60,6 @@ const DocumentViewScreen = () => {
         // onPress: () => { },
       },
       {
-        title: 'Удалить все',
-        type: 'destructive',
-        // onPress: () => { },
-      },
-      {
         title: 'Отмена',
         type: 'cancel',
       },

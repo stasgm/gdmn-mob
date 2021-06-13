@@ -33,10 +33,10 @@ const TabsNavigator = () => {
     dispatch(documentActions.addDocuments(documentsMock));
   };
 
-  const handleReset = () => {
-    dispatch(documentActions.init());
-  };
-
+  /*   const handleReset = () => {
+      dispatch(documentActions.init());
+    };
+   */
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -46,11 +46,6 @@ const TabsNavigator = () => {
       {
         title: 'Загрузить',
         onPress: handleLoad,
-      },
-      {
-        title: 'Удалить все',
-        type: 'destructive',
-        onPress: handleReset,
       },
       {
         title: 'Отмена',

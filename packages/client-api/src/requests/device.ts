@@ -156,14 +156,14 @@ class Device extends BaseRequest {
     * @param params
     * @returns
     */
-  getDevices = async (params?: Record<string, string>) => {
+  getDevices = async (params?: Record<string, string>): Promise<types.IGetDevicesResponse | error.INetworkError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'GET_DEVICES',
         devices: mockDevices,
-      } as types.IGetDevicesResponse;
+      };
     }
 
     let paramText = params ? getParams(params) : '';
@@ -179,18 +179,18 @@ class Device extends BaseRequest {
       if (resData.result) {
         return {
           type: 'GET_DEVICES',
-          devices: resData.data,
-        } as types.IGetDevicesResponse;
+          devices: resData?.data || [],
+        };
       }
       return {
         type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
+        message: resData?.error || 'ошибка получения данных об устройствах',
+      };
     } catch (err) {
       return {
         type: 'ERROR',
         message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
-      } as error.INetworkError;
+      };
     }
   };
 

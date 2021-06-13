@@ -4,6 +4,7 @@ export { ItemSeparator } from './ItemSeparator';
 export { RadioGroup } from './RadioGroup';
 export { default as ScreenTitle } from './ScreenTitle';
 export { default as Input } from './Input';
+export { default as SelectableInput } from './SelectableInput';
 export { default as SubTitle } from './SubTitle';
 export { default as FilterButtons, Status } from './FilterButtons';
 export { default as PrimeButton } from './PrimeButton';
