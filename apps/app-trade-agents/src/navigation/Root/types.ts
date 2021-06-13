@@ -11,9 +11,9 @@ export type OrdersStackParamList = {
     parentScreen: keyof OrdersStackParamList;
     refName: string;
     fieldName: string;
-    title: string;
-    isMulti?: boolean;
     value: INamedEntity[];
+    clause?: Record<string, string>;
+    isMulti?: boolean;
   };
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string; groupId: string };

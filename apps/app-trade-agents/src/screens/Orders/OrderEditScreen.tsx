@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, TouchableOpacity } from 'react-native';
+import { Alert, Switch, TouchableOpacity, View, Text } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
-import { BackButton, AppInputScreen, Input, ScreenTitle, SaveButton } from '@lib/mobile-ui';
+import { BackButton, AppInputScreen, Input, ScreenTitle, SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { INamedEntity } from '@lib/types';
+import { INamedEntity, IDocument, IEntity, IUserDocument, StatusType } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument } from '../../store/docs/types';
@@ -16,7 +16,6 @@ import { getDateString } from '../../utils/helpers';
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
 import { orderType } from '../../store/docs/mock';
-import { IDocument, IEntity, IUserDocument } from '../../../../../packages/types';
 import { IFormParam } from '../../store/app/types';
 
 interface IOrderFormParam extends IFormParam {
@@ -25,6 +24,7 @@ interface IOrderFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   onDate?: string;
+  status?: StatusType;
 }
 
 const OrderEditScreen = () => {
@@ -35,11 +35,9 @@ const OrderEditScreen = () => {
 
   const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
 
-  const [status, setStatus] = useState(order?.status || 0);
+  const [statusId, setStatusId] = useState('DRAFT');
 
   const formParams = useSelector((state) => state.app.formParams);
-
-  console.log('formParams', formParams);
 
   const {
     contact: docContact,
@@ -47,12 +45,20 @@ const OrderEditScreen = () => {
     number: docNumber,
     documentDate: docDocumentDate,
     onDate: docOnDate,
+    status: docStatus,
   } = useMemo(() => {
     return formParams as IOrderFormParam;
   }, [formParams]);
 
   useEffect(() => {
-    setStatus(order?.status || 'DRAFT');
+    return () => {
+      dispatch(appActions.clearFormParams());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setStatusId(order?.status || 'DRAFT');
 
     // Инициализируем параметры
     if (order) {
@@ -63,6 +69,7 @@ const OrderEditScreen = () => {
           outlet: order.head.outlet,
           onDate: order.head.onDate,
           documentDate: order.documentDate,
+          status: order.status,
         }),
       );
     } else {
@@ -71,13 +78,14 @@ const OrderEditScreen = () => {
           number: '',
           onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
+          status: 'DRAFT',
         }),
       );
     }
   }, [dispatch, order]);
 
   const handleSave = useCallback(() => {
-    if (!docNumber || !docContact || !docOutlet || !docOnDate || !docDocumentDate) {
+    if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
       Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
       return;
     }
@@ -98,19 +106,19 @@ const OrderEditScreen = () => {
         creationDate: new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
-      console.log('newOrder', newOrder);
+
       docDispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
     } else {
       if (!order) {
         return;
       }
-      console.log(docOutlet);
+
       const updatedHead: IOrderDocument = {
         id,
         documentType: orderType,
         number: docNumber,
         documentDate: docDocumentDate,
-        status: 'DRAFT',
+        status: docStatus || 'DRAFT',
         head: {
           contact: docContact,
           onDate: docOnDate,
@@ -120,22 +128,20 @@ const OrderEditScreen = () => {
         creationDate: order.creationDate || new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
-      console.log('updatedHead', updatedHead);
+
       docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
     }
-    dispatch(appActions.clearFormParams());
     navigation.goBack();
-    // navigation.navigate('OrderList');
-  }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, dispatch, navigation, docDispatch, order]);
+  }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
-  }, [handleSave, navigation]);
+  }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = status !== 0;
+  const isBlocked = statusId !== 'DRAFT';
 
   const statusName =
     id !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа';
@@ -159,36 +165,56 @@ const OrderEditScreen = () => {
     navigation.navigate('SelectItem', {
       refName: 'contact',
       fieldName: 'contact',
-      title: 'Организация',
-      value: order?.head.contact || docContact,
+      value: docContact,
     });
   };
 
   const handlePresentOutlet = () => {
+    //TODO: если изменился контакт, то и магазин должен обнулиться
+    const params: Record<string, string> = {};
+
+    if (docContact?.id) {
+      params.companyId = docContact?.id;
+    }
+
     navigation.navigate('SelectItem', {
       refName: 'outlet',
       fieldName: 'outlet',
-      title: 'Магазин',
-      value: order?.head.outlet || docOutlet,
+      clause: params,
+      value: docOutlet,
     });
   };
 
   return (
     <AppInputScreen>
       <ScreenTitle>{statusName}</ScreenTitle>
+      {(statusId === 'DRAFT' || statusId === 'READY') && (
+        <>
+          <View style={[styles.directionRow, { margin: 10 }]}>
+            <Text>Черновик:</Text>
+            <Switch
+              value={docStatus === 'DRAFT' || !docStatus}
+              // disabled={id === undefined}
+              onValueChange={() => {
+                dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+              }}
+            />
+          </View>
+        </>
+      )}
       <Input
         label="Номер документа"
         value={docNumber as string}
         onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
+        editable={!isBlocked}
       />
-      {/* <Input label="Дата документа" value={getDateString(docDate)} editable={false} /> */}
-      <TouchableOpacity onPress={handlePresentOnDate}>
+      <TouchableOpacity onPress={handlePresentOnDate} disabled={isBlocked}>
         <Input label="Дата отгрузки" value={getDateString(docOnDate || '')} editable={false} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={handlePresentContact}>
+      <TouchableOpacity onPress={handlePresentContact} disabled={isBlocked}>
         <Input label="Организация" value={docContact?.name} editable={false} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={handlePresentOutlet}>
+      <TouchableOpacity onPress={handlePresentOutlet} disabled={isBlocked}>
         <Input label="Магазин" value={docOutlet?.name} editable={false} />
       </TouchableOpacity>
       {showOnDate && (

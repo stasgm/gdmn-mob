@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -94,12 +94,14 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
-        <>
-          <Text>{order.number}</Text>
-          <Text>{getDateString(order.head.onDate)}</Text>
-        </>
-      </InfoBlock>
+      <TouchableOpacity onPress={handleEditOrderHead}>
+        <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
+          <>
+            <Text>{order.number}</Text>
+            <Text>{getDateString(order.head.onDate)}</Text>
+          </>
+        </InfoBlock>
+      </TouchableOpacity>
       <FlatList
         ref={ref}
         data={order.lines}

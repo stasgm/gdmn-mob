@@ -10,7 +10,7 @@ import {
 import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { refSelectors } from '@lib/store';
@@ -18,16 +18,37 @@ import { refSelectors } from '@lib/store';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
-import { IOrderHead } from '../../store/docs/types';
+import { IOrderHead, IOutlet } from '../../store/docs/types';
+import { extraPredicate } from '../../utils/helpers';
 
 const SelectItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { refName, isMulti, fieldName, title, value } =
+  const { refName, isMulti, fieldName, value, clause } =
     useRoute<RouteProp<OrdersStackParamList, 'SelectItem'>>().params;
 
-  const list = (refSelectors.selectByName(refName) as IReference<INamedEntity>)?.data;
+  const refObj = refSelectors.selectByName(refName) as IReference<INamedEntity>;
+
+  const list = useMemo(() => {
+    if (clause && refObj?.data) {
+      return refObj?.data.filter((item) => {
+        const newParams = Object.assign({}, clause);
+
+        let companyFound = true;
+
+        if ('companyId' in newParams && refName === 'outlet') {
+          companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
+          delete newParams.companyId;
+        }
+
+        return companyFound && extraPredicate(item, newParams);
+      });
+    }
+    return refObj?.data;
+  }, [clause, refName, refObj?.data]);
+
+  const title = refObj?.name;
 
   const formParams = useSelector((state) => state.app.formParams);
 
