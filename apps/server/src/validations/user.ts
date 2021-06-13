@@ -9,6 +9,9 @@ const addUser: Config = {
       name: Joi.string().required().error(new InvalidParameterException('Не указано имя пользователя')),
       password: Joi.string().required().error(new InvalidParameterException('Не указан пароль')),
     }),
+    validateOptions: {
+      allowUnknown: true,
+    },
   },
 };
 

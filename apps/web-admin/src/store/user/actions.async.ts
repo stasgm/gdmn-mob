@@ -80,4 +80,22 @@ const updateUser = (user: IUser): AppThunk => {
   };
 };
 
-export default { fetchUsers, fetchUserById, addUser, updateUser };
+const removeUser = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(userActions.removeUserAsync.request('Удаление пользователя'));
+
+    const response = await api.user.removeUser(id);
+
+    if (response.type === 'REMOVE_USER') {
+      return dispatch(userActions.removeUserAsync.success());
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(userActions.removeUserAsync.failure(response.message));
+    }
+
+    return dispatch(userActions.removeUserAsync.failure('Ошибка удаления компании'));
+  };
+};
+
+export default { fetchUsers, fetchUserById, addUser, updateUser, removeUser };

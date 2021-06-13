@@ -112,7 +112,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
             }}
           >
             <Typography color="textPrimary" variant="body1" key={company.admin.id}>
-              {new Date(company.creationDate || '').toUTCString()}
+              {new Date(company.creationDate || '').toLocaleString('en-US', { hour12: false })}
             </Typography>
           </Box>
         </TableCell>
@@ -124,7 +124,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
             }}
           >
             <Typography color="textPrimary" variant="body1" key={company.admin.id}>
-              {new Date(company.editionDate || '').toUTCString()}
+              {new Date(company.editionDate || '').toLocaleString('en-US', { hour12: false })}
             </Typography>
           </Box>
         </TableCell>

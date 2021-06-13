@@ -15,4 +15,10 @@ const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   return matched === paramsEntries.length;
 };
 
-export { extraPredicate };
+const asyncFilter = async (arr: any[], predicate: any) => {
+  const results = await Promise.all(arr.map(predicate));
+
+  return arr.filter((_v, index) => results[index]);
+};
+
+export { extraPredicate, asyncFilter };

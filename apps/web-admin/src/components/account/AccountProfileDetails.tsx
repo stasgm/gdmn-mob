@@ -1,136 +1,151 @@
-import { useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@material-ui/core';
+import { IUser } from '@lib/types';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
-const states = [
-  {
-    value: 'alabama',
-    label: 'Alabama',
-  },
-  {
-    value: 'new-york',
-    label: 'New York',
-  },
-  {
-    value: 'san-francisco',
-    label: 'San Francisco',
-  },
-];
+interface IProps {
+  user: IUser;
+  loading: boolean;
+  onSubmit: (user: IUser) => void;
+  // onCancel: () => void;
+}
 
-const AccountProfileDetails = (props: any) => {
-  const [values, setValues] = useState({
-    firstName: 'Katarina',
-    lastName: 'Smith',
-    email: 'demo@devias.io',
-    phone: '',
-    state: 'Alabama',
-    country: 'USA',
+const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
+  const formik = useFormik<IUser>({
+    enableReinitialize: true,
+    initialValues: user,
+    validationSchema: yup.object().shape({
+      name: yup.string().required('Required'),
+    }),
+    onSubmit: (values) => {
+      console.log('onSubmit', values);
+      onSubmit(values);
+    },
   });
 
-  const handleChange = (event: any) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value,
-    });
-  };
-
   return (
-    <form autoComplete="off" noValidate {...props}>
+    <>
       <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
+        <CardHeader title="Профиль" />
         <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                helperText="Please specify the first name"
-                label="First name"
-                name="firstName"
-                onChange={handleChange}
-                required
-                value={values.firstName}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Last name"
-                name="lastName"
-                onChange={handleChange}
-                required
-                value={values.lastName}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Email Address"
-                name="email"
-                onChange={handleChange}
-                required
-                value={values.email}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Phone Number"
-                name="phone"
-                onChange={handleChange}
-                type="number"
-                value={values.phone}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Country"
-                name="country"
-                onChange={handleChange}
-                required
-                value={values.country}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item md={6} xs={12}>
-              <TextField
-                fullWidth
-                label="Select State"
-                name="state"
-                onChange={handleChange}
-                required
-                select
-                SelectProps={{ native: true }}
-                value={values.state}
-                variant="outlined"
-              >
-                {states.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            p: 2,
-          }}
-        >
-          <Button color="primary" variant="contained">
-            Save details
-          </Button>
-        </Box>
+        <form onSubmit={formik.handleSubmit}>
+          <Card sx={{ p: 1 }}>
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid item md={12} xs={12}>
+                  <TextField
+                    error={formik.touched.name && Boolean(formik.errors.name)}
+                    fullWidth
+                    label="Пользователь"
+                    name="name"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    required
+                    value={formik.values.name}
+                    variant="outlined"
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                    fullWidth
+                    label="Имя"
+                    name="firstName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.firstName}
+                    variant="outlined"
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                    fullWidth
+                    label="Фамилия"
+                    name="lastName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.lastName}
+                    variant="outlined"
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                    fullWidth
+                    label="Номер телефона"
+                    name="phoneNumber"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.phoneNumber}
+                    variant="outlined"
+                    disabled={loading}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.email}
+                    variant="outlined"
+                    disabled={loading}
+                  />
+                </Grid>
+                {/* <Grid item md={6} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Country"
+                    name="country"
+                    onChange={handleChange}
+                    required
+                    value={values.country}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Select State"
+                    name="state"
+                    onChange={handleChange}
+                    required
+                    select
+                    SelectProps={{ native: true }}
+                    value={values.state}
+                    variant="outlined"
+                  >
+                    {states.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </TextField>
+                </Grid> */}
+              </Grid>
+            </CardContent>
+            <Divider />
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                p: 2,
+              }}
+            >
+              <Button color="primary" variant="contained" type="submit" disabled={loading}>
+                Сохранить
+              </Button>
+            </Box>
+          </Card>
+        </form>
       </Card>
-    </form>
+    </>
   );
 };
 

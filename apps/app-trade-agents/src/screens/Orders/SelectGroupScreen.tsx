@@ -41,7 +41,7 @@ const Group = ({
   const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id);
 
   const isExpand =
-    !expendGroup || expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
+    !!expendGroup || expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
 
   const icon = (nextLevelGroups.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
 

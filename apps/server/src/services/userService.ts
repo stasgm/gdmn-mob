@@ -21,7 +21,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
 
   if (user) {
-    throw new ConflictException('пользователь с таким именем уже существует');
+    throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(newUser.password);
@@ -29,14 +29,15 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   const newUserObj: IDBUser = {
     id: '',
     name: newUser.name,
-    companies: newUser.companies?.map((i) => i.id),
+    companies: newUser.companies.map((i) => i),
     password: passwordHash,
-    role: !newUser.creator?.id ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
-    creatorId: newUser.creator?.id || '',
+    role: !newUser.creatorId ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
+    creatorId: newUser.creatorId || '',
     externalId: newUser.externalId,
     firstName: newUser.firstName,
     lastName: newUser.lastName,
     phoneNumber: newUser.phoneNumber,
+    email: newUser.email,
     creationDate: new Date().toString(),
     editionDate: new Date().toString(),
   };
@@ -100,6 +101,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toString(),
+    email: userData.email || oldUser.email,
   };
 
   await users.update(newUser);
@@ -272,6 +274,7 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     externalId: user.externalId,
     creationDate: user.creationDate,
     editionDate: user.editionDate,
+    email: user.email,
   };
 };
 

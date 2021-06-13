@@ -48,6 +48,13 @@ const UserView = () => {
     dispatch(actions.fetchUserById(userId));
   }, [dispatch, userId]);
 
+  const handleDelete = async () => {
+    const res = await dispatch(actions.removeUser(userId));
+    if (res.type === 'USER/REMOVE_SUCCCES') {
+      navigate(-1);
+    }
+  };
+
   useEffect(() => {
     handleRefresh();
   }, [handleRefresh]);
@@ -79,9 +86,7 @@ const UserView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => {
-        return;
-      },
+      onClick: () => handleDelete(),
       icon: <DeleteIcon />,
     },
   ];

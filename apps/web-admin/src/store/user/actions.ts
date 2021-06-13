@@ -28,11 +28,18 @@ const updateUserAsync = createAsyncAction('USER/UPDATE', 'USER/UPDATE_SUCCCES', 
   string
 >();
 
+const removeUserAsync = createAsyncAction('USER/REMOVE', 'USER/REMOVE_SUCCCES', 'USER/REMOVE_FAILURE')<
+  string | undefined,
+  undefined,
+  string
+>();
+
 export const userActions = {
   fetchUsersAsync,
   fetchUserAsync,
   addUserAsync,
   updateUserAsync,
+  removeUserAsync,
   clearError,
   init,
 };
