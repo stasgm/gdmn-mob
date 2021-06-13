@@ -72,17 +72,17 @@ const OrderListScreen = () => {
         title: 'Добавить',
         onPress: handleAddDocument,
       },
-      {
-        title: 'Удалить все',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
+      /*       {
+              title: 'Удалить',
+              type: 'destructive',
+              onPress: handleDelete,
+            }, */
       {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocument, handleDelete]);
+  }, [showActionSheet, handleAddDocument]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

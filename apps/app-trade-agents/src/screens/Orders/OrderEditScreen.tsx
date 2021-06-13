@@ -1,13 +1,22 @@
-import { v4 as uuid } from 'uuid';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, Switch, TouchableOpacity, View, Text } from 'react-native';
+import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
-import { BackButton, AppInputScreen, Input, ScreenTitle, SaveButton, globalStyles as styles } from '@lib/mobile-ui';
-
 import { INamedEntity, IDocument, IEntity, IUserDocument, StatusType } from '@lib/types';
+import {
+  BackButton,
+  AppInputScreen,
+  Input,
+  SelectableInput,
+  SaveButton,
+  globalStyles as styles,
+  SubTitle,
+} from '@lib/mobile-ui';
+
+import { Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument } from '../../store/docs/types';
@@ -75,7 +84,7 @@ const OrderEditScreen = () => {
     } else {
       dispatch(
         appActions.setFormParams({
-          number: '',
+          number: '1',
           onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
@@ -86,8 +95,7 @@ const OrderEditScreen = () => {
 
   const handleSave = useCallback(() => {
     if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
-      Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-      return;
+      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     if (!id) {
@@ -144,7 +152,7 @@ const OrderEditScreen = () => {
   const isBlocked = statusId !== 'DRAFT';
 
   const statusName =
-    id !== undefined ? (!isBlocked ? 'Редактирование Документа' : 'Просмотр документа') : 'Создание документа';
+    id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
   //---Окно календаря для выбора даты---
   const [showOnDate, setShowOnDate] = useState(false);
@@ -187,43 +195,51 @@ const OrderEditScreen = () => {
 
   return (
     <AppInputScreen>
-      <ScreenTitle>{statusName}</ScreenTitle>
-      {(statusId === 'DRAFT' || statusId === 'READY') && (
-        <>
-          <View style={[styles.directionRow, { margin: 10 }]}>
-            <Text>Черновик:</Text>
-            <Switch
-              value={docStatus === 'DRAFT' || !docStatus}
-              // disabled={id === undefined}
-              onValueChange={() => {
-                dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-              }}
-            />
-          </View>
-        </>
-      )}
-      <Input
-        label="Номер документа"
-        value={docNumber as string}
-        onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-        editable={!isBlocked}
-      />
-      <TouchableOpacity onPress={handlePresentOnDate} disabled={isBlocked}>
-        <Input label="Дата отгрузки" value={getDateString(docOnDate || '')} editable={false} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handlePresentContact} disabled={isBlocked}>
-        <Input label="Организация" value={docContact?.name} editable={false} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handlePresentOutlet} disabled={isBlocked}>
-        <Input label="Магазин" value={docOutlet?.name} editable={false} />
-      </TouchableOpacity>
+      <SubTitle>{statusName}</SubTitle>
+      <Divider />
+      <ScrollView>
+        {(statusId === 'DRAFT' || statusId === 'READY') && (
+          <>
+            <View style={[styles.directionRow, localStyles.switchContainer]}>
+              <Text>Черновик:</Text>
+              <Switch
+                value={docStatus === 'DRAFT' || !docStatus}
+                // disabled={id === undefined}
+                onValueChange={() => {
+                  dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+                }}
+              />
+            </View>
+          </>
+        )}
+        <Input
+          label="Номер документа"
+          value={docNumber}
+          onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
+          editable={!isBlocked}
+        />
+        <SelectableInput
+          label="Дата отгрузки"
+          value={getDateString(docOnDate || '')}
+          editable={isBlocked}
+          onFocus={handlePresentOnDate}
+        />
+        <SelectableInput
+          label="Организация"
+          placeholder="Выберите покупателя..."
+          value={docContact?.name}
+          editable={isBlocked}
+          onFocus={handlePresentContact}
+        />
+        <SelectableInput label="Магазин" value={docOutlet?.name} editable={isBlocked} onFocus={handlePresentOutlet} />
+      </ScrollView>
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
           value={new Date(docOnDate || '')}
-          mode={'date'}
-          is24Hour={true}
-          display="default"
+          mode="date"
+          // is24Hour={true}
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}
         />
       )}
@@ -232,3 +248,9 @@ const OrderEditScreen = () => {
 };
 
 export default OrderEditScreen;
+
+const localStyles = StyleSheet.create({
+  switchContainer: {
+    margin: 10,
+  },
+});

@@ -40,7 +40,7 @@ const ConfigScreen = (props: Props) => {
 
   return (
     <AppInputScreen>
-      <ScreenTitle>Настройка подключения</ScreenTitle>
+      <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
       <ScrollView>
         <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
         <Input label="Порт" value={serverPort} onChangeText={setServerPort} />

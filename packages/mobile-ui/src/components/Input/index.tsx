@@ -2,8 +2,6 @@ import React from 'react';
 import { ReturnKeyTypeOptions, View } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
-// import colors from '../../styles/colors';
-
 import styles from './styles';
 
 interface Props {
@@ -14,23 +12,22 @@ interface Props {
   returnKeyType?: ReturnKeyTypeOptions;
   spellCheck?: boolean;
   maxLength?: number;
-  maks?: string | undefined;
   autoCorrect?: boolean;
   keyboardType?:
-    | 'default'
-    | 'email-address'
-    | 'numeric'
-    | 'phone-pad'
-    | 'number-pad'
-    | 'decimal-pad'
-    | 'visible-password'
-    | 'ascii-capable'
-    | 'numbers-and-punctuation'
-    | 'url'
-    | 'name-phone-pad'
-    | 'twitter'
-    | 'web-search'
-    | undefined;
+  | 'default'
+  | 'email-address'
+  | 'numeric'
+  | 'phone-pad'
+  | 'number-pad'
+  | 'decimal-pad'
+  | 'visible-password'
+  | 'ascii-capable'
+  | 'numbers-and-punctuation'
+  | 'url'
+  | 'name-phone-pad'
+  | 'twitter'
+  | 'web-search'
+  | undefined;
   editable?: boolean;
 }
 

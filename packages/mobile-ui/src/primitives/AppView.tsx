@@ -40,6 +40,13 @@ const BaseStyle = StyleSheet.create({
   container: {
     display: 'flex',
     flex: 1,
+    /*     flexDirection: 'column',
+        justifyContent: 'center',
+        padding: 5, */
+  },
+  containerCenter: {
+    display: 'flex',
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
     padding: 5,
@@ -134,6 +141,27 @@ export class AppView extends React.Component<AppViewProps> {
   }
 }
 
+export const AppSafeScreen = (props: AppViewProps) => (
+  <SafeAreaView style={BaseStyle.container}>
+    <AppView {...props} style={[BaseStyle.containerCenter, props.style]} />
+  </SafeAreaView>
+);
+
+export const AppScreen = (props: AppViewProps) => (
+  <AppView {...props} style={[BaseStyle.containerCenter, props.style]} />
+);
+
+export const AppInputScreen = (props: AppViewProps) => (
+  <SafeAreaView style={[BaseStyle.container, props.style]}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[BaseStyle.container]}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <AppScreen {...props} />
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+  </SafeAreaView>
+);
+
+/*
 export const Centered = (props: AppViewProps) => <AppView center {...props} />;
 
 export const Row = (props: AppViewProps) => <AppView direction="row" {...props} />;
@@ -146,18 +174,6 @@ export const Main = (props: AppViewProps) => (
   <MainContainer>
     <Centered style={[BaseStyle.main, props.style]} {...props} />
   </MainContainer>
-);
-
-export const AppScreen = (props: AppViewProps) => <AppView {...props} style={[BaseStyle.container, props.style]} />;
-
-export const AppInputScreen = (props: AppViewProps) => (
-  <SafeAreaView style={BaseStyle.container}>
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[BaseStyle.container]}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <AppView {...props} style={[BaseStyle.container, props.style]} />
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-  </SafeAreaView>
 );
 
 export const MainHead = (props: AppViewProps) => <Centered style={[BaseStyle.mainHead, props.style]} {...props} />;
@@ -175,3 +191,4 @@ export const BorderBox = (props: AppViewProps) => <Centered style={[BaseStyle.bo
 export const HiddenXS = (props: AppViewProps) => <AppView nativeID="hiddenLayoutXS" {...props} />;
 
 export const VisibleXS = (props: AppViewProps) => <AppView nativeID="visibleLayoutXS" {...props} />;
+ */

@@ -24,7 +24,8 @@ const CompaniesScreen = (props: Props) => {
       // const response = await apiService.auth.getUserStatus();
       const response: IResponse<ICompany[]> = {
         result: true,
-        data: [company3, company2, company, { ...company2, id: '111', name: 'Новая компания с длинным названием' }],
+        // data: [company3, company2, company, { ...company2, id: '111', name: 'Новая компания с длинным названием' }],
+        data: [company3],
       };
 
       if (response.result) {

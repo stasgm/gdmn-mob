@@ -54,11 +54,6 @@ const ReturnViewScreen = () => {
         // onPress: handleAddOrderLine,
       },*/
       {
-        title: 'Удалить возврат',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
         title: 'Удалить',
         type: 'destructive',
         onPress: handleDelete,

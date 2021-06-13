@@ -37,7 +37,7 @@
     "@lib/store": "*",
     "@lib/types": "*",
     "@react-native-async-storage/async-storage": "^1.13.0",
-    "@react-native-community/datetimepicker": "^3.2.0",
+    "@react-native-community/datetimepicker": "3.2.0",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.8",
     "@react-navigation/drawer": "^5.12.4",
