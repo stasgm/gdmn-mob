@@ -8,7 +8,7 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, externalId } = ctx.request.body;
+  const { name, externalId } = ctx.body as NewCompany;
 
   const { id: userId } = ctx.state.user;
 
@@ -24,9 +24,13 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
   console.log(1, companyId);
-  const companyData = ctx.request.body as Partial<ICompany>;
+
+  const companyData = ctx.body as Partial<ICompany>;
+
   console.log(2, companyData);
+
   const updatedCompany = await companyService.updateOne(companyId, companyData);
+
   console.log(3, updatedCompany);
 
   ok(ctx as Context, updatedCompany);

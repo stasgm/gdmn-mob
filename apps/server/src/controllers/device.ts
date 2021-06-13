@@ -10,15 +10,15 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceName, userId } = ctx.request.body;
+  const { name } = ctx.body as NewDevice;
 
-  const device: NewDevice = { name: deviceName, userId };
+  const device: NewDevice = { name, userId };
 
   const newDevice = await deviceService.addOne(device);
 
   created(ctx as Context, newDevice);
 
-  log.info(`addDevice: device '${deviceName}' is successfully created'`);
+  log.info(`add device: device '${name}' is successfully created'`);
 };
 
 const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
