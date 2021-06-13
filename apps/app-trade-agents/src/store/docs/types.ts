@@ -63,12 +63,12 @@ export interface IPackageGood extends IEntity {
   package: INamedEntity;
 }
 
-interface IOrderHead {
+export interface IOrderHead {
   contact: INamedEntity; //организация-плательщик
   outlet: INamedEntity; // магазин –подразделение организации плательщика
   road?: INamedEntity; // 	Маршрут
   depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
-  ondate: string; //  Дата отгрузки
+  onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
 }
 

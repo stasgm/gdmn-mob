@@ -33,7 +33,7 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
     case getType(actions.updateDocument):
       return {
         ...state,
-        list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...doc, head: action.payload.head } : doc)),
+        list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...action.payload.head } : doc)),
       };
 
     case getType(actions.deleteDocument):

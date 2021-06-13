@@ -4,17 +4,17 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 
 import geoReducer from './geo/reducer';
-import docsReducer from './docs/reducer';
 import visitsReducer from './visits/reducer';
+import appReducer from './app/reducer';
 
-import { DocActionType } from './docs/actions';
 import { GeoActionType } from './geo/actions';
 import { VisitActionType } from './visits/actions';
+import { AppActionType } from './app/actions';
 
-type TActions = DocActionType | GeoActionType | VisitActionType;
+type TActions = AppActionType | GeoActionType | VisitActionType;
 
 export const combinedReducer = {
-  docs: docsReducer,
+  app: appReducer,
   visits: visitsReducer,
   geo: geoReducer,
 };

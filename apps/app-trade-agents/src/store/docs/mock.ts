@@ -1236,7 +1236,7 @@ const orderMock: IOrderDocument[] = [
     head: {
       contact: contact1,
       outlet: outlet1,
-      ondate: '2021-06-07',
+      onDate: '2021-06-07',
     },
     lines: [
       { id: '147023073', good: good3, quantity: 4 },
@@ -1252,7 +1252,7 @@ const orderMock: IOrderDocument[] = [
     head: {
       contact: contact1,
       outlet: outlet3,
-      ondate: '2021-06-01',
+      onDate: '2021-06-01',
     },
     lines: [
       { id: '147023076', good: good5, quantity: 23 },
@@ -1268,7 +1268,7 @@ const orderMock: IOrderDocument[] = [
     head: {
       contact: contact1,
       outlet: outlet2,
-      ondate: '2021-06-02',
+      onDate: '2021-06-02',
     },
     lines: [
       { id: '147023078', good: good2, quantity: 45 },
@@ -1284,7 +1284,7 @@ const orderMock: IOrderDocument[] = [
     head: {
       contact: contact3,
       outlet: outlet6,
-      ondate: '2021-06-03',
+      onDate: '2021-06-03',
     },
     lines: [
       { id: '147023082', good: good4, quantity: 10 },
@@ -1301,7 +1301,7 @@ const orderMock: IOrderDocument[] = [
       contact: outletMock[10].company,
       outlet: outlet11,
       road: route1,
-      ondate: '2021-06-07',
+      onDate: '2021-06-07',
     },
     lines: [],
   },
@@ -1371,6 +1371,7 @@ const returnDocMock: IReturnDocument[] = [
 
 export {
   documentTypeMock,
+  orderType,
   routeMock,
   orderMock,
   returnDocMock,

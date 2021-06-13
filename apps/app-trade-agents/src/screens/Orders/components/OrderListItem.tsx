@@ -32,7 +32,7 @@ const OrderListItem = ({ item }: { item: IOrderDocument }) => {
               </Text>
             </View>
             <View style={[styles.directionRow]}>
-              <Text style={[styles.field, { color: colors.text }]}>{getDateString(item.head.ondate)}</Text>
+              <Text style={[styles.field, { color: colors.text }]}>{getDateString(item.head.onDate)}</Text>
               <MaterialCommunityIcons name="calendar-check-outline" size={15} />
             </View>
           </View>

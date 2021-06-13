@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -35,6 +35,10 @@ const OrderViewScreen = () => {
     });
   }, [navigation, id]);
 
+  const handleEditOrderHead = useCallback(() => {
+    navigation.navigate('OrderEdit', { id });
+  }, [navigation, id]);
+
   const handleDelete = useCallback(() => {
     if (id) {
       dispatch(documentActions.deleteDocument(id));
@@ -48,13 +52,13 @@ const OrderViewScreen = () => {
         title: 'Добавить товар',
         onPress: handleAddOrderLine,
       },
-      /* {
+      {
         title: 'Редактировать',
-        // onPress: handleAddOrderLine,
-      }, */
+        type: 'destructive',
+        onPress: handleEditOrderHead,
+      },
       {
         title: 'Удалить заявку',
-        type: 'destructive',
         onPress: handleDelete,
       },
       {
@@ -62,7 +66,7 @@ const OrderViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddOrderLine, handleDelete]);
+  }, [showActionSheet, handleAddOrderLine, handleDelete, handleEditOrderHead]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -90,12 +94,14 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
-        <>
-          <Text>{order.number}</Text>
-          <Text>{getDateString(order.head.ondate)}</Text>
-        </>
-      </InfoBlock>
+      <TouchableOpacity onPress={handleEditOrderHead}>
+        <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
+          <>
+            <Text>{order.number}</Text>
+            <Text>{getDateString(order.head.onDate)}</Text>
+          </>
+        </InfoBlock>
+      </TouchableOpacity>
       <FlatList
         ref={ref}
         data={order.lines}

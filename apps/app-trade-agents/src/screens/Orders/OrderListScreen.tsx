@@ -46,7 +46,20 @@ const OrderListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('OrderView');
+    // const newOrder = {
+    //   id: '9',
+    //   number: '225',
+    //   documentDate: '2021.06.03',
+    //   documentType: orderType,
+    //   status: 'DRAFT',
+    //   head: {
+    //     contact: contact1,
+    //     outlet: outlet1,
+    //     ondate: '02.06.2021',
+    //   },
+    // };
+    // dispatch(documentActions.addDocument());
+    navigation.navigate('OrderEdit');
   }, [navigation]);
 
   const handleDelete = useCallback(() => {

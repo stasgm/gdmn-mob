@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
 import { TouchableHighlight, View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { IListItem } from '@lib/mobile-types';
 
-type IListItem = {
-  id: string;
-  value: string;
-};
+// type IListItem = {
+//   id: string;
+//   value: string;
+// };
 
 type Props = {
   options: IListItem[];
