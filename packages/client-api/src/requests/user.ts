@@ -14,14 +14,14 @@ class User extends BaseRequest {
     super(api);
   }
 
-  addUser = async (user: NewUser) => {
+  addUser = async (user: NewUser): Promise<error.INetworkError | types.IAddUserResponse> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'ADD_USER',
         user: { ...user, id: uuid(), creator: mockUser, role: 'User' },
-      } as types.IAddUserResponse;
+      };
     }
 
     try {
@@ -39,13 +39,13 @@ class User extends BaseRequest {
 
       return {
         type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
+        message: resData.error || 'ошибка добавления пользователя',
+      };
     } catch (err) {
       return {
         type: 'ERROR',
         message: err?.response?.data?.error || 'ошибка добавления пользователя',
-      } as error.INetworkError;
+      };
     }
   };
 
