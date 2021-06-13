@@ -34,7 +34,7 @@ const Account = () => {
         }
       }
     },
-    [dispatch],
+    [account?.id, dispatch],
   );
 
   useEffect(() => {

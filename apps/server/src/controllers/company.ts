@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { ICompany, NewCompany } from '@lib/types';
+import { ICompany, IUser, NewCompany } from '@lib/types';
 
 import log from '../utils/logger';
 import { companyService } from '../services';
@@ -10,13 +10,13 @@ import { DataNotFoundException, ForbiddenException } from '../exceptions';
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, externalId } = ctx.request.body as NewCompany;
 
-  const { id: userId, role } = ctx.state.user;
+  const user = ctx.state.user as IUser;
 
-  if (role !== 'Admin' && role !== 'SuperAdmin') {
+  if (user?.role !== 'Admin' && user?.role !== 'SuperAdmin') {
     throw new ForbiddenException('Нет прав для создания компании');
   }
 
-  const company: NewCompany = { name, adminId: userId, externalId };
+  const company: NewCompany = { name, admin: { id: user.id, name: user.name }, externalId };
 
   const newCompany = await companyService.addOne(company);
 

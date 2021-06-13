@@ -10,7 +10,7 @@ import { created, ok } from '../utils/apiHelpers';
  * Регистрация нового пользователя
  * */
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, password } = ctx.body as IUserCredentials;
+  const { name, password } = ctx.request.body as IUserCredentials;
 
   const user: NewUser = {
     password,
@@ -68,7 +68,7 @@ const logOut = async (ctx: Context): Promise<void> => {
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { code, uid }: { code: string; uid?: string } = ctx.body;
+  const { code, uid }: { code: string; uid?: string } = ctx.request.body;
 
   const deviceUid = await authService.verifyCode({ code, uid });
 

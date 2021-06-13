@@ -84,7 +84,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;
-export type NewUser = Omit<IDBUser, 'role' | 'id'>;
+export type NewUser = Omit<IUser, 'role' | 'id'>;
 
 export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
 
@@ -92,7 +92,7 @@ export interface ICompany extends Omit<IDBCompany, 'adminId'> {
   admin: INamedEntity;
 }
 
-export type NewCompany = Pick<IDBCompany, 'name' | 'externalId' | 'adminId'>;
+export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name'>;
 
 export interface IMessageInfo {
   uid: string;
@@ -101,17 +101,16 @@ export interface IMessageInfo {
 
 export interface IDevice extends Omit<IDBDevice, 'companyId'> {
   company: INamedEntity;
-  // user: INamedEntity;
 }
 
-export type NewDevice = Pick<IDBDevice, 'name' | 'companyId'>;
-
-export type NewDeviceBinding = Pick<IDBDeviceBinding, 'userId' | 'deviceId'>;
+export type NewDevice = Pick<IDevice, 'name' | 'company'>;
 
 export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'deviceId'> {
   user: INamedEntity;
   device: INamedEntity;
 }
+
+export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

@@ -32,7 +32,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   const newCompanyObj: IDBCompany = {
     id: '',
     name: company.name,
-    adminId: company.adminId,
+    adminId: company.admin.id,
     externalId: company.externalId,
     creationDate: new Date().toString(),
     editionDate: new Date().toString(),

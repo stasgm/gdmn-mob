@@ -1,37 +1,28 @@
-import { IDevice, INamedEntity } from '@lib/types';
-import { v4 as uuid } from 'uuid';
+import { IDevice } from '@lib/types';
 
-const user1: INamedEntity = {
-  id: '123',
-  name: 'Stas',
-};
-
-const user2: INamedEntity = {
-  id: '345',
-  name: 'Ina',
-};
+import { company, company2, company3 } from './companies';
 
 const devices: IDevice[] = [
   {
-    id: uuid(),
+    id: '1',
     name: 'iPhone',
     state: 'ACTIVE',
     uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
-    user: user1,
+    company: company,
   },
   {
-    id: uuid(),
+    id: '2',
     name: 'Android',
     state: 'ACTIVE',
     uid: 'ecc6ff20-999c-11eb-b406-85744eedb503',
-    user: user2,
+    company: company2,
   },
   {
-    id: uuid(),
+    id: '3',
     name: 'WEB',
     state: 'ACTIVE',
     uid: 'WEB',
-    user: user1,
+    company: company3,
   },
 ];
 
