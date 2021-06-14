@@ -15,19 +15,19 @@ import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { refSelectors } from '@lib/store';
 
-import { OrdersStackParamList, ReturnsStackParamList } from '../navigation/Root/types';
 import { useDispatch, useSelector } from '../store';
 import { appActions } from '../store/app/actions';
 import { IOutlet } from '../store/docs/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
+import { RoutesStackParamList } from '../navigation/Root/types';
 
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const { refName, isMulti, fieldName, value, clause } =
-    useRoute<RouteProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>().params;
+    useRoute<RouteProp<RoutesStackParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName(refName) as IReference<INamedEntity>;
 

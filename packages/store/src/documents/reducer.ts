@@ -33,7 +33,7 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
     case getType(actions.updateDocument):
       return {
         ...state,
-        list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...action.payload.head } : doc)),
+        list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...action.payload.document } : doc)),
       };
 
     case getType(actions.deleteDocument):
@@ -65,7 +65,7 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
       return {
         ...state,
         list: state.list.map((doc) =>
-          doc.id === action.payload.docId ? { ...doc, lines: [...doc.lines, action.payload.line] } : doc,
+          doc.id === action.payload.docId ? { ...doc, lines: [...(doc.lines || []), action.payload.line] } : doc,
         ),
       };
     }
@@ -77,7 +77,7 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
           doc.id === action.payload.docId
             ? {
                 ...doc,
-                lines: doc.lines.map((line) => (line.id === action.payload.line.id ? action.payload.line : line)),
+                lines: doc?.lines?.map((line) => (line.id === action.payload.line.id ? action.payload.line : line)),
               }
             : doc,
         ),
@@ -90,7 +90,7 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
           doc.id === action.payload.docId
             ? {
                 ...doc,
-                lines: doc.lines.filter((line) => line.id !== action.payload.lineId),
+                lines: doc?.lines?.filter((line) => line.id !== action.payload.lineId),
               }
             : doc,
         ),

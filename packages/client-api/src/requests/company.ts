@@ -24,9 +24,9 @@ class Company extends BaseRequest {
     }
 
     //  try {
-    console.log('company', company);
+    // console.log('company', company);
     const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-    console.log('res', res);
+    // console.log('res', res);
     const resData = res.data;
 
     if (resData?.result) {

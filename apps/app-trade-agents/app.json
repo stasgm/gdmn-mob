@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "trade-agents",
-    "slug": "app",
-    "version": "1.0.0",
+    "name": "GDMN Sales Representative",
+    "slug": "gdmn-sales-representative",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -27,6 +27,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "package": "com.gsbelarus.salesrepresentative",
+      "permissions": [
+        "LOCATION",
+        "CALENDAR"
+      ],
+      "versionCode": 1
     }
   }
 }

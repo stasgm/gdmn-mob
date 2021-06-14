@@ -28,7 +28,7 @@ import {
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
 export function DrawerContent(props: Props) {
-  const paperTheme = useTheme();
+  const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -86,7 +86,7 @@ export function DrawerContent(props: Props) {
           style={[
             styles.drawerContent,
             {
-              backgroundColor: paperTheme.colors.surface,
+              backgroundColor: colors.surface,
               transform: [{ translateX }],
             },
           ]}

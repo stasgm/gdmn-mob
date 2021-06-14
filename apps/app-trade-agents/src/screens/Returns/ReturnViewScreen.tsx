@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -16,10 +16,11 @@ import {
 
 import { IconButton } from 'react-native-paper';
 
-import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
+
+import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 import ReturnItem from './components/ReturnItem';
 
@@ -46,23 +47,27 @@ const ReturnViewScreen = () => {
     }
   }, [dispatch, id, navigation]);
 
+  const handleEditReturnHead = useCallback(() => {
+    navigation.navigate('ReturnEdit', { id });
+  }, [navigation, id]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Добавить товар',
         onPress: handleAddReturnLine,
       },
-      /*{
+      {
         title: 'Редактировать',
-        // onPress: handleAddOrderLine,
-      },*/
+        onPress: handleEditReturnHead,
+      },
       {
         title: 'Удалить',
         type: 'destructive',
         onPress: handleDelete,
       },
     ]);
-  }, [showActionSheet, handleAddReturnLine, handleDelete]);
+  }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -95,13 +100,14 @@ const ReturnViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      {/* <Header item={order} /> */}
-      <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
-        <>
-          <Text>{returnDoc.number}</Text>
-          <Text>{getDateString(returnDoc.documentDate)}</Text>
-        </>
-      </InfoBlock>
+      <TouchableOpacity onPress={handleEditReturnHead}>
+        <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
+          <>
+            <Text>{returnDoc.number}</Text>
+            <Text>{getDateString(returnDoc.documentDate)}</Text>
+          </>
+        </InfoBlock>
+      </TouchableOpacity>
       <FlatList
         ref={ref}
         data={returnDoc.lines}

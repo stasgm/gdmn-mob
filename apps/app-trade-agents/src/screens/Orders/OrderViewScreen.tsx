@@ -16,10 +16,11 @@ import {
 
 import { IconButton } from 'react-native-paper';
 
-import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
+
+import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import OrderItem from './components/OrderItem';
 

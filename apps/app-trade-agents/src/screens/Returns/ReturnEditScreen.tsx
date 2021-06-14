@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
-import { IDocument, IEntity, IUserDocument } from '@lib/types';
 import {
   BackButton,
   AppInputScreen,
@@ -112,13 +111,15 @@ const ReturnEditScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.addDocument(newReturn as unknown as IUserDocument<IDocument, IEntity[]>));
+      docDispatch(documentActions.addDocument(newReturn));
+
+      navigation.dispatch(StackActions.replace('ReturnView', { id: newReturn.id }));
     } else {
       if (!returnDoc) {
         return;
       }
 
-      const updatedHead: IReturnDocument = {
+      const doc: IReturnDocument = {
         id: docId,
         documentType: returnType,
         number: docNumber,
@@ -136,10 +137,12 @@ const ReturnEditScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
+      docDispatch(documentActions.updateDocument({ docId: id, document: doc }));
+
+      navigation.navigate('ReturnView', { id });
     }
 
-    navigation.navigate('ReturnView', { id: docId, routeBack: 'ReturnList' });
+    // navigation.navigate('ReturnView', { id: docId, routeBack: 'ReturnList' });
   }, [
     docNumber,
     docContact,

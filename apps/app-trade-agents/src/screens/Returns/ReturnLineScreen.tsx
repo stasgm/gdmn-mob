@@ -5,9 +5,9 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { ReturnsStackParamList } from '../../navigation/Root/types';
-
 import { IReturnLine } from '../../store/docs/types';
+
+import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 import ReturnLine from './components/ReturnLine';
 

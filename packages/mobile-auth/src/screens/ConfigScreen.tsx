@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { IApiConfig } from '@lib/client-types';
@@ -41,11 +41,9 @@ const ConfigScreen = (props: Props) => {
   return (
     <AppInputScreen>
       <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
-      <ScrollView>
-        <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
-        <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
-        <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
-      </ScrollView>
+      <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
+      <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
+      <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
       <View style={localStyles.buttonsView}>
         <PrimeButton
           icon="check"
