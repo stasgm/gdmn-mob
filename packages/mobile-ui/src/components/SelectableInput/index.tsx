@@ -15,6 +15,7 @@ interface Props {
   editable?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
 const renderTouchText = (props: RenderProps) => {
   const { style, value, onFocus } = props;
 

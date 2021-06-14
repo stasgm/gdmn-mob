@@ -29,12 +29,12 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.gs.sales-representative",
+      "package": "com.gsbelarus.salesrepresentative",
       "permissions": [
         "LOCATION",
         "CALENDAR"
       ],
-      "versionCode": "0.1.0"
+      "versionCode": 1
     }
   }
 }

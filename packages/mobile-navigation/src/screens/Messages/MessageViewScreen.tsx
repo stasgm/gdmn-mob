@@ -5,7 +5,7 @@ import { useTheme, FAB } from 'react-native-paper';
 import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IReferences, IUserDocument } from '@lib/types';
+import { IReferences } from '@lib/types';
 import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 
 import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
@@ -43,7 +43,7 @@ const MessageViewScreen = () => {
 
       case 'docs':
         //TODO: проверка данных, приведение к типу
-        dispatch(documentActions.setDocuments(msg.body.payload as IUserDocument[]));
+        dispatch(documentActions.setDocuments(msg.body.payload));
         dispatch(messageActions.updateStatusMessage({ id: msg.id, newStatus: 'procd' }));
         break;
 

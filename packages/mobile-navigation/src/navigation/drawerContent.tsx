@@ -23,7 +23,6 @@ import {
   packageRefMock,
   packageGoodRefMock,
 } from '../../../../apps/app-trade-agents/src/store/docs/mock';
-import { IUserDocument } from '../../../types';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
@@ -53,9 +52,9 @@ export function DrawerContent(props: Props) {
         packageGood: packageGoodRefMock,
       }),
     );
-    await dispatch(documentActions.addDocuments(orderMock as unknown as IUserDocument[]));
-    await dispatch(documentActions.addDocuments(returnDocMock as unknown as IUserDocument[]));
-    await dispatch(documentActions.addDocuments(routeMock as unknown as IUserDocument[]));
+    await dispatch(documentActions.addDocuments(orderMock));
+    await dispatch(documentActions.addDocuments(returnDocMock));
+    await dispatch(documentActions.addDocuments(routeMock));
 
     setLoading(false);
   };

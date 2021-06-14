@@ -1,6 +1,6 @@
 {
-  "name": "@apps/trade-agents",
-  "version": "1.0.0",
+  "name": "@apps/sales-representative",
+  "version": "0.1.0",
   "private": true,
   "main": "__generated__/AppEntry.js",
   "scripts": {

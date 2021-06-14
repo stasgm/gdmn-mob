@@ -1,4 +1,4 @@
-import { IEntity, INamedEntity, IUserDocument } from '@lib/types';
+import { IDocument, IEntity, IHead, INamedEntity } from '@lib/types';
 
 import { docTypeRefMock, good1, good2 } from './references';
 
@@ -9,7 +9,7 @@ const dep1: INamedEntity = {
   name: 'Склад',
 };
 
-interface DocHeader {
+interface DocHeader extends IHead {
   department: INamedEntity;
 }
 
@@ -18,7 +18,7 @@ interface DocLine extends IEntity {
   quantity: number;
 }
 
-export const documentsMock: IUserDocument<DocHeader, DocLine[]>[] = [
+export const documentsMock: IDocument<DocHeader, DocLine[]>[] = [
   {
     id: '9',
     number: '225',

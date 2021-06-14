@@ -8,10 +8,10 @@ export type OrdersStackParamList = {
   OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectItem: {
-    parentScreen: keyof OrdersStackParamList;
+    // parentScreen: keyof OrdersStackParamList;
     refName: string;
     fieldName: string;
-    value: INamedEntity[];
+    value?: INamedEntity[];
     clause?: Record<string, string>;
     isMulti?: boolean;
   };
@@ -31,6 +31,7 @@ export type RoutesStackParamList = {
   RouteView: { id: string };
   RouteDetails: { routeId: string; id: string };
   OrderView: { id: string } | undefined;
+  OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string; groupId: string };

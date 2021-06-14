@@ -3,7 +3,7 @@ import { View, ScrollView } from 'react-native';
 
 import { globalStyles as styles, ScreenTitle, RadioGroup, PrimeButton, RoundButton, AppScreen } from '@lib/mobile-ui';
 import { ICompany, IResponse } from '@lib/types';
-import { company3, company2, company } from '@lib/mock';
+import { company3 } from '@lib/mock';
 
 import localStyles from './styles';
 

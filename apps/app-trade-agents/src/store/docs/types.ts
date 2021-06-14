@@ -1,4 +1,4 @@
-import { INamedEntity, IEntity, IUserDocument } from '@lib/types';
+import { INamedEntity, IEntity, IDocument, MandateProps, IHead } from '@lib/types';
 
 import { TakeOrderType } from '../visits/types';
 
@@ -63,10 +63,10 @@ export interface IPackageGood extends IEntity {
   package: INamedEntity;
 }
 
-export interface IOrderHead {
+export interface IOrderHead extends IHead {
   contact: INamedEntity; //организация-плательщик
   outlet: INamedEntity; // магазин –подразделение организации плательщика
-  road?: INamedEntity; // 	Маршрут
+  route?: INamedEntity; // 	Маршрут
   depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
@@ -78,9 +78,10 @@ export interface IOrderLine extends IEntity {
   packagekey?: INamedEntity; // Вид упаковки
 }
 
-export type IOrderDocument = IUserDocument<IOrderHead, IOrderLine[]>;
+export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine[]>, 'head' | 'lines'>;
+// export type IOrderDocument = IDocument<IOrderHead, IOrderLine[]>;
 
-interface IRouteHead {
+interface IRouteHead extends IHead {
   agent: INamedEntity;
 }
 
@@ -92,14 +93,14 @@ export interface IRouteLine extends IEntity {
   /* result?: typeVisit; -это убрать в визиты */
 }
 
-export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
+export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine[]>, 'head' | 'lines'>;
 
-interface IReturnHead {
+interface IReturnHead extends IHead {
   contact: INamedEntity;
   outlet: INamedEntity;
   depart: INamedEntity;
   reason: string;
-  road?: INamedEntity; // 	Маршрут
+  route?: INamedEntity; // 	Маршрут
 }
 
 export interface IReturnLine extends IEntity {
@@ -107,7 +108,7 @@ export interface IReturnLine extends IEntity {
   quantity: number;
 }
 
-export type IReturnDocument = IUserDocument<IReturnHead, IReturnLine[]>;
+export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine[]>, 'head' | 'lines'>;
 
 /* export interface ICoords {
   latitude: number;

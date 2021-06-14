@@ -1305,7 +1305,7 @@ const orderMock: IOrderDocument[] = [
     head: {
       contact: outletMock[10].company,
       outlet: outlet11,
-      road: route1,
+      route: route1,
       onDate: '2021-06-07',
     },
     lines: [],
