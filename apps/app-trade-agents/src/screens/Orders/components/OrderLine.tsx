@@ -21,7 +21,7 @@ interface IProps {
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const OrderLine = ({ item, onSetLine }: IProps) => {
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '0');
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
