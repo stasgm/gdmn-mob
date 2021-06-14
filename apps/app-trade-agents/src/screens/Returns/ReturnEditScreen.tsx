@@ -4,7 +4,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
-import { INamedEntity, IDocument, IEntity, IUserDocument, StatusType } from '@lib/types';
+import { IDocument, IEntity, IUserDocument } from '@lib/types';
 import {
   BackButton,
   AppInputScreen,
@@ -23,18 +23,7 @@ import { IReturnDocument } from '../../store/docs/types';
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
 import { returnType } from '../../store/docs/mock';
-import { IFormParam } from '../../store/app/types';
-
-interface IReturnFormParam extends IFormParam {
-  contact?: INamedEntity;
-  outlet?: INamedEntity;
-  number?: string;
-  documentDate?: string;
-  depart?: INamedEntity;
-  reason?: string;
-  road?: INamedEntity;
-  status?: StatusType;
-}
+import { IReturnFormParam } from '../../store/app/types';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
@@ -102,9 +91,11 @@ const ReturnEditScreen = () => {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
+    const docId = !id ? uuid() : id;
+
     if (!id) {
       const newReturn: IReturnDocument = {
-        id: uuid(),
+        id: docId,
         documentType: returnType,
         number: docNumber,
         documentDate: new Date().toISOString(),
@@ -128,7 +119,7 @@ const ReturnEditScreen = () => {
       }
 
       const updatedHead: IReturnDocument = {
-        id,
+        id: docId,
         documentType: returnType,
         number: docNumber,
         documentDate: docDocumentDate,
@@ -147,7 +138,8 @@ const ReturnEditScreen = () => {
 
       docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
     }
-    navigation.goBack();
+
+    navigation.navigate('ReturnView', { id: docId, routeBack: 'ReturnList' });
   }, [
     docNumber,
     docContact,
@@ -176,7 +168,7 @@ const ReturnEditScreen = () => {
     id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
   const handlePresentContact = () => {
-    navigation.navigate('SelectItem', {
+    navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
       value: docContact,
@@ -191,7 +183,7 @@ const ReturnEditScreen = () => {
       params.companyId = docContact?.id;
     }
 
-    navigation.navigate('SelectItem', {
+    navigation.navigate('SelectRefItem', {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
@@ -200,17 +192,9 @@ const ReturnEditScreen = () => {
   };
 
   const handlePresentDepart = () => {
-    //TODO: если изменился контакт, то и магазин должен обнулиться
-    const params: Record<string, string> = {};
-
-    if (docContact?.id) {
-      params.companyId = docContact?.id;
-    }
-
-    navigation.navigate('SelectItem', {
-      refName: 'depart',
+    navigation.navigate('SelectRefItem', {
+      refName: 'department',
       fieldName: 'depart',
-      clause: params,
       value: docDepart,
     });
   };

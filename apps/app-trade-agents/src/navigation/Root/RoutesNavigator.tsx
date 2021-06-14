@@ -5,17 +5,12 @@ import RouteListScreen from '../../screens/Routes/RouteListScreen';
 import RouteViewScreen from '../../screens/Routes/RouteViewScreen';
 import RouteDetailScreen from '../../screens/Routes/RouteDetailScreen';
 
-import {
-  OrderLineScreen,
-  OrderViewScreen,
-  SelectGoodScreen,
-  SelectGroupScreen,
-  SelectItemScreen,
-} from '../../screens/Orders';
+import { OrderLineScreen, OrderViewScreen, SelectGoodScreen, SelectGroupScreen } from '../../screens/Orders';
 
-import { ReturnLineScreen, ReturnViewScreen, SelectItemScreen as SelectItemReturnScreen } from '../../screens/Returns';
+import { ReturnLineScreen, ReturnViewScreen } from '../../screens/Returns';
 
 import { RoutesStackParamList } from './types';
+import SelectItemScreen from '../../screens/Returns/SelectItemScreen';
 
 const Stack = createStackNavigator<RoutesStackParamList>();
 
@@ -32,10 +27,10 @@ const RoutesNavigator = () => {
       <Stack.Screen name="OrderLine" component={OrderLineScreen} options={{ title: 'Заявка' }} />
       <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
       <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
-      <Stack.Screen name="SelectItem" component={SelectItemScreen} options={{ title: 'Заявка' }} />
+      {/* <Stack.Screen name="SelectItem" component={SelectItemScreen} options={{ title: 'Заявка' }} /> */}
       <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возвраты' }} />
       <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возвраты' }} />
-      <Stack.Screen name="SelectItemReturn" component={SelectItemReturnScreen} options={{ title: 'Возвраты' }} />
+      <Stack.Screen name="SelectItemReturn" component={SelectItemScreen} options={{ title: 'Возвраты' }} />
     </Stack.Navigator>
   );
 };

@@ -18,7 +18,7 @@ const SelectItemScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const { docId, name } = useRoute<RouteProp<ReturnsStackParamList, 'SelectItem'>>().params;
+  const { docId, name } = useRoute<RouteProp<ReturnsStackParamList, 'SelectItemReturn'>>().params;
 
   const list = refSelectors.selectByName(name) as IReference<INamedEntity>;
 

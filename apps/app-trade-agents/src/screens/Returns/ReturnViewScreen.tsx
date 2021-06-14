@@ -14,13 +14,14 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { IconButton } from 'react-native-paper';
+
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 
 import ReturnItem from './components/ReturnItem';
-import { IconButton } from 'react-native-paper';
 
 const ReturnViewScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.id;
@@ -78,7 +79,7 @@ const ReturnViewScreen = () => {
         </View>
       ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu, routeBack]);
+  }, [navigation, handleAddReturnLine, routeBack, actionsMenu]);
 
   const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
 

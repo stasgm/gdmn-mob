@@ -7,7 +7,7 @@ export type OrdersStackParamList = {
   OrderView: { id: string; routeBack?: string } | undefined;
   OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
-  SelectItem: {
+  SelectRefItem: {
     parentScreen: keyof OrdersStackParamList;
     refName: string;
     fieldName: string;
@@ -24,7 +24,15 @@ export type ReturnsStackParamList = {
   ReturnView: { id: string; routeBack?: string } | undefined;
   ReturnEdit: { id: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
-  SelectItem: { docId: string; name: string };
+  SelectRefItem: {
+    parentScreen: keyof ReturnsStackParamList;
+    refName: string;
+    fieldName: string;
+    value: INamedEntity[];
+    clause?: Record<string, string>;
+    isMulti?: boolean;
+  };
+  SelectItemReturn: { docId: string; name: string };
 };
 
 export type RoutesStackParamList = {
@@ -35,7 +43,14 @@ export type RoutesStackParamList = {
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string; groupId: string };
-  SelectItem: { docId: string; name: string };
+  SelectRefItem: {
+    parentScreen: keyof RoutesStackParamList;
+    refName: string;
+    fieldName: string;
+    value: INamedEntity[];
+    clause?: Record<string, string>;
+    isMulti?: boolean;
+  };
   ReturnView: { id: string; routeBack?: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItemReturn: { docId: string; name: string };

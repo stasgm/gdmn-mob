@@ -10,6 +10,6 @@
     "../mobile-ui/src/components/AppBar/HeaderList.tsx",
     "../mobile-ui/src/components/AppBar/DrawerButton.tsx",
     "../mobile-ui/src/components/AppBar/HeaderView.tsx"
-  ],
+, "../../apps/app-trade-agents/src/components/SelectRefItemScreen.tsx"  ],
   "exclude": ["node_modules"]
 }

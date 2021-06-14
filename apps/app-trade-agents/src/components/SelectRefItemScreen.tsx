@@ -15,18 +15,19 @@ import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { refSelectors } from '@lib/store';
 
-import { OrdersStackParamList } from '../../navigation/Root/types';
-import { useDispatch, useSelector } from '../../store';
-import { appActions } from '../../store/app/actions';
-import { IOrderHead, IOutlet } from '../../store/docs/types';
-import { extraPredicate } from '../../utils/helpers';
+import { OrdersStackParamList, ReturnsStackParamList } from '../navigation/Root/types';
+import { useDispatch, useSelector } from '../store';
+import { appActions } from '../store/app/actions';
+import { IOutlet } from '../store/docs/types';
+import { extraPredicate } from '../utils/helpers';
+import { IFormParam } from '../store/app/types';
 
-const SelectItemScreen = () => {
+const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const { refName, isMulti, fieldName, value, clause } =
-    useRoute<RouteProp<OrdersStackParamList, 'SelectItem'>>().params;
+    useRoute<RouteProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName(refName) as IReference<INamedEntity>;
 
@@ -129,7 +130,7 @@ const SelectItemScreen = () => {
                   Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
                   return;
                 }
-                const newFormParams: Partial<IOrderHead> = {
+                const newFormParams: IFormParam = {
                   ...formParams,
                   [fieldName]: checkedItem,
                 };
@@ -190,4 +191,4 @@ const LineItem = React.memo(
   },
 );
 
-export default SelectItemScreen;
+export default SelectRefItemScreen;

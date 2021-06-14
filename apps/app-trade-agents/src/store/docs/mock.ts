@@ -1322,6 +1322,12 @@ const deprt1 = departmetsMock[0];
 const deprt2 = departmetsMock[1];
 const deprt3 = departmetsMock[2];
 
+const departmentRefMock: IReference<INamedEntity> = {
+  id: '666',
+  name: 'Подразделения',
+  data: departmetsMock,
+};
+
 // Документ Return
 const returnDocMock: IReturnDocument[] = [
   {
@@ -1377,6 +1383,7 @@ const returnDocMock: IReturnDocument[] = [
 export {
   documentTypeMock,
   orderType,
+  returnType,
   routeMock,
   orderMock,
   returnDocMock,
@@ -1429,4 +1436,5 @@ export {
   company,
   packageRefMock,
   packageGoodRefMock,
+  departmentRefMock,
 };

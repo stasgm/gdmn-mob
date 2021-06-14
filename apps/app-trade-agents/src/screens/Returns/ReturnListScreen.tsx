@@ -46,17 +46,16 @@ const ReturnListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('ReturnView');
+    navigation.navigate('ReturnEdit');
   }, [navigation]);
 
   const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocuments());
   }, [dispatch]);
 
-  /*
   const actionsMenu = useCallback(() => {
     showActionSheet([
-       {
+      {
         title: 'Добавить',
         onPress: handleAddDocument,
       },
@@ -71,19 +70,18 @@ const ReturnListScreen = () => {
       },
     ]);
   }, [showActionSheet, handleAddDocument, handleDelete]);
-  */
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      /*  headerRight: () => (
-         <View style={styles.buttons}>
-           <MenuButton actionsMenu={actionsMenu} />
-           <AddButton onPress={handleAddDocument} />
-         </View>
-       ), */
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <MenuButton actionsMenu={actionsMenu} />
+          <AddButton onPress={handleAddDocument} />
+        </View>
+      ),
     });
-  }, [navigation]);
+  }, [actionsMenu, handleAddDocument, navigation]);
 
   const ref = useRef<FlatList<IReturnDocument>>(null);
 

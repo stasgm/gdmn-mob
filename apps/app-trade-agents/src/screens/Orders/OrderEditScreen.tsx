@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
-import { INamedEntity, IDocument, IEntity, IUserDocument, StatusType } from '@lib/types';
+import { IDocument, IEntity, IUserDocument } from '@lib/types';
 import {
   BackButton,
   AppInputScreen,
@@ -25,16 +25,7 @@ import { getDateString } from '../../utils/helpers';
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
 import { orderType } from '../../store/docs/mock';
-import { IFormParam } from '../../store/app/types';
-
-interface IOrderFormParam extends IFormParam {
-  contact?: INamedEntity;
-  outlet?: INamedEntity;
-  number?: string;
-  documentDate?: string;
-  onDate?: string;
-  status?: StatusType;
-}
+import { IOrderFormParam } from '../../store/app/types';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
@@ -142,7 +133,7 @@ const OrderEditScreen = () => {
       docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
     }
 
-    navigation.navigate('OrderView', { id: docId, route: 'OrderList' });
+    navigation.navigate('OrderView', { id: docId, routeBack: 'OrderList' });
   }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
 
   useLayoutEffect(() => {
@@ -173,7 +164,7 @@ const OrderEditScreen = () => {
   };
 
   const handlePresentContact = () => {
-    navigation.navigate('SelectItem', {
+    navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
       value: docContact,
@@ -188,7 +179,7 @@ const OrderEditScreen = () => {
       params.companyId = docContact?.id;
     }
 
-    navigation.navigate('SelectItem', {
+    navigation.navigate('SelectRefItem', {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
