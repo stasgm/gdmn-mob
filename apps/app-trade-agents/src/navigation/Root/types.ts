@@ -22,6 +22,7 @@ export type OrdersStackParamList = {
 export type ReturnsStackParamList = {
   ReturnList: undefined;
   ReturnView: { id: string; routeBack?: string } | undefined;
+  ReturnEdit: { id: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItem: { docId: string; name: string };
 };

@@ -15,7 +15,7 @@ const RouteListScreen = () => {
 
   const { loading } = useSelector((state) => state.documents);
 
-  const list = ((docSelectors.selectByDocType('route') as unknown) as IRouteDocument[]).sort(
+  const list = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[]).sort(
     (a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
   );
 

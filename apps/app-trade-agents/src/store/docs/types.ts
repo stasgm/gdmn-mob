@@ -97,7 +97,7 @@ export type IRouteDocument = IUserDocument<IRouteHead, IRouteLine[]>;
 interface IReturnHead {
   contact: INamedEntity;
   outlet: INamedEntity;
-  depart: INamedEntity;
+  depart?: INamedEntity;
   reason: string;
   road?: INamedEntity; // 	Маршрут
 }
