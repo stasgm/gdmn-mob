@@ -23,11 +23,12 @@ import {
   packageRefMock,
   packageGoodRefMock,
 } from '../../../../apps/app-trade-agents/src/store/docs/mock';
+import { IUserDocument } from '../../../types';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
 export function DrawerContent(props: Props) {
-  const paperTheme = useTheme();
+  const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -52,9 +53,9 @@ export function DrawerContent(props: Props) {
         packageGood: packageGoodRefMock,
       }),
     );
-    await dispatch(documentActions.addDocuments(orderMock));
-    await dispatch(documentActions.addDocuments(returnDocMock));
-    await dispatch(documentActions.addDocuments(routeMock));
+    await dispatch(documentActions.addDocuments(orderMock as unknown as IUserDocument[]));
+    await dispatch(documentActions.addDocuments(returnDocMock as unknown as IUserDocument[]));
+    await dispatch(documentActions.addDocuments(routeMock as unknown as IUserDocument[]));
 
     setLoading(false);
   };
@@ -84,7 +85,7 @@ export function DrawerContent(props: Props) {
           style={[
             styles.drawerContent,
             {
-              backgroundColor: paperTheme.colors.surface,
+              backgroundColor: colors.surface,
               transform: [{ translateX }],
             },
           ]}

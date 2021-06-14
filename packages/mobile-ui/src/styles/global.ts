@@ -17,9 +17,18 @@ const globalstyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     borderWidth: 0.5,
-    borderRadius: 0,
+    // borderRadius: 50,
     padding: 10,
+    marginHorizontal: 1,
     justifyContent: 'center',
+  },
+  firstBtnTab: {
+    borderTopLeftRadius: 3,
+    borderBottomLeftRadius: 3,
+  },
+  lastBtnTab: {
+    borderTopRightRadius: 3,
+    borderBottomRightRadius: 3,
   },
   buttonText: {
     fontSize: 18,
