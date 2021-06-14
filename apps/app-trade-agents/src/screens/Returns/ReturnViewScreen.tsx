@@ -20,9 +20,11 @@ import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 import { getDateString } from '../../utils/helpers';
 
 import ReturnItem from './components/ReturnItem';
+import { IconButton } from 'react-native-paper';
 
 const ReturnViewScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.id;
+  const routeBack = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.routeBack;
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
@@ -63,7 +65,12 @@ const ReturnViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: () =>
+        routeBack ? (
+          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
+        ) : (
+          <BackButton />
+        ),
       headerRight: () => (
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />
@@ -71,7 +78,7 @@ const ReturnViewScreen = () => {
         </View>
       ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu]);
+  }, [navigation, handleAddReturnLine, actionsMenu, routeBack]);
 
   const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
 

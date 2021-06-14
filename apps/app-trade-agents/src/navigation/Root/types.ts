@@ -21,7 +21,7 @@ export type OrdersStackParamList = {
 
 export type ReturnsStackParamList = {
   ReturnList: undefined;
-  ReturnView: { id: string } | undefined;
+  ReturnView: { id: string; routeBack?: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItem: { docId: string; name: string };
 };
@@ -35,7 +35,7 @@ export type RoutesStackParamList = {
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string; groupId: string };
   SelectItem: { docId: string; name: string };
-  ReturnView: { id: string } | undefined;
+  ReturnView: { id: string; routeBack?: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItemReturn: { docId: string; name: string };
 };
