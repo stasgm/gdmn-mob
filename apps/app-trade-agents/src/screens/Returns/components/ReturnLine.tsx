@@ -1,11 +1,13 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { IReference } from '@lib/types';
-import { useIsFocused, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, TextInput, View, Text } from 'react-native';
+
+import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
 import { IGood, IReturnLine } from '../../../store/docs/types';
 
@@ -15,6 +17,11 @@ interface IProps {
 }
 
 const ReturnLine = ({ item, onSetLine }: IProps) => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const { docId } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
+
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '0');
   const isFocused = useIsFocused();
 
@@ -31,6 +38,11 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
+
+  const handleDelete = useCallback(() => {
+    dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
+    navigation.goBack();
+  }, [dispatch, docId, item.id, navigation]);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
@@ -90,6 +102,9 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
             />
           </View>
         </View>
+        <PrimeButton icon="delete" onPress={handleDelete} outlined>
+          Удалить позицию
+        </PrimeButton>
       </View>
       <ItemSeparator />
     </ScrollView>

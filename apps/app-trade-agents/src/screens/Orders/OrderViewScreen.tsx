@@ -42,7 +42,7 @@ const OrderViewScreen = () => {
   const handleDelete = useCallback(() => {
     if (id) {
       dispatch(documentActions.deleteDocument(id));
-      navigation.navigate('OrderList');
+      navigation.goBack();
     }
   }, [dispatch, id, navigation]);
 

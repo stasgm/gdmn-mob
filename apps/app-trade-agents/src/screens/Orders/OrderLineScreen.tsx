@@ -59,7 +59,12 @@ const OrderLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <OrderLine item={item} onSetLine={(value: IOrderLine) => setLine(value)} />
+      <OrderLine
+        item={line}
+        onSetLine={(value: IOrderLine) => {
+          setLine(value);
+        }}
+      />
     </View>
   );
 };

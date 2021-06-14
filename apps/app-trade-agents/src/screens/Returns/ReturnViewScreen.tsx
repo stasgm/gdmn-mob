@@ -39,7 +39,7 @@ const ReturnViewScreen = () => {
   const handleDelete = useCallback(() => {
     if (id) {
       dispatch(documentActions.deleteDocument(id));
-      navigation.navigate('ReturnList');
+      navigation.goBack();
     }
   }, [dispatch, id, navigation]);
 
