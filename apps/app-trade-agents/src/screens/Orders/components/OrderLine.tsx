@@ -1,15 +1,17 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
-import { useIsFocused } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IGood, IOrderLine, IPackageGood } from '../../../store/docs/types';
+
+import { OrdersStackParamList } from '../../../navigation/Root/types';
 
 import Checkbox from './Checkbox';
 
@@ -21,6 +23,11 @@ interface IProps {
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const OrderLine = ({ item, onSetLine }: IProps) => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
+
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
@@ -40,6 +47,11 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
+
+  const handleDelete = useCallback(() => {
+    dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
+    navigation.goBack();
+  }, [dispatch, docId, item.id, navigation]);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
@@ -116,6 +128,9 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           </View>
         )}
         <ItemSeparator />
+        <PrimeButton icon="delete" onPress={handleDelete} outlined>
+          Удалить позицию
+        </PrimeButton>
       </View>
     </ScrollView>
   );
