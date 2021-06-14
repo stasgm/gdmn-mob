@@ -98,9 +98,11 @@ const OrderEditScreen = () => {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
+    const docId = !id ? uuid() : id;
+
     if (!id) {
       const newOrder: IOrderDocument = {
-        id: uuid(),
+        id: docId,
         documentType: orderType,
         number: docNumber,
         documentDate: new Date().toISOString(),
@@ -122,7 +124,7 @@ const OrderEditScreen = () => {
       }
 
       const updatedHead: IOrderDocument = {
-        id,
+        id: docId,
         documentType: orderType,
         number: docNumber,
         documentDate: docDocumentDate,
@@ -139,7 +141,8 @@ const OrderEditScreen = () => {
 
       docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
     }
-    navigation.goBack();
+
+    navigation.navigate('OrderView', { id: docId, route: 'OrderList' });
   }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
 
   useLayoutEffect(() => {

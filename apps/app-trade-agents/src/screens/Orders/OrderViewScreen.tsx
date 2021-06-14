@@ -14,6 +14,8 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { IconButton } from 'react-native-paper';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
@@ -23,6 +25,7 @@ import OrderItem from './components/OrderItem';
 
 const OrderViewScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
+  const routeBack = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeBack;
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
@@ -70,7 +73,12 @@ const OrderViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: () =>
+        routeBack ? (
+          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
+        ) : (
+          <BackButton />
+        ),
       headerRight: () => (
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />
@@ -78,7 +86,7 @@ const OrderViewScreen = () => {
         </View>
       ),
     });
-  }, [navigation, handleAddOrderLine, actionsMenu]);
+  }, [navigation, handleAddOrderLine, actionsMenu, routeBack]);
 
   const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
 
