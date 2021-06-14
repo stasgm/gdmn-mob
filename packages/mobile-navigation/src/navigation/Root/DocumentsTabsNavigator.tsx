@@ -26,7 +26,7 @@ const TabsNavigator = () => {
   const dispatch = useDispatch();
 
   const handleAddDocument = () => {
-    console.log('types', JSON.stringify(types?.data));
+    // console.log('types', JSON.stringify(types?.data));
   };
 
   const handleLoad = () => {

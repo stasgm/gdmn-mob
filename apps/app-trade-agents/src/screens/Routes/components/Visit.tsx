@@ -2,12 +2,12 @@ import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions } from '@lib/store';
 import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
-import { IDocument, IEntity, INamedEntity, IUserDocument } from '@lib/types';
-
-import { StackNavigationProp } from '@react-navigation/stack';
+import { INamedEntity } from '@lib/types';
 
 import { useDispatch } from '../../../store';
 
@@ -24,12 +24,12 @@ const Visit = ({
   item,
   outlet,
   contact,
-  road,
+  route,
 }: {
   item: IVisit;
   outlet: INamedEntity;
   contact: INamedEntity;
-  road: INamedEntity;
+  route: INamedEntity;
 }) => {
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
@@ -40,11 +40,11 @@ const Visit = ({
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
   const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
-    (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
+    (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
   );
 
   const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find(
-    (e) => e.head.road?.id === road.id && e.head.outlet.id === outlet.id,
+    (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
   );
 
   const timeProcess = () => {
@@ -97,25 +97,25 @@ const Visit = ({
 
   const handleNewOrder = () => {
     const newOrder: IOrderDocument = {
+      id: uuid(),
+      number: 'б\\н',
+      status: 'DRAFT',
       documentDate: new Date().toISOString(),
       documentType: {
         id: '1',
         name: 'order',
       },
-      id: '111' + new Date().toISOString(),
-      number: 'б\\н',
-      status: 'DRAFT',
       head: {
         contact,
         outlet,
-        road,
+        route,
         onDate: new Date().toISOString(),
         takenOrder: item.takenType,
       },
       lines: [],
     };
 
-    dispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument(newOrder));
 
     navigation.navigate('OrderView', { id: newOrder.id });
   };
@@ -134,20 +134,19 @@ const Visit = ({
         contact,
         outlet,
         depart: deprt1,
-        road,
+        route,
         reason: 'Брак',
       },
       lines: [],
     };
 
-    dispatch(documentActions.addDocument(newReturn as unknown as IUserDocument<IDocument, IEntity[]>));
+    dispatch(documentActions.addDocument(newReturn));
 
     navigation.navigate('ReturnView', { id: newReturn.id });
   };
 
-  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
-    !dateEnd ? 'тся' : 'лся'
-  } ${timeProcess()})`;
+  // eslint-disable-next-line prettier/prettier
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'} ${timeProcess()})`;
   const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
 
   const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;

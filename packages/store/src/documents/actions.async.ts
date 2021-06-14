@@ -1,6 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 
-import { IUserDocument } from '@lib/types';
+import { IDocument } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -10,7 +10,7 @@ import { DocumentActionType, actions } from './actions';
 
 export type AppThunk = ThunkAction<Promise<DocumentActionType>, IDocumentState, null, DocumentActionType>;
 
-export const addDocuments = (documents: IUserDocument[]): AppThunk => {
+export const addDocuments = (documents: IDocument[]): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.addDocumentsAsync.request(''));
 

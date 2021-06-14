@@ -62,6 +62,7 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
   const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocuments());
   }, [dispatch]);

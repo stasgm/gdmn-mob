@@ -6,6 +6,7 @@ import RouteViewScreen from '../../screens/Routes/RouteViewScreen';
 import RouteDetailScreen from '../../screens/Routes/RouteDetailScreen';
 
 import {
+  OrderEditScreen,
   OrderLineScreen,
   OrderViewScreen,
   SelectGoodScreen,
@@ -29,6 +30,7 @@ const RoutesNavigator = () => {
       <Stack.Screen name="RouteView" component={RouteViewScreen} />
       <Stack.Screen name="RouteDetails" component={RouteDetailScreen} options={{ title: 'Визит' }} />
       <Stack.Screen name="OrderView" component={OrderViewScreen} options={{ title: 'Заявка' }} />
+      <Stack.Screen name="OrderEdit" component={OrderEditScreen} options={{ title: 'Заявка' }} />
       <Stack.Screen name="OrderLine" component={OrderLineScreen} options={{ title: 'Заявка' }} />
       <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
       <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />

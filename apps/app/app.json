@@ -12,17 +12,26 @@
     },
     "packagerOpts": {
       "config": "metro.config.js",
-      "sourceExts": ["svg"]
+      "sourceExts": [
+        "svg"
+      ]
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.gs.app"
+      "package": "com.gdmn.app",
+      "permissions": [
+        "LOCATION",
+        "CALENDAR"
+      ],
+      "versionCode": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"

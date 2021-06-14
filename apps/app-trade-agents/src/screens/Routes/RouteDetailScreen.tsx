@@ -129,7 +129,7 @@ const RouteDetailScreen = () => {
               item={visit}
               outlet={outlet as INamedEntity}
               contact={contact as INamedEntity}
-              road={{ id: routeId, name: '' }}
+              route={{ id: routeId, name: '' }}
             />
           ))}
         </>

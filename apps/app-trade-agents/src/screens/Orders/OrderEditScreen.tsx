@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
-import { INamedEntity, IDocument, IEntity, IUserDocument, StatusType } from '@lib/types';
+import { INamedEntity, StatusType } from '@lib/types';
 import {
   BackButton,
   AppInputScreen,
@@ -15,8 +17,6 @@ import {
   globalStyles as styles,
   SubTitle,
 } from '@lib/mobile-ui';
-
-import { Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument } from '../../store/docs/types';
@@ -38,11 +38,11 @@ interface IOrderFormParam extends IFormParam {
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find((e) => e.id === id);
+  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
 
   const [statusId, setStatusId] = useState('DRAFT');
 
@@ -115,31 +115,36 @@ const OrderEditScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.addDocument(newOrder as unknown as IUserDocument<IDocument, IEntity[]>));
+      docDispatch(documentActions.addDocument(newOrder));
+
+      navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
+      // navigation.navigate('OrderView', { id: newOrder.id });
     } else {
       if (!order) {
         return;
       }
 
-      const updatedHead: IOrderDocument = {
+      const doc: IOrderDocument = {
+        ...order,
         id,
-        documentType: orderType,
         number: docNumber,
-        documentDate: docDocumentDate,
         status: docStatus || 'DRAFT',
+        documentDate: docDocumentDate,
+        documentType: orderType,
         head: {
+          ...order.head,
           contact: docContact,
-          onDate: docOnDate,
           outlet: docOutlet,
+          onDate: docOnDate,
         },
-        lines: { ...order.lines },
+        lines: order.lines,
         creationDate: order.creationDate || new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, head: updatedHead as unknown as IUserDocument }));
+      docDispatch(documentActions.updateDocument({ docId: id, document: doc }));
+      navigation.navigate('OrderView', { id });
     }
-    navigation.goBack();
   }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
 
   useLayoutEffect(() => {
@@ -173,7 +178,7 @@ const OrderEditScreen = () => {
     navigation.navigate('SelectItem', {
       refName: 'contact',
       fieldName: 'contact',
-      value: docContact,
+      value: docContact && [docContact],
     });
   };
 
@@ -189,7 +194,7 @@ const OrderEditScreen = () => {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
-      value: docOutlet,
+      value: docOutlet && [docOutlet],
     });
   };
 

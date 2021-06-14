@@ -36,13 +36,18 @@ const FilterButtons = ({ status, onPress }: IProps) => {
 
   return (
     <View style={styles.containerCenter}>
-      {statusTypes.map((e) => {
+      {statusTypes.map((e, i) => {
         return (
           <TouchableHighlight
             activeOpacity={0.7}
             underlayColor="#DDDDDD"
             key={e.name}
-            style={[styles.btnTab, e.status === status && { backgroundColor: colors.primary }]}
+            style={[
+              styles.btnTab,
+              i === 0 && styles.firstBtnTab,
+              i === statusTypes.length - 1 && styles.lastBtnTab,
+              e.status === status && { backgroundColor: colors.primary },
+            ]}
             onPress={() => onPress(e.status)}
           >
             <Text style={{ color: e.status === status ? colors.background : colors.text }}>{e.name}</Text>

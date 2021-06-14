@@ -1,7 +1,7 @@
-import { IUserDocument } from '@lib/types';
+import { IDocument } from '@lib/types';
 
 export type IDocumentState = {
-  readonly list: IUserDocument[];
+  readonly list: IDocument[];
   readonly loading: boolean;
   readonly errorMessage: string;
 };
