@@ -214,9 +214,6 @@ const ReturnEditScreen = () => {
     });
   };
 
-  console.log('docStatus', docStatus);
-  console.log('isBlocked', isBlocked);
-
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
