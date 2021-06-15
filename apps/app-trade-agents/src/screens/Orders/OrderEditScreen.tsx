@@ -116,7 +116,7 @@ const OrderEditScreen = () => {
         return;
       }
 
-      const newOrder: IOrderDocument = {
+      const updatedOrder: IOrderDocument = {
         ...order,
         id,
         number: docNumber,
@@ -134,7 +134,7 @@ const OrderEditScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, document: newOrder }));
+      docDispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
       navigation.navigate('OrderView', { id });
     }
 
