@@ -25,7 +25,7 @@ const OrderListScreen = () => {
   const dispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.documents);
-  const list = docSelectors.selectByDocType('order') as unknown as IOrderDocument[];
+  const list = docSelectors.selectByDocType('order') as IOrderDocument[];
 
   const [status, setStatus] = useState<Status>('all');
 

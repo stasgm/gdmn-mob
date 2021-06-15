@@ -1,4 +1,4 @@
-import { INamedEntity, IEntity, IDocument, MandateProps, IHead } from '@lib/types';
+import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData } from '@lib/types';
 
 import { TakeOrderType } from '../visits/types';
 
@@ -6,14 +6,14 @@ import { TakeOrderType } from '../visits/types';
 
 // export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
 //Организации
-export interface IContact extends INamedEntity {
+export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
 }
 //Магазины
-export interface IOutlet extends INamedEntity {
+export interface IOutlet extends INamedEntity, IReferenceData {
   company: INamedEntity; //организация-плательщик
   address: string; //Адрес разгрузки
   phoneNumber: string; // Номер телефона

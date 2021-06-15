@@ -40,11 +40,11 @@ const Visit = ({
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find(
     (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
   );
 
-  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find(
+  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find(
     (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
   );
 
@@ -141,8 +141,9 @@ const Visit = ({
     navigation.navigate('ReturnView', { id: newReturn.id });
   };
 
-  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'
-    } ${timeProcess()})`;
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+    !dateEnd ? 'тся' : 'лся'
+  } ${timeProcess()})`;
   const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
 
   const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;

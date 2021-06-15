@@ -86,7 +86,7 @@ const ReturnViewScreen = () => {
     });
   }, [navigation, handleAddReturnLine, routeBack, actionsMenu]);
 
-  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
+  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
 
   if (!returnDoc) {
     return (
