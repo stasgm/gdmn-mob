@@ -119,30 +119,30 @@ const ReturnEditScreen = () => {
         return;
       }
 
-      const doc: IReturnDocument = {
-        id: docId,
+      const updatedReturn: IReturnDocument = {
+        ...returnDoc,
+        id,
         documentType: returnType,
         number: docNumber,
         documentDate: docDocumentDate,
         status: docStatus || 'DRAFT',
         head: {
+          ...returnDoc.head,
           contact: docContact,
           outlet: docOutlet,
           depart: docDepart,
           reason: docReason,
           road: docRoad,
         },
-        lines: { ...returnDoc.lines },
+        lines: returnDoc.lines,
         creationDate: returnDoc.creationDate || new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, document: doc }));
+      docDispatch(documentActions.updateDocument({ docId: id, document: updatedReturn }));
 
       navigation.navigate('ReturnView', { id });
     }
-
-    // navigation.navigate('ReturnView', { id: docId, routeBack: 'ReturnList' });
   }, [
     docNumber,
     docContact,
@@ -171,6 +171,10 @@ const ReturnEditScreen = () => {
     id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
   const handlePresentContact = () => {
+    if (isBlocked) {
+      return;
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
@@ -180,6 +184,10 @@ const ReturnEditScreen = () => {
 
   const handlePresentOutlet = () => {
     //TODO: если изменился контакт, то и магазин должен обнулиться
+    if (isBlocked) {
+      return;
+    }
+
     const params: Record<string, string> = {};
 
     if (docContact?.id) {
@@ -195,12 +203,19 @@ const ReturnEditScreen = () => {
   };
 
   const handlePresentDepart = () => {
+    if (isBlocked) {
+      return;
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'department',
       fieldName: 'depart',
       value: docDepart,
     });
   };
+
+  console.log('docStatus', docStatus);
+  console.log('isBlocked', isBlocked);
 
   return (
     <AppInputScreen>
@@ -231,15 +246,15 @@ const ReturnEditScreen = () => {
           label="Организация"
           placeholder="Выберите покупателя..."
           value={docContact?.name}
-          editable={isBlocked}
+          editable={!isBlocked}
           onFocus={handlePresentContact}
         />
-        <SelectableInput label="Магазин" value={docOutlet?.name} editable={isBlocked} onFocus={handlePresentOutlet} />
+        <SelectableInput label="Магазин" value={docOutlet?.name} editable={!isBlocked} onFocus={handlePresentOutlet} />
         <SelectableInput
           label="Подразделение"
           placeholder="Выберите покупателя..."
           value={docDepart?.name}
-          editable={isBlocked}
+          editable={!isBlocked}
           onFocus={handlePresentDepart}
         />
         <Input
