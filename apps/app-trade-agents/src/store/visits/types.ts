@@ -17,7 +17,7 @@ export interface IVisit extends IEntity {
   comment?: string;
   dateBegin: string; //начало визита
   dateEnd?: string; // конец визита
-  beginGeoPoint: ICoords; //место начало визита
+  beginGeoPoint?: ICoords; //место начало визита
   endGeoPoint?: ICoords; // место завершения визита
   result?: VisitResultType;
   takenType: TakeOrderType; //тип визита - это поле забрать из заявки

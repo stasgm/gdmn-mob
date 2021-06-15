@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
-import * as Location from 'expo-location';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Snackbar } from 'react-native-paper';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles as styles, Theme } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
@@ -12,6 +12,8 @@ import { geoActions } from '../../store/geo/actions';
 import { ILocation } from '../../store/geo/types';
 import { IOutlet } from '../../store/docs/types';
 import { routeMock } from '../../store/docs/mock';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import localStyles from './styles';
 
@@ -29,6 +31,9 @@ const DEFAULT_LATITUDE = 53.9;
 const DEFAULT_LONGITUDE = 27.56667;
 
 const MapScreen = () => {
+  const [barVisible, setBarVisible] = useState(false);
+  const [message, setMessage] = useState('');
+
   const dispatch = useDispatch();
 
   const [region, setRegion] = useState<Region>();
@@ -84,24 +89,17 @@ const MapScreen = () => {
   }, [dispatch, initLocations]);
 
   const handleGetLocation = async () => {
-    const serviceEnabled = await Location.hasServicesEnabledAsync();
-
-    if (!serviceEnabled) {
-      /// Сервис у пользователя выключен
-      return;
-    }
-
-    const { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== 'granted') {
-      return;
-    }
-
     setLoading(true);
 
     dispatch(geoActions.deleteCurrent());
-    const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Lowest });
-    dispatch(geoActions.addCurrent({ coords: location.coords }));
+
+    try {
+      const coords = await getCurrentPosition();
+      dispatch(geoActions.addCurrent({ coords }));
+    } catch (e) {
+      setMessage(e.message);
+      setBarVisible(true);
+    }
 
     setLoading(false);
   };
@@ -208,8 +206,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                  ? localStyles.selectedMark
-                  : localStyles.mark,
+                    ? localStyles.selectedMark
+                    : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>
@@ -242,6 +240,20 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
         </TouchableOpacity>
       </View>
+      <Snackbar
+        visible={barVisible}
+        onDismiss={() => setBarVisible(false)}
+        style={{ backgroundColor: Theme.colors.error }}
+        action={{
+          icon: 'close',
+          label: '',
+          onPress: () => {
+            setBarVisible(false);
+          },
+        }}
+      >
+        {message}
+      </Snackbar>
     </View>
   );
 };

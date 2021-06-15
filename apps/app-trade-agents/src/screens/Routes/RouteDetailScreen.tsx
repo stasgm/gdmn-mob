@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import * as Location from 'expo-location';
 
 import { docSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
@@ -18,6 +17,8 @@ import { visitActions } from '../../store/visits/actions';
 import { ICoords } from '../../store/geo/types';
 
 import { getDateString } from '../../utils/helpers';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';
 
@@ -68,16 +69,14 @@ const RouteDetailScreen = () => {
   const handleNewVisit = async () => {
     setProcess(true);
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    let coords: ICoords | undefined;
 
-    if (status !== 'granted') {
-      setProcess(false);
-      return;
+    try {
+      coords = await getCurrentPosition();
+    } catch (e) {
+      // setMessage(e.message);
+      // setBarVisible(true);
     }
-
-    const coords = (await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Lowest,
-    })) as unknown as ICoords;
 
     const date = new Date().toISOString();
 
