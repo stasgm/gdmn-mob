@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 import { DrawerNavigator } from '@lib/mobile-navigation';
@@ -7,7 +8,7 @@ import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator'
 // import DashboardNavigator from './Root/DashboardNavigator';
 import OrdersNavigator from './Root/OrdersNavigator';
 import RoutesNavigator from './Root/RoutesNavigator';
-// import MapNavigator from './Root/Maps/MapNavigator';
+import MapNavigator from './Root/Maps/MapNavigator';
 import ReturnsNavigator from './Root/ReturnsNavigator';
 // import DocumentsNavigator from './Root/';
 
@@ -36,12 +37,12 @@ const navItems: INavItem[] = [
     icon: 'file-restore',
     component: ReturnsNavigator,
   },
-  /* {
+  {
     name: 'Map',
     title: 'Карта',
     icon: 'map-outline',
     component: MapNavigator,
-  }, */
+  },
 ];
 
 const RootNavigator = () => {
