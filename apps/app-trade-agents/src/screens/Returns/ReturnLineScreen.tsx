@@ -5,16 +5,16 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { IReturnLine } from '../../store/docs/types';
 
-import { IOrderLine } from '../../store/docs/types';
+import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 import ReturnLine from './components/ReturnLine';
 
 const ReturnLineScreen = () => {
   const { mode, docId, item } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
 
-  const [line, setLine] = useState<IOrderLine>(item);
+  const [line, setLine] = useState<IReturnLine>(item);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -58,7 +58,7 @@ const ReturnLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <ReturnLine item={item} onSetLine={(value: IOrderLine) => setLine(value)} />
+      <ReturnLine item={item} onSetLine={(value: IReturnLine) => setLine(value)} />
     </View>
   );
 };

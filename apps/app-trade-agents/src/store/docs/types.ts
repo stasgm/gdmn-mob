@@ -98,7 +98,7 @@ export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine[]>, '
 interface IReturnHead extends IHead {
   contact: INamedEntity;
   outlet: INamedEntity;
-  depart: INamedEntity;
+  depart?: INamedEntity;
   reason: string;
   route?: INamedEntity; // 	Маршрут
 }

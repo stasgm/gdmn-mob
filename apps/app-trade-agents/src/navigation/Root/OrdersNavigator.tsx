@@ -8,8 +8,9 @@ import {
   OrderViewScreen,
   SelectGroupScreen,
   SelectGoodScreen,
-  SelectItemScreen,
 } from '../../screens/Orders';
+
+import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
 import { OrdersStackParamList } from './types';
 
@@ -24,7 +25,7 @@ const OrdersNavigator = () => {
       <Stack.Screen name="OrderLine" component={OrderLineScreen} />
       <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
       <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
-      <Stack.Screen name="SelectItem" component={SelectItemScreen} />
+      <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} />
     </Stack.Navigator>
   );
 };

@@ -2,12 +2,13 @@ import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions } from '@lib/store';
 import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 import { INamedEntity } from '@lib/types';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from '../../../store';
 
@@ -16,7 +17,7 @@ import { visitActions } from '../../../store/visits/actions';
 import { IOrderDocument, IReturnDocument } from '../../../store/docs/types';
 import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
-import { deprt1 } from '../../../store/docs/mock';
+import { deprt1, orderType } from '../../../store/docs/mock';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -101,10 +102,7 @@ const Visit = ({
       number: 'б\\н',
       status: 'DRAFT',
       documentDate: new Date().toISOString(),
-      documentType: {
-        id: '1',
-        name: 'order',
-      },
+      documentType: orderType,
       head: {
         contact,
         outlet,
@@ -146,7 +144,9 @@ const Visit = ({
   };
 
   // eslint-disable-next-line prettier/prettier
-  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'} ${timeProcess()})`;
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+    !dateEnd ? 'тся' : 'лся'
+  } ${timeProcess()})`;
   const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
 
   const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;

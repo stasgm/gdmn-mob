@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -14,15 +14,19 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { IconButton } from 'react-native-paper';
+
 import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
+
+import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 import ReturnItem from './components/ReturnItem';
 
 const ReturnViewScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.id;
+  const routeBack = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.routeBack;
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
@@ -43,27 +47,36 @@ const ReturnViewScreen = () => {
     }
   }, [dispatch, id, navigation]);
 
+  const handleEditReturnHead = useCallback(() => {
+    navigation.navigate('ReturnEdit', { id });
+  }, [navigation, id]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Добавить товар',
         onPress: handleAddReturnLine,
       },
-      /*{
+      {
         title: 'Редактировать',
-        // onPress: handleAddOrderLine,
-      },*/
+        onPress: handleEditReturnHead,
+      },
       {
         title: 'Удалить',
         type: 'destructive',
         onPress: handleDelete,
       },
     ]);
-  }, [showActionSheet, handleAddReturnLine, handleDelete]);
+  }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: () =>
+        routeBack ? (
+          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
+        ) : (
+          <BackButton />
+        ),
       headerRight: () => (
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />
@@ -71,7 +84,7 @@ const ReturnViewScreen = () => {
         </View>
       ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu]);
+  }, [navigation, handleAddReturnLine, routeBack, actionsMenu]);
 
   const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
 
@@ -87,13 +100,14 @@ const ReturnViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      {/* <Header item={order} /> */}
-      <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
-        <>
-          <Text>{returnDoc.number}</Text>
-          <Text>{getDateString(returnDoc.documentDate)}</Text>
-        </>
-      </InfoBlock>
+      <TouchableOpacity onPress={handleEditReturnHead}>
+        <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
+          <>
+            <Text>{returnDoc.number}</Text>
+            <Text>{getDateString(returnDoc.documentDate)}</Text>
+          </>
+        </InfoBlock>
+      </TouchableOpacity>
       <FlatList
         ref={ref}
         data={returnDoc.lines}

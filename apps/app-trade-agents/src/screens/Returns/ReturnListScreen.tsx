@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars-experimental */
 import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -47,17 +46,16 @@ const ReturnListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('ReturnView');
+    navigation.navigate('ReturnEdit');
   }, [navigation]);
 
   const handleDelete = useCallback(() => {
     dispatch(documentActions.deleteDocuments());
   }, [dispatch]);
 
-  /*
   const actionsMenu = useCallback(() => {
     showActionSheet([
-       {
+      {
         title: 'Добавить',
         onPress: handleAddDocument,
       },
@@ -72,19 +70,18 @@ const ReturnListScreen = () => {
       },
     ]);
   }, [showActionSheet, handleAddDocument, handleDelete]);
-  */
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      /*  headerRight: () => (
-         <View style={styles.buttons}>
-           <MenuButton actionsMenu={actionsMenu} />
-           <AddButton onPress={handleAddDocument} />
-         </View>
-       ), */
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <MenuButton actionsMenu={actionsMenu} />
+          <AddButton onPress={handleAddDocument} />
+        </View>
+      ),
     });
-  }, [navigation]);
+  }, [actionsMenu, handleAddDocument, navigation]);
 
   const ref = useRef<FlatList<IReturnDocument>>(null);
 

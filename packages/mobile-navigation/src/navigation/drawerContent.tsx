@@ -22,6 +22,7 @@ import {
   returnDocMock,
   packageRefMock,
   packageGoodRefMock,
+  departmentRefMock,
 } from '../../../../apps/app-trade-agents/src/store/docs/mock';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
@@ -50,6 +51,7 @@ export function DrawerContent(props: Props) {
         good: goodRefMock,
         package: packageRefMock,
         packageGood: packageGoodRefMock,
+        department: departmentRefMock,
       }),
     );
     await dispatch(documentActions.addDocuments(orderMock));

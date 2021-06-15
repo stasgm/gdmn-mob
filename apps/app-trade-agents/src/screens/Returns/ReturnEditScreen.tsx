@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Divider } from 'react-native-paper';
+import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native';
+import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
@@ -17,22 +14,23 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument } from '../../store/docs/types';
+import { Divider } from 'react-native-paper';
 
-import { getDateString } from '../../utils/helpers';
+import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { IReturnDocument } from '../../store/docs/types';
+
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
-import { orderType } from '../../store/docs/mock';
-import { IOrderFormParam } from '../../store/app/types';
+import { returnType } from '../../store/docs/mock';
+import { IReturnFormParam } from '../../store/app/types';
 
-const OrderEditScreen = () => {
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
+const ReturnEditScreen = () => {
+  const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
 
   const [statusId, setStatusId] = useState('DRAFT');
 
@@ -43,10 +41,12 @@ const OrderEditScreen = () => {
     outlet: docOutlet,
     number: docNumber,
     documentDate: docDocumentDate,
-    onDate: docOnDate,
+    depart: docDepart,
+    reason: docReason,
+    road: docRoad,
     status: docStatus,
   } = useMemo(() => {
-    return formParams as IOrderFormParam;
+    return formParams as IReturnFormParam;
   }, [formParams]);
 
   useEffect(() => {
@@ -57,18 +57,20 @@ const OrderEditScreen = () => {
   }, []);
 
   useEffect(() => {
-    setStatusId(order?.status || 'DRAFT');
+    setStatusId(returnDoc?.status || 'DRAFT');
 
     // Инициализируем параметры
-    if (order) {
+    if (returnDoc) {
       dispatch(
         appActions.setFormParams({
-          number: order.number,
-          contact: order.head.contact,
-          outlet: order.head.outlet,
-          onDate: order.head.onDate,
-          documentDate: order.documentDate,
-          status: order.status,
+          number: returnDoc.number,
+          contact: returnDoc.head.contact,
+          outlet: returnDoc.head.outlet,
+          depart: returnDoc.head.depart,
+          reason: returnDoc.head.reason,
+          road: returnDoc.head.road,
+          documentDate: returnDoc.documentDate,
+          status: returnDoc.status,
         }),
       );
     } else {
@@ -81,65 +83,80 @@ const OrderEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, order]);
+  }, [dispatch, returnDoc]);
 
   const handleSave = useCallback(() => {
-    if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
+    if (!(docNumber && docContact && docOutlet && docReason && docDocumentDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
 
     if (!id) {
-      const newOrder: IOrderDocument = {
+      const newReturn: IReturnDocument = {
         id: docId,
-        documentType: orderType,
+        documentType: returnType,
         number: docNumber,
         documentDate: new Date().toISOString(),
         status: 'DRAFT',
         head: {
           contact: docContact,
-          onDate: docOnDate,
           outlet: docOutlet,
+          depart: docDepart,
+          reason: docReason,
+          road: docRoad,
         },
         lines: [],
         creationDate: new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.addDocument(newOrder));
+      docDispatch(documentActions.addDocument(newReturn));
 
-      navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
-      // navigation.navigate('OrderView', { id: newOrder.id });
+      navigation.dispatch(StackActions.replace('ReturnView', { id: newReturn.id }));
     } else {
-      if (!order) {
+      if (!returnDoc) {
         return;
       }
 
-      const doc: IOrderDocument = {
-        ...order,
-        id,
+      const doc: IReturnDocument = {
+        id: docId,
+        documentType: returnType,
         number: docNumber,
-        status: docStatus || 'DRAFT',
         documentDate: docDocumentDate,
-        documentType: orderType,
+        status: docStatus || 'DRAFT',
         head: {
-          ...order.head,
           contact: docContact,
           outlet: docOutlet,
-          onDate: docOnDate,
+          depart: docDepart,
+          reason: docReason,
+          road: docRoad,
         },
-        lines: order.lines,
-        creationDate: order.creationDate || new Date().toISOString(),
+        lines: { ...returnDoc.lines },
+        creationDate: returnDoc.creationDate || new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
       docDispatch(documentActions.updateDocument({ docId: id, document: doc }));
-      navigation.navigate('OrderView', { id });
+
+      navigation.navigate('ReturnView', { id });
     }
 
-    // navigation.navigate('OrderView', { id: docId, routeBack: 'OrderList' });
-  }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
+    // navigation.navigate('ReturnView', { id: docId, routeBack: 'ReturnList' });
+  }, [
+    docNumber,
+    docContact,
+    docOutlet,
+    docDocumentDate,
+    id,
+    navigation,
+    docDepart,
+    docReason,
+    docRoad,
+    docDispatch,
+    returnDoc,
+    docStatus,
+  ]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -153,26 +170,11 @@ const OrderEditScreen = () => {
   const statusName =
     id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
-  //---Окно календаря для выбора даты---
-  const [showOnDate, setShowOnDate] = useState(false);
-
-  const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату
-    setShowOnDate(false);
-    if (selectedOnDate) {
-      dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
-    }
-  };
-
-  const handlePresentOnDate = () => {
-    setShowOnDate(true);
-  };
-
   const handlePresentContact = () => {
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
-      value: docContact && [docContact],
+      value: docContact,
     });
   };
 
@@ -188,7 +190,15 @@ const OrderEditScreen = () => {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
-      value: docOutlet && [docOutlet],
+      value: docOutlet,
+    });
+  };
+
+  const handlePresentDepart = () => {
+    navigation.navigate('SelectRefItem', {
+      refName: 'department',
+      fieldName: 'depart',
+      value: docDepart,
     });
   };
 
@@ -218,12 +228,6 @@ const OrderEditScreen = () => {
           editable={!isBlocked}
         />
         <SelectableInput
-          label="Дата отгрузки"
-          value={getDateString(docOnDate || '')}
-          editable={isBlocked}
-          onFocus={handlePresentOnDate}
-        />
-        <SelectableInput
           label="Организация"
           placeholder="Выберите покупателя..."
           value={docContact?.name}
@@ -231,22 +235,25 @@ const OrderEditScreen = () => {
           onFocus={handlePresentContact}
         />
         <SelectableInput label="Магазин" value={docOutlet?.name} editable={isBlocked} onFocus={handlePresentOutlet} />
-      </ScrollView>
-      {showOnDate && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={new Date(docOnDate || '')}
-          mode="date"
-          // is24Hour={true}
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={handleApplyOnDate}
+        <SelectableInput
+          label="Подразделение"
+          placeholder="Выберите покупателя..."
+          value={docDepart?.name}
+          editable={isBlocked}
+          onFocus={handlePresentDepart}
         />
-      )}
+        <Input
+          label="Причина возврата"
+          value={docReason}
+          onChangeText={(text) => dispatch(appActions.setFormParams({ reason: text }))}
+          editable={!isBlocked}
+        />
+      </ScrollView>
     </AppInputScreen>
   );
 };
 
-export default OrderEditScreen;
+export default ReturnEditScreen;
 
 const localStyles = StyleSheet.create({
   switchContainer: {
