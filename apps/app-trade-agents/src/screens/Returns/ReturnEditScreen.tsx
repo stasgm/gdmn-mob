@@ -119,30 +119,30 @@ const ReturnEditScreen = () => {
         return;
       }
 
-      const doc: IReturnDocument = {
+      const newReturn: IReturnDocument = {
+        ...returnDoc,
         id: docId,
         documentType: returnType,
         number: docNumber,
         documentDate: docDocumentDate,
         status: docStatus || 'DRAFT',
         head: {
+          ...returnDoc.head,
           contact: docContact,
           outlet: docOutlet,
           depart: docDepart,
           reason: docReason,
           road: docRoad,
         },
-        lines: { ...returnDoc.lines },
+        lines: returnDoc.lines,
         creationDate: returnDoc.creationDate || new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, document: doc }));
+      docDispatch(documentActions.updateDocument({ docId: id, document: newReturn }));
 
       navigation.navigate('ReturnView', { id });
     }
-
-    // navigation.navigate('ReturnView', { id: docId, routeBack: 'ReturnList' });
   }, [
     docNumber,
     docContact,
