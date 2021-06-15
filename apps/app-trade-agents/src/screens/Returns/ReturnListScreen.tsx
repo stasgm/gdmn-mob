@@ -21,7 +21,7 @@ import ReturnListItem from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
-  const list = docSelectors.selectByDocType('return') as unknown as IReturnDocument[];
+  const list = docSelectors.selectByDocType('return') as IReturnDocument[];
 
   const [status, setStatus] = useState<Status>('all');
 

@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import * as Location from 'expo-location';
 
 import { docSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
@@ -18,6 +17,8 @@ import { visitActions } from '../../store/visits/actions';
 import { ICoords } from '../../store/geo/types';
 
 import { getDateString } from '../../utils/helpers';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';
 
@@ -36,7 +37,7 @@ const RouteDetailScreen = () => {
     });
   }, [navigation]);
 
-  const point = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])
+  const point = (docSelectors.selectByDocType('route') as IRouteDocument[])
     ?.find((e) => e.id === routeId)
     ?.lines.find((i) => i.id === id);
 
@@ -52,9 +53,9 @@ const RouteDetailScreen = () => {
   /*const outlet = point
     ? (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find((e) => e.id === point.outlet.id)
     : undefined;*/
-  const outlet = (outletRefMock as unknown as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
+  const outlet = (outletRefMock as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
   const contact = outlet
-    ? (contactRefMock as unknown as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
+    ? (contactRefMock as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
     : undefined;
 
   const debt: IDebt = {
@@ -68,16 +69,14 @@ const RouteDetailScreen = () => {
   const handleNewVisit = async () => {
     setProcess(true);
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    let coords: ICoords | undefined;
 
-    if (status !== 'granted') {
-      setProcess(false);
-      return;
+    try {
+      coords = await getCurrentPosition();
+    } catch (e) {
+      // setMessage(e.message);
+      // setBarVisible(true);
     }
-
-    const coords = (await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Lowest,
-    })) as unknown as ICoords;
 
     const date = new Date().toISOString();
 

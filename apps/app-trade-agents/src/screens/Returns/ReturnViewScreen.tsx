@@ -58,13 +58,17 @@ const ReturnViewScreen = () => {
         onPress: handleAddReturnLine,
       },
       {
-        title: 'Редактировать',
+        title: 'Редактировать данные',
         onPress: handleEditReturnHead,
       },
       {
-        title: 'Удалить',
+        title: 'Удалить заявку',
         type: 'destructive',
         onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
       },
     ]);
   }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);
@@ -86,7 +90,7 @@ const ReturnViewScreen = () => {
     });
   }, [navigation, handleAddReturnLine, routeBack, actionsMenu]);
 
-  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
+  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
 
   if (!returnDoc) {
     return (

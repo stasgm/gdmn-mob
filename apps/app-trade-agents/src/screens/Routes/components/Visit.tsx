@@ -1,6 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
-import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
@@ -18,6 +17,7 @@ import { IOrderDocument, IReturnDocument } from '../../../store/docs/types';
 import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { deprt1, orderType } from '../../../store/docs/mock';
+import { getCurrentPosition } from '../../../utils/expoFunctions';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -40,11 +40,11 @@ const Visit = ({
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
-  const order = (docSelectors.selectByDocType('order') as unknown as IOrderDocument[])?.find(
+  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find(
     (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
   );
 
-  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find(
+  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find(
     (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
   );
 
@@ -66,16 +66,14 @@ const Visit = ({
     // TODO Вынести в async actions
     setProcess(true);
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    let coords: ICoords | undefined;
 
-    if (status !== 'granted') {
-      setProcess(false);
-      return;
+    try {
+      coords = await getCurrentPosition();
+    } catch (e) {
+      // setMessage(e.message);
+      // setBarVisible(true);
     }
-
-    const coords = (await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Lowest,
-    })) as unknown as ICoords;
 
     const date = new Date().toISOString();
 
@@ -143,7 +141,6 @@ const Visit = ({
     navigation.navigate('ReturnView', { id: newReturn.id });
   };
 
-  // eslint-disable-next-line prettier/prettier
   const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
     !dateEnd ? 'тся' : 'лся'
   } ${timeProcess()})`;

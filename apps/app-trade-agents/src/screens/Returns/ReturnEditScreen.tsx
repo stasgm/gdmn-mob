@@ -30,7 +30,7 @@ const ReturnEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const returnDoc = (docSelectors.selectByDocType('return') as unknown as IReturnDocument[])?.find((e) => e.id === id);
+  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
 
   const [statusId, setStatusId] = useState('DRAFT');
 
@@ -241,7 +241,6 @@ const ReturnEditScreen = () => {
         />
         <SelectableInput
           label="Организация"
-          placeholder="Выберите покупателя..."
           value={docContact?.name}
           editable={!isBlocked}
           onFocus={handlePresentContact}
@@ -249,7 +248,6 @@ const ReturnEditScreen = () => {
         <SelectableInput label="Магазин" value={docOutlet?.name} editable={!isBlocked} onFocus={handlePresentOutlet} />
         <SelectableInput
           label="Подразделение"
-          placeholder="Выберите покупателя..."
           value={docDepart?.name}
           editable={!isBlocked}
           onFocus={handlePresentDepart}

@@ -52,6 +52,7 @@ export type RoutesStackParamList = {
     clause?: Record<string, string>;
     isMulti?: boolean;
   };
+  ReturnEdit: { id: string } | undefined;
   ReturnView: { id: string; routeBack?: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItemReturn: { docId: string; name: string };

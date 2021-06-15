@@ -30,16 +30,12 @@
     },
     "android": {
       "package": "com.gsbelarus.salesrepresentative",
+      "versionCode": 3,
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCfRUOn_DizZ-kS-BIf6hF5Tg3UhODTfJM"
+          "apiKey": "${process.env.GOOGLE_API_KEY}"
         }
-      },
-      "permissions": [
-        "LOCATION",
-        "CALENDAR"
-      ],
-      "versionCode": 3
+      }
     }
   }
 }
