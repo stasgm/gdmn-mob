@@ -1,8 +1,7 @@
+import { useEffect, useState } from 'react';
 import { Box, Container } from '@material-ui/core';
 
-import { useNavigate } from 'react-router-dom';
-
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 
 // import CachedIcon from '@material-ui/icons/Cached';
 
@@ -14,12 +13,24 @@ import DeviceListTable from '../device/DeviceListTable';
 import { IToolBarButton } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 
+import UserSelectDevices from './UserSelectDevices';
+
 interface props {
   devices: IDevice[];
+  handleDeviceListSave: (newDeviceList: IDevice[]) => void;
+  onAddDevicesClick?: (value: boolean) => void;
+  sourcePath?: string;
+  isAddDevices?: boolean;
 }
 
-const UserDevices = ({ devices }: props) => {
-  const navigate = useNavigate();
+const UserDevices = ({ devices, handleDeviceListSave, onAddDevicesClick, sourcePath, isAddDevices = false }: props) => {
+  //const navigate = useNavigate();
+  //  const [isAddDevices, setIsAddDevices] = useState(false);
+  const [selectedDevices, setSelectedDevices] = useState<IDevice[]>([]);
+
+  const handleAddClick = (value: boolean) => {
+    onAddDevicesClick && onAddDevicesClick(value);
+  };
 
   const deviceButtons: IToolBarButton[] = [
     // {
@@ -45,13 +56,62 @@ const UserDevices = ({ devices }: props) => {
       },
     },
     {
-      name: 'Добавить',
+      name: 'Выбрать',
       color: 'primary',
       variant: 'contained',
-      onClick: () => navigate('app/devices/new'),
-      icon: <AddCircleOutlineIcon />,
+      onClick: () => handleAddClick(true),
+      icon: <LibraryAddCheckIcon />,
     },
   ];
+
+  /** изменение списка новых выбранных девайсов  */
+  const handleChangeSelectedDevices = (value: any[]) => {
+    console.log('handleChangeSelectedDevices', value);
+    setSelectedDevices(value);
+  };
+
+  const handleSaveClick = () => {
+    onAddDevicesClick && onAddDevicesClick(false);
+
+    handleDeviceListSave(selectedDevices);
+  };
+
+  const handleCancelClick = () => {
+    onAddDevicesClick && onAddDevicesClick(false);
+  };
+
+  useEffect(() => {
+    setSelectedDevices(devices);
+  }, [devices]);
+  interface UserDetailProps {
+    isAddingDevice: boolean;
+    sourcePath?: string;
+  }
+
+  const UserDetail = (props: UserDetailProps) => {
+    const { isAddingDevice } = props;
+
+    if (isAddingDevice) {
+      return (
+        <UserSelectDevices
+          devices={selectedDevices}
+          onSaveClick={handleSaveClick}
+          onCancelClick={handleCancelClick}
+          onChangeSelectedDevices={handleChangeSelectedDevices}
+          sourcePath={sourcePath}
+        />
+      );
+    }
+
+    return (
+      <div>
+        <ToolbarActionsWithSearch buttons={deviceButtons} searchTitle={'Найти устройство'} />
+        <Box sx={{ pt: 2 }}>
+          <DeviceListTable devices={devices} limitRows={5} sourcePath={sourcePath} />
+        </Box>
+      </div>
+    );
+  };
 
   return (
     <Box
@@ -61,10 +121,7 @@ const UserDevices = ({ devices }: props) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActionsWithSearch buttons={deviceButtons} searchTitle={'Найти устройство'} />
-        <Box sx={{ pt: 2 }}>
-          <DeviceListTable devices={devices} />
-        </Box>
+        <UserDetail isAddingDevice={isAddDevices} />
       </Container>
     </Box>
   );

@@ -24,8 +24,17 @@ import DeviceDetailsView from '../../components/device/DeviceDetailsView';
 
 // import UserDevices from '../../components/device/';
 
-const DeviceView = () => {
+interface IDeviceView {
+  sourcePath?: string;
+}
+
+const DeviceView = (props: IDeviceView) => {
+  const { sourcePath } = props;
   const { id: deviceId } = useParams();
+  const { userid: userId } = useParams();
+
+  console.log('DeviceView_sourcePath', sourcePath);
+  console.log('DeviceView_deviceId', deviceId);
 
   const navigate = useNavigate();
 
@@ -38,10 +47,19 @@ const DeviceView = () => {
   // const { devices, devicesLoading } = useSelector((state) => state.devices); пользователи из хранилища по deviceId
 
   const handleCancel = () => {
+    if (sourcePath) {
+      navigate(sourcePath.replace(':userid', userId));
+      return;
+    }
+
     navigate('/app/devices');
   };
 
   const handleEdit = () => {
+    if (sourcePath) {
+      navigate(`${sourcePath.replace(':userid', userId)}/devices/edit/${deviceId}`);
+      return;
+    }
     navigate(`/app/devices/edit/${deviceId}`);
   };
 
@@ -105,7 +123,7 @@ const DeviceView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список пользователей'} />
+            <CardHeader title={'Список устройств'} />
             {loading && <CircularProgress size={40} />}
           </Box>
           <Box

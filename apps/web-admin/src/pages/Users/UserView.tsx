@@ -8,9 +8,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { device } from '@lib/mock';
+import { IDevice } from '@lib/types';
 
-import { useCallback, useEffect } from 'react';
+import { device, device2 } from '@lib/mock';
+
+import { useCallback, useEffect, useState } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
@@ -23,18 +25,34 @@ import UserDetailsView from '../../components/user/UserDetailsView';
 
 import UserDevices from '../../components/user/UserDevices';
 
-const UserView = () => {
+interface IUserView {
+  isSelectDevice?: boolean;
+}
+
+const UserView = (props: IUserView) => {
+  const { isSelectDevice } = props;
+  const [isAddDevices, setIsAddDevices] = useState(false);
   const { id: userId } = useParams();
+
+  // const { devices, newDevices } = useSelector((state) => state.devices);
+  const [devices, setDevices] = useState<IDevice[]>([]);
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
   // const classes = useStyles();
+  const sourcePath = `/app/users/${userId}/`;
+
+  console.log('UserView_isSelectDevice', isSelectDevice);
 
   const { loading } = useSelector((state) => state.companies);
   const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
   // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
+
+  const handleAddDevicesClick = (value: boolean) => {
+    setIsAddDevices(value);
+  };
 
   const handleCancel = () => {
     navigate('/app/users');
@@ -55,9 +73,16 @@ const UserView = () => {
     }
   };
 
+  const handleDeviceListSave = (newDeviceList: IDevice[]) => {
+    setDevices(newDeviceList);
+  };
+
   useEffect(() => {
+    setDevices([device, device2]);
+    if (isSelectDevice) setIsAddDevices(isSelectDevice);
+
     handleRefresh();
-  }, [handleRefresh]);
+  }, [handleRefresh, isSelectDevice]);
 
   if (!user) {
     return <Box>Пользователь не найден</Box>;
@@ -131,7 +156,13 @@ const UserView = () => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices devices={[device]} />
+        <UserDevices
+          devices={devices}
+          handleDeviceListSave={(newDeviceList) => handleDeviceListSave(newDeviceList)}
+          sourcePath={sourcePath}
+          isAddDevices={isAddDevices}
+          onAddDevicesClick={handleAddDevicesClick}
+        />
       </Box>
     </>
   );

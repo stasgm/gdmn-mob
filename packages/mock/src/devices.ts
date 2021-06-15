@@ -24,6 +24,27 @@ const devices: IDevice[] = [
     uid: 'WEB',
     company: company3,
   },
+  {
+    id: '4',
+    name: 'Test 1',
+    state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb504',
+    company: company3,
+  },
+  {
+    id: '5',
+    name: 'Test 2',
+    state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb505',
+    company: company2,
+  },
+  {
+    id: '6',
+    name: 'Test 3',
+    state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb506',
+    company: company3,
+  },
 ];
 
 const device = devices[0];

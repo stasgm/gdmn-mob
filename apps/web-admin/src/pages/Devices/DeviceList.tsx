@@ -8,17 +8,24 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
+import { IDevice } from '@lib/types';
+
 import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device/actions.async';
 
-import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-
 import { IToolBarButton } from '../../types';
+import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
+interface props {
+  selectedDevices?: IDevice[];
+  limitRows?: number;
+  onChangeSelectedDevices?: (value: any[]) => void;
+  sourcePath?: string;
+}
 
-const DeviceList = () => {
+const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevices, sourcePath }: props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -62,6 +69,8 @@ const DeviceList = () => {
     },
   ];
 
+  console.log('DeviceList_sourcePath', sourcePath);
+
   return (
     <>
       <Helmet>
@@ -80,7 +89,13 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={list} />
+              <DeviceListTable
+                devices={list}
+                limitRows={limitRows}
+                selectedDevices={selectedDevices}
+                onChangeSelectedDevices={onChangeSelectedDevices}
+                sourcePath={sourcePath}
+              />
             </Box>
           )}
         </Container>
