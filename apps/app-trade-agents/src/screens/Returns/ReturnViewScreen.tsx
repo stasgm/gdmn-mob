@@ -58,13 +58,17 @@ const ReturnViewScreen = () => {
         onPress: handleAddReturnLine,
       },
       {
-        title: 'Редактировать',
+        title: 'Редактировать данные',
         onPress: handleEditReturnHead,
       },
       {
-        title: 'Удалить',
+        title: 'Удалить заявку',
         type: 'destructive',
         onPress: handleDelete,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
       },
     ]);
   }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);

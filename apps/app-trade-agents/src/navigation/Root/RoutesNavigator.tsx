@@ -14,7 +14,7 @@ import {
   SelectRefItemScreen,
 } from '../../screens/Orders';
 
-import { ReturnLineScreen, ReturnViewScreen } from '../../screens/Returns';
+import { ReturnLineScreen, ReturnViewScreen, ReturnEditScreen } from '../../screens/Returns';
 
 import SelectItemScreen from '../../screens/Returns/SelectItemScreen';
 
@@ -37,6 +37,7 @@ const RoutesNavigator = () => {
       <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
       <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
       <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} options={{ title: 'Заявка' }} />
+      <Stack.Screen name="ReturnEdit" component={ReturnEditScreen} options={{ title: 'Возвраты' }} />
       <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возвраты' }} />
       <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возвраты' }} />
       <Stack.Screen name="SelectItemReturn" component={SelectItemScreen} options={{ title: 'Возвраты' }} />
