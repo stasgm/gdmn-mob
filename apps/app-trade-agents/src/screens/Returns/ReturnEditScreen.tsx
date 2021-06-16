@@ -241,7 +241,7 @@ const ReturnEditScreen = () => {
         />
         <SelectableInput label="Организация" value={docContact?.name} onPress={handlePresentContact} />
         <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
-        <SelectableInput label="Подразделение" value={docDepart?.name} onPress={handlePresentDepart} />
+        {/* <SelectableInput label="Подразделение" value={docDepart?.name} onPress={handlePresentDepart} /> */}
         <Input
           label="Причина возврата"
           value={docReason}
