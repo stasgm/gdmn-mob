@@ -12,20 +12,48 @@ import {
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
-import { OrdersStackParamList } from './types';
+import { NestingOrderParamList, OrdersStackParamList, SelectParamList } from './types';
 
 const Stack = createStackNavigator<OrdersStackParamList>();
+
+const orderScreens = [
+  {
+    name: 'OrderView',
+    component: OrderViewScreen,
+  },
+  {
+    name: 'OrderEdit',
+    component: OrderEditScreen,
+  },
+  {
+    name: 'OrderLine',
+    component: OrderLineScreen,
+  },
+  {
+    name: 'SelectGroupItem',
+    component: SelectGroupScreen,
+  },
+  {
+    name: 'SelectGoodItem',
+    component: SelectGoodScreen,
+  },
+  {
+    name: 'SelectRefItemOrder',
+    component: SelectRefItemScreen,
+  },
+];
 
 const OrdersNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="OrderList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
       <Stack.Screen name="OrderList" component={OrderListScreen} />
-      <Stack.Screen name="OrderView" component={OrderViewScreen} />
-      <Stack.Screen name="OrderEdit" component={OrderEditScreen} />
-      <Stack.Screen name="OrderLine" component={OrderLineScreen} />
-      <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
-      <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
-      <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} />
+      {orderScreens.map((screen) => (
+        <Stack.Screen
+          key={screen.name}
+          name={screen.name as keyof NestingOrderParamList | keyof SelectParamList}
+          component={screen.component}
+        />
+      ))}
     </Stack.Navigator>
   );
 };

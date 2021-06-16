@@ -175,7 +175,7 @@ const ReturnEditScreen = () => {
       return;
     }
 
-    navigation.navigate('SelectItemReturn', {
+    navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
       value: docContact && [docContact],
@@ -194,7 +194,7 @@ const ReturnEditScreen = () => {
       params.companyId = docContact?.id;
     }
 
-    navigation.navigate('SelectItemReturn', {
+    navigation.navigate('SelectRefItem', {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
@@ -207,7 +207,7 @@ const ReturnEditScreen = () => {
       return;
     }
 
-    navigation.navigate('SelectItemReturn', {
+    navigation.navigate('SelectRefItem', {
       refName: 'department',
       fieldName: 'depart',
       value: docDepart && [docDepart],

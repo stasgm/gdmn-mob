@@ -11,14 +11,64 @@ import {
   OrderViewScreen,
   SelectGoodScreen,
   SelectGroupScreen,
-  SelectRefItemScreen,
 } from '../../screens/Orders';
 
 import { ReturnLineScreen, ReturnViewScreen, ReturnEditScreen } from '../../screens/Returns';
 
-import { RoutesStackParamList } from './types';
+import SelectRefItemScreen from '../../components/SelectRefItemScreen';
+
+import { RoutesStackParamList, NestingOrderParamList, NestingReturnParamList, SelectParamList } from './types';
 
 const Stack = createStackNavigator<RoutesStackParamList>();
+
+const orderScreens = [
+  {
+    name: 'OrderView',
+    component: OrderViewScreen,
+  },
+  {
+    name: 'OrderEdit',
+    component: OrderEditScreen,
+  },
+  {
+    name: 'OrderLine',
+    component: OrderLineScreen,
+  },
+  {
+    name: 'SelectGroupItem',
+    component: SelectGroupScreen,
+  },
+  {
+    name: 'SelectGoodItem',
+    component: SelectGoodScreen,
+  },
+];
+
+const returnScreens = [
+  {
+    name: 'ReturnView',
+    component: ReturnViewScreen,
+  },
+  {
+    name: 'ReturnEdit',
+    component: ReturnEditScreen,
+  },
+  {
+    name: 'ReturnLine',
+    component: ReturnLineScreen,
+  },
+  {
+    name: 'SelectItemReturn',
+    component: SelectRefItemScreen,
+  },
+];
+
+const selectItemRefScreens = [
+  {
+    name: 'SelectRefItem',
+    component: SelectRefItemScreen,
+  },
+];
 
 const RoutesNavigator = () => {
   return (
@@ -29,16 +79,30 @@ const RoutesNavigator = () => {
       <Stack.Screen name="RouteList" component={RouteListScreen} />
       <Stack.Screen name="RouteView" component={RouteViewScreen} />
       <Stack.Screen name="RouteDetails" component={RouteDetailScreen} options={{ title: 'Визит' }} />
-      <Stack.Screen name="OrderView" component={OrderViewScreen} options={{ title: 'Заявка' }} />
-      <Stack.Screen name="OrderEdit" component={OrderEditScreen} options={{ title: 'Заявка' }} />
-      <Stack.Screen name="OrderLine" component={OrderLineScreen} options={{ title: 'Заявка' }} />
-      <Stack.Screen name="SelectGroupItem" component={SelectGroupScreen} />
-      <Stack.Screen name="SelectGoodItem" component={SelectGoodScreen} />
-      <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} options={{ title: 'Заявка' }} />
-      <Stack.Screen name="ReturnEdit" component={ReturnEditScreen} options={{ title: 'Возвраты' }} />
-      <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возвраты' }} />
-      <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возвраты' }} />
-      <Stack.Screen name="SelectItemReturn" component={SelectRefItemScreen} options={{ title: 'Возвраты' }} />
+      {orderScreens.map((screen) => (
+        <Stack.Screen
+          key={screen.name}
+          name={screen.name as keyof NestingOrderParamList}
+          component={screen.component}
+          options={{ title: 'Заявка' }}
+        />
+      ))}
+      {returnScreens.map((screen) => (
+        <Stack.Screen
+          key={screen.name}
+          name={screen.name as keyof NestingReturnParamList}
+          component={screen.component}
+          options={{ title: 'Возврат' }}
+        />
+      ))}
+      {selectItemRefScreens.map((screen) => (
+        <Stack.Screen
+          key={screen.name}
+          name={screen.name as keyof SelectParamList}
+          component={screen.component}
+          options={{ title: 'Поиск' }}
+        />
+      ))}
     </Stack.Navigator>
   );
 };
