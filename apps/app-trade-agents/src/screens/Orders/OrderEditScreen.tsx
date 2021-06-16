@@ -34,9 +34,9 @@ const OrderEditScreen = () => {
 
   const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
 
-  const [statusId, setStatusId] = useState('DRAFT');
+  // const [statusId, setStatusId] = useState(order?.status || 'DRAFT');
 
-  const formParams = useSelector((state) => state.app.formParams);
+  const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   const {
     contact: docContact,
@@ -46,7 +46,7 @@ const OrderEditScreen = () => {
     onDate: docOnDate,
     status: docStatus,
   } = useMemo(() => {
-    return formParams as IOrderFormParam;
+    return formParams;
   }, [formParams]);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const OrderEditScreen = () => {
   }, []);
 
   useEffect(() => {
-    setStatusId(order?.status || 'DRAFT');
+    //setStatusId(order?.status || 'DRAFT');
 
     // Инициализируем параметры
     if (order) {
@@ -148,7 +148,7 @@ const OrderEditScreen = () => {
     });
   }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = statusId !== 'DRAFT';
+  const isBlocked = docStatus !== 'DRAFT';
 
   const statusName =
     id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
@@ -165,10 +165,18 @@ const OrderEditScreen = () => {
   };
 
   const handlePresentOnDate = () => {
+    if (isBlocked) {
+      return;
+    }
+
     setShowOnDate(true);
   };
 
   const handlePresentContact = () => {
+    if (isBlocked) {
+      return;
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
@@ -177,6 +185,10 @@ const OrderEditScreen = () => {
   };
 
   const handlePresentOutlet = () => {
+    if (isBlocked) {
+      return;
+    }
+
     //TODO: если изменился контакт, то и магазин должен обнулиться
     const params: Record<string, string> = {};
 
@@ -197,7 +209,7 @@ const OrderEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {(statusId === 'DRAFT' || statusId === 'READY') && (
+        {(docStatus === 'DRAFT' || docStatus === 'READY') && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
@@ -217,20 +229,14 @@ const OrderEditScreen = () => {
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
           editable={!isBlocked}
         />
-        <SelectableInput
-          label="Дата отгрузки"
-          value={getDateString(docOnDate || '')}
-          editable={isBlocked}
-          onFocus={handlePresentOnDate}
-        />
+        <SelectableInput label="Дата отгрузки" value={getDateString(docOnDate || '')} onPress={handlePresentOnDate} />
         <SelectableInput
           label="Организация"
           placeholder="Выберите покупателя..."
           value={docContact?.name}
-          editable={isBlocked}
-          onFocus={handlePresentContact}
+          onPress={handlePresentContact}
         />
-        <SelectableInput label="Магазин" value={docOutlet?.name} editable={isBlocked} onFocus={handlePresentOutlet} />
+        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
       </ScrollView>
       {showOnDate && (
         <DateTimePicker
