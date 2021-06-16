@@ -4,8 +4,6 @@ import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
 
-import * as Location from 'expo-location';
-
 import { globalStyles as styles, Theme } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 

@@ -2,7 +2,7 @@ import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from '
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   useActionSheet,
@@ -27,7 +27,6 @@ const ReturnListScreen = () => {
 
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
 
   const filteredList = useMemo(() => {
     if (status === 'all') {
@@ -49,10 +48,6 @@ const ReturnListScreen = () => {
     navigation.navigate('ReturnEdit');
   }, [navigation]);
 
-  const handleDelete = useCallback(() => {
-    dispatch(documentActions.deleteDocuments());
-  }, [dispatch]);
-
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -60,16 +55,11 @@ const ReturnListScreen = () => {
         onPress: handleAddDocument,
       },
       {
-        title: 'Удалить все',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocument, handleDelete]);
+  }, [showActionSheet, handleAddDocument]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

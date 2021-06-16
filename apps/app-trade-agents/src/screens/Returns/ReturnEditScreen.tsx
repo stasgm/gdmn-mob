@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
@@ -199,18 +199,6 @@ const ReturnEditScreen = () => {
       fieldName: 'outlet',
       clause: params,
       value: docOutlet && [docOutlet],
-    });
-  };
-
-  const handlePresentDepart = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'department',
-      fieldName: 'depart',
-      value: docDepart && [docDepart],
     });
   };
 
