@@ -16,8 +16,6 @@ import {
 
 import { ReturnLineScreen, ReturnViewScreen, ReturnEditScreen } from '../../screens/Returns';
 
-import SelectItemScreen from '../../screens/Returns/SelectItemScreen';
-
 import { RoutesStackParamList } from './types';
 
 const Stack = createStackNavigator<RoutesStackParamList>();
@@ -40,7 +38,7 @@ const RoutesNavigator = () => {
       <Stack.Screen name="ReturnEdit" component={ReturnEditScreen} options={{ title: 'Возвраты' }} />
       <Stack.Screen name="ReturnView" component={ReturnViewScreen} options={{ title: 'Возвраты' }} />
       <Stack.Screen name="ReturnLine" component={ReturnLineScreen} options={{ title: 'Возвраты' }} />
-      <Stack.Screen name="SelectItemReturn" component={SelectItemScreen} options={{ title: 'Возвраты' }} />
+      <Stack.Screen name="SelectItemReturn" component={SelectRefItemScreen} options={{ title: 'Возвраты' }} />
     </Stack.Navigator>
   );
 };
