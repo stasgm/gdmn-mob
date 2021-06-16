@@ -175,7 +175,7 @@ const ReturnEditScreen = () => {
       return;
     }
 
-    navigation.navigate('SelectRefItem', {
+    navigation.navigate('SelectItemReturn', {
       refName: 'contact',
       fieldName: 'contact',
       value: docContact && [docContact],
@@ -194,7 +194,7 @@ const ReturnEditScreen = () => {
       params.companyId = docContact?.id;
     }
 
-    navigation.navigate('SelectRefItem', {
+    navigation.navigate('SelectItemReturn', {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
@@ -213,7 +213,6 @@ const ReturnEditScreen = () => {
               <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
-                // disabled={id === undefined}
                 onValueChange={() => {
                   dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
                 }}
@@ -229,7 +228,6 @@ const ReturnEditScreen = () => {
         />
         <SelectableInput label="Организация" value={docContact?.name} onPress={handlePresentContact} />
         <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
-        {/* <SelectableInput label="Подразделение" value={docDepart?.name} onPress={handlePresentDepart} /> */}
         <Input
           label="Причина возврата"
           value={docReason}
