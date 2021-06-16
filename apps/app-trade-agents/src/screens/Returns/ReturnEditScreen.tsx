@@ -32,7 +32,7 @@ const ReturnEditScreen = () => {
 
   const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
 
-  const [statusId, setStatusId] = useState('DRAFT');
+  // const [statusId, setStatusId] = useState('DRAFT');
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -57,7 +57,7 @@ const ReturnEditScreen = () => {
   }, []);
 
   useEffect(() => {
-    setStatusId(returnDoc?.status || 'DRAFT');
+    // setStatusId(returnDoc?.status || 'DRAFT');
 
     // Инициализируем параметры
     if (returnDoc) {
@@ -165,7 +165,7 @@ const ReturnEditScreen = () => {
     });
   }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = statusId !== 'DRAFT';
+  const isBlocked = docStatus !== 'DRAFT';
 
   const statusName =
     id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
@@ -178,7 +178,7 @@ const ReturnEditScreen = () => {
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
-      value: docContact,
+      value: docContact && [docContact],
     });
   };
 
@@ -198,7 +198,7 @@ const ReturnEditScreen = () => {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
-      value: docOutlet,
+      value: docOutlet && [docOutlet],
     });
   };
 
@@ -210,7 +210,7 @@ const ReturnEditScreen = () => {
     navigation.navigate('SelectRefItem', {
       refName: 'department',
       fieldName: 'depart',
-      value: docDepart,
+      value: docDepart && [docDepart],
     });
   };
 
@@ -219,7 +219,7 @@ const ReturnEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {(statusId === 'DRAFT' || statusId === 'READY') && (
+        {(docStatus === 'DRAFT' || docStatus === 'READY') && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
@@ -239,19 +239,9 @@ const ReturnEditScreen = () => {
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
           editable={!isBlocked}
         />
-        <SelectableInput
-          label="Организация"
-          value={docContact?.name}
-          editable={!isBlocked}
-          onFocus={handlePresentContact}
-        />
-        <SelectableInput label="Магазин" value={docOutlet?.name} editable={!isBlocked} onFocus={handlePresentOutlet} />
-        <SelectableInput
-          label="Подразделение"
-          value={docDepart?.name}
-          editable={!isBlocked}
-          onFocus={handlePresentDepart}
-        />
+        <SelectableInput label="Организация" value={docContact?.name} onPress={handlePresentContact} />
+        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
+        <SelectableInput label="Подразделение" value={docDepart?.name} onPress={handlePresentDepart} />
         <Input
           label="Причина возврата"
           value={docReason}

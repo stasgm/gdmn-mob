@@ -56,11 +56,7 @@ const SelectRefItemScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [filteredList, setFilteredList] = useState<INamedEntity[]>();
-  const [checkedItem, setCheckedItem] = useState<INamedEntity[] | INamedEntity>();
-
-  useEffect(() => {
-    setCheckedItem(value);
-  }, [searchQuery, value]);
+  const [checkedItem, setCheckedItem] = useState<INamedEntity[]>(value || []);
 
   useEffect(() => {
     if (!list) {
@@ -69,14 +65,8 @@ const SelectRefItemScreen = () => {
     setFilteredList(
       list
         .filter((i) => i?.name?.toUpperCase().includes(searchQuery.toUpperCase()))
-        .sort((a, _b) => {
-          return isMulti
-            ? !(checkedItem as INamedEntity[])?.find((v) => v.id === a.id)
-              ? -1
-              : 1
-            : (checkedItem as INamedEntity)?.id === a.id
-            ? -1
-            : 1;
+        .sort((a) => {
+          return checkedItem?.find((v) => v.id === a.id) ? -1 : 1;
         }),
     );
   }, [checkedItem, isMulti, list, searchQuery, value]);
@@ -109,12 +99,10 @@ const SelectRefItemScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: INamedEntity }) => {
-      const isChecked = isMulti
-        ? !!(checkedItem as INamedEntity[])?.find((i) => i.id === item.id)
-        : item.id === (checkedItem as INamedEntity)?.id;
+      const isChecked = !!(checkedItem as INamedEntity[])?.find((i) => i.id === item.id);
       return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
     },
-    [checkedItem, isMulti, handleSelectItem],
+    [checkedItem, handleSelectItem],
   );
 
   useLayoutEffect(() => {
