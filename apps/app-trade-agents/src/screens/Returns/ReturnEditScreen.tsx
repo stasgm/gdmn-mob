@@ -16,6 +16,8 @@ import {
 
 import { Divider } from 'react-native-paper';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IReturnDocument } from '../../store/docs/types';
 
@@ -26,7 +28,7 @@ import { IReturnFormParam } from '../../store/app/types';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnEdit'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
@@ -175,7 +177,7 @@ const ReturnEditScreen = () => {
       return;
     }
 
-    navigation.navigate('SelectItemReturn', {
+    navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
       value: docContact && [docContact],
@@ -194,7 +196,7 @@ const ReturnEditScreen = () => {
       params.companyId = docContact?.id;
     }
 
-    navigation.navigate('SelectItemReturn', {
+    navigation.navigate('SelectRefItem', {
       refName: 'outlet',
       fieldName: 'outlet',
       clause: params,
