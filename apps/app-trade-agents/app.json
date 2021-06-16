@@ -31,9 +31,13 @@
     "android": {
       "package": "com.gsbelarus.salesrepresentative",
       "versionCode": 3,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
       "config": {
         "googleMaps": {
-          "apiKey": "${process.env.GOOGLE_API_KEY}"
+          "apiKey": "AIzaSyBHC0awJaSoP-rQnctSsp6DmEYZ06SGTh0"
         }
       }
     }

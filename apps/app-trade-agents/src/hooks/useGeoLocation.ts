@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 
-const useLocation = () => {
+const useGeoLocation = () => {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -38,4 +38,4 @@ const useLocation = () => {
   return { location, errorMsg, isLoading };
 };
 
-export default useLocation;
+export default useGeoLocation;
