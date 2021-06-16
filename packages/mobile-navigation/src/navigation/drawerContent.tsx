@@ -9,6 +9,8 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
+import Constants from 'expo-constants';
+
 import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
 
 import {
@@ -117,7 +119,9 @@ export function DrawerContent(props: Props) {
         </TouchableOpacity>
         <View style={styles.updateSection}>
           <Caption style={styles.caption}>{isLoading ? 'загрузка данных...' : ''}</Caption>
-          <Caption style={styles.caption}>Версия программы: 0.0.1</Caption>
+          <Caption style={styles.caption}>
+            Версия программы: {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
+          </Caption>
         </View>
       </View>
     </>
