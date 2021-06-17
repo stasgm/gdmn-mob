@@ -1355,7 +1355,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'SENT',
     head: {
       contact: contact1,
-      outlet: outlet4,
+      outlet: outlet3,
       depart: deprt2,
       reason: 'Брак',
     },
@@ -1372,7 +1372,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'PROCESSED',
     head: {
       contact: contact1,
-      outlet: outlet5,
+      outlet: outlet2,
       depart: deprt3,
       reason: 'Брак',
     },
