@@ -11,6 +11,7 @@ export interface IAppState {
 export interface IOrderFormParam extends IFormParam {
   contact?: INamedEntity;
   outlet?: INamedEntity;
+  depart?: INamedEntity;
   number?: string;
   documentDate?: string;
   onDate?: string;
