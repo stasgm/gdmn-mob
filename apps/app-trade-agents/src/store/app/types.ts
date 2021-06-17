@@ -15,6 +15,7 @@ export interface IOrderFormParam extends IFormParam {
   documentDate?: string;
   onDate?: string;
   status?: StatusType;
+  route?: INamedEntity;
 }
 
 export interface IReturnFormParam extends IFormParam {
@@ -24,6 +25,6 @@ export interface IReturnFormParam extends IFormParam {
   documentDate?: string;
   depart?: INamedEntity;
   reason?: string;
-  road?: INamedEntity;
+  route?: INamedEntity;
   status?: StatusType;
 }

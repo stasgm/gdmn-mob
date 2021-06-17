@@ -3,7 +3,7 @@ import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native'
 import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -18,8 +18,10 @@ import { Divider } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { IReference } from '@lib/types';
+
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IReturnDocument } from '../../store/docs/types';
+import { IOutlet, IReturnDocument } from '../../store/docs/types';
 
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
@@ -43,10 +45,9 @@ const ReturnEditScreen = () => {
     outlet: docOutlet,
     number: docNumber,
     documentDate: docDocumentDate,
-    depart: docDepart,
     reason: docReason,
-    road: docRoad,
     status: docStatus,
+    route: docRoute,
   } = useMemo(() => {
     return formParams as IReturnFormParam;
   }, [formParams]);
@@ -58,9 +59,35 @@ const ReturnEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    // setStatusId(returnDoc?.status || 'DRAFT');
+  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
+    (e) => e.id === docOutlet?.id,
+  );
 
+  useEffect(() => {
+    if (!docContact && !!docOutlet) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['contact']: outlet?.company,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docContact, outlet?.company]);
+
+  useEffect(() => {
+    if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['outlet']: undefined,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docContact?.id, outlet?.company.id]);
+
+  useEffect(() => {
     // Инициализируем параметры
     if (returnDoc) {
       dispatch(
@@ -70,7 +97,7 @@ const ReturnEditScreen = () => {
           outlet: returnDoc.head.outlet,
           depart: returnDoc.head.depart,
           reason: returnDoc.head.reason,
-          road: returnDoc.head.road,
+          route: returnDoc.head.route,
           documentDate: returnDoc.documentDate,
           status: returnDoc.status,
         }),
@@ -89,7 +116,7 @@ const ReturnEditScreen = () => {
 
   const handleSave = useCallback(() => {
     if (!(docNumber && docContact && docOutlet && docReason && docDocumentDate)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
@@ -104,9 +131,7 @@ const ReturnEditScreen = () => {
         head: {
           contact: docContact,
           outlet: docOutlet,
-          depart: docDepart,
           reason: docReason,
-          road: docRoad,
         },
         lines: [],
         creationDate: new Date().toISOString(),
@@ -132,9 +157,7 @@ const ReturnEditScreen = () => {
           ...returnDoc.head,
           contact: docContact,
           outlet: docOutlet,
-          depart: docDepart,
           reason: docReason,
-          road: docRoad,
         },
         lines: returnDoc.lines,
         creationDate: returnDoc.creationDate || new Date().toISOString(),
@@ -145,20 +168,7 @@ const ReturnEditScreen = () => {
 
       navigation.navigate('ReturnView', { id });
     }
-  }, [
-    docNumber,
-    docContact,
-    docOutlet,
-    docDocumentDate,
-    id,
-    navigation,
-    docDepart,
-    docReason,
-    docRoad,
-    docDispatch,
-    returnDoc,
-    docStatus,
-  ]);
+  }, [docNumber, docContact, docOutlet, docDocumentDate, id, navigation, docReason, docDispatch, returnDoc, docStatus]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -177,6 +187,12 @@ const ReturnEditScreen = () => {
       return;
     }
 
+    if (docRoute) {
+      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
+        { text: 'OK' },
+      ]);
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
@@ -188,6 +204,12 @@ const ReturnEditScreen = () => {
     //TODO: если изменился контакт, то и магазин должен обнулиться
     if (isBlocked) {
       return;
+    }
+
+    if (docRoute) {
+      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
+        { text: 'OK' },
+      ]);
     }
 
     const params: Record<string, string> = {};

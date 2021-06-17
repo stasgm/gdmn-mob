@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -17,8 +17,10 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { IReference } from '@lib/types';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument } from '../../store/docs/types';
+import { IOrderDocument, IOutlet } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 import { useDispatch, useSelector } from '../../store';
@@ -34,8 +36,6 @@ const OrderEditScreen = () => {
 
   const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
 
-  // const [statusId, setStatusId] = useState(order?.status || 'DRAFT');
-
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   const {
@@ -45,6 +45,7 @@ const OrderEditScreen = () => {
     documentDate: docDocumentDate,
     onDate: docOnDate,
     status: docStatus,
+    route: docRoute,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
@@ -56,9 +57,35 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    //setStatusId(order?.status || 'DRAFT');
+  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
+    (e) => e.id === docOutlet?.id,
+  );
 
+  useEffect(() => {
+    if (!docContact && !!docOutlet) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['contact']: outlet?.company,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docOutlet, outlet?.company]);
+
+  useEffect(() => {
+    if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['outlet']: undefined,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docContact?.id, outlet?.company.id]);
+
+  useEffect(() => {
     // Инициализируем параметры
     if (order) {
       dispatch(
@@ -69,6 +96,7 @@ const OrderEditScreen = () => {
           onDate: order.head.onDate,
           documentDate: order.documentDate,
           status: order.status,
+          route: order.head.route,
         }),
       );
     } else {
@@ -177,6 +205,12 @@ const OrderEditScreen = () => {
       return;
     }
 
+    if (docRoute) {
+      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
+        { text: 'OK' },
+      ]);
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
@@ -187,6 +221,12 @@ const OrderEditScreen = () => {
   const handlePresentOutlet = () => {
     if (isBlocked) {
       return;
+    }
+
+    if (docRoute) {
+      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
+        { text: 'OK' },
+      ]);
     }
 
     //TODO: если изменился контакт, то и магазин должен обнулиться

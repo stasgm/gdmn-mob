@@ -23,6 +23,7 @@ import { getDateString } from '../../utils/helpers';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import OrderItem from './components/OrderItem';
+import { getStatusColor } from '../../utils/constants';
 
 const OrderViewScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
@@ -104,7 +105,7 @@ const OrderViewScreen = () => {
   return (
     <View style={[styles.container]}>
       <TouchableOpacity onPress={handleEditOrderHead}>
-        <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
+        <InfoBlock colorLabel={getStatusColor(order?.status || 'DRAFT')} title={order?.head.outlet.name}>
           <>
             <Text>{order.number}</Text>
             <Text>{getDateString(order.head.onDate)}</Text>

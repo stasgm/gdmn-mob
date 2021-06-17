@@ -99,7 +99,7 @@ const SelectRefItemScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: INamedEntity }) => {
-      const isChecked = !!(checkedItem as INamedEntity[])?.find((i) => i.id === item.id);
+      const isChecked = !!checkedItem?.find((i) => i.id === item.id);
       return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
     },
     [checkedItem, handleSelectItem],
