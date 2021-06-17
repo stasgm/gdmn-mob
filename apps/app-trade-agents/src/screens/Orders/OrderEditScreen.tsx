@@ -41,6 +41,7 @@ const OrderEditScreen = () => {
   const {
     contact: docContact,
     outlet: docOutlet,
+    depart: docDepart,
     number: docNumber,
     documentDate: docDocumentDate,
     onDate: docOnDate,
@@ -97,6 +98,7 @@ const OrderEditScreen = () => {
           documentDate: order.documentDate,
           status: order.status,
           route: order.head.route,
+          depart: order.head.depart,
         }),
       );
     } else {
@@ -156,6 +158,7 @@ const OrderEditScreen = () => {
           contact: docContact,
           outlet: docOutlet,
           onDate: docOnDate,
+          depart: docDepart,
         },
         lines: order.lines,
         creationDate: order.creationDate || new Date().toISOString(),
@@ -167,7 +170,19 @@ const OrderEditScreen = () => {
     }
 
     // navigation.navigate('OrderView', { id: docId, routeBack: 'OrderList' });
-  }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
+  }, [
+    docNumber,
+    docContact,
+    docDepart,
+    docOutlet,
+    docOnDate,
+    docDocumentDate,
+    id,
+    navigation,
+    docDispatch,
+    order,
+    docStatus,
+  ]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -244,6 +259,18 @@ const OrderEditScreen = () => {
     });
   };
 
+  const handlePresentDepart = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'department',
+      fieldName: 'depart',
+      value: docDepart && [docDepart],
+    });
+  };
+
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
@@ -277,6 +304,7 @@ const OrderEditScreen = () => {
           onPress={handlePresentContact}
         />
         <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
+        <SelectableInput label="Склад-магазин" value={docDepart?.name} onPress={handlePresentDepart} />
       </ScrollView>
       {showOnDate && (
         <DateTimePicker
