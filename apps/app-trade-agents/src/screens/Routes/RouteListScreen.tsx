@@ -16,7 +16,7 @@ const RouteListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
 
   const list = (docSelectors.selectByDocType('route') as IRouteDocument[]).sort(
-    (a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
   );
 
   const ref = useRef<FlatList<IRouteDocument>>(null);
