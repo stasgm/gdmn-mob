@@ -8,7 +8,7 @@ import { styles as globalStyles } from '@lib/mobile-navigation/src/screens/Refer
 import { NumberKeypad } from './NumberKeypad';
 
 interface IProps {
-  label: string;
+  label?: string;
   value: string;
   isKeyboardVisible: boolean;
   position?: number;
@@ -20,7 +20,7 @@ interface IProps {
 
 const NumberInput = ({
   isKeyboardVisible,
-  label,
+  label = '',
   position = 0,
   height = 0,
   value,

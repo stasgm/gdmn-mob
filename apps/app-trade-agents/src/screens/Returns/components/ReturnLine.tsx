@@ -1,11 +1,11 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ItemSeparator, NumberInput, PrimeButton } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
+import { ScrollView, TextInput, View, Text, Alert, Keyboard } from 'react-native';
 
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
@@ -23,6 +23,10 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
   const { docId, mode } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item.quantity.toString());
+  //const isFocused = useIsFocused();
+  const [isNumberKeyboardVisible, setNumberKeyboardVisible] = useState(false);
+  const [positionNK, setPositionNK] = useState(0);
+  const [height, setHeight] = useState(0);
 
   const { colors } = useTheme();
 
@@ -70,8 +74,8 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   return (
     <>
-      <ScrollView>
-        <View style={[styles.content]}>
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <View style={[styles.content, { flex: 1 }]}>
           <View style={[styles.item]}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Наименование</Text>
@@ -88,10 +92,26 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <View
+            style={[styles.item, { backgroundColor: colors.background }]}
+            onLayout={(obj) => {
+              setPositionNK(obj.nativeEvent.layout.y + obj.nativeEvent.layout.height);
+              setHeight(obj.nativeEvent.layout.height);
+            }}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Количество</Text>
-              <TextInput
+              <NumberInput
+                isKeyboardVisible={isNumberKeyboardVisible}
+                value={goodQty}
+                setValue={handelQuantityChange}
+                handlePress={() => {
+                  Keyboard.dismiss();
+                  setNumberKeyboardVisible(!isNumberKeyboardVisible);
+                }}
+                position={positionNK}
+                height={height}
+              />
+              {/*<TextInput
                 style={[styles.number, styles.field, { color: colors.text }]}
                 editable={true}
                 ref={qtyRef}
@@ -100,17 +120,17 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
                 returnKeyType="done"
                 // autoFocus={isFocused}
                 value={goodQty}
-              />
+              />*/}
             </View>
           </View>
+          <ItemSeparator />
         </View>
-        <ItemSeparator />
       </ScrollView>
-      {mode ? (
+      {(!isNumberKeyboardVisible || mode) && (
         <PrimeButton icon="delete" onPress={handleDelete} outlined>
           Удалить позицию
         </PrimeButton>
-      ) : null}
+      )}
     </>
   );
 };
