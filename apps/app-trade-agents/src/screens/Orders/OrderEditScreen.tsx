@@ -191,17 +191,17 @@ const OrderEditScreen = () => {
     });
   }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = docStatus !== 'DRAFT';
+  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 
-  const statusName =
-    id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
-  //---Окно календаря для выбора даты---
+  // Окно календаря для выбора даты
   const [showOnDate, setShowOnDate] = useState(false);
 
   const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
     //Закрываем календарь и записываем выбранную дату
     setShowOnDate(false);
+
     if (selectedOnDate) {
       dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
     }
@@ -282,7 +282,7 @@ const OrderEditScreen = () => {
               <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
-                // disabled={id === undefined}
+                // disabled={isBlocked}
                 onValueChange={() => {
                   dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
                 }}

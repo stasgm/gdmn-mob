@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
@@ -13,10 +15,6 @@ import {
   globalStyles as styles,
   SubTitle,
 } from '@lib/mobile-ui';
-
-import { Divider } from 'react-native-paper';
-
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IReference } from '@lib/types';
 
@@ -168,7 +166,7 @@ const ReturnEditScreen = () => {
     }
   }, [docNumber, docContact, docOutlet, docDocumentDate, id, navigation, docReason, docDispatch, returnDoc, docStatus]);
 
-  const isBlocked = docStatus !== 'DRAFT' || docRoute;
+  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -234,6 +232,7 @@ const ReturnEditScreen = () => {
               <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
+                // disabled={isBlocked}
                 onValueChange={() => {
                   dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
                 }}

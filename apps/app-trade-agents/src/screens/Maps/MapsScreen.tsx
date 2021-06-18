@@ -203,8 +203,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                  ? localStyles.selectedMark
-                  : localStyles.mark,
+                    ? localStyles.selectedMark
+                    : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>
@@ -213,9 +213,11 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      <View style={localStyles.statusContainer}>
-        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-      </View>
+      {currentPoint ? (
+        <View style={localStyles.statusContainer}>
+          <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+        </View>
+      ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />

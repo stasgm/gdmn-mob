@@ -1,9 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import RouteListScreen from '../../screens/Routes/RouteListScreen';
-import RouteViewScreen from '../../screens/Routes/RouteViewScreen';
-import RouteDetailScreen from '../../screens/Routes/RouteDetailScreen';
+import { RouteViewScreen, RouteListScreen, RouteDetailScreen } from '../../screens/Routes/';
 
 import {
   OrderEditScreen,

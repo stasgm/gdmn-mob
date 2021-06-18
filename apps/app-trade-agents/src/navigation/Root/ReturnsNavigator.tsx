@@ -9,7 +9,7 @@ import {
   SelectItemScreen as SelectItemReurnScreen,
 } from '../../screens/Returns';
 
-// import SelectRefItemScreen from '../../components/SelectRefItemScreen';
+import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
 import { ReturnsStackParamList } from './types';
 
@@ -22,7 +22,7 @@ const ReturnsNavigator = () => {
       <Stack.Screen name="ReturnView" component={ReturnViewScreen} />
       <Stack.Screen name="ReturnEdit" component={ReturnEditScreen} />
       <Stack.Screen name="ReturnLine" component={ReturnLineScreen} />
-      {/* <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} /> */}
+      <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} />
       <Stack.Screen name="SelectItemReturn" component={SelectItemReurnScreen} />
     </Stack.Navigator>
   );

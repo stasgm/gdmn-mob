@@ -1018,7 +1018,7 @@ const packageGoodMock: IPackageGood[] = [
   {
     id: '147012244',
     good: goodMock[38],
-    package: packageMock[2], //{ id: '147012082', name: '10' },
+    package: packageMock[3], //{ id: '147012082', name: '10' },
   },
   {
     id: '147012246',
@@ -1058,7 +1058,7 @@ const packageGoodMock: IPackageGood[] = [
   {
     id: '147012260',
     good: goodMock[31],
-    package: packageMock[23],
+    package: packageMock[24],
   },
   {
     id: '147012262',
@@ -1071,9 +1071,9 @@ const packageGoodMock: IPackageGood[] = [
     package: packageMock[27],
   },
   {
-    id: '147012264',
-    good: goodMock[4],
-    package: packageMock[27],
+    id: '147012265',
+    good: goodMock[5],
+    package: packageMock[28],
   },
 ];
 
