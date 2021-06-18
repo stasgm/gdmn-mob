@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -14,8 +15,6 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IconButton } from 'react-native-paper';
-
 import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
@@ -25,12 +24,11 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import ReturnItem from './components/ReturnItem';
 
 const ReturnViewScreen = () => {
-  const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.id;
-  const routeBack = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.routeBack;
-
-  const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
+  const { id, routeBack } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
+
   const ref = useRef<FlatList<IReturnLine>>(null);
 
   const handleAddReturnLine = useCallback(() => {
@@ -38,13 +36,20 @@ const ReturnViewScreen = () => {
       docId: id,
       name: 'good',
     });
-  }, [navigation, id]);
+
+    /*     navigation.navigate('SelectRefItem', {
+          refName: 'good',
+          fieldName: 'good',
+        }); */
+  }, [id, navigation]);
 
   const handleDelete = useCallback(() => {
-    if (id) {
-      dispatch(documentActions.deleteDocument(id));
-      navigation.goBack();
+    if (!id) {
+      return;
     }
+
+    dispatch(documentActions.deleteDocument(id));
+    navigation.goBack();
   }, [dispatch, id, navigation]);
 
   const handleEditReturnHead = useCallback(() => {
@@ -62,7 +67,7 @@ const ReturnViewScreen = () => {
         onPress: handleEditReturnHead,
       },
       {
-        title: 'Удалить заявку',
+        title: 'Удалить возврат',
         type: 'destructive',
         onPress: handleDelete,
       },
@@ -75,12 +80,7 @@ const ReturnViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () =>
-        routeBack ? (
-          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
-        ) : (
-          <BackButton />
-        ),
+      headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
       headerRight: () => (
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />

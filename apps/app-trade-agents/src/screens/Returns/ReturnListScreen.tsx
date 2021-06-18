@@ -1,5 +1,6 @@
 import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
@@ -17,16 +18,18 @@ import {
 
 import { IReturnDocument } from '../../store/docs/types';
 
+import { ReturnsStackParamList } from '../../navigation/Root/types';
+
 import ReturnListItem from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
+  const showActionSheet = useActionSheet();
+
   const { loading } = useSelector((state) => state.documents);
   const list = docSelectors.selectByDocType('return') as IReturnDocument[];
 
   const [status, setStatus] = useState<Status>('all');
-
-  const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
 
   const filteredList = useMemo(() => {
     if (status === 'all') {

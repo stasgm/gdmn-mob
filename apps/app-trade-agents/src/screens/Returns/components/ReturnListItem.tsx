@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
@@ -9,10 +10,11 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { IReturnDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';
 import { getDateString } from '../../../utils/helpers';
+import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
 const ReturnListItem = ({ item }: { item: IReturnDocument }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
 
   return (
     <TouchableOpacity

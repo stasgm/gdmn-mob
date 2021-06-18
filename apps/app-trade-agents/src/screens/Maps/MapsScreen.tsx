@@ -177,9 +177,6 @@ const MapScreen = () => {
 
   return (
     <View style={localStyles.containerMap}>
-      <View>
-        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-      </View>
       {loading && (
         <View style={localStyles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
@@ -206,8 +203,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                  ? localStyles.selectedMark
-                  : localStyles.mark,
+                    ? localStyles.selectedMark
+                    : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>
@@ -216,7 +213,7 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      <View>
+      <View style={localStyles.statusContainer}>
         <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
       </View>
       <View style={[localStyles.buttonContainer]}>

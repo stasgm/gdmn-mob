@@ -1,6 +1,7 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
@@ -14,24 +15,22 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IconButton } from 'react-native-paper';
-
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
-import OrderItem from './components/OrderItem';
 import { getStatusColor } from '../../utils/constants';
 
-const OrderViewScreen = () => {
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
-  const routeBack = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeBack;
+import OrderItem from './components/OrderItem';
 
-  const navigation = useNavigation();
+const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
+  const { id, routeBack } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
+
   const ref = useRef<FlatList<IOrderLine>>(null);
 
   const handleAddOrderLine = useCallback(() => {
@@ -45,10 +44,12 @@ const OrderViewScreen = () => {
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
-    if (id) {
-      dispatch(documentActions.deleteDocument(id));
-      navigation.goBack();
+    if (!id) {
+      return;
     }
+
+    dispatch(documentActions.deleteDocument(id));
+    navigation.goBack();
   }, [dispatch, id, navigation]);
 
   const actionsMenu = useCallback(() => {
@@ -75,12 +76,7 @@ const OrderViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () =>
-        routeBack ? (
-          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
-        ) : (
-          <BackButton />
-        ),
+      headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
       headerRight: () => (
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />

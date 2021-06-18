@@ -1,3 +1,12 @@
+import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
+import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
+import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+
+import { INamedEntity, IReference } from '@lib/types';
+import { refSelectors } from '@lib/store';
+
 import {
   AppScreen,
   BackButton,
@@ -7,13 +16,6 @@ import {
   SubTitle,
   globalStyles as styles,
 } from '@lib/mobile-ui';
-import { INamedEntity, IReference } from '@lib/types';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
-
-import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
-import { refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../store';
 import { appActions } from '../store/app/actions';
@@ -23,9 +25,8 @@ import { IFormParam } from '../store/app/types';
 import { RoutesStackParamList } from '../navigation/Root/types';
 
 const SelectRefItemScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'SelectRefItem'>>();
   const dispatch = useDispatch();
-
   const { refName, isMulti, fieldName, value, clause } =
     useRoute<RouteProp<RoutesStackParamList, 'SelectRefItem'>>().params;
 

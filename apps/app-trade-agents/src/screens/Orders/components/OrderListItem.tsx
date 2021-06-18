@@ -3,16 +3,18 @@ import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';
 import { getDateString } from '../../../utils/helpers';
+import { OrdersStackParamList } from '../../../navigation/Root/types';
 
 const OrderListItem = ({ item }: { item: IOrderDocument }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
   return (
     <TouchableOpacity

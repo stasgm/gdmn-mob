@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -10,6 +11,7 @@ import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 
 import { IGood, IReturnLine } from '../../../store/docs/types';
+import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {
   docId: string;
@@ -18,7 +20,7 @@ interface IProps {
 
 const ReturnItem = ({ docId, item }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
 
   const good = (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id);
 

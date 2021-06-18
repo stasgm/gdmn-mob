@@ -36,8 +36,6 @@ const ReturnEditScreen = () => {
 
   const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
 
-  // const [statusId, setStatusId] = useState('DRAFT');
-
   const formParams = useSelector((state) => state.app.formParams);
 
   const {
@@ -170,28 +168,27 @@ const ReturnEditScreen = () => {
     }
   }, [docNumber, docContact, docOutlet, docDocumentDate, id, navigation, docReason, docDispatch, returnDoc, docStatus]);
 
+  const isBlocked = docStatus !== 'DRAFT' || docRoute;
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => <SaveButton onPress={handleSave} />,
+      headerRight: () => !isBlocked && <SaveButton onPress={handleSave} />,
     });
-  }, [dispatch, handleSave, navigation]);
+  }, [dispatch, handleSave, isBlocked, navigation]);
 
-  const isBlocked = docStatus !== 'DRAFT';
-
-  const statusName =
-    id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
   const handlePresentContact = () => {
     if (isBlocked) {
       return;
     }
 
-    if (docRoute) {
-      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
-        { text: 'OK' },
-      ]);
-    }
+    /*     if (docRoute) {
+          return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
+            { text: 'OK' },
+          ]);
+        } */
 
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
@@ -206,11 +203,11 @@ const ReturnEditScreen = () => {
       return;
     }
 
-    if (docRoute) {
+    /* if (docRoute) {
       return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
         { text: 'OK' },
       ]);
-    }
+    } */
 
     const params: Record<string, string> = {};
 

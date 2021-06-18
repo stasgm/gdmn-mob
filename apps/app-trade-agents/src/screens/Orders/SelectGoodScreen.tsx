@@ -45,11 +45,10 @@ const Good = ({ item }: { item: INamedEntity }) => {
 const SelectGoodScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
+  const { groupId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-
-  const { groupId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
 
   const goods = refSelectors.selectByName('good') as IReference<IGood>;
 
@@ -90,7 +89,6 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen>
-      {/*<SubTitle style={styles.title}>{list?.name}</SubTitle>*/}
       <SubTitle style={styles.title}>{goods.name}</SubTitle>
       <Divider />
       {filterVisible && (
