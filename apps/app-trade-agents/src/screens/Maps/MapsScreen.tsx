@@ -203,8 +203,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                    ? localStyles.selectedMark
-                    : localStyles.mark,
+                  ? localStyles.selectedMark
+                  : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>
