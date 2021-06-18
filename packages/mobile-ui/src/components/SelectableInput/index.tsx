@@ -11,9 +11,10 @@ interface Props {
   value?: string;
   label?: string;
   placeholder?: string;
+  editable?: boolean;
 }
 
-const SelectableInput: React.FC<Props> = ({ value, onPress, label, placeholder }) => {
+const SelectableInput: React.FC<Props> = ({ value, onPress, label, placeholder, editable = true }) => {
   const { colors } = useTheme();
 
   return (
@@ -27,9 +28,10 @@ const SelectableInput: React.FC<Props> = ({ value, onPress, label, placeholder }
               primary: colors.primary,
               text: colors.text,
               placeholder: colors.primary,
-              background: colors.surface,
+              background: editable ? colors.surface : colors.background,
             },
           }}
+          maxLength={35}
           mode="outlined"
           style={styles.input}
           placeholderTextColor={colors.text}
