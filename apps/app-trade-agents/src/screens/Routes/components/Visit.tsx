@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions } from '@lib/store';
-import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
+import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 import { INamedEntity } from '@lib/types';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -141,8 +141,9 @@ const Visit = ({
     navigation.navigate('ReturnView', { id: newReturn.id });
   };
 
-  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'
-    } ${timeProcess()})`;
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+    !dateEnd ? 'тся' : 'лся'
+  } ${timeProcess()})`;
   const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
 
   const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;
