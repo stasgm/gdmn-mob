@@ -12,9 +12,19 @@ interface Props {
   label?: string;
   placeholder?: string;
   editable?: boolean;
+  disabled?: boolean;
+  required?: boolean;
 }
 
-const SelectableInput: React.FC<Props> = ({ value, onPress, label, placeholder, editable = true }) => {
+const SelectableInput: React.FC<Props> = ({
+  value,
+  onPress,
+  label,
+  placeholder,
+  editable = false,
+  disabled,
+  required,
+}) => {
   const { colors } = useTheme();
 
   return (
@@ -22,13 +32,13 @@ const SelectableInput: React.FC<Props> = ({ value, onPress, label, placeholder, 
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={value || ''}
+          value={value}
           theme={{
             colors: {
               primary: colors.primary,
               text: colors.text,
               placeholder: colors.primary,
-              background: editable ? colors.surface : colors.background,
+              background: colors.surface,
             },
           }}
           maxLength={35}
@@ -36,8 +46,9 @@ const SelectableInput: React.FC<Props> = ({ value, onPress, label, placeholder, 
           style={styles.input}
           placeholderTextColor={colors.text}
           placeholder={placeholder}
-          right={<TextInput.Icon name="chevron-right" style={{ marginTop: 14 }} onPress={onPress} />}
-          editable={false}
+          right={!disabled && <TextInput.Icon name="chevron-right" style={{ marginTop: 14 }} onPress={onPress} />}
+          editable={editable}
+          disabled={disabled}
         />
       </View>
     </View>

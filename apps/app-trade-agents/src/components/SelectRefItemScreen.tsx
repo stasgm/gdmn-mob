@@ -22,13 +22,14 @@ import { appActions } from '../store/app/actions';
 import { IOutlet } from '../store/docs/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
-import { RoutesStackParamList } from '../navigation/Root/types';
+import { OrdersStackParamList, ReturnsStackParamList } from '../navigation/Root/types';
 
 const SelectRefItemScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'SelectRefItem'>>();
+  const navigation =
+    useNavigation<StackNavigationProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>();
   const dispatch = useDispatch();
   const { refName, isMulti, fieldName, value, clause } =
-    useRoute<RouteProp<RoutesStackParamList, 'SelectRefItem'>>().params;
+    useRoute<RouteProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName(refName) as IReference<INamedEntity>;
 
@@ -48,7 +49,7 @@ const SelectRefItemScreen = () => {
       });
     }
     return refObj?.data;
-  }, [clause, refName, refObj?.data]);
+  }, [clause]);
 
   const title = refObj?.name;
 
@@ -103,7 +104,7 @@ const SelectRefItemScreen = () => {
       const isChecked = !!checkedItem?.find((i) => i.id === item.id);
       return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
     },
-    [checkedItem, handleSelectItem],
+    [handleSelectItem],
   );
 
   useLayoutEffect(() => {

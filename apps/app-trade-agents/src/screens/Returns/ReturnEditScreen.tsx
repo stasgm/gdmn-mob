@@ -171,9 +171,9 @@ const ReturnEditScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => !isBlocked && <SaveButton onPress={handleSave} />,
+      headerRight: () => ['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && <SaveButton onPress={handleSave} />,
     });
-  }, [dispatch, handleSave, isBlocked, navigation]);
+  }, [dispatch, docStatus, handleSave, isBlocked, navigation]);
 
   const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
@@ -181,12 +181,6 @@ const ReturnEditScreen = () => {
     if (isBlocked) {
       return;
     }
-
-    /*     if (docRoute) {
-          return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
-            { text: 'OK' },
-          ]);
-        } */
 
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
@@ -200,12 +194,6 @@ const ReturnEditScreen = () => {
     if (isBlocked) {
       return;
     }
-
-    /* if (docRoute) {
-      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
-        { text: 'OK' },
-      ]);
-    } */
 
     const params: Record<string, string> = {};
 
@@ -226,7 +214,7 @@ const ReturnEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {(docStatus === 'DRAFT' || docStatus === 'READY') && (
+        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
@@ -244,15 +232,20 @@ const ReturnEditScreen = () => {
           label="Номер документа"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          editable={!isBlocked}
+          disabled={isBlocked}
         />
-        <SelectableInput label="Организация" value={docContact?.name} onPress={handlePresentContact} />
-        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
+        <SelectableInput
+          label="Организация"
+          value={docContact?.name}
+          onPress={handlePresentContact}
+          disabled={isBlocked}
+        />
+        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
         <Input
           label="Причина возврата"
           value={docReason}
           onChangeText={(text) => dispatch(appActions.setFormParams({ reason: text }))}
-          editable={!isBlocked}
+          disabled={!['DRAFT', 'READY'].includes(docStatus || 'DRAFT')}
         />
       </ScrollView>
     </AppInputScreen>

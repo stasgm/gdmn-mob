@@ -208,7 +208,7 @@ const OrderEditScreen = () => {
   };
 
   const handlePresentOnDate = () => {
-    if (isBlocked) {
+    if (docStatus !== 'DRAFT') {
       return;
     }
 
@@ -276,7 +276,7 @@ const OrderEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {(docStatus === 'DRAFT' || docStatus === 'READY') && (
+        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
@@ -294,24 +294,34 @@ const OrderEditScreen = () => {
           label="Номер документа"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          editable={!isBlocked}
+          disabled={isBlocked}
         />
-        <SelectableInput label="Дата отгрузки" value={getDateString(docOnDate || '')} onPress={handlePresentOnDate} />
+        <SelectableInput
+          label="Дата отгрузки"
+          value={getDateString(docOnDate || '')}
+          onPress={handlePresentOnDate}
+          disabled={docStatus !== 'DRAFT'}
+        />
         <SelectableInput
           label="Организация"
           placeholder="Выберите покупателя..."
           value={docContact?.name}
           onPress={handlePresentContact}
+          disabled={isBlocked}
         />
-        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
-        <SelectableInput label="Склад-магазин" value={docDepart?.name} onPress={handlePresentDepart} />
+        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
+        <SelectableInput
+          label="Склад-магазин"
+          value={docDepart?.name}
+          onPress={handlePresentDepart}
+          disabled={isBlocked}
+        />
       </ScrollView>
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
           value={new Date(docOnDate || '')}
           mode="date"
-          // is24Hour={true}
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}
         />

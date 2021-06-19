@@ -22,15 +22,13 @@ const SelectItemScreen = () => {
 
   const list = refSelectors.selectByName(name) as IReference<INamedEntity>;
 
-  console.log('11');
-
   const filteredList = useMemo(() => {
     return (
       list?.data
         .filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, [list, searchQuery]);
+  }, []);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {

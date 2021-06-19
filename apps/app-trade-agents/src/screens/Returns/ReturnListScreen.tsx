@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
@@ -76,13 +76,10 @@ const ReturnListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const ref = useRef<FlatList<IReturnDocument>>(null);
-
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
-        ref={ref}
         data={filteredList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}

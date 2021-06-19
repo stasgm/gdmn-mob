@@ -141,9 +141,8 @@ const Visit = ({
     navigation.navigate('ReturnView', { id: newReturn.id });
   };
 
-  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
-    !dateEnd ? 'тся' : 'лся'
-  } ${timeProcess()})`;
+  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${!dateEnd ? 'тся' : 'лся'
+    } ${timeProcess()})`;
   const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
 
   const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;
@@ -164,7 +163,7 @@ const Visit = ({
           {dateEnd ? (
             <Text>{visitTextEnd}</Text>
           ) : (
-            <View style={styles.flexGrow}>
+            <View>
               <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
                 {orderText}
               </PrimeButton>

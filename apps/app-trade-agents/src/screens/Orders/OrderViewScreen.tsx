@@ -1,5 +1,5 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useLayoutEffect } from 'react';
+import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -31,7 +31,9 @@ const OrderViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const { id, routeBack } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
 
-  const ref = useRef<FlatList<IOrderLine>>(null);
+  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+
+  const isBlocked = order?.status !== 'DRAFT';
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {
@@ -77,21 +79,20 @@ const OrderViewScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
-          <AddButton onPress={handleAddOrderLine} />
-        </View>
-      ),
+      headerRight: () =>
+        !isBlocked && (
+          <View style={styles.buttons}>
+            <MenuButton actionsMenu={actionsMenu} />
+            <AddButton onPress={handleAddOrderLine} />
+          </View>
+        ),
     });
-  }, [navigation, handleAddOrderLine, actionsMenu, routeBack]);
-
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  }, [navigation, handleAddOrderLine, actionsMenu, routeBack, isBlocked]);
 
   if (!order) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Заказ не найден</SubTitle>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
       </View>
     );
   }
@@ -100,16 +101,17 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <TouchableOpacity onPress={handleEditOrderHead}>
-        <InfoBlock colorLabel={getStatusColor(order?.status || 'DRAFT')} title={order?.head.outlet.name}>
-          <>
-            <Text>{order.number}</Text>
-            <Text>{getDateString(order.head.onDate)}</Text>
-          </>
-        </InfoBlock>
-      </TouchableOpacity>
+      <InfoBlock
+        colorLabel={getStatusColor(order?.status || 'DRAFT')}
+        title={order?.head.outlet.name}
+        onPress={handleEditOrderHead}
+        disabled={!['DRAFT', 'READY'].includes(order.status)}
+      >
+        <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+          order.head?.onDate,
+        )}`}</Text>
+      </InfoBlock>
       <FlatList
-        ref={ref}
         data={order.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}

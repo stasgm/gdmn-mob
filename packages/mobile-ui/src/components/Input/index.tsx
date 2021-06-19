@@ -13,22 +13,24 @@ interface Props {
   spellCheck?: boolean;
   maxLength?: number;
   autoCorrect?: boolean;
+  required?: boolaen;
   keyboardType?:
-    | 'default'
-    | 'email-address'
-    | 'numeric'
-    | 'phone-pad'
-    | 'number-pad'
-    | 'decimal-pad'
-    | 'visible-password'
-    | 'ascii-capable'
-    | 'numbers-and-punctuation'
-    | 'url'
-    | 'name-phone-pad'
-    | 'twitter'
-    | 'web-search'
-    | undefined;
+  | 'default'
+  | 'email-address'
+  | 'numeric'
+  | 'phone-pad'
+  | 'number-pad'
+  | 'decimal-pad'
+  | 'visible-password'
+  | 'ascii-capable'
+  | 'numbers-and-punctuation'
+  | 'url'
+  | 'name-phone-pad'
+  | 'twitter'
+  | 'web-search'
+  | undefined;
   editable?: boolean;
+  disabled?: boolean;
 }
 
 const Input: React.FC<Props> = ({
@@ -42,6 +44,8 @@ const Input: React.FC<Props> = ({
   keyboardType,
   returnKeyType,
   editable,
+  disabled,
+  required,
 }) => {
   const { colors } = useTheme();
 
@@ -64,11 +68,12 @@ const Input: React.FC<Props> = ({
           returnKeyType={returnKeyType}
           keyboardType={keyboardType}
           autoCorrect={autoCorrect}
-          style={styles.input}
+          style={[styles.input]}
           maxLength={maxLength}
           placeholderTextColor={colors.text}
           secureTextEntry={secureText}
           spellCheck={spellCheck}
+          disabled={disabled}
           editable={editable}
         />
       </View>
