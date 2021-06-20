@@ -27,18 +27,24 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IPr
         styles.rectangularButton,
         outlined
           ? {
-              borderWidth: 1,
-              borderColor: colors.primary,
-              backgroundColor: disabled ? colors.disabled : colors.background,
-            }
+            borderWidth: 1,
+            borderColor: colors.primary,
+            backgroundColor: disabled ? colors.disabled : colors.background,
+          }
           : { backgroundColor: disabled ? colors.disabled : colors.primary },
         style,
       ]}
     >
       <View style={localStyles.buttons}>
-        {icon && <Icon name={icon} size={16} color={outlined ? colors.primary : colors.background} />}
+        {icon && (
+          <Icon
+            name={icon}
+            size={16}
+            color={outlined ? colors.primary : colors.background}
+            style={{ marginRight: 5 }}
+          />
+        )}
         <Text style={[localStyles.text, { color: outlined ? colors.primary : colors.background }]}>
-          {'  '}
           {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>
       </View>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,9 +30,9 @@ const OrderItem = ({ docId, item }: IProps) => {
         navigation.navigate('OrderLine', { mode: 1, docId, item });
       }}
     >
-      <View style={[styles.item]}>
+      <View style={[styles.item, { margin: 0 }]}>
         <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          <MaterialCommunityIcons name="minus" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
@@ -46,6 +46,7 @@ const OrderItem = ({ docId, item }: IProps) => {
           </View>
         </View>
       </View>
+      <Divider />
     </TouchableOpacity>
   );
 };
