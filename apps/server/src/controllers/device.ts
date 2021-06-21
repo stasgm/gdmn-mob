@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IDevice, NewDevice } from '@lib/types';
+import { IDevice, IUser, NewDevice } from '@lib/types';
 
 import log from '../utils/logger';
 import { deviceService } from '../services';
@@ -12,12 +12,12 @@ import { DataNotFoundException } from '../exceptions';
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { name } = ctx.request.body as NewDevice;
 
-  const { companies } = ctx.state.user;
-  const companyId = companies[0].id;
+  const { companies } = ctx.state.user as IUser;
+  const company = companies[0];
 
   // console.log('companyId', companyId);
 
-  const device: NewDevice = { name, companyId };
+  const device: NewDevice = { name, company };
 
   // console.log('device', device);
 
@@ -79,6 +79,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   }
 
   ok(ctx as Context, device);
+
   log.info(`getDevice: device '${device.name}' is successfully received`);
 };
 

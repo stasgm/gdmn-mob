@@ -8,9 +8,9 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     throw new InvalidParameterException('Не указан идентификатор устройства');
   }
 
-  const db = getDb();
+  const { devices } = getDb();
 
-  const currDevice = await db.devices.find((device) => device.uid === ctx.query.deviceId);
+  const currDevice = await devices.find((device) => device.uid === ctx.query.deviceId);
 
   if (!currDevice) {
     throw new DataNotFoundException('Устройство не найдено');

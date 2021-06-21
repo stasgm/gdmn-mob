@@ -7,19 +7,16 @@ import { authService, deviceService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
 
 /**
- * Регистрация нового пользователя
+ * Регистрация нового пользователя (Администратора компании)
  * */
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password } = ctx.request.body as IUserCredentials;
 
-  const user: NewUser = {
+  const newUser = await authService.signUp({
     password,
     name,
     companies: [],
-    creatorId: '',
-  };
-
-  const newUser = await authService.signUp(user);
+  } as NewUser);
 
   created(ctx as Context, newUser);
 
@@ -68,9 +65,9 @@ const logOut = async (ctx: Context): Promise<void> => {
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { code, uid }: { code: string; uid?: string } = ctx.request.body;
+  const { code } = ctx.params;
 
-  const deviceUid = await authService.verifyCode({ code, uid });
+  const deviceUid = await authService.verifyCode(code);
 
   ok(ctx as Context, deviceUid);
 
