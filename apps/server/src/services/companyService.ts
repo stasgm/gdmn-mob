@@ -22,21 +22,19 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const db = getDb();
-  const { companies, users } = db;
+  const { companies, users } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
   }
 
-  const newCompanyObj: IDBCompany = {
-    id: '',
+  const newCompanyObj = {
     name: company.name,
     adminId: company.admin.id,
     externalId: company.externalId,
-    creationDate: new Date().toString(),
-    editionDate: new Date().toString(),
-  };
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
+  } as IDBCompany;
 
   const newCompany = await companies.insert(newCompanyObj);
 
@@ -46,13 +44,15 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   //TODO переделать на updateCompany
 
-  // Добавляем к пользователю gdmn
+  // TODO Временно! Добавляем к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
 
   if (user) {
     await addCompanyToUser(user.id, createdCompany.id);
   }
+
   const retCompany = await makeCompany(createdCompany);
+
   return retCompany;
 };
 
@@ -83,7 +83,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     creationDate: companyObj.creationDate,
-    editionDate: new Date().toString(),
+    editionDate: new Date().toISOString(),
   };
 
   await companies.update(newCompany);

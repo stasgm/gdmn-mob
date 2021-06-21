@@ -4,7 +4,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import bcrypt from 'bcrypt';
 
-import { IUser, NewUser, IDBUser } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, IDBDeviceBinding, IDBDevice } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -17,7 +17,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const { devices, users } = db;
 
   const { deviceId } = ctx.query;
-  const { name }: { name: string } = ctx.request.body;
+  const { name } = ctx.request.body as IUserCredentials;
 
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
@@ -53,54 +53,58 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   })(ctx, next);
 };
 
+/**
+ * Регистрация нового пользователя (Администратора компании)
+ * @param user NewUser
+ * @returns IUser
+ */
 const signUp = async (user: NewUser): Promise<IUser> => {
-  // Если в базе нет пользователей
-  // добавляем пользователя gdmn
-  const db = getDb();
+  const { devices, users, deviceBindings } = getDb();
 
-  const { devices, users } = db;
-
+  // Кол-во пользователей
   const userCount = (await users.read()).length;
-
-  if (!userCount) {
-    // TODO временно!!! в дальнейшем пользователя внешней системы тоже надо создавать
-    const gdmnUserObj: IDBUser = {
-      id: '',
-      name: 'gdmn',
-      creatorId: '',
-      password: 'gdmn',
-      companies: [],
-      role: 'Admin',
-      creationDate: new Date().toString(),
-      editionDate: new Date().toString(),
-    };
-
-    await userService.addOne(gdmnUserObj);
-
-    await devices.insert({
-      id: '',
-      name: 'GDMN-WEB',
-      uid: 'WEB',
-      state: 'ACTIVE',
-      companyId: '',
-      creationDate: new Date().toString(),
-      editionDate: new Date().toString(),
-    });
-  }
-
+  // Создаём пользователя
   const newUser = await userService.addOne(user);
 
-  if (!user.creatorId) {
-    // TODO временно!!! если создаётся не пользователем то добавляем устройство WEB
-    await devices.insert({
-      id: '',
+  if (userCount === 0) {
+    // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)
+    const webDeviceId = await devices.insert({
       name: 'WEB',
       uid: 'WEB',
       state: 'ACTIVE',
-      companyId: '',
-      creationDate: new Date().toString(),
-      editionDate: new Date().toString(),
-    });
+      creationDate: new Date().toISOString(),
+      editionDate: new Date().toISOString(),
+    } as IDBDevice);
+
+    // TODO временно!!!
+    // Создаём пользователя gdmn (внешняя система). В дальнейшем тоже надо создавать для каждой организации
+    const gdmnUserObj: NewUser = {
+      name: 'gdmn',
+      password: 'gdmn',
+      companies: [],
+      creationDate: new Date().toISOString(),
+      editionDate: new Date().toISOString(),
+    };
+
+    const { id: gdmnUserId } = await userService.addOne(gdmnUserObj);
+    // TODO временно!!! Привязываем пользователя gdmn (внешняя система) к устройству WEB
+    // в дальнейшем будет создаваться свой DeviceId для учётной систмеы
+    await deviceBindings.insert({
+      state: 'ACTIVE',
+      deviceId: webDeviceId,
+      userId: gdmnUserId,
+    } as IDBDeviceBinding);
+  }
+
+  const webDevice = await devices.find((e) => e.uid === 'WEB');
+
+  if (webDevice) {
+    // Привязываем нового пользователя к устройству WEB
+    await deviceBindings.insert({
+      state: 'ACTIVE',
+      deviceId: webDevice.id,
+      userId: newUser.id,
+    } as IDBDeviceBinding);
   }
 
   return newUser;
@@ -127,7 +131,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   }
 };
 
-const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
+const verifyCode = async (code: string) => {
   const db = getDb();
   const { devices, codes } = db;
 
@@ -152,7 +156,7 @@ const verifyCode = async ({ code, uid }: { code: string; uid?: string }) => {
   }
 
   // обновляем uid у устройства
-  const deviceId = uid || uuidv1();
+  const deviceId = uuidv1();
   const device = await devices.find(rec.deviceId);
 
   if (!device) {

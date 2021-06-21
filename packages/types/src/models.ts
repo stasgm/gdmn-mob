@@ -84,7 +84,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;
-export type NewUser = Omit<IUser, 'role' | 'id'>;
+export type NewUser = Omit<IUser, 'role' | 'id'> & { password: string };
 
 export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
 
