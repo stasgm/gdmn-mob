@@ -20,6 +20,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
 
   if (user) {
+    // TODO проверять по каждой организации
     throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
