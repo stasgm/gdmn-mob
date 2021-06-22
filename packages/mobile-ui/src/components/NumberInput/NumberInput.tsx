@@ -61,21 +61,12 @@ const NumberInput = ({
   </TextInputWithIcon>*/}
       {isKeyboardVisible && (
         <View
-          onLayout={(obj) => {
-            console.log('onLayout', obj.nativeEvent.layout);
-            console.log('heightW', heightW);
-            console.log('headerHeight', headerHeight);
-          }}
           style={[
-            styles.keypad,
             {
-              //flex: 1,
-              //top: -position,
-              //bottom: 0,
-              height: heightW - headerHeight,
-              backgroundColor: '#500',
-              //height: '100%',
+              top: -position,
+              height: heightW - headerHeight + height,
             },
+            styles.keypad,
           ]}>
           <NumberKeypad
             oldValue={value}
@@ -97,7 +88,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     position: 'absolute',
     width: '100%',
-    zIndex: 99999,
+    //zIndex: -99999,
   },
   marginRight: {
     alignItems: 'center',

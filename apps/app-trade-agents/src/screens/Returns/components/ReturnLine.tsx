@@ -105,7 +105,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
                 value={goodQty}
                 setValue={handelQuantityChange}
                 handlePress={() => {
-                  Keyboard.dismiss();
+                  //Keyboard.dismiss();
                   setNumberKeyboardVisible(!isNumberKeyboardVisible);
                 }}
                 position={positionNK}
@@ -126,7 +126,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
         </View>
       </ScrollView>
-      {(!isNumberKeyboardVisible || mode) && (
+      {!isNumberKeyboardVisible && mode && (
         <PrimeButton icon="delete" onPress={handleDelete} outlined>
           Удалить позицию
         </PrimeButton>

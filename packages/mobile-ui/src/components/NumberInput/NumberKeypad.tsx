@@ -1,8 +1,9 @@
 import { Feather } from '@expo/vector-icons';
 import { evaluate } from 'mathjs';
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IKeyProps, Key } from './Key';
 
