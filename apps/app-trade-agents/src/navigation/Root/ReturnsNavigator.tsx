@@ -1,14 +1,17 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { ReturnLineScreen, ReturnListScreen, ReturnViewScreen } from '../../screens/Returns';
-
-import ReturnEditScreen from '../../screens/Returns/ReturnEditScreen';
+import {
+  ReturnLineScreen,
+  ReturnListScreen,
+  ReturnViewScreen,
+  ReturnEditScreen,
+  SelectItemScreen as SelectItemReurnScreen,
+} from '../../screens/Returns';
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
-import SelectItemScreen from '../../screens/Returns/SelectItemScreen';
 
-import { NestingReturnParamList, ReturnsStackParamList, SelectParamList } from './types';
+import { NestingReturnParamList, ReturnsStackParamList } from './types';
 
 const Stack = createStackNavigator<ReturnsStackParamList>();
 
@@ -27,7 +30,7 @@ const returnScreens = [
   },
   {
     name: 'SelectItemReturn',
-    component: SelectItemScreen,
+    component: SelectItemReurnScreen,
   },
   {
     name: 'SelectRefItem',
@@ -37,12 +40,12 @@ const returnScreens = [
 
 const ReturnsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="ReturnList" screenOptions={{ headerShown: true, title: 'Возврат' }}>
+    <Stack.Navigator initialRouteName="ReturnList" screenOptions={{ headerShown: true, title: 'Возвраты' }}>
       <Stack.Screen name="ReturnList" component={ReturnListScreen} />
       {returnScreens.map((screen) => (
         <Stack.Screen
           key={screen.name}
-          name={screen.name as keyof NestingReturnParamList | keyof SelectParamList}
+          name={screen.name as keyof NestingReturnParamList}
           component={screen.component}
         />
       ))}

@@ -2,7 +2,12 @@ import { INamedEntity } from '@lib/types';
 
 import { IOrderLine, IReturnLine } from '../../store/docs/types';
 
-export type SelectParamList = {
+export type NestingOrderParamList = {
+  OrderView: { id: string; routeBack?: string } | undefined;
+  OrderEdit: { id: string } | undefined;
+  OrderLine: { mode: number; docId: string; item: IOrderLine };
+  SelectGroupItem: { docId: string };
+  SelectGoodItem: { docId: string; groupId: string };
   SelectRefItem: {
     // parentScreen: keyof OrdersStackParamList;
     refName: string;
@@ -13,19 +18,11 @@ export type SelectParamList = {
   };
 };
 
-export type NestingOrderParamList = {
-  OrderView: { id: string; routeBack?: string } | undefined;
-  OrderEdit: { id: string } | undefined;
-  OrderLine: { mode: number; docId: string; item: IOrderLine };
-  SelectGroupItem: { docId: string };
-  SelectGoodItem: { docId: string; groupId: string };
-};
-
 type OrdersParamList = {
   OrderList: undefined;
 };
 
-export type OrdersStackParamList = OrdersParamList & NestingOrderParamList & SelectParamList;
+export type OrdersStackParamList = OrdersParamList & NestingOrderParamList;
 
 export type NestingReturnParamList = {
   ReturnView: { id: string; routeBack?: string } | undefined;
@@ -38,7 +35,7 @@ type ReturnsParamList = {
   ReturnList: undefined;
 };
 
-export type ReturnsStackParamList = ReturnsParamList & NestingReturnParamList & SelectParamList;
+export type ReturnsStackParamList = ReturnsParamList & NestingReturnParamList;
 
 export type RoutesParamList = {
   RouteList: undefined;
@@ -46,7 +43,7 @@ export type RoutesParamList = {
   RouteDetails: { routeId: string; id: string };
 };
 
-export type RoutesStackParamList = RoutesParamList & NestingOrderParamList & NestingReturnParamList & SelectParamList;
+export type RoutesStackParamList = RoutesParamList & NestingOrderParamList & NestingReturnParamList;
 
 export type MapStackParamList = {
   MapGeoView: undefined;

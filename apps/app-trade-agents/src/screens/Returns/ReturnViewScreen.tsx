@@ -1,5 +1,6 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useLayoutEffect } from 'react';
+import { Text, View, FlatList } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -14,37 +15,40 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IconButton } from 'react-native-paper';
-
 import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 
+import { getStatusColor } from '../../utils/constants';
+
 import ReturnItem from './components/ReturnItem';
 
 const ReturnViewScreen = () => {
-  const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.id;
-  const routeBack = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params?.routeBack;
-
-  const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const ref = useRef<FlatList<IReturnLine>>(null);
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
+  const { id, routeBack } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
+
+  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
+
+  const isBlocked = returnDoc?.status !== 'DRAFT';
 
   const handleAddReturnLine = useCallback(() => {
     navigation.navigate('SelectItemReturn', {
       docId: id,
       name: 'good',
     });
-  }, [navigation, id]);
+  }, [id, navigation]);
 
   const handleDelete = useCallback(() => {
-    if (id) {
-      dispatch(documentActions.deleteDocument(id));
-      navigation.goBack();
+    if (!id) {
+      return;
     }
+
+    dispatch(documentActions.deleteDocument(id));
+    navigation.goBack();
   }, [dispatch, id, navigation]);
 
   const handleEditReturnHead = useCallback(() => {
@@ -62,7 +66,7 @@ const ReturnViewScreen = () => {
         onPress: handleEditReturnHead,
       },
       {
-        title: 'Удалить заявку',
+        title: 'Удалить возврат',
         type: 'destructive',
         onPress: handleDelete,
       },
@@ -75,27 +79,21 @@ const ReturnViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () =>
-        routeBack ? (
-          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
-        ) : (
-          <BackButton />
+      headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
+      headerRight: () =>
+        !isBlocked && (
+          <View style={styles.buttons}>
+            <MenuButton actionsMenu={actionsMenu} />
+            <AddButton onPress={handleAddReturnLine} />
+          </View>
         ),
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
-          <AddButton onPress={handleAddReturnLine} />
-        </View>
-      ),
     });
-  }, [navigation, handleAddReturnLine, routeBack, actionsMenu]);
-
-  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
+  }, [navigation, handleAddReturnLine, routeBack, actionsMenu, isBlocked]);
 
   if (!returnDoc) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Заказ не найден</SubTitle>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
       </View>
     );
   }
@@ -104,16 +102,15 @@ const ReturnViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <TouchableOpacity onPress={handleEditReturnHead}>
-        <InfoBlock colorLabel="#3914AF" title={returnDoc?.head.outlet.name}>
-          <>
-            <Text>{returnDoc.number}</Text>
-            <Text>{getDateString(returnDoc.documentDate)}</Text>
-          </>
-        </InfoBlock>
-      </TouchableOpacity>
+      <InfoBlock
+        colorLabel={getStatusColor(returnDoc?.status || 'DRAFT')}
+        title={returnDoc?.head.outlet.name}
+        onPress={handleEditReturnHead}
+        disabled={isBlocked}
+      >
+        <Text>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
+      </InfoBlock>
       <FlatList
-        ref={ref}
         data={returnDoc.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}

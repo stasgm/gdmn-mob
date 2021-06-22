@@ -7,14 +7,7 @@ import { IApiConfig } from '@lib/client-types';
 
 import { CompaniesScreen, SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens';
 
-type AuthStackParamList = {
-  Connection: undefined;
-  Splash: undefined;
-  Login: undefined;
-  Config: undefined;
-  Activation: undefined;
-  Company: undefined;
-};
+import { AuthStackParamList } from './types';
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
 

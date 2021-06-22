@@ -1,9 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import RouteListScreen from '../../screens/Routes/RouteListScreen';
-import RouteViewScreen from '../../screens/Routes/RouteViewScreen';
-import RouteDetailScreen from '../../screens/Routes/RouteDetailScreen';
+import { RouteViewScreen, RouteListScreen, RouteDetailScreen } from '../../screens/Routes/';
 
 import {
   OrderEditScreen,
@@ -13,11 +11,11 @@ import {
   SelectGroupScreen,
 } from '../../screens/Orders';
 
-import { ReturnLineScreen, ReturnViewScreen, ReturnEditScreen } from '../../screens/Returns';
+import { ReturnLineScreen, ReturnViewScreen, ReturnEditScreen, SelectItemScreen } from '../../screens/Returns';
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
-import { RoutesStackParamList, NestingOrderParamList, NestingReturnParamList, SelectParamList } from './types';
+import { RoutesStackParamList, NestingOrderParamList, NestingReturnParamList } from './types';
 
 const Stack = createStackNavigator<RoutesStackParamList>();
 
@@ -42,6 +40,10 @@ const orderScreens = [
     name: 'SelectGoodItem',
     component: SelectGoodScreen,
   },
+  {
+    name: 'SelectRefItem',
+    component: SelectRefItemScreen,
+  },
 ];
 
 const returnScreens = [
@@ -59,14 +61,7 @@ const returnScreens = [
   },
   {
     name: 'SelectItemReturn',
-    component: SelectRefItemScreen,
-  },
-];
-
-const selectItemRefScreens = [
-  {
-    name: 'SelectRefItem',
-    component: SelectRefItemScreen,
+    component: SelectItemScreen,
   },
 ];
 
@@ -74,8 +69,7 @@ const RoutesNavigator = () => {
   return (
     <Stack.Navigator
       initialRouteName="RouteList"
-      screenOptions={{ headerShown: true, headerBackTitleVisible: false, title: 'Маршруты' }}
-    >
+      screenOptions={{ headerShown: true, headerBackTitleVisible: false, title: 'Маршруты' }}>
       <Stack.Screen name="RouteList" component={RouteListScreen} />
       <Stack.Screen name="RouteView" component={RouteViewScreen} />
       <Stack.Screen name="RouteDetails" component={RouteDetailScreen} options={{ title: 'Визит' }} />
@@ -93,14 +87,6 @@ const RoutesNavigator = () => {
           name={screen.name as keyof NestingReturnParamList}
           component={screen.component}
           options={{ title: 'Возврат' }}
-        />
-      ))}
-      {selectItemRefScreens.map((screen) => (
-        <Stack.Screen
-          key={screen.name}
-          name={screen.name as keyof SelectParamList}
-          component={screen.component}
-          options={{ title: 'Поиск' }}
         />
       ))}
     </Stack.Navigator>

@@ -1,6 +1,7 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { Text, View, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback, useLayoutEffect } from 'react';
+import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
@@ -14,24 +15,25 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IconButton } from 'react-native-paper';
-
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
+import { getStatusColor } from '../../utils/constants';
+
 import OrderItem from './components/OrderItem';
 
 const OrderViewScreen = () => {
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
-  const routeBack = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeBack;
-
-  const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const ref = useRef<FlatList<IOrderLine>>(null);
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
+  const { id, routeBack } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
+
+  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+
+  const isBlocked = order?.status !== 'DRAFT';
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {
@@ -44,10 +46,12 @@ const OrderViewScreen = () => {
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
-    if (id) {
-      dispatch(documentActions.deleteDocument(id));
-      navigation.goBack();
+    if (!id) {
+      return;
     }
+
+    dispatch(documentActions.deleteDocument(id));
+    navigation.goBack();
   }, [dispatch, id, navigation]);
 
   const actionsMenu = useCallback(() => {
@@ -74,27 +78,21 @@ const OrderViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () =>
-        routeBack ? (
-          <IconButton icon="chevron-left" onPress={() => navigation.navigate(routeBack)} size={30} />
-        ) : (
-          <BackButton />
+      headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
+      headerRight: () =>
+        !isBlocked && (
+          <View style={styles.buttons}>
+            <MenuButton actionsMenu={actionsMenu} />
+            <AddButton onPress={handleAddOrderLine} />
+          </View>
         ),
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
-          <AddButton onPress={handleAddOrderLine} />
-        </View>
-      ),
     });
-  }, [navigation, handleAddOrderLine, actionsMenu, routeBack]);
-
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  }, [navigation, handleAddOrderLine, actionsMenu, routeBack, isBlocked]);
 
   if (!order) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Заказ не найден</SubTitle>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
       </View>
     );
   }
@@ -103,16 +101,17 @@ const OrderViewScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <TouchableOpacity onPress={handleEditOrderHead}>
-        <InfoBlock colorLabel="#4479D4" title={order?.head.outlet.name}>
-          <>
-            <Text>{order.number}</Text>
-            <Text>{getDateString(order.head.onDate)}</Text>
-          </>
-        </InfoBlock>
-      </TouchableOpacity>
+      <InfoBlock
+        colorLabel={getStatusColor(order?.status || 'DRAFT')}
+        title={order?.head.outlet.name}
+        onPress={handleEditOrderHead}
+        disabled={!['DRAFT', 'READY'].includes(order.status)}
+      >
+        <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+          order.head?.onDate,
+        )}`}</Text>
+      </InfoBlock>
       <FlatList
-        ref={ref}
         data={order.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}

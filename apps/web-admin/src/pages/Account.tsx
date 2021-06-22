@@ -28,13 +28,14 @@ const Account = () => {
     async (id: string) => {
       if (account?.id) {
         const res = await dispatch(actions.fetchUserById(id));
+
         if (res.type === 'USER/FETCH_USER_SUCCCES') {
           console.log('res.payload', res.payload);
           setUser(res.payload);
         }
       }
     },
-    [account?.id, dispatch],
+    [dispatch, account?.id],
   );
 
   useEffect(() => {

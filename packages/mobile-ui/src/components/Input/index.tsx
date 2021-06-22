@@ -13,6 +13,7 @@ interface Props {
   spellCheck?: boolean;
   maxLength?: number;
   autoCorrect?: boolean;
+  required?: boolaen;
   keyboardType?:
     | 'default'
     | 'email-address'
@@ -29,6 +30,7 @@ interface Props {
     | 'web-search'
     | undefined;
   editable?: boolean;
+  disabled?: boolean;
 }
 
 const Input: React.FC<Props> = ({
@@ -42,6 +44,8 @@ const Input: React.FC<Props> = ({
   keyboardType,
   returnKeyType,
   editable,
+  disabled,
+  required,
 }) => {
   const { colors } = useTheme();
 
@@ -64,11 +68,12 @@ const Input: React.FC<Props> = ({
           returnKeyType={returnKeyType}
           keyboardType={keyboardType}
           autoCorrect={autoCorrect}
-          style={styles.input}
+          style={[styles.input]}
           maxLength={maxLength}
           placeholderTextColor={colors.text}
           secureTextEntry={secureText}
           spellCheck={spellCheck}
+          disabled={disabled}
           editable={editable}
         />
       </View>

@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions } from '@lib/store';
-import { globalStyles as styles, BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
+import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 import { INamedEntity } from '@lib/types';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -164,7 +164,7 @@ const Visit = ({
           {dateEnd ? (
             <Text>{visitTextEnd}</Text>
           ) : (
-            <View style={styles.flexGrow}>
+            <View>
               <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
                 {orderText}
               </PrimeButton>

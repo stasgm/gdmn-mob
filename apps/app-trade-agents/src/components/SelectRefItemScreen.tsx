@@ -1,3 +1,12 @@
+import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
+import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
+import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+
+import { INamedEntity, IReference } from '@lib/types';
+import { refSelectors } from '@lib/store';
+
 import {
   AppScreen,
   BackButton,
@@ -7,27 +16,20 @@ import {
   SubTitle,
   globalStyles as styles,
 } from '@lib/mobile-ui';
-import { INamedEntity, IReference } from '@lib/types';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
-
-import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
-import { refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../store';
 import { appActions } from '../store/app/actions';
 import { IOutlet } from '../store/docs/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
-import { RoutesStackParamList } from '../navigation/Root/types';
+import { OrdersStackParamList, ReturnsStackParamList } from '../navigation/Root/types';
 
 const SelectRefItemScreen = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<StackNavigationProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>();
   const dispatch = useDispatch();
-
   const { refName, isMulti, fieldName, value, clause } =
-    useRoute<RouteProp<RoutesStackParamList, 'SelectRefItem'>>().params;
+    useRoute<RouteProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName(refName) as IReference<INamedEntity>;
 
@@ -47,7 +49,7 @@ const SelectRefItemScreen = () => {
       });
     }
     return refObj?.data;
-  }, [clause, refName, refObj?.data]);
+  }, [clause]);
 
   const title = refObj?.name;
 
@@ -99,10 +101,10 @@ const SelectRefItemScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: INamedEntity }) => {
-      const isChecked = !!(checkedItem as INamedEntity[])?.find((i) => i.id === item.id);
+      const isChecked = !!checkedItem?.find((i) => i.id === item.id);
       return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
     },
-    [checkedItem, handleSelectItem],
+    [handleSelectItem],
   );
 
   useLayoutEffect(() => {

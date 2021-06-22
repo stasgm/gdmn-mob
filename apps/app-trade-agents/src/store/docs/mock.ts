@@ -1018,7 +1018,7 @@ const packageGoodMock: IPackageGood[] = [
   {
     id: '147012244',
     good: goodMock[38],
-    package: packageMock[2], //{ id: '147012082', name: '10' },
+    package: packageMock[3], //{ id: '147012082', name: '10' },
   },
   {
     id: '147012246',
@@ -1058,7 +1058,7 @@ const packageGoodMock: IPackageGood[] = [
   {
     id: '147012260',
     good: goodMock[31],
-    package: packageMock[23],
+    package: packageMock[24],
   },
   {
     id: '147012262',
@@ -1071,9 +1071,9 @@ const packageGoodMock: IPackageGood[] = [
     package: packageMock[27],
   },
   {
-    id: '147012264',
-    good: goodMock[4],
-    package: packageMock[27],
+    id: '147012265',
+    good: goodMock[5],
+    package: packageMock[28],
   },
 ];
 
@@ -1230,6 +1230,22 @@ const routeMock: IRouteDocument[] = [
 
 const route1 = { id: routeMock[0].id, name: routeMock[0].documentDate };
 
+const departmetsMock: IDepartment[] = [
+  { id: '147012303', name: 'Склад №1' },
+  { id: '147012304', name: 'Склад №2' },
+  { id: '147012305', name: 'Склад №3' },
+];
+
+const deprt1 = departmetsMock[0];
+const deprt2 = departmetsMock[1];
+const deprt3 = departmetsMock[2];
+
+const departmentRefMock: IReference<INamedEntity> = {
+  id: '666',
+  name: 'Подразделения',
+  data: departmetsMock,
+};
+
 // Документ Order
 const orderMock: IOrderDocument[] = [
   {
@@ -1289,6 +1305,7 @@ const orderMock: IOrderDocument[] = [
     head: {
       contact: contact3,
       outlet: outlet6,
+      depart: deprt1,
       onDate: '2021-06-03',
     },
     lines: [
@@ -1311,22 +1328,6 @@ const orderMock: IOrderDocument[] = [
     lines: [],
   },
 ];
-
-const departmetsMock: IDepartment[] = [
-  { id: '147012303', name: 'Склад №1' },
-  { id: '147012304', name: 'Склад №2' },
-  { id: '147012305', name: 'Склад №3' },
-];
-
-const deprt1 = departmetsMock[0];
-const deprt2 = departmetsMock[1];
-const deprt3 = departmetsMock[2];
-
-const departmentRefMock: IReference<INamedEntity> = {
-  id: '666',
-  name: 'Подразделения',
-  data: departmetsMock,
-};
 
 // Документ Return
 const returnDocMock: IReturnDocument[] = [
@@ -1355,7 +1356,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'SENT',
     head: {
       contact: contact1,
-      outlet: outlet4,
+      outlet: outlet3,
       depart: deprt2,
       reason: 'Брак',
     },
@@ -1372,7 +1373,7 @@ const returnDocMock: IReturnDocument[] = [
     status: 'PROCESSED',
     head: {
       contact: contact1,
-      outlet: outlet5,
+      outlet: outlet2,
       depart: deprt3,
       reason: 'Брак',
     },

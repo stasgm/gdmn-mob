@@ -31,6 +31,7 @@ interface IServer {
 }
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
+// export type KoaApp = Koa;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();
@@ -63,8 +64,8 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
   app
-    .use(helmet())
     .use(errorHandler)
+    .use(helmet())
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(koaConfig, app))
     .use(
@@ -75,7 +76,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         enableTypes: ['json', 'form', 'text'],
       }),
     )
-    // .use(errorHandler)
     .use(passport.initialize())
     .use(passport.session())
     .use(

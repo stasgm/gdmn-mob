@@ -17,7 +17,7 @@ export async function initEnvironment(): Promise<void> {
 
 export async function cleanUp(): Promise<void> {
   const dir = `${testDb.path}\\.${testDb.name}`;
-  fs.rmdir(dir, { recursive: true }, (err) => {
+  fs.rm(dir, { recursive: true }, (err) => {
     if (err) {
       throw err;
     }

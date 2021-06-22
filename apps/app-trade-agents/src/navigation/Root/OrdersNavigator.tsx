@@ -12,7 +12,7 @@ import {
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
-import { NestingOrderParamList, OrdersStackParamList, SelectParamList } from './types';
+import { NestingOrderParamList, OrdersStackParamList } from './types';
 
 const Stack = createStackNavigator<OrdersStackParamList>();
 
@@ -38,7 +38,7 @@ const orderScreens = [
     component: SelectGoodScreen,
   },
   {
-    name: 'SelectRefItemOrder',
+    name: 'SelectRefItem',
     component: SelectRefItemScreen,
   },
 ];
@@ -50,7 +50,7 @@ const OrdersNavigator = () => {
       {orderScreens.map((screen) => (
         <Stack.Screen
           key={screen.name}
-          name={screen.name as keyof NestingOrderParamList | keyof SelectParamList}
+          name={screen.name as keyof NestingOrderParamList}
           component={screen.component}
         />
       ))}

@@ -16,27 +16,27 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
   const db = getDb();
   const { deviceBindings, users, devices } = db;
 
-  const user = await users.find(deviceBinding.userId);
+  const user = await users.find(deviceBinding.user.id);
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
   }
 
-  const device = await devices.find(deviceBinding.deviceId);
+  const device = await devices.find(deviceBinding.device.id);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  if (await deviceBindings.find((i) => i.deviceId === deviceBinding.deviceId && i.userId === deviceBinding.userId)) {
+  if (await deviceBindings.find((i) => i.deviceId === deviceBinding.device.id && i.userId === deviceBinding.user.id)) {
     throw new ConflictException('Данное устройство уже добавлено пользователю');
   }
 
   const newDeviceBinding: IDBDeviceBinding = {
     id: '',
     state: 'NEW',
-    deviceId: deviceBinding.deviceId,
-    userId: deviceBinding.userId,
+    deviceId: deviceBinding.device.id,
+    userId: deviceBinding.user.id,
   };
 
   const createdDeviceBinding = await deviceBindings.find(await deviceBindings.insert(newDeviceBinding));

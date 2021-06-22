@@ -2,15 +2,17 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, TouchableHighlight } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IRouteDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';
 import { getDateString } from '../../../utils/helpers';
+import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 const RouteListItem = ({ item }: { item: IRouteDocument }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteList'>>();
 
   const todayStr = new Date(item.documentDate).getDate() === new Date().getDate() ? ' (сегодня)' : '';
 

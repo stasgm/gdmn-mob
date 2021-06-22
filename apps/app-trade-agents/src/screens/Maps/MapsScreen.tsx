@@ -177,9 +177,6 @@ const MapScreen = () => {
 
   return (
     <View style={localStyles.containerMap}>
-      <View>
-        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-      </View>
       {loading && (
         <View style={localStyles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />
@@ -216,9 +213,11 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      <View>
-        <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-      </View>
+      {currentPoint ? (
+        <View style={localStyles.statusContainer}>
+          <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
+        </View>
+      ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />

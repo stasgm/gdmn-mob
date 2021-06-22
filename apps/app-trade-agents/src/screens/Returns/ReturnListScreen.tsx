@@ -1,8 +1,9 @@
-import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   useActionSheet,
@@ -17,17 +18,18 @@ import {
 
 import { IReturnDocument } from '../../store/docs/types';
 
+import { ReturnsStackParamList } from '../../navigation/Root/types';
+
 import ReturnListItem from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
+  const showActionSheet = useActionSheet();
+
   const { loading } = useSelector((state) => state.documents);
   const list = docSelectors.selectByDocType('return') as IReturnDocument[];
 
   const [status, setStatus] = useState<Status>('all');
-
-  const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
 
   const filteredList = useMemo(() => {
     if (status === 'all') {
@@ -49,10 +51,6 @@ const ReturnListScreen = () => {
     navigation.navigate('ReturnEdit');
   }, [navigation]);
 
-  const handleDelete = useCallback(() => {
-    dispatch(documentActions.deleteDocuments());
-  }, [dispatch]);
-
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -60,16 +58,11 @@ const ReturnListScreen = () => {
         onPress: handleAddDocument,
       },
       {
-        title: 'Удалить все',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocument, handleDelete]);
+  }, [showActionSheet, handleAddDocument]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -83,13 +76,10 @@ const ReturnListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const ref = useRef<FlatList<IReturnDocument>>(null);
-
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
       <FlatList
-        ref={ref}
         data={filteredList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}

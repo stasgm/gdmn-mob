@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -14,10 +16,10 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { Divider } from 'react-native-paper';
+import { IReference } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IReturnDocument } from '../../store/docs/types';
+import { IOutlet, IReturnDocument } from '../../store/docs/types';
 
 import { useDispatch, useSelector } from '../../store';
 import { appActions } from '../../store/app/actions';
@@ -26,13 +28,11 @@ import { IReturnFormParam } from '../../store/app/types';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnEdit'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
   const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
-
-  // const [statusId, setStatusId] = useState('DRAFT');
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -41,10 +41,9 @@ const ReturnEditScreen = () => {
     outlet: docOutlet,
     number: docNumber,
     documentDate: docDocumentDate,
-    depart: docDepart,
     reason: docReason,
-    road: docRoad,
     status: docStatus,
+    route: docRoute,
   } = useMemo(() => {
     return formParams as IReturnFormParam;
   }, [formParams]);
@@ -56,9 +55,35 @@ const ReturnEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    // setStatusId(returnDoc?.status || 'DRAFT');
+  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
+    (e) => e.id === docOutlet?.id,
+  );
 
+  useEffect(() => {
+    if (!docContact && !!docOutlet) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['contact']: outlet?.company,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docContact, outlet?.company]);
+
+  useEffect(() => {
+    if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['outlet']: undefined,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docContact?.id, outlet?.company.id]);
+
+  useEffect(() => {
     // Инициализируем параметры
     if (returnDoc) {
       dispatch(
@@ -68,7 +93,7 @@ const ReturnEditScreen = () => {
           outlet: returnDoc.head.outlet,
           depart: returnDoc.head.depart,
           reason: returnDoc.head.reason,
-          road: returnDoc.head.road,
+          route: returnDoc.head.route,
           documentDate: returnDoc.documentDate,
           status: returnDoc.status,
         }),
@@ -87,7 +112,7 @@ const ReturnEditScreen = () => {
 
   const handleSave = useCallback(() => {
     if (!(docNumber && docContact && docOutlet && docReason && docDocumentDate)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
@@ -102,9 +127,7 @@ const ReturnEditScreen = () => {
         head: {
           contact: docContact,
           outlet: docOutlet,
-          depart: docDepart,
           reason: docReason,
-          road: docRoad,
         },
         lines: [],
         creationDate: new Date().toISOString(),
@@ -130,9 +153,7 @@ const ReturnEditScreen = () => {
           ...returnDoc.head,
           contact: docContact,
           outlet: docOutlet,
-          depart: docDepart,
           reason: docReason,
-          road: docRoad,
         },
         lines: returnDoc.lines,
         creationDate: returnDoc.creationDate || new Date().toISOString(),
@@ -143,32 +164,18 @@ const ReturnEditScreen = () => {
 
       navigation.navigate('ReturnView', { id });
     }
-  }, [
-    docNumber,
-    docContact,
-    docOutlet,
-    docDocumentDate,
-    id,
-    navigation,
-    docDepart,
-    docReason,
-    docRoad,
-    docDispatch,
-    returnDoc,
-    docStatus,
-  ]);
+  }, [docNumber, docContact, docOutlet, docDocumentDate, id, navigation, docReason, docDispatch, returnDoc, docStatus]);
+
+  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => <SaveButton onPress={handleSave} />,
+      headerRight: () => ['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && <SaveButton onPress={handleSave} />,
     });
-  }, [dispatch, handleSave, navigation]);
+  }, [dispatch, docStatus, handleSave, isBlocked, navigation]);
 
-  const isBlocked = docStatus !== 'DRAFT';
-
-  const statusName =
-    id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
   const handlePresentContact = () => {
     if (isBlocked) {
@@ -202,30 +209,18 @@ const ReturnEditScreen = () => {
     });
   };
 
-  const handlePresentDepart = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'department',
-      fieldName: 'depart',
-      value: docDepart && [docDepart],
-    });
-  };
-
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {(docStatus === 'DRAFT' || docStatus === 'READY') && (
+        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
-                // disabled={id === undefined}
+                // disabled={isBlocked}
                 onValueChange={() => {
                   dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
                 }}
@@ -237,16 +232,20 @@ const ReturnEditScreen = () => {
           label="Номер документа"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          editable={!isBlocked}
+          disabled={isBlocked}
         />
-        <SelectableInput label="Организация" value={docContact?.name} onPress={handlePresentContact} />
-        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
-        {/* <SelectableInput label="Подразделение" value={docDepart?.name} onPress={handlePresentDepart} /> */}
+        <SelectableInput
+          label="Организация"
+          value={docContact?.name}
+          onPress={handlePresentContact}
+          disabled={isBlocked}
+        />
+        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
         <Input
           label="Причина возврата"
           value={docReason}
           onChangeText={(text) => dispatch(appActions.setFormParams({ reason: text }))}
-          editable={!isBlocked}
+          disabled={!['DRAFT', 'READY'].includes(docStatus || 'DRAFT')}
         />
       </ScrollView>
     </AppInputScreen>

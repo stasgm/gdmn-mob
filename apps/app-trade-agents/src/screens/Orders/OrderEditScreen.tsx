@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, useDispatch as useDocDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -17,8 +17,10 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { IReference } from '@lib/types';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument } from '../../store/docs/types';
+import { IOrderDocument, IOutlet } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
 import { useDispatch, useSelector } from '../../store';
@@ -34,17 +36,17 @@ const OrderEditScreen = () => {
 
   const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
 
-  // const [statusId, setStatusId] = useState(order?.status || 'DRAFT');
-
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
   const {
     contact: docContact,
     outlet: docOutlet,
+    depart: docDepart,
     number: docNumber,
     documentDate: docDocumentDate,
     onDate: docOnDate,
     status: docStatus,
+    route: docRoute,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
@@ -56,9 +58,35 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    //setStatusId(order?.status || 'DRAFT');
+  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
+    (e) => e.id === docOutlet?.id,
+  );
 
+  useEffect(() => {
+    if (!docContact && !!docOutlet) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['contact']: outlet?.company,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docOutlet, outlet?.company]);
+
+  useEffect(() => {
+    if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['outlet']: undefined,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docContact?.id, outlet?.company.id]);
+
+  useEffect(() => {
     // Инициализируем параметры
     if (order) {
       dispatch(
@@ -69,6 +97,8 @@ const OrderEditScreen = () => {
           onDate: order.head.onDate,
           documentDate: order.documentDate,
           status: order.status,
+          route: order.head.route,
+          depart: order.head.depart,
         }),
       );
     } else {
@@ -128,6 +158,7 @@ const OrderEditScreen = () => {
           contact: docContact,
           outlet: docOutlet,
           onDate: docOnDate,
+          depart: docDepart,
         },
         lines: order.lines,
         creationDate: order.creationDate || new Date().toISOString(),
@@ -139,7 +170,19 @@ const OrderEditScreen = () => {
     }
 
     // navigation.navigate('OrderView', { id: docId, routeBack: 'OrderList' });
-  }, [docNumber, docContact, docOutlet, docOnDate, docDocumentDate, id, navigation, docDispatch, order, docStatus]);
+  }, [
+    docNumber,
+    docContact,
+    docDepart,
+    docOutlet,
+    docOnDate,
+    docDocumentDate,
+    id,
+    navigation,
+    docDispatch,
+    order,
+    docStatus,
+  ]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -148,24 +191,24 @@ const OrderEditScreen = () => {
     });
   }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = docStatus !== 'DRAFT';
+  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 
-  const statusName =
-    id !== undefined ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
-  //---Окно календаря для выбора даты---
+  // Окно календаря для выбора даты
   const [showOnDate, setShowOnDate] = useState(false);
 
   const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
     //Закрываем календарь и записываем выбранную дату
     setShowOnDate(false);
+
     if (selectedOnDate) {
       dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
     }
   };
 
   const handlePresentOnDate = () => {
-    if (isBlocked) {
+    if (docStatus !== 'DRAFT') {
       return;
     }
 
@@ -175,6 +218,12 @@ const OrderEditScreen = () => {
   const handlePresentContact = () => {
     if (isBlocked) {
       return;
+    }
+
+    if (docRoute) {
+      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
+        { text: 'OK' },
+      ]);
     }
 
     navigation.navigate('SelectRefItem', {
@@ -187,6 +236,12 @@ const OrderEditScreen = () => {
   const handlePresentOutlet = () => {
     if (isBlocked) {
       return;
+    }
+
+    if (docRoute) {
+      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
+        { text: 'OK' },
+      ]);
     }
 
     //TODO: если изменился контакт, то и магазин должен обнулиться
@@ -204,18 +259,30 @@ const OrderEditScreen = () => {
     });
   };
 
+  const handlePresentDepart = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'department',
+      fieldName: 'depart',
+      value: docDepart && [docDepart],
+    });
+  };
+
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {(docStatus === 'DRAFT' || docStatus === 'READY') && (
+        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
-                // disabled={id === undefined}
+                // disabled={isBlocked}
                 onValueChange={() => {
                   dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
                 }}
@@ -227,23 +294,34 @@ const OrderEditScreen = () => {
           label="Номер документа"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          editable={!isBlocked}
+          disabled={isBlocked}
         />
-        <SelectableInput label="Дата отгрузки" value={getDateString(docOnDate || '')} onPress={handlePresentOnDate} />
+        <SelectableInput
+          label="Дата отгрузки"
+          value={getDateString(docOnDate || '')}
+          onPress={handlePresentOnDate}
+          disabled={docStatus !== 'DRAFT'}
+        />
         <SelectableInput
           label="Организация"
           placeholder="Выберите покупателя..."
           value={docContact?.name}
           onPress={handlePresentContact}
+          disabled={isBlocked}
         />
-        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} />
+        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
+        <SelectableInput
+          label="Склад-магазин"
+          value={docDepart?.name}
+          onPress={handlePresentDepart}
+          disabled={isBlocked}
+        />
       </ScrollView>
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
           value={new Date(docOnDate || '')}
           mode="date"
-          // is24Hour={true}
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}
         />

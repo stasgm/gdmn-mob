@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Торговый представитель",
     "slug": "gdmn-sales-representative",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -30,12 +30,11 @@
     },
     "android": {
       "package": "com.gsbelarus.salesrepresentative",
-      "versionCode": 3,
-      "config": {
-        "googleMaps": {
-          "apiKey": "${process.env.GOOGLE_API_KEY}"
-        }
-      }
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "versionCode": 10
     }
   }
 }
