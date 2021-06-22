@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ItemSeparator, NumberInput, PrimeButton } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -29,6 +29,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const { docId, mode } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
+  const [isNumberKeyboardVisible, setNumberKeyboardVisible] = useState(false);
   // const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
@@ -84,23 +85,35 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
 
   return (
     <>
-      <ScrollView>
-        <View style={[styles.content]}>
-          <View style={[styles.item]}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={[styles.number, styles.field]}>{item ? item.good.name || 'товар не найден' : ''}</Text>
-            </View>
+      <ScrollView contentContainerStyle={[styles.content]}>
+        <View style={[styles.item]}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Наименование</Text>
+            <Text style={[styles.number, styles.field]}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
-            </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Цена</Text>
+            <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
+        </View>
+        <ItemSeparator />
+        <NumberInput
+          isKeyboardVisible={isNumberKeyboardVisible}
+          value={goodQty}
+          label="Количество"
+          setValue={handelQuantityChange}
+          visibleOperation={true}
+          handlePress={() => {
+            //Keyboard.dismiss();
+            setIsVisiblePackages(false);
+            setNumberKeyboardVisible(!isNumberKeyboardVisible);
+          }}
+          //position={positionNK}
+        />
+        {/*<View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
               <TextInput
@@ -114,45 +127,49 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                 value={goodQty}
               />
             </View>
+          </View>*/}
+        <ItemSeparator />
+        <TouchableOpacity
+          style={styles.item}
+          onPress={() => {
+            setIsVisiblePackages(!isVisiblePackages);
+            setNumberKeyboardVisible(false);
+          }}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Упаковка</Text>
+            <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-            </View>
-            <MaterialCommunityIcons
-              name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
-          {isVisiblePackages && (
-            <View>
-              {packages.length > 0 ? (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === pack?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              ) : (
-                <Text style={localStyles.text}>Для данного товара нет</Text>
-              )}
-            </View>
-          )}
-          <ItemSeparator />
-        </View>
+          <MaterialCommunityIcons
+            name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
+            size={24}
+            color="black"
+          />
+        </TouchableOpacity>
+        {isVisiblePackages && (
+          <View>
+            {packages.length > 0 ? (
+              <View style={localStyles.packages}>
+                {packages.map((elem) => (
+                  <Checkbox
+                    key={elem.package.id}
+                    title={elem.package.name}
+                    selected={elem.package.id === pack?.id}
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <Text style={localStyles.text}>Для данного товара нет</Text>
+            )}
+          </View>
+        )}
+        <ItemSeparator />
       </ScrollView>
-      {mode ? (
+      {!isNumberKeyboardVisible && mode && (
         <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
           Удалить позицию
         </PrimeButton>
-      ) : null}
+      )}
     </>
   );
 };

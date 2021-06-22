@@ -5,7 +5,7 @@ import { IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert, Keyboard } from 'react-native';
+import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
 
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
@@ -25,8 +25,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
   const [goodQty, setGoodQty] = useState<string>(item.quantity.toString());
   //const isFocused = useIsFocused();
   const [isNumberKeyboardVisible, setNumberKeyboardVisible] = useState(false);
-  const [positionNK, setPositionNK] = useState(0);
-  const [height, setHeight] = useState(0);
+  //const [positionNK, setPositionNK] = useState(0);
 
   const { colors } = useTheme();
 
@@ -74,60 +73,43 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
-        <View style={[styles.content, { flex: 1 }]}>
-          <View style={[styles.item]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>Наименование</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {item ? item.good.name || 'товар не найден' : ''}
-              </Text>
-            </View>
+      <ScrollView contentContainerStyle={[styles.content]}>
+        <View style={[styles.item]}>
+          <View style={styles.details}>
+            <Text style={[styles.name, { color: colors.text }]}>Наименование</Text>
+            <Text style={[styles.number, styles.field, { color: colors.text }]}>
+              {item ? item.good.name || 'товар не найден' : ''}
+            </Text>
           </View>
-          <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{priceFSN.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View
-            style={[styles.item, { backgroundColor: colors.background }]}
-            onLayout={(obj) => {
-              setPositionNK(obj.nativeEvent.layout.y + obj.nativeEvent.layout.height);
-              setHeight(obj.nativeEvent.layout.height);
-            }}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>Количество</Text>
-              <NumberInput
-                isKeyboardVisible={isNumberKeyboardVisible}
-                value={goodQty}
-                setValue={handelQuantityChange}
-                handlePress={() => {
-                  //Keyboard.dismiss();
-                  setNumberKeyboardVisible(!isNumberKeyboardVisible);
-                }}
-                position={positionNK}
-                height={height}
-              />
-              {/*<TextInput
-                style={[styles.number, styles.field, { color: colors.text }]}
-                editable={true}
-                ref={qtyRef}
-                keyboardType="numeric"
-                onChangeText={handelQuantityChange}
-                returnKeyType="done"
-                // autoFocus={isFocused}
-                value={goodQty}
-              />*/}
-            </View>
-          </View>
-          <ItemSeparator />
         </View>
+        <ItemSeparator />
+        <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <View style={styles.details}>
+            <Text style={[styles.name, { color: colors.text }]}>Цена</Text>
+            <Text style={[styles.number, styles.field, { color: colors.text }]}>{priceFSN.toString()}</Text>
+          </View>
+        </View>
+        <ItemSeparator />
+        {/*<View
+          onLayout={(obj) => {
+            setPositionNK(obj.nativeEvent.layout.y + obj.nativeEvent.layout.height);
+          }}
+        />*/}
+        <NumberInput
+          isKeyboardVisible={isNumberKeyboardVisible}
+          value={goodQty}
+          label="Количество"
+          setValue={handelQuantityChange}
+          handlePress={() => {
+            //Keyboard.dismiss();
+            setNumberKeyboardVisible(!isNumberKeyboardVisible);
+          }}
+          //position={positionNK}
+        />
+        <ItemSeparator />
       </ScrollView>
       {!isNumberKeyboardVisible && mode && (
-        <PrimeButton icon="delete" onPress={handleDelete} outlined>
+        <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
           Удалить позицию
         </PrimeButton>
       )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
-import { useHeaderHeight } from '@react-navigation/stack';
-import { StyleSheet, View, BackHandler, useWindowDimensions, Text, TouchableOpacity } from 'react-native';
+//import { useHeaderHeight } from '@react-navigation/stack';
+import { StyleSheet, View, BackHandler, Text, TouchableOpacity } from 'react-native';
 
 import { styles as globalStyles } from '@lib/mobile-navigation/src/screens/References/styles';
 
@@ -12,7 +12,6 @@ interface IProps {
   value: string;
   isKeyboardVisible: boolean;
   position?: number;
-  height?: number;
   visibleOperation?: boolean;
   setValue: (newValue: string) => void;
   handlePress: () => void;
@@ -21,16 +20,15 @@ interface IProps {
 const NumberInput = ({
   isKeyboardVisible,
   label = '',
-  position = 0,
-  height = 0,
+  //position = 0,
   value,
-  visibleOperation,
+  visibleOperation = false,
   setValue,
   handlePress,
 }: IProps) => {
   const { colors } = useTheme();
-  const heightW = useWindowDimensions().height;
-  const headerHeight = useHeaderHeight();
+  //const height = useWindowDimensions().height;
+  //const headerHeight = useHeaderHeight();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -58,19 +56,19 @@ const NumberInput = ({
       </TouchableOpacity>
       {/*<TextInputWithIcon label={label} onPress={handlePress} isFocus={isKeyboardVisible} value={value}>
         <MaterialCommunityIcons style={styles.marginRight} size={20} color={colors.text} name="calculator-variant" />
-  </TextInputWithIcon>*/}
+      </TextInputWithIcon>*/}
       {isKeyboardVisible && (
         <View
           style={[
             {
-              top: -position,
-              height: heightW - headerHeight + height,
+              //top: -position,
+              //height: height + headerHeight,
             },
             styles.keypad,
           ]}>
           <NumberKeypad
             oldValue={value}
-            visibleOperation={visibleOperation || false}
+            visibleOperation={visibleOperation}
             handelApply={setValue}
             handelDismiss={handlePress}
           />
@@ -88,7 +86,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     position: 'absolute',
     width: '100%',
-    //zIndex: -99999,
+    bottom: 0,
+    //zIndex: 1,
   },
   marginRight: {
     alignItems: 'center',

@@ -1,6 +1,6 @@
+import React, { useState, useEffect } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { evaluate } from 'mathjs';
-import React, { useState } from 'react';
 import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { Colors } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -16,7 +16,7 @@ interface IProps {
 
 const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }: IProps) => {
   const [expression, setExpression] = useState('');
-  const [number, setNumber] = useState('');
+  const [number, setNumber] = useState(oldValue || '');
   const [firstOperation, setFirstOperation] = useState(true);
 
   const handleNumberPress = ({ value }: { value: string }) => {
@@ -66,6 +66,10 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
       setFirstOperation(true);
     }
   };
+
+  useEffect(() => {
+    !visibleOperation && handelApply(number);
+  }, [number]);
 
   const keys: IKeyProps[][] = visibleOperation
     ? [
@@ -137,6 +141,10 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
             operation: true,
           },
         ],
+        [
+          { title: 'C', onPress: () => handleClear(), operation: true },
+          { title: 'DEL', onPress: () => handleDelete(), operation: true },
+        ],
       ];
 
   return (
@@ -155,9 +163,9 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
         </View>
       )}
       <View style={styles.keypad}>
-        {keys.map((rowKeys, idx) => (
-          <View key={idx} style={styles.keypadRow}>
-            {rowKeys.map((keyProps) => (
+        {keys.map((columnKeys, idx) => (
+          <View key={idx} style={styles.keypadColumn}>
+            {columnKeys.map((keyProps) => (
               <Key key={keyProps.title} {...keyProps} />
             ))}
           </View>
@@ -172,6 +180,7 @@ export { NumberKeypad };
 const styles = StyleSheet.create({
   container: {
     height: Dimensions.get('window').height / 2.6,
+    //zIndex: 1,
   },
   currentNumber: {
     fontSize: 18,
@@ -189,13 +198,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   keypad: {
-    backgroundColor: Colors.grey300,
+    // backgroundColor: Colors.grey300,
     flex: 1,
     flexDirection: 'row',
   },
-  keypadRow: {
+  keypadColumn: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-evenly',
+    //zIndex: 1,
   },
 });
