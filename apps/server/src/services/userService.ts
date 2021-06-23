@@ -1,6 +1,11 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
-import { DataNotFoundException, InnerErrorException, ConflictException } from '../exceptions';
+import {
+  DataNotFoundException,
+  InnerErrorException,
+  ConflictException,
+  InvalidParameterException,
+} from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
 import { extraPredicate } from '../utils/helpers';
@@ -24,25 +29,30 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
-  let creator;
+  let creatorId;
+  let companies;
 
   if (newUser.creator) {
-    creator = await users.find(newUser.creator.id);
-  }
+    const creator = await users.find(newUser.creator.id);
 
-  const userCount = (await users.read()).length;
-  // TODO временно!!! первый пользователь SuperAdmin. Если создаётся пользователем то User иначе Admin
-  const role = userCount === 0 ? 'SuperAdmin' : !newUser.creator?.id ? 'Admin' : 'User';
+    creatorId = creator.id;
+    companies = creator.companies;
+
+    if (!creator.companies.length) {
+      // Нельзя создавать пользователей пока не создана администратором организация
+      throw new InvalidParameterException('Не создана организация');
+    }
+  }
 
   const passwordHash = await hashPassword(newUser.password);
 
   const newUserObj: IDBUser = {
     id: '',
     name: newUser.name,
-    companies: creator?.companies || [],
+    companies: companies || [],
     password: passwordHash,
-    role,
-    creatorId: creator?.id || '',
+    role: newUser.role,
+    creatorId: creatorId || '',
     externalId: newUser.externalId,
     firstName: newUser.firstName,
     lastName: newUser.lastName,

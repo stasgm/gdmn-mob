@@ -4,7 +4,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import bcrypt from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials, IDBDeviceBinding, IDBDevice } from '@lib/types';
+import { IUser, NewUser, IUserCredentials } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -23,18 +23,19 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
 
   if (!user) {
     throw new UnauthorizedException('Неверные данные');
-    // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
-  // const device = await devices.find((el) => el.uid === deviceId && el.userId === user.id);
-  const device = await devices.find((el) => el.uid === deviceId);
+  if (user.role === 'User') {
+    // Для пользователей с рольдю User проверяем дополнительно DeviceId
+    const device = await devices.find((el) => el.uid === deviceId);
 
-  if (!device) {
-    throw new UnauthorizedException('Связанное с пользователем Устройство не найдено');
-  }
+    if (!device) {
+      throw new UnauthorizedException('Связанное с пользователем Устройство не найдено');
+    }
 
-  if (device.state === 'BLOCKED') {
-    throw new UnauthorizedException('Устройство заблокировано');
+    if (device.state === 'BLOCKED') {
+      throw new UnauthorizedException('Устройство заблокировано');
+    }
   }
 
   return koaPassport.authenticate('local', async (err: Error, usr: IUser) => {
@@ -58,54 +59,56 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
  * @param user NewUser
  * @returns IUser
  */
-const signUp = async (user: NewUser): Promise<IUser> => {
-  const { devices, users, deviceBindings } = getDb();
+const signUp = async (user: Omit<NewUser, 'role'>): Promise<IUser> => {
+  const { users } = getDb();
 
   // Кол-во пользователей
   const userCount = (await users.read()).length;
+  // Роль нового пользователя
+  const role = userCount === 0 ? 'SuperAdmin' : 'Admin';
   // Создаём пользователя
-  const newUser = await userService.addOne(user);
+  const newUser = await userService.addOne({ ...user, role });
 
-  if (userCount === 0) {
-    // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)
-    const webDeviceId = await devices.insert({
-      name: 'WEB',
-      uid: 'WEB',
-      state: 'ACTIVE',
-      creationDate: new Date().toISOString(),
-      editionDate: new Date().toISOString(),
-    } as IDBDevice);
+  /*   if (userCount === 0) {
+      // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)
+      const webDeviceId = await devices.insert({
+        name: 'WEB',
+        uid: 'WEB',
+        state: 'ACTIVE',
+        creationDate: new Date().toISOString(),
+        editionDate: new Date().toISOString(),
+      } as IDBDevice);
 
-    // TODO временно!!!
-    // Создаём пользователя gdmn (внешняя система). В дальнейшем тоже надо создавать для каждой организации
-    const gdmnUserObj: NewUser = {
-      name: 'gdmn',
-      password: 'gdmn',
-      companies: [],
-      creationDate: new Date().toISOString(),
-      editionDate: new Date().toISOString(),
-    };
+      // TODO временно!!!
+      // Создаём пользователя gdmn (внешняя система). В дальнейшем тоже надо создавать для каждой организации
+      const gdmnUserObj: NewUser = {
+        name: 'gdmn',
+        password: 'gdmn',
+        companies: [],
+        creationDate: new Date().toISOString(),
+        editionDate: new Date().toISOString(),
+      };
 
-    const { id: gdmnUserId } = await userService.addOne(gdmnUserObj);
-    // TODO временно!!! Привязываем пользователя gdmn (внешняя система) к устройству WEB
-    // в дальнейшем будет создаваться свой DeviceId для учётной систмеы
-    await deviceBindings.insert({
-      state: 'ACTIVE',
-      deviceId: webDeviceId,
-      userId: gdmnUserId,
-    } as IDBDeviceBinding);
-  }
+      const { id: gdmnUserId } = await userService.addOne(gdmnUserObj);
+      // TODO временно!!! Привязываем пользователя gdmn (внешняя система) к устройству WEB
+      // в дальнейшем будет создаваться свой DeviceId для учётной систмеы
+      await deviceBindings.insert({
+        state: 'ACTIVE',
+        deviceId: webDeviceId,
+        userId: gdmnUserId,
+      } as IDBDeviceBinding);
+    }
 
-  const webDevice = await devices.find((e) => e.uid === 'WEB');
+    const webDevice = await devices.find((e) => e.uid === 'WEB');
 
-  if (webDevice) {
-    // Привязываем нового пользователя к устройству WEB
-    await deviceBindings.insert({
-      state: 'ACTIVE',
-      deviceId: webDevice.id,
-      userId: newUser.id,
-    } as IDBDeviceBinding);
-  }
+    if (webDevice) {
+      // Привязываем нового пользователя к устройству WEB
+      await deviceBindings.insert({
+        state: 'ACTIVE',
+        deviceId: webDevice.id,
+        userId: newUser.id,
+      } as IDBDeviceBinding);
+    } */
 
   return newUser;
 };

@@ -14,7 +14,7 @@ afterAll(async () => {
 describe('testing /api/auth/', () => {
   describe('POST /api/auth/signup', () => {
     it('should return 201 & valid response if a new user was created', async () => {
-      const response = await request(getApp().callback()).post('/api/auth/signup').query('deviceId=WEB').send({
+      const response = await request(getApp().callback()).post('/api/auth/signup').send({
         name: '5',
         password: '3',
       });

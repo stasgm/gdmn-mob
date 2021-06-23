@@ -8,23 +8,23 @@ import {
   updateDeviceBinding,
 } from '../controllers/deviceBinding';
 import { authMiddleware } from '../middleware/authRequired';
-import { deviceMiddleware } from '../middleware/deviceRequired';
+import { permissionMiddleware } from '../middleware/permissionRequired';
 
 import { deviceBindingValidation } from '../validations';
 
 const router = Router();
 
 router.prefix('/binding');
-router.post('/', deviceBindingValidation.bindingDevice, deviceMiddleware, authMiddleware, addDeviceBinding);
-router.get('/', deviceMiddleware, authMiddleware, getDeviceBindings);
-router.get('/:id', deviceBindingValidation.getDeviceBinding, deviceMiddleware, authMiddleware, getDeviceBinding);
+router.post('/', deviceBindingValidation.bindingDevice, authMiddleware, permissionMiddleware, addDeviceBinding);
+router.get('/', authMiddleware, permissionMiddleware, getDeviceBindings);
+router.get('/:id', deviceBindingValidation.getDeviceBinding, authMiddleware, permissionMiddleware, getDeviceBinding);
 router.patch(
   '/:id',
   deviceBindingValidation.updateDeviceBinding,
-  deviceMiddleware,
   authMiddleware,
+  permissionMiddleware,
   updateDeviceBinding,
 );
-router.delete('/:id', deviceMiddleware, authMiddleware, removeDeviceBinding);
+router.delete('/:id', authMiddleware, permissionMiddleware, removeDeviceBinding);
 
 export default router;

@@ -12,16 +12,9 @@ import { DataNotFoundException } from '../exceptions';
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { name } = ctx.request.body as NewDevice;
 
-  const { companies } = ctx.state.user as IUser;
-  const company = companies[0];
+  const company = (ctx.state.user as IUser)?.companies[0];
 
-  // console.log('companyId', companyId);
-
-  const device: NewDevice = { name, company };
-
-  // console.log('device', device);
-
-  const newDevice = await deviceService.addOne(device);
+  const newDevice = await deviceService.addOne({ name, company });
 
   created(ctx as Context, newDevice);
 

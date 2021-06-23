@@ -22,6 +22,7 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
     lastName,
     phoneNumber,
     email,
+    role: 'User',
     creator: { id: creator.id, name: creator.name },
   } as NewUser;
 
