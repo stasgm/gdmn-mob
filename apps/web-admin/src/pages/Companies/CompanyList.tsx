@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
 
 import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -53,20 +53,20 @@ const CompanyList = () => {
       onClick: fetchCompanies,
       icon: <CachedIcon />,
     },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Загрузить',
+    //   onClick: () => {
+    //     return;
+    //   },
+    //   icon: <ImportExportIcon />,
+    // },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Добавить',
       color: 'primary',

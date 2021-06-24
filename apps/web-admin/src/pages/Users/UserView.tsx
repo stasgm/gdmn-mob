@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { device } from '@lib/mock';
+// import { device } from '@lib/mock';
 
 import { useCallback, useEffect } from 'react';
 
@@ -22,6 +22,8 @@ import ToolBarAction from '../../components/ToolBarActions';
 import UserDetailsView from '../../components/user/UserDetailsView';
 
 import UserDevices from '../../components/user/UserDevices';
+import deviceActions from '../../store/device';
+import SnackBar from '../../components/SnackBar';
 
 const UserView = () => {
   const { id: userId } = useParams();
@@ -32,8 +34,9 @@ const UserView = () => {
 
   // const classes = useStyles();
 
-  const { loading } = useSelector((state) => state.companies);
+  const { loading, errorMessage } = useSelector((state) => state.users);
   const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
+  const devices = useSelector((state) => state.devices.list);
   // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
 
   const handleCancel = () => {
@@ -44,8 +47,13 @@ const UserView = () => {
     navigate(`/app/users/edit/${userId}`);
   };
 
+  const handleClearError = () => {
+    dispatch(actions.userActions.clearError());
+  };
+
   const handleRefresh = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
+    dispatch(deviceActions.fetchDevices(userId));
   }, [dispatch, userId]);
 
   const handleDelete = async () => {
@@ -131,8 +139,9 @@ const UserView = () => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices devices={[device]} />
+        <UserDevices devices={devices} />
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

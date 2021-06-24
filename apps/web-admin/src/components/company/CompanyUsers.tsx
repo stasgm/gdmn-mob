@@ -30,20 +30,20 @@ const CompanyUsers = ({ users }: props) => {
     //   },
     //   icon: <CachedIcon />,
     // },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Загрузить',
+    //   onClick: () => {
+    //     return;
+    //   },
+    //   icon: <ImportExportIcon />,
+    // },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -60,12 +60,10 @@ const CompanyUsers = ({ users }: props) => {
         minHeight: '100%',
       }}
     >
-      <Container maxWidth={false}>
-        <ToolbarActionsWithSearch buttons={userButtons} searchTitle={'Найти пользователя'} />
-        <Box sx={{ pt: 2 }}>
-          <UserListTable users={users} />
-        </Box>
-      </Container>
+      <ToolbarActionsWithSearch buttons={userButtons} searchTitle={'Найти пользователя'} />
+      <Box sx={{ pt: 2 }}>
+        <UserListTable users={users} />
+      </Box>
     </Box>
   );
 };

@@ -93,6 +93,8 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
         {/* <TableCell>{device.name}</TableCell> */}
         <TableCell>{device.uid}</TableCell>
         <TableCell>{device.state}</TableCell>
+        <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
     return <>{deviceList}</>;
@@ -116,6 +118,8 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
                 <TableCell>Наименование</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

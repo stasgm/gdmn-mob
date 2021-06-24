@@ -35,7 +35,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container spacing={3} item lg={8} md={6} xs={12}>
+              <Grid container spacing={3}>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}

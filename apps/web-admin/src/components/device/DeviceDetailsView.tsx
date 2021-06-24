@@ -14,7 +14,7 @@ const DeviceDetailsView = ({ device }: IProps) => {
       <CardContent>
         <Grid>
           <Grid>
-            <Grid container md={10} xs={12}>
+            <Grid container>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
                   Наименование

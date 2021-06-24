@@ -20,6 +20,8 @@ const users: IUser[] = [
     creator: superAdmin,
     companies: [company3],
     role: 'Admin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '123',
@@ -31,6 +33,8 @@ const users: IUser[] = [
     creator: superAdmin,
     companies: [],
     role: 'Admin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '345',
@@ -42,6 +46,8 @@ const users: IUser[] = [
     creator: superAdmin,
     companies: [company1],
     role: 'Admin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '12',
@@ -53,6 +59,8 @@ const users: IUser[] = [
     creator: superAdmin,
     companies: [company1],
     role: 'User',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '13',
@@ -62,8 +70,10 @@ const users: IUser[] = [
     lastName: 'Doctor',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company2, company1],
+    companies: [company2],
     role: 'User',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '14',
@@ -75,6 +85,8 @@ const users: IUser[] = [
     creator: superAdmin,
     companies: [company2],
     role: 'User',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
 ];
 

@@ -16,7 +16,7 @@ const UserDetailsView = ({ user }: IProps) => {
       <CardContent>
         <Grid>
           <Grid>
-            <Grid container md={10} xs={12}>
+            <Grid container>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
                   Пользователь
@@ -57,15 +57,15 @@ const UserDetailsView = ({ user }: IProps) => {
                   {user.phoneNumber}
                 </Typography>
               </Grid>
-              <Grid container item md={2} xs={6}>
+              <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Компании
+                  Компания
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
                 {user.companies.map((c) => (
                   <NavLink to={`/app/companies/${c.id}`} key={c.id}>
-                    <Typography color="textPrimary" variant="body1" key={c.id} gutterBottom>
+                    <Typography color="textPrimary" variant="h4" key={c.id} gutterBottom>
                       {c.name}
                     </Typography>
                   </NavLink>

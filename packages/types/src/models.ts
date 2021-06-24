@@ -31,6 +31,7 @@ export interface IDBUser extends INamedEntity, IExternalSystemProps {
 
 export interface IDBCompany extends INamedEntity, IExternalSystemProps {
   adminId: string;
+  city?: string;
 }
 
 export interface IDBDevice extends INamedEntity {
@@ -92,7 +93,7 @@ export interface ICompany extends Omit<IDBCompany, 'adminId'> {
   admin: INamedEntity;
 }
 
-export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name'>;
+export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city'>;
 
 export interface IMessageInfo {
   uid: string;

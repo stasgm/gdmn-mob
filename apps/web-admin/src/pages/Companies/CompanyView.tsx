@@ -1,4 +1,4 @@
-import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
+import { Box, CardHeader, IconButton, CircularProgress, Container, Typography } from '@material-ui/core';
 
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -26,6 +26,7 @@ import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import CompanyDetailsView from '../../components/company/CompanyDetailsView';
+import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
 const CompanyView = () => {
   const { id: companyId } = useParams();
@@ -34,15 +35,24 @@ const CompanyView = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { loading, errorMessage } = useSelector((state) => state.companies);
+  const {
+    loading: companyLoading,
+    errorMessage: companyError,
+    list: companies,
+  } = useSelector((state) => state.companies);
 
-  console.log('errorMessage', errorMessage);
+  const { loading: usersLoading, errorMessage: usersError, list: users } = useSelector((state) => state.users);
+
   //TODO Вынести в селекторы
-  const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
-  const users = useSelector((state) => state.users.list);
+  const company = companies.find((i) => i.id === companyId);
+  // const users = useSelector((state) => state.users.list);
 
-  const handleClearError = () => {
+  const handleClearCompanyError = () => {
     dispatch(actions.companyActions.clearError());
+  };
+
+  const handleClearUsersError = () => {
+    dispatch(userActions.userActions.clearError());
   };
 
   const handleCancel = () => {
@@ -80,7 +90,7 @@ const CompanyView = () => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: () => handleRefresh(),
+      onClick: handleRefresh,
       icon: <CachedIcon />,
     },
     {
@@ -89,7 +99,7 @@ const CompanyView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleEdit(),
+      onClick: handleEdit,
       icon: <EditIcon />,
     },
     {
@@ -97,7 +107,7 @@ const CompanyView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleDelete(),
+      onClick: handleDelete,
       icon: <DeleteIcon />,
     },
   ];
@@ -109,42 +119,50 @@ const CompanyView = () => {
           p: 3,
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <IconButton color="primary" onClick={handleCancel}>
-              <ArrowBackIcon />
-            </IconButton>
-            <CardHeader title={'Назад'} />
-            {loading && <CircularProgress size={40} />}
-          </Box>
+        <Container maxWidth={false}>
           <Box
             sx={{
-              justifyContent: 'right',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
-            <ToolBarAction buttons={buttons} />
+            <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
+              <IconButton color="primary" onClick={handleCancel}>
+                <ArrowBackIcon />
+              </IconButton>
+              <CardHeader title={'Назад'} />
+            </Box>
+            <Box
+              sx={{
+                justifyContent: 'right',
+              }}
+            >
+              <ToolBarAction buttons={buttons} />
+            </Box>
           </Box>
-        </Box>
-        <Box
-          sx={{
-            backgroundColor: 'background.default',
-            minHeight: '100%',
-          }}
-        >
-          <CompanyDetailsView company={company} />
-        </Box>
+
+          <Box>
+            {companyLoading ? (
+              <CircularProgressWithContent content={'Идет загрузка данных...'} />
+            ) : (
+              <Box>
+                <CompanyDetailsView company={company} />
+                <Box sx={{ pt: 2 }}>
+                  <Typography variant="h5" sx={{ mx: 2 }}>
+                    Пользователи компании
+                  </Typography>
+                  <Box sx={{ pt: 2 }}>
+                    <CompanyUsers users={users?.filter((u) => u.companies.find((c) => c.id === companyId))} />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </Container>
       </Box>
-      <Box>
-        <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users?.filter((u) => u.companies.find((c) => c.id === companyId))} />
-      </Box>
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+      <SnackBar errorMessage={companyError} onClearError={handleClearCompanyError} />
+      <SnackBar errorMessage={usersError} onClearError={handleClearUsersError} />
     </>
   );
 };

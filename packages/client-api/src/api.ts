@@ -114,7 +114,7 @@ export default new Api({
   server: name,
   debug: {
     isMock: useMockup,
-    mockDelay: 500,
+    mockDelay: 1000,
     mockDeviceId: deviceId,
   },
 });
