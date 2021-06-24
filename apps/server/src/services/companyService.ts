@@ -163,13 +163,21 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
   const companyList = await companies?.read((item) => {
     const newParams = Object.assign({}, params);
 
+    let companyIdFound = true;
+
+    if ('companyId' in newParams) {
+      companyIdFound = item.id === newParams.companyId;
+      delete newParams['companyId'];
+    }
+
+    /*
     let adminFound = true;
 
     if ('adminId' in newParams) {
-      adminFound = item.adminId?.includes(newParams.adminId);
-      delete newParams['adminId'];
+       adminFound = item.adminId?.includes(newParams.adminId);
+       delete newParams['adminId'];
     }
-
+    */
     let nameFound = true;
 
     if ('name' in newParams) {
@@ -177,7 +185,7 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
       delete newParams['name'];
     }
 
-    return adminFound && nameFound && extraPredicate(item, newParams);
+    return companyIdFound && nameFound && extraPredicate(item, newParams);
   });
 
   const pr = companyList?.map(async (i) => await makeCompany(i));

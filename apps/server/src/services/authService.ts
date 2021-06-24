@@ -12,9 +12,7 @@ import * as userService from './userService';
 import { getDb } from './dao/db';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
-  const db = getDb();
-
-  const { devices, users } = db;
+  const { devices, users } = getDb();
 
   const { deviceId } = ctx.query;
   const { name } = ctx.request.body as IUserCredentials;

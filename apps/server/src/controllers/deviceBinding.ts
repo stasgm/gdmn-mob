@@ -22,13 +22,15 @@ const addDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceBindingId } = ctx.params;
+  const { companyId } = ctx.query;
+
   const deviceBindingData = ctx.request.body as Partial<IDeviceBinding>;
 
   const params: Record<string, string> = {};
 
-  const { id: adminId } = ctx.state.user;
-
-  params.adminId = adminId;
+  if (companyId && typeof companyId === 'string') {
+    params.companyId = companyId;
+  }
 
   const updatedDeviceBinding = await deviceBindingService.updateOne(deviceBindingId, deviceBindingData, params);
 
@@ -38,15 +40,24 @@ const updateDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => 
 };
 
 const removeDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: deviceBindingId } = ctx.params;
+  const { id }: { id: string } = ctx.params;
 
-  await deviceBindingService.deleteOne({ deviceBindingId });
+  /*
+    const { companyId } = ctx.query;
+
+    const params: Record<string, string> = {};
+
+    if (companyId && typeof companyId === 'string') {
+      params.companyId = companyId;
+    } */
+
+  await deviceBindingService.deleteOne({ deviceBindingId: id });
 
   ok(ctx as Context);
 
   // TODO передавать только код 204 без body
 
-  log.info(`removeDevice: device '${deviceBindingId}' is successfully removed `);
+  log.info(`removeDevice: device '${id}' is successfully removed `);
 };
 
 const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
@@ -64,14 +75,12 @@ const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceId, userId, state } = ctx.query;
+  const { deviceId, companyId, state } = ctx.query;
 
   const params: Record<string, string> = {};
 
-  const { id: adminId } = ctx.state.user;
-
-  if (typeof userId === 'string') {
-    params.userId = userId;
+  if (companyId && typeof companyId === 'string') {
+    params.companyId = companyId;
   }
 
   if (typeof deviceId === 'string') {
@@ -80,10 +89,6 @@ const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof state === 'string') {
     params.state = state;
-  }
-
-  if (typeof adminId === 'string') {
-    params.adminId = adminId;
   }
 
   const deviceBindingList = await deviceBindingService.findAll(params);

@@ -2,7 +2,7 @@ import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { asyncFilter, extraPredicate } from '../utils/helpers';
+import { extraPredicate } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
@@ -138,9 +138,9 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
 // };
 
 const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
-  const { devices, companies } = getDb();
+  const { devices } = getDb();
 
-  let deviceList = await devices.read((item) => {
+  const deviceList = await devices.read((item) => {
     const newParams = { ...params };
 
     let companyFound = true;
@@ -164,21 +164,17 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
       delete newParams['state'];
     }
 
-    if ('adminId' in newParams) {
-      delete newParams['adminId'];
-    }
-
     return companyFound && uIdFound && stateFound && extraPredicate(item, newParams);
   });
 
-  const newParams = { ...params };
+  /*   const newParams = { ...params };
 
-  if ('adminId' in newParams) {
-    deviceList = await asyncFilter(deviceList, async (i: IDBDevice) => {
-      const company = await companies.find(i.companyId);
-      return company?.adminId === newParams.adminId;
-    });
-  }
+    if ('adminId' in newParams) {
+      deviceList = await asyncFilter(deviceList, async (i: IDBDevice) => {
+        const company = await companies.find(i.companyId);
+        return company?.adminId === newParams.adminId;
+      });
+    } */
 
   const pr = deviceList.map(async (i) => await makeDevice(i));
 

@@ -12,7 +12,14 @@ const router = Router();
 
 router.prefix('/companies');
 router.post('/', companyValidation.addCompany, authMiddleware, permissionMiddleware, addCompany);
-router.get('/:id', companyValidation.getCompany, authMiddleware, deviceMiddleware, getCompany);
+router.get(
+  '/:id',
+  companyValidation.getCompany,
+  authMiddleware,
+  deviceMiddleware,
+  roleBasedParamsMiddlware,
+  getCompany,
+);
 router.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getCompanies);
 router.patch('/:id', companyValidation.updateCompany, authMiddleware, permissionMiddleware, updateCompany);
 router.delete('/:id', companyValidation.removeCompany, authMiddleware, permissionMiddleware, removeCompany);

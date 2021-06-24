@@ -67,12 +67,6 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
 
   const params: Record<string, string> = {};
 
-  const { id: adminId } = ctx.state.user;
-
-  if (typeof adminId === 'string') {
-    params.adminId = adminId;
-  }
-
   if (companyId && typeof companyId === 'string') {
     params.companyId = companyId;
   }

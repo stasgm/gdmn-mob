@@ -81,8 +81,6 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
 
   const params: Record<string, string> = {};
 
-  const { id: adminId } = ctx.state.user;
-
   if (typeof companyId === 'string') {
     params.companyId = companyId;
   }
@@ -93,10 +91,6 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof state === 'string') {
     params.state = state;
-  }
-
-  if (typeof adminId === 'string') {
-    params.adminId = adminId;
   }
 
   const deviceList = await deviceService.findAll(params);
