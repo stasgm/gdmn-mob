@@ -158,8 +158,7 @@ const findOne = async (id: string): Promise<ICompany> => {
  * @return company[], компании
  * */
 const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => {
-  const db = getDb();
-  const { companies } = db;
+  const { companies } = getDb();
 
   const companyList = await companies?.read((item) => {
     const newParams = Object.assign({}, params);
