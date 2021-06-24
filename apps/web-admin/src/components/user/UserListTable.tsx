@@ -93,6 +93,8 @@ const UserListTable = ({ users = [], ...rest }: props) => {
         <TableCell>{user.lastName}</TableCell>
         <TableCell>{user.firstName}</TableCell>
         <TableCell>{user.phoneNumber}</TableCell>
+        <TableCell>{new Date(user.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(user.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
     return <>{userList}</>;
@@ -117,6 +119,8 @@ const UserListTable = ({ users = [], ...rest }: props) => {
                 <TableCell>Фамилия</TableCell>
                 <TableCell>Имя</TableCell>
                 <TableCell>Телефон</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

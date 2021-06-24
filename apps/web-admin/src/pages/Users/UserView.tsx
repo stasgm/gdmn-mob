@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { IDevice } from '@lib/types';
+// import { device } from '@lib/mock';
 
 import { device, device2 } from '@lib/mock';
 
@@ -24,6 +24,8 @@ import ToolBarAction from '../../components/ToolBarActions';
 import UserDetailsView from '../../components/user/UserDetailsView';
 
 import UserDevices from '../../components/user/UserDevices';
+import deviceActions from '../../store/device';
+import SnackBar from '../../components/SnackBar';
 
 interface IUserView {
   isSelectDevice?: boolean;
@@ -46,8 +48,9 @@ const UserView = (props: IUserView) => {
 
   console.log('UserView_isSelectDevice', isSelectDevice);
 
-  const { loading } = useSelector((state) => state.companies);
+  const { loading, errorMessage } = useSelector((state) => state.users);
   const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
+  const devices = useSelector((state) => state.devices.list);
   // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
 
   const handleAddDevicesClick = (value: boolean) => {
@@ -62,8 +65,13 @@ const UserView = (props: IUserView) => {
     navigate(`/app/users/edit/${userId}`);
   };
 
+  const handleClearError = () => {
+    dispatch(actions.userActions.clearError());
+  };
+
   const handleRefresh = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
+    dispatch(deviceActions.fetchDevices(userId));
   }, [dispatch, userId]);
 
   const handleDelete = async () => {
@@ -164,6 +172,7 @@ const UserView = (props: IUserView) => {
           onAddDevicesClick={handleAddDevicesClick}
         />
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

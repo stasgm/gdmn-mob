@@ -5,7 +5,7 @@ import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 
 // import CachedIcon from '@material-ui/icons/Cached';
 
-import ImportExportIcon from '@material-ui/icons/ImportExport';
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
 
 import { IDevice } from '@lib/types';
 
@@ -36,25 +36,23 @@ const UserDevices = ({ devices, handleDeviceListSave, onAddDevicesClick, sourceP
     // {
     //   name: 'Обновить',
     //   sx: { mx: 1 },
+    //   onClick: fetchDevices,
+    //   icon: <CachedIcon />,
+    // },
+    // {
+    //   name: 'Загрузить',
     //   onClick: () => {
     //     return;
     //   },
-    //   icon: <CachedIcon />,
+    //   icon: <ImportExportIcon />,
     // },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Выбрать',
       color: 'primary',

@@ -34,7 +34,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container spacing={3}>
+              <Grid container direction="column" md={6} xs={12} spacing={3}>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
@@ -48,6 +48,20 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                     type="name"
                     disabled={loading}
                     value={formik.values.name}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.city && Boolean(formik.errors.city)}
+                    fullWidth
+                    label="Город"
+                    name="city"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="city"
+                    disabled={loading}
+                    value={formik.values.city}
                   />
                 </Grid>
               </Grid>

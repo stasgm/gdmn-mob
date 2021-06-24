@@ -27,11 +27,11 @@ const fetchDeviceById = (id: string): AppThunk => {
   };
 };
 
-const fetchDevices = (): AppThunk => {
+const fetchDevices = (userId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceActions.fetchDevicesAsync.request(''));
 
-    const response = await api.device.getDevices();
+    const response = await api.device.getDevices(userId ? { userId: userId } : undefined);
 
     if (response.type === 'GET_DEVICES') {
       return dispatch(deviceActions.fetchDevicesAsync.success(response.devices));

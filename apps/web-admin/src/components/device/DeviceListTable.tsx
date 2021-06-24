@@ -136,6 +136,8 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, ...rest }: pro
         {/* <TableCell>{device.name}</TableCell> */}
         <TableCell>{device.uid}</TableCell>
         <TableCell>{device.state}</TableCell>
+        <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
 
@@ -171,6 +173,8 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, ...rest }: pro
                 <TableCell>Наименование</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
