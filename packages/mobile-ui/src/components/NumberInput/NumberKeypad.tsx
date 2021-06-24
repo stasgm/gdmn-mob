@@ -14,12 +14,14 @@ interface IProps {
   handelApply: (newValue: string) => void;
 }
 
-const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }: IProps) => {
+const KeypadWithOperation = ({ oldValue, handelDismiss, handelApply }: IProps) => {
+  // выражение математическое
   const [expression, setExpression] = useState('');
+  // последнее вводимое число
   const [number, setNumber] = useState(oldValue || '');
   const [firstOperation, setFirstOperation] = useState(true);
 
-  const handleNumberPressForOperation = ({ value }: { value: string }) => {
+  const handleNumberPress = ({ value }: { value: string }) => {
     setNumber((prev) => {
       value = `${prev}${value}`;
       value = Number.isNaN(parseFloat(value)) ? '0' : value ?? '0';
@@ -29,14 +31,10 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
     });
   };
 
-  const handleNumberPress = ({ value }: { value: string }) => {
-    value = `${oldValue}${value}`;
-    value = Number.isNaN(parseFloat(value)) ? '0' : value ?? '0';
-
-    const validNumber = new RegExp(/^(\d{1,6}(.))?\d{0,4}$/);
-    handelApply(validNumber.test(value) ? value : oldValue || '');
-  };
-
+  // если сразу же вводят оператор, а не число, то берётся старое значение поля в expression и оператор
+  // если вводится первая операция в выражении, то number переноситься expression
+  // если это уже вторая операция, то предыдущее выражение вычисляется и результат записывается в expression
+  // если был введён один оператор и сразу же второй, то заменяем на последний введённый
   const handleOperationPress = ({ value }: { value: string }) => {
     if (!firstOperation && number) {
       const result = evaluate(`${expression}${number}`).toFixed(3).toString();
@@ -60,20 +58,12 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
   };
 
   const handleClear = () => {
-    handelApply('');
-  };
-
-  const handleClearForOperation = () => {
     setExpression('');
     setNumber('');
     setFirstOperation(true);
   };
 
   const handleDelete = () => {
-    oldValue && handelApply(`${oldValue.slice(0, -1)}`);
-  };
-
-  const handleDeleteForOperation = () => {
     if (number) {
       setNumber((prev) => `${prev.slice(0, -1)}`);
     } else {
@@ -83,96 +73,61 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
     }
   };
 
-  const keys: IKeyProps[][] = visibleOperation
-    ? [
-        [
-          { title: 'C', onPress: () => handleClearForOperation(), operation: true },
-          { title: '7', onPress: () => handleNumberPressForOperation({ value: '7' }) },
-          { title: '4', onPress: () => handleNumberPressForOperation({ value: '4' }) },
-          { title: '1', onPress: () => handleNumberPressForOperation({ value: '1' }) },
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          { title: '', onPress: () => {} },
-        ],
-        [
-          { title: '/', onPress: () => handleOperationPress({ value: '/' }), operation: true },
-          { title: '8', onPress: () => handleNumberPressForOperation({ value: '8' }) },
-          { title: '5', onPress: () => handleNumberPressForOperation({ value: '5' }) },
-          { title: '2', onPress: () => handleNumberPressForOperation({ value: '2' }) },
-          { title: '0', onPress: () => handleNumberPressForOperation({ value: '0' }) },
-        ],
-        [
-          { title: '*', onPress: () => handleOperationPress({ value: '*' }), operation: true },
-          { title: '9', onPress: () => handleNumberPressForOperation({ value: '9' }) },
-          { title: '6', onPress: () => handleNumberPressForOperation({ value: '6' }) },
-          { title: '3', onPress: () => handleNumberPressForOperation({ value: '3' }) },
-          { title: '.', onPress: () => handleNumberPressForOperation({ value: '.' }) },
-        ],
-        [
-          { title: '-', onPress: () => handleOperationPress({ value: '-' }), operation: true },
-          { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 2, operation: true },
-          {
-            title: '=',
-            onPress: () => {
-              handelApply(
-                evaluate(`${expression}${number || '0'}`)
-                  .toFixed(3)
-                  .toString(),
-              );
-              handelDismiss();
-            },
-            grow: 2,
-            operation: true,
-          },
-        ],
-      ]
-    : [
-        [
-          { title: '7', onPress: () => handleNumberPress({ value: '7' }) },
-          { title: '4', onPress: () => handleNumberPress({ value: '4' }) },
-          { title: '1', onPress: () => handleNumberPress({ value: '1' }) },
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
-          { title: '.', onPress: () => handleNumberPress({ value: '.' }) },
-        ],
-        [
-          { title: '8', onPress: () => handleNumberPress({ value: '8' }) },
-          { title: '5', onPress: () => handleNumberPress({ value: '5' }) },
-          { title: '2', onPress: () => handleNumberPress({ value: '2' }) },
-          { title: '0', onPress: () => handleNumberPress({ value: '0' }) },
-        ],
-        [
-          { title: '9', onPress: () => handleNumberPress({ value: '9' }) },
-          { title: '6', onPress: () => handleNumberPress({ value: '6' }) },
-          { title: '3', onPress: () => handleNumberPress({ value: '3' }) },
-          {
-            title: '=',
-            onPress: () => {
-              handelDismiss();
-            },
-            //grow: 2,
-            operation: true,
-          },
-        ],
-        [
-          { title: 'C', onPress: () => handleClear(), operation: true },
-          { title: 'DEL', onPress: () => handleDelete(), operation: true },
-        ],
-      ];
+  const keys: IKeyProps[][] = [
+    [
+      { title: 'C', onPress: () => handleClear(), operation: true },
+      { title: '7', onPress: () => handleNumberPress({ value: '7' }) },
+      { title: '4', onPress: () => handleNumberPress({ value: '4' }) },
+      { title: '1', onPress: () => handleNumberPress({ value: '1' }) },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      { title: '', onPress: () => {} },
+    ],
+    [
+      { title: '/', onPress: () => handleOperationPress({ value: '/' }), operation: true },
+      { title: '8', onPress: () => handleNumberPress({ value: '8' }) },
+      { title: '5', onPress: () => handleNumberPress({ value: '5' }) },
+      { title: '2', onPress: () => handleNumberPress({ value: '2' }) },
+      { title: '0', onPress: () => handleNumberPress({ value: '0' }) },
+    ],
+    [
+      { title: '*', onPress: () => handleOperationPress({ value: '*' }), operation: true },
+      { title: '9', onPress: () => handleNumberPress({ value: '9' }) },
+      { title: '6', onPress: () => handleNumberPress({ value: '6' }) },
+      { title: '3', onPress: () => handleNumberPress({ value: '3' }) },
+      { title: '.', onPress: () => handleNumberPress({ value: '.' }) },
+    ],
+    [
+      { title: '-', onPress: () => handleOperationPress({ value: '-' }), operation: true },
+      { title: '+', onPress: () => handleOperationPress({ value: '+' }), grow: 2, operation: true },
+      {
+        title: '=',
+        onPress: () => {
+          handelApply(
+            evaluate(`${expression}${number || '0'}`)
+              .toFixed(3)
+              .toString(),
+          );
+          handelDismiss();
+        },
+        grow: 2,
+        operation: true,
+      },
+    ],
+  ];
 
   return (
-    <View style={styles.container}>
-      {visibleOperation && (
-        <View style={styles.input}>
-          <View style={styles.flex1}>
-            <Text style={styles.currentNumber}>
-              {expression}
-              {number}
-            </Text>
-          </View>
-          <TouchableOpacity style={{}} onPress={handleDeleteForOperation}>
-            <Feather name="delete" size={24} color="black" />
-          </TouchableOpacity>
+    <>
+      <View style={styles.input}>
+        <View style={styles.flex1}>
+          <Text style={styles.currentNumber}>
+            {expression}
+            {number}
+          </Text>
         </View>
-      )}
+        <TouchableOpacity style={{}} onPress={handleDelete}>
+          <Feather name="delete" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.keypad}>
         {keys.map((columnKeys, idx) => (
           <View key={idx} style={styles.keypadColumn}>
@@ -182,6 +137,77 @@ const NumberKeypad = ({ oldValue, visibleOperation, handelDismiss, handelApply }
           </View>
         ))}
       </View>
+    </>
+  );
+};
+
+const Keypad = ({ oldValue, handelDismiss, handelApply }: IProps) => {
+  const handleNumberPress = ({ value }: { value: string }) => {
+    value = `${oldValue}${value}`;
+    value = Number.isNaN(parseFloat(value)) ? '0' : value ?? '0';
+
+    const validNumber = new RegExp(/^(\d{1,6}(.))?\d{0,4}$/);
+    handelApply(validNumber.test(value) ? value : oldValue || '');
+  };
+
+  const handleClear = () => {
+    handelApply('');
+  };
+
+  const handleDelete = () => {
+    oldValue && handelApply(`${oldValue.slice(0, -1)}`);
+  };
+
+  const keys: IKeyProps[][] = [
+    [
+      { title: '7', onPress: () => handleNumberPress({ value: '7' }) },
+      { title: '4', onPress: () => handleNumberPress({ value: '4' }) },
+      { title: '1', onPress: () => handleNumberPress({ value: '1' }) },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      { title: '.', onPress: () => handleNumberPress({ value: '.' }) },
+    ],
+    [
+      { title: '8', onPress: () => handleNumberPress({ value: '8' }) },
+      { title: '5', onPress: () => handleNumberPress({ value: '5' }) },
+      { title: '2', onPress: () => handleNumberPress({ value: '2' }) },
+      { title: '0', onPress: () => handleNumberPress({ value: '0' }) },
+    ],
+    [
+      { title: '9', onPress: () => handleNumberPress({ value: '9' }) },
+      { title: '6', onPress: () => handleNumberPress({ value: '6' }) },
+      { title: '3', onPress: () => handleNumberPress({ value: '3' }) },
+      {
+        title: '=',
+        onPress: () => {
+          handelDismiss();
+        },
+        //grow: 2,
+        operation: true,
+      },
+    ],
+    [
+      { title: 'C', onPress: () => handleClear(), operation: true },
+      { title: 'DEL', icon: 'backspace', onPress: () => handleDelete(), operation: true },
+    ],
+  ];
+
+  return (
+    <View style={styles.keypad}>
+      {keys.map((columnKeys, idx) => (
+        <View key={idx} style={styles.keypadColumn}>
+          {columnKeys.map((keyProps) => (
+            <Key key={keyProps.title} {...keyProps} />
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+};
+
+const NumberKeypad = (props: IProps) => {
+  return (
+    <View style={styles.container}>
+      {props.visibleOperation ? <KeypadWithOperation {...props} /> : <Keypad {...props} />}
     </View>
   );
 };
@@ -191,6 +217,7 @@ export { NumberKeypad };
 const styles = StyleSheet.create({
   container: {
     height: Dimensions.get('window').height / 2.6,
+    top: 0,
     //zIndex: 1,
   },
   currentNumber: {

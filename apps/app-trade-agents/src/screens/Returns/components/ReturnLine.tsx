@@ -101,7 +101,6 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           label="Количество"
           setValue={handelQuantityChange}
           handlePress={() => {
-            //Keyboard.dismiss();
             setNumberKeyboardVisible(!isNumberKeyboardVisible);
           }}
           //position={positionNK}

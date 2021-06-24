@@ -1,22 +1,17 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Colors } from 'react-native-paper';
 
 interface IKeyProps {
   title: string;
-  grow?: number;
+  grow?: number; //если надо вытянуть клавишу в 2 или больше раз
   operation?: boolean;
+  icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   onPress: () => void;
 }
 
-/*
-        <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
-          <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
-        </TouchableOpacity>
-
-*/
-
-const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
+const Key = ({ title, grow = 1, operation, icon, onPress }: IKeyProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -28,8 +23,13 @@ const Key = ({ title, grow = 1, operation, onPress }: IKeyProps) => {
           flexGrow: grow,
           paddingBottom: grow > 1 ? grow : 0,
         },
-      ]}>
-      <Text style={[styles.text, { color: operation ? Colors.blue600 : Colors.black }]}>{title}</Text>
+      ]}
+    >
+      {icon ? (
+        <MaterialCommunityIcons name={icon} size={24} color={operation ? Colors.blue600 : Colors.black} />
+      ) : (
+        <Text style={[styles.text, { color: operation ? Colors.blue600 : Colors.black }]}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 };
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(200,200,200,0.3)',
     flex: 1,
-    //height: '25%',
     width: '100%',
     justifyContent: 'center',
     shadowColor: '#000',

@@ -1,17 +1,16 @@
 import React from 'react';
-import { useFocusEffect, useTheme } from '@react-navigation/native';
-//import { useHeaderHeight } from '@react-navigation/stack';
-import { StyleSheet, View, BackHandler, Text, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { StyleSheet, View, BackHandler } from 'react-native';
 
-import { styles as globalStyles } from '@lib/mobile-navigation/src/screens/References/styles';
+import { TouchableOpacity } from '@gorhom/bottom-sheet';
 
 import { NumberKeypad } from './NumberKeypad';
+import { Input } from './Input';
 
 interface IProps {
   label?: string;
   value: string;
   isKeyboardVisible: boolean;
-  position?: number;
   visibleOperation?: boolean;
   setValue: (newValue: string) => void;
   handlePress: () => void;
@@ -20,16 +19,11 @@ interface IProps {
 const NumberInput = ({
   isKeyboardVisible,
   label = '',
-  //position = 0,
   value,
   visibleOperation = false,
   setValue,
   handlePress,
 }: IProps) => {
-  const { colors } = useTheme();
-  //const height = useWindowDimensions().height;
-  //const headerHeight = useHeaderHeight();
-
   useFocusEffect(
     React.useCallback(() => {
       const handleBack = () => {
@@ -48,24 +42,10 @@ const NumberInput = ({
 
   return (
     <>
-      <TouchableOpacity onPress={handlePress} style={[globalStyles.item]}>
-        <View style={globalStyles.details}>
-          <Text style={[globalStyles.name, { color: colors.text }]}>{label}</Text>
-          <Text style={[globalStyles.number, globalStyles.field, { color: colors.text }]}>{value}</Text>
-        </View>
-      </TouchableOpacity>
-      {/*<TextInputWithIcon label={label} onPress={handlePress} isFocus={isKeyboardVisible} value={value}>
-        <MaterialCommunityIcons style={styles.marginRight} size={20} color={colors.text} name="calculator-variant" />
-      </TextInputWithIcon>*/}
+      <Input label={label} onPress={handlePress} isFocus={isKeyboardVisible} value={value} />
       {isKeyboardVisible && (
-        <View
-          style={[
-            {
-              //top: -position,
-              //height: height + headerHeight,
-            },
-            styles.keypad,
-          ]}>
+        <View style={styles.keypad}>
+          <TouchableOpacity style={{ height: '100%', width: '100%' }} onPress={handlePress} />
           <NumberKeypad
             oldValue={value}
             visibleOperation={visibleOperation}
@@ -82,11 +62,11 @@ export { NumberInput };
 
 const styles = StyleSheet.create({
   keypad: {
-    flex: 1,
     justifyContent: 'flex-end',
     position: 'absolute',
+    height: '100%',
     width: '100%',
-    bottom: 0,
+    //top: 0,
     //zIndex: 1,
   },
   marginRight: {

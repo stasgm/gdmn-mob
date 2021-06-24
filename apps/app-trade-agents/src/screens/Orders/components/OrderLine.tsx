@@ -105,36 +105,20 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           value={goodQty}
           label="Количество"
           setValue={handelQuantityChange}
-          visibleOperation={true}
           handlePress={() => {
-            //Keyboard.dismiss();
-            setIsVisiblePackages(false);
+            !isNumberKeyboardVisible && setIsVisiblePackages(false);
             setNumberKeyboardVisible(!isNumberKeyboardVisible);
           }}
           //position={positionNK}
         />
-        {/*<View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество</Text>
-              <TextInput
-                style={[styles.number, styles.field]}
-                editable={true}
-                keyboardType="numeric"
-                onChangeText={handelQuantityChange}
-                returnKeyType="done"
-                ref={qtyRef}
-                // autoFocus={isFocused}
-                value={goodQty}
-              />
-            </View>
-          </View>*/}
         <ItemSeparator />
         <TouchableOpacity
           style={styles.item}
           onPress={() => {
             setIsVisiblePackages(!isVisiblePackages);
             setNumberKeyboardVisible(false);
-          }}>
+          }}
+        >
           <View style={styles.details}>
             <Text style={styles.name}>Упаковка</Text>
             <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
