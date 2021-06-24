@@ -3,9 +3,9 @@ import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -29,12 +29,19 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const { docId, mode } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
-  const isFocused = useIsFocused();
+  // const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
   const packages = (refSelectors.selectByName('packageGood') as IReference<IPackageGood>)?.data?.filter(
     (e) => e.good.id === item.good.id,
   );
+
+  const qtyRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    //TODO временное решение
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 500);
+  }, []);
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -99,10 +106,11 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               <TextInput
                 style={[styles.number, styles.field]}
                 editable={true}
-                keyboardType="decimal-pad"
+                keyboardType="numeric"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
-                autoFocus={isFocused}
+                ref={qtyRef}
+                // autoFocus={isFocused}
                 value={goodQty}
               />
             </View>
@@ -140,9 +148,11 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
         </View>
       </ScrollView>
-      <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
-        Удалить позицию
-      </PrimeButton>
+      {mode ? (
+        <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
+          Удалить позицию
+        </PrimeButton>
+      ) : null}
     </>
   );
 };

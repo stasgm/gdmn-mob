@@ -1,26 +1,54 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { ReturnLineScreen, ReturnListScreen, ReturnViewScreen } from '../../screens/Returns';
-
-import ReturnEditScreen from '../../screens/Returns/ReturnEditScreen';
+import {
+  ReturnLineScreen,
+  ReturnListScreen,
+  ReturnViewScreen,
+  ReturnEditScreen,
+  SelectItemScreen as SelectItemReurnScreen,
+} from '../../screens/Returns';
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
-import SelectItemScreen from '../../screens/Returns/SelectItemScreen';
 
-import { ReturnsStackParamList } from './types';
+import { NestingReturnParamList, ReturnsStackParamList } from './types';
 
 const Stack = createStackNavigator<ReturnsStackParamList>();
 
+const returnScreens = [
+  {
+    name: 'ReturnView',
+    component: ReturnViewScreen,
+  },
+  {
+    name: 'ReturnEdit',
+    component: ReturnEditScreen,
+  },
+  {
+    name: 'ReturnLine',
+    component: ReturnLineScreen,
+  },
+  {
+    name: 'SelectItemReturn',
+    component: SelectItemReurnScreen,
+  },
+  {
+    name: 'SelectRefItem',
+    component: SelectRefItemScreen,
+  },
+];
+
 const ReturnsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="ReturnList" screenOptions={{ headerShown: true, title: 'Возврат' }}>
+    <Stack.Navigator initialRouteName="ReturnList" screenOptions={{ headerShown: true, title: 'Возвраты' }}>
       <Stack.Screen name="ReturnList" component={ReturnListScreen} />
-      <Stack.Screen name="ReturnView" component={ReturnViewScreen} />
-      <Stack.Screen name="ReturnEdit" component={ReturnEditScreen} />
-      <Stack.Screen name="ReturnLine" component={ReturnLineScreen} />
-      <Stack.Screen name="SelectRefItem" component={SelectRefItemScreen} />
-      <Stack.Screen name="SelectItemReturn" component={SelectItemScreen} />
+      {returnScreens.map((screen) => (
+        <Stack.Screen
+          key={screen.name}
+          name={screen.name as keyof NestingReturnParamList}
+          component={screen.component}
+        />
+      ))}
     </Stack.Navigator>
   );
 };

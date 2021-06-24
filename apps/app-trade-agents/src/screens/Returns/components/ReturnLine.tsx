@@ -2,9 +2,9 @@ import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { IReference } from '@lib/types';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
 
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
@@ -22,8 +22,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   const { docId, mode } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
 
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString() || '0');
-  const isFocused = useIsFocused();
+  const [goodQty, setGoodQty] = useState<string>(item.quantity.toString());
 
   const { colors } = useTheme();
 
@@ -37,6 +36,11 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
       return validNumber.test(value) ? value : prev;
     });
+  }, []);
+
+  useEffect(() => {
+    //TODO временное решение
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 500);
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -55,28 +59,14 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    //TODO Исправить
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  /*   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
-    useEffect(() => {
-      if (isFocused) {
-        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-
-        return () => {
-          keyboardDidHideListener.remove();
-          keyboardDidShowListener.remove();
-        };
-      }
-
-      return;
-    }, [isFocused]); */
-
   const priceFSN =
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
+
+  const qtyRef = useRef<TextInput>(null);
 
   return (
     <>
@@ -104,10 +94,11 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
               <TextInput
                 style={[styles.number, styles.field, { color: colors.text }]}
                 editable={true}
-                keyboardType="decimal-pad"
+                ref={qtyRef}
+                keyboardType="numeric"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
-                autoFocus={isFocused}
+                // autoFocus={isFocused}
                 value={goodQty}
               />
             </View>
@@ -115,9 +106,11 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
         </View>
         <ItemSeparator />
       </ScrollView>
-      <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
-        Удалить позицию
-      </PrimeButton>
+      {mode ? (
+        <PrimeButton icon="delete" onPress={handleDelete} outlined>
+          Удалить позицию
+        </PrimeButton>
+      ) : null}
     </>
   );
 };

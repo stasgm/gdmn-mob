@@ -10,10 +10,11 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { externalId, name, password, firstName, lastName, phoneNumber, companies, creatorId, email } = ctx.request
-    .body as NewUser;
+  const { externalId, name, password, firstName, lastName, phoneNumber, email } = ctx.request.body as NewUser;
 
-  const user: NewUser = {
+  const creator = ctx.state.user as IUser;
+
+  const user = {
     externalId,
     password,
     name,
@@ -21,9 +22,8 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
     lastName,
     phoneNumber,
     email,
-    companies: companies || [],
-    creatorId,
-  };
+    creator: { id: creator.id, name: creator.name },
+  } as NewUser;
 
   const newUser = await userService.addOne(user);
 
@@ -34,6 +34,7 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
+  // TODO Исключать поля: role, creator, creationDate, company
   const userData = ctx.request.body as Partial<IUser & { password: string }>;
 
   const updatedUser = await userService.updateOne(userId, userData);
@@ -45,7 +46,7 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-  // TODO пользовате
+  // TODO
   await userService.deleteOne(userId);
 
   ok(ctx as Context);

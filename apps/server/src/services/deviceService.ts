@@ -17,7 +17,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
   const db = getDb();
   const { devices } = db;
 
-  if (await devices.find((i) => i.name === device.name && i.companyId === device.companyId)) {
+  if (await devices.find((i) => i.name === device.name && i.companyId === device.company.id)) {
     throw new ConflictException(`Устройство с наименование ${device.name} уже сущеcтвует`);
   }
 
@@ -26,7 +26,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     name: device.name,
     uid: '',
     state: 'NEW',
-    companyId: device.companyId,
+    companyId: device.company.id,
   };
 
   const createdDevice = await devices.find(await devices.insert(newDevice));
@@ -113,10 +113,15 @@ const genActivationCode = async (deviceId: string) => {
 };
 
 const findOne = async (id: string): Promise<IDevice | undefined> => {
-  const db = getDb();
-  const { devices } = db;
+  const { devices } = getDb();
 
-  const device = await devices.find(id);
+  let device: IDBDevice | undefined;
+
+  if (id === 'WEB') {
+    device = await devices.find((e) => e.uid === id);
+  } else {
+    device = await devices.find(id);
+  }
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');

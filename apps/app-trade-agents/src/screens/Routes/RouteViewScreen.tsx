@@ -28,7 +28,7 @@ const RouteViewScreen = () => {
   const dispatch = useDispatch();
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
-  const route = (docSelectors.selectByDocType('route') as unknown as IRouteDocument[])?.find((e) => e.id === id);
+  const route = (docSelectors.selectByDocType('route') as IRouteDocument[])?.find((e) => e.id === id);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);

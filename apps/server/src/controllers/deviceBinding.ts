@@ -9,11 +9,11 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
-  const { userId, deviceId } = ctx.request.body;
+  const { device, user } = ctx.request.body as NewDeviceBinding;
 
-  const deviceBinding: NewDeviceBinding = { userId, deviceId };
+  // const deviceBinding: NewDeviceBinding = { userId, deviceId };
 
-  const newDeviceBinding = await deviceBindingService.addOne(deviceBinding);
+  const newDeviceBinding = await deviceBindingService.addOne({ device, user });
 
   created(ctx as Context, newDeviceBinding);
 

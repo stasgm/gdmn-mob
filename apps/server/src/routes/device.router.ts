@@ -11,7 +11,7 @@ const router = Router();
 router.prefix('/devices');
 router.post('/', deviceValidation.addDevice, deviceMiddleware, authMiddleware, addDevice);
 router.get('/', deviceMiddleware, authMiddleware, getDevices);
-router.get('/:id', deviceValidation.getDevice, deviceMiddleware, authMiddleware, getDevice);
+router.get('/:id', deviceValidation.getDevice, deviceMiddleware, getDevice);
 //TODO - без доп проверки даёт возможность получить доступ по любому  устройству
 // router.get('/:id/user/:name', getDeviceByUser);
 // router.get('/:id/user/', getDeviceByUser);

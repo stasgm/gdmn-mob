@@ -1,14 +1,14 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
-import { IReference } from '@lib/types';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
-
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
+import { IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup } from '../../store/docs/types';
@@ -26,8 +26,7 @@ const Group = ({
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
 }) => {
-  const navigation = useNavigation();
-
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
   const goods = (refSelectors.selectByName('good') as IReference<IGood>).data.filter(
@@ -158,10 +157,10 @@ const SelectGroupScreen = () => {
   );
 };
 
+export default SelectGroupScreen;
+
 const localStyles = StyleSheet.create({
   marginLeft: {
     marginLeft: 20,
   },
 });
-
-export default SelectGroupScreen;

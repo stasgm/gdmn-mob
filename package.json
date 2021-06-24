@@ -20,9 +20,9 @@
     "lerna": "lerna bootstrap",
     "build:lib": "lerna run --scope=@lib/* build --stream",
     "clean": "lerna clean",
-    "clean:all": "yarn clean:dist && clean:node-modules && yarn clean:expo-cache",
-    "clean:dist": "rimraf packages/*/dist apps/*/dist configs/*/dist",
-    "clean:node-modules": "rimraf node_modules",
+    "clean:all": "yarn clean:node-modules && yarn clean:expo-cache",
+    "clean:dist": "rimraf packages/*/dist && rimraf apps/*/dist && rimraf configs/*/dist",
+    "clean:node-modules": "rimraf node_modules && rimraf apps/*/node_modules",
     "clean:expo-cache": "rimraf apps/*/.expo packages/*/.expo",
     "update": "yarn upgrade-interactive --latest",
     "lint-staged-project": "lerna run --scope=@lib/* --scope=@apps/* --concurrency 1 --stream precommit --since HEAD --exclude-dependents",
@@ -46,6 +46,6 @@
     "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
     "sort-package-json": "1.50.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.4"
   }
 }

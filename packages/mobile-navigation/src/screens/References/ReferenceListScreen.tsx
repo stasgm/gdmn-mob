@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 
@@ -12,8 +12,6 @@ import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useTheme } from 'react-native-paper';
-
-import { useScrollToTop } from '@react-navigation/native';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -84,13 +82,9 @@ const ReferenceListScreen = () => {
 
   const renderItem = ({ item }: { item: RefListItem }) => <ReferenceItem item={item} />;
 
-  const ref = useRef<FlatList<RefListItem>>(null);
-  useScrollToTop(ref);
-
   return (
     <View style={[styles.content, { backgroundColor: colors.background }]}>
       <FlatList
-        ref={ref}
         data={refData}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}

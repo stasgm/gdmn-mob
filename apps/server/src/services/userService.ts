@@ -11,12 +11,11 @@ import { getDb } from './dao/db';
 
 /**
  * Добавляет одного пользователя
- * @param {IUser} user - пользователь
+ * @param newUser - пользователь
  * @return id, идентификатор пользователя
  * */
 const addOne = async (newUser: NewUser): Promise<IUser> => {
-  const db = getDb();
-  const { users } = db;
+  const { users } = getDb();
 
   const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
 
@@ -24,22 +23,32 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
+  let creator;
+
+  if (newUser.creator) {
+    creator = await users.find(newUser.creator.id);
+  }
+
+  const userCount = (await users.read()).length;
+  // TODO временно!!! первый пользователь SuperAdmin. Если создаётся пользователем то User иначе Admin
+  const role = userCount === 0 ? 'SuperAdmin' : !newUser.creator?.id ? 'Admin' : 'User';
+
   const passwordHash = await hashPassword(newUser.password);
 
   const newUserObj: IDBUser = {
     id: '',
     name: newUser.name,
-    companies: newUser.companies.map((i) => i),
+    companies: creator?.companies || [],
     password: passwordHash,
-    role: !newUser.creatorId ? 'Admin' : 'User', // TODO временно!!! если создаётся пользователем то User иначе Admin
-    creatorId: newUser.creatorId || '',
+    role,
+    creatorId: creator?.id || '',
     externalId: newUser.externalId,
     firstName: newUser.firstName,
     lastName: newUser.lastName,
     phoneNumber: newUser.phoneNumber,
     email: newUser.email,
-    creationDate: new Date().toString(),
-    editionDate: new Date().toString(),
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
   };
 
   const userId = await users.insert(newUserObj);
@@ -59,12 +68,11 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
 
 /**
  * Обновляет одного пользователя
- * @param {IUser} user - пользователь
+ * @param user - пользователь
  * @return id, идентификатор пользователя
  * */
 const updateOne = async (userId: string, userData: Partial<IUser & { password: string }>): Promise<IUser> => {
-  const db = getDb();
-  const { users, companies } = db;
+  const { users, companies } = getDb();
 
   const oldUser = await users.find(userId);
 
@@ -100,7 +108,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     lastName: userData.lastName || oldUser.lastName,
     phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
     creationDate: oldUser.creationDate,
-    editionDate: new Date().toString(),
+    editionDate: new Date().toISOString(),
     email: userData.email || oldUser.email,
   };
 

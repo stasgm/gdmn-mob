@@ -1,6 +1,6 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-const { width } = Dimensions.get('window');
+// const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   containerMap: {
@@ -17,10 +17,10 @@ const styles = StyleSheet.create({
     right: 0,
   },
   bubble: {
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    paddingHorizontal: 22,
-    paddingVertical: 10,
+    backgroundColor: 'rgba(255,255,255,0.8)',
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(200,200,200,0.3)',
     width: 70,
     height: 70,
     alignContent: 'center',
@@ -28,13 +28,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {
-      width: 0,
+      width: 10,
       height: 3,
     },
-    shadowOpacity: 0.29,
-    shadowRadius: 4.65,
-
-    elevation: 7,
+    shadowOpacity: 0.15,
+    shadowRadius: 9,
+    // elevation: 7,
   },
   button: {
     marginTop: 5,
@@ -59,17 +58,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   statusContainer: {
-    zIndex: 2,
-    flex: 1,
     position: 'absolute',
-    left: 0,
+    // right: 0,
+    // bottom: 0,
     top: 0,
-    opacity: 0.5,
-    backgroundColor: 'black',
-    width,
+    left: 0,
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    justifyContent: 'center',
+    overflow: 'hidden',
     height: 50,
   },
   pointName: {
+    textAlign: 'center',
     fontSize: 18,
   },
   mark: {

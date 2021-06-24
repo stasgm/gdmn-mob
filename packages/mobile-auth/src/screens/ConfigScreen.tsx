@@ -5,6 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { IApiConfig } from '@lib/client-types';
 import { AppInputScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
+import { AuthStackParamList } from '../navigation/types';
+
 import localStyles from './styles';
 
 export type Props = {
@@ -13,7 +17,7 @@ export type Props = {
 };
 
 const ConfigScreen = (props: Props) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
 
   const { settings, onSetSettings } = props;
   const [serverName, setServerName] = useState(`${settings?.protocol}${settings?.server}` || '');
