@@ -16,9 +16,10 @@ import { OrdersStackParamList } from '../../../navigation/Root/types';
 interface IProps {
   docId: string;
   item: IOrderLine;
+  readonly?: boolean;
 }
 
-const OrderItem = ({ docId, item }: IProps) => {
+const OrderItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
 
@@ -27,7 +28,7 @@ const OrderItem = ({ docId, item }: IProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('OrderLine', { mode: 1, docId, item });
+        !readonly && navigation.navigate('OrderLine', { mode: 1, docId, item });
       }}
     >
       <View style={[styles.item]}>

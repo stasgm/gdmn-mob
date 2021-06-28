@@ -16,9 +16,10 @@ import { ReturnsStackParamList } from '../../../navigation/Root/types';
 interface IProps {
   docId: string;
   item: IReturnLine;
+  readonly?: boolean;
 }
 
-const ReturnItem = ({ docId, item }: IProps) => {
+const ReturnItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
 
@@ -27,7 +28,7 @@ const ReturnItem = ({ docId, item }: IProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ReturnLine', { mode: 1, docId, item });
+        !readonly && navigation.navigate('ReturnLine', { mode: 1, docId, item });
       }}
     >
       <View style={[styles.item]}>

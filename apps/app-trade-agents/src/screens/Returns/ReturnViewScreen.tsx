@@ -98,7 +98,9 @@ const ReturnViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IReturnLine }) => <ReturnItem docId={returnDoc.id} item={item} />;
+  const renderItem = ({ item }: { item: IReturnLine }) => (
+    <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+  );
 
   return (
     <View style={[styles.container]}>

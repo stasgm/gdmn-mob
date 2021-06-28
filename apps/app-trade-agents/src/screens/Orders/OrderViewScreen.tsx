@@ -97,7 +97,9 @@ const OrderViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IOrderLine }) => <OrderItem docId={order.id} item={item} />;
+  const renderItem = ({ item }: { item: IOrderLine }) => (
+    <OrderItem docId={order.id} item={item} readonly={isBlocked} />
+  );
 
   return (
     <View style={[styles.container]}>
