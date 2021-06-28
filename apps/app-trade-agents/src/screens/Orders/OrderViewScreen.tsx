@@ -2,6 +2,7 @@ import React, { useCallback, useLayoutEffect } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
@@ -14,6 +15,7 @@ import {
   ItemSeparator,
   SubTitle,
 } from '@lib/mobile-ui';
+
 
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
@@ -109,9 +111,12 @@ const OrderViewScreen = () => {
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
-        <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
-          order.head?.onDate,
-        )}`}</Text>
+        <View style={styles.directionRow}>
+          <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+            order.head?.onDate,
+          )}`}</Text>
+          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+        </View>
       </InfoBlock>
       <FlatList
         data={order.lines}

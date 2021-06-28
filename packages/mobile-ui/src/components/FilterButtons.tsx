@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableHighlight, View } from 'react-native';
+import { StyleProp, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
@@ -27,15 +27,16 @@ const statusTypes: StatusTypes[] = [
 interface IProps {
   status: Status;
   onPress: (status: Status) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 export type Status = 'all' | 'active' | 'archive';
 
-const FilterButtons = ({ status, onPress }: IProps) => {
+const FilterButtons = ({ status, onPress, style }: IProps) => {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.containerCenter}>
+    <View style={[styles.containerCenter, style]}>
       {statusTypes.map((e, i) => {
         return (
           <TouchableHighlight
