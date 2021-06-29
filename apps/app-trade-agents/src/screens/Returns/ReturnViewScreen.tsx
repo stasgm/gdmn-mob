@@ -24,6 +24,7 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import ReturnItem from './components/ReturnItem';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ReturnViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -98,7 +99,9 @@ const ReturnViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IReturnLine }) => <ReturnItem docId={returnDoc.id} item={item} />;
+  const renderItem = ({ item }: { item: IReturnLine }) => (
+    <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+  );
 
   return (
     <View style={[styles.container]}>
@@ -108,7 +111,10 @@ const ReturnViewScreen = () => {
         onPress={handleEditReturnHead}
         disabled={isBlocked}
       >
-        <Text>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
+        <View style={styles.directionRow}>
+          <Text>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
+          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+        </View>
       </InfoBlock>
       <FlatList
         data={returnDoc.lines}

@@ -21,7 +21,7 @@ const localStyles = StyleSheet.create({
   titleText: {
     color: '#333536',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: 'bold',
     textAlign: 'center',
   },
 });
