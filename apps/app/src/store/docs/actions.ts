@@ -4,7 +4,7 @@ import { IDocument } from './types';
 
 const init = createAction('DOC/INIT')();
 
-const fetchDocsAsync = createAsyncAction('DOC/FETCH', 'DOC/FETCH_SUCCCES', 'DOC/FETCH_FAILURE')<
+const fetchDocsAsync = createAsyncAction('DOC/FETCH', 'DOC/FETCH_SUCCESS', 'DOC/FETCH_FAILURE')<
   string | undefined,
   IDocument[],
   string

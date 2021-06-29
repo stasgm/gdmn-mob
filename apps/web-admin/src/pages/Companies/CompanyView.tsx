@@ -56,7 +56,7 @@ const CompanyView = () => {
 
   const handleDelete = async () => {
     const res = await dispatch(actions.removeCompany(companyId));
-    if (res.type === 'COMPANY/REMOVE_SUCCCES') {
+    if (res.type === 'COMPANY/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };

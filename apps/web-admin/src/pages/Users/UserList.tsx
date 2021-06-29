@@ -28,16 +28,21 @@ const UserList = () => {
   const { list, loading } = useSelector((state) => state.users);
   const [dataList, setDataList] = useState<IUser[]>([]);
 
-  const fetchUsers = useCallback(() => dispatch(actions.fetchUsers()), [dispatch]);
+  const fetchUsers = useCallback(async () => {
+    const res = await dispatch(actions.fetchUsers());
+
+    if (res.type === 'USER/FETCH_USERS_SUCCESS') {
+      setDataList(res.payload);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     fetchUsers();
-    setDataList(list);
   }, [fetchUsers]);
 
-  const handleUpdateInput = (event: any) => {
-    const inputValue: string = event.target.value.toUpperCase();
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value.toUpperCase();
 
     const filtered = list.filter((item) => {
       const name = item.name.toUpperCase();
@@ -79,8 +84,6 @@ const UserList = () => {
       icon: <AddCircleOutlineIcon />,
     },
   ];
-
-  console.log('list', list);
 
   return (
     <>

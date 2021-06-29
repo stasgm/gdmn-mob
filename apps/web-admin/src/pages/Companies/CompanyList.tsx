@@ -32,22 +32,22 @@ const CompanyList = () => {
 
   const fetchCompanies = useCallback(async () => {
     const res = await dispatch(actions.fetchCompanies());
-    if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCCES') {
-      console.log(res.payload);
+    if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCESS') {
+      //console.log(res.payload);
+      setDataList(res.payload);
     }
     if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
-      console.log('ошибочка', res.payload);
+      //console.log('ошибочка', res.payload);
     }
   }, [dispatch]);
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchCompanies();
-    setDataList(list);
   }, [fetchCompanies]);
 
-  const handleUpdateInput = (event: any) => {
-    const inputValue: string = event.target.value.toUpperCase();
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value.toUpperCase();
 
     const filtered = list.filter((item) => {
       const name = item.name.toUpperCase();

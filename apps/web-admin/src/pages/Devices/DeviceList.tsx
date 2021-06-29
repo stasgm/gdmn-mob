@@ -28,17 +28,21 @@ const DeviceList = () => {
   const { list, loading } = useSelector((state) => state.devices);
   const [dataList, setDataList] = useState<IDevice[]>([]);
 
-  const fetchDevices = useCallback(() => dispatch(actions.fetchDevices()), [dispatch]);
+  const fetchDevices = useCallback(async () => {
+    const res = await dispatch(actions.fetchDevices());
+
+    if (res.type === 'DEVICE/FETCH_DEVICES_SUCCESS') {
+      setDataList(res.payload);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     !list?.length && fetchDevices();
-
-    setDataList(list);
   }, [fetchDevices, list.length]);
 
-  const handleUpdateInput = (event: any) => {
-    const inputValue: string = event.target.value.toUpperCase();
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value.toUpperCase();
 
     const filtered = list.filter((item) => {
       const name = item.name.toUpperCase();

@@ -14,23 +14,23 @@ const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c вы
 
 const checkDeviceAsync = createAsyncAction(
   'AUTH/CHECK_DEVICE',
-  'AUTH/CHECK_DEVICE_SUCCCES',
+  'AUTH/CHECK_DEVICE_SUCCESS',
   'AUTH/CHECK_DEVICE_FAILURE',
 )<string | undefined, IDevice | null, string>();
 
 const activateDeviceAsync = createAsyncAction(
   'AUTH/ACTIVATE_DEVICE',
-  'AUTH/ACTIVATE_DEVICE_SUCCCES',
+  'AUTH/ACTIVATE_DEVICE_SUCCESS',
   'AUTH/ACTIVATE_DEVICE_FAILURE',
 )<string | undefined, IDevice | null, string>();
 
-const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCCES', 'AUTH/LOGIN_FAILURE')<
+const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AUTH/LOGIN_FAILURE')<
   string | undefined,
   IUser | null,
   string
 >();
 
-const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCCES', 'AUTH/SIGNUP_FAILURE')<
+const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUTH/SIGNUP_FAILURE')<
   string | undefined,
   IUser,
   string

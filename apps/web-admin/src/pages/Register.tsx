@@ -27,7 +27,7 @@ const Register = () => {
 
     console.log('res.type', res.type);
     console.log(res);
-    if (res.type === 'AUTH/SIGNUP_SUCCCES') {
+    if (res.type === 'AUTH/SIGNUP_SUCCESS') {
       navigate('/login');
     }
   };

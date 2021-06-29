@@ -17,13 +17,13 @@ const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
 
 const addDocumentsAsync = createAsyncAction(
   'DOCUMENTS/ADD_MANY',
-  'DOCUMENTS/ADD_MANY_SUCCCES',
+  'DOCUMENTS/ADD_MANY_SUCCESS',
   'DOCUMENTS/ADD_MANY_FAILURE',
 )<string | undefined, IDocument[], string>();
 
 // const addDocumentAsync = createAsyncAction(
 //   'DOCUMENTS/ADD_ONE',
-//   'DOCUMENTS/ADD_ONE_SUCCCES',
+//   'DOCUMENTS/ADD_ONE_SUCCESS',
 //   'DOCUMENTS/ADD_ONE_FAILURE',
 // )<string | undefined, IDocument, string>();
 
