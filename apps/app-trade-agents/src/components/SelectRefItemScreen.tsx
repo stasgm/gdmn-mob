@@ -22,16 +22,14 @@ import { appActions } from '../store/app/actions';
 import { IOutlet } from '../store/docs/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
-import { OrdersStackParamList, ReturnsStackParamList } from '../navigation/Root/types';
+import { RefParamList } from '../navigation/Root/types';
 
 const SelectRefItemScreen = () => {
-  const navigation =
-    useNavigation<StackNavigationProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>();
+  const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { refName, isMulti, fieldName, value, clause } =
-    useRoute<RouteProp<OrdersStackParamList | ReturnsStackParamList, 'SelectRefItem'>>().params;
+  const { refName, isMulti, fieldName, value, clause } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
-  const refObj = refSelectors.selectByName(refName) as IReference<INamedEntity>;
+  const refObj = refSelectors.selectByName(refName) as IReference<any>;
 
   const list = useMemo(() => {
     if (clause && refObj?.data) {
@@ -40,16 +38,34 @@ const SelectRefItemScreen = () => {
 
         let companyFound = true;
 
-        if ('companyId' in newParams && refName === 'outlet') {
-          companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
-          delete newParams.companyId;
-        }
+        // clause = { type: 'shop', name: 'Раница', company: { id: 1} }
+        // if ('companyId' in newParams && refName === 'outlet') {
+        /*         const params: Record<string, string> = {};
+                Object.keys(clause).forEach((i) => {
+                  if (i in item) {
+                    if (typeof clause[i] !== 'object') {
+                      params[i] = clause[i];
+                    }
+                  }
+                });
+                 */
+        Object.keys(clause).forEach((i) => {
+          if (i in item) {
+            if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
+
+            }
+          }
+        });
+        // params = { name: 'Раница' }
+        companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
+        delete newParams.companyId;
+        // }
 
         return companyFound && extraPredicate(item, newParams);
       });
     }
     return refObj?.data;
-  }, [clause]);
+  }, [clause, refObj?.data]);
 
   const title = refObj?.name;
 

@@ -15,6 +15,7 @@ router.prefix('/auth');
 router.post('/signup', authValidation.signup, signUp);
 router.post('/login', authValidation.login, logIn);
 router.post('/logout', authMiddleware, logOut);
+// TODO permissionMiddlware вместе deviceMiddleware
 router.get('/user', authMiddleware, deviceMiddleware, getCurrentUser);
 router.get('/device/:deviceId/code', authValidation.getActivationCode, getActivationCode);
 router.post('/device/code', authValidation.verifyCode, verifyCode);
