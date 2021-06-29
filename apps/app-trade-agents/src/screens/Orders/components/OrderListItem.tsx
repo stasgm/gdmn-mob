@@ -7,36 +7,39 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IOrderDocument } from '../../../store/docs/types';
 import { getStatusColor } from '../../../utils/constants';
-import { getDateString } from '../../../utils/helpers';
 import { OrdersStackParamList } from '../../../navigation/Root/types';
+// eslint-disable-next-line import/no-cycle
+import { OrderListRenderItemProps } from '../OrderListScreen';
 
-const OrderListItem = ({ item }: { item: IOrderDocument }) => {
+const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: OrderListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
-  const info = `№ ${item.number} от ${getDateString(item.documentDate)} на ${getDateString(item.head?.onDate)}`;
+  // const info = `№ ${item.number} от ${getDateString(item.documentDate)} на ${getDateString(item.head?.onDate)}`;
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('OrderView', { id: item.id });
+        navigation.navigate('OrderView', { id });
       }}
     >
       <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: getStatusColor(item?.status || 'DRAFT') }]}>
+        <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
           <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.head.outlet.name}</Text>
+            <Text style={styles.name}>{title}</Text>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{info}</Text>
+            <Text style={[styles.field, { color: colors.text }]}>{subtitle}</Text>
             <View style={styles.directionRow}>
-              <Text style={[styles.field, { color: colors.text }]}>{item.lines.length}</Text>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
+              <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
+              {isFromRoute ? (
+                <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
+              ) : null}
             </View>
           </View>
         </View>

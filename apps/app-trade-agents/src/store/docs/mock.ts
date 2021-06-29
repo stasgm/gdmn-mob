@@ -1142,7 +1142,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '147022890',
     number: '2',
-    documentDate: '2021-06-27',
+    documentDate: '2021-06-29',
     documentType: routeType,
     status: 'DRAFT',
     head: {
@@ -1167,14 +1167,14 @@ const routeMock: IRouteDocument[] = [
         id: '147022905',
         outlet: outlet1,
         ordNumber: 3,
-        visited: true,
+        visited: false,
         //  result: undefined,
       },
       {
         id: '147022902',
         outlet: outlet4,
-        ordNumber: 2,
-        visited: true,
+        ordNumber: 4,
+        visited: false,
         // result: undefined,
       },
     ],
@@ -1182,7 +1182,7 @@ const routeMock: IRouteDocument[] = [
   {
     id: '147022891',
     number: '3',
-    documentDate: '2021-06-14',
+    documentDate: '2021-06-26',
     documentType: routeType,
     status: 'PROCESSED',
     head: {

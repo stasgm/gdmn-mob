@@ -37,6 +37,7 @@ const ReturnListItem = ({ item }: { item: IReturnDocument }) => {
             <View style={styles.directionRow}>
               <Text style={[styles.field, { color: colors.text }]}>{item.lines.length}</Text>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
+              {item.head.route ? <MaterialCommunityIcons name="routes" size={15} /> : null}
             </View>
           </View>
         </View>

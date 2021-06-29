@@ -26,8 +26,8 @@ const ReturnLineScreen = () => {
         : documentActions.updateDocumentLine({ docId, line }),
     );
 
-    // navigation.goBack();
-    navigation.navigate('ReturnView', { id: docId });
+    navigation.goBack();
+    // navigation.navigate('ReturnView', { id: docId });
   }, [navigation, line, docId, dispatch, mode]);
 
   useLayoutEffect(() => {
