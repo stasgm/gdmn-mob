@@ -1,8 +1,6 @@
 import { Box, Container } from '@material-ui/core';
 
-import { useNavigate } from 'react-router-dom';
-
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 
 // import CachedIcon from '@material-ui/icons/Cached';
 
@@ -14,42 +12,82 @@ import DeviceListTable from '../device/DeviceListTable';
 import { IToolBarButton } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 
-interface props {
+interface IProps {
   devices: IDevice[];
+  onAddDevice: () => void;
+  // onSave: (selectedDevices: IDevice[]) => void;
+  // onAddDevicesClick?: (value: boolean) => void;
+  // sourcePath?: string;
+  // isAddDevices?: boolean;
 }
 
-const UserDevices = ({ devices }: props) => {
-  const navigate = useNavigate();
+const UserDevices = ({ devices, onAddDevice }: IProps) => {
+  // const navigate = useNavigate();
+  // const [isAddDevices, setIsAddDevices] = useState(false);
+  // const [selectedDevices, setSelectedDevices] = useState<IDevice[]>(devices || []);
+
+  // const handleAddClick = (value: boolean) => {
+  //   onAddDevicesClick && onAddDevicesClick(value);
+  // };
 
   const deviceButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Обновить',
-    //   sx: { mx: 1 },
-    //   onClick: fetchDevices,
-    //   icon: <CachedIcon />,
-    // },
-    // {
-    //   name: 'Загрузить',
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <ImportExportIcon />,
-    // },
-    // {
-    //   name: 'Выгрузить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    // },
     {
-      name: 'Добавить',
+      name: 'Добавить устройство',
       color: 'primary',
       variant: 'contained',
-      onClick: () => navigate('app/devices/new'),
-      icon: <AddCircleOutlineIcon />,
+      onClick: onAddDevice,
+      icon: <LibraryAddCheckIcon />,
     },
   ];
+
+  // /** изменение списка новых выбранных девайсов  */
+  // const handleChangeSelectedDevices = (value: any[]) => {
+  //   console.log('handleChangeSelectedDevices', value);
+  //   setSelectedDevices(value);
+  // };
+
+  // const handleSave = () => {
+  //   onSave(selectedDevices);
+  //   setIsAddDevices(false);
+  // };
+
+  // const handleCancel = () => {
+  //   setIsAddDevices(false);
+  // };
+
+  // useEffect(() => {
+  //   setSelectedDevices(devices);
+  // }, [devices]);
+
+  // interface UserDetailProps {
+  //   isAddingDevice: boolean;
+  //   // sourcePath?: string;
+  // }
+
+  // const UserDetail = (props: UserDetailProps) => {
+  //   const { isAddingDevice } = props;
+
+  //   if (isAddingDevice) {
+  //     return (
+  //       <UserSelectDevices
+  //         devices={selectedDevices}
+  //         onSaveClick={onSave}
+  //         onCancelClick={handleCancelClick}
+  //         onChangeSelectedDevices={handleChangeSelectedDevices}
+  //         // sourcePath={sourcePath}
+  //       />
+  //     );
+  //   }
+
+  //   return (
+  //     <div>
+  //       <ToolbarActionsWithSearch buttons={deviceButtons} searchTitle={'Найти устройство'} />
+  //       <Box sx={{ pt: 2 }}>
+  //         <DeviceListTable devices={devices} limitRows={5} />
+  //       </Box>
+  //     </div>
+  //   );
+  // };
 
   return (
     <Box
@@ -61,7 +99,7 @@ const UserDevices = ({ devices }: props) => {
       <Container maxWidth={false}>
         <ToolbarActionsWithSearch buttons={deviceButtons} searchTitle={'Найти устройство'} />
         <Box sx={{ pt: 2 }}>
-          <DeviceListTable devices={devices} />
+          <DeviceListTable devices={devices} limitRows={5} />
         </Box>
       </Container>
     </Box>

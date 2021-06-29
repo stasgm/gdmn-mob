@@ -11,7 +11,14 @@ const ToolBarActions = ({ buttons }: props) => {
   const buttonList = (
     <>
       {buttons.map((button: IToolBarButton) => (
-        <Button key={button.name} color={button.color} variant={button.variant} onClick={button.onClick} sx={button.sx}>
+        <Button
+          key={button.name}
+          color={button.color}
+          variant={button.variant}
+          onClick={button.onClick}
+          sx={button.sx}
+          startIcon={button.icon}
+        >
           {button.name}
         </Button>
       ))}

@@ -9,6 +9,7 @@ import Auth from './requests/auth';
 import { BaseApi } from './types/BaseApi';
 import Company from './requests/company';
 import Device from './requests/device';
+import DeviceBinding from './requests/deviceBinding';
 import Message from './requests/message';
 import User from './requests/user';
 
@@ -21,6 +22,7 @@ class Api extends BaseApi {
   public auth: Auth;
   public company: Company;
   public device: Device;
+  public deviceBinding: DeviceBinding;
   public message: Message;
   public user: User;
 
@@ -39,6 +41,7 @@ class Api extends BaseApi {
     this.auth = new Auth(this);
     this.company = new Company(this);
     this.device = new Device(this);
+    this.deviceBinding = new DeviceBinding(this);
     this.message = new Message(this);
     this.user = new User(this);
 

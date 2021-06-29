@@ -40,8 +40,7 @@ export interface IDBDevice extends INamedEntity {
   companyId: string;
 }
 
-export interface IDBDeviceBinding {
-  id: string;
+export interface IDBDeviceBinding extends IEntity {
   userId: string;
   deviceId: string;
   state: DeviceState;
@@ -111,7 +110,7 @@ export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'devic
   device: INamedEntity;
 }
 
-export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device'>;
+export type NewDeviceBinding = Pick<IDeviceBinding, 'user'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

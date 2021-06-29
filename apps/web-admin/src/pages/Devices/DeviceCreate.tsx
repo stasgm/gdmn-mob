@@ -26,7 +26,7 @@ const DeviceCreate = () => {
   const handleSubmit = async (values: IDevice | NewDevice) => {
     console.log('handleSubmit values', values);
     const res = await dispatch(
-      actions.addDevice({ ...values, userId: '70e3d810-c204-11eb-b85e-f3bb0925a990' } as NewDevice),
+      actions.addDevice({ ...values, userId: '70e3d810-c204-11eb-b85e-f3bb0925a990' } as unknown as NewDevice),
     );
     if (res.type === 'DEVICE/ADD_SUCCCES') {
       handleGoToDevices();

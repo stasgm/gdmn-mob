@@ -1,4 +1,4 @@
-import { Box, CardHeader, IconButton, CircularProgress, Container, Typography } from '@material-ui/core';
+import { Box, CardHeader, IconButton, Container, Typography } from '@material-ui/core';
 
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';

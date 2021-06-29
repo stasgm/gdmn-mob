@@ -7,16 +7,19 @@ import companyReducer from './company/reducer';
 import { CompanyActionType } from './company/actions';
 import userReducer from './user/reducer';
 import deviceReducer from './device/reducer';
+import deviceBindingReducer from './deviceBinding/reducer';
 import { DeviceActionType } from './device/actions';
 import { UserActionType } from './user/actions';
+import { DeviceBindingActionType } from './deviceBinding/actions';
 
 export const reducers = {
   companies: companyReducer,
   users: userReducer,
   devices: deviceReducer,
+  deviceBindings: deviceBindingReducer,
 };
 
-type TActions = CompanyActionType | DeviceActionType | UserActionType;
+type TActions = CompanyActionType | DeviceActionType | UserActionType | DeviceBindingActionType;
 
 const rootReducer = combineReducers(reducers);
 
