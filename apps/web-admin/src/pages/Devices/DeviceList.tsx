@@ -1,12 +1,14 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
+
+import { IDevice } from '@lib/types';
 
 import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -24,13 +26,28 @@ const DeviceList = () => {
   const dispatch = useDispatch();
 
   const { list, loading } = useSelector((state) => state.devices);
+  const [dataList, setDataList] = useState<IDevice[]>([]);
 
   const fetchDevices = useCallback(() => dispatch(actions.fetchDevices()), [dispatch]);
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     !list?.length && fetchDevices();
+
+    setDataList(list);
   }, [fetchDevices, list.length]);
+
+  const handleUpdateInput = (event: any) => {
+    const inputValue: string = event.target.value.toUpperCase();
+
+    const filtered = list.filter((item) => {
+      const name = item.name.toUpperCase();
+
+      return name.includes(inputValue);
+    });
+
+    setDataList(filtered);
+  };
 
   const buttons: IToolBarButton[] = [
     {
@@ -75,12 +92,16 @@ const DeviceList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти устройство'} />
+          <ToolbarActionsWithSearch
+            buttons={buttons}
+            searchTitle={'Найти устройство'}
+            updateInput={handleUpdateInput}
+          />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={list} />
+              <DeviceListTable devices={dataList} />
             </Box>
           )}
         </Container>

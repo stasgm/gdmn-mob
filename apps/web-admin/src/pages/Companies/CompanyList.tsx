@@ -1,12 +1,14 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
+
+import { ICompany } from '@lib/types';
 
 import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -26,6 +28,7 @@ const CompanyList = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.companies);
+  const [dataList, setDataList] = useState<ICompany[]>([]);
 
   const fetchCompanies = useCallback(async () => {
     const res = await dispatch(actions.fetchCompanies());
@@ -40,7 +43,20 @@ const CompanyList = () => {
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchCompanies();
+    setDataList(list);
   }, [fetchCompanies]);
+
+  const handleUpdateInput = (event: any) => {
+    const inputValue: string = event.target.value.toUpperCase();
+
+    const filtered = list.filter((item) => {
+      const name = item.name.toUpperCase();
+
+      return name.includes(inputValue);
+    });
+
+    setDataList(filtered);
+  };
 
   const handleClearError = () => {
     dispatch(actions.companyActions.clearError());
@@ -89,12 +105,12 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти компанию'} />
+          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти компанию'} updateInput={handleUpdateInput} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <CompanyListTable companies={list} />
+              <CompanyListTable companies={dataList} />
             </Box>
           )}
         </Container>
