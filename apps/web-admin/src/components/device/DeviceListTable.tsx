@@ -67,7 +67,7 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
   };
 
   const TableRows = () => {
-    const deviceList = devices.slice(0, limit).map((device: IDevice) => (
+    const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => (
       <TableRow hover key={device.id} selected={selectedDeviceIds.indexOf(device.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
@@ -95,7 +95,19 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
         <TableCell>{device.state}</TableCell>
       </TableRow>
     ));
-    return <>{deviceList}</>;
+
+    const emptyRows = limit - Math.min(limit, devices.length - page * limit);
+
+    return (
+      <>
+        {deviceList}
+        {emptyRows > 0 && page > 0 && (
+          <TableRow style={{ height: 53 * emptyRows }}>
+            <TableCell colSpan={4} />
+          </TableRow>
+        )}
+      </>
+    );
   };
 
   return (
