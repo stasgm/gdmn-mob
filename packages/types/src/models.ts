@@ -13,7 +13,7 @@ export interface IExternalSystemProps {
   externalId?: string;
 }
 
-export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
+export type DeviceState = 'NON-REGISTERED' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
 export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
 

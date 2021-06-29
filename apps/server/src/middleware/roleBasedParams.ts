@@ -6,11 +6,11 @@ export const roleBasedParamsMiddlware = async (ctx: Context, next: Next): Promis
 
   if (user?.role !== 'SuperAdmin') {
     // Ограничиваем запрос организацией администратора системы
-    const { companyId } = ctx.request.query;
+    // const { companyId } = ctx.request.query;
 
-    if (!companyId) {
-      ctx.request.query.companyId = user.companies?.[0].id;
-    }
+    // if (!companyId) {
+    ctx.request.query.companyId = user.companies?.[0].id;
+    // }
   }
 
   await next();

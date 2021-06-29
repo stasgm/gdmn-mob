@@ -12,27 +12,37 @@ import * as userService from './userService';
 import { getDb } from './dao/db';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
-  const { devices, users } = getDb();
+  const { devices, users, deviceBindings } = getDb();
 
-  const { deviceId } = ctx.query;
   const { name } = ctx.request.body as IUserCredentials;
 
   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
+  // TODO Вынести в отдельную функцию
   if (!user) {
     throw new UnauthorizedException('Неверные данные');
   }
 
   if (user.role === 'User') {
-    // Для пользователей с рольдю User проверяем дополнительно DeviceId
-    const device = await devices.find((el) => el.uid === deviceId);
+    // Для пользователей с ролью User проверяем дополнительно DeviceId
+    const { deviceId } = ctx.query;
 
+    const device = await devices.find((el) => el.uid === deviceId);
     if (!device) {
-      throw new UnauthorizedException('Связанное с пользователем Устройство не найдено');
+      throw new UnauthorizedException('Устройство не найдено');
     }
 
     if (device.state === 'BLOCKED') {
       throw new UnauthorizedException('Устройство заблокировано');
+    }
+
+    const deviceBinding = await deviceBindings.find((el) => el.deviceId === deviceId && el.userId === user.id);
+    if (!deviceBinding) {
+      throw new UnauthorizedException('Связанное с пользователем устройство не найдено');
+    }
+
+    if (deviceBinding.state === 'BLOCKED') {
+      throw new UnauthorizedException('Связанное с пользователем устройство заблокировано');
     }
   }
 

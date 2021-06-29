@@ -34,7 +34,7 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
 
   const newDeviceBinding: IDBDeviceBinding = {
     id: '',
-    state: 'NEW',
+    state: 'NON-ACTIVATED',
     deviceId: deviceBinding.device.id,
     userId: deviceBinding.user.id,
   };
