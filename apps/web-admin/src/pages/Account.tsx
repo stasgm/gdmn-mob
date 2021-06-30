@@ -29,7 +29,7 @@ const Account = () => {
       if (account?.id) {
         const res = await dispatch(actions.fetchUserById(id));
 
-        if (res.type === 'USER/FETCH_USER_SUCCCES') {
+        if (res.type === 'USER/FETCH_USER_SUCCESS') {
           console.log('res.payload', res.payload);
           setUser(res.payload);
         }
@@ -46,7 +46,7 @@ const Account = () => {
 
   const handleSaveUser = async (user: IUser) => {
     const res = await dispatch(actions.updateUser(user));
-    if (res.type === 'USER/UPDATE_SUCCCES') {
+    if (res.type === 'USER/UPDATE_SUCCESS') {
       fetchUser(res.payload.id);
     }
   };

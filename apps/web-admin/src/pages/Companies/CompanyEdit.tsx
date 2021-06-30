@@ -30,7 +30,7 @@ const CompanyEdit = () => {
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
     const res = await dispatch(actions.updateCompany(values as ICompany));
-    if (res.type === 'COMPANY/UPDATE_SUCCCES') {
+    if (res.type === 'COMPANY/UPDATE_SUCCESS') {
       handleGoToCompanyView();
     }
   };

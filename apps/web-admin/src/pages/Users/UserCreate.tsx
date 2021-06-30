@@ -25,7 +25,7 @@ const UserCreate = () => {
 
   const handleSubmit = async (values: IUser | NewUser) => {
     const res = await dispatch(actions.addUser(values as NewUser));
-    if (res.type === 'USER/ADD_SUCCCES') {
+    if (res.type === 'USER/ADD_SUCCESS') {
       handleGoToUsers();
     }
   };

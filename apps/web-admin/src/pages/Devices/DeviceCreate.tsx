@@ -28,7 +28,7 @@ const DeviceCreate = () => {
     const res = await dispatch(
       actions.addDevice({ ...values, userId: '70e3d810-c204-11eb-b85e-f3bb0925a990' } as NewDevice),
     );
-    if (res.type === 'DEVICE/ADD_SUCCCES') {
+    if (res.type === 'DEVICE/ADD_SUCCESS') {
       handleGoToDevices();
     }
   };

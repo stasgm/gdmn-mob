@@ -67,7 +67,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
   };
 
   const TableRows = () => {
-    const companyList = companies.slice(0, limit).map((company: ICompany) => (
+    const companyList = companies.slice(page * limit, page * limit + limit).map((company: ICompany) => (
       <TableRow hover key={company.id} selected={selectedCompanyIds.indexOf(company.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
@@ -130,7 +130,19 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
         </TableCell>
       </TableRow>
     ));
-    return <>{companyList}</>;
+
+    const emptyRows = limit - Math.min(limit, companies.length - page * limit);
+
+    return (
+      <>
+        {companyList}
+        {emptyRows > 0 && page > 0 && (
+          <TableRow style={{ height: 53 * emptyRows }}>
+            <TableCell colSpan={4} />
+          </TableRow>
+        )}
+      </>
+    );
   };
 
   return (

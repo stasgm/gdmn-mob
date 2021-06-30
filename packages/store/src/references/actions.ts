@@ -9,11 +9,11 @@ const clearError = createAction('REFERENCES/CLEAR_ERROR')();
 
 /*const addReferencesAsync = createAsyncAction(
   'REFERENCES/ADD_MANY',
-  'REFERENCES/ADD_MANY_SUCCCES',
+  'REFERENCES/ADD_MANY_SUCCESS',
   'REFERENCES/ADD_MANY_FAILURE',
 )<string | undefined, IReferences, string>();*/
 
-const addReferencesAsync = createAsyncAction('REFERENCES/ADD', 'REFERENCES/ADD_SUCCCES', 'REFERENCES/ADD_FAILURE')<
+const addReferencesAsync = createAsyncAction('REFERENCES/ADD', 'REFERENCES/ADD_SUCCESS', 'REFERENCES/ADD_FAILURE')<
   string | undefined,
   IReferences,
   string
@@ -21,7 +21,7 @@ const addReferencesAsync = createAsyncAction('REFERENCES/ADD', 'REFERENCES/ADD_S
 
 /*const addReferenceAsync = createAsyncAction(
   'REFERENCES/ADD_ONE',
-  'REFERENCES/ADD_ONE_SUCCCES',
+  'REFERENCES/ADD_ONE_SUCCESS',
   'REFERENCES/ADD_ONE_FAILURE',
 )<string | undefined, IReferences, string>();*/
 

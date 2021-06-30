@@ -50,7 +50,7 @@ const UserView = () => {
 
   const handleDelete = async () => {
     const res = await dispatch(actions.removeUser(userId));
-    if (res.type === 'USER/REMOVE_SUCCCES') {
+    if (res.type === 'USER/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };
