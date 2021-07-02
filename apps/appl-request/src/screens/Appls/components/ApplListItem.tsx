@@ -12,7 +12,7 @@ import { ApplsStackParamList } from '../../../navigation/Root/types';
 // eslint-disable-next-line import/no-cycle
 import { ApplListRenderItemProps } from '../ApplListScreen';
 
-const ApplListItem = ({ id, title, subtitle, description, status, lineCount }: ApplListRenderItemProps) => {
+const ApplListItem = ({ id, title, subtitle, description, status, lineCount, applStatus }: ApplListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ApplsStackParamList, 'ApplList'>>();
 
@@ -27,16 +27,17 @@ const ApplListItem = ({ id, title, subtitle, description, status, lineCount }: A
           <MaterialCommunityIcons name="file-outline" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <View style={styles.directionRow}>
+          <View style={styles.rowCenter}>
             <Text style={styles.name}>{title}</Text>
+            <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
           </View>
-          <View style={styles.directionRow}>
+          <View style={styles.rowBottom}>
             <View>
-              <Text style={[styles.field, { color: colors.text }]}>{subtitle}</Text>
-              <Text style={[styles.field, { color: colors.text }]}>{description}</Text>
+              <Text style={[styles.number, styles.field]}>{subtitle}</Text>
+              <Text style={[styles.number, styles.field]}>{description}</Text>
             </View>
-            <View style={styles.directionRow}>
-              <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
+            <View style={[styles.rowCenter]}>
+              <Text style={[styles.number, styles.field]}>{lineCount}</Text>
               <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
             </View>
           </View>

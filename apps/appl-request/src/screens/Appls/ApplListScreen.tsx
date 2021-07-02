@@ -1,14 +1,11 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
-  useActionSheet,
-  AddButton,
   DrawerButton,
-  MenuButton,
   FilterButtons,
   ItemSeparator,
   Status,
@@ -33,6 +30,7 @@ export interface ApplListItemProps {
   subtitle?: string;
   description?: string;
   status?: StatusType;
+  applStatus: string;
   isFromRoute?: boolean;
   lineCount?: number;
 }
@@ -57,13 +55,12 @@ const renderItem: ListRenderItem<ApplListRenderItemProps> = ({ item }) => {
 
 const ApplListScreen = () => {
   const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
 
   const { loading } = useSelector((state) => state.documents);
 
-  const list = (docSelectors.selectByDocType('appl') as IApplDocument[]).sort(
-    (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
-  );
+  const list = docSelectors
+    .selectByDocType<IApplDocument>('appl')
+    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -84,6 +81,7 @@ const ApplListScreen = () => {
           title: i.head.dept.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
+          applStatus: i.head.applStatus.name,
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
           description: shortenString(i.head.justification, 60),
           lineCount: i.lines.length,
@@ -117,42 +115,21 @@ const ApplListScreen = () => {
     navigation.navigate('ApplView');
   }, [navigation]);
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить',
-        onPress: handleAddDocument,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddDocument]);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
-          <AddButton onPress={handleAddDocument} />
-        </View>
-      ),
     });
-  }, [actionsMenu, handleAddDocument, navigation]);
+  }, [handleAddDocument, navigation]);
 
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={{ marginBottom: 5 }} />
+      <FilterButtons status={status} onPress={setStatus} />
       <SectionList
         sections={sections}
         renderItem={renderItem}
         keyExtractor={({ id }) => id}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, { backgroundColor: '#ddd', paddingVertical: 5 }]}>{section.title}</SubTitle>
-        )}
+        renderSectionHeader={({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />

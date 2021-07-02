@@ -1,17 +1,13 @@
 import React, { useLayoutEffect, useMemo } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
-
-// import { peopleRefMock, depRefMock, companyRefMock, docTypeRefMock } from '@lib/mock';
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { useSelector } from '@lib/store';
-
-// import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
-
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { useTheme } from 'react-native-paper';
+// import { peopleRefMock, depRefMock, companyRefMock, docTypeRefMock } from '@lib/mock';
+import { useSelector } from '@lib/store';
+import { DrawerButton, AppScreen } from '@lib/mobile-ui';
+
+import { Divider } from 'react-native-paper';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -24,11 +20,12 @@ const ReferenceListScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
 
   const refData = useMemo(() => {
-    return Object.entries(list)?.map(([key]) => ({ ...list[key], refName: key } as RefListItem)) || [];
+    return Object.entries(list)
+      .map(([key]) => ({ ...list[key], refName: key } as RefListItem))
+      .filter((i) => i.visible !== false);
   }, [list]);
 
   const navigation = useNavigation<ViewScreenProp>();
-  const { colors } = useTheme();
   // const showActionSheet = useActionSheet();
   // const dispatch = useDispatch();
 
@@ -83,17 +80,17 @@ const ReferenceListScreen = () => {
   const renderItem = ({ item }: { item: RefListItem }) => <ReferenceItem item={item} />;
 
   return (
-    <View style={[styles.content, { backgroundColor: colors.background }]}>
+    <AppScreen>
       <FlatList
         data={refData}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
+        ItemSeparatorComponent={Divider}
         scrollEventThrottle={400}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </View>
+    </AppScreen>
   );
 };
 

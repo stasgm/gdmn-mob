@@ -1,6 +1,5 @@
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
@@ -13,18 +12,17 @@ interface IProps {
 }
 
 const ApplItem = ({ item }: IProps) => {
-  const { colors } = useTheme();
   return (
     <TouchableOpacity>
       <View style={[styles.item]}>
         <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          <MaterialCommunityIcons name="information-outline" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.goodName}</Text>
-          <View style={[styles.directionRow]}>
-            <Text style={[styles.field, { color: colors.text }]}>{item.quantity}</Text>
-          </View>
+          <Text style={styles.name}>{item.goodName}</Text>
+          <Text
+            style={[styles.field, styles.number, styles.rightAlignmentSelf]}
+          >{`${item.quantity} ${item.value.name}`}</Text>
         </View>
       </View>
     </TouchableOpacity>

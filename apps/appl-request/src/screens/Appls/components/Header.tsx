@@ -18,13 +18,13 @@ const Header = ({ item }: IProps) => {
         <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
       </View>
       <View style={styles.details}>
-        <View style={[styles.directionRow]}>
-          <View style={[styles.directionRow]}>
+        <View style={[styles.rowCenter]}>
+          <View style={[styles.rowCenter]}>
             <Text style={styles.field}>{getDateString(item.head.verificationDate || new Date())}</Text>
             <MaterialCommunityIcons name="calendar-check-outline" size={15} />
           </View>
         </View>
-        <View style={styles.directionRow}>
+        <View style={styles.rowCenter}>
           <Text style={styles.name}>{item.head.dept.name}</Text>
         </View>
       </View>

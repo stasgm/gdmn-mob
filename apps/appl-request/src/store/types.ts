@@ -65,6 +65,7 @@ interface IApplLine extends IEntity {
   orderNum: number;
   goodName: string;
   quantity: number;
+  value: INamedEntity;
 }
 
 type IApplDocument = MandateProps<IDocument<IApplHead, IApplLine[]>, 'head' | 'lines'>;

@@ -1,4 +1,4 @@
-import { IReference, INamedEntity, ICompany } from '@lib/types';
+import { IReference, INamedEntity, ICompany, IRefMetadata } from '@lib/types';
 import { superAdmin } from '@lib/mock';
 
 import { IApplDocument, IEmployee } from './types';
@@ -16,7 +16,7 @@ const applStatuses: INamedEntity[] = [
   },
   {
     id: '147000002',
-    name: 'Принято к исполнению',
+    name: 'Принято',
   },
   {
     id: '147000003',
@@ -27,7 +27,8 @@ const applStatuses: INamedEntity[] = [
 // appl statuses reference
 const refApplStatuses: IReference<INamedEntity> = {
   id: '148000001',
-  name: 'Статусы',
+  name: 'Statuses',
+  visible: false,
   description: 'Статусы заявок',
   data: applStatuses,
 };
@@ -56,7 +57,7 @@ const employees: IEmployee[] = [
     lastName: 'Булла',
     position: {
       id: '011',
-      name: 'Энергетик"',
+      name: 'Энергетик',
     },
   },
   {
@@ -67,7 +68,7 @@ const employees: IEmployee[] = [
     lastName: 'Самусевич',
     position: {
       id: '006',
-      name: 'Начальник отдела материально-тенического обеспечения"',
+      name: 'Начальник отдела материально-тенического обеспечения',
     },
   },
   {
@@ -83,12 +84,45 @@ const employees: IEmployee[] = [
   },
 ];
 
+const emplMetadata: IRefMetadata<IEmployee> = {
+  id: {
+    visible: false,
+  },
+  name: {
+    sortOrder: 1,
+    name: 'ФИО',
+  },
+  lastName: {
+    sortOrder: 2,
+    name: 'Фамилия',
+  },
+  firstName: {
+    sortOrder: 3,
+    name: 'Имя',
+  },
+  middleName: {
+    sortOrder: 4,
+    name: 'Отчество',
+  },
+  position: {
+    sortOrder: 5,
+    name: 'Должность',
+  },
+};
+
 // appl emplyees reference
 const refEmplyees: IReference<IEmployee> = {
   id: '148000002',
-  name: 'Сотрудники',
-  description: 'Сотрудники организации',
+  name: 'Employees',
+  description: 'Сотрудники',
+  metadata: emplMetadata,
   data: employees,
+};
+
+// Ед. изм - штуки
+const value: INamedEntity = {
+  id: '999',
+  name: 'шт.',
 };
 
 // Документы Appl
@@ -136,8 +170,9 @@ const applDocuments: IApplDocument[] = [
       {
         id: '701',
         orderNum: 1,
-        goodName: 'Прошу найти организацию  для утилизации люминесцентных ламп',
+        goodName: 'Прошу найти организацию для утилизации люминесцентных ламп',
         quantity: 368,
+        value,
       },
     ],
   },
@@ -186,24 +221,28 @@ const applDocuments: IApplDocument[] = [
         orderNum: 1,
         goodName: 'Прошу закупить карандаши',
         quantity: 100,
+        value,
       },
       {
         id: '703',
         orderNum: 2,
         goodName: 'Прошу закупить тетради',
         quantity: 150,
+        value,
       },
       {
         id: '704',
         orderNum: 3,
         goodName: 'Прошу закупить столы',
         quantity: 10,
+        value,
       },
       {
         id: '705',
         orderNum: 4,
-        goodName: 'Прошу закупить книги',
+        goodName: 'Прошу закупить учебники необходимые для повышения квалификации работников всех отделов',
         quantity: 50,
+        value,
       },
     ],
   },

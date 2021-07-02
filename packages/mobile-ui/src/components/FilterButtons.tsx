@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
+import { StyleProp, Text, TouchableHighlight, View, ViewStyle, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
@@ -36,7 +36,7 @@ const FilterButtons = ({ status, onPress, style }: IProps) => {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.containerCenter, style]}>
+    <View style={[styles.containerCenter, localStyles.container, style]}>
       {statusTypes.map((e, i) => {
         return (
           <TouchableHighlight
@@ -60,3 +60,9 @@ const FilterButtons = ({ status, onPress, style }: IProps) => {
 };
 
 export default FilterButtons;
+
+const localStyles = StyleSheet.create({
+  container: {
+    marginBottom: 5,
+  },
+});
