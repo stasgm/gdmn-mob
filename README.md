@@ -2,7 +2,7 @@
 
 ## Установка
 
-1. Установить [https://nodejs.org/en/download/](Node.js), [https://classic.yarnpkg.com/lang/en/] (yarn).
+1. Установить [Node.js](https://nodejs.org/en/download/), [Yarn](https://classic.yarnpkg.com/lang/en/).
 
 2. Скачать репозиторий:
 
