@@ -4,7 +4,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIc
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IApplDocument } from '../../../store/docs/types';
+import { IApplDocument } from '../../../store/types';
+import { getDateString } from '../../../utils/helpers';
 
 interface IProps {
   item: IApplDocument;
@@ -19,12 +20,12 @@ const Header = ({ item }: IProps) => {
       <View style={styles.details}>
         <View style={[styles.directionRow]}>
           <View style={[styles.directionRow]}>
-            <Text style={styles.field}>{item.head.onDate}</Text>
+            <Text style={styles.field}>{getDateString(item.head.verificationDate || new Date())}</Text>
             <MaterialCommunityIcons name="calendar-check-outline" size={15} />
           </View>
         </View>
         <View style={styles.directionRow}>
-          <Text style={styles.name}>{item.head.outlet.name}</Text>
+          <Text style={styles.name}>{item.head.dept.name}</Text>
         </View>
       </View>
     </View>

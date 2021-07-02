@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import { BackButton, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
-import { IApplDocument, IApplLine } from '../../store/docs/types';
+import { IApplDocument, IApplLine } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 
@@ -58,7 +58,7 @@ const ApplViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IApplLine }) => <ApplItem docId={appl.id} item={item} readonly={isBlocked} />;
+  const renderItem = ({ item }: { item: IApplLine }) => <ApplItem docId={appl.id} item={item} />;
 
   return (
     <View style={[styles.container]}>

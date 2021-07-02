@@ -5,12 +5,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IApplLine } from '../../../store/docs/types';
+import { IApplLine } from '../../../store/types';
 
 interface IProps {
   docId: string;
   item: IApplLine;
-  readonly?: boolean;
 }
 
 const ApplItem = ({ item }: IProps) => {

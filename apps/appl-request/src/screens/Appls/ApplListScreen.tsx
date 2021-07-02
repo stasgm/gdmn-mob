@@ -18,17 +18,20 @@ import {
 
 import { StatusType } from '@lib/types';
 
-import { IApplDocument } from '../../store/docs/types';
+import { IApplDocument } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
+
+import { shortenString } from '../../utils/stringOperations';
 
 // eslint-disable-next-line import/no-cycle
 import ApplListItem from './components/ApplListItem';
 
 export interface ApplListItemProps {
-  title: string;
   documentDate: string;
+  title: string;
   subtitle?: string;
+  description?: string;
   status?: StatusType;
   isFromRoute?: boolean;
   lineCount?: number;
@@ -81,9 +84,8 @@ const ApplListScreen = () => {
           title: i.head.dept.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(
-            i.head?.verificationDate || new Date(),
-          )}`,
+          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
+          description: shortenString(i.head.justification, 60),
           lineCount: i.lines.length,
         } as ApplListRenderItemProps),
     );
@@ -112,7 +114,7 @@ const ApplListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('ApplEdit');
+    navigation.navigate('ApplView');
   }, [navigation]);
 
   const actionsMenu = useCallback(() => {

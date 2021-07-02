@@ -13,7 +13,7 @@ import Constants from 'expo-constants';
 
 import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
 
-import { applDocuments, refApplStatuses } from '../../../../apps/appl-request/src/store/docs/mock';
+import { applDocuments, refApplStatuses, refEmplyees } from '../../../../apps/appl-request/src/store/mock';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
@@ -35,6 +35,7 @@ export function DrawerContent(props: Props) {
     await dispatch(
       referenceActions.addReferences({
         applStatuses: refApplStatuses,
+        emplyees: refEmplyees,
       }),
     );
     await dispatch(documentActions.addDocuments(applDocuments));
