@@ -8,7 +8,7 @@ const Stack = createStackNavigator<OrdersStackParamList>();
 
 const OrdersNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="OrderLine" screenOptions={{ headerShown: true, title: 'Заявки' }}>
+    <Stack.Navigator initialRouteName="OrderList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
       {Object.entries({ ...orderListScreens, ...orderScreens }).map(([name, component]) => (
         <Stack.Screen name={name as keyof OrdersStackParamList} component={component} key={name} />
       ))}

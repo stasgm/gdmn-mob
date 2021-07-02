@@ -26,7 +26,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { docId, mode } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
+  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   // const isFocused = useIsFocused();

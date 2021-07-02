@@ -2,6 +2,7 @@ import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { v4 as uuid } from 'uuid';
 
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
@@ -13,22 +14,20 @@ import { IOrderLine } from '../../store/docs/types';
 import OrderLine from './components/OrderLine';
 
 const OrderLineScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList | RoutesStackParamList, 'OrderLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, item } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'OrderLine'>>();
+  const { docId, item } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
 
-  const [line, setLine] = useState<IOrderLine>(item);
+  const [line, setLine] = useState<IOrderLine>({ ...item, id: item.id || uuid() });
 
   const handleSave = useCallback(() => {
     dispatch(
-      mode === 0
-        ? documentActions.addDocumentLine({ docId, line })
-        : documentActions.updateDocumentLine({ docId, line }),
+      !item.id ? documentActions.addDocumentLine({ docId, line }) : documentActions.updateDocumentLine({ docId, line }),
     );
 
     navigation.goBack();
     // navigation.navigate('OrderView', { id: docId });
-  }, [navigation, line, docId, dispatch, mode]);
+  }, [dispatch, item.id, docId, line, navigation]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

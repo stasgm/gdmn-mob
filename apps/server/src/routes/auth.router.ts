@@ -10,7 +10,7 @@ import { authValidation } from '../validations';
 
 const router = Router();
 
-// deviceMiddleware - проверка в случае если пользователь заблокирован но залогинен
+// deviceMiddleware - проверка для случаев если пользователь заблокирован но залогинен
 router.prefix('/auth');
 router.post('/signup', authValidation.signup, signUp);
 router.post('/login', authValidation.login, logIn); // Проверка устройства проводится в методе службе

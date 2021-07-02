@@ -28,7 +28,7 @@ const OrderItem = ({ docId, item, readonly = false }: IProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        !readonly && navigation.navigate('OrderLine', { mode: 1, docId, item });
+        !readonly && navigation.navigate('OrderLine', { docId, item });
       }}
     >
       <View style={[styles.item]}>

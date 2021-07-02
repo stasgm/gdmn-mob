@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
@@ -9,11 +8,13 @@ import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/docs/types';
 
 const Good = ({ item }: { item: INamedEntity }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderLine'>>();
 
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
 
@@ -22,9 +23,8 @@ const Good = ({ item }: { item: INamedEntity }) => {
       onPress={() => {
         // dispatch(documentActions.);
         navigation.navigate('OrderLine', {
-          mode: 0,
           docId,
-          item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
+          item: { id: '', good: { id: item.id, name: item.name }, quantity: 0 },
         });
       }}
     >
@@ -60,7 +60,7 @@ const SelectGoodScreen = () => {
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, []);
+  }, [list, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
