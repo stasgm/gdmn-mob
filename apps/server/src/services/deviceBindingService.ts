@@ -34,7 +34,7 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
 
   const newDeviceBinding: IDBDeviceBinding = {
     id: '',
-    state: 'NEW',
+    state: 'NON-ACTIVATED',
     deviceId: deviceBinding.device.id,
     userId: deviceBinding.user.id,
   };
@@ -50,8 +50,7 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
  * @return обновленную связь
  * */
 const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>, params?: Record<string, string>) => {
-  const db = getDb();
-  const { deviceBindings, companies, devices } = db;
+  const { deviceBindings, companies, devices } = getDb();
 
   const oldDeviceBinding = await deviceBindings.find(id);
 
@@ -64,12 +63,11 @@ const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>,
     : oldDeviceBinding.deviceId;
 
   if (params) {
-    if ('adminId' in params) {
+    if ('companyId' in params) {
       const device = await devices.find(deviceId);
-      const company = await companies.find((c) => c.id === device.companyId && c.adminId === params.adminId);
 
-      if (!company) {
-        throw new DataNotFoundException('Устройство не может быть отредактировано');
+      if (device.companyId !== params.companyID) {
+        throw new DataNotFoundException('Устройство не может быть обновлено');
       }
     }
   }
@@ -106,8 +104,7 @@ const deleteOne = async ({ deviceBindingId }: { deviceBindingId: string }): Prom
 };
 
 const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
-  const db = getDb();
-  const { deviceBindings } = db;
+  const { deviceBindings } = getDb();
 
   const deviceBinding = await deviceBindings.find(id);
 
@@ -119,8 +116,7 @@ const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[]> => {
-  const db = getDb();
-  const { deviceBindings, devices, companies } = db;
+  const { deviceBindings, devices } = getDb();
 
   let deviceBindingList = await deviceBindings.read((item) => {
     const newParams = { ...params };
@@ -146,20 +142,15 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
       delete newParams['state'];
     }
 
-    if ('adminId' in newParams) {
-      delete newParams['adminId'];
-    }
-
     return userFound && deviceFound && stateFound && extraPredicate(item, newParams);
   });
 
   const newParams = { ...params };
 
-  if ('adminId' in newParams) {
+  if ('companyId' in newParams) {
     deviceBindingList = await asyncFilter(deviceBindingList, async (i: IDBDeviceBinding) => {
       const device = await devices.find(i.deviceId);
-      const company = await companies.find(device.companyId);
-      return company?.adminId === newParams.adminId;
+      return device?.companyId === newParams.companyId;
     });
   }
 

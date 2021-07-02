@@ -6,29 +6,17 @@ import { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode } 
 
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
-
 import { authValidation } from '../validations';
 
 const router = Router();
 
+// deviceMiddleware - проверка в случае если пользователь заблокирован но залогинен
 router.prefix('/auth');
 router.post('/signup', authValidation.signup, signUp);
-router.post('/login', authValidation.login, logIn);
-router.post('/logout', authMiddleware, logOut);
-// TODO permissionMiddlware вместе deviceMiddleware
+router.post('/login', authValidation.login, logIn); // Проверка устройства проводится в методе службе
+router.post('/logout', authMiddleware, deviceMiddleware, logOut);
 router.get('/user', authMiddleware, deviceMiddleware, getCurrentUser);
 router.get('/device/:deviceId/code', authValidation.getActivationCode, getActivationCode);
 router.post('/device/code', authValidation.verifyCode, verifyCode);
-
-// router.post('/login', logIn); // В методе logIn идёт проверка связи устройства с пользователем
-
-// const router = new Router({ prefix: '/auth' });
-
-// router.post('/signup', signUp);
-// router.post('/login', logIn); // В методе logIn идёт проверка связи устройства с пользователем
-// router.get('/logout', authMiddleware, logOut);
-// router.get('/user', compose([authMiddleware, deviceMiddleware]), getCurrentUser);
-// router.get('/device/:deviceId/code', getActivationCode);
-// router.post('/device/code', verifyCode);
 
 export default router;

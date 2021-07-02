@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IUser, IUserCredentials, NewUser } from '@lib/types';
+import { IUser, IUserCredentials } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -16,7 +16,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
     password,
     name,
     companies: [],
-  } as NewUser);
+  });
 
   created(ctx as Context, newUser);
 
@@ -51,11 +51,8 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
 const logOut = async (ctx: Context): Promise<void> => {
   const user = ctx.state.user as IUser;
-  console.log('user', user);
 
   await authService.logout(user.id);
-
-  console.log('user1', user);
 
   ctx.logout();
 
