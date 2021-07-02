@@ -13,19 +13,7 @@ import Constants from 'expo-constants';
 
 import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
 
-import {
-  routeMock,
-  orderMock,
-  goodRefMock,
-  contactRefMock,
-  outletRefMock,
-  debtRefMock,
-  goodGroupRefMock,
-  returnDocMock,
-  packageRefMock,
-  packageGoodRefMock,
-  departmentRefMock,
-} from '../../../../apps/app-trade-agents/src/store/docs/mock';
+import { applDocuments, refApplStatuses } from '../../../../apps/appl-request/src/store/docs/mock';
 
 type Props = DrawerContentComponentProps<DrawerContentOptions>;
 
@@ -46,19 +34,10 @@ export function DrawerContent(props: Props) {
 
     await dispatch(
       referenceActions.addReferences({
-        contact: contactRefMock,
-        outlet: outletRefMock,
-        debt: debtRefMock,
-        goodGroup: goodGroupRefMock,
-        good: goodRefMock,
-        package: packageRefMock,
-        packageGood: packageGoodRefMock,
-        department: departmentRefMock,
+        applStatuses: refApplStatuses,
       }),
     );
-    await dispatch(documentActions.addDocuments(orderMock));
-    await dispatch(documentActions.addDocuments(returnDocMock));
-    await dispatch(documentActions.addDocuments(routeMock));
+    await dispatch(documentActions.addDocuments(applDocuments));
 
     setLoading(false);
   };
