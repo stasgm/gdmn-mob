@@ -68,6 +68,6 @@ interface IApplLine extends IEntity {
   value: INamedEntity;
 }
 
-type IApplDocument = MandateProps<IDocument<IApplHead, IApplLine[]>, 'head' | 'lines'>;
+type IApplDocument = MandateProps<IDocument<IApplHead, IApplLine>, 'head' | 'lines'>;
 
 export { IEmployee, IApplDocument, IApplLine, IApplHead };

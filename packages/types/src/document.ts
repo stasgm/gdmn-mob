@@ -2,43 +2,45 @@ import { IEntity, INamedEntity } from './models';
 
 export type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
 
-/* interface IDocument extends IEntity {
-  number: string;
-  documentDate: string;
-  documentType: INamedEntity;
-  status: StatusType;
-} */
-/*
-interface IUserDocument<T = IDocument, K extends IEntity[] = IEntity[]> extends IDocument {
-  head: T;
-  lines: K;
-}
- */
+type Meta<T> = {
+  [P in keyof T]?: {
+    visible?: boolean;
+    sortOrder?: number;
+    name?: string;
+    required?: boolean;
+    type?: 'string' | 'date' | 'number' | 'ref';
+    refName?: string;
+  };
+};
 
+type IDocfMetadata<T, K> = {
+  head?: Meta<T>;
+  lines?: Meta<K>;
+};
 export interface IHead {
   [fieldname: string]: unknown;
 }
 
-interface IDocument<T = IHead, K extends IEntity[] = IEntity[]> extends IEntity {
+interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {
   number: string;
   documentDate: string;
   documentType: INamedEntity;
   status: StatusType;
+  metadata?: IDocfMetadata<T, K>;
   head?: T;
-  lines?: K;
+  lines?: K[];
 }
 
-export type MandateProps<T extends IEntity, K extends keyof T> = Omit<T, K> &
+type MandateProps<T extends IEntity, K extends keyof T> = Omit<T, K> &
   {
     [MK in K]-?: NonNullable<T[MK]>;
   };
 
+// Examples
+
 // type IOrder = MandateProps<IDocument<IHead, ILine[]>, 'head' | 'lines'>;
-
 // type Omit<T, K extends keyof IDocument> = Pick<T, Exclude<keyof T, K>>;
-
 // export type ISimpleDocument = Omit<IDocument, 'head' | 'lines'>;
-
 /* const g:  ISimpleDocument = {   };
 
 const a: IDocument = {
@@ -77,4 +79,4 @@ const c: IDocument<IHead, ILine[]> = {
   lines: [{ id: '1', name: 'Товар1', quantity: 2 }],
 };
  */
-export { IDocument };
+export { IDocument, IDocfMetadata, MandateProps };

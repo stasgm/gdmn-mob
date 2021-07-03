@@ -5,9 +5,9 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, Easing } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
-import Animated, { Extrapolate } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import Constants from 'expo-constants';
 
@@ -42,14 +42,6 @@ export function DrawerContent(props: Props) {
 
     setLoading(false);
   };
-  /*
-  const [fadeAnimation] = useState(new Animated.Value(0));
-
-   const opacity = Animated.interpolateNode(props.progress, {
-    inputRange: [0, 0.01],
-    outputRange: [0, 1],
-    extrapolate: Extrapolate.CLAMP,
-  }); */
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],

@@ -5,17 +5,11 @@ interface IReferenceData extends IEntity {
 }
 
 type IRefMetadata<T> = {
-  [P in keyof T]?:
-    | {
-        sortOrder?: number;
-        visible?: true;
-        name: string;
-      }
-    | {
-        sortOrder?: never;
-        visible: false;
-        name?: never;
-      };
+  [P in keyof T]?: {
+    visible?: boolean;
+    sortOrder?: number;
+    name?: string;
+  };
 };
 
 interface IReference<T = IReferenceData> {
@@ -32,16 +26,3 @@ interface IReferences<T = any> {
 }
 
 export { IReference, IReferences, IReferenceData, IRefMetadata };
-
-/* interface IDepartment extends INamedEntity {
-  company: INamedEntity;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface IPeople extends INamedEntity {
-  company?: INamedEntity;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface ICompany extends INamedEntity { }
- */

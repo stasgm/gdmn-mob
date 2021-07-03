@@ -1,7 +1,7 @@
-import { IReference, INamedEntity, ICompany, IRefMetadata } from '@lib/types';
+import { IReference, INamedEntity, ICompany, IRefMetadata, IDocfMetadata } from '@lib/types';
 import { superAdmin } from '@lib/mock';
 
-import { IApplDocument, IEmployee } from './types';
+import { IApplDocument, IApplHead, IApplLine, IEmployee } from './types';
 
 // DocumentTypes
 const applType = { id: '147010699', name: 'appl' };
@@ -84,6 +84,7 @@ const employees: IEmployee[] = [
   },
 ];
 
+// Метаданные для справочника Сотрудники
 const emplMetadata: IRefMetadata<IEmployee> = {
   id: {
     visible: false,
@@ -125,6 +126,22 @@ const value: INamedEntity = {
   name: 'шт.',
 };
 
+// Метаданные для документа заявки
+const applDocMetadata: IDocfMetadata<IApplHead, IApplLine> = {
+  head: {
+    justification: {
+      name: 'Основание',
+      sortOrder: 1,
+    },
+    sysApplicant: {
+      name: 'Системный заявитель',
+      sortOrder: 2,
+      type: 'ref',
+      refName: 'employees',
+    },
+  },
+};
+
 // Документы Appl
 const applDocuments: IApplDocument[] = [
   {
@@ -133,6 +150,7 @@ const applDocuments: IApplDocument[] = [
     documentDate: '2021-07-04',
     documentType: applType,
     status: 'DRAFT',
+    metadata: applDocMetadata,
     head: {
       applStatus: applStatuses[0],
       purchaseType: {

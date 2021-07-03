@@ -5,7 +5,15 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity } from '@lib/types';
-import { BackButton, globalStyles as styles, InfoBlock, ItemSeparator, PrimeButton, SubTitle } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  BackButton,
+  globalStyles as styles,
+  InfoBlock,
+  ItemSeparator,
+  PrimeButton,
+  SubTitle,
+} from '@lib/mobile-ui';
 
 import { Divider, useTheme } from 'react-native-paper';
 
@@ -69,16 +77,16 @@ const ApplViewScreen = () => {
 
   if (!appl) {
     return (
-      <View style={styles.container}>
+      <AppScreen>
         <SubTitle style={styles.title}>Документ не найден</SubTitle>
-      </View>
+      </AppScreen>
     );
   }
 
   const renderItem = ({ item }: { item: IApplLine }) => <ApplItem docId={appl.id} item={item} />;
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
       <InfoBlock colorLabel={colors.primary} title={appl.head.dept.name}>
         <>
           <Text>{`№ ${appl.number} от ${getDateString(appl.documentDate)}`} </Text>
@@ -117,7 +125,7 @@ const ApplViewScreen = () => {
           </PrimeButton>
         </View>
       ) : null}
-    </View>
+    </AppScreen>
   );
 };
 
