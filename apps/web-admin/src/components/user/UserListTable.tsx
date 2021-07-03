@@ -21,7 +21,7 @@ interface props {
   users?: IUser[];
 }
 
-const UserListTable = ({ users = [], ...rest }: props) => {
+const UserListTable = ({ users = [] }: props) => {
   const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -101,7 +101,7 @@ const UserListTable = ({ users = [], ...rest }: props) => {
   };
 
   return (
-    <Card {...rest}>
+    <Card>
       <PerfectScrollbar>
         <Box sx={{ minWidth: 1050, p: 1 }}>
           <Table>

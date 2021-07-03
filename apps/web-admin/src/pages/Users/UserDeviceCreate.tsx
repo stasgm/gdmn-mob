@@ -1,14 +1,13 @@
 import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
-
 import { useEffect } from 'react';
 
 import SnackBar from '../../components/SnackBar';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
-import userActions from '../../store/user';
+import actions from '../../store/user';
+import selectors from '../../store/user/selectors';
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 
 const UserDeviceCreate = () => {
@@ -19,10 +18,10 @@ const UserDeviceCreate = () => {
 
   const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
 
-  const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
+  const user = selectors.userById(userId);
 
   useEffect(() => {
-    dispatch(userActions.fetchUserById(userId));
+    dispatch(actions.fetchUserById(userId));
   }, [dispatch, userId]);
 
   const goBack = () => {

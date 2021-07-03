@@ -9,20 +9,12 @@ interface IUserSelectDevices {
   onSave: (selectedDevices: IDevice[]) => void;
   onCancel: () => void;
   onChangeSelectedDevices: (value: any[]) => void;
-  // sourcePath: string;
 }
-//{ devices = [] }:
-const UserSelectDevices = ({ onSave, onCancel, onChangeSelectedDevices, devices }: IUserSelectDevices) => {
-  // sourcePath = `${sourcePath}selectdevice/`;
 
+const UserSelectDevices = ({ onSave, onCancel, onChangeSelectedDevices, devices }: IUserSelectDevices) => {
   return (
     <div>
-      <DeviceList
-        selectedDevices={devices}
-        limitRows={5}
-        onChangeSelectedDevices={onChangeSelectedDevices}
-        // sourcePath={sourcePath}
-      />
+      <DeviceList selectedDevices={devices} limitRows={5} onChangeSelectedDevices={onChangeSelectedDevices} />
       <>
         <Button
           color="primary"

@@ -3,27 +3,24 @@ import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
 
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
 import UserListTable from '../../components/user/UserListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user/actions.async';
-
+import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-
 import { IToolBarButton } from '../../types';
+import SnackBar from '../../components/SnackBar';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.users);
+  const { list, loading, errorMessage } = useSelector((state) => state.users);
 
   const fetchUsers = useCallback(() => dispatch(actions.fetchUsers()), [dispatch]);
 
@@ -31,6 +28,10 @@ const UserList = () => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     fetchUsers();
   }, [fetchUsers]);
+
+  const handleClearError = () => {
+    dispatch(actions.userActions.clearError());
+  };
 
   const buttons: IToolBarButton[] = [
     {
@@ -85,6 +86,7 @@ const UserList = () => {
           )}
         </Container>
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

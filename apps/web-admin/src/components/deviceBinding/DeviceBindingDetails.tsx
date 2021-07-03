@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { IDeviceBinding, NewDeviceBinding, INamedEntity, IDevice } from '@lib/types';
+import { IDeviceBinding, NewDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';
 import * as yup from 'yup';
 
@@ -12,7 +12,6 @@ import ComboBox from '../ComboBox';
 import { deviceStates } from '../../utils/constants';
 
 interface IProps {
-  // devices: INamedEntity[];
   loading: boolean;
   deviceBinding: NewDeviceBinding | IDeviceBinding;
   onSubmit: (values: NewDeviceBinding | IDeviceBinding) => void;
@@ -24,16 +23,22 @@ export interface IDeviceBindingFormik extends Omit<NewDeviceBinding | IDeviceBin
 }
 
 const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IProps) => {
-  const [devices, setDevices] = useState<IDevice[]>();
+  const [devices, setDevices] = useState<INamedEntity[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(true);
 
   useEffect(() => {
+    let unmounted = false;
     const getDevices = async () => {
       const res = await api.device.getDevices();
-      if (res.type === 'GET_DEVICES') {
-        setDevices(res.devices);
+      if (res.type === 'GET_DEVICES' && !unmounted) {
+        setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
+        setLoadingDevices(false);
       }
     };
     getDevices();
+    return () => {
+      unmounted = true;
+    };
   }, []);
 
   const initialValues: IDeviceBindingFormik = {
@@ -93,6 +98,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.device && formik.errors.device)}
+                    disabled={loading || loadingDevices}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -105,6 +111,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.state && formik.errors.state)}
+                    disabled={loading}
                   />
                 </Grid>
               </Grid>

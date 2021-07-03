@@ -16,7 +16,6 @@ const CompanyCreate = () => {
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
   const handleGoToCompanies = () => {
-    //navigate('/app/companies');
     navigate(-1);
   };
 

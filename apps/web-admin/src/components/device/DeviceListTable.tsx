@@ -22,16 +22,12 @@ interface IProps {
   selectedDevices?: IDevice[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
-  sourcePath?: string;
 }
 
 const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevices = [], limitRows = 0 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  // const { selectedDevices = [], limitRows = 0, sourcePath = '/app/' } = rest;
-  // = '/app/devices/'
-  ///app/users/devices/
 
   const handleSelectAll = (event: any) => {
     let newSelectedDeviceIds;
@@ -91,8 +87,6 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
     }
   }, [limitRows, selectedDeviceIds.length, selectedDevices]);
 
-  // console.log('DeviceListTable_sourcePath', sourcePath);
-
   const TableRows = () => {
     const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => (
       <TableRow
@@ -133,7 +127,6 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
             </NavLink>
           </Box>
         </TableCell>
-        {/* <TableCell>{device.name}</TableCell> */}
         <TableCell>{device.uid}</TableCell>
         <TableCell>{device.state}</TableCell>
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>

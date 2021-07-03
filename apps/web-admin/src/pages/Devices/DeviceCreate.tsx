@@ -15,8 +15,8 @@ const DeviceCreate = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
 
-  const handleGoToDevices = () => {
-    navigate('/app/devices');
+  const goBack = () => {
+    navigate(-1);
   };
 
   const handleClearError = () => {
@@ -24,10 +24,9 @@ const DeviceCreate = () => {
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
-    console.log('handleSubmit values', values);
     const res = await dispatch(actions.addDevice({ ...values } as NewDevice));
     if (res.type === 'DEVICE/ADD_SUCCCES') {
-      handleGoToDevices();
+      goBack();
     }
   };
 
@@ -50,12 +49,7 @@ const DeviceCreate = () => {
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>
-        <DeviceDetails
-          device={{ name: '' } as IDevice}
-          loading={loading}
-          onSubmit={handleSubmit}
-          onCancel={handleGoToDevices}
-        />
+        <DeviceDetails device={{ name: '' } as IDevice} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>

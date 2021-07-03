@@ -8,6 +8,8 @@ import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
+import selectors from '../../store/user/selectors';
+import bindingSelectors from '../../store/deviceBinding/selectors';
 import bindingActions from '../../store/deviceBinding';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
@@ -22,10 +24,10 @@ const UserView = () => {
 
   const dispatch = useDispatch();
 
-  const users = useSelector((state) => state.users);
-  const user = users.list.find((i) => i.id === userId);
+  const { loading, errorMessage } = useSelector((state) => state.users);
+  const user = selectors.userById(userId);
 
-  const userDevices = useSelector((state) => state.deviceBindings.list.filter((b) => b.user.id === userId));
+  const userDevices = bindingSelectors.bindingsByUserId(userId);
 
   const handleCancel = () => {
     navigate('/app/users');
@@ -110,8 +112,8 @@ const UserView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список пользователей'} />
-            {users.loading && <CircularProgress size={40} />}
+            <CardHeader title={'Назад'} />
+            {loading && <CircularProgress size={40} />}
           </Box>
           <Box
             sx={{
@@ -134,7 +136,7 @@ const UserView = () => {
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
         <UserDevices userDevices={userDevices} onAddDevice={handleAddDevice} />
       </Box>
-      <SnackBar errorMessage={users.errorMessage} onClearError={handleClearError} />
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

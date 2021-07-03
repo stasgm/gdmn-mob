@@ -3,41 +3,42 @@ import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
-
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
 import { IDevice } from '@lib/types';
 
 import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device/actions.async';
-
+import actions from '../../store/device';
 import { IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-interface props {
+import SnackBar from '../../components/SnackBar';
+
+interface IProps {
   selectedDevices?: IDevice[];
   limitRows?: number;
   onChangeSelectedDevices?: (value: any[]) => void;
-  sourcePath?: string;
 }
 
-const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevices, sourcePath }: props) => {
+const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevices }: IProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.devices);
+  const { list, loading, errorMessage } = useSelector((state) => state.devices);
 
   const fetchDevices = useCallback(() => dispatch(actions.fetchDevices()), [dispatch]);
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    !list?.length && fetchDevices();
-  }, [fetchDevices, list.length]);
+    fetchDevices();
+  }, [fetchDevices]);
+
+  const handleClearError = () => {
+    dispatch(actions.deviceActions.clearError());
+  };
 
   const buttons: IToolBarButton[] = [
     {
@@ -69,8 +70,6 @@ const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevic
     },
   ];
 
-  // console.log('DeviceList_sourcePath', sourcePath);
-
   return (
     <>
       <Helmet>
@@ -94,12 +93,12 @@ const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevic
                 limitRows={limitRows}
                 selectedDevices={selectedDevices}
                 onChangeSelectedDevices={onChangeSelectedDevices}
-                // sourcePath={sourcePath}
               />
             </Box>
           )}
         </Container>
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

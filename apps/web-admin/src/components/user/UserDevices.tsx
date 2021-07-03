@@ -1,11 +1,5 @@
 import { Box, Container } from '@material-ui/core';
-
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
-
-// import CachedIcon from '@material-ui/icons/Cached';
-
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
-
 import { IDeviceBinding } from '@lib/types';
 
 import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';

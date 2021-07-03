@@ -1,17 +1,13 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { IDevice, NewDevice } from '@lib/types';
+import { useEffect } from 'react';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/device';
 import SnackBar from '../../components/SnackBar';
-
-// interface IDeviceEdit {
-//   sourcePath?: string;
-// }
+import selectors from '../../store/device/selectors';
+import actions from '../../store/device';
 
 const DeviceEdit = () => {
   const { id: deviceId } = useParams();
@@ -21,18 +17,14 @@ const DeviceEdit = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
-  const device = useSelector((state) => state.devices.list.find((i) => i.id === deviceId));
+  const device = selectors.deviceById(deviceId);
 
-  const handleGoToDeviceView = () => {
-    // if (sourcePath) {
-    //   let text;
-    //   text = sourcePath.replace(':userid', userId);
-    //   text = text.replace(':id', deviceId);
+  useEffect(() => {
+    dispatch(actions.fetchDeviceById(deviceId));
+  }, [dispatch, deviceId]);
 
-    //   navigate(text);
-    //   return;
-    // }
-    navigate(`/app/devices/${deviceId}`);
+  const goBack = () => {
+    navigate(-1);
   };
 
   const handleClearError = () => {
@@ -42,7 +34,7 @@ const DeviceEdit = () => {
   const handleSubmit = async (values: IDevice | NewDevice) => {
     const res = await dispatch(actions.updateDevice(values as IDevice));
     if (res.type === 'DEVICE/UPDATE_SUCCCES') {
-      handleGoToDeviceView();
+      goBack();
     }
   };
 
@@ -65,7 +57,7 @@ const DeviceEdit = () => {
         <CardHeader title={'Редактирование устройства'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <DeviceDetails device={device} loading={loading} onSubmit={handleSubmit} onCancel={handleGoToDeviceView} />
+      <DeviceDetails device={device} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );

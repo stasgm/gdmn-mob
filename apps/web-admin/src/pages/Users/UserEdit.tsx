@@ -1,14 +1,12 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { IUser, NewUser } from '@lib/types';
-
 import { useEffect } from 'react';
 
 import UserDetails from '../../components/user/UserDetails';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/user';
+import selectors from '../../store/user/selectors';
 import SnackBar from '../../components/SnackBar';
 
 const UserEdit = () => {
@@ -18,8 +16,8 @@ const UserEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading, list: users } = useSelector((state) => state.users);
-  const user = users.find((i) => i.id === userId);
+  const { errorMessage, loading } = useSelector((state) => state.users);
+  const user = selectors.userById(userId);
 
   useEffect(() => {
     dispatch(actions.fetchUserById(userId));

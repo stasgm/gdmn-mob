@@ -1,6 +1,6 @@
 import { TextField, createFilterOptions, Autocomplete } from '@material-ui/core';
 
-import { INamedEntity } from '../../../../packages/types';
+import { INamedEntity } from '@lib/types';
 
 interface IProps {
   field: any;

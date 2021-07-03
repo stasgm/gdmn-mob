@@ -1,16 +1,13 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
-
 import { useEffect } from 'react';
 
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import SnackBar from '../../components/SnackBar';
-
-import bindingActions from '../../store/deviceBinding';
+import actions from '../../store/deviceBinding';
+import selectors from '../../store/deviceBinding/selectors';
 
 const BindingEdit = () => {
   const { id: userId, deviceid } = useParams();
@@ -19,11 +16,11 @@ const BindingEdit = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const bindings = useSelector((state) => state.deviceBindings);
-  const binding = bindings.list.find((b) => b.device.id === deviceid && b.user.id === userId);
+  const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
+  const binding = selectors.bindingsByDeviceIdAndUserId(deviceid, userId);
 
   useEffect(() => {
-    dispatch(bindingActions.fetchDeviceBindings(userId));
+    dispatch(actions.fetchDeviceBindings(userId));
   }, [dispatch, userId]);
 
   const goBack = () => {
@@ -31,11 +28,11 @@ const BindingEdit = () => {
   };
 
   const handleClearError = () => {
-    dispatch(bindingActions.deviceBindingActions.clearError());
+    dispatch(actions.deviceBindingActions.clearError());
   };
 
   const handleSubmit = async (values: NewDeviceBinding | IDeviceBinding) => {
-    const res = await dispatch(bindingActions.updateDeviceBinding(values as IDeviceBinding));
+    const res = await dispatch(actions.updateDeviceBinding(values as IDeviceBinding));
     if (res.type === 'DEVICEBINDING/UPDATE_SUCCCES') {
       goBack();
     }
@@ -58,15 +55,15 @@ const BindingEdit = () => {
         }}
       >
         <CardHeader title={'Редактирование связи с устройством'} />
-        {bindings.loading && <CircularProgress size={40} />}
+        {loading && <CircularProgress size={40} />}
       </Box>
       <DeviceBindingDetails
         deviceBinding={binding as IDeviceBinding}
-        loading={bindings.loading}
+        loading={loading}
         onSubmit={handleSubmit}
         onCancel={goBack}
       />
-      <SnackBar errorMessage={bindings.errorMessage} onClearError={handleClearError} />
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };
