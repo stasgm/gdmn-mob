@@ -20,7 +20,14 @@ class User extends BaseRequest {
 
       return {
         type: 'ADD_USER',
-        user: { ...user, id: uuid(), creator: mockUser, role: 'User' },
+        user: {
+          ...user,
+          id: uuid(),
+          creator: mockUser,
+          role: 'User',
+          editionDate: new Date().toISOString(),
+          creationDate: new Date().toISOString(),
+        },
       };
     }
 
@@ -57,13 +64,13 @@ class User extends BaseRequest {
       if (updatedUser) {
         return {
           type: 'UPDATE_USER',
-          user: updatedUser,
+          user: { ...updatedUser, editionDate: new Date().toISOString() },
         } as types.IUpdateUserResponse;
       }
 
       return {
         type: 'ERROR',
-        message: 'Пользоватль не найден',
+        message: 'Пользователь не найден',
       } as error.INetworkError;
     }
 

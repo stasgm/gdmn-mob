@@ -2,34 +2,41 @@ import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
+import { useEffect } from 'react';
+
 import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
-import actions from '../../store/deviceBinding';
-import BindingDetails from '../../components/deviceBinding/BindingDetails';
+import bindingActions from '../../store/deviceBinding';
+import userActions from '../../store/user';
+import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 
-const BindingCreate = () => {
+const UserDeviceCreate = () => {
   const { id: userId } = useParams();
 
   const navigate = useNavigate();
-
   const dispatch: AppDispatch = useDispatch();
 
-  const { errorMessage, loading } = useSelector((state) => state.users);
+  const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
+
   const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
 
-  const handleGoBack = () => {
+  useEffect(() => {
+    dispatch(userActions.fetchUserById(userId));
+  }, [dispatch, userId]);
+
+  const goBack = () => {
     navigate(-1);
   };
 
   const handleClearError = () => {
-    dispatch(actions.deviceBindingActions.clearError());
+    dispatch(bindingActions.deviceBindingActions.clearError());
   };
 
   const handleSubmit = async (values: IDeviceBinding | NewDeviceBinding) => {
-    const res = await dispatch(actions.addDeviceBinding(values as NewDeviceBinding));
+    const res = await dispatch(bindingActions.addDeviceBinding(values as NewDeviceBinding));
     if (res.type === 'DEVICEBINDING/ADD_SUCCCES') {
-      handleGoBack();
+      goBack();
     }
   };
 
@@ -48,15 +55,15 @@ const BindingCreate = () => {
           }}
         >
           <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <CardHeader title={'Добавление устройства пользователю'} />
+            <CardHeader title={'Добавление устройства для пользователя'} />
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>
-        <BindingDetails
-          deviceBinding={{ user } as NewDeviceBinding}
+        <DeviceBindingDetails
+          deviceBinding={{ user: { id: user?.id, name: user?.name }, state: 'NON-ACTIVATED' } as NewDeviceBinding}
           loading={loading}
           onSubmit={handleSubmit}
-          onCancel={handleGoBack}
+          onCancel={goBack}
         />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
@@ -64,4 +71,4 @@ const BindingCreate = () => {
   );
 };
 
-export default BindingCreate;
+export default UserDeviceCreate;

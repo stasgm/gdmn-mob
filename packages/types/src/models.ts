@@ -13,7 +13,7 @@ export interface IExternalSystemProps {
   externalId?: string;
 }
 
-export type DeviceState = 'NEW' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
+export type DeviceState = 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
 export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
 
@@ -110,7 +110,7 @@ export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'devic
   device: INamedEntity;
 }
 
-export type NewDeviceBinding = Pick<IDeviceBinding, 'user'>;
+export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device' | 'state'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

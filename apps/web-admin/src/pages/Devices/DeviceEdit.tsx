@@ -9,15 +9,12 @@ import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/device';
 import SnackBar from '../../components/SnackBar';
 
-interface IDeviceEdit {
-  sourcePath?: string;
-}
+// interface IDeviceEdit {
+//   sourcePath?: string;
+// }
 
-const DeviceEdit = (props: IDeviceEdit) => {
-  const { sourcePath } = props;
-
+const DeviceEdit = () => {
   const { id: deviceId } = useParams();
-  const { userid: userId } = useParams();
 
   const navigate = useNavigate();
 
@@ -27,14 +24,14 @@ const DeviceEdit = (props: IDeviceEdit) => {
   const device = useSelector((state) => state.devices.list.find((i) => i.id === deviceId));
 
   const handleGoToDeviceView = () => {
-    if (sourcePath) {
-      let text;
-      text = sourcePath.replace(':userid', userId);
-      text = text.replace(':id', deviceId);
+    // if (sourcePath) {
+    //   let text;
+    //   text = sourcePath.replace(':userid', userId);
+    //   text = text.replace(':id', deviceId);
 
-      navigate(text);
-      return;
-    }
+    //   navigate(text);
+    //   return;
+    // }
     navigate(`/app/devices/${deviceId}`);
   };
 

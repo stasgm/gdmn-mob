@@ -1,84 +1,31 @@
 import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
-
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-
 import { useNavigate, useParams } from 'react-router-dom';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
-// import { device } from '@lib/mock';
-
-// import { device, device2 } from '@lib/mock';
-
-import { useCallback } from 'react';
-
-import { IDevice } from '@lib/types';
+import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
-
 import bindingActions from '../../store/deviceBinding';
-
 import { IToolBarButton } from '../../types';
-
 import ToolBarAction from '../../components/ToolBarActions';
-
 import UserDetailsView from '../../components/user/UserDetailsView';
-
 import UserDevices from '../../components/user/UserDevices';
-import deviceActions from '../../store/device';
 import SnackBar from '../../components/SnackBar';
 
-interface IUserView {
-  isSelectDevice?: boolean;
-}
-
-const UserView = (props: IUserView) => {
-  const { isSelectDevice } = props;
+const UserView = () => {
   const { id: userId } = useParams();
-
-  // const [devices, setDevices] = useState<IDevice[]>([]);
 
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  // const classes = useStyles();
-  //const sourcePath = `/app/users/${userId}/`;
-
-  console.log('UserView_isSelectDevice', isSelectDevice);
-
   const users = useSelector((state) => state.users);
-  const devices = useSelector((state) => state.devices);
-  const bindings = useSelector((state) => state.deviceBindings);
-
   const user = users.list.find((i) => i.id === userId);
-  const userDevices: IDevice[] = [];
-  bindings.list
-    .filter((b) => b.user.id === userId)
-    .forEach((b) => {
-      const device = devices.list.find((d) => b.device.id === d.id);
-      if (device) {
-        userDevices.push(device);
-      }
-    });
 
-  // const devices = useSelector((state) =>
-  //   state.deviceBindings.list
-  //     .filter((b) => b.user.id === userId)
-  //     .map((b) => state.devices.list.find((d) => d.id === b.device.id)),
-  // );
-
-  // useEffect(() => {
-
-  // }, []);
-  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
-
-  // const handleAddDevicesClick = (value: boolean) => {
-  //   setIsAddDevices(value);
-  // };
+  const userDevices = useSelector((state) => state.deviceBindings.list.filter((b) => b.user.id === userId));
 
   const handleCancel = () => {
     navigate('/app/users');
@@ -89,18 +36,22 @@ const UserView = (props: IUserView) => {
   };
 
   const handleAddDevice = () => {
-    navigate(`/app/users/${userId}/addDevice`);
+    navigate(`/app/users/${userId}/devices/new`);
   };
 
   const handleClearError = () => {
     dispatch(actions.userActions.clearError());
   };
 
-  const handleRefresh = useCallback(() => {
+  const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
-    dispatch(deviceActions.fetchDevices(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
   }, [dispatch, userId]);
+
+  useEffect(() => {
+    /* Загружаем данные при загрузке компонента */
+    refreshData();
+  }, [refreshData]);
 
   const handleDelete = async () => {
     const res = await dispatch(actions.removeUser(userId));
@@ -108,21 +59,6 @@ const UserView = (props: IUserView) => {
       navigate(-1);
     }
   };
-
-  // const handleSaveSelectedDevices = (selectedDevices: IDevice[]) => {
-  //   const newBindings: IDeviceBindings = selectedDevices.map((d) => { user, device: { id: d.id, name: d.name } })
-  //   const res = await dispatch(bindingActions.addDeviceBinding(selectedDevices);
-  //   if (res.type === 'DEVICEBINDING/ADD_SUCCCES') {
-  //     handleGoToCompanyView();
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   setDevices([device, device2]);
-  //   if (isSelectDevice) setIsAddDevices(isSelectDevice);
-
-  //   handleRefresh();
-  // }, [handleRefresh, isSelectDevice]);
 
   if (!user) {
     return <Box>Пользователь не найден</Box>;
@@ -134,7 +70,7 @@ const UserView = (props: IUserView) => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: () => handleRefresh(),
+      onClick: () => refreshData(),
       icon: <CachedIcon />,
     },
     {
@@ -196,13 +132,7 @@ const UserView = (props: IUserView) => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices
-          devices={userDevices}
-          onAddDevice={handleAddDevice}
-          // sourcePath={sourcePath}
-          // isAddDevices={isAddDevices}
-          // onAddDevicesClick={handleAddDevicesClick}
-        />
+        <UserDevices userDevices={userDevices} onAddDevice={handleAddDevice} />
       </Box>
       <SnackBar errorMessage={users.errorMessage} onClearError={handleClearError} />
     </>

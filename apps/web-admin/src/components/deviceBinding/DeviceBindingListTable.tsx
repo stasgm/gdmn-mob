@@ -15,29 +15,31 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import { IDevice } from '@lib/types';
+import { IDeviceBinding } from '@lib/types';
+import { deviceStates } from '../../utils/constants';
 
 interface IProps {
-  devices?: IDevice[];
-  selectedDevices?: IDevice[];
+  deviceBindings?: IDeviceBinding[];
+  selectedDevices?: IDeviceBinding[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
-  sourcePath?: string;
 }
 
-const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevices = [], limitRows = 0 }: IProps) => {
-  const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
+const DeviceBindingListTable = ({
+  deviceBindings = [],
+  onChangeSelectedDevices,
+  selectedDevices = [],
+  limitRows = 0,
+}: IProps) => {
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDeviceBinding[]>(selectedDevices);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  // const { selectedDevices = [], limitRows = 0, sourcePath = '/app/' } = rest;
-  // = '/app/devices/'
-  ///app/users/devices/
 
   const handleSelectAll = (event: any) => {
     let newSelectedDeviceIds;
 
     if (event.target.checked) {
-      newSelectedDeviceIds = devices.map((device: any) => device);
+      newSelectedDeviceIds = deviceBindings.map((binding: any) => binding);
     } else {
       newSelectedDeviceIds = [];
     }
@@ -46,13 +48,13 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
     onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
   };
 
-  const handleSelectOne = (_event: any, device: IDevice) => {
-    const selectedIndex = selectedDeviceIds.map((item: IDevice) => item.id).indexOf(device.id);
+  const handleSelectOne = (_event: any, binding: IDeviceBinding) => {
+    const selectedIndex = selectedDeviceIds.map((item: IDeviceBinding) => item.id).indexOf(binding.id);
 
-    let newSelectedDeviceIds: IDevice[] = [];
+    let newSelectedDeviceIds: IDeviceBinding[] = [];
 
     if (selectedIndex === -1) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds, device);
+      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds, binding);
     } else if (selectedIndex === 0) {
       newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds.slice(1));
     } else if (selectedIndex === selectedDeviceIds.length - 1) {
@@ -84,38 +86,36 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
 
     if (selectedDeviceIds.length === 0) {
       if (selectedDevices.length > 0) {
-        const newSelectedDeviceIds = selectedDevices.map((device: IDevice) => device);
+        const newSelectedDeviceIds = selectedDevices.map((binding: IDeviceBinding) => binding);
 
         setSelectedDeviceIds(newSelectedDeviceIds);
       }
     }
   }, [limitRows, selectedDeviceIds.length, selectedDevices]);
 
-  // console.log('DeviceListTable_sourcePath', sourcePath);
-
   const TableRows = () => {
-    const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => (
+    const deviceList = deviceBindings.slice(page * limit, page * limit + limit).map((binding: IDeviceBinding) => (
       <TableRow
         hover
-        key={device.id}
+        key={binding.id}
         selected={
           selectedDeviceIds
-            .map((item: IDevice) => {
+            .map((item: IDeviceBinding) => {
               return item.id;
             })
-            .indexOf(device.id) !== -1
+            .indexOf(binding.id) !== -1
         }
       >
         <TableCell padding="checkbox">
           <Checkbox
             checked={
               selectedDeviceIds
-                .map((item: IDevice) => {
+                .map((item: IDeviceBinding) => {
                   return item.id;
                 })
-                .indexOf(device.id) !== -1
+                .indexOf(binding.id) !== -1
             }
-            onChange={(event) => handleSelectOne(event, device)}
+            onChange={(event) => handleSelectOne(event, binding)}
             value="true"
           />
         </TableCell>
@@ -126,22 +126,20 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/devices/${device.id}`}>
-              <Typography color="textPrimary" variant="body1" key={device.id}>
-                {device.name}
+            <NavLink to={`/app/users/${binding.user.id}/devices/${binding.device.id}`}>
+              <Typography color="textPrimary" variant="body1" key={binding.id}>
+                {binding.device?.name}
               </Typography>
             </NavLink>
           </Box>
         </TableCell>
-        {/* <TableCell>{device.name}</TableCell> */}
-        <TableCell>{device.uid}</TableCell>
-        <TableCell>{device.state}</TableCell>
-        <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
-        <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{deviceStates[binding.state]}</TableCell>
+        <TableCell>{new Date(binding.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(binding.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
 
-    const emptyRows = limit - Math.min(limit, devices.length - page * limit);
+    const emptyRows = limit - Math.min(limit, deviceBindings.length - page * limit);
 
     return (
       <>
@@ -164,14 +162,13 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedDeviceIds.length === devices.length}
+                    checked={selectedDeviceIds.length === deviceBindings.length}
                     color="primary"
-                    indeterminate={selectedDeviceIds.length > 0 && selectedDeviceIds.length < devices.length}
+                    indeterminate={selectedDeviceIds.length > 0 && selectedDeviceIds.length < deviceBindings.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
-                <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
@@ -185,7 +182,7 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
       </PerfectScrollbar>
       <TablePagination
         component="div"
-        count={devices.length}
+        count={deviceBindings.length}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
@@ -196,4 +193,4 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
   );
 };
 
-export default DeviceListTable;
+export default DeviceBindingListTable;

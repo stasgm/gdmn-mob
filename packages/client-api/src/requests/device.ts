@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
 import { device as mockDevice, devices as mockDevices } from '@lib/mock';
 
@@ -17,7 +18,12 @@ class Device extends BaseRequest {
 
       return {
         type: 'ADD_DEVICE',
-        device: mockDevice,
+        device: {
+          ...newDevice,
+          id: uuid(),
+          editionDate: new Date().toISOString(),
+          creationDate: new Date().toISOString(),
+        },
       } as types.IAddDeviceResponse;
     }
 
@@ -49,7 +55,7 @@ class Device extends BaseRequest {
 
       return {
         type: 'UPDATE_DEVICE',
-        device,
+        device: { ...device, editionDate: new Date().toISOString() },
       } as types.IUpdateDeviceResponse;
     }
 
