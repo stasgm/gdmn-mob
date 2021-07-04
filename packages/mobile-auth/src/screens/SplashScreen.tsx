@@ -37,7 +37,7 @@ const SplashScreen = (props: Props) => {
         </View>
       </AppScreen>
       <View style={styles.buttons}>
-        <RoundButton icon="server" onPress={() => navigation.navigate('Config')} />
+        <RoundButton icon="server" onPress={() => navigation.navigate('Config')} disabled={loading} />
       </View>
     </>
   );

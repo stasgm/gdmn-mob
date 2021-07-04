@@ -15,7 +15,6 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const newUser = await authService.signUp({
     password,
     name,
-    companies: [],
   });
 
   created(ctx as Context, newUser);

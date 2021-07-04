@@ -73,7 +73,7 @@ const signIn = (
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
-  ActionType<typeof actions.loginUserAsync>
+  ActionType<typeof actions.loginUserAsync /* | typeof actions.setCompany */>
 > => {
   return async (dispatch) => {
     dispatch(actions.loginUserAsync.request(''));
@@ -81,6 +81,15 @@ const signIn = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
+      /*       // Если к пользователю привязана компания то сразу выполняем вход
+            if (response.user.company?.id) {
+              const companyResponse = await api.company.getCompany(response.user.company?.id);
+
+              if (companyResponse.type === 'GET_COMPANY') {
+                dispatch(actions.setCompany(companyResponse.company));
+              }
+            } */
+
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 

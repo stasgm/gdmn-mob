@@ -52,7 +52,6 @@ const SelectRefItemScreen = () => {
         Object.keys(clause).forEach((i) => {
           if (i in item) {
             if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
-
             }
           }
         });

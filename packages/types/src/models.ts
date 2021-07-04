@@ -22,7 +22,7 @@ export interface IDBUser extends INamedEntity, IExternalSystemProps {
   password: string;
   creatorId: string;
   role: UserRole;
-  companies: string[]; // по умолчанию пустой массив
+  company: string | null; // по умолчанию null
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
@@ -80,7 +80,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   email?: string;
   phoneNumber?: string;
   creator?: INamedEntity;
-  companies: INamedEntity[];
+  company?: INamedEntity;
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;

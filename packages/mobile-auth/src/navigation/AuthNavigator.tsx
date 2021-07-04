@@ -5,7 +5,7 @@ import { authActions, useSelector, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
-import { CompaniesScreen, SplashScreen, SignInScreen, ConfigScreen, ActivationScreen } from '../screens';
+import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen, AppLoadScreen } from '../screens';
 
 import { AuthStackParamList } from './types';
 
@@ -47,16 +47,15 @@ const AuthNavigator: React.FC = () => {
     [activateDevice, disconnect],
   );
 
-  const CompaniesWithParams = useCallback(
-    () => <CompaniesScreen onLogout={logout} onSetCompany={setCompany} />,
-    [logout, setCompany],
+  const AppLoadWithParams = useCallback(
+    () => <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} />,
+    [logout, setCompany, user?.company],
   );
 
   /*
     Если device undefined то переходим на окно с подключеним
     Если device null то переходим на окно активации устройства
     Если device не null и user undefined то переходим на окно входа пользователя
-    Если device не null и user не undefined или null то переходим на окно выбора компании
   */
 
   return (
@@ -70,9 +69,9 @@ const AuthNavigator: React.FC = () => {
           />
         ) : (
           <AuthStack.Screen
-            name="Company"
-            component={CompaniesWithParams}
-            options={{ animationTypeForReplace: 'push' }}
+            name="Login"
+            component={AppLoadWithParams}
+            options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />
         )
       ) : device === undefined ? (

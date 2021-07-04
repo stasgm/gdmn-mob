@@ -18,7 +18,7 @@ const users: IUser[] = [
     lastName: 'ГОЦЕЛЮК',
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
-    companies: [company3],
+    company: company3,
     role: 'Admin',
   },
   {
@@ -29,7 +29,7 @@ const users: IUser[] = [
     lastName: 'Шляхтич',
     phoneNumber: '+37529-11-111-11',
     creator: superAdmin,
-    companies: [],
+    company: undefined,
     role: 'Admin',
   },
   {
@@ -40,7 +40,7 @@ const users: IUser[] = [
     lastName: 'Dzadzevich',
     phoneNumber: '+37529-33-333-33',
     creator: superAdmin,
-    companies: [company1],
+    company: company1,
     role: 'Admin',
   },
   {
@@ -51,7 +51,7 @@ const users: IUser[] = [
     lastName: 'Svinka',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company1],
+    company: company1,
     role: 'User',
   },
   {
@@ -62,7 +62,7 @@ const users: IUser[] = [
     lastName: 'Doctor',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company2, company1],
+    company: company2,
     role: 'User',
   },
   {
@@ -73,7 +73,7 @@ const users: IUser[] = [
     lastName: 'Marley',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company2],
+    company: company2,
     role: 'User',
   },
 ];

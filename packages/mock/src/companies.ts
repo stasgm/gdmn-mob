@@ -13,7 +13,7 @@ const user2: INamedEntity = {
 const companies: ICompany[] = [
   { id: '789', name: 'ОДО Золотые Программы', admin: user1 },
   { id: '654', name: 'ОДО Амперсант', admin: user2 },
-  { id: '11', name: 'Бройлерная птицефабрика', admin: user1 },
+  { id: '777', name: 'Бройлерная птицефабрика', admin: user1 },
   { id: '12', name: 'Company 2', admin: user2 },
   { id: '13', name: 'Company 3', admin: user1 },
   { id: '44', name: 'Company 4', admin: user2 },

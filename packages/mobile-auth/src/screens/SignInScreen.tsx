@@ -4,6 +4,7 @@ import { View, Keyboard } from 'react-native';
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
+import { config } from '@lib/client-config';
 
 /*
   Порядок работы:
@@ -25,10 +26,19 @@ const SignInScreen = (props: Props) => {
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
-  const [credential, setCredentials] = useState<IUserCredentials>({
-    name: 'ГОЦЕЛЮК',
-    password: '@123!',
-  });
+  let initialCredentials: IUserCredentials = {
+    name: '',
+    password: '',
+  };
+
+  if (config.debug?.useMockup) {
+    initialCredentials = {
+      name: 'ГОЦЕЛЮК',
+      password: '@123!',
+    };
+  }
+
+  const [credential, setCredentials] = useState<IUserCredentials>(initialCredentials);
 
   const handleLogIn = () => {
     Keyboard.dismiss();
@@ -58,7 +68,7 @@ const SignInScreen = (props: Props) => {
         </PrimeButton>
       </AppInputScreen>
       <View style={styles.buttons}>
-        <RoundButton icon="server" onPress={onDisconnect} />
+        <RoundButton icon="server" onPress={onDisconnect} disabled={loading} />
       </View>
     </>
   );

@@ -5,5 +5,6 @@ export type AuthStackParamList = {
   Config: undefined;
   Activation: undefined;
   Company: undefined;
+  AppLoad: undefined;
   [screenName: string]: undefined;
 };
