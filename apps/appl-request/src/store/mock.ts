@@ -1,4 +1,4 @@
-import { IReference, INamedEntity, ICompany, IRefMetadata, IDocfMetadata } from '@lib/types';
+import { IReference, INamedEntity, ICompany, IRefMetadata, IDocfMetadata, IReferences } from '@lib/types';
 import { superAdmin } from '@lib/mock';
 
 import { IApplDocument, IApplHead, IApplLine, IEmployee } from './types';
@@ -265,4 +265,20 @@ const applDocuments: IApplDocument[] = [
     ],
   },
 ];
-export { documentTypes, applType, applStatuses, refApplStatuses, employees, applDocuments, refEmplyees, company };
+
+const applRefs: IReferences = {
+  [refApplStatuses.name]: refApplStatuses,
+  [refEmplyees.name]: refEmplyees,
+};
+
+export {
+  documentTypes,
+  applType,
+  applStatuses,
+  refApplStatuses,
+  employees,
+  applDocuments,
+  refEmplyees,
+  company,
+  applRefs,
+};

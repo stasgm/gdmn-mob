@@ -8,7 +8,7 @@ type Meta<T> = {
     sortOrder?: number;
     name?: string;
     required?: boolean;
-    type?: 'string' | 'date' | 'number' | 'ref';
+    type?: 'string' | 'date' | 'number' | 'boolean' | 'ref';
     refName?: string;
   };
 };

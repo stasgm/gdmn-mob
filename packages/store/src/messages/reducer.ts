@@ -1,14 +1,14 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { messages } from '@lib/mock';
+// import { messages } from '@lib/mock';
 
 import { actions, MsgActionType } from './actions';
 
 import { IMessagesState } from './types';
 
 const initialState: Readonly<IMessagesState> = {
-  data: messages,
+  data: [],
   loading: false,
   errorMessage: '',
 };

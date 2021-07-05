@@ -13,11 +13,14 @@ import Constants from 'expo-constants';
 
 import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
 
-import { applDocuments, refApplStatuses, refEmplyees } from '../../../../apps/appl-request/src/store/mock';
+interface ICutsomProps {
+  onSync?: () => void;
+  syncing?: boolean;
+}
 
-type Props = DrawerContentComponentProps<DrawerContentOptions>;
+type Props = DrawerContentComponentProps<DrawerContentOptions> & ICutsomProps;
 
-export function DrawerContent(props: Props) {
+export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
@@ -27,18 +30,29 @@ export function DrawerContent(props: Props) {
 
   const handleUpdate = async () => {
     // Загрузка данных
+    if (onSync) {
+      // Если передан внешний обработчик то вызываем
+      return onSync();
+    }
+
+    /*
+      Поддержка платформы:
+      - загрузка сообщений
+      - обработка сообщение
+    */
     setLoading(true);
 
     await dispatch(referenceActions.deleteAllReferences());
     await dispatch(documentActions.deleteDocuments());
-
-    await dispatch(
-      referenceActions.addReferences({
-        [refApplStatuses.name]: refApplStatuses,
-        [refEmplyees.name]: refEmplyees,
-      }),
-    );
-    await dispatch(documentActions.addDocuments(applDocuments));
+    /*
+         await dispatch(
+          referenceActions.addReferences({
+            [refApplStatuses.name]: refApplStatuses,
+            [refEmplyees.name]: refEmplyees,
+          }),
+          );
+          await dispatch(documentActions.addDocuments(applDocuments));
+      */
 
     setLoading(false);
   };
@@ -94,11 +108,11 @@ export function DrawerContent(props: Props) {
       </DrawerContentScrollView>
       {/* <Divider /> */}
       <View style={styles.systemInfo}>
-        <TouchableOpacity disabled={isLoading} onPress={handleUpdate}>
+        <TouchableOpacity disabled={syncing || isLoading} onPress={handleUpdate}>
           <Avatar.Icon size={50} icon="cloud-refresh" />
         </TouchableOpacity>
         <View style={styles.updateSection}>
-          <Caption style={styles.caption}>{isLoading ? 'загрузка данных...' : ''}</Caption>
+          <Caption style={styles.caption}>{syncing || isLoading ? 'загрузка данных...' : ''}</Caption>
           <Caption style={styles.caption}>
             Версия программы: {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
           </Caption>

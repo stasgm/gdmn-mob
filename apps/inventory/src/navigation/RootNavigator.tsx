@@ -1,8 +1,6 @@
 import React from 'react';
 
-import { DrawerNavigator } from '@lib/mobile-navigation';
-
-import { INavItem } from '@lib/mobile-navigation/src/navigation/DrawerNavigator';
+import { INavItem, DrawerNavigator } from '@lib/mobile-navigation';
 
 import DashboardNavigator from './Root/DashboardNavigator';
 import MapNavigator from './Root/MapNavigator';

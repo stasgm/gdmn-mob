@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -7,12 +8,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useSelector } from '@lib/store';
 import { DrawerButton, AppScreen } from '@lib/mobile-ui';
 
-import { Divider } from 'react-native-paper';
-
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
-import { styles } from './styles';
 import ReferenceItem, { RefListItem } from './components/ReferenceListItem';
+
+import { styles } from './styles';
 
 type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceView'>;
 
@@ -21,7 +21,7 @@ const ReferenceListScreen = () => {
 
   const refData = useMemo(() => {
     return Object.entries(list)
-      .map(([key]) => ({ ...list[key], refName: key } as RefListItem))
+      .map(([key, value]) => ({ ...value, refName: key } as RefListItem))
       .filter((i) => i.visible !== false);
   }, [list]);
 

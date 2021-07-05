@@ -7,3 +7,4 @@ export { default as documentActions } from './src/documents';
 export { default as docSelectors } from './src/documents/selectors';
 export { default as referenceActions } from './src/references';
 export { default as refSelectors } from './src/references/selectors';
+export { default as settingsActions } from './src/settings';

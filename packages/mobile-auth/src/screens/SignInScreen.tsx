@@ -4,7 +4,8 @@ import { View, Keyboard } from 'react-native';
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
-import { config } from '@lib/client-config';
+import api from '@lib/client-api';
+// import { config } from '@lib/client-config';
 
 /*
   Порядок работы:
@@ -31,7 +32,8 @@ const SignInScreen = (props: Props) => {
     password: '',
   };
 
-  if (config.debug?.useMockup) {
+  if (api.config.debug?.isMock) {
+    // config.debug?.useMockup
     initialCredentials = {
       name: 'ГОЦЕЛЮК',
       password: '@123!',
