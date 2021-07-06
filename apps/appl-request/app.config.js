@@ -6,9 +6,6 @@ export default ({ config }) => ({
     ...config.android,
     config: {
       ...config.android.config,
-      googleMaps: {
-        apiKey: process.env.GOOGLE_API_KEY,
-      },
     },
   },
   extra: {

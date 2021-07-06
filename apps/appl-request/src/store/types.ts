@@ -30,6 +30,9 @@ interface IEmployee extends INamedEntity {
  Заявитель INamedEntity (с должностью) - applicant
  Специалист предварительно согласовавший заявку INamedEntity (с должностью) - specPreAgree
  Специалист согласовавший со стороны инженерной службы заявку INamedEntity (с должностью) - specAgreeEngin
+-
+ Кто разрешил INamedEntity - specApprove
+ Кто отклонил INamedEntity - specCancel
  -
  Обоснование необходимости закупки string - justification
  Причина отказа всей заявки string - cancelReason
@@ -41,7 +44,7 @@ interface IApplHead extends IHead {
   purpose: INamedEntity;
   dept: INamedEntity;
   purchaseType: INamedEntity;
-  verificationDate?: Date;
+  verificationDate?: string;
   vdaGood?: INamedEntity;
   faGood?: INamedEntity;
   faGoodNumber?: string;
@@ -51,6 +54,8 @@ interface IApplHead extends IHead {
   specAgreeEngin?: INamedEntity;
   justification?: string;
   cancelReason?: string;
+  specApprove?: INamedEntity;
+  specCancel?: INamedEntity;
   note?: string;
 }
 
@@ -62,9 +67,9 @@ interface IApplHead extends IHead {
   Кол-во по заявке - quantity
 */
 interface IApplLine extends IEntity {
-  orderNum: number;
+  orderNum: string; //TODO вернуть обратно к number
   goodName: string;
-  quantity: number;
+  quantity: string; //TODO вернуть обратно к number
   value: INamedEntity;
 }
 

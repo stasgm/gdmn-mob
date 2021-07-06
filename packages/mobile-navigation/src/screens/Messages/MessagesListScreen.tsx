@@ -1,17 +1,14 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { useNavigation } from '@react-navigation/core';
-// import { DrawerActions } from '@react-navigation/native';
 
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
 import { useSelector, messageActions, useDispatch } from '@lib/store';
+import { useActionSheet, MenuButton, DrawerButton } from '@lib/mobile-ui';
 
-import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { getDateString } from '../../../../../apps/app-trade-agents/src/utils/helpers';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
   const { colors } = useTheme();
@@ -33,7 +30,7 @@ const MessageItem = ({ item }: { item: IMessage }) => {
               style={[styles.name, { color: colors.text }]}
             >{`${item.head.producer.name} > ${item.head.consumer.name}`}</Text>
           </View>
-          <Text style={[styles.number, styles.field, { color: colors.text }]}>Сообщение от {item.head.dateTime}</Text>
+          <Text style={[styles.number, styles.field, { color: colors.text }]}>{getDateString(item.head.dateTime)}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -89,9 +86,9 @@ const handleSend = async () => {
     //TODO systemId из конфига
     //company &&
     dispatch(
-      messageActions.fetchMsg({
+      messageActions.fetchMessages({
         companyId: company.id,
-        systemId: 'Inventory',
+        systemId: 'gdmn-appl-request',
       }),
     );
   }, [company, dispatch]);
@@ -144,7 +141,7 @@ const handleSend = async () => {
           data={data}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
-          ItemSeparatorComponent={ItemSeparator}
+          ItemSeparatorComponent={Divider}
           scrollEventThrottle={400}
           onEndReached={() => ({})}
           refreshControl={<RefreshControl refreshing={loading} title="Загрузка данных..." />}

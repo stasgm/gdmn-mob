@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -22,29 +22,45 @@ const ApplListItem = ({ id, title, subtitle, description, status, lineCount, app
         navigation.navigate('ApplView', { id });
       }}
     >
-      <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
+      <View style={[styles.flexDirectionRow, localStyles.box]}>
+        <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
+        {/* <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
           <MaterialCommunityIcons name="file-outline" size={20} color={'#FFF'} />
-        </View>
-        <View style={styles.details}>
-          <View style={styles.rowCenter}>
-            <Text style={styles.name}>{title}</Text>
-            <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
-          </View>
+        </View> */}
+        <View style={localStyles.info}>
+          <Text style={styles.name}>{title}</Text>
+          <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
           <View style={styles.rowBottom}>
-            <View>
-              <Text style={[styles.number, styles.field]}>{subtitle}</Text>
-              <Text style={[styles.number, styles.field]}>{description}</Text>
-            </View>
+            <Text style={[styles.number, styles.field]}>{subtitle}</Text>
             <View style={[styles.rowCenter]}>
               <Text style={[styles.number, styles.field]}>{lineCount}</Text>
               <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
             </View>
           </View>
+          <Text style={[styles.number, styles.field]}>{description}</Text>
         </View>
       </View>
     </TouchableOpacity>
   );
 };
+
+const localStyles = StyleSheet.create({
+  box: {
+    borderColor: '#8888',
+    borderRadius: 5,
+    borderWidth: 0.5,
+    marginVertical: 4,
+  },
+  info: {
+    flex: 1,
+    padding: 5,
+    paddingLeft: 10,
+  },
+  label: {
+    width: 5,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+  },
+});
 
 export default ApplListItem;

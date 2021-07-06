@@ -31,11 +31,11 @@ const ApplViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ApplsStackParamList, 'ApplView'>>();
   const { id } = useRoute<RouteProp<ApplsStackParamList, 'ApplView'>>().params;
 
-  const appl = docSelectors.selectByDocType<IApplDocument>('appl').find((e) => e.id === id);
+  const appl = docSelectors.selectByDocType<IApplDocument>('Заявки на закупку ТМЦ').find((e) => e.id === id);
 
   const refApplStatuses = refSelectors.selectByName<INamedEntity>('Statuses').data;
 
-  const isBlocked = appl?.head.applStatus.id !== refApplStatuses[0].id; // Заменить на реальные данные
+  const isBlocked = !['DRAFT', 'READY'].includes(appl?.status || 'DRAFT'); // Заменить на реальные данные
 
   const handleRefuse = useCallback(() => {
     if (!id || !appl) {

@@ -1,7 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 
 import { sleep } from '@lib/client-api';
-
 import { IReferences } from '@lib/types';
 
 import { actions, ReferenceActionType } from './actions';

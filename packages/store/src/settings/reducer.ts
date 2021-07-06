@@ -42,17 +42,17 @@ const reducer: Reducer<ISettingsState, SettingsActionType> = (state = initialSta
       return { ...state, errorMessage: '' };
 
     // Loading
-    /*     case getType(actions.fetchMsgAsync.request):
+    /*     case getType(actions.fetchMessagesAsync.request):
           return { ...state, loading: true };
 
-        case getType(actions.fetchMsgAsync.success):
+        case getType(actions.fetchMessagesAsync.success):
           return {
             ...state,
             loading: false,
             data: [...state.data, ...action.payload],
           };
 
-        case getType(actions.fetchMsgAsync.failure):
+        case getType(actions.fetchMessagesAsync.failure):
           return {
             ...state,
             loading: false,

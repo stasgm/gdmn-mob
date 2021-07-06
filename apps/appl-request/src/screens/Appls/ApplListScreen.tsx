@@ -59,7 +59,7 @@ const ApplListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
-    .selectByDocType<IApplDocument>('appl')
+    .selectByDocType<IApplDocument>('Заявки на закупку ТМЦ')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
@@ -83,7 +83,7 @@ const ApplListScreen = () => {
           status: i.status,
           applStatus: i.head.applStatus.name,
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
-          description: shortenString(i.head.justification, 60),
+          description: shortenString(i.head.justification, 100),
           lineCount: i.lines.length,
         } as ApplListRenderItemProps),
     );
@@ -128,9 +128,9 @@ const ApplListScreen = () => {
         sections={sections}
         renderItem={renderItem}
         keyExtractor={({ id }) => id}
-        ItemSeparatorComponent={ItemSeparator}
+        // ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        // refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>

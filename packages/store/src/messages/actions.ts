@@ -7,14 +7,14 @@ const deleteMessage = createAction('MESSAGES/DELETE')<string>();
 const deleteAllMessages = createAction('MESSAGES/DELETE_ALL')();
 const clearError = createAction('MESSAGES/CLEAR_ERROR')();
 
-const fetchMsgAsync = createAsyncAction('MESSAGES/FETCH', 'MESSAGES/FETCH_SUCCESS', 'MESSAGES/FETCH_FAILURE')<
+const fetchMessagesAsync = createAsyncAction('MESSAGES/FETCH', 'MESSAGES/FETCH_SUCCESS', 'MESSAGES/FETCH_FAILURE')<
   string | undefined,
   IMessage[],
   string
 >();
 
 export const actions = {
-  fetchMsgAsync,
+  fetchMessagesAsync,
   updateStatusMessage,
   deleteMessage,
   deleteAllMessages,

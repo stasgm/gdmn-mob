@@ -8,14 +8,14 @@ const deleteSettingsOption = createAction('SETTINGS/DELETE_ONE')<keyof IBaseSett
 const deleteAllSettings = createAction('SETTINGS/DELETE_ALL')();
 const clearError = createAction('SETTINGS/CLEAR_ERROR')();
 
-const fetchSettingsAsync = createAsyncAction('SETTINGS/FETCH', 'SETTINGS/FETCH_SUCCESS', 'SETTINGS/FETCH_FAILURE')<
+const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS', 'SETTINGS/ADD_FAILURE')<
   string | undefined,
   ISettings<IBaseSettings>,
   string
 >();
 
 export const actions = {
-  fetchSettingsAsync,
+  addSettingsAsync,
   updateSettings,
   deleteSettingsOption,
   deleteAllSettings,

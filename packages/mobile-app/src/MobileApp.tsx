@@ -9,6 +9,7 @@ import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 import api from '@lib/client-api';
+import { View } from 'react-native';
 
 export interface IApp {
   items?: INavItem[];
@@ -30,7 +31,17 @@ const AppRoot = ({ items, onSync, syncing }: Omit<IApp, 'store'>) => {
 const MobileApp = ({ store, ...props }: IApp) => {
   const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
-  const App = () => (
+  return store ? (
+    <Provider store={store}>
+      <UIProvider theme={defaultTheme}>
+        <ActionSheetProvider>
+          <NavigationContainer>
+            <Router />
+          </NavigationContainer>
+        </ActionSheetProvider>
+      </UIProvider>
+    </Provider>
+  ) : (
     <UIProvider theme={defaultTheme}>
       <ActionSheetProvider>
         <NavigationContainer>
@@ -38,14 +49,6 @@ const MobileApp = ({ store, ...props }: IApp) => {
         </NavigationContainer>
       </ActionSheetProvider>
     </UIProvider>
-  );
-
-  return store ? (
-    <Provider store={store}>
-      <App />
-    </Provider>
-  ) : (
-    <App />
   );
 };
 

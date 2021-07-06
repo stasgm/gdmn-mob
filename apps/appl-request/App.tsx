@@ -1,22 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import { MobileApp } from '@lib/mobile-app';
-/* import { Provider } from 'react-redux';
-import { NavigationContainer } from '@react-navigation/native';
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-
-import { authSelectors } from '@lib/store';
-import { AuthNavigator } from '@lib/mobile-auth';
-import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
-
-import RootNavigator from './src/navigation/RootNavigator';
- */
-import { INavItem } from '@lib/mobile-navigation';
 import { Provider } from 'react-redux';
-import { useDispatch, documentActions, referenceActions } from '@lib/store';
+
+import { MobileApp } from '@lib/mobile-app';
+import { INavItem } from '@lib/mobile-navigation';
+import { useDispatch, documentActions, referenceActions, messageActions } from '@lib/store';
 
 import { store } from './src/store';
 
-import { applDocuments, applRefs } from './src/store/mock';
+import { applDocuments, applDocuments2, applRefs } from './src/store/mock';
+import { applMessages } from './src/store/docsMock';
 
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
 
@@ -40,18 +32,21 @@ const Root = React.memo(() => {
   const handleSync = async () => {
     setLoading(true);
 
-    // dispatch(referenceActions.deleteAllReferences());
+    console.log('Загрузка данных');
+    dispatch(referenceActions.deleteAllReferences());
     dispatch(referenceActions.deleteAllReferences());
     dispatch(documentActions.deleteDocuments());
+    dispatch(messageActions.deleteAllMessages());
 
     dispatch(referenceActions.addReferences(applRefs));
-    dispatch(documentActions.addDocuments(applDocuments));
+    dispatch(documentActions.addDocuments(applDocuments2));
+    dispatch(messageActions.addMessages(applMessages));
 
     setLoading(false);
   };
 
   return (
-    // <MobileApp store={store} items={navItems} onSync={handleSync} syncing={isLoading} />
+    // <MobileApp store={store} items={navItems} /> - если не нужна
     <MobileApp items={navItems} onSync={handleSync} syncing={isLoading} />
   );
 });
