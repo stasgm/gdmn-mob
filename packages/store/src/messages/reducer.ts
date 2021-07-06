@@ -21,7 +21,7 @@ const reducer: Reducer<IMessagesState, MsgActionType> = (state = initialState, a
     case getType(actions.updateStatusMessage):
       return {
         ...state,
-        data: [...state.data.map((i) => (i.id !== action.payload.id ? { ...i, status: action.payload.newStatus } : i))],
+        data: [...state.data.map((i) => (i.id === action.payload.id ? { ...i, status: action.payload.status } : i))],
       };
 
     case getType(actions.deleteAllMessages):

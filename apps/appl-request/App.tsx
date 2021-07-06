@@ -32,12 +32,11 @@ const Root = React.memo(() => {
     setLoading(true);
 
     dispatch(referenceActions.deleteAllReferences());
-    dispatch(referenceActions.deleteAllReferences());
     dispatch(documentActions.deleteDocuments());
     dispatch(messageActions.deleteAllMessages());
 
-    dispatch(referenceActions.addReferences(applRefs));
-    dispatch(documentActions.addDocuments(applDocuments));
+    // dispatch(referenceActions.addReferences(applRefs));
+    // dispatch(documentActions.addDocuments(applDocuments));
     dispatch(messageActions.addMessages(applMessages));
 
     setLoading(false);

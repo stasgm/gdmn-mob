@@ -1,10 +1,10 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { StyleSheet, View, Text, Alert } from 'react-native';
-import { Divider, useTheme } from 'react-native-paper';
+import { View, Text, Alert } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { IReferences } from '@lib/types';
-import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
+import { messageActions, referenceActions, documentActions, useDispatch, messageSelectors } from '@lib/store';
 import { AppScreen, BackButton, MenuButton, SubTitle, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
 
 type MessagesStackParamList = {
@@ -14,15 +14,14 @@ type MessagesStackParamList = {
 
 const MessageViewScreen = () => {
   //const { data } = useSelector((state) => state.messages);
-  const { colors } = useTheme();
   const id = useRoute<RouteProp<MessagesStackParamList, 'MessageView'>>().params?.id;
-  const msg = useSelector((state) => state.messages).data.find((item) => item.id === id);
+  const msg = messageSelectors.selectById(id);
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
 
-  const handleTransform = useCallback(async () => {
+  const handleProccess = useCallback(async () => {
     if (!msg) {
       return;
     }
@@ -34,14 +33,15 @@ const MessageViewScreen = () => {
 
       case 'refs':
         //TODO: проверка данных, приведение к типу
+        console.log('load ref');
         dispatch(referenceActions.updateList(msg.body.payload as IReferences));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, newStatus: 'procd' }));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
         break;
 
       case 'docs':
         //TODO: проверка данных, приведение к типу
         dispatch(documentActions.setDocuments(msg.body.payload));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, newStatus: 'procd' }));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
         break;
 
       default:
@@ -61,7 +61,7 @@ const MessageViewScreen = () => {
     showActionSheet([
       {
         title: 'Обработать',
-        onPress: handleTransform,
+        onPress: handleProccess,
       },
       {
         title: 'Удалить',
@@ -73,7 +73,7 @@ const MessageViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [handleTransform, handleDelete, showActionSheet]);
+  }, [handleProccess, handleDelete, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
