@@ -1,7 +1,8 @@
 import { IMessage, IReferences, IDocument } from '@lib/types';
 import { company, user, user2 } from '@lib/mock';
 
-import { applDocuments, applRefs } from './mock';
+import { applDocuments } from './documents';
+import { applRefs } from './references';
 
 export const applMessages: IMessage<string | IDocument[] | IReferences>[] = [
   {

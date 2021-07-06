@@ -35,7 +35,10 @@ const ApplViewScreen = () => {
 
   const refApplStatuses = refSelectors.selectByName<INamedEntity>('Statuses').data;
 
-  const isBlocked = !['DRAFT', 'READY'].includes(appl?.status || 'DRAFT'); // Заменить на реальные данные
+  const isBlocked = !['DRAFT', 'READY'].includes(appl?.status || 'DRAFT'); // Заблокировано если статус не Черновик или не Готово
+
+  const statusAccepted = refApplStatuses.find((i) => i.name === 'Утвержден')!;
+  const statusRefused = refApplStatuses.find((i) => i.name === 'Отказано')!;
 
   const handleRefuse = useCallback(() => {
     if (!id || !appl) {
@@ -45,13 +48,13 @@ const ApplViewScreen = () => {
     const newDocument: IApplDocument = {
       ...appl,
       status: 'READY',
-      head: { ...appl.head, applStatus: refApplStatuses[2] },
+      head: { ...appl.head, applStatus: statusRefused },
     };
 
     dispatch(documentActions.updateDocument({ docId: id, document: newDocument }));
 
     navigation.goBack();
-  }, [appl, dispatch, id, navigation, refApplStatuses]);
+  }, [appl, dispatch, id, navigation, statusRefused]);
 
   const handleAccept = useCallback(() => {
     if (!id || !appl) {
@@ -61,13 +64,13 @@ const ApplViewScreen = () => {
     const newDocument: IApplDocument = {
       ...appl,
       status: 'READY',
-      head: { ...appl.head, applStatus: refApplStatuses[1] },
+      head: { ...appl.head, applStatus: statusAccepted },
     };
 
     dispatch(documentActions.updateDocument({ docId: id, document: newDocument }));
 
     navigation.goBack();
-  }, [appl, dispatch, id, navigation, refApplStatuses]);
+  }, [appl, dispatch, id, navigation, statusAccepted]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -1,17 +1,9 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text } from 'react-native';
+import { ListRenderItem, SectionList, SectionListData, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
-import {
-  globalStyles as styles,
-  DrawerButton,
-  FilterButtons,
-  ItemSeparator,
-  Status,
-  AppScreen,
-  SubTitle,
-} from '@lib/mobile-ui';
+import { globalStyles as styles, DrawerButton, FilterButtons, Status, AppScreen, SubTitle } from '@lib/mobile-ui';
 
 import { StatusType } from '@lib/types';
 

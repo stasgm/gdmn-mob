@@ -67,9 +67,9 @@ interface IApplHead extends IHead {
   Кол-во по заявке - quantity
 */
 interface IApplLine extends IEntity {
-  orderNum: string; //TODO вернуть обратно к number
+  orderNum: number;
   goodName: string;
-  quantity: string; //TODO вернуть обратно к number
+  quantity: number;
   value: INamedEntity;
 }
 

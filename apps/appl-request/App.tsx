@@ -7,8 +7,7 @@ import { useDispatch, documentActions, referenceActions, messageActions } from '
 
 import { store } from './src/store';
 
-import { applDocuments, applDocuments2, applRefs } from './src/store/mock';
-import { applMessages } from './src/store/docsMock';
+import { applMessages, applDocuments, applRefs } from './src/store/mock';
 
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
 
@@ -32,21 +31,20 @@ const Root = React.memo(() => {
   const handleSync = async () => {
     setLoading(true);
 
-    console.log('Загрузка данных');
     dispatch(referenceActions.deleteAllReferences());
     dispatch(referenceActions.deleteAllReferences());
     dispatch(documentActions.deleteDocuments());
     dispatch(messageActions.deleteAllMessages());
 
     dispatch(referenceActions.addReferences(applRefs));
-    dispatch(documentActions.addDocuments(applDocuments2));
+    dispatch(documentActions.addDocuments(applDocuments));
     dispatch(messageActions.addMessages(applMessages));
 
     setLoading(false);
   };
 
   return (
-    // <MobileApp store={store} items={navItems} /> - если не нужна
+    // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне
     <MobileApp items={navItems} onSync={handleSync} syncing={isLoading} />
   );
 });
