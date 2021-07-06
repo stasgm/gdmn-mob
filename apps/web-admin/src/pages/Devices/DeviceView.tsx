@@ -31,7 +31,7 @@ const DeviceView = () => {
   const users = userSelectors.usersByDeviceId(deviceId);
 
   const handleCancel = () => {
-    navigate('/app/devices');
+    navigate(-1);
   };
 
   const handleEdit = () => {

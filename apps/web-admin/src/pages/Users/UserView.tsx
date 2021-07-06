@@ -30,7 +30,7 @@ const UserView = () => {
   const userDevices = bindingSelectors.bindingsByUserId(userId);
 
   const handleCancel = () => {
-    navigate('/app/users');
+    navigate(-1);
   };
 
   const handleEdit = () => {
