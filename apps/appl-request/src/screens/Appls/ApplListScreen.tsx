@@ -75,7 +75,7 @@ const ApplListScreen = () => {
           status: i.status,
           applStatus: i.head.applStatus.name,
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
-          description: shortenString(i.head.justification, 100),
+          description: shortenString(i.head.justification, 90),
           lineCount: i.lines.length,
         } as ApplListRenderItemProps),
     );
@@ -86,6 +86,7 @@ const ApplListScreen = () => {
       filteredList.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
+
         if (sectionExists) {
           return prev.map((section) =>
             section.title === sectionTitle ? { ...section, data: [...section.data, item] } : section,
