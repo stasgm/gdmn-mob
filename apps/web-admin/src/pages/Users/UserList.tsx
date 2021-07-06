@@ -1,12 +1,13 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
+import { IUser } from '@lib/types';
+
 import UserListTable from '../../components/user/UserListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
@@ -21,13 +22,33 @@ const UserList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.users);
+  const [dataList, setDataList] = useState<IUser[]>(list);
 
-  const fetchUsers = useCallback(() => dispatch(actions.fetchUsers()), [dispatch]);
+  const fetchUsers = useCallback(() => {
+    dispatch(actions.fetchUsers());
+  }, [dispatch]);
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
+    /* Загружаем данные при загрузке компонента */
     fetchUsers();
   }, [fetchUsers]);
+
+  const handleUpdateInput = useCallback(
+    (value: string) => {
+      const inputValue: string = value.toUpperCase();
+
+      const filtered = list.filter((item) => {
+        const name = item.name.toUpperCase();
+        const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
+        const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+
+        return name.includes(inputValue) || firstname.includes(inputValue) || lastName.includes(inputValue);
+      });
+
+      setDataList(filtered);
+    },
+    [list],
+  );
 
   const handleClearError = () => {
     dispatch(actions.userActions.clearError());
@@ -76,12 +97,16 @@ const UserList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти пользователя'} />
+          <ToolbarActionsWithSearch
+            buttons={buttons}
+            searchTitle={'Найти пользователя'}
+            updateInput={handleUpdateInput}
+          />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <UserListTable users={list} />
+              <UserListTable users={dataList} />
             </Box>
           )}
         </Container>

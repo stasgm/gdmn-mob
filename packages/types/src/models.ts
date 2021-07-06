@@ -13,7 +13,7 @@ export interface IExternalSystemProps {
   externalId?: string;
 }
 
-export type DeviceState = 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
+export type DeviceState = 'NON-REGISTERED' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
 
 export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
 
@@ -84,7 +84,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;
-export type NewUser = Omit<IUser, 'role' | 'id'> & { password: string };
+export type NewUser = Omit<IUser, 'id'> & { password: string };
 
 export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
 

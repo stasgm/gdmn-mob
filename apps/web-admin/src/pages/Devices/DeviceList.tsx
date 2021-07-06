@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
@@ -16,29 +16,41 @@ import { IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 
-interface IProps {
-  selectedDevices?: IDevice[];
-  limitRows?: number;
-  onChangeSelectedDevices?: (value: any[]) => void;
-}
-
-const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevices }: IProps) => {
+const DeviceList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const [dataList, setDataList] = useState<IDevice[]>(list);
 
-  const fetchDevices = useCallback(() => dispatch(actions.fetchDevices()), [dispatch]);
+  const fetchDevices = useCallback(() => {
+    dispatch(actions.fetchDevices());
+  }, [dispatch]);
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
+    /* Загружаем данные при загрузке компонента */
     fetchDevices();
   }, [fetchDevices]);
 
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());
   };
+
+  const handleUpdateInput = useCallback(
+    (value: string) => {
+      const inputValue: string = value.toUpperCase();
+
+      const filtered = list.filter((item) => {
+        const name = item.name.toUpperCase();
+
+        return name.includes(inputValue);
+      });
+
+      setDataList(filtered);
+    },
+    [list],
+  );
 
   const buttons: IToolBarButton[] = [
     {
@@ -83,17 +95,16 @@ const DeviceList = ({ selectedDevices = [], limitRows = 0, onChangeSelectedDevic
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти устройство'} />
+          <ToolbarActionsWithSearch
+            buttons={buttons}
+            searchTitle={'Найти устройство'}
+            updateInput={handleUpdateInput}
+          />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable
-                devices={list}
-                limitRows={limitRows}
-                selectedDevices={selectedDevices}
-                onChangeSelectedDevices={onChangeSelectedDevices}
-              />
+              <DeviceListTable devices={dataList} />
             </Box>
           )}
         </Container>

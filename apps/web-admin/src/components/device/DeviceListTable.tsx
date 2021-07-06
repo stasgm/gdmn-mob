@@ -89,17 +89,7 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
 
   const TableRows = () => {
     const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => (
-      <TableRow
-        hover
-        key={device.id}
-        selected={
-          selectedDeviceIds
-            .map((item: IDevice) => {
-              return item.id;
-            })
-            .indexOf(device.id) !== -1
-        }
-      >
+      <TableRow hover key={device.id} selected={selectedDeviceIds.findIndex((d) => d.id === device?.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
             checked={

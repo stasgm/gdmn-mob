@@ -2,7 +2,7 @@ import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { asyncFilter, extraPredicate } from '../utils/helpers';
+import { extraPredicate } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
@@ -14,8 +14,7 @@ import { getDb } from './dao/db';
  * */
 
 const addOne = async (device: NewDevice): Promise<IDevice> => {
-  const db = getDb();
-  const { devices } = db;
+  const { devices } = getDb();
 
   if (await devices.find((i) => i.name === device.name && i.companyId === device.company.id)) {
     throw new ConflictException(`Устройство с наименование ${device.name} уже сущеcтвует`);
@@ -25,7 +24,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     id: '',
     name: device.name,
     uid: '',
-    state: 'NEW',
+    state: 'NON-ACTIVATED',
     companyId: device.company.id,
   };
 
@@ -40,8 +39,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
  * @return обновленное устройство
  * */
 const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>) => {
-  const db = getDb();
-  const { devices, companies } = db;
+  const { devices, companies } = getDb();
 
   const oldDevice = await devices.find(id);
 
@@ -80,8 +78,7 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
  * @param {string} id - идентификатор устройства
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
-  const db = getDb();
-  const { devices } = db;
+  const { devices } = getDb();
 
   if (!(await devices.find((device) => device.id === deviceId))) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -91,8 +88,7 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
 };
 
 const genActivationCode = async (deviceId: string) => {
-  const db = getDb();
-  const { devices, codes } = db;
+  const { devices, codes } = getDb();
 
   const device = await devices.find(deviceId);
 
@@ -142,10 +138,9 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
 // };
 
 const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
-  const db = getDb();
-  const { devices, companies } = db;
+  const { devices } = getDb();
 
-  let deviceList = await devices.read((item) => {
+  const deviceList = await devices.read((item) => {
     const newParams = { ...params };
 
     let companyFound = true;
@@ -169,21 +164,17 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
       delete newParams['state'];
     }
 
-    if ('adminId' in newParams) {
-      delete newParams['adminId'];
-    }
-
     return companyFound && uIdFound && stateFound && extraPredicate(item, newParams);
   });
 
-  const newParams = { ...params };
+  /*   const newParams = { ...params };
 
-  if ('adminId' in newParams) {
-    deviceList = await asyncFilter(deviceList, async (i: IDBDevice) => {
-      const company = await companies.find(i.companyId);
-      return company?.adminId === newParams.adminId;
-    });
-  }
+    if ('adminId' in newParams) {
+      deviceList = await asyncFilter(deviceList, async (i: IDBDevice) => {
+        const company = await companies.find(i.companyId);
+        return company?.adminId === newParams.adminId;
+      });
+    } */
 
   const pr = deviceList.map(async (i) => await makeDevice(i));
 

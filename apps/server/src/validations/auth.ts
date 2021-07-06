@@ -4,9 +4,9 @@ import { InvalidParameterException } from '../exceptions';
 
 const login: Config = {
   validate: {
-    query: {
+    /* query: {
       deviceId: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
-    },
+    }, */
     type: 'json',
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не заполнено имя пользователя')),

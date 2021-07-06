@@ -67,7 +67,7 @@ const UserListTable = ({ users = [] }: props) => {
   };
 
   const TableRows = () => {
-    const userList = users.slice(0, limit).map((user: IUser) => (
+    const userList = users.slice(page * limit, page * limit + limit).map((user: IUser) => (
       <TableRow hover key={user.id} selected={selectedUserIds.indexOf(user.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
@@ -97,7 +97,19 @@ const UserListTable = ({ users = [] }: props) => {
         <TableCell>{new Date(user.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
-    return <>{userList}</>;
+
+    const emptyRows = limit - Math.min(limit, users.length - page * limit);
+
+    return (
+      <>
+        {userList}
+        {emptyRows > 0 && page > 0 && (
+          <TableRow style={{ height: 53 * emptyRows }}>
+            <TableCell colSpan={4} />
+          </TableRow>
+        )}
+      </>
+    );
   };
 
   return (

@@ -25,7 +25,7 @@ const CompanyCreate = () => {
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
     const res = await dispatch(actions.addCompany(values as NewCompany));
-    if (res.type === 'COMPANY/ADD_SUCCCES') {
+    if (res.type === 'COMPANY/ADD_SUCCESS') {
       handleGoToCompanies();
     }
   };

@@ -9,9 +9,10 @@ import ToolBarActions from './ToolBarActions';
 interface props {
   buttons: IToolBarButton[];
   searchTitle: string;
+  updateInput: (value: string) => void;
 }
 
-const ToolbarActionsWithSearch = ({ buttons, searchTitle }: props) => {
+const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput }: props) => {
   return (
     <Card>
       <Box
@@ -37,6 +38,8 @@ const ToolbarActionsWithSearch = ({ buttons, searchTitle }: props) => {
             }}
             placeholder={searchTitle}
             variant="outlined"
+            onChange={(event) => updateInput(event.target.value)}
+            type="search"
           />
         </Box>
         <Box

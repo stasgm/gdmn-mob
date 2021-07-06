@@ -26,7 +26,10 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
           <Logo />
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />
-        <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
+        <Box
+          component="button"
+          sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' }, color: 'white' }}
+        >
           <IconButton color="inherit">
             <Badge badgeContent={notifications.length} color="primary" variant="dot">
               <NotificationsIcon />
@@ -36,7 +39,10 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
             <LogoutIcon />
           </IconButton>
         </Box>
-        <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'block', md: 'none' } }}>
+        <Box
+          component="button"
+          sx={{ background: 'transparent', border: 'none', display: { xs: 'block', md: 'none' }, color: 'white' }}
+        >
           <IconButton color="inherit" onClick={onMobileNavOpen}>
             <MenuIcon />
           </IconButton>
