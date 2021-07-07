@@ -32,7 +32,13 @@ const CompanyUsers = ({ users }: IProps) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActionsWithSearch buttons={userButtons} searchTitle={'Найти пользователя'} />
+        <ToolbarActionsWithSearch
+          buttons={userButtons}
+          title={'Найти пользователя'}
+          onChangeValue={() => {
+            return;
+          }}
+        />
         <Box sx={{ pt: 2 }}>
           <UserListTable users={users} />
         </Box>

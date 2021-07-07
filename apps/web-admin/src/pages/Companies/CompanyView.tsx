@@ -58,7 +58,17 @@ const CompanyView = () => {
   }, [refreshData]);
 
   if (!company) {
-    return <Box>Компания не найдена</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Компания не найдена
+      </Box>
+    );
   }
 
   const buttons: IToolBarButton[] = [

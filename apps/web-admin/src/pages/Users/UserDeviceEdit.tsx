@@ -39,7 +39,17 @@ const BindingEdit = () => {
   };
 
   if (!binding) {
-    return <Box>Связь с устройством не найдена</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Связь с устройством не найдена
+      </Box>
+    );
   }
 
   return (

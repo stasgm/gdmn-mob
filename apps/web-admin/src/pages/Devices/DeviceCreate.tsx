@@ -25,7 +25,7 @@ const DeviceCreate = () => {
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
     const res = await dispatch(actions.addDevice({ ...values } as NewDevice));
-    if (res.type === 'DEVICE/ADD_SUCCCES') {
+    if (res.type === 'DEVICE/ADD_SUCCESS') {
       goBack();
     }
   };

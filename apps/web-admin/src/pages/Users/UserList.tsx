@@ -21,8 +21,9 @@ const UserList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading, errorMessage } = useSelector((state) => state.users);
-  const [dataList, setDataList] = useState<IUser[]>(list);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.users);
+  const [users, setUsers] = useState<IUser[]>();
+  const filterValue = pageParams?.filter as string | undefined;
 
   const fetchUsers = useCallback(() => {
     dispatch(actions.fetchUsers());
@@ -33,22 +34,25 @@ const UserList = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleUpdateInput = useCallback(
-    (value: string) => {
-      const inputValue: string = value.toUpperCase();
+  useEffect(() => {
+    const inputValue = filterValue?.toUpperCase();
 
-      const filtered = list.filter((item) => {
-        const name = item.name.toUpperCase();
-        const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
-        const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+    const filtered = inputValue
+      ? list.filter((item) => {
+          const name = item.name.toUpperCase();
+          const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
+          const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
 
-        return name.includes(inputValue) || firstname.includes(inputValue) || lastName.includes(inputValue);
-      });
+          return name.includes(inputValue) || firstname.includes(inputValue) || lastName.includes(inputValue);
+        })
+      : list;
 
-      setDataList(filtered);
-    },
-    [list],
-  );
+    setUsers(filtered);
+  }, [list, filterValue]);
+
+  const handleUpdateInput = (value: string) => {
+    dispatch(actions.userActions.setPageParam({ filter: value }));
+  };
 
   const handleClearError = () => {
     dispatch(actions.userActions.clearError());
@@ -99,14 +103,15 @@ const UserList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            searchTitle={'Найти пользователя'}
-            updateInput={handleUpdateInput}
+            title={'Найти пользователя'}
+            value={filterValue}
+            onChangeValue={handleUpdateInput}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <UserListTable users={dataList} />
+              <UserListTable users={users} />
             </Box>
           )}
         </Container>

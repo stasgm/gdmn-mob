@@ -60,7 +60,17 @@ const DeviceView = () => {
   };
 
   if (!device) {
-    return <Box>Устройство не найдено</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Устройство не найдено
+      </Box>
+    );
   }
 
   const buttons: IToolBarButton[] = [

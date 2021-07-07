@@ -33,7 +33,7 @@ const Register = () => {
   };
 
   useEffect(() => {
-    // dispatch(authActions.authActions.clearError());
+    dispatch(authActions.clearError());
   }, [dispatch]);
 
   const formik = useFormik<IUserCredentials>({

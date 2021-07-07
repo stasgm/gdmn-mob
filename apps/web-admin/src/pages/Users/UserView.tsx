@@ -63,7 +63,17 @@ const UserView = () => {
   };
 
   if (!user) {
-    return <Box>Пользователь не найден</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Пользователь не найден
+      </Box>
+    );
   }
 
   const buttons: IToolBarButton[] = [

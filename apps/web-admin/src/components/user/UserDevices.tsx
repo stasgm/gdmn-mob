@@ -30,7 +30,13 @@ const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActionsWithSearch buttons={deviceButtons} searchTitle={'Найти устройство'} />
+        <ToolbarActionsWithSearch
+          buttons={deviceButtons}
+          title={'Найти устройство'}
+          onChangeValue={() => {
+            return;
+          }}
+        />
         <Box sx={{ pt: 2 }}>
           <DeviceBindingListTable deviceBindings={userDevices} limitRows={5} />
         </Box>

@@ -16,7 +16,6 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const { error, loading, status } = useSelector((state) => state.auth);
-  console.log('login');
 
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,

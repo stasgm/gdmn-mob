@@ -28,17 +28,10 @@ const CompanyList = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.companies);
-  const [dataList, setDataList] = useState<ICompany[]>([]);
+  const [dataList, setDataList] = useState<ICompany[]>(list);
 
-  const fetchCompanies = useCallback(async () => {
-    const res = await dispatch(actions.fetchCompanies());
-    if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCESS') {
-      //console.log(res.payload);
-      setDataList(res.payload);
-    }
-    if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
-      //console.log('ошибочка', res.payload);
-    }
+  const fetchCompanies = useCallback(() => {
+    dispatch(actions.fetchCompanies());
   }, [dispatch]);
 
   useEffect(() => {
@@ -46,17 +39,24 @@ const CompanyList = () => {
     fetchCompanies();
   }, [fetchCompanies]);
 
-  const handleUpdateInput = (value: string) => {
-    const inputValue: string = value.toUpperCase();
+  useEffect(() => {
+    setDataList(list);
+  }, [list]);
 
-    const filtered = list.filter((item) => {
-      const name = item.name.toUpperCase();
+  const handleUpdateInput = useCallback(
+    (value: string) => {
+      const inputValue: string = value.toUpperCase();
 
-      return name.includes(inputValue);
-    });
+      const filtered = list.filter((item) => {
+        const name = item.name.toUpperCase();
 
-    setDataList(filtered);
-  };
+        return name.includes(inputValue);
+      });
+
+      setDataList(filtered);
+    },
+    [list],
+  );
 
   const handleClearError = () => {
     dispatch(actions.companyActions.clearError());
@@ -105,7 +105,7 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти компанию'} updateInput={handleUpdateInput} />
+          <ToolbarActionsWithSearch buttons={buttons} title={'Найти компанию'} onChangeValue={handleUpdateInput} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (

@@ -33,6 +33,10 @@ const DeviceList = () => {
     fetchDevices();
   }, [fetchDevices]);
 
+  useEffect(() => {
+    setDataList(list);
+  }, [list]);
+
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());
   };
@@ -95,11 +99,7 @@ const DeviceList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch
-            buttons={buttons}
-            searchTitle={'Найти устройство'}
-            updateInput={handleUpdateInput}
-          />
+          <ToolbarActionsWithSearch buttons={buttons} title={'Найти устройство'} onChangeValue={handleUpdateInput} />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (

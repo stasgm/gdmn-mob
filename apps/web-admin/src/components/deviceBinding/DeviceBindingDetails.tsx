@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { IDeviceBinding, NewDeviceBinding, INamedEntity } from '@lib/types';
+import { IDeviceBinding, INamedEntity } from '@lib/types';
 import { Field, FormikProvider, useFormik } from 'formik';
 import * as yup from 'yup';
 
@@ -13,12 +13,12 @@ import { deviceStates } from '../../utils/constants';
 
 interface IProps {
   loading: boolean;
-  deviceBinding: NewDeviceBinding | IDeviceBinding;
-  onSubmit: (values: NewDeviceBinding | IDeviceBinding) => void;
+  deviceBinding: IDeviceBinding;
+  onSubmit: (values: IDeviceBinding) => void;
   onCancel: () => void;
 }
 
-export interface IDeviceBindingFormik extends Omit<NewDeviceBinding | IDeviceBinding, 'state'> {
+export interface IDeviceBindingFormik extends Omit<IDeviceBinding, 'state'> {
   state: INamedEntity;
 }
 
@@ -45,7 +45,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
     ...deviceBinding,
     user: deviceBinding.user || null,
     device: deviceBinding.device || null,
-    state: { id: deviceBinding.state, name: deviceStates[deviceBinding.state || 'NON-ACTIVATED'] },
+    state: { id: deviceBinding.state, name: deviceStates[deviceBinding.state] },
   };
 
   const formik = useFormik<IDeviceBindingFormik>({
@@ -57,7 +57,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
       state: yup.object().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit({ ...values, state: values.state.id } as NewDeviceBinding | IDeviceBinding);
+      onSubmit({ ...values, state: values.state.id } as IDeviceBinding);
     },
   });
 

@@ -28,13 +28,23 @@ const CompanyEdit = () => {
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
     const res = await dispatch(actions.updateCompany(values as ICompany));
-    if (res.type === 'COMPANY/UPDATE_SUCCCES') {
+    if (res.type === 'COMPANY/UPDATE_SUCCESS') {
       goBack();
     }
   };
 
   if (!company) {
-    return <Box>Компания не найдена</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Компания не найдена
+      </Box>
+    );
   }
 
   return (

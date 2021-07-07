@@ -59,7 +59,7 @@ const UserDeviceCreate = () => {
           </Box>
         </Box>
         <DeviceBindingDetails
-          deviceBinding={{ user: { id: user?.id, name: user?.name }, state: 'NON-ACTIVATED' } as NewDeviceBinding}
+          deviceBinding={{ user: { id: user?.id, name: user?.name }, state: 'NON-REGISTERED' } as IDeviceBinding}
           loading={loading}
           onSubmit={handleSubmit}
           onCancel={goBack}

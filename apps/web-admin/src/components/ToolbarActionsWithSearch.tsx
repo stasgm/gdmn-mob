@@ -6,13 +6,14 @@ import { IToolBarButton } from '../types';
 
 import ToolBarActions from './ToolBarActions';
 
-interface props {
+interface IProps {
   buttons: IToolBarButton[];
-  searchTitle: string;
-  updateInput: (value: string) => void;
+  title: string;
+  value?: string;
+  onChangeValue: (value: string) => void;
 }
 
-const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput }: props) => {
+const ToolbarActionsWithSearch = ({ buttons, title, value, onChangeValue }: IProps) => {
   return (
     <Card>
       <Box
@@ -36,10 +37,11 @@ const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput }: props) 
                 </InputAdornment>
               ),
             }}
-            placeholder={searchTitle}
+            placeholder={title}
             variant="outlined"
-            onChange={(event) => updateInput(event.target.value)}
+            onChange={(event) => onChangeValue(event.target.value)}
             type="search"
+            value={value}
           />
         </Box>
         <Box
