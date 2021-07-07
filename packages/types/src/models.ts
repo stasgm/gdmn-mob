@@ -1,21 +1,5 @@
-// Базовые типы
-export interface IEntity {
-  id: string;
-  creationDate?: string;
-  editionDate?: string;
-}
-
-export interface INamedEntity extends IEntity {
-  name: string;
-}
-
-export interface IExternalSystemProps {
-  externalId?: string;
-}
-
-export type DeviceState = 'NON-REGISTERED' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
-
-export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
+import { DeviceState, IExternalSystemProps, INamedEntity, UserRole } from './common';
+import { IHeadMessage, IMessage } from './messages';
 
 // Типы для хранения данных в бд
 export interface IDBUser extends INamedEntity, IExternalSystemProps {
@@ -53,22 +37,17 @@ export interface IDBActivationCode {
   deviceId: string;
 }
 
-interface IDBHeadMessage {
-  appSystem: string;
+// Messages
+export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer'> {
+  // appSystem: string;
   companyId: string;
   producerId: string;
   consumerId: string;
-  dateTime: string;
+  // dateTime: string;
 }
 
-export interface IDBMessage<T = any> {
-  id: string;
-  status: TStatusMessage;
+export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
-  body: {
-    type: TBodyType;
-    payload: T;
-  };
 }
 
 // Типы для передачи и хранения данных на клиенте
@@ -94,11 +73,6 @@ export interface ICompany extends Omit<IDBCompany, 'adminId'> {
 
 export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name'>;
 
-export interface IMessageInfo {
-  uid: string;
-  date: Date;
-}
-
 export interface IDevice extends Omit<IDBDevice, 'companyId'> {
   company: INamedEntity;
 }
@@ -114,41 +88,4 @@ export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;
-}
-
-interface IHeadMessage {
-  appSystem: string;
-  company: INamedEntity;
-  producer: INamedEntity;
-  consumer: INamedEntity;
-  dateTime: string;
-}
-
-export type TStatusMessage = 'recd' | 'procd';
-type TBodyType = 'cmd' | 'refs' | 'docs';
-
-export interface IMessage<T = any> {
-  id: string;
-  status: TStatusMessage;
-  head: IHeadMessage;
-  body: {
-    type: TBodyType;
-    payload: T;
-  };
-}
-
-export type NewMessage<T = any> = {
-  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-  status: TStatusMessage;
-  body: {
-    type: TBodyType;
-    payload: T;
-  };
-};
-
-export interface IDataMessage<T = any> {
-  id: string;
-  name: string;
-  type: string;
-  data: T;
 }

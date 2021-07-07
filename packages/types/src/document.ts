@@ -1,6 +1,4 @@
-import { IEntity, INamedEntity } from './models';
-
-export type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED';
+import { IEntity, INamedEntity, StatusType } from './common';
 
 type Meta<T> = {
   [P in keyof T]?: {

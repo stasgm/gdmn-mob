@@ -1,4 +1,4 @@
-import { IEntity } from './models';
+import { IEntity } from './common';
 
 interface IReferenceData extends IEntity {
   [fieldName: string]: unknown;

@@ -3,7 +3,7 @@ import { View, Text, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IReferences } from '@lib/types';
+import { BodyType, IReferences } from '@lib/types';
 import { messageActions, referenceActions, documentActions, useDispatch, messageSelectors } from '@lib/store';
 import { AppScreen, BackButton, MenuButton, SubTitle, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
 
@@ -26,19 +26,18 @@ const MessageViewScreen = () => {
       return;
     }
 
-    switch (msg.body.type) {
-      case 'cmd':
+    switch (msg.body.type as BodyType) {
+      case 'CMD':
         //TODO: обработка
         break;
 
-      case 'refs':
+      case 'REFS':
         //TODO: проверка данных, приведение к типу
-        console.log('load ref');
         dispatch(referenceActions.updateList(msg.body.payload as IReferences));
         dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
         break;
 
-      case 'docs':
+      case 'DOCS':
         //TODO: проверка данных, приведение к типу
         dispatch(documentActions.setDocuments(msg.body.payload));
         dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));

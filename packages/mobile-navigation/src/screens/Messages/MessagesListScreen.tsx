@@ -18,7 +18,7 @@ const MessageItem = ({ item }: { item: IMessage }) => {
       }}
     >
       <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: item.status === 'recd' ? '#E91E63' : '#06567D' }]}>
+        <View style={[styles.icon, { backgroundColor: item.status === 'READY' ? '#E91E63' : '#06567D' }]}>
           <MaterialCommunityIcons name="message-text-outline" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
