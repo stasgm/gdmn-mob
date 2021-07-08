@@ -1,10 +1,10 @@
-import { IMessage, IReferences, IDocument, ICmd } from '@lib/types';
+import { IMessage, IReferences, IDocument, ICmd, ICmdParams } from '@lib/types';
 import { company, user, user2 } from '@lib/mock';
 
 import { applDocuments } from './documents';
 import { applRefs } from './references';
 
-export const applMessages: IMessage<ICmd | IDocument[] | IReferences>[] = [
+export const applMessages: IMessage<ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences>[] = [
   {
     id: '1',
     status: 'READY',
@@ -17,12 +17,18 @@ export const applMessages: IMessage<ICmd | IDocument[] | IReferences>[] = [
     },
     body: {
       type: 'CMD',
+      /*  Для загрузки справочников : payload: { name: 'GET_REF', params: { data: ['Employees', 'Statuses'] } },
+      ниже вид для загрузки документов. В них дата может быть чем то дополнительным, например, массов из дополнительных полей*/
       payload: {
-        name: 'GET_APPL_DOCUMENTS',
+        name: 'GET_DOCUMENTS',
         params: [
           {
             dateBegin: '2021-07-06',
             dateEnd: '2021-07-07',
+            documentType: {
+              id: '168063006',
+              name: 'Заявки на закупку ТМЦ',
+            },
           },
         ],
       },
