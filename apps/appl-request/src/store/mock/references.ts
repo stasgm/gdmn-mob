@@ -24,7 +24,7 @@ export const refApplDocTypes: IReference<INamedEntity> = {
 
 // appl statuses reference
 export const refApplStatuses: IReference<INamedEntity> = {
-  id: '148000001',
+  id: '148000002',
   name: 'Statuses',
   visible: false,
   description: 'Статусы заявок',
@@ -33,7 +33,7 @@ export const refApplStatuses: IReference<INamedEntity> = {
 
 // appl emplyees reference
 export const refEmplyees: IReference<IEmployee> = {
-  id: '148000002',
+  id: '148000003',
   name: 'Employees',
   description: 'Сотрудники',
   metadata: emplMetadata,

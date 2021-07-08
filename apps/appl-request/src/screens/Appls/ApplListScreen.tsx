@@ -73,7 +73,9 @@ const ApplListScreen = () => {
           title: i.head.dept.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          applStatus: i.head.applStatus.name,
+          applStatus: `${i.head.applStatus.name} ${
+            i.head.cancelReason ? '(' + shortenString(i.head.cancelReason, 50) + ')' : ''
+          }`,
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
           description: shortenString(i.head.justification, 90),
           lineCount: i.lines.length,

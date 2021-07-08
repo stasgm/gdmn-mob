@@ -4,7 +4,9 @@ import { company, user, user2 } from '@lib/mock';
 import { applDocuments } from './documents';
 import { applRefs } from './references';
 
-export const applMessages: IMessage<ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences>[] = [
+type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences;
+
+export const applMessages: IMessage<MessageType>[] = [
   {
     id: '1',
     status: 'READY',
