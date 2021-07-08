@@ -50,7 +50,7 @@ const UserList = () => {
     setUsers(filtered);
   }, [list, filterValue]);
 
-  const handleUpdateInput = (value: string) => {
+  const handleFilterUsers = (value: string) => {
     dispatch(actions.userActions.setPageParam({ filter: value }));
   };
 
@@ -105,7 +105,7 @@ const UserList = () => {
             buttons={buttons}
             title={'Найти пользователя'}
             value={filterValue}
-            onChangeValue={handleUpdateInput}
+            onChangeValue={handleFilterUsers}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
