@@ -9,7 +9,6 @@ import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 import api from '@lib/client-api';
-import { View } from 'react-native';
 
 export interface IApp {
   items?: INavItem[];

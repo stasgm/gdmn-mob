@@ -4,7 +4,7 @@ import { extraPredicate } from '../utils/helpers';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { addCompanyToUser } from './userService';
+import { updateOne as updateUserCompany } from './userService';
 
 import { getDb } from './dao/db';
 
@@ -41,14 +41,16 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   const createdCompany = await companies.find(newCompany);
 
   // Добавляем к текущему
-  await addCompanyToUser(createdCompany.adminId, createdCompany.id);
+  //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
+  await updateUserCompany(createdCompany.adminId, { id: company.admin.id, company: createdCompany });
   //TODO переделать на updateCompany
 
   // TODO Временно! Добавляем к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
 
   if (user) {
-    await addCompanyToUser(user.id, createdCompany.id);
+    //await addCompanyToUser(user.id, createdCompany.id);
+    await updateUserCompany(user.id, { id: user.id, company: createdCompany });
   }
 
   const retCompany = await makeCompany(createdCompany);

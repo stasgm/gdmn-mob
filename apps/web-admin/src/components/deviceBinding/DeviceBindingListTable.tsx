@@ -16,6 +16,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { IDeviceBinding } from '@lib/types';
+
 import { deviceStates } from '../../utils/constants';
 
 interface IProps {

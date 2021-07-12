@@ -1,7 +1,7 @@
 import { useSelector } from '../';
 
 const usersByCompanyId = (companyId: string) => {
-  return useSelector((state) => state.users.list.filter((u) => u.companies.find((c) => c.id === companyId)));
+  return useSelector((state) => state.users.list.filter((u) => u.company?.id === companyId));
 };
 
 const userById = (id: string) => {

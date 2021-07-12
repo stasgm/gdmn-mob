@@ -1,8 +1,8 @@
-import { IMessage, TStatusMessage } from '@lib/types';
+import { IMessage, StatusType } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('MESSAGES/INIT')();
-const updateStatusMessage = createAction('MESSAGES/UPDATE_STATUS')<{ id: string; status: TStatusMessage }>();
+const updateStatusMessage = createAction('MESSAGES/UPDATE_STATUS')<{ id: string; status: StatusType }>();
 const deleteMessage = createAction('MESSAGES/DELETE')<string>();
 const deleteAllMessages = createAction('MESSAGES/DELETE_ALL')();
 const clearError = createAction('MESSAGES/CLEAR_ERROR')();

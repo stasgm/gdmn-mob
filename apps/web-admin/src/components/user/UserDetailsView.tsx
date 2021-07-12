@@ -73,13 +73,11 @@ const UserDetailsView = ({ user }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                {user.companies.map((c) => (
-                  <NavLink to={`/app/companies/${c.id}`} key={c.id}>
-                    <Typography color="textPrimary" variant="h4" key={c.id} gutterBottom>
-                      {c.name}
-                    </Typography>
-                  </NavLink>
-                ))}
+                <NavLink to={`/app/companies/${user.company?.id}`} key={user.company?.id}>
+                  <Typography color="textPrimary" variant="h4" key={user.company?.id} gutterBottom>
+                    {user.company?.name}
+                  </Typography>
+                </NavLink>
               </Grid>
             </Grid>
           </Grid>

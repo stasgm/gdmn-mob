@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
 import { AppScreen, SettingsItem, globalStyles as styles, DrawerButton } from '@lib/mobile-ui';
 
-import { ISettingsOption } from '../../../types';
+import { ISettingsOption } from '@lib/types';
 
 const SettingsSceen = () => {
   const navigation = useNavigation();
