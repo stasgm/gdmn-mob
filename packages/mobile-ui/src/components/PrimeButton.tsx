@@ -13,9 +13,10 @@ interface IProps {
   disabled?: boolean;
   onPress?: () => void;
   children: React.ReactNode;
+  type?: 'cancel' | 'normal';
 }
 
-const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IProps) => {
+const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type = 'normal' }: IProps) => {
   const { colors } = useTheme();
 
   return (
@@ -31,13 +32,18 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined }: IPr
               borderColor: colors.primary,
               backgroundColor: disabled ? colors.disabled : colors.background,
             }
-          : { backgroundColor: disabled ? colors.disabled : colors.primary },
+          : { backgroundColor: disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160' },
         style,
       ]}
     >
       <View style={localStyles.buttons}>
         {icon && <Icon name={icon} size={16} color={outlined ? colors.primary : colors.background} />}
-        <Text style={[localStyles.text, { color: outlined ? colors.primary : colors.background }]}>
+        <Text
+          style={[
+            localStyles.text,
+            { color: outlined ? (type === 'normal' ? colors.primary : colors.error) : colors.background },
+          ]}
+        >
           {'  '}
           {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>

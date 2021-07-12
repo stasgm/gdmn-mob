@@ -78,7 +78,7 @@ export interface IOrderLine extends IEntity {
   packagekey?: INamedEntity; // Вид упаковки
 }
 
-export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine[]>, 'head' | 'lines'>;
+export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
 // export type IOrderDocument = IDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead extends IHead {
@@ -93,7 +93,7 @@ export interface IRouteLine extends IEntity {
   /* result?: typeVisit; -это убрать в визиты */
 }
 
-export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine[]>, 'head' | 'lines'>;
+export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine>, 'head' | 'lines'>;
 
 interface IReturnHead extends IHead {
   contact: INamedEntity;
@@ -108,7 +108,7 @@ export interface IReturnLine extends IEntity {
   quantity: number;
 }
 
-export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine[]>, 'head' | 'lines'>;
+export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
 /* export interface ICoords {
   latitude: number;

@@ -1,7 +1,6 @@
 import { ThunkAction } from 'redux-thunk';
 
 import { IDocument } from '@lib/types';
-
 import { sleep } from '@lib/client-api';
 
 import { IDocumentState } from './types';

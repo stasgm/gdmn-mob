@@ -67,7 +67,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
  * @param user NewUser
  * @returns IUser
  */
-const signUp = async (user: Omit<NewUser, 'role'>): Promise<IUser> => {
+const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<IUser> => {
   const { users } = getDb();
 
   // Кол-во пользователей

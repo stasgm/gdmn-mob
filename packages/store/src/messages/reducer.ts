@@ -1,14 +1,14 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { messages } from '@lib/mock';
+// import { messages } from '@lib/mock';
 
 import { actions, MsgActionType } from './actions';
 
 import { IMessagesState } from './types';
 
 const initialState: Readonly<IMessagesState> = {
-  data: messages,
+  data: [],
   loading: false,
   errorMessage: '',
 };
@@ -21,7 +21,7 @@ const reducer: Reducer<IMessagesState, MsgActionType> = (state = initialState, a
     case getType(actions.updateStatusMessage):
       return {
         ...state,
-        data: [...state.data.map((i) => (i.id !== action.payload.id ? { ...i, status: action.payload.newStatus } : i))],
+        data: [...state.data.map((i) => (i.id === action.payload.id ? { ...i, status: action.payload.status } : i))],
       };
 
     case getType(actions.deleteAllMessages):
@@ -34,17 +34,17 @@ const reducer: Reducer<IMessagesState, MsgActionType> = (state = initialState, a
       return { ...state, errorMessage: '' };
 
     // Loading
-    case getType(actions.fetchMsgAsync.request):
+    case getType(actions.fetchMessagesAsync.request):
       return { ...state, loading: true };
 
-    case getType(actions.fetchMsgAsync.success):
+    case getType(actions.fetchMessagesAsync.success):
       return {
         ...state,
         loading: false,
         data: [...state.data, ...action.payload],
       };
 
-    case getType(actions.fetchMsgAsync.failure):
+    case getType(actions.fetchMessagesAsync.failure):
       return {
         ...state,
         loading: false,

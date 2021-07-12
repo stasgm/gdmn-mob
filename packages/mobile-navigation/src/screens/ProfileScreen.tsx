@@ -23,18 +23,13 @@ const ProfileScreen = () => {
   }, [navigation]);
 
   const handleLogout = () => dispatch(authActions.logout());
-  const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
+  // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 
   return (
     <View style={styles.container}>
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon
-            size={50}
-            icon="badge-account-horizontal-outline"
-            style={{ backgroundColor: colors.background }}
-            color={colors.text}
-          />
+          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
@@ -45,7 +40,7 @@ const ProfileScreen = () => {
       <Divider />
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.background }} color={colors.text} />
+          <Avatar.Icon size={50} icon="devices" />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{device?.name || ''}</Text>
@@ -58,9 +53,9 @@ const ProfileScreen = () => {
         <PrimeButton outlined onPress={handleLogout}>
           Сменить пользователя
         </PrimeButton>
-        <PrimeButton outlined onPress={handleChangeCompany}>
+        {/*         <PrimeButton outlined onPress={handleChangeCompany}>
           Сменить организацию
-        </PrimeButton>
+        </PrimeButton> */}
       </View>
     </View>
   );
@@ -85,6 +80,7 @@ const styles = StyleSheet.create({
   },
   profileIcon: {
     justifyContent: 'space-around',
+    marginRight: 5,
   },
   profileInfo: {
     flex: 1,

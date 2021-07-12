@@ -13,7 +13,7 @@ interface Props {
   spellCheck?: boolean;
   maxLength?: number;
   autoCorrect?: boolean;
-  required?: boolaen;
+  required?: boolean;
   keyboardType?:
     | 'default'
     | 'email-address'

@@ -30,7 +30,7 @@ const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => voi
           <MaterialCommunityIcons name="bookmark" size={15} color="#FFF" />
         </View> */}
         <View style={styles.details}>
-          <View style={styles.directionRow}>
+          <View style={styles.rowCenter}>
             <Text style={styles.name}>{item.name}</Text>
           </View>
           <View style={styles.flexDirectionRow}>

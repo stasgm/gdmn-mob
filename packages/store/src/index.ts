@@ -8,6 +8,7 @@ import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
 import { reducer as msgReducer } from './messages';
 import { reducer as referenceReducer } from './references';
+import { reducer as settingsReducer } from './settings';
 import { TActions } from './types';
 
 export const rootReducer = {
@@ -15,6 +16,7 @@ export const rootReducer = {
   messages: msgReducer,
   references: referenceReducer,
   documents: documentReducer,
+  settings: settingsReducer,
 };
 
 type AppReducers<S, A extends AnyAction> = { [key: string]: Reducer<S, A> };
