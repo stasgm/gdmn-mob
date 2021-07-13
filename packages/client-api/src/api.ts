@@ -29,7 +29,7 @@ class Api extends BaseApi {
   constructor(config: IApiConfig) {
     super();
     this._config = config;
-    this._deviceId = deviceId; // TODO убрать web  || 'WEB'
+    this._deviceId = ''; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
@@ -103,7 +103,7 @@ class Api extends BaseApi {
 }
 
 const {
-  debug: { deviceId, useMockup },
+  debug: { useMockup },
   server: { name, port, protocol },
   timeout,
   apiPath,
@@ -118,6 +118,6 @@ export default new Api({
   debug: {
     isMock: useMockup,
     mockDelay: 1000,
-    mockDeviceId: deviceId,
+    // mockDeviceId: deviceId,
   },
 });
