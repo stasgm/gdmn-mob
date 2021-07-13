@@ -20,13 +20,9 @@ const Register = () => {
 
   const dispatch = useThunkDispatch();
 
-  console.log(error, loading, status);
-
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signUp(values));
 
-    console.log('res.type', res.type);
-    console.log(res);
     if (res.type === 'AUTH/SIGNUP_SUCCESS') {
       navigate('/login');
     }

@@ -28,7 +28,7 @@ const Login = () => {
       password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values: IUserCredentials) => {
-      dispatch(authActions.signInWithDevice(values));
+      dispatch(authActions.signIn(values));
     },
   });
 

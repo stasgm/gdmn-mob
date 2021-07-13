@@ -17,23 +17,6 @@ interface IBaseSettings {
   refLoadType: boolean;
 }
 
-const baseSettings: ISettings<IBaseSettings> = {
-  serverAutoCheck: {
-    id: '1',
-    sortOrder: 1,
-    description: 'Опрашивать сервер автоматически',
-    data: true,
-    type: 'boolean',
-  },
-  refLoadType: {
-    id: '2',
-    description: 'Перезаписывать справочники',
-    data: true,
-    type: 'boolean',
-    sortOrder: 2,
-  },
-};
-
 // Example
 
 /*
@@ -61,4 +44,4 @@ const InvSettings: ISettings<IInvSettings> =  {
   },
 }; */
 
-export { ISettings, ISettingsOption, IBaseSettings, baseSettings };
+export { ISettings, ISettingsOption, IBaseSettings };

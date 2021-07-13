@@ -135,14 +135,15 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
       delete newParams['deviceId'];
     }
 
-    let stateFound = true;
+    /*state обработается в extraPredicate */
+    // let stateFound = true;
 
-    if ('state' in newParams) {
-      stateFound = item.state === newParams.state;
-      delete newParams['state'];
-    }
+    // if ('state' in newParams) {
+    //   stateFound = item.state === newParams.state;
+    //   delete newParams['state'];
+    // }
 
-    return userFound && deviceFound && stateFound && extraPredicate(item, newParams);
+    return userFound && deviceFound && extraPredicate(item, newParams);
   });
 
   const newParams = { ...params };

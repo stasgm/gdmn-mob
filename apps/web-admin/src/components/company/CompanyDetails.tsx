@@ -14,11 +14,12 @@ interface IProps {
 const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
   const formik = useFormik<ICompany | NewCompany>({
     enableReinitialize: true,
-    initialValues: company,
+    initialValues: { ...company, city: company.city || '' },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
+      console.log(values);
       onSubmit(values);
     },
   });
@@ -34,7 +35,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container direction="column" md={6} xs={12} spacing={3}>
+              <Grid container direction="column" item md={6} xs={12} spacing={3}>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}

@@ -57,7 +57,7 @@ const signUp = (
     const response = await api.auth.signup(userCredentials);
 
     if (response.type === 'SIGNUP') {
-      return dispatch(actions.signUpAsync.success(response.user));
+      return dispatch(actions.signUpAsync.success());
     }
 
     if (response.type === 'ERROR') {

@@ -38,7 +38,7 @@ const getConfig = () => {
     ...config,
     debug: {
       useMockup: process.env.MOCK ? process.env.MOCK === 'true' : config.debug.useMockup,
-      deviceId: (process.env.DEVICE_ID || config.debug.deviceId || '').toUpperCase(),
+      //deviceId: (process.env.DEVICE_ID || config.debug.deviceId || '').toUpperCase(),
     },
   };
   // console.log('config from init', configWithDebug);

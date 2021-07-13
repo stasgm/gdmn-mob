@@ -28,6 +28,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
     const { deviceId } = ctx.query;
 
     const device = await devices.find((el) => el.uid === deviceId);
+
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
     }
@@ -67,7 +68,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
  * @param user NewUser
  * @returns IUser
  */
-const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<IUser> => {
+const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefined> => {
   const { users } = getDb();
 
   // Кол-во пользователей
@@ -76,6 +77,8 @@ const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<IUser> =
   const role = userCount === 0 ? 'SuperAdmin' : 'Admin';
   // Создаём пользователя
   const newUser = await userService.addOne({ ...user, role });
+
+  console.log('newUser', newUser);
 
   /*   if (userCount === 0) {
       // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)
@@ -118,7 +121,8 @@ const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<IUser> =
       } as IDBDeviceBinding);
     } */
 
-  return newUser;
+  // return newUser;
+  return;
 };
 
 const validateAuthCreds: VerifyFunction = async (name: string, password: string, done) => {

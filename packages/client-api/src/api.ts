@@ -29,7 +29,7 @@ class Api extends BaseApi {
   constructor(config: IApiConfig) {
     super();
     this._config = config;
-    this._deviceId = deviceId || 'WEB'; // TODO убрать web
+    this._deviceId = deviceId; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,

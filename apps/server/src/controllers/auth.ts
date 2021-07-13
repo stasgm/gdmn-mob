@@ -12,12 +12,12 @@ import { created, ok } from '../utils/apiHelpers';
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password } = ctx.request.body as IUserCredentials;
 
-  const newUser = await authService.signUp({
+  await authService.signUp({
     password,
     name,
   });
 
-  created(ctx as Context, newUser);
+  created(ctx as Context);
 
   log.info(`signUp: user '${name}' is successfully signed up`);
 };

@@ -111,13 +111,13 @@ const genActivationCode = async (deviceId: string) => {
 const findOne = async (id: string): Promise<IDevice | undefined> => {
   const { devices } = getDb();
 
-  let device: IDBDevice | undefined;
+  //let device: IDBDevice | undefined;
 
-  if (id === 'WEB') {
-    device = await devices.find((e) => e.uid === id);
-  } else {
-    device = await devices.find(id);
-  }
+  // if (id === 'WEB') {
+  //   device = await devices.find((e) => e.uid === id);
+  // } else {
+  const device = await devices.find(id);
+  //}
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -150,21 +150,22 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
       delete newParams['companyId'];
     }
 
-    let uIdFound = true;
+    /*state и uId обработается в extraPredicate */
+    // let uIdFound = true;
 
-    if ('uId' in newParams) {
-      uIdFound = item.uid === newParams.uId;
-      delete newParams['uId'];
-    }
+    // if ('uId' in newParams) {
+    //   uIdFound = item.uid === newParams.uId;
+    //   delete newParams['uId'];
+    // }
 
-    let stateFound = true;
+    // let stateFound = true;
 
-    if ('state' in newParams) {
-      stateFound = item.state === newParams.state;
-      delete newParams['state'];
-    }
+    // if ('state' in newParams) {
+    //   stateFound = item.state === newParams.state;
+    //   delete newParams['state'];
+    // }
 
-    return companyFound && uIdFound && stateFound && extraPredicate(item, newParams);
+    return companyFound && extraPredicate(item, newParams);
   });
 
   /*   const newParams = { ...params };

@@ -5,6 +5,7 @@ import {
   InnerErrorException,
   ConflictException,
   InvalidParameterException,
+  ForbiddenException,
 } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
@@ -139,13 +140,16 @@ const deleteOne = async (id: string): Promise<void> => {
 
   // TODO Если пользователь является админом организации то прерывать
   // удаление с соответствующим сообщением
+  if (user.role === 'SuperAdmin' || (user.role === 'Admin' && Boolean(user.company))) {
+    throw new ForbiddenException('Администратор не может быть удален');
+  }
+
   await users.delete(id);
 };
 
 const findOne = async (id: string): Promise<IUser | undefined> => {
   const db = getDb();
   const { users } = db;
-
   const user = await users.find(id);
 
   if (!user) {

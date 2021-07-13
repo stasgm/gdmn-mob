@@ -8,6 +8,5 @@ export default {
   apiPath: 'api',
   debug: {
     useMockup: false,
-    deviceId: 'WEB',
   },
 };

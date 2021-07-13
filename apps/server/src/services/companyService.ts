@@ -30,12 +30,14 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
 
   const newCompanyObj = {
     name: company.name,
+    city: company.city,
     adminId: company.admin.id,
     externalId: company.externalId,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   } as IDBCompany;
 
+  console.log('newCompanyObj', newCompanyObj);
   const newCompany = await companies.insert(newCompanyObj);
 
   const createdCompany = await companies.find(newCompany);
@@ -180,14 +182,16 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
        delete newParams['adminId'];
     }
     */
-    let nameFound = true;
 
-    if ('name' in newParams) {
-      nameFound = item.name === newParams.name;
-      delete newParams['name'];
-    }
+    /*name обработается в extraPredicate */
+    // let nameFound = true;
 
-    return companyIdFound && nameFound && extraPredicate(item, newParams);
+    // if ('name' in newParams) {
+    //   nameFound = item.name === newParams.name;
+    //   delete newParams['name'];
+    // }
+
+    return companyIdFound && extraPredicate(item, newParams);
   });
 
   const pr = companyList?.map(async (i) => await makeCompany(i));
@@ -213,6 +217,7 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
   return {
     id: company.id,
     name: company.name,
+    city: company.city,
     admin: adminEntity,
     externalId: company.externalId,
     creationDate: company.creationDate,

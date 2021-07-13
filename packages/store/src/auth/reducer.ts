@@ -72,7 +72,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, error: false, status: '', loading: true, user: undefined };
 
     case getType(actions.signUpAsync.success):
-      return { ...state, user: action.payload, error: false, status: '', loading: false, company: undefined };
+      return { ...state, user: undefined, error: false, status: '', loading: false, company: undefined };
 
     case getType(actions.signUpAsync.failure):
       return { ...state, error: true, status: action.payload, loading: false, user: null };

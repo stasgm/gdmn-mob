@@ -6,7 +6,7 @@ export interface IAuthQueryResponse {
 
 export interface ISignUpResponse extends IAuthQueryResponse {
   type: 'SIGNUP';
-  user: IUser;
+  //user: IUser;
 }
 
 export interface ILoginResponse extends IAuthQueryResponse {

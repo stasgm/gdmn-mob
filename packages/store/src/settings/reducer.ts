@@ -1,11 +1,28 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { baseSettings } from '@lib/types';
+import { ISettings, IBaseSettings } from '@lib/types';
 
 import { actions, SettingsActionType } from './actions';
 
 import { ISettingsState } from './types';
+
+const baseSettings: ISettings<IBaseSettings> = {
+  serverAutoCheck: {
+    id: '1',
+    sortOrder: 1,
+    description: 'Опрашивать сервер автоматически',
+    data: true,
+    type: 'boolean',
+  },
+  refLoadType: {
+    id: '2',
+    description: 'Перезаписывать справочники',
+    data: true,
+    type: 'boolean',
+    sortOrder: 2,
+  },
+};
 
 const initialState: Readonly<ISettingsState> = {
   data: baseSettings,

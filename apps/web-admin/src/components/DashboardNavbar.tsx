@@ -27,7 +27,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />
         <Box
-          component="button"
+          // component="button"
           sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' }, color: 'white' }}
         >
           <IconButton color="inherit">
@@ -40,7 +40,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
           </IconButton>
         </Box>
         <Box
-          component="button"
+          // component="button"
           sx={{ background: 'transparent', border: 'none', display: { xs: 'block', md: 'none' }, color: 'white' }}
         >
           <IconButton color="inherit" onClick={onMobileNavOpen}>

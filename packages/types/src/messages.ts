@@ -1,6 +1,6 @@
-import { IReferences, IDocument } from '@lib/types';
-
 import { BodyType, INamedEntity, StatusType } from './common';
+import { IDocument } from './document';
+import { IReferences } from './references';
 
 export interface IHeadMessage {
   appSystem: string;
@@ -16,6 +16,7 @@ export interface ICmdParams<T = any> {
   documentType: INamedEntity;
   data?: T;
 }
+
 export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdParams[]> {
   name: string;
   params?: T;

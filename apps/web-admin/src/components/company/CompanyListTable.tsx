@@ -90,6 +90,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
             </NavLink>
           </Box>
         </TableCell>
+        <TableCell>{company.city}</TableCell>
         <TableCell>
           <Box
             sx={{
@@ -139,6 +140,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>Город</TableCell>
                 <TableCell>Администратор</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

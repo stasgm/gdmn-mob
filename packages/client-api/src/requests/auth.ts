@@ -35,7 +35,7 @@ class Auth extends BaseRequest {
       if (resData.result) {
         return {
           type: 'SIGNUP',
-          user: resData.data,
+          //user: resData.data,
         } as types.ISignUpResponse;
       }
 
