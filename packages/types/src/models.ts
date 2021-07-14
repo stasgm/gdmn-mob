@@ -84,7 +84,7 @@ export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'devic
   device: INamedEntity;
 }
 
-export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device'>;
+export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device' | 'state'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;

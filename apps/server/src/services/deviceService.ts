@@ -24,8 +24,10 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     id: '',
     name: device.name,
     uid: '',
-    state: 'NON-ACTIVATED',
+    state: 'NON-REGISTERED',
     companyId: device.company.id,
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
   };
 
   const createdDevice = await devices.find(await devices.insert(newDevice));
@@ -64,6 +66,8 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
     state: deviceData.state || oldDevice.state,
     uid: deviceData.uid || oldDevice.uid,
     companyId,
+    creationDate: deviceData.creationDate,
+    editionDate: new Date().toISOString(),
   };
 
   await devices.update(newDevice);
@@ -240,6 +244,8 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
     company: companyEntity,
     state: device.state,
     uid: device.uid,
+    creationDate: device.creationDate,
+    editionDate: device.editionDate,
   };
 };
 

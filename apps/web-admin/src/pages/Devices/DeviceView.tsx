@@ -40,7 +40,7 @@ const DeviceView = () => {
 
   const handleDelete = async () => {
     const res = await dispatch(deviceActions.removeDevice(deviceId));
-    if (res.type === 'DEVICE/REMOVE_SUCCCES') {
+    if (res.type === 'DEVICE/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };

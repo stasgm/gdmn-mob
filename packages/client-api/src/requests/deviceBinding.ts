@@ -92,7 +92,7 @@ class DeviceBinding extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/devices/${deviceId}`);
+      const res = await this.api.axios.delete<IResponse<void>>(`/binding/${deviceId}`);
       const resData = res.data;
 
       if (resData.result) {
@@ -133,7 +133,7 @@ class DeviceBinding extends BaseRequest {
 
     try {
       // || this.api.deviceId
-      const res = await this.api.axios.get<IResponse<IDeviceBinding>>(`/devices/${deviceId || this.api.deviceId}`);
+      const res = await this.api.axios.get<IResponse<IDeviceBinding>>(`/binding/${deviceId || this.api.deviceId}`);
 
       const resData = res?.data;
 
@@ -182,7 +182,7 @@ class DeviceBinding extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IDeviceBinding[]>>(`/devices${paramText}`);
+      const res = await this.api.axios.get<IResponse<IDeviceBinding[]>>(`/binding${paramText}`);
       const resData = res.data;
 
       if (resData.result) {

@@ -15,7 +15,7 @@ import User from './requests/user';
 
 class Api extends BaseApi {
   protected _config: IApiConfig;
-  protected _deviceId: string;
+  protected _deviceId: string | undefined;
 
   protected readonly _axios: AxiosInstance;
   // Классы запросов
@@ -29,7 +29,7 @@ class Api extends BaseApi {
   constructor(config: IApiConfig) {
     super();
     this._config = config;
-    this._deviceId = ''; // TODO убрать web  || 'WEB'
+    this._deviceId = undefined; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
@@ -49,8 +49,10 @@ class Api extends BaseApi {
 
     this._axios.interceptors.request.use(
       (request) => {
-        // Добавляем device_ID
-        request.params.deviceId = this._deviceId;
+        if (this._deviceId) {
+          // Добавляем device_ID
+          request.params.deviceId = this._deviceId;
+        }
         console.info('✉️ request', request);
         return request;
       },
@@ -85,7 +87,7 @@ class Api extends BaseApi {
     return this._config;
   }
 
-  set deviceId(deviceId: string) {
+  set deviceId(deviceId: string | undefined) {
     this._deviceId = deviceId;
   }
 

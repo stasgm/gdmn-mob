@@ -6,8 +6,9 @@ const bindingDevice: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
-      deviceId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
-      userId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
+      device: Joi.object().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
+      user: Joi.object().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
+      state: Joi.string().optional(),
     }),
   },
 };

@@ -76,9 +76,7 @@ const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefine
   // Роль нового пользователя
   const role = userCount === 0 ? 'SuperAdmin' : 'Admin';
   // Создаём пользователя
-  const newUser = await userService.addOne({ ...user, role });
-
-  console.log('newUser', newUser);
+  await userService.addOne({ ...user, role });
 
   /*   if (userCount === 0) {
       // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)

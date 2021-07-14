@@ -28,10 +28,10 @@ const DeviceList = () => {
     dispatch(actions.fetchDevices());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   /* Загружаем данные при загрузке компонента */
-  //   fetchDevices();
-  // }, [fetchDevices]);
+  useEffect(() => {
+    /* Загружаем данные при загрузке компонента */
+    fetchDevices();
+  }, [fetchDevices]);
 
   useEffect(() => {
     setDataList(list);
