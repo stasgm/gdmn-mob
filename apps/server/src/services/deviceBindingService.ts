@@ -138,8 +138,12 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
     let deviceFound = true;
 
     if ('deviceId' in newParams) {
-      deviceFound = item.userId?.includes(newParams.deviceId);
+      deviceFound = item.deviceId?.includes(newParams.deviceId);
       delete newParams['deviceId'];
+    }
+
+    if ('companyId' in newParams) {
+      delete newParams['companyId'];
     }
 
     /*state обработается в extraPredicate */
