@@ -33,7 +33,7 @@ const BindingEdit = () => {
 
   const handleSubmit = async (values: NewDeviceBinding | IDeviceBinding) => {
     const res = await dispatch(actions.updateDeviceBinding(values as IDeviceBinding));
-    if (res.type === 'DEVICEBINDING/UPDATE_SUCCCES') {
+    if (res.type === 'DEVICEBINDING/UPDATE_SUCCES') {
       goBack();
     }
   };

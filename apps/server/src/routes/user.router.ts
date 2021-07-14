@@ -4,6 +4,7 @@ import { addUser, getUsers, getUser, removeUser, updateUser } from '../controlle
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
 import { permissionMiddleware } from '../middleware/permissionRequired';
+import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 
 import { userValidation } from '../validations';
 
@@ -12,7 +13,7 @@ const router = Router();
 router.prefix('/users');
 router.post('/', userValidation.addUser, authMiddleware, permissionMiddleware, addUser);
 router.get('/:id', userValidation.getUser, authMiddleware, deviceMiddleware, getUser);
-router.get('/', authMiddleware, deviceMiddleware, getUsers);
+router.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getUsers);
 router.patch('/:id', userValidation.updateUser, authMiddleware, permissionMiddleware, updateUser);
 router.delete('/:id', userValidation.removeUser, authMiddleware, permissionMiddleware, removeUser);
 

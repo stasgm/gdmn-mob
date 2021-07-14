@@ -34,7 +34,7 @@ const UserDeviceCreate = () => {
 
   const handleSubmit = async (values: IDeviceBinding | NewDeviceBinding) => {
     const res = await dispatch(bindingActions.addDeviceBinding(values as NewDeviceBinding));
-    if (res.type === 'DEVICEBINDING/ADD_SUCCCES') {
+    if (res.type === 'DEVICEBINDING/ADD_SUCCES') {
       goBack();
     }
   };

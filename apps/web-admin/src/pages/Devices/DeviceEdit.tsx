@@ -33,7 +33,7 @@ const DeviceEdit = () => {
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
     const res = await dispatch(actions.updateDevice(values as IDevice));
-    if (res.type === 'DEVICE/UPDATE_SUCCCES') {
+    if (res.type === 'DEVICE/UPDATE_SUCCESS') {
       goBack();
     }
   };

@@ -33,7 +33,7 @@ const UserEdit = () => {
 
   const handleSubmit = async (values: IUser | NewUser) => {
     const res = await dispatch(actions.updateUser(values as IUser));
-    if (res.type === 'USER/UPDATE_SUCCCES') {
+    if (res.type === 'USER/UPDATE_SUCCESS') {
       goBack();
     }
   };
