@@ -7,7 +7,7 @@ export const superAdmin: INamedEntity = {
 
 const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
 const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
-const company3: INamedEntity = { id: '777', name: 'Бройлерная птицефабрика' };
+const company3: INamedEntity = { id: '777', name: 'Компания 1' };
 
 const users: IUser[] = [
   {

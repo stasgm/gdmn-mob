@@ -197,7 +197,7 @@ class Auth extends BaseRequest {
     }
 
     try {
-      const body = { uid: this.api.deviceId, code };
+      const body = { code };
 
       const res = await this.api.axios.post<IResponse<IDevice>>('/auth/device/code', body);
 

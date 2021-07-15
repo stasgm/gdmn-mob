@@ -29,9 +29,9 @@ const companies: ICompany[] = [
   },
   {
     id: '11',
-    name: 'Бройлерная птицефабрика',
+    name: 'Компания 1',
     admin: user1,
-    city: 'Витебск',
+    city: 'Город',
     creationDate: '2021.01.02',
     editionDate: '2021.01.02',
   },

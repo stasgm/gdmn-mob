@@ -89,3 +89,5 @@ export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device' | 'state'>
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;
 }
+
+export type NewActivationCode = Pick<IActivationCode, 'code'>;

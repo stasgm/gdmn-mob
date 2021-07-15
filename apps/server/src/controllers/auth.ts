@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IUser, IUserCredentials } from '@lib/types';
+import { IUser, IUserCredentials, NewActivationCode } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -61,7 +61,7 @@ const logOut = async (ctx: Context): Promise<void> => {
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { code } = ctx.params;
+  const { code } = ctx.request.body as NewActivationCode;
 
   const deviceUid = await authService.verifyCode(code);
 

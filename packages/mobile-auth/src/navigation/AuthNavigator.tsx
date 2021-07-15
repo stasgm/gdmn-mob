@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
-import { ICompany, IUserCredentials } from '@lib/types';
+import { DeviceState, ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen, AppLoadScreen } from '../screens';
@@ -20,7 +20,9 @@ const AuthNavigator: React.FC = () => {
     [dispatch],
   );
 
-  const checkDevice = useCallback(() => dispatch(authActions.checkDevice()), [dispatch]);
+  const [deviceStatus, setDeviceStatus] = useState<DeviceState | undefined>(undefined);
+
+  const checkDevice = useCallback(() => deviceStatus ? dispatch(authActions.checkDevice())  : setDeviceStatus('NON-ACTIVATED'), [dispatch]);
   const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
   const disconnect = useCallback(() => dispatch(authActions.disconnect()), [dispatch]);
   const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
@@ -74,7 +76,7 @@ const AuthNavigator: React.FC = () => {
             options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />
         )
-      ) : device === undefined ? (
+      ) : device === undefined && deviceStatus !== 'NON-ACTIVATED' ? (
         <>
           <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />

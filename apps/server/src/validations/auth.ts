@@ -27,7 +27,8 @@ const signup: Config = {
 
 const verifyCode: Config = {
   validate: {
-    params: Joi.object({
+    type: 'json',
+    body: Joi.object({
       code: Joi.string().required().error(new InvalidParameterException('Не указан код активации')),
     }),
   },
