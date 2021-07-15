@@ -1,7 +1,15 @@
 import { IDevice, IUser } from '@lib/types';
 
 export interface IAuthQueryResponse {
-  type: 'SIGNUP' | 'LOGIN' | 'LOGOUT' | 'GET_CURRENT_USER' | 'USER_NOT_AUTHENTICATED' | 'GET_CODE' | 'VERIFY_CODE';
+  type:
+    | 'SIGNUP'
+    | 'LOGIN'
+    | 'LOGOUT'
+    | 'GET_CURRENT_USER'
+    | 'USER_NOT_AUTHENTICATED'
+    | 'GET_CODE'
+    | 'VERIFY_CODE'
+    | 'GET_DEVICE_STATUS';
 }
 
 export interface ISignUpResponse extends IAuthQueryResponse {
@@ -38,6 +46,11 @@ export interface IVerifyCodeResponse extends IAuthQueryResponse {
   device: IDevice;
 }
 
+export interface IDeviceStatusResponse extends IAuthQueryResponse {
+  type: 'GET_DEVICE_STATUS';
+  status: string;
+}
+
 export type QueryResponse =
   | ILoginResponse
   | IUserResponse
@@ -45,4 +58,5 @@ export type QueryResponse =
   | ILogOutResponse
   | ICreateCodeResponse
   | IVerifyCodeResponse
-  | IUserNotAuthResponse;
+  | IUserNotAuthResponse
+  | IDeviceStatusResponse;

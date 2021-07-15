@@ -221,6 +221,29 @@ class Auth extends BaseRequest {
       } as error.INetworkError;
     }
   };
+
+  getDeviceStatus = async (uid: string) => {
+    try {
+      const res = await this.api.axios.get<IResponse<string>>(`/auth/deviceStatus/${uid}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'GET_DEVICE_STATUS',
+          status: resData.data,
+        } as types.IDeviceStatusResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка получения статуса устройства',
+      } as error.INetworkError;
+    }
+  };
 }
 
 export default Auth;
