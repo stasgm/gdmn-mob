@@ -7,6 +7,7 @@ import companyReducer from './company/reducer';
 import { CompanyActionType } from './company/actions';
 import userReducer from './user/reducer';
 import deviceReducer from './device/reducer';
+import activationCodeReducer from './activationCode/reducer';
 import deviceBindingReducer from './deviceBinding/reducer';
 import { DeviceActionType } from './device/actions';
 import { UserActionType } from './user/actions';
@@ -16,6 +17,7 @@ export const reducers = {
   companies: companyReducer,
   users: userReducer,
   devices: deviceReducer,
+  activationCodes: activationCodeReducer,
   deviceBindings: deviceBindingReducer,
 };
 

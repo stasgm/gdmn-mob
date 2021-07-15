@@ -3,6 +3,8 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
+import AddCommentIcon from '@material-ui/icons/AddComment';
+
 import {
   Box,
   Card,
@@ -15,11 +17,13 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import { IDevice } from '@lib/types';
+
+import { IDevice, IActivationCode } from '@lib/types';
 
 interface IProps {
   devices?: IDevice[];
   selectedDevices?: IDevice[];
+  activationCodes?: IActivationCode[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
@@ -121,6 +125,10 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
         <TableCell>{device.state}</TableCell>
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>
+          {/* {device.code = Math.floor(Math.random() * 10) + 1 }
+          <AddCommentIcon/> */}
+        </TableCell>
       </TableRow>
     ));
 
@@ -158,6 +166,7 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
                 <TableCell>Состояние</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
+                <TableCell>Код активации</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
