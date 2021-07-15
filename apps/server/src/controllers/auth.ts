@@ -80,4 +80,14 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getActivationCode: activation code generated successfully');
 };
 
-export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };
+const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: uid } = ctx.params;
+
+  const deviceStatus = await authService.getDeviceStatus(uid);
+
+  ok(ctx as Context, deviceStatus);
+
+  log.info('getDeviceStatus: ok');
+};
+
+export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode, getDeviceStatus };

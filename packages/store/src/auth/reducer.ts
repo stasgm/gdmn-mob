@@ -18,6 +18,7 @@ const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
+  deviceStatus: undefined,
   settings: {
     apiPath,
     port,
@@ -85,6 +86,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.disconnect):
       return { ...state, device: undefined, error: false, status: '', loading: false };
+
+    case getType(actions.getDeviceStatusAsync.request):
+      return { ...state, loading: true, deviceStatus: action.payload, error: false };
+
+    case getType(actions.getDeviceStatusAsync.success):
+      return { ...state, loading: false, status: '', error: false, deviceStatus: action.payload };
+
+    case getType(actions.getDeviceStatusAsync.failure):
+      return { ...state, loading: false, deviceStatus: action.payload, error: true };
 
     default:
       return state;

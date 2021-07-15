@@ -50,4 +50,12 @@ const checkDevice: Config = {
   },
 };
 
-export { login, signup, verifyCode, getActivationCode, checkDevice };
+const getDeviceStatus: Config = {
+  validate: {
+    params: Joi.object({
+      id: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
+    }),
+  },
+};
+
+export { login, signup, verifyCode, getActivationCode, checkDevice, getDeviceStatus };

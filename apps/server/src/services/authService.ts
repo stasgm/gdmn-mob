@@ -190,4 +190,17 @@ const logout = async (userId: string) => {
   // делаем что надо
 };
 
-export { authenticate, validateAuthCreds, signUp, verifyCode, logout };
+// Получить статус устройства
+
+const getDeviceStatus = async (uid: string): Promise<string> => {
+  const { devices } = getDb();
+  const device = await devices.find((i) => i.uid === uid);
+
+  if (!device) {
+    throw new UnauthorizedException('Устройство не найдено');
+  }
+
+  return device.state;
+};
+
+export { authenticate, validateAuthCreds, signUp, verifyCode, logout, getDeviceStatus };

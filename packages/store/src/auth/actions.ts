@@ -36,6 +36,12 @@ const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUT
   string
 >();
 
+const getDeviceStatusAsync = createAsyncAction(
+  'AUTH/GET_DEVICE_STATUS',
+  'AUTH/GET_DEVICE_STATUS_SUCCESS',
+  'AUTH/GET_DEVICE_STATUS_FAILURE',
+)<string, string, string>();
+
 export const actions = {
   init,
   clearError,
@@ -47,6 +53,7 @@ export const actions = {
   loginUserAsync,
   signUpAsync,
   activateDeviceAsync,
+  getDeviceStatusAsync,
 };
 
 export type AuthActionType = ActionType<typeof actions>;
