@@ -4,9 +4,9 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import bcrypt from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, DeviceState } from '@lib/types';
 
-import { DataNotFoundException, UnauthorizedException } from '../exceptions';
+import { DataNotFoundException, InvalidParameterException, UnauthorizedException } from '../exceptions';
 
 import * as userService from './userService';
 import { getDb } from './dao/db';
@@ -27,7 +27,9 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
     // Для пользователей с ролью User проверяем дополнительно DeviceId
     const { deviceId } = ctx.query;
 
-    const device = await devices.find((el) => el.uid === deviceId);
+    console.log('deviceId', deviceId);
+
+    const device = await devices.find((el) => el.id === deviceId);
 
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
@@ -138,6 +140,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
+    console.log('comp user', user);
     done(null, user);
   } else {
     done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
@@ -182,7 +185,7 @@ const verifyCode = async (code: string) => {
 
   await codes.delete((i) => i.code === code);
 
-  return deviceId;
+  return device;
 };
 
 const logout = async (userId: string) => {
@@ -192,7 +195,7 @@ const logout = async (userId: string) => {
 
 // Получить статус устройства
 
-const getDeviceStatus = async (uid: string): Promise<string> => {
+const getDeviceStatus = async (uid: string): Promise<DeviceState> => {
   const { devices } = getDb();
   const device = await devices.find((i) => i.uid === uid);
 

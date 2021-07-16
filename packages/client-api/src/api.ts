@@ -36,6 +36,7 @@ class Api extends BaseApi {
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
+      // headers: { 'Access-Control-Allow-Origin': 'http://localhost:8080' },
     });
 
     this.auth = new Auth(this);
@@ -47,12 +48,17 @@ class Api extends BaseApi {
 
     this._axios.defaults.params = {};
 
+    this._axios.defaults.withCredentials = true;
+
     this._axios.interceptors.request.use(
       (request) => {
+        console.log('interceptors deviceId', this._deviceId);
         if (this._deviceId) {
           // Добавляем device_ID
           request.params.deviceId = this._deviceId;
+          console.log('request.params.deviceId', request.params.deviceId);
         }
+
         console.info('✉️ request', request);
         return request;
       },

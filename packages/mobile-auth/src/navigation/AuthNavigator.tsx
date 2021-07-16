@@ -12,7 +12,7 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { device, settings, user } = useSelector((state) => state.auth);
+  const { device, settings, user, deviceStatus } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const saveSettings = useCallback(
@@ -20,9 +20,20 @@ const AuthNavigator: React.FC = () => {
     [dispatch],
   );
 
-  const [deviceStatus, setDeviceStatus] = useState<DeviceState | undefined>(undefined);
+  console.log('deviceStatus', deviceStatus);
 
-  const checkDevice = useCallback(() => deviceStatus ? dispatch(authActions.checkDevice())  : setDeviceStatus('NON-ACTIVATED'), [dispatch]);
+  console.log('device', device);
+
+  console.log('settings', settings);
+
+  const [deviceStatusApp, setDeviceStatus] = useState<DeviceState | undefined>(deviceStatus);
+
+  console.log('deviceStatusApp', deviceStatusApp);
+
+  const checkDevice = useCallback(
+    () => (device ? dispatch(authActions.getDeviceStatus(device.uid)) : setDeviceStatus('NON-ACTIVATED')),
+    [dispatch, device],
+  );
   const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
   const disconnect = useCallback(() => dispatch(authActions.disconnect()), [dispatch]);
   const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
@@ -76,7 +87,7 @@ const AuthNavigator: React.FC = () => {
             options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />
         )
-      ) : device === undefined && deviceStatus !== 'NON-ACTIVATED' ? (
+      ) : device === undefined && deviceStatusApp !== 'NON-ACTIVATED' ? (
         <>
           <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />

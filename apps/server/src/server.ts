@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import Koa from 'koa';
+import Koa, { Context, Next } from 'koa';
 import cors from '@koa/cors';
 
 import session from 'koa-session';
@@ -45,7 +45,9 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
+      console.log('id', id);
       const user = await userService.findOne(id);
+      console.log('user', user);
       done(null, user);
     } catch (err) {
       done(err);
@@ -62,6 +64,8 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     fs.mkdirSync(logPath);
   }
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
+
+  //const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'http://example.com';
 
   app
     .use(errorHandler)

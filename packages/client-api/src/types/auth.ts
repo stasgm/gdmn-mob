@@ -1,4 +1,4 @@
-import { IDevice, IUser } from '@lib/types';
+import { DeviceState, IDevice, IUser } from '@lib/types';
 
 export interface IAuthQueryResponse {
   type:
@@ -48,7 +48,7 @@ export interface IVerifyCodeResponse extends IAuthQueryResponse {
 
 export interface IDeviceStatusResponse extends IAuthQueryResponse {
   type: 'GET_DEVICE_STATUS';
-  status: string;
+  status: DeviceState;
 }
 
 export type QueryResponse =

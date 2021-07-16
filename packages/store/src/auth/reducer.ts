@@ -85,16 +85,16 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, company: action.payload };
 
     case getType(actions.disconnect):
-      return { ...state, device: undefined, error: false, status: '', loading: false };
+      return { ...state, device: undefined, deviceStatus: undefined, error: false, status: '', loading: false };
 
     case getType(actions.getDeviceStatusAsync.request):
-      return { ...state, loading: true, deviceStatus: action.payload, error: false };
+      return { ...state, loading: true, deviceStatus: undefined, status: '', error: false };
 
     case getType(actions.getDeviceStatusAsync.success):
       return { ...state, loading: false, status: '', error: false, deviceStatus: action.payload };
 
     case getType(actions.getDeviceStatusAsync.failure):
-      return { ...state, loading: false, deviceStatus: action.payload, error: true };
+      return { ...state, loading: false, status: action.payload, deviceStatus: undefined, error: true };
 
     default:
       return state;

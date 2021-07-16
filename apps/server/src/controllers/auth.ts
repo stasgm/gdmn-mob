@@ -63,9 +63,9 @@ const logOut = async (ctx: Context): Promise<void> => {
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { code } = ctx.request.body as NewActivationCode;
 
-  const deviceUid = await authService.verifyCode(code);
+  const device = await authService.verifyCode(code);
 
-  ok(ctx as Context, deviceUid);
+  ok(ctx as Context, device);
 
   log.info('verifyCode: ok');
 };

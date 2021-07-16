@@ -1,5 +1,5 @@
 import { IApiConfig } from '@lib/client-types';
-import { IDevice, IUser, ICompany } from '@lib/types';
+import { IDevice, IUser, ICompany, DeviceState } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { AuthState } from './types';
@@ -40,7 +40,7 @@ const getDeviceStatusAsync = createAsyncAction(
   'AUTH/GET_DEVICE_STATUS',
   'AUTH/GET_DEVICE_STATUS_SUCCESS',
   'AUTH/GET_DEVICE_STATUS_FAILURE',
-)<string, string, string>();
+)<string, DeviceState | undefined, string>();
 
 export const actions = {
   init,

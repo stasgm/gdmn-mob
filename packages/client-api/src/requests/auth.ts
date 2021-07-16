@@ -1,4 +1,4 @@
-import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
+import { DeviceState, IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
@@ -204,6 +204,11 @@ class Auth extends BaseRequest {
       const resData = res?.data;
 
       if (resData?.result) {
+        console.log('resData.data', resData.data);
+        if (resData?.data?.id) {
+          this.api.deviceId = resData.data.id;
+          console.log('this.api.deviceId set', this.api.deviceId);
+        }
         return {
           type: 'VERIFY_CODE',
           device: resData?.data,
@@ -224,7 +229,7 @@ class Auth extends BaseRequest {
 
   getDeviceStatus = async (uid: string) => {
     try {
-      const res = await this.api.axios.get<IResponse<string>>(`/auth/deviceStatus/${uid}`);
+      const res = await this.api.axios.get<IResponse<DeviceState>>(`/auth/deviceStatus/${uid}`);
       const resData = res.data;
 
       if (resData.result) {
