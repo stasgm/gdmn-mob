@@ -10,6 +10,7 @@ import deviceReducer from './device/reducer';
 import activationCodeReducer from './activationCode/reducer';
 import deviceBindingReducer from './deviceBinding/reducer';
 import { DeviceActionType } from './device/actions';
+import { ActivationCodeActionType } from './activationCode/actions';
 import { UserActionType } from './user/actions';
 import { DeviceBindingActionType } from './deviceBinding/actions';
 
@@ -21,7 +22,12 @@ export const reducers = {
   deviceBindings: deviceBindingReducer,
 };
 
-type TActions = CompanyActionType | DeviceActionType | UserActionType | DeviceBindingActionType;
+type TActions =
+  | CompanyActionType
+  | DeviceActionType
+  | ActivationCodeActionType
+  | UserActionType
+  | DeviceBindingActionType;
 
 const rootReducer = combineReducers(reducers);
 

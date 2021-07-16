@@ -19,6 +19,7 @@ import {
 } from '@material-ui/core';
 
 import { IDevice, IActivationCode } from '@lib/types';
+import { activationCode } from '@lib/mock/src/activationCodes';
 
 interface IProps {
   devices?: IDevice[];
@@ -126,6 +127,7 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>
+          {activationCode.code}
           {/* {device.code = Math.floor(Math.random() * 10) + 1 }
           <AddCommentIcon/> */}
         </TableCell>

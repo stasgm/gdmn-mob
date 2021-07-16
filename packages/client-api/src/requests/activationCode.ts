@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
-import { IDevice, IResponse, NewDevice } from '@lib/types';
-import { device as mockDevice, devices as mockDevices } from '@lib/mock';
+import { IActivationCode, IResponse /*, NewAcivationCode*/ } from '@lib/types';
+import { activationCode as mockActivationCode, activationCodes as mockActivationCodes } from '@lib/mock';
 
-import { error, device as types } from '../types';
+import { error, activationCode as types } from '../types';
 import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
-class Device extends BaseRequest {
+class ActivationCode extends BaseRequest {
   constructor(api: BaseApi) {
     super(api);
   }
@@ -20,28 +20,30 @@ class Device extends BaseRequest {
     * @param string userId
     * @returns IDevice
     */
-  getDevice = async (deviceId?: string) => {
+  getActivationCode = async (activationCodeId?: string) => {
     // console.log('getDevice', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
-        type: 'GET_DEVICE',
-        device: mockDevice,
-      } as types.IGetDeviceResponse;
+        type: 'GET_ACTIVATION_CODE',
+        activationCode: mockActivationCode,
+      } as types.IGetActivationCodeResponse;
     }
 
     try {
       // || this.api.deviceId
-      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.deviceId}`);
+      const res = await this.api.axios.get<IResponse<IActivationCode>>(
+        `/activationCodes/${activationCodeId || this.api.activationCodeId}`,
+      );
 
       const resData = res?.data;
 
       if (resData?.result) {
         return {
-          type: 'GET_DEVICE',
-          device: resData.data,
-        } as types.IGetDeviceResponse;
+          type: 'GET_ACTIVATION_CODE',
+          activationCode: resData.data,
+        } as types.IGetActivationCodeResponse;
       }
 
       return {
@@ -63,13 +65,16 @@ class Device extends BaseRequest {
     * @param params
     * @returns
     */
-  getDevices = async (params?: Record<string, string>): Promise<types.IGetDevicesResponse | error.INetworkError> => {
+
+  getActivationCodes = async (
+    params?: Record<string, string>,
+  ): Promise<types.IGetActivationCodesResponse | error.INetworkError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
-        type: 'GET_DEVICES',
-        devices: mockDevices,
+        type: 'GET_ACTIVATION_CODES',
+        activationCodes: mockActivationCodes,
       };
     }
 
@@ -80,13 +85,13 @@ class Device extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
+      const res = await this.api.axios.get<IResponse<IActivationCode[]>>(`/activationCodes${paramText}`);
       const resData = res.data;
 
       if (resData.result) {
         return {
-          type: 'GET_DEVICES',
-          devices: resData?.data || [],
+          type: 'GET_ACTIVATION_CODES',
+          activationCodes: resData?.data || [],
         };
       }
       return {
@@ -102,4 +107,4 @@ class Device extends BaseRequest {
   };
 }
 
-export default Device;
+export default ActivationCode;

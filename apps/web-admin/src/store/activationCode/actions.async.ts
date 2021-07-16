@@ -1,5 +1,5 @@
 import api from '@lib/client-api';
-import { IActivationCode, NewActivationCode } from '@lib/types';
+import { IActivationCode /*, NewActivationCode*/ } from '@lib/types';
 
 import { ThunkAction } from 'redux-thunk';
 
@@ -44,7 +44,5 @@ const fetchActivationCodes = (): AppThunk => {
     return dispatch(activationCodeActions.fetchActivationCodesAsync.failure('Ошибка получения данных об устройствах'));
   };
 };
-
-
 
 export default { fetchActivationCodes };

@@ -12,13 +12,16 @@ import Device from './requests/device';
 import DeviceBinding from './requests/deviceBinding';
 import Message from './requests/message';
 import User from './requests/user';
+import ActivationCode from './requests/activationCode';
 
 class Api extends BaseApi {
   protected _config: IApiConfig;
   protected _deviceId: string | undefined;
+  protected _activationCodeId: string | undefined;
 
   protected readonly _axios: AxiosInstance;
   // Классы запросов
+  public activationCode: ActivationCode;
   public auth: Auth;
   public company: Company;
   public device: Device;
@@ -30,6 +33,7 @@ class Api extends BaseApi {
     super();
     this._config = config;
     this._deviceId = undefined; // TODO убрать web  || 'WEB'
+    this._activationCodeId = undefined;
 
     this._axios = axios.create({
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
@@ -38,6 +42,7 @@ class Api extends BaseApi {
       withCredentials: true,
     });
 
+    this.activationCode = new ActivationCode(this);
     this.auth = new Auth(this);
     this.company = new Company(this);
     this.device = new Device(this);
@@ -78,6 +83,37 @@ class Api extends BaseApi {
     );
   }
 
+  /* this._axios.interceptors.request.use(
+    (request) => {
+      if (this._activationCodeId) {
+        // Добавляем device_ID
+        request.params.activationCodeId = this._activationCodeId;
+      }
+      console.info('✉️ request', request);
+      return request;
+    },
+    (error) => {
+      console.info('✉️ request error', error);
+
+      return {
+        type: 'ERROR',
+        message: error,
+      } as error.INetworkError;
+    },
+  );
+
+  this._axios.interceptors.response.use(
+    (response) => {
+      console.info('✉️ response', response);
+      return response;
+    },
+    (error) => {
+      console.info('✉️ response error', error);
+      throw error;
+    },
+  );
+}*/
+
   set config(config: IApiConfig) {
     this._config = config;
   }
@@ -93,6 +129,14 @@ class Api extends BaseApi {
 
   get deviceId() {
     return this._deviceId;
+  }
+
+  set activationCodeId(activationCodeId: string | undefined) {
+    this._activationCodeId = activationCodeId;
+  }
+
+  get activationCodeId() {
+    return this._activationCodeId;
   }
 
   get axios() {
