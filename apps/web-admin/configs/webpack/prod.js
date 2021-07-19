@@ -2,7 +2,7 @@
 const { merge } = require('webpack-merge');
 const { getRootRelativePath } = require('./utils');
 const config = require('../config.json');
-
+const webpack = require('webpack');
 const commonConfig = require('./common');
 
 module.exports = merge(commonConfig, {
@@ -14,5 +14,5 @@ module.exports = merge(commonConfig, {
     publicPath: '/',
   },
   devtool: 'source-map',
-  plugins: [],
+  plugins: [new webpack.DefinePlugin({ 'process.env.NODE_ENV': JSON.stringify('production') })],
 });

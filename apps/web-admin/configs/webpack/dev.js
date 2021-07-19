@@ -34,7 +34,6 @@ module.exports = merge(commonConfig, {
   plugins: [
     new webpack.HotModuleReplacementPlugin(), // enable HMR globally
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development'),
       'process.env': {
         MOCK: JSON.stringify(process.env.MOCK),
         // DEVICE_ID: JSON.stringify(process.env.DEVICE_ID),
