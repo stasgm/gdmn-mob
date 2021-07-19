@@ -3,6 +3,8 @@ import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mater
 import { IDevice, IActivationCode } from '@lib/types';
 /* import activationCode from '../../store/activationCode';*/
 
+import { activationCodes } from '@lib/mock';
+
 interface IProps {
   device: IDevice;
   activationCode: IActivationCode;
@@ -54,7 +56,7 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {activationCode.code}
+                  {activationCodes[4].code}
                 </Typography>
               </Grid>
             </Grid>

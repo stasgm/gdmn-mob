@@ -7,6 +7,7 @@ import AddCommentIcon from '@material-ui/icons/AddComment';
 
 import {
   Box,
+  Button,
   Card,
   Checkbox,
   Table,
@@ -19,13 +20,15 @@ import {
 } from '@material-ui/core';
 
 import { IDevice, IActivationCode } from '@lib/types';
-import { activationCode } from '@lib/mock/src/activationCodes';
+
+// import activationCode from '../../store/activationCode';
 
 interface IProps {
   devices?: IDevice[];
   selectedDevices?: IDevice[];
   activationCodes?: IActivationCode[];
   limitRows?: number;
+  getActivationCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
 
@@ -127,9 +130,23 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>
-          {activationCode.code}
+          {/*selectedDeviceIds
+            .map((item: IDevice) => {
+              return item.id;
+            })
+          .indexOf(device.id) !== -1*/}
+          {/*activationCodes[4].code*/}
           {/* {device.code = Math.floor(Math.random() * 10) + 1 }
-          <AddCommentIcon/> */}
+
+        {}*/}
+          {
+            <Button
+              // component={RouterLink}
+              onClick={() => getActivationCode(deviceId)}
+            >
+              <AddCommentIcon />
+            </Button>
+          }
         </TableCell>
       </TableRow>
     ));

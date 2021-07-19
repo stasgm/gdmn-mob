@@ -12,6 +12,7 @@ import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
+import authActions from '@lib/store';
 import codeActions from '../../store/activationCode';
 import { IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
@@ -30,8 +31,12 @@ const DeviceList = () => {
   }, [dispatch]);
 
   const fetchActivationCodes = useCallback(() => {
-    dispatch(codeActions.fetchActivationCodes());
-  }, [dispatch]);
+      dispatch(codeActions.fetchActivationCodes());
+    }, [dispatch]);
+
+  const getActivationCode = (deviceId: string) => {
+    dispatch(codeActions.fetchActivationCode());
+  }
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
@@ -91,6 +96,8 @@ const DeviceList = () => {
     },
   ];
 
+  import { activationCodes } from '@lib/mock';
+
   return (
     <>
       <Helmet>
@@ -109,7 +116,7 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={dataList} />
+              <DeviceListTable devices={dataList} activationCodes={activationCodes} />
             </Box>
           )}
         </Container>
