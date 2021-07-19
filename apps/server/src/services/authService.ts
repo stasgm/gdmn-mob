@@ -39,7 +39,11 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
       throw new UnauthorizedException('Устройство заблокировано');
     }
 
-    const deviceBinding = await deviceBindings.find((el) => el.deviceId === deviceId && el.userId === user.id);
+    console.log('device.id', device.id);
+    console.log(' user.id', user.id);
+
+
+    const deviceBinding = await deviceBindings.find((el) => el.deviceId === device.id && el.userId === user.id);
     if (!deviceBinding) {
       throw new UnauthorizedException('Связанное с пользователем устройство не найдено');
     }
