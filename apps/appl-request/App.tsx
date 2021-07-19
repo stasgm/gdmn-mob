@@ -5,12 +5,13 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { useDispatch, documentActions, referenceActions, messageActions } from '@lib/store';
 
+import { PersistGate } from 'redux-persist/integration/react';
+
 import { persistor, store } from './src/store';
 
 import { applMessages, applDocuments, applRefs } from './src/store/mock';
 
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
-import { PersistGate } from 'redux-persist/integration/react';
 
 const Root = React.memo(() => {
   const dispatch = useDispatch();

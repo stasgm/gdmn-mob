@@ -55,7 +55,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, error: false, status: '', loading: true };
 
     case getType(actions.activateDeviceAsync.success):
-      return { ...state, device: action.payload, error: false, status: '', loading: false };
+      console.log('action.payload?.state', action.payload?.state);
+      return {
+        ...state,
+        device: action.payload,
+        deviceStatus: action.payload?.state,
+        error: false,
+        status: '',
+        loading: false,
+      };
 
     case getType(actions.activateDeviceAsync.failure):
       return { ...state, device: null, error: true, status: action.payload, loading: false };
