@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { IActivationCode, IResponse /*, NewAcivationCode*/ } from '@lib/types';
 import { activationCode as mockActivationCode, activationCodes as mockActivationCodes } from '@lib/mock';
 
