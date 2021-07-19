@@ -1,4 +1,4 @@
-import { Box, Card, TextField, InputAdornment, SvgIcon } from '@material-ui/core';
+import { Box, Card, TextField, InputAdornment, SvgIcon, IconButton } from '@material-ui/core';
 
 import { Search as SearchIcon } from 'react-feather';
 
@@ -9,10 +9,13 @@ import ToolBarActions from './ToolBarActions';
 interface props {
   buttons: IToolBarButton[];
   searchTitle: string;
+  valueRef: any;
   updateInput: (value: string) => void;
+  searchOnClick: () => void;
+  keyPress: (key: string) => void;
 }
 
-const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput }: props) => {
+const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnClick, keyPress, valueRef }: props) => {
   return (
     <Card>
       <Box
@@ -29,17 +32,19 @@ const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput }: props) 
             sx={{ p: 2 }}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
-                  <SvgIcon fontSize="small">
-                    <SearchIcon />
-                  </SvgIcon>
+                <InputAdornment position="start" onClick={() => searchOnClick()}>
+                  <IconButton>
+                    <SearchIcon fontSize="small" />
+                  </IconButton>
                 </InputAdornment>
               ),
             }}
             placeholder={searchTitle}
             variant="outlined"
             onChange={(event) => updateInput(event.target.value)}
+            onKeyPress={(event) => keyPress(event.key)}
             type="search"
+            inputRef={valueRef}
           />
         </Box>
         <Box
