@@ -162,15 +162,15 @@ class Company extends BaseRequest {
     }
   };
 
-  getCompanies = async (params?: Record<string, string>) => {
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
+  getCompanies = async (params?: Record<string, string | number>) => {
+    // if (this.api.config.debug?.isMock) {
+    //   await sleep(this.api.config.debug?.mockDelay || 0);
 
-      return {
-        type: 'GET_COMPANIES',
-        companies: mockCompanies,
-      } as types.IGetCompaniesResponse;
-    }
+    //   return {
+    //     type: 'GET_COMPANIES',
+    //     companies: mockCompanies,
+    //   } as types.IGetCompaniesResponse;
+    // }
 
     let paramText = params ? getParams(params) : '';
 

@@ -1,14 +1,14 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import { ICompany } from '@lib/types';
+import { ICompany, IHeadCells } from '@lib/types';
 
 import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -21,25 +21,30 @@ import CircularProgressWithContent from '../../components/CircularProgressWidthC
 import { IToolBarButton } from '../../types';
 
 import SnackBar from '../../components/SnackBar';
+import SortableTable from '../../components/SortableTable';
 
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { list, loading, errorMessage } = useSelector((state) => state.companies);
-  const [dataList, setDataList] = useState<ICompany[]>([]);
+  //const [dataList, setDataList] = useState<ICompany[]>([]);
 
-  const fetchCompanies = useCallback(async () => {
-    const res = await dispatch(actions.fetchCompanies());
-    if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCESS') {
-      //console.log(res.payload);
-      setDataList(res.payload);
-    }
-    if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
-      //console.log('ошибочка', res.payload);
-    }
-  }, [dispatch]);
+  const fetchCompanies = useCallback(
+    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      const res = await dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
+      if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCESS') {
+        //console.log(res.payload);
+        //setDataList(res.payload);
+      }
+      if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
+        //console.log('ошибочка', res.payload);
+      }
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
@@ -47,15 +52,25 @@ const CompanyList = () => {
   }, [fetchCompanies]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value.toUpperCase();
+    const inputValue: string = value;
 
-    const filtered = list.filter((item) => {
-      const name = item.name.toUpperCase();
+    if (inputValue) return;
 
-      return name.includes(inputValue);
-    });
+    fetchCompanies('');
+  };
 
-    setDataList(filtered);
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchCompanies(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchCompanies(inputValue);
   };
 
   const handleClearError = () => {
@@ -92,6 +107,13 @@ const CompanyList = () => {
     },
   ];
 
+  const headCells: IHeadCells<ICompany>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'admin', label: 'Администратор', sortEnable: true },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+  ];
+
   return (
     <>
       <Helmet>
@@ -105,12 +127,19 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} searchTitle={'Найти компанию'} updateInput={handleUpdateInput} />
+          <ToolbarActionsWithSearch
+            buttons={buttons}
+            searchTitle={'Найти компанию'}
+            valueRef={valueRef}
+            updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
+          />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <CompanyListTable companies={dataList} />
+              <SortableTable<ICompany> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>

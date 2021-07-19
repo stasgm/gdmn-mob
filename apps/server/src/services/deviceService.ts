@@ -6,6 +6,8 @@ import { extraPredicate } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
+import { devices as mockDevices } from './data/devices';
+
 /**
  * Добавляет одно устройство
  * @param {string} name - название устройства
@@ -137,16 +139,24 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
 //   return makeDevice(device);
 // };
 
-const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
+const findAll = async (params: Record<string, string | number>): Promise<IDevice[]> => {
   const { devices } = getDb();
 
-  const deviceList = await devices.read((item) => {
-    const newParams = { ...params };
+  let deviceList;
+  if (process.env.MOCK) {
+    deviceList = mockDevices;
+  } else {
+    deviceList = await devices.read();
+  }
+
+  //const deviceList = await devices.read((item) => {
+  deviceList = deviceList.filter((item) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
     let companyFound = true;
 
     if ('companyId' in newParams) {
-      companyFound = item.companyId?.includes(newParams.companyId);
+      companyFound = item.companyId?.includes(newParams.companyId as string);
       delete newParams['companyId'];
     }
 
@@ -164,7 +174,28 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
       delete newParams['state'];
     }
 
-    return companyFound && uIdFound && stateFound && extraPredicate(item, newParams);
+    /** filtering data */
+    let filteredDevices = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        const name = item.name.toUpperCase();
+        const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
+        const state = typeof item.state === 'string' ? item.state.toUpperCase() : '';
+
+        filteredDevices = name.includes(filterText) || uid.includes(filterText) || state.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return (
+      companyFound &&
+      uIdFound &&
+      stateFound &&
+      filteredDevices &&
+      extraPredicate(item, newParams as Record<string, string>)
+    );
   });
 
   /*   const newParams = { ...params };
@@ -176,7 +207,19 @@ const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
       });
     } */
 
-  const pr = deviceList.map(async (i) => await makeDevice(i));
+  /** pagination */
+  const limitParams = Object.assign({}, params);
+
+  let fromRecord = 0;
+  if ('fromRecord' in limitParams) {
+    fromRecord = limitParams.fromRecord as number;
+  }
+
+  let toRecord = deviceList.length;
+  if ('toRecord' in limitParams)
+    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
+
+  const pr = deviceList.slice(fromRecord, toRecord).map(async (i) => await makeDevice(i));
 
   return Promise.all(pr);
 };

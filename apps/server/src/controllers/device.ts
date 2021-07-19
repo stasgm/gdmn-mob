@@ -77,7 +77,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, uId, state } = ctx.query;
+  const { companyId, uId, state, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -91,6 +91,18 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof state === 'string') {
     params.state = state;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string') {
+    params.fromRecord = fromRecord;
+  }
+
+  if (typeof toRecord === 'string') {
+    params.toRecord = toRecord;
   }
 
   const deviceList = await deviceService.findAll(params);

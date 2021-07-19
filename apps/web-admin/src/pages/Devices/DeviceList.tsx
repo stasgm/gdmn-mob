@@ -1,14 +1,14 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import { IDevice } from '@lib/types';
+import { IDevice, IHeadCells } from '@lib/types';
 
 import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
@@ -19,6 +19,7 @@ import actions from '../../store/device/actions.async';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
 import { IToolBarButton } from '../../types';
+import SortableTable from '../../components/SortableTable';
 
 const DeviceList = () => {
   const navigate = useNavigate();
@@ -26,31 +27,45 @@ const DeviceList = () => {
   const dispatch = useDispatch();
 
   const { list, loading } = useSelector((state) => state.devices);
-  const [dataList, setDataList] = useState<IDevice[]>([]);
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const fetchDevices = useCallback(async () => {
-    const res = await dispatch(actions.fetchDevices());
+  const fetchDevices = useCallback(
+    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      const res = await dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
 
-    if (res.type === 'DEVICE/FETCH_DEVICES_SUCCESS') {
-      setDataList(res.payload);
-    }
-  }, [dispatch]);
+      if (res.type === 'DEVICE/FETCH_DEVICES_SUCCESS') {
+        //setDataList(res.payload);
+      }
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    !list?.length && fetchDevices();
-  }, [fetchDevices, list.length]);
+    //!list?.length && fetchDevices();
+    fetchDevices();
+  }, [fetchDevices]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value.toUpperCase();
+    const inputValue: string = value;
 
-    const filtered = list.filter((item) => {
-      const name = item.name.toUpperCase();
+    if (inputValue) return;
 
-      return name.includes(inputValue);
-    });
+    fetchDevices('');
+  };
 
-    setDataList(filtered);
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchDevices(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchDevices(inputValue);
   };
 
   const buttons: IToolBarButton[] = [
@@ -83,6 +98,12 @@ const DeviceList = () => {
     },
   ];
 
+  const headCells: IHeadCells<IDevice>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'uid', label: 'Номер', sortEnable: true },
+    { id: 'state', label: 'Состояние', sortEnable: true },
+  ];
+
   return (
     <>
       <Helmet>
@@ -99,13 +120,16 @@ const DeviceList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти устройство'}
+            valueRef={valueRef}
             updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={dataList} />
+              <SortableTable<IDevice> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>

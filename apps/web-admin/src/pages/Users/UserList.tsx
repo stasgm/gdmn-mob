@@ -1,16 +1,17 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import { IUser } from '@lib/types';
+import { IUser, IHeadCells } from '@lib/types';
 
-import UserListTable from '../../components/user/UserListTable';
+import SortableTable from '../../components/SortableTable';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch } from '../../store';
@@ -24,17 +25,20 @@ const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { list, loading } = useSelector((state) => state.users);
-  const [dataList, setDataList] = useState<IUser[]>([]);
 
-  const fetchUsers = useCallback(async () => {
-    const res = await dispatch(actions.fetchUsers());
+  const fetchUsers = useCallback(
+    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      const res = await dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
 
-    if (res.type === 'USER/FETCH_USERS_SUCCESS') {
-      setDataList(res.payload);
-    }
-  }, [dispatch]);
+      if (res.type === 'USER/FETCH_USERS_SUCCESS') {
+        //setDataList(res.payload);
+      }
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
@@ -42,17 +46,25 @@ const UserList = () => {
   }, [fetchUsers]);
 
   const handleUpdateInput = (value: string) => {
-    const inputValue: string = value.toUpperCase();
+    const inputValue: string = value;
 
-    const filtered = list.filter((item) => {
-      const name = item.name.toUpperCase();
-      const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
-      const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+    if (inputValue) return;
 
-      return name.includes(inputValue) || firstname.includes(inputValue) || lastName.includes(inputValue);
-    });
+    fetchUsers('');
+  };
 
-    setDataList(filtered);
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchUsers(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchUsers(inputValue);
   };
 
   const buttons: IToolBarButton[] = [
@@ -85,6 +97,13 @@ const UserList = () => {
     },
   ];
 
+  const headCells: IHeadCells<IUser>[] = [
+    { id: 'name', label: 'Пользователь', sortEnable: true },
+    { id: 'lastName', label: 'Фамилия', sortEnable: true },
+    { id: 'firstName', label: 'Имя', sortEnable: true },
+    { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
+  ];
+
   return (
     <>
       <Helmet>
@@ -101,13 +120,16 @@ const UserList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти пользователя'}
+            valueRef={valueRef}
             updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <UserListTable users={dataList} />
+              <SortableTable<IUser> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>

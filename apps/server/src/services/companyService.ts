@@ -8,6 +8,8 @@ import { addCompanyToUser } from './userService';
 
 import { getDb } from './dao/db';
 
+import { companies as mockCompanies } from './data/companies';
+
 // const db = getDb();
 // const { companies, users } = db;
 /**
@@ -157,11 +159,20 @@ const findOne = async (id: string): Promise<ICompany> => {
  * @param {string} param - параметры
  * @return company[], компании
  * */
-const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => {
+const findAll = async (params: Record<string, string | number>): Promise<ICompany[]> => {
   const { companies } = getDb();
 
-  const companyList = await companies?.read((item) => {
-    const newParams = Object.assign({}, params);
+  let companyList;
+  if (process.env.MOCK) {
+    companyList = mockCompanies;
+  } else {
+    companyList = await companies.read();
+  }
+
+  //const companyList = await companies?.read((item) => {
+  companyList = companyList.filter((item) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+    //const newParams = Object.assign({}, params);
 
     let companyIdFound = true;
 
@@ -185,7 +196,25 @@ const findAll = async (params?: Record<string, string>): Promise<ICompany[]> => 
       delete newParams['name'];
     }
 
-    return companyIdFound && nameFound && extraPredicate(item, newParams);
+    /** filtering data */
+    let filteredCompanies = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        const name = item.name.toUpperCase();
+        //const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
+        //const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+
+        filteredCompanies = name.includes(filterText);
+        // || firstname.includes(filterText) || lastName.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return (
+      companyIdFound && nameFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>)
+    );
   });
 
   const pr = companyList?.map(async (i) => await makeCompany(i));
