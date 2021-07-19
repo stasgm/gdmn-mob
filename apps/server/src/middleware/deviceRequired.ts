@@ -14,6 +14,9 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
 
   if (user?.role === 'User') {
     const { deviceId } = ctx.query;
+
+    console.log('server deviceId', deviceId);
+
     if (!deviceId) {
       throw new InvalidParameterException('Не указан идентификатор устройства');
     }

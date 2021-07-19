@@ -72,6 +72,8 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(helmet())
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(koaConfig, app))
+    .use(passport.initialize())
+    .use(passport.session())
     .use(
       bodyParser({
         formLimit: '10mb',
@@ -80,12 +82,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         enableTypes: ['json', 'form', 'text'],
       }),
     )
-    .use(passport.initialize())
-    .use(passport.session())
     .use(
       cors({
         credentials: true,
-        origin: 'http://localhost:8080',
+        origin: 'http://192.168.0.61:8080',
       }),
     )
     .use(router.routes())

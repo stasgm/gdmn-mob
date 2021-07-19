@@ -36,7 +36,7 @@ class Api extends BaseApi {
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
-      // headers: { 'Access-Control-Allow-Origin': 'http://localhost:8080' },
+      headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.61:8080' },
     });
 
     this.auth = new Auth(this);

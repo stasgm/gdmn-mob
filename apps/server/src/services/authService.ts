@@ -29,7 +29,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
 
     console.log('deviceId', deviceId);
 
-    const device = await devices.find((el) => el.id === deviceId);
+    const device = await devices.find((el) => el.uid === deviceId);
 
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
@@ -172,20 +172,18 @@ const verifyCode = async (code: string) => {
   }
 
   // обновляем uid у устройства
-  const deviceId = uuidv1();
+  const uid = uuidv1();
   const device = await devices.find(rec.deviceId);
 
   if (!device) {
-    throw new UnauthorizedException('Код не соответствует заданному устройству');
+    throw new DataNotFoundException('По данному коду устройство не найдено');
   }
 
-  await devices.update({ ...device, uid: deviceId, state: 'ACTIVE' });
-
-  // const newDeviceId = await devices.insert({ userId: rec.user, uid: deviceId, blocked: false });
+  await devices.update({ ...device, uid: uid, state: 'ACTIVE' });
 
   await codes.delete((i) => i.code === code);
 
-  return device;
+  return await devices.find(device.id);
 };
 
 const logout = async (userId: string) => {

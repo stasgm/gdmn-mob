@@ -205,8 +205,8 @@ class Auth extends BaseRequest {
 
       if (resData?.result) {
         console.log('resData.data', resData.data);
-        if (resData?.data?.id) {
-          this.api.deviceId = resData.data.id;
+        if (resData?.data?.uid) {
+          this.api.deviceId = resData.data.uid;
           console.log('this.api.deviceId set', this.api.deviceId);
         }
         return {
