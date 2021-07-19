@@ -10,15 +10,16 @@ const fetchActivationCodesAsync = createAsyncAction(
   'ACTIVATION_CODES/FETCH_ACTIVATION_CODES',
 )<string | undefined, IActivationCode[], string>();
 
-const fetchActivationCodeAsync = createAsyncAction(
-  'ACTIVATION_CODE/FETCH_ACTIVATION_CODE',
-  'ACTIVATION_CODE/FETCH_ACTIVATION_CODE_SUCCESS',
-  'ACTIVATION_CODE/FETCH_ACTIVATION_CODE_FAILURE',
+const getActivationCodeAsync = createAsyncAction(
+  'ACTIVATION_CODE/GET_ACTIVATION_CODE',
+  'ACTIVATION_CODE/GET_ACTIVATION_CODE_SUCCESS',
+  'ACTIVATION_CODE/GET_ACTIVATION_CODE_FAILURE',
 )<string | undefined, IActivationCode, string>();
 
 export const activationCodeActions = {
   fetchActivationCodesAsync,
-  fetchActivationCodeAsync,
+  getActivationCodeAsync,
+
   clearError,
   init,
 };
