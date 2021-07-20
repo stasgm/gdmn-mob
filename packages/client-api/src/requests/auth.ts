@@ -204,11 +204,11 @@ class Auth extends BaseRequest {
       const resData = res?.data;
 
       if (resData?.result) {
-        console.log('resData.data', resData.data);
-        if (resData?.data?.uid) {
-          this.api.deviceId = resData.data.uid;
-          console.log('this.api.deviceId set', this.api.deviceId);
-        }
+        // console.log('resData.data', resData.data);
+        // if (resData?.data?.uid) {
+        //   this.api.deviceId = resData.data.uid;
+        //   console.log('this.api.deviceId set', this.api.deviceId);
+        // }
         return {
           type: 'VERIFY_CODE',
           device: resData?.data,
