@@ -38,7 +38,7 @@ const reducer: Reducer<IActivationCodeState, ActivationCodeActionType> = (
     case getType(activationCodeActions.createCodeAsync.success):
       return {
         ...state,
-        list: [...(state.list || []), action.payload],
+        list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
         loading: false,
       };
 

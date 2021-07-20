@@ -56,7 +56,7 @@ const createActivationCode = (deviceId: string): AppThunk => {
       return dispatch(activationCodeActions.createCodeAsync.success(response.code));
     }
 
-    if (response.type === '') {
+    if (response.type === 'ERROR') {
       return dispatch(activationCodeActions.createCodeAsync.failure(response.message));
     }
 

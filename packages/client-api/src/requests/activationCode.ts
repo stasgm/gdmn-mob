@@ -1,5 +1,5 @@
 import { IActivationCode, IResponse } from '@lib/types';
-import { activationCodes as mockActivationCodes } from '@lib/mock';
+import { activationCode, activationCodes as mockActivationCodes } from '@lib/mock';
 
 import { error, activationCode as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -45,27 +45,27 @@ class ActivationCode extends BaseRequest {
         return {
           type: 'GET_CODES',
           codes: resData?.data || [],
-        };
+        } as types.IGetCodesResponse;
       }
       return {
         type: 'ERROR',
         message: resData?.error || 'ошибка получения данных об активационных кодах',
-      };
+      } as error.INetworkError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err?.response?.data?.error || 'ошибка получения данных об активационных кодах',
-      };
+      } as error.INetworkError;
     }
   };
 
-  createActivationCode = async (deviceId: string) => {
+  createActivationCode = async (deviceId: string): Promise<types.ICreateCodeResponse | error.INetworkError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
       return {
         type: 'CREATE_CODE',
-        code: mockActivationCodes.find((a) => a.device.id === deviceId),
+        code: mockActivationCodes.find((a) => a.device.id === deviceId) || activationCode,
       };
     }
 

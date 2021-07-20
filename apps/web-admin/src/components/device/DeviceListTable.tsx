@@ -24,9 +24,9 @@ import { IDevice, IActivationCode } from '@lib/types';
 // import activationCode from '../../store/activationCode';
 
 interface IProps {
-  devices?: IDevice[];
+  devices: IDevice[];
   selectedDevices?: IDevice[];
-  activationCodes?: IActivationCode[];
+  activationCodes: IActivationCode[];
   limitRows?: number;
   onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
@@ -34,6 +34,7 @@ interface IProps {
 
 const DeviceListTable = ({
   devices = [],
+  activationCodes = [],
   onChangeSelectedDevices,
   selectedDevices = [],
   limitRows = 0,
@@ -136,15 +137,7 @@ const DeviceListTable = ({
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>
-          {/*selectedDeviceIds
-            .map((item: IDevice) => {
-              return item.id;
-            })
-          .indexOf(device.id) !== -1*/}
-          {/*activationCodes[4].code*/}
-          {/* {device.code = Math.floor(Math.random() * 10) + 1 }
-
-        {}*/}
+          {activationCodes.find((d) => d.id === device?.id)}
           {onCreateCode && (
             <Button
               // component={RouterLink}

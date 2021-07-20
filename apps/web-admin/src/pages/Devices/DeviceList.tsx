@@ -70,18 +70,16 @@ const DeviceList = () => {
     [list],
   );
 
-  const onCreateCode = useCallback(
-    (value: string) => {
-      const filtered = list.filter((item) => {
-        const deviceId = device.id.toUpperCase();
+  const handleCreateCode = (deviceId: string) => {
+    dispatch(codeActions.(deviceId));
+  };
 
-        return deviceId.includes(inputValue);
-      });
-
-      setDataList(filtered);
-    },
-    [list],
-  );
+  // const handleSubmit = async (values: IDevice | NewDevice) => {
+  //   const res = await dispatch(actions.updateDevice(values as IDevice));
+  //   if (res.type === 'DEVICE/UPDATE_SUCCESS') {
+  //     goBack();
+  //   }
+  // };
 
   const buttons: IToolBarButton[] = [
     {
@@ -133,7 +131,7 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={dataList} activationCodes={activationCodes} onCreateCode={onCreateCode} />
+              <DeviceListTable devices={dataList} activationCodes={activationCodes} onCreateCode={handleCreateCode} />
             </Box>
           )}
         </Container>
