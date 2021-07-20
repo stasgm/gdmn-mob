@@ -7,7 +7,7 @@ import { activationCodes } from '@lib/mock';
 
 interface IProps {
   device: IDevice;
-  activationCode: IActivationCode;
+  activationCode: string;
 }
 
 const DeviceDetailsView = ({ device, activationCode }: IProps) => {

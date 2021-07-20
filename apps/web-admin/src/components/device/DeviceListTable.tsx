@@ -28,11 +28,17 @@ interface IProps {
   selectedDevices?: IDevice[];
   activationCodes?: IActivationCode[];
   limitRows?: number;
-  getActivationCode?: (deviceId: string) => void;
+  onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
 
-const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevices = [], limitRows = 0 }: IProps) => {
+const DeviceListTable = ({
+  devices = [],
+  onChangeSelectedDevices,
+  selectedDevices = [],
+  limitRows = 0,
+  onCreateCode,
+}: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -139,14 +145,14 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
           {/* {device.code = Math.floor(Math.random() * 10) + 1 }
 
         {}*/}
-          {
+          {onCreateCode && (
             <Button
               // component={RouterLink}
-              onClick={() => getActivationCode(deviceId)}
+              onClick={() => onCreateCode(device.id)}
             >
               <AddCommentIcon />
             </Button>
-          }
+          )}
         </TableCell>
       </TableRow>
     ));

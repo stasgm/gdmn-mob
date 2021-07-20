@@ -1,5 +1,4 @@
 import api from '@lib/client-api';
-import { IActivationCode /*, NewActivationCode*/ } from '@lib/types';
 
 import { ThunkAction } from 'redux-thunk';
 
@@ -29,19 +28,19 @@ export type AppThunk = ThunkAction<Promise<ActivationCodeActionType>, AppState, 
 
 const fetchActivationCodes = (): AppThunk => {
   return async (dispatch) => {
-    dispatch(activationCodeActions.fetchActivationCodesAsync.request(''));
+    dispatch(activationCodeActions.fetchCodesAsync.request(''));
 
-    const response = await api.activationCode.fetchActivationCodes();
+    const response = await api.activationCode.getActivationCodes();
 
-    if (response.type === 'GET_ACTIVATION_CODES') {
-      return dispatch(activationCodeActions.fetchActivationCodesAsync.success(response.activationCodes));
+    if (response.type === 'GET_CODES') {
+      return dispatch(activationCodeActions.fetchCodesAsync.success(response.codes));
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(activationCodeActions.fetchActivationCodesAsync.failure(response.message));
+      return dispatch(activationCodeActions.fetchCodesAsync.failure(response.message));
     }
 
-    return dispatch(activationCodeActions.fetchActivationCodesAsync.failure('Ошибка получения данных об устройствах'));
+    return dispatch(activationCodeActions.fetchCodesAsync.failure('Ошибка получения данных об активационных кодах'));
   };
 };
 

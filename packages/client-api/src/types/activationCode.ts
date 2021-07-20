@@ -1,12 +1,17 @@
 import { IActivationCode } from '@lib/types';
 
 export interface IActivationCodeQueryResponse {
-  type: 'GET_ACTIVATION_CODES';
+  type: 'GET_CODES' | 'CREATE_CODE';
 }
 
-export interface IGetActivationCodesResponse extends IActivationCodeQueryResponse {
-  type: 'GET_ACTIVATION_CODES';
-  activationCodes: IActivationCode[];
+export interface IGetCodesResponse extends IActivationCodeQueryResponse {
+  type: 'GET_CODES';
+  codes: IActivationCode[];
 }
 
-export type QueryResponse = IGetActivationCodesResponse;
+export interface ICreateCodeResponse extends IActivationCodeQueryResponse {
+  type: 'CREATE_CODE';
+  code: string;
+}
+
+export type QueryResponse = IGetCodesResponse | ICreateCodeResponse;

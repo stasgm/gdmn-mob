@@ -6,13 +6,12 @@ import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 // import ImportExportIcon from '@material-ui/icons/ImportExport';
-import { IDevice, IActivationCode } from '@lib/types';
+import { IDevice } from '@lib/types';
 
 import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
-import authActions from '@lib/store';
 import codeActions from '../../store/activationCode';
 import { IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
@@ -24,24 +23,29 @@ const DeviceList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const { list: activationCodes } = useSelector((state) => state.activationCodes);
+
+  console.log('activationCodes', activationCodes);
+
   const [dataList, setDataList] = useState<IDevice[]>(list);
 
-  const fetchDevices = useCallback(() => {
+  const fetchData = useCallback(() => {
     dispatch(actions.fetchDevices());
+    dispatch(codeActions.fetchActivationCodes());
   }, [dispatch]);
 
-  const fetchActivationCodes = useCallback(() => {
-      dispatch(codeActions.fetchActivationCodes());
-    }, [dispatch]);
+  // const fetchActivationCodes = useCallback(() => {
+  //   dispatch(codeActions.fetchActivationCodes());
+  // }, [dispatch]);
 
-  const getActivationCode = (deviceId: string) => {
-    dispatch(codeActions.fetchActivationCode());
-  }
+  // const getActivationCode = (deviceId: string) => {
+  //   dispatch(codeActions.fetchActivationCode());
+  // }
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    fetchDevices();
-  }, [fetchDevices]);
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     setDataList(list);
@@ -70,7 +74,7 @@ const DeviceList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: fetchDevices,
+      onClick: fetchData,
       icon: <CachedIcon />,
     },
     // {
@@ -96,7 +100,7 @@ const DeviceList = () => {
     },
   ];
 
-  import { activationCodes } from '@lib/mock';
+  // import { activationCodes } from '@lib/mock';
 
   return (
     <>

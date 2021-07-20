@@ -4,22 +4,21 @@ import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 const init = createAction('ACTIVATION_CODES/INIT')();
 const clearError = createAction('ACTIVATION_CODES/CLEAR_ERROR')();
 
-const fetchActivationCodesAsync = createAsyncAction(
-  'ACTIVATION_CODES/FETCH_ACTIVATION_CODES',
-  'ACTIVATION_CODES/FETCH_ACTIVATION_CODES',
-  'ACTIVATION_CODES/FETCH_ACTIVATION_CODES',
+const fetchCodesAsync = createAsyncAction(
+  'ACTIVATION_CODES/FETCH_CODES',
+  'ACTIVATION_CODES/FETCH_CODES_SUCCESS',
+  'ACTIVATION_CODES/FETCH_CODES_FAILURE',
 )<string | undefined, IActivationCode[], string>();
 
-const getActivationCodeAsync = createAsyncAction(
-  'ACTIVATION_CODE/GET_ACTIVATION_CODE',
-  'ACTIVATION_CODE/GET_ACTIVATION_CODE_SUCCESS',
-  'ACTIVATION_CODE/GET_ACTIVATION_CODE_FAILURE',
+const fetchCodeAsync = createAsyncAction(
+  'ACTIVATION_CODE/GET_CODE',
+  'ACTIVATION_CODE/GET_CODE_SUCCESS',
+  'ACTIVATION_CODE/GET_CODE_FAILURE',
 )<string | undefined, IActivationCode, string>();
 
 export const activationCodeActions = {
-  fetchActivationCodesAsync,
-  getActivationCodeAsync,
-
+  fetchCodesAsync,
+  fetchCodeAsync,
   clearError,
   init,
 };

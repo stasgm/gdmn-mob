@@ -157,28 +157,28 @@ class Auth extends BaseRequest {
     }
   };
 
-  getActivationCode = async () => {
-    try {
-      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
-      const resData = res.data;
+  // getActivationCode = async () => {
+  //   try {
+  //     const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
+  //     const resData = res.data;
 
-      if (resData.result) {
-        return {
-          type: 'GET_CODE',
-          code: resData.data,
-        } as types.ICreateCodeResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: resData.error,
-      } as error.INetworkError;
-    } catch (err) {
-      return {
-        type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения кода',
-      } as error.INetworkError;
-    }
-  };
+  //     if (resData.result) {
+  //       return {
+  //         type: 'GET_CODE',
+  //         code: resData.data,
+  //       } as types.ICreateCodeResponse;
+  //     }
+  //     return {
+  //       type: 'ERROR',
+  //       message: resData.error,
+  //     } as error.INetworkError;
+  //   } catch (err) {
+  //     return {
+  //       type: 'ERROR',
+  //       message: err?.response?.data?.error || 'ошибка получения кода',
+  //     } as error.INetworkError;
+  //   }
+  // };
 
   verifyCode = async (code: string) => {
     if (this.api.config.debug?.isMock) {

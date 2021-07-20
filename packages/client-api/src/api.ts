@@ -10,9 +10,9 @@ import { BaseApi } from './types/BaseApi';
 import Company from './requests/company';
 import Device from './requests/device';
 import DeviceBinding from './requests/deviceBinding';
+import ActivationCode from './requests/activationCode';
 import Message from './requests/message';
 import User from './requests/user';
-import ActivationCode from './requests/activationCode';
 
 class Api extends BaseApi {
   protected _config: IApiConfig;
@@ -21,11 +21,11 @@ class Api extends BaseApi {
 
   protected readonly _axios: AxiosInstance;
   // Классы запросов
-  public activationCode: ActivationCode;
   public auth: Auth;
   public company: Company;
   public device: Device;
   public deviceBinding: DeviceBinding;
+  public activationCode: ActivationCode;
   public message: Message;
   public user: User;
 
@@ -42,11 +42,11 @@ class Api extends BaseApi {
       withCredentials: true,
     });
 
-    this.activationCode = new ActivationCode(this);
     this.auth = new Auth(this);
     this.company = new Company(this);
     this.device = new Device(this);
     this.deviceBinding = new DeviceBinding(this);
+    this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
 

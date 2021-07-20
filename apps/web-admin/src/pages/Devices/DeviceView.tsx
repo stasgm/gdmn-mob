@@ -136,7 +136,7 @@ const DeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceDetailsView device={device} />
+          <DeviceDetailsView device={device} activationCode={'1'} />
         </Box>
       </Box>
       <Box>
