@@ -63,9 +63,19 @@ class ActivationCode extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
+      const c = mockActivationCodes.find((a) => a.device.id === deviceId) || {
+        code: '4444',
+        device: { id: deviceId, name: 'iPhone' },
+        id: '169',
+        date: '2021-07-07T07:25:25.265Z',
+      };
+
       return {
         type: 'CREATE_CODE',
-        code: mockActivationCodes.find((a) => a.device.id === deviceId) || activationCode,
+        code: {
+          ...c,
+          code: '5555',
+        },
       };
     }
 

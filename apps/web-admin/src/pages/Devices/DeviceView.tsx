@@ -9,9 +9,11 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import { useSelector, useDispatch } from '../../store';
 import deviceActions from '../../store/device';
 import userActions from '../../store/user';
+import codeActions from '../../store/activationCode';
 import bindingActions from '../../store/deviceBinding';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
+// eslint-disable-next-line import/namespace
 import DeviceDetailsView from '../../components/device/DeviceDetailsView';
 import UserListTable from '../../components/user/UserListTable';
 import userSelectors from '../../store/user/selectors';
@@ -29,6 +31,10 @@ const DeviceView = () => {
 
   const device = deviceSelectors.deviceById(deviceId);
   const users = userSelectors.usersByDeviceId(deviceId);
+
+  const { list: activationCodes } = useSelector((state) => state.activationCodes);
+
+  console.log('activationCodes', activationCodes);
 
   const handleCancel = () => {
     navigate(-1);
@@ -49,6 +55,7 @@ const DeviceView = () => {
     dispatch(deviceActions.fetchDeviceById(deviceId));
     dispatch(bindingActions.fetchDeviceBindings());
     dispatch(userActions.fetchUsers());
+    dispatch(codeActions.fetchActivationCodes());
   }, [dispatch, deviceId]);
 
   useEffect(() => {
@@ -136,7 +143,7 @@ const DeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceDetailsView device={device} activationCode={'1'} />
+          <DeviceDetailsView device={device} activationCodes={activationCodes} />
         </Box>
       </Box>
       <Box>

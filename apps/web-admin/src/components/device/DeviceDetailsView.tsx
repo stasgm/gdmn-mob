@@ -3,14 +3,14 @@ import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@mater
 import { IDevice, IActivationCode } from '@lib/types';
 /* import activationCode from '../../store/activationCode';*/
 
-import { activationCodes } from '@lib/mock';
+/*import { activationCodes } from '@lib/mock';*/
 
 interface IProps {
   device: IDevice;
-  activationCode: string;
+  activationCodes: IActivationCode[];
 }
 
-const DeviceDetailsView = ({ device, activationCode }: IProps) => {
+const DeviceDetailsView = ({ device, activationCodes }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -56,7 +56,7 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {activationCodes[4].code}
+                  {activationCodes.find((a) => a.device.id === device.id)?.code}
                 </Typography>
               </Grid>
             </Grid>

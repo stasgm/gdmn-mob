@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 import {
   Box,
@@ -137,15 +137,19 @@ const DeviceListTable = ({
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>
-          {activationCodes.find((d) => d.id === device?.id)}
-          {onCreateCode && (
-            <Button
-              // component={RouterLink}
-              onClick={() => onCreateCode(device.id)}
-            >
-              <AddCircleOutlineIcon />
-            </Button>
-          )}
+          <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box /*style={{ width: '5px' }}*/>{activationCodes.find((a) => a.device.id === device.id)?.code}</Box>
+            <Box>
+              {onCreateCode && (
+                <Button
+                  // component={RouterLink}
+                  onClick={() => onCreateCode(device.id)}
+                >
+                  <RefreshIcon />
+                </Button>
+              )}
+            </Box>
+          </Box>
         </TableCell>
       </TableRow>
     ));

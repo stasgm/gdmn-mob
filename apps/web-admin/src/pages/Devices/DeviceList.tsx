@@ -42,10 +42,10 @@ const DeviceList = () => {
   //   dispatch(codeActions.fetchActivationCode());
   // }
 
-  useEffect(() => {
-    /* Загружаем данные при загрузке компонента */
-    fetchData();
-  }, [fetchData]);
+  // useEffect(() => {
+  //   /* Загружаем данные при загрузке компонента */
+  //   fetchData();
+  // }, [fetchData]);
 
   useEffect(() => {
     setDataList(list);
@@ -71,7 +71,7 @@ const DeviceList = () => {
   );
 
   const handleCreateCode = (deviceId: string) => {
-    dispatch(codeActions.(deviceId));
+    dispatch(codeActions.createActivationCode(deviceId));
   };
 
   // const handleSubmit = async (values: IDevice | NewDevice) => {
