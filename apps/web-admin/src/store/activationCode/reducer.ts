@@ -2,6 +2,7 @@ import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
 import { IActivationCodeState } from './types';
+// eslint-disable-next-line import/namespace
 import { ActivationCodeActionType, activationCodeActions } from './actions';
 
 const initialState: Readonly<IActivationCodeState> = {
@@ -31,7 +32,24 @@ const reducer: Reducer<IActivationCodeState, ActivationCodeActionType> = (
         loading: false,
       };
 
-    case getType(activationCodeActions.fetchCodesAsync.failure):
+    case getType(activationCodeActions.createCodeAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(activationCodeActions.createCodeAsync.success):
+      return {
+        ...state,
+        list: [...(state.list || []), action.payload],
+        loading: false,
+      };
+
+    case getType(activationCodeActions.createCodeAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    /*case getType(activationCodeActions.fetchCodesAsync.failure):
       return {
         ...state,
         loading: false,
@@ -54,7 +72,7 @@ const reducer: Reducer<IActivationCodeState, ActivationCodeActionType> = (
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
-      };
+      };*/
     default:
       return state;
   }

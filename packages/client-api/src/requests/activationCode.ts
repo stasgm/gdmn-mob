@@ -70,7 +70,7 @@ class ActivationCode extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${deviceId}/code`);
+      const res = await this.api.axios.get<IResponse<IActivationCode>>(`/auth/device/${deviceId}/code`);
       const resData = res.data;
 
       if (resData.result) {

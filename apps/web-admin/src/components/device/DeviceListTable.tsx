@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import AddCommentIcon from '@material-ui/icons/AddComment';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
 import {
   Box,
@@ -150,7 +150,7 @@ const DeviceListTable = ({
               // component={RouterLink}
               onClick={() => onCreateCode(device.id)}
             >
-              <AddCommentIcon />
+              <AddCircleOutlineIcon />
             </Button>
           )}
         </TableCell>

@@ -16,9 +16,16 @@ const fetchCodeAsync = createAsyncAction(
   'ACTIVATION_CODE/GET_CODE_FAILURE',
 )<string | undefined, IActivationCode, string>();
 
+const createCodeAsync = createAsyncAction(
+  'ACTIVATION_CODE/CREATE_CODE',
+  'ACTIVATION_CODE/CREATE_CODE_SUCCESS',
+  'ACTIVATION_CODE/CREATE_CODE_FAILURE',
+)<string | undefined, IActivationCode, string>();
+
 export const activationCodeActions = {
   fetchCodesAsync,
   fetchCodeAsync,
+  createCodeAsync,
   clearError,
   init,
 };

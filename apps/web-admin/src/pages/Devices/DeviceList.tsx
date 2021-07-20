@@ -70,6 +70,19 @@ const DeviceList = () => {
     [list],
   );
 
+  const onCreateCode = useCallback(
+    (value: string) => {
+      const filtered = list.filter((item) => {
+        const deviceId = device.id.toUpperCase();
+
+        return deviceId.includes(inputValue);
+      });
+
+      setDataList(filtered);
+    },
+    [list],
+  );
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -120,7 +133,7 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={dataList} activationCodes={activationCodes} />
+              <DeviceListTable devices={dataList} activationCodes={activationCodes} onCreateCode={onCreateCode} />
             </Box>
           )}
         </Container>

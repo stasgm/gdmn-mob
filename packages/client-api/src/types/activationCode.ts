@@ -11,7 +11,7 @@ export interface IGetCodesResponse extends IActivationCodeQueryResponse {
 
 export interface ICreateCodeResponse extends IActivationCodeQueryResponse {
   type: 'CREATE_CODE';
-  code: string;
+  code: IActivationCode;
 }
 
 export type QueryResponse = IGetCodesResponse | ICreateCodeResponse;

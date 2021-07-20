@@ -44,6 +44,26 @@ const fetchActivationCodes = (): AppThunk => {
   };
 };
 
+/*CREATE*/
+
+const createActivationCode = (deviceId: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(activationCodeActions.createCodeAsync.request(''));
+
+    const response = await api.activationCode.createActivationCode(deviceId);
+
+    if (response.type === 'CREATE_CODE') {
+      return dispatch(activationCodeActions.createCodeAsync.success(response.code));
+    }
+
+    if (response.type === '') {
+      return dispatch(activationCodeActions.createCodeAsync.failure(response.message));
+    }
+
+    return dispatch(activationCodeActions.createCodeAsync.failure('Ошибка получения кода активации'));
+  };
+};
+
 // const getActivationCode = (): AppThunk => {
 //   return async (dispatch) => {
 //     dispatch(activationCodeActions.getActivationCodeAsync.request(''));
@@ -62,4 +82,4 @@ const fetchActivationCodes = (): AppThunk => {
 //   };
 // };
 
-export default { fetchActivationCodes };
+export default { fetchActivationCodes, createActivationCode };
