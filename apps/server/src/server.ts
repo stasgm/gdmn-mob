@@ -88,7 +88,11 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(
       cors({
         credentials: true,
+<<<<<<< .mine
         origin: 'http://192.168.0.70:8080',
+=======
+        origin: 'http://192.168.0.104:8080',
+>>>>>>> .theirs
       }),
     )
 
