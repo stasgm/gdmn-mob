@@ -4,6 +4,7 @@ export interface IApiConfig {
   port: number;
   timeout: number;
   apiPath: string;
+  deviceId?: string;
   debug?: {
     isMock?: boolean;
     mockDelay?: number;

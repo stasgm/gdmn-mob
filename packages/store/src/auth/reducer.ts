@@ -25,6 +25,7 @@ const initialState: Readonly<AuthState> = {
     protocol,
     server: name,
     timeout,
+    deviceId: undefined,
   },
   error: false,
   loading: false,

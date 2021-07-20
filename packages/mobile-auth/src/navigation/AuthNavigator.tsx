@@ -36,8 +36,8 @@ const AuthNavigator: React.FC = () => {
 
   useEffect(() => {
     console.log('useEffect device');
-    api.deviceId = device?.uid;
-  }, [device]);
+    api.deviceId = settings?.deviceId;
+  }, [settings?.deviceId]);
 
   console.log('deviceStatus', deviceStatus);
 
@@ -51,17 +51,21 @@ const AuthNavigator: React.FC = () => {
 
   // console.log('deviceStatusApp', doActivating);
 
-  const checkDevice = useCallback(
-    () => (device ? dispatch(authActions.getDeviceStatus(device.uid)) : setStatus('NON-ACTIVATED')),
-    [dispatch, device],
-  );
-  // const isActivated = device || deviceStatus === 'ACTIVE';
+  const checkDevice = useCallback(() => {
+    if (settings?.deviceId) {
+      dispatch(authActions.getDeviceStatus(settings?.deviceId));
+    }
+    dispatch(authActions.checkDevice());
+  }, [dispatch, settings?.deviceId]);
 
   const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
+
   const disconnect = useCallback(() => {
     dispatch(authActions.disconnect());
     setStatus(deviceStatus);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
+
   const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
   const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);
   const setCompany = useCallback((company: ICompany) => dispatch(authActions.setCompany(company)), [dispatch]);

@@ -5,7 +5,8 @@ import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { StateType } from 'typesafe-actions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { persistStore, persistReducer } from 'redux-persist';
+import { persistReducer } from 'redux-persist';
+
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
 import { reducer as msgReducer } from './messages';
@@ -16,7 +17,7 @@ import { TActions } from './types';
 const persistConfig = {
   key: 'auth',
   storage: AsyncStorage,
-  whitelist: ['user', 'device', 'company', 'deviceStatus'],
+  blacklist: ['device'],
 };
 
 export const rootReducer = {
