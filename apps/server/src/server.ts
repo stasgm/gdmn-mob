@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars-experimental */
 import fs from 'fs';
 import path from 'path';
 
@@ -10,6 +11,8 @@ import helmet from 'koa-helmet';
 import { Strategy as LocalStrategy, IStrategyOptions } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
+
+import serve from 'koa-static-server';
 
 import { IUser } from '@lib/types';
 
@@ -88,6 +91,8 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         origin: 'http://192.168.0.70:8080',
       }),
     )
+
+    .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
     .use(router.routes())
     .use(router.allowedMethods());
 
