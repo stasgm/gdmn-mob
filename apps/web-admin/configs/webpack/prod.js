@@ -11,8 +11,11 @@ module.exports = merge(commonConfig, {
   output: {
     path: getRootRelativePath(config.webpack.buildPath),
     filename: 'js/bundle.[contenthash].min.js',
-    publicPath: '/',
+    publicPath: '/admin/',
   },
   devtool: 'source-map',
-  plugins: [new webpack.DefinePlugin({ 'process.env.NODE_ENV': JSON.stringify('production') })],
+  plugins: [
+   // new webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify('production')}),
+    new webpack.ProvidePlugin({process: 'process/browser', }),
+  ],
 });
