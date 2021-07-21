@@ -21,7 +21,7 @@ const ConfigScreen = (props: Props) => {
 
   const { settings, onSetSettings } = props;
   const [serverName, setServerName] = useState(`${settings?.protocol}${settings?.server}` || '');
-  const [serverPort, setServerPort] = useState(settings?.port.toString() || '');
+  const [serverPort, setServerPort] = useState(settings?.port?.toString() || '');
   const [timeout, setTimeout] = useState(settings?.timeout?.toString() || '');
   const [deviceId, setDeviceId] = useState(settings?.deviceId || '');
 

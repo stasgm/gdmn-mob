@@ -27,8 +27,6 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
     // Для пользователей с ролью User проверяем дополнительно DeviceId
     const { deviceId } = ctx.query;
 
-    console.log('deviceId', deviceId);
-
     const device = await devices.find((el) => el.uid === deviceId);
 
     if (!device) {

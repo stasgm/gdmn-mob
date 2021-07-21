@@ -130,16 +130,16 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
   return makeDevice(device);
 };
 
-// const findOneByUid = async (uid: string) => {
-//   const db = getDb();
-//   const { devices } = db;
+const findOneByUid = async (uid: string) => {
+  const db = getDb();
+  const { devices } = db;
 
-//   const device = await devices.find((i) => i.uid === uid);
+  const device = await devices.find((i) => i.uid === uid);
 
-//   if (!device) return;
+  if (!device) return;
 
-//   return makeDevice(device);
-// };
+  return makeDevice(device);
+};
 
 const findAll = async (params?: Record<string, string>): Promise<IDevice[]> => {
   const { devices } = getDb();
@@ -249,4 +249,4 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
   };
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll, genActivationCode };
+export { addOne, updateOne, deleteOne, findOne, findAll, genActivationCode, findOneByUid };

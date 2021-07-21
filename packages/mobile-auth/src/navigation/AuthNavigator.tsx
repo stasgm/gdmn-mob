@@ -16,58 +16,63 @@ const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthNavigator: React.FC = () => {
   const { device, settings, user, deviceStatus } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const [status, setStatus] = useState(deviceStatus);
+  const [deviceId, setDeviceId] = useState<string | undefined | null>(settings?.deviceId);
+
+  console.log('deviceeee', device);
+  console.log('deviceId', deviceId);
+  console.log('user', user);
+  console.log('settings', settings);
+  console.log('api.config', api.config);
+
+  useEffect(() => {
+    //При измении настроек подключения в хранилище записываем его в апи
+    api.config = { ...api.config, ...settings };
+  }, [settings]);
+
+  useEffect(() => {
+    setDeviceId(settings?.deviceId);
+  }, [settings?.deviceId]);
+
+  useEffect(() => {
+    if (device?.uid) {
+      //При изменении устройства, запишем ид в настройки
+      dispatch(authActions.setSettings({ ...settings, deviceId: device?.uid } as IApiConfig));
+      dispatch(authActions.getDeviceStatus(device?.uid));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [device?.uid, dispatch]);
+
+  useEffect(() => {
+    if (deviceStatus === 'NON-ACTIVATED' && !deviceId) {
+      setDeviceId(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deviceStatus, dispatch]);
 
   const saveSettings = useCallback(
     (newSettings: IApiConfig) => dispatch(authActions.setSettings(newSettings)),
     [dispatch],
   );
 
-  useEffect(() => {
-    console.log('useEffect');
-    checkDevice();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    console.log('useEffect setStatus');
-    setStatus(deviceStatus);
-  }, [deviceStatus]);
-
-  useEffect(() => {
-    console.log('useEffect device');
-    api.deviceId = settings?.deviceId;
-  }, [settings?.deviceId]);
-
-  console.log('deviceStatus', deviceStatus);
-
-  console.log('status', status);
-
-  console.log('device', device);
-
-  console.log('settings', settings);
-
-  // const [doActivating, setDoActivating] = useState<boolean>(deviceStatus !== 'ACTIVE');
-
-  // console.log('deviceStatusApp', doActivating);
-
-  const checkDevice = useCallback(() => {
-    if (settings?.deviceId) {
-      dispatch(authActions.getDeviceStatus(settings?.deviceId));
-    }
-    dispatch(authActions.checkDevice());
-  }, [dispatch, settings?.deviceId]);
+  const checkDevice = useCallback(
+    () => (settings?.deviceId ? dispatch(authActions.checkDevice()) : setDeviceId(null)),
+    [dispatch, settings?.deviceId],
+  );
 
   const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
 
   const disconnect = useCallback(() => {
     dispatch(authActions.disconnect());
-    setStatus(deviceStatus);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+    setDeviceId(undefined);
+  }, [dispatch, setDeviceId]);
 
   const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
-  const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);
+
+  const logout = useCallback(() => {
+    dispatch(authActions.logout());
+    setDeviceId(undefined);
+  }, [dispatch]);
+
   const setCompany = useCallback((company: ICompany) => dispatch(authActions.setCompany(company)), [dispatch]);
 
   const CongfigWithParams = useCallback(
@@ -95,16 +100,17 @@ const AuthNavigator: React.FC = () => {
     [logout, setCompany, user?.company],
   );
 
-  console.log('ddd', status !== 'NON-ACTIVATED' && !!device);
   /*
     Если device undefined то переходим на окно с подключеним
     Если device null то переходим на окно активации устройства
     Если device не null и user undefined то переходим на окно входа пользователя
   */
 
+  console.log('deviceId === undefined', deviceId === undefined);
+
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      {device ? (
+      {deviceId ? (
         !user ? (
           <AuthStack.Screen
             name="Login"
@@ -118,7 +124,7 @@ const AuthNavigator: React.FC = () => {
             options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />
         )
-      ) : device === undefined && status !== 'NON-ACTIVATED' ? (
+      ) : deviceId === undefined ? (
         <>
           <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />

@@ -30,7 +30,13 @@ const checkDevice = (): AppThunk<
   };
 };
 
-const activateDevice = (code: string): AppThunk => {
+const activateDevice = (
+  code: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.activateDeviceAsync>>,
+  AuthState,
+  ActionType<typeof actions.activateDeviceAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.activateDeviceAsync.request(''));
 

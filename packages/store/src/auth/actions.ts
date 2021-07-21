@@ -2,9 +2,7 @@ import { IApiConfig } from '@lib/client-types';
 import { IDevice, IUser, ICompany, DeviceState } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { AuthState } from './types';
-
-const init = createAction('AUTH/INIT')<AuthState>();
+const init = createAction('AUTH/INIT')();
 const clearError = createAction('AUTH/CLEAR_ERROR')();
 
 const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();

@@ -17,11 +17,12 @@ import { TActions } from './types';
 const persistConfig = {
   key: 'auth',
   storage: AsyncStorage,
-  blacklist: ['device'],
+  whitelist: ['user', 'settings', 'company'],
 };
 
 export const rootReducer = {
-  auth: persistReducer(persistConfig, authReducer),
+  // auth: persistReducer(persistConfig, authReducer),
+  auth: authReducer,
   messages: msgReducer,
   references: referenceReducer,
   documents: documentReducer,

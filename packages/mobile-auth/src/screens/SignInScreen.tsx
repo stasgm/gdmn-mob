@@ -57,6 +57,8 @@ const SignInScreen = (props: Props) => {
           label="Имя пользователя"
           value={credential.name}
           autoCorrect={false}
+          keyboardType="default"
+          returnKeyType="done"
           onChangeText={(e) => setCredentials({ ...credential, name: e })}
         />
         <Input
@@ -70,7 +72,14 @@ const SignInScreen = (props: Props) => {
         </PrimeButton>
       </AppInputScreen>
       <View style={styles.buttons}>
-        <RoundButton icon="server" onPress={onDisconnect} disabled={loading} />
+        <RoundButton
+          icon="server"
+          onPress={() => {
+            console.log('press');
+            onDisconnect();
+          }}
+          disabled={loading}
+        />
       </View>
     </>
   );

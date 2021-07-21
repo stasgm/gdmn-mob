@@ -65,7 +65,7 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
 
-  const device = await deviceService.findOne(deviceId);
+  const device = await deviceService.findOneByUid(deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
