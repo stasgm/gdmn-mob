@@ -28,7 +28,12 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
         <Box sx={{ flexGrow: 1 }} />
         <Box
           // component="button"
-          sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' }, color: 'white' }}
+          sx={{
+            background: 'transparent',
+            border: 'none',
+            display: { xs: 'none', md: 'block', lg: 'block' },
+            color: 'white',
+          }}
         >
           <IconButton color="inherit">
             <Badge badgeContent={notifications.length} color="primary" variant="dot">
