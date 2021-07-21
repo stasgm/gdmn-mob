@@ -186,17 +186,17 @@ class Device extends BaseRequest {
         return {
           type: 'GET_DEVICES',
           devices: resData?.data || [],
-        };
+        } as types.IGetDevicesResponse;
       }
       return {
         type: 'ERROR',
         message: resData?.error || 'ошибка получения данных об устройствах',
-      };
+      } as error.INetworkError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
-      };
+      } as error.INetworkError;
     }
   };
 

@@ -1,4 +1,5 @@
 import api from '@lib/client-api';
+import { IActivationCode } from '@lib/types';
 
 import { ThunkAction } from 'redux-thunk';
 
@@ -26,11 +27,11 @@ export type AppThunk = ThunkAction<Promise<ActivationCodeActionType>, AppState, 
   };
 };*/
 
-const fetchActivationCodes = (): AppThunk => {
+const fetchActivationCodes = (deviceId?: string): AppThunk => {
   return async (dispatch) => {
     dispatch(activationCodeActions.fetchCodesAsync.request(''));
 
-    const response = await api.activationCode.getActivationCodes();
+    const response = await api.activationCode.getActivationCodes(deviceId ? { deviceId: deviceId } : undefined);
 
     if (response.type === 'GET_CODES') {
       return dispatch(activationCodeActions.fetchCodesAsync.success(response.codes));

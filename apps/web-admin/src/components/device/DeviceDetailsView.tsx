@@ -1,16 +1,16 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { IDevice, IActivationCode } from '@lib/types';
+import { IDevice } from '@lib/types';
 /* import activationCode from '../../store/activationCode';*/
 
 /*import { activationCodes } from '@lib/mock';*/
 
 interface IProps {
   device: IDevice;
-  activationCodes: IActivationCode[];
+  activationCode?: string;
 }
 
-const DeviceDetailsView = ({ device, activationCodes }: IProps) => {
+const DeviceDetailsView = ({ device, activationCode }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -56,7 +56,8 @@ const DeviceDetailsView = ({ device, activationCodes }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {activationCodes.find((a) => a.device.id === device.id)?.code}
+                  {activationCode}
+                  {/*activationCode.code*/}
                 </Typography>
               </Grid>
             </Grid>
