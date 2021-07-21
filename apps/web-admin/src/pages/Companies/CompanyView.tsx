@@ -17,6 +17,8 @@ import CompanyDetailsView from '../../components/company/CompanyDetailsView';
 import companySelectors from '../../store/company/selectors';
 import userSelectors from '../../store/user/selectors';
 
+import { adminPath } from '../../utils/constants';
+
 const CompanyView = () => {
   const { id: companyId } = useParams();
 
@@ -38,7 +40,7 @@ const CompanyView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/app/companies/edit/${companyId}`);
+    navigate(`${adminPath}/app/companies/edit/${companyId}`);
   };
 
   const handleDelete = async () => {

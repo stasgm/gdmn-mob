@@ -17,6 +17,8 @@ import {
 } from '@material-ui/core';
 import { IDevice } from '@lib/types';
 
+import { adminPath } from '../../utils/constants';
+
 interface IProps {
   devices?: IDevice[];
   selectedDevices?: IDevice[];
@@ -110,7 +112,7 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/devices/${device.id}`}>
+            <NavLink to={`${adminPath}/app/devices/${device.id}`}>
               <Typography color="textPrimary" variant="body1" key={device.id}>
                 {device.name}
               </Typography>

@@ -12,6 +12,8 @@ import { authActions, useSelector, useDispatch } from '@lib/store';
 
 import Logo from '../components/Logo';
 
+import { adminPath } from '../utils/constants';
+
 const Login = () => {
   const dispatch = useDispatch();
 
@@ -125,7 +127,7 @@ const Login = () => {
             </Box>
             <Typography color="textSecondary" variant="body1">
               Ещё не с нами?{' '}
-              <Link component={RouterLink} to="/register" variant="h6">
+              <Link component={RouterLink} to={`${adminPath}/register`} variant="h6">
                 Зарегистрироваться
               </Link>
             </Typography>

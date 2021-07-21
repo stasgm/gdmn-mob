@@ -17,6 +17,8 @@ import {
 } from '@material-ui/core';
 import { IUser } from '@lib/types';
 
+import { adminPath } from '../../utils/constants';
+
 interface props {
   users?: IUser[];
 }
@@ -83,7 +85,7 @@ const UserListTable = ({ users = [] }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/users/${user.id}`}>
+            <NavLink to={`${adminPath}/app/users/${user.id}`}>
               <Typography color="textPrimary" variant="body1" key={user.id}>
                 {user.name}
               </Typography>
