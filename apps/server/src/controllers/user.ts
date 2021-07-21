@@ -70,7 +70,7 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, name, filterText, fromRecord, toRecord } = ctx.query;
+  const { companyId, name, filterText, fromRecord, toRecord, version } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -94,7 +94,19 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
     params.toRecord = toRecord;
   }
 
-  const users = await userService.findAll(params);
+  let users;
+  switch (version) {
+    case '1.0.0':
+      users = await userService.findAll(params);
+      break;
+    case '2.0.0':
+      // call another service f.e. userService_v2
+      break;
+    default:
+      users = await userService.findAll(params);
+      break;
+  }
+  //const users = await userService.findAll(params);
 
   ok(ctx as Context, users);
 
