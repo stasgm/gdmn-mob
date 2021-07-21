@@ -18,9 +18,13 @@ import {
   TableSortLabel,
   Typography,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 
 type Order = 'asc' | 'desc';
 
+const useStyles = makeStyles(() => ({
+  row: { height: 53 },
+}));
 interface props<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
@@ -31,7 +35,8 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof T>(headCells[0].id);
+  const [orderBy, setOrderBy] = useState<keyof T>(); //headCells[0].id
+  const classes = useStyles();
 
   const handleSelectAll = (event: any) => {
     let newSelectedUserIds;
@@ -103,11 +108,25 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
     return stabilizedThis.map((el) => el[0]);
   }
 
+  function DeserializeProp<T>(propName: keyof T, value: T[keyof T]) {
+    switch (propName) {
+      case 'creationDate':
+      case 'editionDate':
+        return new Date(value || '').toLocaleString('ru', { hour12: false });
+
+      case 'admin':
+        return typeof value === 'object' ? ('name' in value ? value.name : '') : value;
+
+      default:
+        return value;
+    }
+  }
+
   const TableRows = () => {
     const userList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
       .map((item: T) => (
-        <TableRow hover key={item.id} selected={selectedUserIds.indexOf(item.id) !== -1}>
+        <TableRow className={classes.row} hover key={item.id} selected={selectedUserIds.indexOf(item.id) !== -1}>
           <TableCell padding="checkbox">
             <Checkbox
               checked={selectedUserIds.indexOf(item.id) !== -1}
@@ -128,13 +147,15 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
                   >
                     <NavLink to={`/app/users/${item.id}`}>
                       <Typography color="textPrimary" variant="body1" key={item.id}>
-                        {item[headCell.id]}
+                        {DeserializeProp<T>(headCell.id, item[headCell.id])}
                       </Typography>
                     </NavLink>
                   </Box>
                 </TableCell>
               );
-            else return <TableCell key={index}>{item[headCell.id]}</TableCell>;
+            else {
+              return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>;
+            }
           })}
         </TableRow>
       ));
@@ -173,7 +194,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
                     <TableSortLabel
                       active={orderBy === headCell.id}
                       direction={orderBy === headCell.id ? order : 'asc'}
-                      onClick={() => handleSortRequest(headCell.id)}
+                      onClick={headCell.sortEnable ? () => handleSortRequest(headCell.id) : undefined}
                     >
                       {headCell.label}
                     </TableSortLabel>

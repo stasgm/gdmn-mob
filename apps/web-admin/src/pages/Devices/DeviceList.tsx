@@ -101,7 +101,7 @@ const DeviceList = () => {
   const headCells: IHeadCells<IDevice>[] = [
     { id: 'name', label: 'Наименование', sortEnable: true },
     { id: 'uid', label: 'Номер', sortEnable: true },
-    { id: 'state', label: 'Состояние', sortEnable: true },
+    { id: 'state', label: 'Состояние', sortEnable: false },
   ];
 
   return (
