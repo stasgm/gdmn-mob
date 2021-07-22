@@ -194,7 +194,11 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
       delete newParams['filterText'];
     }
 
-    return companyFound && filteredDevices && extraPredicate(item, newParams as Record<string, string>);
+    return (
+      companyFound &&
+      filteredDevices &&
+      extraPredicate(item, newParams as Record<string, string>)
+    );
   });
 
   /*   const newParams = { ...params };

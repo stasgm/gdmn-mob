@@ -8,7 +8,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 // import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import { ICompany } from '@lib/types';
+import { ICompany, IHeadCells } from '@lib/types';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 

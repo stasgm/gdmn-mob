@@ -218,7 +218,9 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
       delete newParams['filterText'];
     }
 
-    return companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>);
+    return (
+      companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>)
+    );
   });
 
   const pr = companyList?.map(async (i) => await makeCompany(i));

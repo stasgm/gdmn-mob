@@ -5,6 +5,7 @@ import { IUser, NewUser } from '@lib/types';
 import { AppState } from '../';
 
 import { userActions, UserActionType } from './actions';
+import { X } from 'react-feather';
 
 export type AppThunk = ThunkAction<Promise<UserActionType>, AppState, null, UserActionType>;
 
