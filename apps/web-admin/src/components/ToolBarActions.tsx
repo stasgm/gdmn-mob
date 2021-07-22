@@ -1,12 +1,34 @@
 import React from 'react';
-import { Button, Box, IconButton, Toolbar, Drawer } from '@material-ui/core';
+import { Button, Box, IconButton, Toolbar, Menu, MenuProps } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+
+import { withStyles } from '@material-ui/styles';
 
 import { IToolBarButton } from '../types';
 
 interface props {
   buttons: IToolBarButton[];
 }
+
+const StyledMenu = withStyles({
+  paper: {
+    border: '1px solid #d3d4d5',
+  },
+})((props: MenuProps) => (
+  <Menu
+    elevation={0}
+    /*getContentAnchorEl={null}*/
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+));
 
 const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
   const buttonList = (
@@ -65,31 +87,35 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
       >
         {iconButtonList}
       </Box>
-      <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'none', md: 'block' } }}>{buttonList}</Box>
-      <Box
-        sx={{ background: 'transparent', border: 'none', display: { xl: 'none', md: 'none', sm: 'none', xs: 'block' } }}
-      >
-        <Drawer
-          /*anchorEl={anchorEl} keepMounted  anchor="right"*/
 
-          id="customized-menu"
-          variant="temporary"
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-          /*  PaperProps={{
-            /*sx: {
-              /*width:  ?isCompact 70 : 256,
-              top: 100,
-              /*height: 'calc(100% - 64px)',
-              transitionProperty: 'width, transform !important',
-              transitionDuration: '0.3s !important',
-              transitionTimingFunction: 'cubic-bezier(0.4, 0, 1, 1) !important',
-            },
-            sx: { mx: 1 }
-          }}*/
+      <Box
+        sx={{
+          /*background: 'transparent',*/
+          border: 'none',
+          display: { xs: 'none', md: 'block' },
+        }}
+      >
+        {buttonList}
+      </Box>
+      <Box
+        sx={{
+          /*background: 'transparent',*/
+          border: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Box
+          sx={{
+            background: 'transparent',
+            border: 'none',
+            display: { xl: 'none', md: 'none', sm: 'none', xs: 'block' },
+          }}
         >
-          {buttonList}
-        </Drawer>
+          <StyledMenu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+            {buttonList}
+          </StyledMenu>
+        </Box>
       </Box>
     </Toolbar>
   );
