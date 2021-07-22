@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -17,12 +17,15 @@ import {
 } from '@material-ui/core';
 import { IDevice } from '@lib/types';
 
-interface props {
+interface IProps {
   devices?: IDevice[];
+  selectedDevices?: IDevice[];
+  limitRows?: number;
+  onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
 
-const DeviceListTable = ({ devices = [], ...rest }: props) => {
-  const [selectedDeviceIds, setSelectedDeviceIds] = useState<any>([]);
+const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevices = [], limitRows = 0 }: IProps) => {
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -30,20 +33,22 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
     let newSelectedDeviceIds;
 
     if (event.target.checked) {
-      newSelectedDeviceIds = devices.map((device: any) => device.id);
+      newSelectedDeviceIds = devices.map((device: any) => device);
     } else {
       newSelectedDeviceIds = [];
     }
 
     setSelectedDeviceIds(newSelectedDeviceIds);
+    onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
   };
 
-  const handleSelectOne = (_event: any, id: any) => {
-    const selectedIndex = selectedDeviceIds.indexOf(id);
-    let newSelectedDeviceIds: any = [];
+  const handleSelectOne = (_event: any, device: IDevice) => {
+    const selectedIndex = selectedDeviceIds.map((item: IDevice) => item.id).indexOf(device.id);
+
+    let newSelectedDeviceIds: IDevice[] = [];
 
     if (selectedIndex === -1) {
-      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds, id);
+      newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds, device);
     } else if (selectedIndex === 0) {
       newSelectedDeviceIds = newSelectedDeviceIds.concat(selectedDeviceIds.slice(1));
     } else if (selectedIndex === selectedDeviceIds.length - 1) {
@@ -56,6 +61,8 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
     }
 
     setSelectedDeviceIds(newSelectedDeviceIds);
+
+    onChangeSelectedDevices && onChangeSelectedDevices(newSelectedDeviceIds);
   };
 
   const handleLimitChange = (event: any) => {
@@ -66,13 +73,33 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
     setPage(newPage);
   };
 
+  useEffect(() => {
+    if (limitRows > 0) {
+      setLimit(limitRows);
+    }
+
+    if (selectedDeviceIds.length === 0) {
+      if (selectedDevices.length > 0) {
+        const newSelectedDeviceIds = selectedDevices.map((device: IDevice) => device);
+
+        setSelectedDeviceIds(newSelectedDeviceIds);
+      }
+    }
+  }, [limitRows, selectedDeviceIds.length, selectedDevices]);
+
   const TableRows = () => {
     const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => (
-      <TableRow hover key={device.id} selected={selectedDeviceIds.indexOf(device.id) !== -1}>
+      <TableRow hover key={device.id} selected={selectedDeviceIds.findIndex((d) => d.id === device?.id) !== -1}>
         <TableCell padding="checkbox">
           <Checkbox
-            checked={selectedDeviceIds.indexOf(device.id) !== -1}
-            onChange={(event) => handleSelectOne(event, device.id)}
+            checked={
+              selectedDeviceIds
+                .map((item: IDevice) => {
+                  return item.id;
+                })
+                .indexOf(device.id) !== -1
+            }
+            onChange={(event) => handleSelectOne(event, device)}
             value="true"
           />
         </TableCell>
@@ -90,9 +117,10 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
             </NavLink>
           </Box>
         </TableCell>
-        {/* <TableCell>{device.name}</TableCell> */}
         <TableCell>{device.uid}</TableCell>
         <TableCell>{device.state}</TableCell>
+        <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
 
@@ -111,7 +139,7 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
   };
 
   return (
-    <Card {...rest}>
+    <Card>
       <PerfectScrollbar>
         <Box sx={{ minWidth: 1050, p: 1 }}>
           <Table>
@@ -128,6 +156,8 @@ const DeviceListTable = ({ devices = [], ...rest }: props) => {
                 <TableCell>Наименование</TableCell>
                 <TableCell>Номер</TableCell>
                 <TableCell>Состояние</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

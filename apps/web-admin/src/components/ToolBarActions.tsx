@@ -11,7 +11,14 @@ const ToolBarActions = ({ buttons }: props) => {
   const buttonList = (
     <>
       {buttons.map((button: IToolBarButton) => (
-        <Button key={button.name} color={button.color} variant={button.variant} onClick={button.onClick} sx={button.sx}>
+        <Button
+          key={button.name}
+          color={button.color}
+          variant={button.variant}
+          onClick={button.onClick}
+          sx={button.sx}
+          startIcon={button.icon}
+        >
           {button.name}
         </Button>
       ))}
@@ -30,20 +37,18 @@ const ToolBarActions = ({ buttons }: props) => {
 
   return (
     <Toolbar>
-      <Box component="button" sx={{ background: 'transparent', border: 'none', display: { sm: 'none', xs: 'block' } }}>
+      <Box sx={{ background: 'transparent', border: 'none', display: { sm: 'none', xs: 'block' } }}>
         <IconButton color="primary">
           <MoreVertIcon />
         </IconButton>
       </Box>
       <Box
-        component="button"
+        // component="button"
         sx={{ background: 'transparent', border: 'none', display: { md: 'none', sm: 'block', xs: 'none' } }}
       >
         {iconButtonList}
       </Box>
-      <Box component="button" sx={{ background: 'transparent', border: 'none', display: { xs: 'none', md: 'block' } }}>
-        {buttonList}
-      </Box>
+      <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'none', md: 'block' } }}>{buttonList}</Box>
     </Toolbar>
   );
 };

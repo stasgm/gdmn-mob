@@ -26,8 +26,10 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     id: '',
     name: device.name,
     uid: '',
-    state: 'NON-ACTIVATED',
+    state: 'NON-REGISTERED',
     companyId: device.company.id,
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
   };
 
   const createdDevice = await devices.find(await devices.insert(newDevice));
@@ -66,6 +68,8 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
     state: deviceData.state || oldDevice.state,
     uid: deviceData.uid || oldDevice.uid,
     companyId,
+    creationDate: deviceData.creationDate,
+    editionDate: new Date().toISOString(),
   };
 
   await devices.update(newDevice);
@@ -113,13 +117,13 @@ const genActivationCode = async (deviceId: string) => {
 const findOne = async (id: string): Promise<IDevice | undefined> => {
   const { devices } = getDb();
 
-  let device: IDBDevice | undefined;
+  //let device: IDBDevice | undefined;
 
-  if (id === 'WEB') {
-    device = await devices.find((e) => e.uid === id);
-  } else {
-    device = await devices.find(id);
-  }
+  // if (id === 'WEB') {
+  //   device = await devices.find((e) => e.uid === id);
+  // } else {
+  const device = await devices.find(id);
+  //}
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -128,16 +132,16 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
   return makeDevice(device);
 };
 
-// const findOneByUid = async (uid: string) => {
-//   const db = getDb();
-//   const { devices } = db;
+const findOneByUid = async (uid: string) => {
+  const db = getDb();
+  const { devices } = db;
 
-//   const device = await devices.find((i) => i.uid === uid);
+  const device = await devices.find((i) => i.uid === uid);
 
-//   if (!device) return;
+  if (!device) return;
 
-//   return makeDevice(device);
-// };
+  return makeDevice(device);
+};
 
 const findAll = async (params: Record<string, string | number>): Promise<IDevice[]> => {
   const { devices } = getDb();
@@ -160,19 +164,20 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
       delete newParams['companyId'];
     }
 
-    let uIdFound = true;
+    /*state и uId обработается в extraPredicate */
+    // let uIdFound = true;
 
-    if ('uId' in newParams) {
-      uIdFound = item.uid === newParams.uId;
-      delete newParams['uId'];
-    }
+    // if ('uId' in newParams) {
+    //   uIdFound = item.uid === newParams.uId;
+    //   delete newParams['uId'];
+    // }
 
-    let stateFound = true;
+    // let stateFound = true;
 
-    if ('state' in newParams) {
-      stateFound = item.state === newParams.state;
-      delete newParams['state'];
-    }
+    // if ('state' in newParams) {
+    //   stateFound = item.state === newParams.state;
+    //   delete newParams['state'];
+    // }
 
     /** filtering data */
     let filteredDevices = true;
@@ -191,8 +196,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
 
     return (
       companyFound &&
-      uIdFound &&
-      stateFound &&
       filteredDevices &&
       extraPredicate(item, newParams as Record<string, string>)
     );
@@ -282,7 +285,9 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
     company: companyEntity,
     state: device.state,
     uid: device.uid,
+    creationDate: device.creationDate,
+    editionDate: device.editionDate,
   };
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll, genActivationCode };
+export { addOne, updateOne, deleteOne, findOne, findAll, genActivationCode, findOneByUid };

@@ -1,6 +1,6 @@
 import { ParameterizedContext, Next, Context } from 'koa';
 
-import { IUser, IUserCredentials } from '@lib/types';
+import { IUser, IUserCredentials, NewActivationCode } from '@lib/types';
 
 import log from '../utils/logger';
 import { authService, deviceService } from '../services';
@@ -12,13 +12,12 @@ import { created, ok } from '../utils/apiHelpers';
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password } = ctx.request.body as IUserCredentials;
 
-  const newUser = await authService.signUp({
+  await authService.signUp({
     password,
     name,
-    companies: [],
   });
 
-  created(ctx as Context, newUser);
+  created(ctx as Context);
 
   log.info(`signUp: user '${name}' is successfully signed up`);
 };
@@ -62,11 +61,11 @@ const logOut = async (ctx: Context): Promise<void> => {
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { code } = ctx.params;
+  const { code } = ctx.request.body as NewActivationCode;
 
-  const deviceUid = await authService.verifyCode(code);
+  const device = await authService.verifyCode(code);
 
-  ok(ctx as Context, deviceUid);
+  ok(ctx as Context, device);
 
   log.info('verifyCode: ok');
 };
@@ -81,4 +80,14 @@ const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getActivationCode: activation code generated successfully');
 };
 
-export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode };
+const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id: uid } = ctx.params;
+
+  const deviceStatus = await authService.getDeviceStatus(uid);
+
+  ok(ctx as Context, deviceStatus);
+
+  log.info('getDeviceStatus: ok');
+};
+
+export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode, getDeviceStatus };

@@ -1,27 +1,21 @@
 import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
-
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-
 import { useNavigate, useParams } from 'react-router-dom';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
-import { device } from '@lib/mock';
-
 import { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
-
+import selectors from '../../store/user/selectors';
+import bindingSelectors from '../../store/deviceBinding/selectors';
+import bindingActions from '../../store/deviceBinding';
 import { IToolBarButton } from '../../types';
-
 import ToolBarAction from '../../components/ToolBarActions';
-
 import UserDetailsView from '../../components/user/UserDetailsView';
-
 import UserDevices from '../../components/user/UserDevices';
+import SnackBar from '../../components/SnackBar';
 
 const UserView = () => {
   const { id: userId } = useParams();
@@ -30,23 +24,36 @@ const UserView = () => {
 
   const dispatch = useDispatch();
 
-  // const classes = useStyles();
+  const { loading, errorMessage } = useSelector((state) => state.users);
+  const user = selectors.userById(userId);
 
-  const { loading } = useSelector((state) => state.companies);
-  const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
-  // const { users, usersLoading } = useSelector((state) => state.users); пользователи из хранилища по userId
+  const userDevices = bindingSelectors.bindingsByUserId(userId);
 
   const handleCancel = () => {
-    navigate('/app/users');
+    navigate(-1);
   };
 
   const handleEdit = () => {
     navigate(`/app/users/edit/${userId}`);
   };
 
-  const handleRefresh = useCallback(() => {
+  const handleAddDevice = () => {
+    navigate(`/app/users/${userId}/devices/new`);
+  };
+
+  const handleClearError = () => {
+    dispatch(actions.userActions.clearError());
+  };
+
+  const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
+    dispatch(bindingActions.fetchDeviceBindings(userId));
   }, [dispatch, userId]);
+
+  useEffect(() => {
+    /* Загружаем данные при загрузке компонента */
+    refreshData();
+  }, [refreshData]);
 
   const handleDelete = async () => {
     const res = await dispatch(actions.removeUser(userId));
@@ -55,12 +62,18 @@ const UserView = () => {
     }
   };
 
-  useEffect(() => {
-    handleRefresh();
-  }, [handleRefresh]);
-
   if (!user) {
-    return <Box>Пользователь не найден</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Пользователь не найден
+      </Box>
+    );
   }
 
   const buttons: IToolBarButton[] = [
@@ -69,7 +82,7 @@ const UserView = () => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: () => handleRefresh(),
+      onClick: () => refreshData(),
       icon: <CachedIcon />,
     },
     {
@@ -109,7 +122,7 @@ const UserView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список пользователей'} />
+            <CardHeader title={'Назад'} />
             {loading && <CircularProgress size={40} />}
           </Box>
           <Box
@@ -131,8 +144,9 @@ const UserView = () => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices devices={[device]} />
+        <UserDevices userDevices={userDevices} onAddDevice={handleAddDevice} />
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

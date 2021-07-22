@@ -1,24 +1,19 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
+import { IDevice } from '@lib/types';
 
-import { IDevice, IHeadCells } from '@lib/types';
-
-import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device/actions.async';
-
+import actions from '../../store/device';
+import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-
-import { IToolBarButton } from '../../types';
+import SnackBar from '../../components/SnackBar';
 import SortableTable from '../../components/SortableTable';
 
 const DeviceList = () => {
@@ -26,16 +21,12 @@ const DeviceList = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.devices);
+  const { list, loading, errorMessage } = useSelector((state) => state.devices);
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const fetchDevices = useCallback(
-    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      const res = await dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
-
-      if (res.type === 'DEVICE/FETCH_DEVICES_SUCCESS') {
-        //setDataList(res.payload);
-      }
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -68,27 +59,31 @@ const DeviceList = () => {
     fetchDevices(inputValue);
   };
 
+  const handleClearError = () => {
+    dispatch(actions.deviceActions.clearError());
+  };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchDevices(),
+      onClick: fetchDevices,
       icon: <CachedIcon />,
     },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Загрузить',
+    //   onClick: () => {
+    //     return;
+    //   },
+    //   icon: <ImportExportIcon />,
+    // },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -134,6 +129,7 @@ const DeviceList = () => {
           )}
         </Container>
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

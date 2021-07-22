@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useLayoutEffect, useEffect } from 'react';
-import { SubTitle, ItemSeparator, BackButton, SearchButton } from '@lib/mobile-ui';
+import { View, FlatList } from 'react-native';
+import { Divider, Searchbar } from 'react-native-paper';
+import { useScrollToTop, RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { SubTitle, ItemSeparator, BackButton, SearchButton, AppScreen } from '@lib/mobile-ui';
+
 import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
-import { useScrollToTop, RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { View, FlatList } from 'react-native';
-import { Searchbar, useTheme } from 'react-native-paper';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -13,7 +14,6 @@ import ReferenceItem from './components/ReferenceItem';
 
 const ReferenceViewScreen = () => {
   const navigation = useNavigation();
-  const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -45,9 +45,9 @@ const ReferenceViewScreen = () => {
 
   if (!list) {
     return (
-      <View style={[styles.content, { backgroundColor: colors.background }]}>
-        <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>Справочник не найден</SubTitle>
-      </View>
+      <AppScreen>
+        <SubTitle style={styles.title}>Справочник не найден</SubTitle>
+      </AppScreen>
     );
   }
 
@@ -58,8 +58,10 @@ const ReferenceViewScreen = () => {
   const renderItem = ({ item }: { item: INamedEntity }) => <ReferenceItem item={item} refName={refName} />;
 
   return (
-    <View style={[styles.content, { backgroundColor: colors.background }]}>
-      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
+    <AppScreen>
+      <SubTitle style={[styles.title]}>{list?.description || list.name}</SubTitle>
+      {/* <ItemSeparator /> */}
+      {/* <ScreenTitle line={false}>{list?.name}</ScreenTitle> */}
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -79,9 +81,9 @@ const ReferenceViewScreen = () => {
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
-        ItemSeparatorComponent={ItemSeparator}
+        ItemSeparatorComponent={Divider}
       />
-    </View>
+    </AppScreen>
   );
 };
 

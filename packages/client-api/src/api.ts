@@ -9,45 +9,57 @@ import Auth from './requests/auth';
 import { BaseApi } from './types/BaseApi';
 import Company from './requests/company';
 import Device from './requests/device';
+import DeviceBinding from './requests/deviceBinding';
 import Message from './requests/message';
 import User from './requests/user';
 
 class Api extends BaseApi {
   protected _config: IApiConfig;
-  protected _deviceId: string;
+  // protected _deviceId: string | undefined;
 
   protected readonly _axios: AxiosInstance;
   // Классы запросов
   public auth: Auth;
   public company: Company;
   public device: Device;
+  public deviceBinding: DeviceBinding;
   public message: Message;
   public user: User;
 
   constructor(config: IApiConfig) {
     super();
     this._config = config;
-    this._deviceId = deviceId || 'WEB'; // TODO убрать web
+    // this._deviceId = undefined; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
+      headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.61:8080' },
     });
 
     this.auth = new Auth(this);
     this.company = new Company(this);
     this.device = new Device(this);
+    this.deviceBinding = new DeviceBinding(this);
     this.message = new Message(this);
     this.user = new User(this);
 
     this._axios.defaults.params = {};
 
+    this._axios.defaults.withCredentials = true;
+
     this._axios.interceptors.request.use(
       (request) => {
-        // Добавляем device_ID
-        request.params.deviceId = this._deviceId;
+        console.log('interceptors deviceId', this._config.deviceId);
+        console.log('interceptors condig', this._config);
+        if (this._config.deviceId) {
+          // Добавляем device_ID
+          request.params.deviceId = this._config.deviceId;
+          console.log('request.params.deviceId', request.params.deviceId);
+        }
+
         console.info('✉️ request', request);
         return request;
       },
@@ -82,13 +94,13 @@ class Api extends BaseApi {
     return this._config;
   }
 
-  set deviceId(deviceId: string) {
-    this._deviceId = deviceId;
-  }
+  // set deviceId(deviceId: string | undefined) {
+  //   this._deviceId = deviceId;
+  // }
 
-  get deviceId() {
-    return this._deviceId;
-  }
+  // get deviceId() {
+  //   return this._deviceId;
+  // }
 
   get axios() {
     return this._axios;
@@ -100,7 +112,7 @@ class Api extends BaseApi {
 }
 
 const {
-  debug: { deviceId, useMockup },
+  debug: { useMockup },
   server: { name, port, protocol },
   timeout,
   apiPath,
@@ -112,9 +124,10 @@ export default new Api({
   protocol,
   port,
   server: name,
+  deviceId: undefined,
   debug: {
     isMock: useMockup,
-    mockDelay: 500,
-    mockDeviceId: deviceId,
+    mockDelay: 1000,
+    // mockDeviceId: deviceId,
   },
 });

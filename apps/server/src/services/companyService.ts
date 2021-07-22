@@ -4,7 +4,7 @@ import { extraPredicate } from '../utils/helpers';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { addCompanyToUser } from './userService';
+import { updateOne as updateUserCompany } from './userService';
 
 import { getDb } from './dao/db';
 
@@ -32,25 +32,29 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
 
   const newCompanyObj = {
     name: company.name,
+    city: company.city,
     adminId: company.admin.id,
     externalId: company.externalId,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   } as IDBCompany;
 
+  console.log('newCompanyObj', newCompanyObj);
   const newCompany = await companies.insert(newCompanyObj);
 
   const createdCompany = await companies.find(newCompany);
 
   // Добавляем к текущему
-  await addCompanyToUser(createdCompany.adminId, createdCompany.id);
+  //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
+  await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
   //TODO переделать на updateCompany
 
   // TODO Временно! Добавляем к пользователю gdmn
   const user = await users.find((i) => i.name === 'gdmn');
 
   if (user) {
-    await addCompanyToUser(user.id, createdCompany.id);
+    //await addCompanyToUser(user.id, createdCompany.id);
+    await updateUserCompany(user.id, { id: user.id, company: createdCompany });
   }
 
   const retCompany = await makeCompany(createdCompany);
@@ -189,12 +193,14 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
        delete newParams['adminId'];
     }
     */
-    let nameFound = true;
 
-    if ('name' in newParams) {
-      nameFound = item.name === newParams.name;
-      delete newParams['name'];
-    }
+    /*name обработается в extraPredicate */
+    // let nameFound = true;
+
+    // if ('name' in newParams) {
+    //   nameFound = item.name === newParams.name;
+    //   delete newParams['name'];
+    // }
 
     /** filtering data */
     let filteredCompanies = true;
@@ -213,7 +219,7 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     }
 
     return (
-      companyIdFound && nameFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>)
+      companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>)
     );
   });
 
@@ -240,6 +246,7 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
   return {
     id: company.id,
     name: company.name,
+    city: company.city,
     admin: adminEntity,
     externalId: company.externalId,
     creationDate: company.creationDate,

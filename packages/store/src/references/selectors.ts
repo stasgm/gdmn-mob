@@ -1,6 +1,8 @@
+import { IReference } from '@lib/types';
+
 import { useSelector } from '../';
 
-const selectByName = (name: string) => {
+const selectByName = <T>(name: string): IReference<T> => {
   return useSelector((state) => state.references.list[name]);
 };
 

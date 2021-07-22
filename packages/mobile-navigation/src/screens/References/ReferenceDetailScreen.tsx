@@ -1,10 +1,11 @@
-import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui/src/components';
-import { refSelectors } from '@lib/store';
-import { INamedEntity } from '@lib/types';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { Divider } from 'react-native-paper';
+
+import { BackButton, SubTitle, AppScreen } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
+import { INamedEntity } from '@lib/types';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -15,48 +16,60 @@ interface IRefEntity extends INamedEntity {
 }
 
 interface IProperty {
+  sortOrder: number;
   name: string;
-  value: string | undefined;
+  title: string;
+  visible: boolean;
+  value?: string;
 }
 
 const LineItem = React.memo(({ item }: { item: IProperty }) => {
-  const { colors } = useTheme();
   return (
-    <View style={[styles.item, { backgroundColor: colors.background }]}>
+    <View style={styles.item}>
       <View style={styles.details}>
-        <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.value}</Text>
+        <Text style={styles.name}>{item.title}</Text>
+        <Text style={[styles.number, styles.field]}>{item.value}</Text>
       </View>
     </View>
   );
 });
 
 const ReferenceDetailScreen = () => {
-  const { colors } = useTheme();
   const navigation = useNavigation();
 
   const { name, id } = useRoute<RouteProp<ReferenceStackParamList, 'ReferenceDetals'>>().params;
 
-  const list = (refSelectors.selectByName(name)?.data as IRefEntity[])?.find((e) => e.id === id);
+  const ref = refSelectors.selectByName<IRefEntity>(name);
+
+  const list = ref?.data.find((e) => e.id === id);
 
   if (!list) {
     return (
-      <View style={[styles.content, { backgroundColor: colors.background }]}>
-        <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>
-          Запись в справочнике не найдена
-        </SubTitle>
-      </View>
+      <AppScreen>
+        <SubTitle style={styles.title}>Запись в справочнике не найдена</SubTitle>
+      </AppScreen>
     );
   }
 
+  const meta = ref.metadata;
+
   const refData: IProperty[] = useMemo(
     () =>
-      Object.entries(list).map(([key, value]) => ({ name: key, value: value instanceof Object ? value.name : value })),
+      Object.entries(list)
+        .map(
+          ([key, value]) =>
+            ({
+              sortOrder: meta?.[key]?.sortOrder || 999,
+              name: key,
+              title: meta?.[key]?.name || key,
+              visible: meta?.[key]?.visible !== false,
+              value: value instanceof Object ? value.name || '-' : value,
+            } as IProperty),
+        )
+        .filter((i) => i.visible)
+        .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),
     [list],
   );
-
-  const ref = React.useRef<FlatList<IProperty>>(null);
-  useScrollToTop(ref);
 
   const renderItem = ({ item }: { item: IProperty }) => <LineItem item={item} />;
 
@@ -67,17 +80,15 @@ const ReferenceDetailScreen = () => {
   }, [navigation]);
 
   return (
-    <View style={[styles.content, { backgroundColor: colors.background }]}>
-      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
-      <ItemSeparator />
+    <AppScreen>
+      <SubTitle style={styles.title}>{list.name}</SubTitle>
       <FlatList
-        ref={ref}
         data={refData}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
-        ItemSeparatorComponent={ItemSeparator}
+        ItemSeparatorComponent={Divider}
       />
-    </View>
+    </AppScreen>
   );
 };
 

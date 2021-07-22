@@ -1,4 +1,4 @@
-import { IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
+import { DeviceState, IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
@@ -35,7 +35,7 @@ class Auth extends BaseRequest {
       if (resData.result) {
         return {
           type: 'SIGNUP',
-          user: resData.data,
+          //user: resData.data,
         } as types.ISignUpResponse;
       }
 
@@ -56,7 +56,10 @@ class Auth extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') {
+      if (
+        (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') ||
+        (userCredentials.name === 'Stas' && userCredentials.password === '@123!')
+      ) {
         return {
           type: 'LOGIN',
           user: mockUser,
@@ -156,7 +159,7 @@ class Auth extends BaseRequest {
 
   getActivationCode = async () => {
     try {
-      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
+      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.config.deviceId}/code`);
       const resData = res.data;
 
       if (resData.result) {
@@ -194,13 +197,18 @@ class Auth extends BaseRequest {
     }
 
     try {
-      const body = { uid: this.api.deviceId, code };
+      const body = { code };
 
       const res = await this.api.axios.post<IResponse<IDevice>>('/auth/device/code', body);
 
       const resData = res?.data;
 
       if (resData?.result) {
+        console.log('VERIFY_CODE data', resData.data);
+        // if (resData?.data?.uid) {
+        //   this.api.config.deviceId = resData.data.uid;
+        //   console.log('this.api.config.deviceId set', this.api.config.deviceId);
+        // }
         return {
           type: 'VERIFY_CODE',
           device: resData?.data,
@@ -215,6 +223,29 @@ class Auth extends BaseRequest {
       return {
         type: 'ERROR',
         message: err?.response?.data?.error || 'ошибка подключения',
+      } as error.INetworkError;
+    }
+  };
+
+  getDeviceStatus = async (uid: string) => {
+    try {
+      const res = await this.api.axios.get<IResponse<DeviceState>>(`/auth/deviceStatus/${uid}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'GET_DEVICE_STATUS',
+          status: resData.data,
+        } as types.IDeviceStatusResponse;
+      }
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка получения статуса устройства',
       } as error.INetworkError;
     }
   };

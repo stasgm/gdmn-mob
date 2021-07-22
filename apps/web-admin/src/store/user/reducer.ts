@@ -8,6 +8,7 @@ const initialState: Readonly<IUserState> = {
   list: [],
   loading: false,
   errorMessage: '',
+  pageParams: undefined,
 };
 
 const reducer: Reducer<IUserState, UserActionType> = (state = initialState, action): IUserState => {
@@ -87,6 +88,19 @@ const reducer: Reducer<IUserState, UserActionType> = (state = initialState, acti
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
+    case getType(userActions.setPageParam):
+      return {
+        ...state,
+        pageParams: { ...state.pageParams, ...action.payload },
+      };
+
+    case getType(userActions.clearPageParams):
+      return {
+        ...state,
+        pageParams: undefined,
+      };
+
     default:
       return state;
   }

@@ -1,14 +1,4 @@
-import { IDBCompany, INamedEntity } from '@lib/types';
-
-const user1: INamedEntity = {
-  id: '123',
-  name: 'Stas',
-};
-
-const user2: INamedEntity = {
-  id: '345',
-  name: 'Ina',
-};
+import { IDBCompany } from '@lib/types';
 
 const companies: IDBCompany[] = [
   { id: '789', name: 'ОДО Золотые Программы', adminId: '1' },

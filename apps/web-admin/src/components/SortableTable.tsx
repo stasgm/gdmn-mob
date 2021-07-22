@@ -3,8 +3,6 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import { IHeadCells } from '@lib/types';
-
 import {
   Box,
   Card,
@@ -18,6 +16,7 @@ import {
   TableSortLabel,
   Typography,
 } from '@material-ui/core';
+import { IHeadCells } from '../types';
 
 type Order = 'asc' | 'desc';
 

@@ -23,6 +23,7 @@ const SelectableInput: React.FC<Props> = ({
   placeholder,
   editable = false,
   disabled,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
   required,
 }) => {
   const { colors } = useTheme();

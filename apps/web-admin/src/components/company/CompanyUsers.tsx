@@ -1,49 +1,20 @@
 import { Box, Container } from '@material-ui/core';
-
 import { useNavigate } from 'react-router-dom';
-
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-
-// import CachedIcon from '@material-ui/icons/Cached';
-
-import ImportExportIcon from '@material-ui/icons/ImportExport';
-
 import { IUser } from '@lib/types';
 
 import UserListTable from '../../components/user/UserListTable';
 import { IToolBarButton } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 
-interface props {
+interface IProps {
   users: IUser[];
 }
 
-const CompanyUsers = ({ users }: props) => {
+const CompanyUsers = ({ users }: IProps) => {
   const navigate = useNavigate();
 
   const userButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Обновить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <CachedIcon />,
-    // },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
     {
       name: 'Добавить',
       color: 'primary',
@@ -61,7 +32,13 @@ const CompanyUsers = ({ users }: props) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActionsWithSearch buttons={userButtons} searchTitle={'Найти пользователя'} />
+        <ToolbarActionsWithSearch
+          buttons={userButtons}
+          title={'Найти пользователя'}
+          onChangeValue={() => {
+            return;
+          }}
+        />
         <Box sx={{ pt: 2 }}>
           <UserListTable users={users} />
         </Box>

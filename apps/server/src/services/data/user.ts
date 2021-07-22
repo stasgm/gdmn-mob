@@ -5,10 +5,6 @@ export const superAdmin: INamedEntity = {
   name: 'gdmn',
 };
 
-const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
-const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
-const company3: INamedEntity = { id: '777', name: 'Бройлерная птицефабрика' };
-
 const users: IDBUser[] = [
   {
     id: '15',
@@ -19,7 +15,7 @@ const users: IDBUser[] = [
     phoneNumber: '8-044-788-86-44',
     password: '1',
     creatorId: '1',
-    companies: ['3'],
+    company: '3',
     role: 'Admin',
   },
   {
@@ -31,7 +27,7 @@ const users: IDBUser[] = [
     phoneNumber: '+37529-11-111-11',
     password: '2',
     creatorId: '1',
-    companies: [],
+    company: 'null',
     role: 'Admin',
   },
   {
@@ -43,7 +39,7 @@ const users: IDBUser[] = [
     phoneNumber: '+37529-33-333-33',
     password: '2',
     creatorId: '1',
-    companies: ['1'],
+    company: '1',
     role: 'Admin',
   },
   {
@@ -55,7 +51,7 @@ const users: IDBUser[] = [
     phoneNumber: '+37529-22-222-22',
     password: '2',
     creatorId: '1',
-    companies: ['1'],
+    company: '1',
     role: 'User',
   },
   {
@@ -67,7 +63,7 @@ const users: IDBUser[] = [
     phoneNumber: '+37529-22-222-22',
     password: '2',
     creatorId: '1',
-    companies: ['1'],
+    company: '1',
     role: 'User',
   },
   {
@@ -79,7 +75,7 @@ const users: IDBUser[] = [
     phoneNumber: '+37529-22-222-22',
     password: '2',
     creatorId: '1',
-    companies: ['1'],
+    company: '1',
     role: 'User',
   },
 ];

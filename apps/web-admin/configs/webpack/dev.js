@@ -7,7 +7,7 @@ module.exports = merge(commonConfig, {
   mode: 'development',
   entry: [
     'react-hot-loader/patch', // activate HMR for React
-    'webpack-dev-server/client?http://localhost:8080', // bundle the client for webpack-dev-server and connect to the provided endpoint
+    'webpack-dev-server/client?http://192.168.0.61:8080', // bundle the client for webpack-dev-server and connect to the provided endpoint
     'webpack/hot/only-dev-server', // bundle the client for hot reloading, only- means to only hot reload for successful updates
     './index.tsx', // the entry point of our app
   ],
@@ -15,6 +15,8 @@ module.exports = merge(commonConfig, {
     publicPath: '/',
   },
   devServer: {
+    host: '192.168.0.61',
+    port: 8080,
     hot: true, // enable HMR on the server
     open: true,
     contentBase: './',
@@ -34,7 +36,7 @@ module.exports = merge(commonConfig, {
     new webpack.DefinePlugin({
       'process.env': {
         MOCK: JSON.stringify(process.env.MOCK),
-        DEVICE_ID: JSON.stringify(process.env.DEVICE_ID),
+        // DEVICE_ID: JSON.stringify(process.env.DEVICE_ID),
       },
     }),
   ],

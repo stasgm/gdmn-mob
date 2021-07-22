@@ -9,7 +9,7 @@ export const roleBasedParamsMiddlware = async (ctx: Context, next: Next): Promis
     // const { companyId } = ctx.request.query;
 
     // if (!companyId) {
-    ctx.request.query.companyId = user.companies?.[0].id;
+    ctx.request.query.companyId = user.company?.id;
     // }
   }
 

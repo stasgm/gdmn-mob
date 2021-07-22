@@ -1,31 +1,21 @@
 import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
-
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-
 import { useNavigate, useParams } from 'react-router-dom';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
-// import { users } from '@lib/mock';
-
 import { useCallback, useEffect } from 'react';
 
 import SnackBar from '../../components/SnackBar';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
-
 import userActions from '../../store/user';
-
 import CompanyUsers from '../../components/company/CompanyUsers';
-
 import { IToolBarButton } from '../../types';
-
 import ToolBarAction from '../../components/ToolBarActions';
-
 import CompanyDetailsView from '../../components/company/CompanyDetailsView';
+import companySelectors from '../../store/company/selectors';
+import userSelectors from '../../store/user/selectors';
 
 const CompanyView = () => {
   const { id: companyId } = useParams();
@@ -36,17 +26,14 @@ const CompanyView = () => {
 
   const { loading, errorMessage } = useSelector((state) => state.companies);
 
-  console.log('errorMessage', errorMessage);
-  //TODO Вынести в селекторы
-  const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
-  const users = useSelector((state) => state.users.list);
+  const company = companySelectors.companyById(companyId);
+  const users = userSelectors.usersByCompanyId(companyId);
 
   const handleClearError = () => {
     dispatch(actions.companyActions.clearError());
   };
 
   const handleCancel = () => {
-    //navigate('/app/companies');
     navigate(-1);
   };
 
@@ -61,17 +48,27 @@ const CompanyView = () => {
     }
   };
 
-  const handleRefresh = useCallback(() => {
+  const refreshData = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
     dispatch(userActions.fetchUsers(companyId));
   }, [dispatch, companyId]);
 
   useEffect(() => {
-    handleRefresh();
-  }, [handleRefresh]);
+    refreshData();
+  }, [refreshData]);
 
   if (!company) {
-    return <Box>Компания не найдена</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Компания не найдена
+      </Box>
+    );
   }
 
   const buttons: IToolBarButton[] = [
@@ -80,7 +77,7 @@ const CompanyView = () => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: () => handleRefresh(),
+      onClick: refreshData,
       icon: <CachedIcon />,
     },
     {
@@ -89,7 +86,7 @@ const CompanyView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleEdit(),
+      onClick: handleEdit,
       icon: <EditIcon />,
     },
     {
@@ -97,7 +94,7 @@ const CompanyView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleDelete(),
+      onClick: handleDelete,
       icon: <DeleteIcon />,
     },
   ];
@@ -142,7 +139,7 @@ const CompanyView = () => {
       </Box>
       <Box>
         <CardHeader title={'Пользователи компании'} sx={{ mx: 2 }} />
-        <CompanyUsers users={users?.filter((u) => u.companies.find((c) => c.id === companyId))} />
+        <CompanyUsers users={users} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>

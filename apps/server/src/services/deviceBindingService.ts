@@ -34,12 +34,17 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
 
   const newDeviceBinding: IDBDeviceBinding = {
     id: '',
-    state: 'NON-ACTIVATED',
+    state: deviceBinding.state,
     deviceId: deviceBinding.device.id,
     userId: deviceBinding.user.id,
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
   };
 
+  console.log('newDeviceBinding', newDeviceBinding);
+
   const createdDeviceBinding = await deviceBindings.find(await deviceBindings.insert(newDeviceBinding));
+  console.log('createdDeviceBinding', createdDeviceBinding);
 
   return makeDeviceBinding(createdDeviceBinding);
 };
@@ -79,6 +84,8 @@ const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>,
     userId: deviceBindingData.user?.id || oldDeviceBinding.userId,
     state: deviceBindingData.state || oldDeviceBinding.state,
     deviceId: deviceBindingData.device?.id || oldDeviceBinding.deviceId,
+    creationDate: deviceBindingData.creationDate,
+    editionDate: new Date().toISOString(),
   };
 
   await deviceBindings.update(newDeviceBinding);
@@ -131,18 +138,23 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
     let deviceFound = true;
 
     if ('deviceId' in newParams) {
-      deviceFound = item.userId?.includes(newParams.deviceId);
+      deviceFound = item.deviceId?.includes(newParams.deviceId);
       delete newParams['deviceId'];
     }
 
-    let stateFound = true;
-
-    if ('state' in newParams) {
-      stateFound = item.state === newParams.state;
-      delete newParams['state'];
+    if ('companyId' in newParams) {
+      delete newParams['companyId'];
     }
 
-    return userFound && deviceFound && stateFound && extraPredicate(item, newParams);
+    /*state обработается в extraPredicate */
+    // let stateFound = true;
+
+    // if ('state' in newParams) {
+    //   stateFound = item.state === newParams.state;
+    //   delete newParams['state'];
+    // }
+
+    return userFound && deviceFound && extraPredicate(item, newParams);
   });
 
   const newParams = { ...params };
@@ -167,7 +179,7 @@ export const makeDeviceBinding = async (deviceBinding: IDBDeviceBinding): Promis
 
   const userEntity: INamedEntity = user && { id: user.id, name: user.name };
 
-  const device = await devices.find(deviceBinding?.userId);
+  const device = await devices.find(deviceBinding?.deviceId);
 
   const deviceEntity: INamedEntity = device && { id: device.id, name: device.name };
 
@@ -177,6 +189,8 @@ export const makeDeviceBinding = async (deviceBinding: IDBDeviceBinding): Promis
     user: userEntity,
     device: deviceEntity,
     state: deviceBinding.state,
+    creationDate: deviceBinding.creationDate,
+    editionDate: deviceBinding.editionDate,
   };
 };
 

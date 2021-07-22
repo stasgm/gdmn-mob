@@ -111,7 +111,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
 
   return (
     <>
-      <Box component="button" sx={{ background: 'transparent', border: 'none', display: { xl: 'none', xs: 'block' } }}>
+      <Box sx={{ background: 'transparent', border: 'none', display: { xl: 'none', xs: 'block' } }}>
         <Drawer
           anchor="left"
           onClose={onMobileClose}
@@ -126,7 +126,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
           {content}
         </Drawer>
       </Box>
-      <Box component="button" sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
+      <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
         <Drawer
           anchor="left"
           open

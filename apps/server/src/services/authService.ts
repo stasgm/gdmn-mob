@@ -4,7 +4,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import bcrypt from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, DeviceState } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -28,6 +28,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
     const { deviceId } = ctx.query;
 
     const device = await devices.find((el) => el.uid === deviceId);
+
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
     }
@@ -36,7 +37,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
       throw new UnauthorizedException('Устройство заблокировано');
     }
 
-    const deviceBinding = await deviceBindings.find((el) => el.deviceId === deviceId && el.userId === user.id);
+    const deviceBinding = await deviceBindings.find((el) => el.deviceId === device.id && el.userId === user.id);
     if (!deviceBinding) {
       throw new UnauthorizedException('Связанное с пользователем устройство не найдено');
     }
@@ -67,7 +68,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
  * @param user NewUser
  * @returns IUser
  */
-const signUp = async (user: Omit<NewUser, 'role'>): Promise<IUser> => {
+const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefined> => {
   const { users } = getDb();
 
   // Кол-во пользователей
@@ -75,7 +76,7 @@ const signUp = async (user: Omit<NewUser, 'role'>): Promise<IUser> => {
   // Роль нового пользователя
   const role = userCount === 0 ? 'SuperAdmin' : 'Admin';
   // Создаём пользователя
-  const newUser = await userService.addOne({ ...user, role });
+  await userService.addOne({ ...user, role });
 
   /*   if (userCount === 0) {
       // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)
@@ -118,7 +119,8 @@ const signUp = async (user: Omit<NewUser, 'role'>): Promise<IUser> => {
       } as IDBDeviceBinding);
     } */
 
-  return newUser;
+  // return newUser;
+  return;
 };
 
 const validateAuthCreds: VerifyFunction = async (name: string, password: string, done) => {
@@ -136,6 +138,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
+    console.log('comp user', user);
     done(null, user);
   } else {
     done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
@@ -167,20 +170,18 @@ const verifyCode = async (code: string) => {
   }
 
   // обновляем uid у устройства
-  const deviceId = uuidv1();
+  const uid = uuidv1();
   const device = await devices.find(rec.deviceId);
 
   if (!device) {
-    throw new UnauthorizedException('Код не соответствует заданному устройству');
+    throw new DataNotFoundException('По данному коду устройство не найдено');
   }
 
-  await devices.update({ ...device, uid: deviceId, state: 'ACTIVE' });
-
-  // const newDeviceId = await devices.insert({ userId: rec.user, uid: deviceId, blocked: false });
+  await devices.update({ ...device, uid: uid, state: 'ACTIVE' });
 
   await codes.delete((i) => i.code === code);
 
-  return deviceId;
+  return await devices.find(device.id);
 };
 
 const logout = async (userId: string) => {
@@ -188,4 +189,17 @@ const logout = async (userId: string) => {
   // делаем что надо
 };
 
-export { authenticate, validateAuthCreds, signUp, verifyCode, logout };
+// Получить статус устройства
+
+const getDeviceStatus = async (uid: string): Promise<DeviceState> => {
+  const { devices } = getDb();
+  const device = await devices.find((i) => i.uid === uid);
+
+  if (!device) {
+    throw new UnauthorizedException('Устройство не найдено');
+  }
+
+  return device.state;
+};
+
+export { authenticate, validateAuthCreds, signUp, verifyCode, logout, getDeviceStatus };

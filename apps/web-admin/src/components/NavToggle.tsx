@@ -8,7 +8,7 @@ interface IProps {
 
 const NavToggle = ({ compact, setCompact }: IProps) => {
   return (
-    <Box component="button" sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
+    <Box sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' } }}>
       <Button
         // component={RouterLink}
         sx={{

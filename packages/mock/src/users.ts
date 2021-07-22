@@ -7,7 +7,7 @@ export const superAdmin: INamedEntity = {
 
 const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
 const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
-const company3: INamedEntity = { id: '777', name: 'Бройлерная птицефабрика' };
+const company3: INamedEntity = { id: '777', name: 'Компания 1' };
 
 const users: IUser[] = [
   {
@@ -18,8 +18,10 @@ const users: IUser[] = [
     lastName: 'ГОЦЕЛЮК',
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
-    companies: [company3],
+    company: company3,
     role: 'Admin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '123',
@@ -29,8 +31,10 @@ const users: IUser[] = [
     lastName: 'Шляхтич',
     phoneNumber: '+37529-11-111-11',
     creator: superAdmin,
-    companies: [],
+    company: undefined,
     role: 'Admin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '345',
@@ -40,8 +44,10 @@ const users: IUser[] = [
     lastName: 'Dzadzevich',
     phoneNumber: '+37529-33-333-33',
     creator: superAdmin,
-    companies: [company1],
+    company: company1,
     role: 'Admin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '12',
@@ -51,8 +57,10 @@ const users: IUser[] = [
     lastName: 'Svinka',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company1],
+    company: company1,
     role: 'User',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '13',
@@ -62,8 +70,10 @@ const users: IUser[] = [
     lastName: 'Doctor',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company2, company1],
+    company: company2,
     role: 'User',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '14',
@@ -73,8 +83,10 @@ const users: IUser[] = [
     lastName: 'Marley',
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
-    companies: [company2],
+    company: company2,
     role: 'User',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
 ];
 
