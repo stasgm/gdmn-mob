@@ -45,7 +45,6 @@ const Input: React.FC<Props> = ({
   returnKeyType,
   editable,
   disabled,
-  required,
 }) => {
   const { colors } = useTheme();
 

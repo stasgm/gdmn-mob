@@ -1,5 +1,7 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
+//import { DB } from '@lib/mock';
+
 import {
   DataNotFoundException,
   InnerErrorException,
@@ -14,6 +16,8 @@ import { extraPredicate } from '../utils/helpers';
 import { getNamedEntity } from './dao/utils';
 
 import { getDb } from './dao/db';
+
+import { users as mockUsers } from './data/user';
 
 /**
  * Добавляет одного пользователя
@@ -185,12 +189,22 @@ const getUserPassword = async (id: string): Promise<string> => {
   return user.password;
 };
 
-const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
+const findAll = async (params: Record<string, string | number>): Promise<IUser[]> => {
   const db = getDb();
   const { users } = db;
 
-  const userList = await users.read((item) => {
-    const newParams = Object.assign({}, params);
+  //console.log('findAll', DB);
+
+  let userList;
+  if (process.env.MOCK) {
+    userList = mockUsers;
+  } else {
+    userList = await users.read();
+  }
+
+  //const userList = await users.read((item) => {
+  userList = userList.filter((item) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
     let companyFound = true;
 
@@ -199,10 +213,37 @@ const findAll = async (params: Record<string, string>): Promise<IUser[]> => {
       delete newParams['companyId'];
     }
 
-    return companyFound && extraPredicate(item, newParams);
+    /** filtering data */
+    let filteredUsers = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        const name = item.name.toUpperCase();
+        const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
+        const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+
+        filteredUsers = name.includes(filterText) || firstname.includes(filterText) || lastName.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return companyFound && filteredUsers && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  const pr = userList.map(async (i) => await makeUser(i));
+  /** pagination */
+  const limitParams = Object.assign({}, params);
+
+  let fromRecord = 0;
+  if ('fromRecord' in limitParams) {
+    fromRecord = limitParams.fromRecord as number;
+  }
+
+  let toRecord = userList.length;
+  if ('toRecord' in limitParams)
+    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
+
+  const pr = userList.slice(fromRecord, toRecord).map(async (i) => await makeUser(i));
 
   return Promise.all(pr);
 };

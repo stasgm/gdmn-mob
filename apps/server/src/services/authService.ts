@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 
 import { IUser, NewUser, IUserCredentials, DeviceState } from '@lib/types';
 
-import { DataNotFoundException, InvalidParameterException, UnauthorizedException } from '../exceptions';
+import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
 import * as userService from './userService';
 import { getDb } from './dao/db';

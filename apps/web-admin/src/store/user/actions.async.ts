@@ -9,6 +9,7 @@ import { userActions, UserActionType } from './actions';
 export type AppThunk = ThunkAction<Promise<UserActionType>, AppState, null, UserActionType>;
 
 const fetchUserById = (id: string): AppThunk => {
+  console.log('fetchUserById');
   return async (dispatch) => {
     dispatch(userActions.fetchUserAsync.request(''));
 
@@ -26,11 +27,18 @@ const fetchUserById = (id: string): AppThunk => {
   };
 };
 
-const fetchUsers = (companyId?: string): AppThunk => {
+const fetchUsers = (companyId?: string, filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
   return async (dispatch) => {
     dispatch(userActions.fetchUsersAsync.request(''));
 
-    const response = await api.user.getUsers(companyId ? { companyId: companyId } : undefined);
+    const params: Record<string, string | number> = {};
+
+    if (companyId) params.companyId = companyId;
+    if (filterText) params.filterText = filterText;
+    if (fromRecord) params.fromRecord = fromRecord;
+    if (toRecord) params.toRecord = toRecord;
+
+    const response = await api.user.getUsers(params);
 
     if (response.type === 'GET_USERS') {
       return dispatch(userActions.fetchUsersAsync.success(response.users));

@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useRef, useLayoutEffect, useMemo } from 'react';
-import { FlatList, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   useActionSheet,

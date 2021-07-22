@@ -14,7 +14,7 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { device, settings, user, deviceStatus } = useSelector((state) => state.auth);
+  const { device, settings, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [deviceId, setDeviceId] = useState<string | undefined | null>(settings?.deviceId);
 

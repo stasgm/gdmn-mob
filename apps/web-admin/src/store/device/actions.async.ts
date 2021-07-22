@@ -27,11 +27,17 @@ const fetchDeviceById = (id: string): AppThunk => {
   };
 };
 
-const fetchDevices = (userId?: string): AppThunk => {
+const fetchDevices = (filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceActions.fetchDevicesAsync.request(''));
 
-    const response = await api.device.getDevices(userId ? { userId: userId } : undefined);
+    const params: Record<string, string | number> = {};
+
+    if (filterText) params.filterText = filterText;
+    if (fromRecord) params.fromRecord = fromRecord;
+    if (toRecord) params.toRecord = toRecord;
+
+    const response = await api.device.getDevices(params);
 
     if (response.type === 'GET_DEVICES') {
       return dispatch(deviceActions.fetchDevicesAsync.success(response.devices));

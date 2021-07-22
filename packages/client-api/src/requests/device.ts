@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
-import { device as mockDevice, devices as mockDevices } from '@lib/mock';
+import { device as mockDevice } from '@lib/mock';
 
 import { error, device as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -162,15 +162,17 @@ class Device extends BaseRequest {
     * @param params
     * @returns
     */
-  getDevices = async (params?: Record<string, string>): Promise<types.IGetDevicesResponse | error.INetworkError> => {
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
+  getDevices = async (
+    params?: Record<string, string | number>,
+  ): Promise<types.IGetDevicesResponse | error.INetworkError> => {
+    // if (this.api.config.debug?.isMock) {
+    //   await sleep(this.api.config.debug?.mockDelay || 0);
 
-      return {
-        type: 'GET_DEVICES',
-        devices: mockDevices,
-      };
-    }
+    //   return {
+    //     type: 'GET_DEVICES',
+    //     devices: mockDevices,
+    //   };
+    // }
 
     let paramText = params ? getParams(params) : '';
 

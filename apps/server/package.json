@@ -11,6 +11,7 @@
     "clean-dist": "rimraf ./dist",
     "start:js": "node ./dist/server/src/index.js",
     "start": "ts-node ./src/index.ts",
+    "start:mock": "cross-env MOCK=true nodemon src/index.ts",
     "dev": "nodemon src/index.ts",
     "prettier:check": "prettier --check \"src/**/*.ts\"",
     "prettier:fix": "prettier --write \"src/**/*.ts\"",
