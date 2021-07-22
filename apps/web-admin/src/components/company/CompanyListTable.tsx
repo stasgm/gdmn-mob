@@ -17,6 +17,8 @@ import {
 } from '@material-ui/core';
 import { ICompany } from '@lib/types';
 
+import { adminPath } from '../../utils/constants';
+
 interface props {
   companies: ICompany[];
 }
@@ -83,7 +85,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/companies/${company.id}`}>
+            <NavLink to={`${adminPath}/app/companies/${company.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.id}>
                 {company.name}
               </Typography>
@@ -98,7 +100,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/users/${company.admin.id}`}>
+            <NavLink to={`${adminPath}/app/users/${company.admin.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.admin.id}>
                 {company.admin.name}
               </Typography>

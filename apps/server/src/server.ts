@@ -71,8 +71,20 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   //const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'http://example.com';
 
   app
+    .use((ctx, next) => {
+      console.log(ctx.querystring);
+      return next();
+    })
     .use(errorHandler)
     .use(helmet())
+    .use(
+      helmet.contentSecurityPolicy({
+        directives: {
+          defaultSrc: ['*'],
+          styleSrc: ["'unsafe-inline'"],
+        },
+      }),
+    )
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(koaConfig, app))
     .use(passport.initialize())
@@ -88,7 +100,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(
       cors({
         credentials: true,
-        origin: 'http://192.168.0.61:8080',
+        origin: 'http://192.168.0.70:8080',
       }),
     )
 

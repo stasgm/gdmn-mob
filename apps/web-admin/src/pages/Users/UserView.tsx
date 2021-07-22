@@ -17,6 +17,8 @@ import UserDetailsView from '../../components/user/UserDetailsView';
 import UserDevices from '../../components/user/UserDevices';
 import SnackBar from '../../components/SnackBar';
 
+import { adminPath } from '../../utils/constants';
+
 const UserView = () => {
   const { id: userId } = useParams();
 
@@ -34,11 +36,11 @@ const UserView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/app/users/edit/${userId}`);
+    navigate(`${adminPath}/app/users/edit/${userId}`);
   };
 
   const handleAddDevice = () => {
-    navigate(`/app/users/${userId}/devices/new`);
+    navigate(`${adminPath}/app/users/${userId}/devices/new`);
   };
 
   const handleClearError = () => {

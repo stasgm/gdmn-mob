@@ -4,6 +4,8 @@ import { IUser } from '@lib/types';
 
 import { NavLink } from 'react-router-dom';
 
+import { adminPath } from '../../utils/constants';
+
 interface IProps {
   user: IUser;
 }
@@ -73,7 +75,7 @@ const UserDetailsView = ({ user }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <NavLink to={`/app/companies/${user.company?.id}`} key={user.company?.id}>
+                <NavLink to={`${adminPath}/app/companies/${user.company?.id}`} key={user.company?.id}>
                   <Typography color="textPrimary" variant="h4" key={user.company?.id} gutterBottom>
                     {user.company?.name}
                   </Typography>

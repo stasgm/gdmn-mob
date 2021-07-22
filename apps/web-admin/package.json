@@ -6,8 +6,9 @@
   "description": "web-admin",
   "license": "MIT",
   "scripts": {
-    "build": "yarn run clean-dist && webpack --config=configs/webpack/prod.js",
+    "build": "set \"INLINE_RUNTIME_CHUNK=false\" && yarn run clean-dist && webpack --config=configs/webpack/prod.js && yarn run copy-dist-admin",
     "clean-dist": "rimraf dist/*",
+    "copy-dist-admin": "xcopy dist\\*.* ..\\server\\admin /s /y",
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
