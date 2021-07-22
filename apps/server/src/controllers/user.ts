@@ -70,7 +70,7 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, name } = ctx.query;
+  const { companyId, name, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -82,12 +82,48 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
     params.name = name;
   }
 
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string') {
+    params.fromRecord = fromRecord;
+  }
+
+  if (typeof toRecord === 'string') {
+    params.toRecord = toRecord;
+  }
+
   const users = await userService.findAll(params);
 
   ok(ctx as Context, users);
 
   log.info('getUsers: users are successfully received');
 };
+
+// const getFilteredUsers = async (ctx: ParameterizedContext): Promise<void> => {
+//   const { filterText, fromRecord, toRecord } = ctx.query;
+
+//   const params: Record<string, string> = {};
+
+//   if (typeof filterText === 'string') {
+//     params.filterText = filterText;
+//   }
+
+//   if (typeof fromRecord === 'string') {
+//     params.fromRecord = fromRecord;
+//   }
+
+//   if (typeof toRecord === 'string') {
+//     params.toRecord = toRecord;
+//   }
+
+//   const users = await userService.findAll(params);
+
+//   ok(ctx as Context, users);
+
+//   log.info('getFilteredUsers: users are successfully received');
+// };
 
 // const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
 //   const { id: userId } = ctx.params;

@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 
 import { IUser, NewUser, IUserCredentials, DeviceState } from '@lib/types';
 
-import { DataNotFoundException, InvalidParameterException, UnauthorizedException } from '../exceptions';
+import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
 import * as userService from './userService';
 import { getDb } from './dao/db';
@@ -26,8 +26,6 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   if (user.role === 'User') {
     // Для пользователей с ролью User проверяем дополнительно DeviceId
     const { deviceId } = ctx.query;
-
-    console.log('deviceId', deviceId);
 
     const device = await devices.find((el) => el.uid === deviceId);
 

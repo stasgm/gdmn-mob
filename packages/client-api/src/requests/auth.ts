@@ -159,7 +159,7 @@ class Auth extends BaseRequest {
 
   getActivationCode = async () => {
     try {
-      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
+      const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.config.deviceId}/code`);
       const resData = res.data;
 
       if (resData.result) {
@@ -204,10 +204,10 @@ class Auth extends BaseRequest {
       const resData = res?.data;
 
       if (resData?.result) {
-        // console.log('resData.data', resData.data);
+        console.log('VERIFY_CODE data', resData.data);
         // if (resData?.data?.uid) {
-        //   this.api.deviceId = resData.data.uid;
-        //   console.log('this.api.deviceId set', this.api.deviceId);
+        //   this.api.config.deviceId = resData.data.uid;
+        //   console.log('this.api.config.deviceId set', this.api.config.deviceId);
         // }
         return {
           type: 'VERIFY_CODE',

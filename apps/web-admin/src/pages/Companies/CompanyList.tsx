@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -10,7 +10,6 @@ import CachedIcon from '@material-ui/icons/Cached';
 
 import { ICompany } from '@lib/types';
 
-import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
@@ -18,45 +17,52 @@ import actions from '../../store/company';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
-import { IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton } from '../../types';
 
 import SnackBar from '../../components/SnackBar';
+import SortableTable from '../../components/SortableTable';
 
 const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { list, loading, errorMessage } = useSelector((state) => state.companies);
-  const [dataList, setDataList] = useState<ICompany[]>(list);
 
-  const fetchCompanies = useCallback(() => {
-    dispatch(actions.fetchCompanies());
-  }, [dispatch]);
+  const fetchCompanies = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchCompanies();
   }, [fetchCompanies]);
 
-  useEffect(() => {
-    setDataList(list);
-  }, [list]);
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value;
 
-  const handleUpdateInput = useCallback(
-    (value: string) => {
-      const inputValue: string = value.toUpperCase();
+    if (inputValue) return;
 
-      const filtered = list.filter((item) => {
-        const name = item.name.toUpperCase();
+    fetchCompanies('');
+  };
 
-        return name.includes(inputValue);
-      });
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
 
-      setDataList(filtered);
-    },
-    [list],
-  );
+    fetchCompanies(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchCompanies(inputValue);
+  };
 
   const handleClearError = () => {
     dispatch(actions.companyActions.clearError());
@@ -92,6 +98,13 @@ const CompanyList = () => {
     },
   ];
 
+  const headCells: IHeadCells<ICompany>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'admin', label: 'Администратор', sortEnable: true },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
+  ];
+
   return (
     <>
       <Helmet>
@@ -105,12 +118,19 @@ const CompanyList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} title={'Найти компанию'} onChangeValue={handleUpdateInput} />
+          <ToolbarActionsWithSearch
+            buttons={buttons}
+            searchTitle={'Найти компанию'}
+            valueRef={valueRef}
+            updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
+          />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <CompanyListTable companies={dataList} />
+              <SortableTable<ICompany> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>

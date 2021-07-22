@@ -1,57 +1,62 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 
 import { IUser } from '@lib/types';
 
-import UserListTable from '../../components/user/UserListTable';
+import SortableTable from '../../components/SortableTable';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { IToolBarButton } from '../../types';
+import { IToolBarButton, IHeadCells } from '../../types';
 import SnackBar from '../../components/SnackBar';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.users);
-  const [users, setUsers] = useState<IUser[]>();
-  const filterValue = pageParams?.filter as string | undefined;
+  const { list, loading, errorMessage } = useSelector((state) => state.users);
 
-  const fetchUsers = useCallback(() => {
-    dispatch(actions.fetchUsers());
-  }, [dispatch]);
+  const fetchUsers = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
     fetchUsers();
   }, [fetchUsers]);
 
-  useEffect(() => {
-    const inputValue = filterValue?.toUpperCase();
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value;
 
-    const filtered = inputValue
-      ? list.filter((item) => {
-          const name = item.name.toUpperCase();
-          const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
-          const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+    if (inputValue) return;
 
-          return name.includes(inputValue) || firstname.includes(inputValue) || lastName.includes(inputValue);
-        })
-      : list;
+    fetchUsers('');
+  };
 
-    setUsers(filtered);
-  }, [list, filterValue]);
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
 
-  const handleFilterUsers = (value: string) => {
-    dispatch(actions.userActions.setPageParam({ filter: value }));
+    fetchUsers(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchUsers(inputValue);
   };
 
   const handleClearError = () => {
@@ -88,6 +93,13 @@ const UserList = () => {
     },
   ];
 
+  const headCells: IHeadCells<IUser>[] = [
+    { id: 'name', label: 'Пользователь', sortEnable: true },
+    { id: 'lastName', label: 'Фамилия', sortEnable: true },
+    { id: 'firstName', label: 'Имя', sortEnable: true },
+    { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
+  ];
+
   return (
     <>
       <Helmet>
@@ -103,15 +115,17 @@ const UserList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            title={'Найти пользователя'}
-            value={filterValue}
-            onChangeValue={handleFilterUsers}
+            searchTitle={'Найти пользователя'}
+            valueRef={valueRef}
+            updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <UserListTable users={users} />
+              <SortableTable<IUser> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>
