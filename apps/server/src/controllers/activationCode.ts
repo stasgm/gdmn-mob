@@ -1,13 +1,9 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { INamedEntity, IActivationCode } from '@lib/types';
-
 import log from '../utils/logger';
 import { activationCodeService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
-
-import { DataNotFoundException } from '../exceptions';
 
 // const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 //   const { id: deviceId }: { id: string } = ctx.params;
@@ -39,4 +35,14 @@ const getActivationCodes = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getActivationCodes: activation codes are successfully received');
 };
 
-export { getActivationCodes };
+const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
+  const { deviceId } = ctx.params;
+
+  const code = await activationCodeService.genActivationCode(deviceId);
+
+  created(ctx as Context, code);
+
+  log.info('getActivationCode: activation code generated successfully');
+};
+
+export { getActivationCodes, getActivationCode };

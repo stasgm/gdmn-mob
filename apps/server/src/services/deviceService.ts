@@ -91,27 +91,6 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
   await devices.delete((device) => device.id === deviceId);
 };
 
-const genActivationCode = async (deviceId: string) => {
-  const { devices, codes } = getDb();
-
-  const device = await devices.find(deviceId);
-
-  if (!device) {
-    throw new DataNotFoundException('Устройство не найдено');
-  }
-
-  // const code = Math.random()
-  //   .toString(36)
-  //   .substr(3, 6);
-  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-  const date = new Date();
-  await codes.insert({ code, date: date.toISOString(), deviceId });
-
-  await devices.update({ ...device, state: 'NON-ACTIVATED' });
-
-  return code;
-};
-
 const findOne = async (id: string): Promise<IDevice | undefined> => {
   const { devices } = getDb();
 
@@ -249,4 +228,4 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
   };
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll, genActivationCode };
+export { addOne, updateOne, deleteOne, findOne, findAll };

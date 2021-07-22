@@ -1,5 +1,5 @@
 import { IActivationCode, IResponse } from '@lib/types';
-import { activationCode, activationCodes as mockActivationCodes } from '@lib/mock';
+import { activationCodes as mockActivationCodes } from '@lib/mock';
 
 import { error, activationCode as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -38,7 +38,7 @@ class ActivationCode extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IActivationCode[]>>(`/activationCodes${paramText}`);
+      const res = await this.api.axios.get<IResponse<IActivationCode[]>>(`/codes${paramText}`);
       const resData = res.data;
 
       if (resData.result) {
@@ -80,7 +80,7 @@ class ActivationCode extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IActivationCode>>(`/auth/device/${deviceId}/code`);
+      const res = await this.api.axios.get<IResponse<IActivationCode>>(`/codes/device/${deviceId}/code`);
       const resData = res.data;
 
       if (resData.result) {

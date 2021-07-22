@@ -1,14 +1,12 @@
-import { IDBDevice, IDevice, INamedEntity, NewDevice, IActivationCode, IDBActivationCode } from '@lib/types';
-import { activationCodeService } from '.';
+import { IActivationCode, IDBActivationCode } from '@lib/types';
 
-import { ConflictException, DataNotFoundException } from '../exceptions';
+import { DataNotFoundException } from '../exceptions';
 
 import { extraPredicate } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
 const findAll = async (params?: Record<string, string>): Promise<IActivationCode[]> => {
-  const db = getDb();
   const { codes } = getDb();
 
   const activationCodesList = await codes.read((item) => {
@@ -29,9 +27,40 @@ const findAll = async (params?: Record<string, string>): Promise<IActivationCode
   return Promise.all(pr);
 };
 
+const genActivationCode = async (deviceId: string) => {
+  const { devices, codes } = getDb();
+
+  const device = await devices.find(deviceId);
+
+  if (!device) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }
+
+  // const code = Math.random()
+  //   .toString(36)
+  //   .substr(3, 6);
+  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const newCodeObj = {
+    code,
+    date: new Date().toISOString(),
+    deviceId,
+  } as IDBActivationCode;
+
+  const newCode = await codes.insert(newCodeObj);
+
+  const createdCode = await codes.find(newCode);
+
+  await devices.update({ ...device, state: 'NON-ACTIVATED' });
+
+  const retCode = await makeCode(createdCode);
+
+  return retCode;
+};
+
 export const makeCode = async (activationCode: IDBActivationCode): Promise<IActivationCode> => {
   const db = getDb();
-  const { devices, codes } = db;
+  const { devices } = db;
 
   const device = await devices.find(activationCode.deviceId);
 
@@ -44,4 +73,4 @@ export const makeCode = async (activationCode: IDBActivationCode): Promise<IActi
   };
 };
 
-export { findAll };
+export { findAll, genActivationCode };
