@@ -21,6 +21,8 @@ import deviceSelectors from '../../store/device/selectors';
 import activationCodeSelectors from '../../store/activationCode/selectors';
 import SnackBar from '../../components/SnackBar';
 
+import { adminPath } from '../../utils/constants';
+
 const DeviceView = () => {
   const { id: deviceId } = useParams();
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const DeviceView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`/app/devices/edit/${deviceId}`);
+    navigate(`${adminPath}/app/devices/edit/${deviceId}`);
   };
 
   const handleDelete = async () => {

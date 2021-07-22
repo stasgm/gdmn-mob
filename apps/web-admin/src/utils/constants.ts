@@ -5,4 +5,6 @@ const deviceStates = {
   BLOCKED: 'Заблокировано',
 };
 
-export { deviceStates };
+const adminPath = '/admin';
+
+export { deviceStates, adminPath };

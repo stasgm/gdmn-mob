@@ -21,8 +21,9 @@ const ConfigScreen = (props: Props) => {
 
   const { settings, onSetSettings } = props;
   const [serverName, setServerName] = useState(`${settings?.protocol}${settings?.server}` || '');
-  const [serverPort, setServerPort] = useState(settings?.port.toString() || '');
+  const [serverPort, setServerPort] = useState(settings?.port?.toString() || '');
   const [timeout, setTimeout] = useState(settings?.timeout?.toString() || '');
+  const [deviceId, setDeviceId] = useState(settings?.deviceId || '');
 
   const handleSaveSettings = () => {
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
@@ -35,6 +36,7 @@ const ConfigScreen = (props: Props) => {
       port: parseInt(serverPort, 10),
       timeout: parseInt(timeout, 10),
       server,
+      deviceId,
     };
 
     onSetSettings(newSettings);
@@ -48,6 +50,7 @@ const ConfigScreen = (props: Props) => {
       <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
       <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
       <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
+      <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} />
       <View style={localStyles.buttonsView}>
         <PrimeButton
           icon="check"

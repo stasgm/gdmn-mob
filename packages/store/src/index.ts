@@ -3,6 +3,9 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { StateType } from 'typesafe-actions';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// import { persistReducer } from 'redux-persist';
 
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
@@ -11,7 +14,14 @@ import { reducer as referenceReducer } from './references';
 import { reducer as settingsReducer } from './settings';
 import { TActions } from './types';
 
+// const persistConfig = {
+//   key: 'auth',
+//   storage: AsyncStorage,
+//   whitelist: ['user', 'settings', 'company'],
+// };
+
 export const rootReducer = {
+  // auth: persistReducer(persistConfig, authReducer),
   auth: authReducer,
   messages: msgReducer,
   references: referenceReducer,

@@ -1,4 +1,4 @@
-import { IDevice, IUser, ICompany } from '@lib/types';
+import { IDevice, IUser, ICompany, DeviceState } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
 export type AuthState = {
@@ -9,4 +9,5 @@ export type AuthState = {
   readonly loading: boolean;
   readonly error: boolean;
   readonly status: string;
+  readonly deviceStatus: DeviceState | undefined;
 };

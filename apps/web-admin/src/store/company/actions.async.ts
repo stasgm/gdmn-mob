@@ -27,10 +27,17 @@ const fetchCompanyById = (id: string): AppThunk => {
   };
 };
 
-const fetchCompanies = (): AppThunk => {
+const fetchCompanies = (filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
   return async (dispatch) => {
     dispatch(companyActions.fetchCompaniesAsync.request(''));
-    const response = await api.company.getCompanies();
+
+    const params: Record<string, string | number> = {};
+
+    if (filterText) params.filterText = filterText;
+    if (fromRecord) params.fromRecord = fromRecord;
+    if (toRecord) params.toRecord = toRecord;
+
+    const response = await api.company.getCompanies(params);
 
     if (response.type === 'GET_COMPANIES') {
       return dispatch(companyActions.fetchCompaniesAsync.success(response.companies));

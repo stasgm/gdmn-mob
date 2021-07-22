@@ -30,7 +30,13 @@ const checkDevice = (): AppThunk<
   };
 };
 
-const activateDevice = (code: string): AppThunk => {
+const activateDevice = (
+  code: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.activateDeviceAsync>>,
+  AuthState,
+  ActionType<typeof actions.activateDeviceAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.activateDeviceAsync.request(''));
 
@@ -141,4 +147,22 @@ const signInWithDevice = (
   };
 };
 
-export default { checkDevice, activateDevice, signUp, signIn, signInWithDevice };
+const getDeviceStatus = (uid: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(actions.getDeviceStatusAsync.request(uid));
+
+    const response = await api.auth.getDeviceStatus(uid);
+
+    if (response.type === 'GET_DEVICE_STATUS') {
+      return dispatch(actions.getDeviceStatusAsync.success(response.status));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(actions.activateDeviceAsync.failure(response.message));
+    }
+
+    return dispatch(actions.activateDeviceAsync.failure('something wrong'));
+  };
+};
+
+export default { checkDevice, activateDevice, signUp, signIn, signInWithDevice, getDeviceStatus };

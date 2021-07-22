@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars-experimental */
 import fs from 'fs';
 import path from 'path';
 
-import Koa from 'koa';
+import Koa, { Context, Next } from 'koa';
 import cors from '@koa/cors';
 
 import session from 'koa-session';
@@ -10,6 +11,8 @@ import helmet from 'koa-helmet';
 import { Strategy as LocalStrategy, IStrategyOptions } from 'passport-local';
 import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
+
+import serve from 'koa-static-server';
 
 import { IUser } from '@lib/types';
 
@@ -45,7 +48,9 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
+      console.log('id', id);
       const user = await userService.findOne(id);
+      console.log('user', user);
       done(null, user);
     } catch (err) {
       done(err);
@@ -63,11 +68,27 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   }
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
+  //const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'http://example.com';
+
   app
+    .use((ctx, next) => {
+      console.log(ctx.querystring);
+      return next();
+    })
     .use(errorHandler)
     .use(helmet())
+    .use(
+      helmet.contentSecurityPolicy({
+        directives: {
+          defaultSrc: ['*'],
+          styleSrc: ["'unsafe-inline'"],
+        },
+      }),
+    )
     .use(morganlogger('combined', { stream: accessLogStream }))
     .use(session(koaConfig, app))
+    .use(passport.initialize())
+    .use(passport.session())
     .use(
       bodyParser({
         formLimit: '10mb',
@@ -76,14 +97,14 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         enableTypes: ['json', 'form', 'text'],
       }),
     )
-    .use(passport.initialize())
-    .use(passport.session())
     .use(
       cors({
         credentials: true,
         // origin: 'http://localhost:8080',
       }),
     )
+
+    .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
     .use(router.routes())
     .use(router.allowedMethods());
 

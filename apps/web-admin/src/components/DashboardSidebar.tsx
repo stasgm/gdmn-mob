@@ -11,6 +11,8 @@ import {
 
 import { useSelector } from '@lib/store';
 
+import { adminPath } from '../utils/constants';
+
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
 
@@ -22,27 +24,27 @@ const userInfo = {
 
 const items = [
   {
-    href: '/app/dashboard',
+    href: `${adminPath}/app/dashboard`,
     icon: BarChartIcon,
     title: 'Сводка',
   },
   {
-    href: '/app/companies',
+    href: `${adminPath}/app/companies`,
     icon: UsersIcon,
     title: 'Организации',
   },
   {
-    href: '/app/users',
+    href: `${adminPath}/app/users`,
     icon: ShoppingBagIcon,
     title: 'Пользователи',
   },
   {
-    href: '/app/devices',
+    href: `${adminPath}/app/devices`,
     icon: UserIcon,
     title: 'Устройства',
   },
   {
-    href: '/app/account',
+    href: `${adminPath}/app/account`,
     icon: SettingsIcon,
     title: 'Профиль',
   },
@@ -83,7 +85,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
             width: 64,
             height: 64,
           }}
-          to="/app/account"
+          to={`${adminPath}/app/account`}
         />
         <Typography color="textPrimary" variant="h5">
           {!isCompact

@@ -13,6 +13,8 @@ import { authActions, useThunkDispatch, useSelector } from '@lib/store';
 
 import Logo from '../components/Logo';
 
+import { adminPath } from '../utils/constants';
+
 const Register = () => {
   const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ const Register = () => {
     const res = await dispatch(authActions.signUp(values));
 
     if (res.type === 'AUTH/SIGNUP_SUCCESS') {
-      navigate('/login');
+      navigate(`${adminPath}/login`);
     }
   };
 
@@ -187,7 +189,7 @@ const Register = () => {
             </Box>
             <Typography color="textSecondary" variant="body1">
               Зарегистрированы?{' '}
-              <Link component={RouterLink} to="/login" variant="h6">
+              <Link component={RouterLink} to={`${adminPath}/login`} variant="h6">
                 Войти
               </Link>
             </Typography>

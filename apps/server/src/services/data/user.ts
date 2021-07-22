@@ -1,15 +1,11 @@
-import { INamedEntity, IUser } from '@lib/types';
+import { INamedEntity, IDBUser } from '@lib/types';
 
 export const superAdmin: INamedEntity = {
   id: 'gdmn',
   name: 'gdmn',
 };
 
-const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
-const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
-const company3: INamedEntity = { id: '777', name: 'Компания 1' };
-
-const users: IUser[] = [
+const users: IDBUser[] = [
   {
     id: '15',
     externalId: '147012274',
@@ -17,11 +13,10 @@ const users: IUser[] = [
     firstName: 'НАТАЛЬЯ',
     lastName: 'ГОЦЕЛЮК',
     phoneNumber: '8-044-788-86-44',
-    creator: superAdmin,
-    company: company3,
+    password: '1',
+    creatorId: '1',
+    company: '3',
     role: 'Admin',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
   },
   {
     id: '123',
@@ -30,11 +25,10 @@ const users: IUser[] = [
     firstName: 'Станислав',
     lastName: 'Шляхтич',
     phoneNumber: '+37529-11-111-11',
-    creator: superAdmin,
-    company: undefined,
+    password: '2',
+    creatorId: '1',
+    company: 'null',
     role: 'Admin',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
   },
   {
     id: '345',
@@ -43,11 +37,10 @@ const users: IUser[] = [
     firstName: 'Ina',
     lastName: 'Dzadzevich',
     phoneNumber: '+37529-33-333-33',
-    creator: superAdmin,
-    company: company1,
+    password: '2',
+    creatorId: '1',
+    company: '1',
     role: 'Admin',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
   },
   {
     id: '12',
@@ -56,11 +49,10 @@ const users: IUser[] = [
     firstName: 'Peppa',
     lastName: 'Svinka',
     phoneNumber: '+37529-22-222-22',
-    creator: superAdmin,
-    company: company1,
+    password: '2',
+    creatorId: '1',
+    company: '1',
     role: 'User',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
   },
   {
     id: '13',
@@ -69,11 +61,10 @@ const users: IUser[] = [
     firstName: 'Watson',
     lastName: 'Doctor',
     phoneNumber: '+37529-22-222-22',
-    creator: superAdmin,
-    company: company2,
+    password: '2',
+    creatorId: '1',
+    company: '1',
     role: 'User',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
   },
   {
     id: '14',
@@ -82,11 +73,10 @@ const users: IUser[] = [
     firstName: 'Bob',
     lastName: 'Marley',
     phoneNumber: '+37529-22-222-22',
-    creator: superAdmin,
-    company: company2,
+    password: '2',
+    creatorId: '1',
+    company: '1',
     role: 'User',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
   },
 ];
 

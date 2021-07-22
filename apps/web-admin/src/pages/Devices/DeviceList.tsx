@@ -1,21 +1,21 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
 // import ImportExportIcon from '@material-ui/icons/ImportExport';
 import { IDevice } from '@lib/types';
 
-import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import codeActions from '../../store/activationCode';
-import { IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
+import SortableTable from '../../components/SortableTable';
 
 const DeviceList = () => {
   const navigate = useNavigate();
@@ -23,52 +23,48 @@ const DeviceList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.devices);
-  const { list: activationCodes } = useSelector((state) => state.activationCodes);
 
-  console.log('activationCodes', activationCodes);
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const [dataList, setDataList] = useState<IDevice[]>(list);
-
-  const fetchData = useCallback(() => {
-    dispatch(actions.fetchDevices());
-    dispatch(codeActions.fetchActivationCodes());
-  }, [dispatch]);
-
-  // const fetchActivationCodes = useCallback(() => {
-  //   dispatch(codeActions.fetchActivationCodes());
-  // }, [dispatch]);
-
-  // const getActivationCode = (deviceId: string) => {
-  //   dispatch(codeActions.fetchActivationCode());
-  // }
-
-  // useEffect(() => {
-  //   /* Загружаем данные при загрузке компонента */
-  //   fetchData();
-  // }, [fetchData]);
+  const fetchDevices = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
-    setDataList(list);
-  }, [list]);
+    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
+    //!list?.length && fetchDevices();
+    fetchDevices();
+  }, [fetchDevices]);
+
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value;
+
+    if (inputValue) return;
+
+    fetchDevices('');
+  };
+
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchDevices(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchDevices(inputValue);
+  };
 
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());
   };
-
-  const handleUpdateInput = useCallback(
-    (value: string) => {
-      const inputValue: string = value.toUpperCase();
-
-      const filtered = list.filter((item) => {
-        const name = item.name.toUpperCase();
-
-        return name.includes(inputValue);
-      });
-
-      setDataList(filtered);
-    },
-    [list],
-  );
 
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
@@ -85,7 +81,7 @@ const DeviceList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: fetchData,
+      onClick: fetchDevices,
       icon: <CachedIcon />,
     },
     // {
@@ -111,7 +107,11 @@ const DeviceList = () => {
     },
   ];
 
-  // import { activationCodes } from '@lib/mock';
+  const headCells: IHeadCells<IDevice>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'uid', label: 'Номер', sortEnable: true },
+    { id: 'state', label: 'Состояние', sortEnable: true },
+  ];
 
   return (
     <>
@@ -126,12 +126,21 @@ const DeviceList = () => {
         }}
       >
         <Container maxWidth={false}>
-          <ToolbarActionsWithSearch buttons={buttons} title={'Найти устройство'} onChangeValue={handleUpdateInput} />
+          <ToolbarActionsWithSearch
+            buttons={buttons}
+            searchTitle={'Найти устройство'}
+            valueRef={valueRef}
+            updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
+          />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={dataList} activationCodes={activationCodes} onCreateCode={handleCreateCode} />
+              {/* <DeviceListTable devices={dataList} activationCodes={activationCodes}
+              onCreateCode={handleCreateCode} /> */}
+              <SortableTable<IDevice> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>

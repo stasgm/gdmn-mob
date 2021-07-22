@@ -17,7 +17,7 @@ import {
 } from '@material-ui/core';
 import { IDeviceBinding } from '@lib/types';
 
-import { deviceStates } from '../../utils/constants';
+import { deviceStates, adminPath } from '../../utils/constants';
 
 interface IProps {
   deviceBindings?: IDeviceBinding[];
@@ -127,7 +127,7 @@ const DeviceBindingListTable = ({
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/users/${binding.user.id}/devices/${binding.device.id}`}>
+            <NavLink to={`${adminPath}/app/users/${binding.user.id}/devices/${binding.device.id}`}>
               <Typography color="textPrimary" variant="body1" key={binding.id}>
                 {binding.device?.name}
               </Typography>

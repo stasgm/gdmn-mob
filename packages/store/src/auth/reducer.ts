@@ -18,12 +18,14 @@ const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
+  deviceStatus: undefined,
   settings: {
     apiPath,
     port,
     protocol,
     server: name,
     timeout,
+    deviceId: undefined,
   },
   error: false,
   loading: false,
@@ -54,7 +56,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, error: false, status: '', loading: true };
 
     case getType(actions.activateDeviceAsync.success):
-      return { ...state, device: action.payload, error: false, status: '', loading: false };
+      console.log('action.payload?.state', action.payload?.state);
+      return {
+        ...state,
+        device: action.payload,
+        deviceStatus: action.payload?.state,
+        error: false,
+        status: '',
+        loading: false,
+      };
 
     case getType(actions.activateDeviceAsync.failure):
       return { ...state, device: null, error: true, status: action.payload, loading: false };
@@ -84,7 +94,16 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, company: action.payload };
 
     case getType(actions.disconnect):
-      return { ...state, device: undefined, error: false, status: '', loading: false };
+      return { ...state, device: undefined, deviceStatus: undefined, error: false, status: '', loading: false };
+
+    case getType(actions.getDeviceStatusAsync.request):
+      return { ...state, loading: true, deviceStatus: undefined, status: '', error: false };
+
+    case getType(actions.getDeviceStatusAsync.success):
+      return { ...state, loading: false, status: '', error: false, deviceStatus: action.payload };
+
+    case getType(actions.getDeviceStatusAsync.failure):
+      return { ...state, loading: false, status: action.payload, deviceStatus: undefined, error: true };
 
     default:
       return state;

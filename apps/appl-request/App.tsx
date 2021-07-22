@@ -5,7 +5,9 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { useDispatch, documentActions, referenceActions, messageActions } from '@lib/store';
 
-import { store } from './src/store';
+import { PersistGate } from 'redux-persist/integration/react';
+
+import { persistor, store } from './src/store';
 
 import { applMessages, applDocuments, applRefs } from './src/store/mock';
 
@@ -50,7 +52,9 @@ const Root = React.memo(() => {
 
 const App = () => (
   <Provider store={store}>
+    {/* <PersistGate loading={null} persistor={persistor}> */}
     <Root />
+    {/* </PersistGate> */}
   </Provider>
 );
 

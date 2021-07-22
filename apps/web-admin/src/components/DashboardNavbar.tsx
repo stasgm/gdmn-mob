@@ -8,6 +8,8 @@ import LogoutIcon from '@material-ui/icons/ExitToAppOutlined';
 
 import { authActions } from '@lib/store';
 
+import { adminPath } from '../utils/constants';
+
 import Logo from './Logo';
 
 interface IProps {
@@ -22,7 +24,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
   return (
     <AppBar elevation={0} {...rest}>
       <Toolbar>
-        <RouterLink to="/">
+        <RouterLink to={`${adminPath}/`}>
           <Logo />
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />

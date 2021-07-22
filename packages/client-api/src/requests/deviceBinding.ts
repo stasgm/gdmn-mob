@@ -132,8 +132,10 @@ class DeviceBinding extends BaseRequest {
     }
 
     try {
-      // || this.api.deviceId
-      const res = await this.api.axios.get<IResponse<IDeviceBinding>>(`/binding/${deviceId || this.api.deviceId}`);
+      // || this.api.config.deviceId
+      const res = await this.api.axios.get<IResponse<IDeviceBinding>>(
+        `/binding/${deviceId || this.api.config.deviceId}`,
+      );
 
       const resData = res?.data;
 
