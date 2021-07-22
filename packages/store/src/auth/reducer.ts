@@ -60,7 +60,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return {
         ...state,
         device: action.payload,
-        // deviceStatus: action.payload?.state,
+        deviceStatus: action.payload?.state,
         error: false,
         status: '',
         loading: false,
