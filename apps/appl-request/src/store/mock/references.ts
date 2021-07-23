@@ -16,7 +16,7 @@ const applDocType = [
 // appl statuses reference
 export const refApplDocTypes: IReference<INamedEntity> = {
   id: '148000001',
-  name: 'false',
+  name: 'DocTypes',
   visible: false,
   description: 'Типы документов',
   data: applDocType,
