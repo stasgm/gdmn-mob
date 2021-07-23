@@ -33,7 +33,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
           sx={{
             background: 'transparent',
             border: 'none',
-            display: { xs: 'none', md: 'block', lg: 'block' },
+            //display: { xs: 'none', md: 'block', lg: 'block' },
             color: 'white',
           }}
         >
@@ -48,7 +48,12 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
         </Box>
         <Box
           // component="button"
-          sx={{ background: 'transparent', border: 'none', display: { xs: 'block', md: 'none' }, color: 'white' }}
+          sx={{
+            background: 'transparent',
+            border: 'none',
+            display: { xs: 'block', md: 'block', lg: 'none' },
+            color: 'white',
+          }}
         >
           <IconButton color="inherit" onClick={onMobileNavOpen}>
             <MenuIcon />
