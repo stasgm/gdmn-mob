@@ -30,8 +30,7 @@ export interface IDBDeviceBinding extends IEntity {
   state: DeviceState;
 }
 
-export interface IDBActivationCode {
-  id?: string;
+export interface IDBActivationCode extends IEntity {
   code: string;
   date: string;
   deviceId: string;

@@ -11,10 +11,12 @@ import { IDevice } from '@lib/types';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
+import codeActions from '../../store/activationCode';
 import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-import SortableTable from '../../components/SortableTable';
+// import SortableTable from '../../components/SortableTable';
+import DeviceListTable from '../../components/device/DeviceListTable';
 
 const DeviceList = () => {
   const navigate = useNavigate();
@@ -22,11 +24,14 @@ const DeviceList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const { list: activationCodes } = useSelector((state) => state.activationCodes);
+
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const fetchDevices = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },
     [dispatch],
   );
@@ -63,6 +68,17 @@ const DeviceList = () => {
     dispatch(actions.deviceActions.clearError());
   };
 
+  const handleCreateCode = (deviceId: string) => {
+    dispatch(codeActions.createActivationCode(deviceId));
+  };
+
+  // const handleSubmit = async (values: IDevice | NewDevice) => {
+  //   const res = await dispatch(actions.updateDevice(values as IDevice));
+  //   if (res.type === 'DEVICE/UPDATE_SUCCESS') {
+  //     goBack();
+  //   }
+  // };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -93,11 +109,11 @@ const DeviceList = () => {
     },
   ];
 
-  const headCells: IHeadCells<IDevice>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'uid', label: 'Номер', sortEnable: true },
-    { id: 'state', label: 'Состояние', sortEnable: true },
-  ];
+  // const headCells: IHeadCells<IDevice>[] = [
+  //   { id: 'name', label: 'Наименование', sortEnable: true },
+  //   { id: 'uid', label: 'Номер', sortEnable: true },
+  //   { id: 'state', label: 'Состояние', sortEnable: true },
+  // ];
 
   return (
     <>
@@ -124,7 +140,8 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<IDevice> headCells={headCells} data={list} />
+              <DeviceListTable devices={list} activationCodes={activationCodes} onCreateCode={handleCreateCode} />
+              {/* <SortableTable<IDevice> headCells={headCells} data={list} /> */}
             </Box>
           )}
         </Container>

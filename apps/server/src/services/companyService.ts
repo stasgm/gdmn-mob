@@ -39,7 +39,6 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     editionDate: new Date().toISOString(),
   } as IDBCompany;
 
-  console.log('newCompanyObj', newCompanyObj);
   const newCompany = await companies.insert(newCompanyObj);
 
   const createdCompany = await companies.find(newCompany);
