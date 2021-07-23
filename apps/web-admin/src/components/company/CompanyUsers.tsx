@@ -5,7 +5,7 @@ import { IUser } from '@lib/types';
 
 import UserListTable from '../../components/user/UserListTable';
 import { IToolBarButton } from '../../types';
-import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
+import ToolbarActions from '../ToolBarActions';
 
 interface IProps {
   users: IUser[];
@@ -32,13 +32,7 @@ const CompanyUsers = ({ users }: IProps) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActionsWithSearch
-          buttons={userButtons}
-          title={'Найти пользователя'}
-          onChangeValue={() => {
-            return;
-          }}
-        />
+        <ToolbarActions buttons={userButtons} />
         <Box sx={{ pt: 2 }}>
           <UserListTable users={users} />
         </Box>
