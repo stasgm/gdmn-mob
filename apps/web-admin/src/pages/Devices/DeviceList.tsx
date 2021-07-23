@@ -15,7 +15,8 @@ import codeActions from '../../store/activationCode';
 import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-import SortableTable from '../../components/SortableTable';
+// import SortableTable from '../../components/SortableTable';
+import DeviceListTable from '../../components/device/DeviceListTable';
 
 const DeviceList = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const DeviceList = () => {
   const dispatch = useDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const { list: activationCodes } = useSelector((state) => state.activationCodes);
 
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
@@ -107,11 +109,11 @@ const DeviceList = () => {
     },
   ];
 
-  const headCells: IHeadCells<IDevice>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'uid', label: 'Номер', sortEnable: true },
-    { id: 'state', label: 'Состояние', sortEnable: true },
-  ];
+  // const headCells: IHeadCells<IDevice>[] = [
+  //   { id: 'name', label: 'Наименование', sortEnable: true },
+  //   { id: 'uid', label: 'Номер', sortEnable: true },
+  //   { id: 'state', label: 'Состояние', sortEnable: true },
+  // ];
 
   return (
     <>
@@ -138,9 +140,8 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              {/* <DeviceListTable devices={dataList} activationCodes={activationCodes}
-              onCreateCode={handleCreateCode} /> */}
-              <SortableTable<IDevice> headCells={headCells} data={list} />
+              <DeviceListTable devices={list} activationCodes={activationCodes} onCreateCode={handleCreateCode} />
+              {/* <SortableTable<IDevice> headCells={headCells} data={list} /> */}
             </Box>
           )}
         </Container>

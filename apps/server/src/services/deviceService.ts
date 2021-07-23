@@ -18,7 +18,7 @@ import { devices as mockDevices } from './data/devices';
 const addOne = async (device: NewDevice): Promise<IDevice> => {
   const { devices } = getDb();
 
-  if (await devices.find((i) => i.name === device.name && i.companyId === device.company.id)) {
+  if (await devices.find((i) => i.name === device.name && i.companyId === device.company?.id)) {
     throw new ConflictException(`Устройство с наименование ${device.name} уже сущеcтвует`);
   }
 
@@ -27,7 +27,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     name: device.name,
     uid: '',
     state: 'NON-REGISTERED',
-    companyId: device.company.id,
+    companyId: device.company?.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   };
@@ -265,4 +265,4 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
   };
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll };
+export { addOne, updateOne, deleteOne, findOne, findOneByUid, findAll };

@@ -38,7 +38,7 @@ class Api extends BaseApi {
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
-      headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.61:8080' },
+      //headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.61:8080' },
     });
 
     this.auth = new Auth(this);
@@ -88,37 +88,6 @@ class Api extends BaseApi {
     );
   }
 
-  /* this._axios.interceptors.request.use(
-    (request) => {
-      if (this._activationCodeId) {
-        // Добавляем device_ID
-        request.params.activationCodeId = this._activationCodeId;
-      }
-      console.info('✉️ request', request);
-      return request;
-    },
-    (error) => {
-      console.info('✉️ request error', error);
-
-      return {
-        type: 'ERROR',
-        message: error,
-      } as error.INetworkError;
-    },
-  );
-
-  this._axios.interceptors.response.use(
-    (response) => {
-      console.info('✉️ response', response);
-      return response;
-    },
-    (error) => {
-      console.info('✉️ response error', error);
-      throw error;
-    },
-  );
-}*/
-
   set config(config: IApiConfig) {
     this._config = config;
   }
@@ -135,14 +104,6 @@ class Api extends BaseApi {
   // get deviceId() {
   //   return this._deviceId;
   // }
-
-  set activationCodeId(activationCodeId: string | undefined) {
-    this._activationCodeId = activationCodeId;
-  }
-
-  get activationCodeId() {
-    return this._activationCodeId;
-  }
 
   get axios() {
     return this._axios;
