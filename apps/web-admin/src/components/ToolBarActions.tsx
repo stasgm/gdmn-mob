@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, Box, IconButton, Toolbar, Menu, MenuProps } from '@material-ui/core';
+import { Button, Box, IconButton, Toolbar, Menu, MenuProps, Icon } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/styles';
 
@@ -50,61 +51,24 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
     </>
   );
 
-  // const buttonsList = (
-  //   <>
-  //     <Box
-  //       sx={{
-  //         display: 'flex',
-  //         flexDirection: 'column',
-  //         flexGrow: 1,
-  //         //justifyContent: 'center',
-  //         //width: '100%',
-  //         // height: '100%',
-  //         // flexGrow: Number(isCompact ? 0 : 1),
-  //       }}
-  //     >
-  //       {buttons.map((button: IToolBarButton) => (
-  //         <Button
-  //           key={button.name}
-  //         //  color={white}
-  //           variant={button.variant}
-  //           onClick={button.onClick}
-  //           sx={{ marginRigth: 0 }}
-  //           startIcon={button.icon}
-  //         >
-  //           {button.name}
-  //         </Button>
-  //       ))}
-  //     </Box>
-  //   </>
-  // );
   const StyledMenuItem = withStyles((theme) => ({
-   /* root: {
+    root: {
       '&:focus': {
-        // backgroundColor: theme.palette.primary.main,
-        '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        //theme.palette.common.white,
-        },
+        backgroundColor: theme.palette.primary.main,
       },
-    },*/
+    },
   }))(MenuItem);
 
   const buttonsList = (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexGrow: 1,
-        }}
-      >
-        {buttons.map((button: IToolBarButton) => (
-          <StyledMenuItem key={button.name} onClick={button.onClick}>
-            <ListItemIcon color="primary">{button.icon}</ListItemIcon>
-            <ListItemText primary={button.name} />
-          </StyledMenuItem>
-        ))}
-      </Box>
+      {buttons.map((button: IToolBarButton) => (
+        <StyledMenuItem key={button.name} color="primary" onClick={button.onClick}>
+          <Icon color="primary" sx={{ display: 'flex', marginRight: 1 }}>
+            {button.icon}
+          </Icon>
+          <ListItemText primary={button.name} />
+        </StyledMenuItem>
+      ))}
     </>
   );
 
@@ -172,7 +136,7 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
             display: { xl: 'none', md: 'none', sm: 'none', xs: 'block' },
           }}
         >
-          <StyledMenu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+          <StyledMenu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
             {buttonsList}
           </StyledMenu>
         </Box>
