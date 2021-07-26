@@ -31,13 +31,41 @@ const findAll = async () => {
  * @param {string} userId - идентификатор пользователя
  * @return массив сообщений
  * */
-const FindMany = async ({ appSystem, companyId, userId }: { appSystem: string; companyId: string; userId: string }) => {
+const FindMany = async ({
+  appSystem,
+  companyId,
+  consumerId,
+}: {
+  appSystem: string;
+  companyId: string;
+  consumerId: string;
+}) => {
   const db = getDb();
-  const { messages } = db;
+  const { messages, companies, users } = db;
+
+  const company = await companies.find(companyId);
+
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
+
+  const consumer = await users.find(consumerId);
+
+  if (!consumer) {
+    throw new DataNotFoundException('Получатель не найден');
+  }
+
+  // if (user.name === 'gdmn') {
+  //   // TODO переделать
+  //   userId = 'gdmn';
+  // }
 
   const messageList = (await messages.read()).filter(
-    (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === userId,
+    (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === consumerId,
   );
+
+  console.log('messageList', messageList);
+
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);
@@ -58,7 +86,11 @@ const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; produc
     throw new Error('сообщение с таким идентификатором уже добавлено');
   }*/
 
-  return messages.insert(makeDBNewMessage(msgObject, producerId));
+  const newMessage = await makeDBNewMessage(msgObject, producerId);
+
+  const messageId = await messages.insert(newMessage);
+
+  return messageId;
 };
 
 /**
@@ -176,7 +208,7 @@ export const makeDBMessage = (message: IMessage): IDBMessage => {
   };
 };
 
-export const makeDBNewMessage = (message: NewMessage, producerId: string): IDBMessage => {
+export const makeDBNewMessage = async (message: NewMessage, producerId: string): Promise<IDBMessage> => {
   return {
     id: uuidv1(),
     head: {
