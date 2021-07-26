@@ -19,6 +19,7 @@ import {
 
 import { IHeadCells } from '../types';
 import { adminPath } from '../utils/constants';
+import { isNamedEntity } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
 
@@ -45,6 +46,8 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
 
     setSelectedUserIds(newSelectedUserIds);
   };
+
+  console.log('SortableTable data', data);
 
   const handleSelectOne = (_event: any, id: any) => {
     const selectedIndex = selectedUserIds.indexOf(id);
@@ -118,24 +121,27 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
           </TableCell>
 
           {headCells.map((headCell, index) => {
-            if (index === 0)
-              return (
-                <TableCell style={{ padding: '0 16px' }}>
-                  <Box
-                    sx={{
-                      alignItems: 'center',
-                      display: 'flex',
-                    }}
-                  >
-                    <NavLink to={`${adminPath}/app/users/${item.id}`}>
-                      <Typography color="textPrimary" variant="body1" key={item.id}>
-                        {item[headCell.id]}
-                      </Typography>
-                    </NavLink>
-                  </Box>
-                </TableCell>
-              );
-            else return <TableCell key={index}>{item[headCell.id]}</TableCell>;
+            const v = item[headCell.id];
+            const s = isNamedEntity(v) ? v.name : v;
+
+            return index ? (
+              <TableCell key={index}>{s}</TableCell>
+            ) : (
+              <TableCell key={index} style={{ padding: '0 16px' }}>
+                <Box
+                  sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  <NavLink to={`${adminPath}/app/users/${item.id}`}>
+                    <Typography color="textPrimary" variant="body1" key={item.id}>
+                      {s}
+                    </Typography>
+                  </NavLink>
+                </Box>
+              </TableCell>
+            );
           })}
         </TableRow>
       ));
