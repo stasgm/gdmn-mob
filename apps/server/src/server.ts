@@ -82,6 +82,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         directives: {
           defaultSrc: ['*'],
           styleSrc: ["'unsafe-inline'"],
+          imgSrc: ['*', 'data:'],
         },
       }),
     )
@@ -100,7 +101,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(
       cors({
         credentials: true,
-        origin: 'http://192.168.0.70:8080',
+        // origin: 'http://192.168.0.70:8080',
       }),
     )
 
