@@ -21,6 +21,7 @@ const getMessage: Config = {
   validate: {
     params: Joi.object({
       companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
+      appSystem: Joi.string().required().error(new InvalidParameterException('Не указана система')),
     }),
   },
 };
