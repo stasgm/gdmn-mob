@@ -23,12 +23,13 @@ import { isNamedEntity } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
 
-interface props<T extends { id: string }> {
+interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
+  path: string;
 }
 
-function SortableTable<T extends { id: string }>({ data = [], headCells = [], ...rest }: props<T>) {
+function SortableTable<T extends { id: string }>({ data = [], headCells = [], path, ...rest }: IProps<T>) {
   const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -134,7 +135,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
                     display: 'flex',
                   }}
                 >
-                  <NavLink to={`${adminPath}/app/users/${item.id}`}>
+                  <NavLink to={`${adminPath}${path}${item.id}`}>
                     <Typography color="textPrimary" variant="body1" key={item.id}>
                       {s}
                     </Typography>

@@ -125,7 +125,7 @@ const UserList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<IUser> headCells={headCells} data={list} />
+              <SortableTable<IUser> headCells={headCells} data={list} path={'/app/users/'} />
             </Box>
           )}
         </Container>
