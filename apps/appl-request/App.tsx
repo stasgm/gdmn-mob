@@ -52,9 +52,9 @@ const Root = React.memo(() => {
 
 const App = () => (
   <Provider store={store}>
-    {/* <PersistGate loading={null} persistor={persistor}> */}
-    <Root />
-    {/* </PersistGate> */}
+    <PersistGate loading={null} persistor={persistor}>
+      <Root />
+    </PersistGate>
   </Provider>
 );
 
