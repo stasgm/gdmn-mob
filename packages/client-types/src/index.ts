@@ -5,6 +5,7 @@ export interface IApiConfig {
   timeout: number;
   version: string;
   apiPath: string;
+  deviceId?: string;
   debug?: {
     isMock?: boolean;
     mockDelay?: number;

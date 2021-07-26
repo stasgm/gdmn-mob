@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
 import { device as mockDevice, devices as mockDevices } from '@lib/mock';
 
@@ -17,7 +18,12 @@ class Device extends BaseRequest {
 
       return {
         type: 'ADD_DEVICE',
-        device: mockDevice,
+        device: {
+          ...newDevice,
+          id: uuid(),
+          editionDate: new Date().toISOString(),
+          creationDate: new Date().toISOString(),
+        },
       } as types.IAddDeviceResponse;
     }
 
@@ -49,7 +55,7 @@ class Device extends BaseRequest {
 
       return {
         type: 'UPDATE_DEVICE',
-        device,
+        device: { ...device, editionDate: new Date().toISOString() },
       } as types.IUpdateDeviceResponse;
     }
 
@@ -125,10 +131,8 @@ class Device extends BaseRequest {
     }
 
     try {
-      // || this.api.deviceId
-      const res = await this.api.axios.get<IResponse<IDevice>>(
-        `/${this.api.config.version}/devices/${deviceId || this.api.deviceId}`,
-      );
+      // || this.api.config.deviceId
+      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
 
       const resData = res?.data;
 
@@ -161,14 +165,14 @@ class Device extends BaseRequest {
   getDevices = async (
     params?: Record<string, string | number>,
   ): Promise<types.IGetDevicesResponse | error.INetworkError> => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-    //   return {
-    //     type: 'GET_DEVICES',
-    //     devices: mockDevices,
-    //   };
-    // }
+      return {
+        type: 'GET_DEVICES',
+        devices: mockDevices,
+      };
+    }
 
     let paramText = params ? getParams(params) : '';
 
@@ -177,24 +181,24 @@ class Device extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/${this.api.config.version}/devices${paramText}`);
+      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
       const resData = res.data;
 
       if (resData.result) {
         return {
           type: 'GET_DEVICES',
           devices: resData?.data || [],
-        };
+        } as types.IGetDevicesResponse;
       }
       return {
         type: 'ERROR',
         message: resData?.error || 'ошибка получения данных об устройствах',
-      };
+      } as error.INetworkError;
     } catch (err) {
       return {
         type: 'ERROR',
         message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
-      };
+      } as error.INetworkError;
     }
   };
 

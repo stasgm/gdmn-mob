@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IDevice, IUser, NewDevice } from '@lib/types';
+import { IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import log from '../utils/logger';
 import { deviceService } from '../services';
@@ -12,7 +12,7 @@ import { DataNotFoundException } from '../exceptions';
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { name } = ctx.request.body as NewDevice;
 
-  const company = (ctx.state.user as IUser)?.companies[0];
+  const company = ctx.state.user.company as INamedEntity;
 
   const newDevice = await deviceService.addOne({ name, company });
 
@@ -65,7 +65,7 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
 
-  const device = await deviceService.findOne(deviceId);
+  const device = await deviceService.findOneByUid(deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');

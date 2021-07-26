@@ -1,16 +1,15 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import { ICompany, IHeadCells } from '@lib/types';
+import { ICompany } from '@lib/types';
 
-import CompanyListTable from '../../components/company/CompanyListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
@@ -18,7 +17,7 @@ import actions from '../../store/company';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
-import { IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton } from '../../types';
 
 import SnackBar from '../../components/SnackBar';
 import SortableTable from '../../components/SortableTable';
@@ -30,18 +29,10 @@ const CompanyList = () => {
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { list, loading, errorMessage } = useSelector((state) => state.companies);
-  //const [dataList, setDataList] = useState<ICompany[]>([]);
 
   const fetchCompanies = useCallback(
-    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      const res = await dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
-      if (res.type === 'COMPANY/FETCH_COMPANIES_SUCCESS') {
-        //console.log(res.payload);
-        //setDataList(res.payload);
-      }
-      if (res.type === 'COMPANY/FETCH_COMPANIES_FAILURE') {
-        //console.log('ошибочка', res.payload);
-      }
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchCompanies(filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -84,20 +75,20 @@ const CompanyList = () => {
       onClick: () => fetchCompanies(),
       icon: <CachedIcon />,
     },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Загрузить',
+    //   onClick: () => {
+    //     return;
+    //   },
+    //   icon: <ImportExportIcon />,
+    // },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Добавить',
       color: 'primary',

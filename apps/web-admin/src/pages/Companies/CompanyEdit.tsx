@@ -1,12 +1,11 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { ICompany, NewCompany } from '@lib/types';
 
 import CompanyDetails from '../../components/company/CompanyDetails';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
+import selectors from '../../store/company/selectors';
 import SnackBar from '../../components/SnackBar';
 
 const CompanyEdit = () => {
@@ -17,10 +16,9 @@ const CompanyEdit = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
-  const company = useSelector((state) => state.companies.list.find((i) => i.id === companyId));
+  const company = selectors.companyById(companyId);
 
-  const handleGoToCompanyView = () => {
-    //navigate(`/app/companies/${companyId}`);
+  const goBack = () => {
     navigate(-1);
   };
 
@@ -31,12 +29,22 @@ const CompanyEdit = () => {
   const handleSubmit = async (values: ICompany | NewCompany) => {
     const res = await dispatch(actions.updateCompany(values as ICompany));
     if (res.type === 'COMPANY/UPDATE_SUCCESS') {
-      handleGoToCompanyView();
+      goBack();
     }
   };
 
   if (!company) {
-    return <Box>Компания не найдена</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Компания не найдена
+      </Box>
+    );
   }
 
   return (
@@ -54,7 +62,7 @@ const CompanyEdit = () => {
         <CardHeader title={'Редактирование компании'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={handleGoToCompanyView} />
+      <CompanyDetails company={company} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );

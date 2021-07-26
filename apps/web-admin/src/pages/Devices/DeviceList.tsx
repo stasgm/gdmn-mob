@@ -1,41 +1,37 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
+// import ImportExportIcon from '@material-ui/icons/ImportExport';
+import { IDevice } from '@lib/types';
 
-import { IDevice, IHeadCells } from '@lib/types';
-
-import DeviceListTable from '../../components/device/DeviceListTable';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device/actions.async';
-
+import actions from '../../store/device';
+import codeActions from '../../store/activationCode';
+import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-
-import { IToolBarButton } from '../../types';
-import SortableTable from '../../components/SortableTable';
+import SnackBar from '../../components/SnackBar';
+// import SortableTable from '../../components/SortableTable';
+import DeviceListTable from '../../components/device/DeviceListTable';
 
 const DeviceList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { list, loading } = useSelector((state) => state.devices);
+  const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const { list: activationCodes } = useSelector((state) => state.activationCodes);
+
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const fetchDevices = useCallback(
-    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      const res = await dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
-
-      if (res.type === 'DEVICE/FETCH_DEVICES_SUCCESS') {
-        //setDataList(res.payload);
-      }
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },
     [dispatch],
   );
@@ -68,27 +64,42 @@ const DeviceList = () => {
     fetchDevices(inputValue);
   };
 
+  const handleClearError = () => {
+    dispatch(actions.deviceActions.clearError());
+  };
+
+  const handleCreateCode = (deviceId: string) => {
+    dispatch(codeActions.createActivationCode(deviceId));
+  };
+
+  // const handleSubmit = async (values: IDevice | NewDevice) => {
+  //   const res = await dispatch(actions.updateDevice(values as IDevice));
+  //   if (res.type === 'DEVICE/UPDATE_SUCCESS') {
+  //     goBack();
+  //   }
+  // };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchDevices(),
+      onClick: fetchDevices,
       icon: <CachedIcon />,
     },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Загрузить',
+    //   onClick: () => {
+    //     return;
+    //   },
+    //   icon: <ImportExportIcon />,
+    // },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -98,11 +109,11 @@ const DeviceList = () => {
     },
   ];
 
-  const headCells: IHeadCells<IDevice>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'uid', label: 'Номер', sortEnable: true },
-    { id: 'state', label: 'Состояние', sortEnable: false },
-  ];
+  // const headCells: IHeadCells<IDevice>[] = [
+  //   { id: 'name', label: 'Наименование', sortEnable: true },
+  //   { id: 'uid', label: 'Номер', sortEnable: true },
+  //   { id: 'state', label: 'Состояние', sortEnable: true },
+  // ];
 
   return (
     <>
@@ -129,11 +140,13 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<IDevice> headCells={headCells} data={list} />
+              <DeviceListTable devices={list} activationCodes={activationCodes} onCreateCode={handleCreateCode} />
+              {/* <SortableTable<IDevice> headCells={headCells} data={list} /> */}
             </Box>
           )}
         </Container>
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

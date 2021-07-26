@@ -1,12 +1,12 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { IUser, NewUser } from '@lib/types';
+import { useEffect } from 'react';
 
 import UserDetails from '../../components/user/UserDetails';
-
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/user';
+import selectors from '../../store/user/selectors';
 import SnackBar from '../../components/SnackBar';
 
 const UserEdit = () => {
@@ -17,10 +17,14 @@ const UserEdit = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.users);
-  const user = useSelector((state) => state.users.list.find((i) => i.id === userId));
+  const user = selectors.userById(userId);
 
-  const handleGoToUserView = () => {
-    navigate(`/app/users/${userId}`);
+  useEffect(() => {
+    dispatch(actions.fetchUserById(userId));
+  }, [dispatch, userId]);
+
+  const goBack = () => {
+    navigate(-1);
   };
 
   const handleClearError = () => {
@@ -30,12 +34,22 @@ const UserEdit = () => {
   const handleSubmit = async (values: IUser | NewUser) => {
     const res = await dispatch(actions.updateUser(values as IUser));
     if (res.type === 'USER/UPDATE_SUCCESS') {
-      handleGoToUserView();
+      goBack();
     }
   };
 
   if (!user) {
-    return <Box>Пользователь не найден</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Пользователь не найден
+      </Box>
+    );
   }
 
   return (
@@ -53,7 +67,7 @@ const UserEdit = () => {
         <CardHeader title={'Редактирование пользователя'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={handleGoToUserView} />
+      <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );

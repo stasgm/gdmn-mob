@@ -20,7 +20,14 @@ class User extends BaseRequest {
 
       return {
         type: 'ADD_USER',
-        user: { ...user, id: uuid(), creator: mockUser, role: 'User' },
+        user: {
+          ...user,
+          id: uuid(),
+          creator: mockUser,
+          role: 'User',
+          editionDate: new Date().toISOString(),
+          creationDate: new Date().toISOString(),
+        },
       };
     }
 
@@ -57,13 +64,13 @@ class User extends BaseRequest {
       if (updatedUser) {
         return {
           type: 'UPDATE_USER',
-          user: updatedUser,
+          user: { ...updatedUser, editionDate: new Date().toISOString() },
         } as types.IUpdateUserResponse;
       }
 
       return {
         type: 'ERROR',
-        message: 'Пользоватль не найден',
+        message: 'Пользователь не найден',
       } as error.INetworkError;
     }
 
@@ -162,21 +169,21 @@ class User extends BaseRequest {
   };
 
   getUsers = async (params?: Record<string, string | number>) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-    //   if (mockUsers) {
-    //     return {
-    //       type: 'GET_USERS',
-    //       users: mockUsers,
-    //     } as types.IGetUsersResponse;
-    //   }
+      if (mockUsers) {
+        return {
+          type: 'GET_USERS',
+          users: mockUsers,
+        } as types.IGetUsersResponse;
+      }
 
-    //   return {
-    //     type: 'ERROR',
-    //     message: 'Пользователи не найдены',
-    //   } as error.INetworkError;
-    // }
+      return {
+        type: 'ERROR',
+        message: 'Пользователи не найдены',
+      } as error.INetworkError;
+    }
 
     let paramText = params ? getParams(params) : '';
 

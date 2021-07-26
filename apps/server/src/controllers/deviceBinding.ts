@@ -9,11 +9,9 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
-  const { device, user } = ctx.request.body as NewDeviceBinding;
+  const { device, user, state } = ctx.request.body as NewDeviceBinding;
 
-  // const deviceBinding: NewDeviceBinding = { userId, deviceId };
-
-  const newDeviceBinding = await deviceBindingService.addOne({ device, user });
+  const newDeviceBinding = await deviceBindingService.addOne({ device, user, state });
 
   created(ctx as Context, newDeviceBinding);
 
@@ -75,7 +73,7 @@ const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceId, companyId, state } = ctx.query;
+  const { deviceId, companyId, userId, state } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -85,6 +83,10 @@ const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof deviceId === 'string') {
     params.deviceId = deviceId;
+  }
+
+  if (typeof userId === 'string') {
+    params.userId = userId;
   }
 
   if (typeof state === 'string') {

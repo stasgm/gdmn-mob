@@ -3,8 +3,6 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import { IHeadCells } from '@lib/types';
-
 import {
   Box,
   Card,
@@ -19,6 +17,9 @@ import {
   Typography,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+
+import { IHeadCells } from '../types';
+import { adminPath } from '../utils/constants';
 
 type Order = 'asc' | 'desc';
 
@@ -145,7 +146,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
                       display: 'flex',
                     }}
                   >
-                    <NavLink to={`/app/users/${item.id}`}>
+                    <NavLink to={`${adminPath}/app/users/${item.id}`}>
                       <Typography color="textPrimary" variant="body1" key={item.id}>
                         {DeserializeProp<T>(headCell.id, item[headCell.id])}
                       </Typography>

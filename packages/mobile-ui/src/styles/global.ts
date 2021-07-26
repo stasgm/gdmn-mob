@@ -93,10 +93,15 @@ const globalstyles = StyleSheet.create({
     height: '100%',
     padding: 3,
   },
-  directionRow: {
+  rowCenter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  rowBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
   details: {
     flex: 1,
@@ -112,11 +117,15 @@ const globalstyles = StyleSheet.create({
   flexGrow: {
     flexGrow: 10,
   },
+  // { backgroundColor: '#ddd', paddingVertical: 5 }
   header: {
     flexDirection: 'row',
     backgroundColor: '#e1e1e1',
     justifyContent: 'space-around',
     paddingVertical: 6,
+  },
+  rightAlignmentSelf: {
+    alignSelf: 'flex-end',
   },
   icon: {
     alignItems: 'center',

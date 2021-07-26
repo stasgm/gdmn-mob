@@ -14,7 +14,7 @@ const CompanyDetailsView = ({ company }: IProps) => {
       <CardContent>
         <Grid>
           <Grid>
-            <Grid container md={10} xs={12}>
+            <Grid container>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
                   Наименование
@@ -32,10 +32,20 @@ const CompanyDetailsView = ({ company }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  Минск
+                  {company.city}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Администратор
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {company.admin.name}
+                </Typography>
+              </Grid>
+              {/* <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
                   Дата создания
                 </Typography>
@@ -54,7 +64,7 @@ const CompanyDetailsView = ({ company }: IProps) => {
                 <Typography variant="h4" gutterBottom>
                   {new Date(company.editionDate || '').toLocaleString('en-US', { hour12: false })}
                 </Typography>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Grid>
         </Grid>

@@ -30,7 +30,13 @@ const checkDevice = (): AppThunk<
   };
 };
 
-const activateDevice = (code: string): AppThunk => {
+const activateDevice = (
+  code: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.activateDeviceAsync>>,
+  AuthState,
+  ActionType<typeof actions.activateDeviceAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.activateDeviceAsync.request(''));
 
@@ -57,7 +63,7 @@ const signUp = (
     const response = await api.auth.signup(userCredentials);
 
     if (response.type === 'SIGNUP') {
-      return dispatch(actions.signUpAsync.success(response.user));
+      return dispatch(actions.signUpAsync.success());
     }
 
     if (response.type === 'ERROR') {
@@ -73,7 +79,7 @@ const signIn = (
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
-  ActionType<typeof actions.loginUserAsync>
+  ActionType<typeof actions.loginUserAsync /* | typeof actions.setCompany */>
 > => {
   return async (dispatch) => {
     dispatch(actions.loginUserAsync.request(''));
@@ -81,6 +87,15 @@ const signIn = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
+      /*       // Если к пользователю привязана компания то сразу выполняем вход
+            if (response.user.company?.id) {
+              const companyResponse = await api.company.getCompany(response.user.company?.id);
+
+              if (companyResponse.type === 'GET_COMPANY') {
+                dispatch(actions.setCompany(companyResponse.company));
+              }
+            } */
+
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
@@ -132,4 +147,22 @@ const signInWithDevice = (
   };
 };
 
-export default { checkDevice, activateDevice, signUp, signIn, signInWithDevice };
+const getDeviceStatus = (uid: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(actions.getDeviceStatusAsync.request(uid));
+
+    const response = await api.auth.getDeviceStatus(uid);
+
+    if (response.type === 'GET_DEVICE_STATUS') {
+      return dispatch(actions.getDeviceStatusAsync.success(response.status));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(actions.activateDeviceAsync.failure(response.message));
+    }
+
+    return dispatch(actions.activateDeviceAsync.failure('something wrong'));
+  };
+};
+
+export default { checkDevice, activateDevice, signUp, signIn, signInWithDevice, getDeviceStatus };

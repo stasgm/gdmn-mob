@@ -3,23 +3,19 @@ import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-import ImportExportIcon from '@material-ui/icons/ImportExport';
 
-import { IUser, IHeadCells } from '@lib/types';
+import { IUser } from '@lib/types';
 
 import SortableTable from '../../components/SortableTable';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/user/actions.async';
-
+import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-
-import { IToolBarButton } from '../../types';
+import { IToolBarButton, IHeadCells } from '../../types';
+import SnackBar from '../../components/SnackBar';
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -27,21 +23,17 @@ const UserList = () => {
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { list, loading } = useSelector((state) => state.users);
+  const { list, loading, errorMessage } = useSelector((state) => state.users);
 
   const fetchUsers = useCallback(
-    async (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      const res = await dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
-
-      if (res.type === 'USER/FETCH_USERS_SUCCESS') {
-        //setDataList(res.payload);
-      }
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
+    /* Загружаем данные при загрузке компонента */
     fetchUsers();
   }, [fetchUsers]);
 
@@ -67,6 +59,10 @@ const UserList = () => {
     fetchUsers(inputValue);
   };
 
+  const handleClearError = () => {
+    dispatch(actions.userActions.clearError());
+  };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -74,20 +70,20 @@ const UserList = () => {
       onClick: () => fetchUsers(),
       icon: <CachedIcon />,
     },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
+    // {
+    //   name: 'Загрузить',
+    //   onClick: () => {
+    //     return;
+    //   },
+    //   icon: <ImportExportIcon />,
+    // },
+    // {
+    //   name: 'Выгрузить',
+    //   sx: { mx: 1 },
+    //   onClick: () => {
+    //     return;
+    //   },
+    // },
     {
       name: 'Добавить',
       color: 'primary',
@@ -134,6 +130,7 @@ const UserList = () => {
           )}
         </Container>
       </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

@@ -18,7 +18,7 @@ interface DocLine extends IEntity {
   quantity: number;
 }
 
-export const documentsMock: IDocument<DocHeader, DocLine[]>[] = [
+export const documentsMock: IDocument<DocHeader, DocLine>[] = [
   {
     id: '9',
     number: '225',

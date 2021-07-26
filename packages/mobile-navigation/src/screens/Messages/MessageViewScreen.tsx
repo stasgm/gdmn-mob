@@ -1,14 +1,11 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { StyleSheet, View, Text, Alert } from 'react-native';
-import { useTheme, FAB } from 'react-native-paper';
-
-import { useSelector, messageActions, referenceActions, documentActions, useDispatch } from '@lib/store';
+import { View, Text, Alert } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { IReferences } from '@lib/types';
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-
-import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+import { BodyType, IReferences } from '@lib/types';
+import { messageActions, referenceActions, documentActions, useDispatch, messageSelectors } from '@lib/store';
+import { AppScreen, BackButton, MenuButton, SubTitle, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
 
 type MessagesStackParamList = {
   Messages: undefined;
@@ -17,34 +14,33 @@ type MessagesStackParamList = {
 
 const MessageViewScreen = () => {
   //const { data } = useSelector((state) => state.messages);
-  const { colors } = useTheme();
   const id = useRoute<RouteProp<MessagesStackParamList, 'MessageView'>>().params?.id;
-  const msg = useSelector((state) => state.messages).data.find((item) => item.id === id);
+  const msg = messageSelectors.selectById(id);
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
 
-  const handleTransform = useCallback(async () => {
+  const handleProccess = useCallback(async () => {
     if (!msg) {
       return;
     }
 
-    switch (msg.body.type) {
-      case 'cmd':
+    switch (msg.body.type as BodyType) {
+      case 'CMD':
         //TODO: обработка
         break;
 
-      case 'refs':
+      case 'REFS':
         //TODO: проверка данных, приведение к типу
         dispatch(referenceActions.updateList(msg.body.payload as IReferences));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, newStatus: 'procd' }));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
         break;
 
-      case 'docs':
+      case 'DOCS':
         //TODO: проверка данных, приведение к типу
         dispatch(documentActions.setDocuments(msg.body.payload));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, newStatus: 'procd' }));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
         break;
 
       default:
@@ -62,13 +58,9 @@ const MessageViewScreen = () => {
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      /*       {
-              title: 'Загрузить',
-              // onPress: handleLoad,
-            }, */
       {
         title: 'Обработать',
-        onPress: handleTransform,
+        onPress: handleProccess,
       },
       {
         title: 'Удалить',
@@ -80,7 +72,7 @@ const MessageViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [handleTransform, handleDelete, showActionSheet]);
+  }, [handleProccess, handleDelete, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -89,32 +81,48 @@ const MessageViewScreen = () => {
     });
   }, [navigation]);
 
-  return msg ? (
-    <>
-      <View style={styles.container}>
-        <Text style={styles.fieldSystem}>
-          {msg.head.appSystem}, {msg.head.company.name}
-        </Text>
-        <Text style={styles.fieldAdress}>{`${msg.head.consumer.name} > ${msg.head.producer.name}`}</Text>
-        <View style={styles.field}>
-          <Text style={styles.fontBold}>Тип:</Text>
-          <Text style={styles.fieldType}>{msg.body.type}</Text>
+  if (!msg) {
+    return (
+      <AppScreen>
+        <SubTitle style={styles.title}>Сообщение не найдено</SubTitle>
+      </AppScreen>
+    );
+  }
+
+  return (
+    <AppScreen style={styles.contentTop}>
+      <View>
+        <View>
+          <Text style={[styles.textBold, styles.title]}>Заголовок</Text>
+          <Divider />
+          <Text style={styles.name}>Система:</Text>
+          <Text style={styles.field}>{msg.head.appSystem}</Text>
+          <Text style={styles.name}>Компания:</Text>
+          <Text style={styles.field}>{msg.head.company.name}</Text>
+          <Text style={styles.name}>Дата и время:</Text>
+          <Text style={[styles.number, styles.field]}>{new Date(msg.head.dateTime).toLocaleString()}</Text>
+          <Text style={styles.name}>Тип:</Text>
+          <Text style={[styles.number, styles.field]}>{msg.body.type}</Text>
+          <Text style={[styles.textBold, styles.title]}>Стороны</Text>
+          <Divider />
+          <Text style={styles.name}>Отправитель:</Text>
+          <Text style={[styles.number, styles.field]}>{msg.head.consumer.name}</Text>
+          <Text style={styles.name}>Получатель:</Text>
+          <Text style={[styles.number, styles.field]}>{msg.head.producer.name}</Text>
+          <Text style={[styles.textBold, styles.title]}>Содержимое</Text>
+          <Divider />
+          <Text style={styles.field}>
+            {typeof msg.body.payload !== 'object' ? msg.body.payload.toString() : '[данные]'}
+          </Text>
         </View>
-        <Text style={styles.fontBold}>Содержимое:</Text>
-        <Text style={styles.fieldText}>{msg.body.payload.toString()}</Text>
-        <Text style={styles.fieldDate}>{msg.head.dateTime}</Text>
       </View>
-      <View style={styles.icons}>
-        <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="sync" onPress={handleTransform} />
-        <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="delete" onPress={handleDelete} />
-      </View>
-    </>
-  ) : null;
+    </AppScreen>
+  );
 };
 
 export default MessageViewScreen;
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 5,
@@ -175,3 +183,4 @@ const styles = StyleSheet.create({
   },
   viewType: {},
 });
+ */

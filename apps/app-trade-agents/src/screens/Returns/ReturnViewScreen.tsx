@@ -15,6 +15,8 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import { IReturnDocument, IReturnLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
@@ -24,7 +26,6 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import ReturnItem from './components/ReturnItem';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ReturnViewScreen = () => {
   const showActionSheet = useActionSheet();

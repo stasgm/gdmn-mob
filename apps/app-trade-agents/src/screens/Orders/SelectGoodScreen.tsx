@@ -60,7 +60,7 @@ const SelectGoodScreen = () => {
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, []);
+  }, [list, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {

@@ -9,6 +9,8 @@ const devices: IDevice[] = [
     state: 'ACTIVE',
     uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
     company: company,
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '2',
@@ -16,6 +18,8 @@ const devices: IDevice[] = [
     state: 'ACTIVE',
     uid: 'ecc6ff20-999c-11eb-b406-85744eedb503',
     company: company2,
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
   {
     id: '3',
@@ -23,6 +27,35 @@ const devices: IDevice[] = [
     state: 'ACTIVE',
     uid: 'WEB',
     company: company3,
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
+  },
+  {
+    id: '4',
+    name: 'Test 1',
+    state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb504',
+    company: company3,
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
+  },
+  {
+    id: '5',
+    name: 'Test 2',
+    state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb505',
+    company: company2,
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
+  },
+  {
+    id: '6',
+    name: 'Test 3',
+    state: 'ACTIVE',
+    uid: 'ecc6ff20-999c-11eb-b406-85744eedb506',
+    company: company3,
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
   },
 ];
 

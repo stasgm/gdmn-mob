@@ -6,6 +6,6 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src", "index.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts*", "index.ts"],
+  "exclude": ["node_modules", "dist"]
 }

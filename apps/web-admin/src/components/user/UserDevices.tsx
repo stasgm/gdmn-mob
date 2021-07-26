@@ -1,55 +1,24 @@
 import { Box, Container } from '@material-ui/core';
+import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
+import { IDeviceBinding } from '@lib/types';
 
-import { useNavigate } from 'react-router-dom';
-
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-
-// import CachedIcon from '@material-ui/icons/Cached';
-
-import ImportExportIcon from '@material-ui/icons/ImportExport';
-
-import { IDevice } from '@lib/types';
-
-import DeviceListTable from '../device/DeviceListTable';
+import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
 import { IToolBarButton } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 
-interface props {
-  devices: IDevice[];
+interface IProps {
+  userDevices: IDeviceBinding[];
+  onAddDevice: () => void;
 }
 
-const UserDevices = ({ devices }: props) => {
-  const navigate = useNavigate();
-
+const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
   const deviceButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Обновить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <CachedIcon />,
-    // },
-    {
-      name: 'Загрузить',
-      onClick: () => {
-        return;
-      },
-      icon: <ImportExportIcon />,
-    },
-    {
-      name: 'Выгрузить',
-      sx: { mx: 1 },
-      onClick: () => {
-        return;
-      },
-    },
     {
       name: 'Добавить',
       color: 'primary',
       variant: 'contained',
-      onClick: () => navigate('app/devices/new'),
-      icon: <AddCircleOutlineIcon />,
+      onClick: onAddDevice,
+      icon: <LibraryAddCheckIcon />,
     },
   ];
 
@@ -61,9 +30,15 @@ const UserDevices = ({ devices }: props) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActionsWithSearch buttons={deviceButtons} searchTitle={'Найти устройство'} />
+        <ToolbarActionsWithSearch
+          buttons={deviceButtons}
+          title={'Найти устройство'}
+          onChangeValue={() => {
+            return;
+          }}
+        />
         <Box sx={{ pt: 2 }}>
-          <DeviceListTable devices={devices} />
+          <DeviceBindingListTable deviceBindings={userDevices} limitRows={5} />
         </Box>
       </Container>
     </Box>

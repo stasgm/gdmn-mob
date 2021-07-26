@@ -3,5 +3,6 @@ import { default as ActivationScreen } from './ActivationScreen';
 import { default as SignInScreen } from './SignInScreen';
 import { default as SplashScreen } from './SplashScreen';
 import { default as CompaniesScreen } from './CompaniesScreen';
+import { default as AppLoadScreen } from './AppLoadScreen';
 
-export { ActivationScreen, SplashScreen, CompaniesScreen, ConfigScreen, SignInScreen };
+export { ActivationScreen, SplashScreen, CompaniesScreen, ConfigScreen, SignInScreen, AppLoadScreen };

@@ -16,7 +16,6 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-
 import { IOrderDocument, IOrderLine } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
@@ -31,7 +30,8 @@ const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const { id, routeBack } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
+  const routeBack = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeBack;
+  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
 
   const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
 
@@ -111,7 +111,7 @@ const OrderViewScreen = () => {
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
-        <View style={styles.directionRow}>
+        <View style={styles.rowCenter}>
           <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
             order.head?.onDate,
           )}`}</Text>

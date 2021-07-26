@@ -17,6 +17,8 @@ import {
 } from '@material-ui/core';
 import { ICompany } from '@lib/types';
 
+import { adminPath } from '../../utils/constants';
+
 interface props {
   companies: ICompany[];
 }
@@ -83,13 +85,14 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/companies/${company.id}`}>
+            <NavLink to={`${adminPath}/app/companies/${company.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.id}>
                 {company.name}
               </Typography>
             </NavLink>
           </Box>
         </TableCell>
+        <TableCell>{company.city}</TableCell>
         <TableCell>
           <Box
             sx={{
@@ -97,37 +100,15 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/users/${company.admin.id}`}>
+            <NavLink to={`${adminPath}/app/users/${company.admin.id}`}>
               <Typography color="textPrimary" variant="body1" key={company.admin.id}>
                 {company.admin.name}
               </Typography>
             </NavLink>
           </Box>
         </TableCell>
-        <TableCell>
-          <Box
-            sx={{
-              alignItems: 'center',
-              display: 'flex',
-            }}
-          >
-            <Typography color="textPrimary" variant="body1" key={company.admin.id}>
-              {new Date(company.creationDate || '').toLocaleString('en-US', { hour12: false })}
-            </Typography>
-          </Box>
-        </TableCell>
-        <TableCell>
-          <Box
-            sx={{
-              alignItems: 'center',
-              display: 'flex',
-            }}
-          >
-            <Typography color="textPrimary" variant="body1" key={company.admin.id}>
-              {new Date(company.editionDate || '').toLocaleString('en-US', { hour12: false })}
-            </Typography>
-          </Box>
-        </TableCell>
+        <TableCell>{new Date(company.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(company.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
 
@@ -161,6 +142,7 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
                   />
                 </TableCell>
                 <TableCell>Наименование</TableCell>
+                <TableCell>Город</TableCell>
                 <TableCell>Администратор</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

@@ -17,11 +17,13 @@ import {
 } from '@material-ui/core';
 import { IUser } from '@lib/types';
 
+import { adminPath } from '../../utils/constants';
+
 interface props {
   users?: IUser[];
 }
 
-const UserListTable = ({ users = [], ...rest }: props) => {
+const UserListTable = ({ users = [] }: props) => {
   const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -83,7 +85,7 @@ const UserListTable = ({ users = [], ...rest }: props) => {
               display: 'flex',
             }}
           >
-            <NavLink to={`/app/users/${user.id}`}>
+            <NavLink to={`${adminPath}/app/users/${user.id}`}>
               <Typography color="textPrimary" variant="body1" key={user.id}>
                 {user.name}
               </Typography>
@@ -93,6 +95,8 @@ const UserListTable = ({ users = [], ...rest }: props) => {
         <TableCell>{user.lastName}</TableCell>
         <TableCell>{user.firstName}</TableCell>
         <TableCell>{user.phoneNumber}</TableCell>
+        <TableCell>{new Date(user.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(user.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
       </TableRow>
     ));
 
@@ -111,7 +115,7 @@ const UserListTable = ({ users = [], ...rest }: props) => {
   };
 
   return (
-    <Card {...rest}>
+    <Card>
       <PerfectScrollbar>
         <Box sx={{ minWidth: 1050, p: 1 }}>
           <Table>
@@ -129,6 +133,8 @@ const UserListTable = ({ users = [], ...rest }: props) => {
                 <TableCell>Фамилия</TableCell>
                 <TableCell>Имя</TableCell>
                 <TableCell>Телефон</TableCell>
+                <TableCell>Дата создания</TableCell>
+                <TableCell>Дата редактирования</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

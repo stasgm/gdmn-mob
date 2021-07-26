@@ -4,7 +4,7 @@ import { RootState } from '../';
 
 const isLogged = (): boolean => {
   const auth = useSelector((state: RootState) => state.auth);
-  return auth && Boolean(auth.device && auth.user);
+  return auth && Boolean(auth.user);
 };
 
 const isLoggedWithCompany = (): boolean => {

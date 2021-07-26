@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 
 import { INamedEntity, IReference } from '@lib/types';
@@ -52,7 +51,6 @@ const SelectRefItemScreen = () => {
         Object.keys(clause).forEach((i) => {
           if (i in item) {
             if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
-
             }
           }
         });
@@ -120,7 +118,7 @@ const SelectRefItemScreen = () => {
       const isChecked = !!checkedItem?.find((i) => i.id === item.id);
       return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
     },
-    [handleSelectItem],
+    [checkedItem, handleSelectItem],
   );
 
   useLayoutEffect(() => {
@@ -187,7 +185,7 @@ const LineItem = React.memo(
         <View style={[styles.item, { backgroundColor: colors.background }]}>
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
           <View style={styles.details}>
-            <View style={styles.directionRow}>
+            <View style={styles.rowCenter}>
               <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
             </View>
           </View>
