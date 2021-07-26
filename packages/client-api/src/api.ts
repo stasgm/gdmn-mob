@@ -10,6 +10,7 @@ import { BaseApi } from './types/BaseApi';
 import Company from './requests/company';
 import Device from './requests/device';
 import DeviceBinding from './requests/deviceBinding';
+import ActivationCode from './requests/activationCode';
 import Message from './requests/message';
 import User from './requests/user';
 
@@ -23,6 +24,7 @@ class Api extends BaseApi {
   public company: Company;
   public device: Device;
   public deviceBinding: DeviceBinding;
+  public activationCode: ActivationCode;
   public message: Message;
   public user: User;
 
@@ -36,13 +38,14 @@ class Api extends BaseApi {
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
-      // headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.70:8080' },
+      //headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.61:8080' },
     });
 
     this.auth = new Auth(this);
     this.company = new Company(this);
     this.device = new Device(this);
     this.deviceBinding = new DeviceBinding(this);
+    this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
 

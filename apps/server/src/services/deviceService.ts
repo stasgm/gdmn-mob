@@ -18,7 +18,7 @@ import { devices as mockDevices } from './data/devices';
 const addOne = async (device: NewDevice): Promise<IDevice> => {
   const { devices } = getDb();
 
-  if (await devices.find((i) => i.name === device.name && i.companyId === device.company.id)) {
+  if (await devices.find((i) => i.name === device.name && i.companyId === device.company?.id)) {
     throw new ConflictException(`Устройство с наименование ${device.name} уже сущеcтвует`);
   }
 
@@ -27,7 +27,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     name: device.name,
     uid: '',
     state: 'NON-REGISTERED',
-    companyId: device.company.id,
+    companyId: device.company?.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   };
@@ -91,27 +91,6 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
   }
 
   await devices.delete((device) => device.id === deviceId);
-};
-
-const genActivationCode = async (deviceId: string) => {
-  const { devices, codes } = getDb();
-
-  const device = await devices.find(deviceId);
-
-  if (!device) {
-    throw new DataNotFoundException('Устройство не найдено');
-  }
-
-  // const code = Math.random()
-  //   .toString(36)
-  //   .substr(3, 6);
-  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-  const date = new Date();
-  await codes.insert({ code, date: date.toISOString(), deviceId });
-
-  await devices.update({ ...device, state: 'NON-ACTIVATED' });
-
-  return code;
 };
 
 const findOne = async (id: string): Promise<IDevice | undefined> => {
@@ -194,11 +173,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
       delete newParams['filterText'];
     }
 
-    return (
-      companyFound &&
-      filteredDevices &&
-      extraPredicate(item, newParams as Record<string, string>)
-    );
+    return companyFound && filteredDevices && extraPredicate(item, newParams as Record<string, string>);
   });
 
   /*   const newParams = { ...params };
@@ -290,4 +265,4 @@ export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
   };
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll, genActivationCode, findOneByUid };
+export { addOne, updateOne, deleteOne, findOne, findOneByUid, findAll };

@@ -101,7 +101,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(
       cors({
         credentials: true,
-        // origin: 'http://192.168.0.70:8080',
+        // origin: 'http://localhost:8080',
       }),
     )
 

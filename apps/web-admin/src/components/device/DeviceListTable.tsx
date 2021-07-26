@@ -3,8 +3,11 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
+import RefreshIcon from '@material-ui/icons/Refresh';
+
 import {
   Box,
+  Button,
   Card,
   Checkbox,
   Table,
@@ -15,18 +18,30 @@ import {
   TableRow,
   Typography,
 } from '@material-ui/core';
-import { IDevice } from '@lib/types';
+
+import { IDevice, IActivationCode } from '@lib/types';
+
+// import activationCode from '../../store/activationCode';
 
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
-  devices?: IDevice[];
+  devices: IDevice[];
   selectedDevices?: IDevice[];
+  activationCodes: IActivationCode[];
   limitRows?: number;
+  onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
 }
 
-const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevices = [], limitRows = 0 }: IProps) => {
+const DeviceListTable = ({
+  devices = [],
+  activationCodes = [],
+  onChangeSelectedDevices,
+  selectedDevices = [],
+  limitRows = 0,
+  onCreateCode,
+}: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -123,6 +138,21 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
         <TableCell>{device.state}</TableCell>
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
         <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>
+          <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <Box style={{ width: '40px' }}>{activationCodes.find((a) => a.device.id === device.id)?.code}</Box>
+            <Box>
+              {onCreateCode && (
+                <Button
+                  // component={RouterLink}
+                  onClick={() => onCreateCode(device.id)}
+                >
+                  <RefreshIcon />
+                </Button>
+              )}
+            </Box>
+          </Box>
+        </TableCell>
       </TableRow>
     ));
 
@@ -160,6 +190,7 @@ const DeviceListTable = ({ devices = [], onChangeSelectedDevices, selectedDevice
                 <TableCell>Состояние</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
+                <TableCell>Код активации</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

@@ -3,7 +3,7 @@ import { ParameterizedContext, Next, Context } from 'koa';
 import { IUser, IUserCredentials, NewActivationCode } from '@lib/types';
 
 import log from '../utils/logger';
-import { authService, deviceService } from '../services';
+import { authService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
 
 /**
@@ -70,16 +70,6 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('verifyCode: ok');
 };
 
-const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceId } = ctx.params;
-
-  const code = await deviceService.genActivationCode(deviceId);
-
-  ok(ctx as Context, code);
-
-  log.info('getActivationCode: activation code generated successfully');
-};
-
 const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: uid } = ctx.params;
 
@@ -90,4 +80,4 @@ const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getDeviceStatus: ok');
 };
 
-export { signUp, logIn, logOut, getCurrentUser, getActivationCode, verifyCode, getDeviceStatus };
+export { signUp, logIn, logOut, getCurrentUser, verifyCode, getDeviceStatus };

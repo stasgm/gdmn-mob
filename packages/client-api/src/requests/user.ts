@@ -169,21 +169,21 @@ class User extends BaseRequest {
   };
 
   getUsers = async (params?: Record<string, string | number>) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-    //   if (mockUsers) {
-    //     return {
-    //       type: 'GET_USERS',
-    //       users: mockUsers,
-    //     } as types.IGetUsersResponse;
-    //   }
+      if (mockUsers) {
+        return {
+          type: 'GET_USERS',
+          users: mockUsers,
+        } as types.IGetUsersResponse;
+      }
 
-    //   return {
-    //     type: 'ERROR',
-    //     message: 'Пользователи не найдены',
-    //   } as error.INetworkError;
-    // }
+      return {
+        type: 'ERROR',
+        message: 'Пользователи не найдены',
+      } as error.INetworkError;
+    }
 
     let paramText = params ? getParams(params) : '';
 
