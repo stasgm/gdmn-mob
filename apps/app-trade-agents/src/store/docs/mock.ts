@@ -24,7 +24,7 @@ const users: IUser[] = [
     lastName: 'ГОЦЕЛЮК',
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
-    companies: [company],
+    company: company,
     role: 'Admin',
   },
   {
@@ -34,7 +34,7 @@ const users: IUser[] = [
     lastName: 'ПАВЛОВСКАЯ',
     phoneNumber: '8-02238-22-209',
     creator: superAdmin,
-    companies: [company],
+    company: company,
     role: 'Admin',
   },
   {
@@ -44,7 +44,7 @@ const users: IUser[] = [
     lastName: 'ЧЕРНЫШОВ',
     phoneNumber: '+37529-7820427',
     creator: superAdmin,
-    companies: [company],
+    company: company,
     role: 'Admin',
   },
 ];

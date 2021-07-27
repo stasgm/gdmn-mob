@@ -1,35 +1,18 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import React from 'react';
 import { useTheme } from 'react-native-paper';
+import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import { DrawerContent } from './drawerContent';
-
-// import SettingsNavigator from './Root/SettingsNavigator';
-// import MessagesNavigator from './Root/MessagesNavigator';
+import SettingsNavigator from './Root/SettingsNavigator';
+import MessagesNavigator from './Root/MessagesNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
 // import DocumentsNavigator from './Root/DocumentsNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
-
-export type RootDrawerParamList = {
-  Dashboard: undefined;
-  References: undefined;
-  Settings: undefined;
-  Profile: undefined;
-  Messages: undefined;
-  [itemName: string]: undefined;
-};
+import { INavItem, RootDrawerParamList } from './types';
+import { DrawerContent } from './drawerContent';
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
-
-// console.log('DrawerNavigator');
-
-export interface INavItem {
-  name: string;
-  title: string;
-  icon: keyof typeof Icon.glyphMap;
-  component: any;
-}
+// / console.log('DrawerNavigator');
 
 const baseNavList: INavItem[] = [
   /*   {
@@ -44,18 +27,18 @@ const baseNavList: INavItem[] = [
     icon: 'file-cabinet',
     title: 'Справочники',
   },
-  /*   {
-      name: 'Messages',
-      component: MessagesNavigator,
-      icon: 'message-text-outline',
-      title: 'Сообщения',
-    }, */
-  /*   {
-      name: 'Settings',
-      component: SettingsNavigator,
-      icon: 'tune',
-      title: 'Настройки',
-    }, */
+  {
+    name: 'Messages',
+    component: MessagesNavigator,
+    icon: 'message-text-outline',
+    title: 'Сообщения',
+  },
+  {
+    name: 'Settings',
+    component: SettingsNavigator,
+    icon: 'tune',
+    title: 'Настройки',
+  },
   {
     name: 'Profile',
     component: ProfileNavigator,
@@ -66,9 +49,11 @@ const baseNavList: INavItem[] = [
 
 export interface IProps {
   items?: INavItem[];
+  onSyncClick?: () => void;
+  syncing?: boolean;
 }
 
-const DrawerNavigator = (props: IProps) => {
+const DrawerNavigator = ({ onSyncClick, syncing, ...props }: IProps) => {
   const { colors } = useTheme();
 
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
@@ -79,7 +64,7 @@ const DrawerNavigator = (props: IProps) => {
         activeBackgroundColor: colors.primary,
         activeTintColor: '#ffffff',
       }}
-      drawerContent={(props) => <DrawerContent {...props} />}
+      drawerContent={(props) => <DrawerContent {...props} onSync={onSyncClick} syncing={syncing} />}
     >
       {navList.map((item) => (
         <Drawer.Screen

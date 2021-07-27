@@ -27,7 +27,8 @@ const signup: Config = {
 
 const verifyCode: Config = {
   validate: {
-    params: Joi.object({
+    type: 'json',
+    body: Joi.object({
       code: Joi.string().required().error(new InvalidParameterException('Не указан код активации')),
     }),
   },
@@ -49,4 +50,12 @@ const checkDevice: Config = {
   },
 };
 
-export { login, signup, verifyCode, getActivationCode, checkDevice };
+const getDeviceStatus: Config = {
+  validate: {
+    params: Joi.object({
+      id: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
+    }),
+  },
+};
+
+export { login, signup, verifyCode, getActivationCode, checkDevice, getDeviceStatus };

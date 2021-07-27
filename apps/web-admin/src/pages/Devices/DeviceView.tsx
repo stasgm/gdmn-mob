@@ -1,60 +1,82 @@
+import { useCallback, useEffect } from 'react';
 import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
-
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-
 import { useNavigate, useParams } from 'react-router-dom';
-
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-// import { device } from '@lib/mock';
-
-import { useCallback, useEffect } from 'react';
-
 import { useSelector, useDispatch } from '../../store';
-import actions from '../../store/device';
-// import CompanyDevices from '../../components/device/CompanyDevices';
-
+import deviceActions from '../../store/device';
+import userActions from '../../store/user';
+import codeActions from '../../store/activationCode';
+import bindingActions from '../../store/deviceBinding';
 import { IToolBarButton } from '../../types';
-
 import ToolBarAction from '../../components/ToolBarActions';
-
+// eslint-disable-next-line import/namespace
 import DeviceDetailsView from '../../components/device/DeviceDetailsView';
+import UserListTable from '../../components/user/UserListTable';
+import userSelectors from '../../store/user/selectors';
+import deviceSelectors from '../../store/device/selectors';
+import activationCodeSelectors from '../../store/activationCode/selectors';
+import SnackBar from '../../components/SnackBar';
 
-// import UserDevices from '../../components/device/';
+import { adminPath } from '../../utils/constants';
 
 const DeviceView = () => {
   const { id: deviceId } = useParams();
-
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
 
-  // const classes = useStyles();
+  const { loading, errorMessage } = useSelector((state) => state.devices);
 
-  const { loading } = useSelector((state) => state.devices);
-  const device = useSelector((state) => state.devices.list.find((i) => i.id === deviceId));
-  // const { devices, devicesLoading } = useSelector((state) => state.devices); пользователи из хранилища по deviceId
+  const device = deviceSelectors.deviceById(deviceId);
+  const users = userSelectors.usersByDeviceId(deviceId);
+  const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
+  /*  console.log('activationCodes', activationCodes);*/
 
   const handleCancel = () => {
-    navigate('/app/devices');
+    navigate(-1);
   };
 
   const handleEdit = () => {
-    navigate(`/app/devices/edit/${deviceId}`);
+    navigate(`${adminPath}/app/devices/edit/${deviceId}`);
   };
 
-  const handleRefresh = useCallback(() => {
-    dispatch(actions.fetchDeviceById(deviceId));
+  const handleDelete = async () => {
+    const res = await dispatch(deviceActions.removeDevice(deviceId));
+    if (res.type === 'DEVICE/REMOVE_SUCCESS') {
+      navigate(-1);
+    }
+  };
+
+  const refreshData = useCallback(() => {
+    dispatch(deviceActions.fetchDeviceById(deviceId));
+    dispatch(bindingActions.fetchDeviceBindings());
+    dispatch(userActions.fetchUsers());
+    dispatch(codeActions.fetchActivationCodes(deviceId));
   }, [dispatch, deviceId]);
 
   useEffect(() => {
-    handleRefresh();
-  }, [handleRefresh]);
+    refreshData();
+  }, [refreshData]);
+
+  const handleClearError = () => {
+    dispatch(deviceActions.deviceActions.clearError());
+  };
 
   if (!device) {
-    return <Box>Устройство не найдено</Box>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Устройство не найдено
+      </Box>
+    );
   }
 
   const buttons: IToolBarButton[] = [
@@ -63,7 +85,7 @@ const DeviceView = () => {
       sx: { marginRight: 1 },
       color: 'primary',
       variant: 'contained',
-      onClick: () => handleRefresh(),
+      onClick: refreshData,
       icon: <CachedIcon />,
     },
     {
@@ -72,7 +94,7 @@ const DeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleEdit(),
+      onClick: handleEdit,
       icon: <EditIcon />,
     },
     {
@@ -80,9 +102,7 @@ const DeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => {
-        return;
-      },
+      onClick: handleDelete,
       icon: <DeleteIcon />,
     },
   ];
@@ -105,7 +125,7 @@ const DeviceView = () => {
             <IconButton color="primary" onClick={handleCancel}>
               <ArrowBackIcon />
             </IconButton>
-            <CardHeader title={'Список пользователей'} />
+            <CardHeader title={'Назад'} />
             {loading && <CircularProgress size={40} />}
           </Box>
           <Box
@@ -122,13 +142,14 @@ const DeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceDetailsView device={device} />
+          <DeviceDetailsView device={device} activationCode={code} />
         </Box>
       </Box>
-      {/* <Box>
-        <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices devices={[device]} />
-      </Box> */}
+      <Box>
+        <CardHeader title={'Пользователи устройства'} sx={{ mx: 2 }} />
+        <UserListTable users={users} />
+      </Box>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };

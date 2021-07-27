@@ -7,6 +7,7 @@ import {
   InnerErrorException,
   ConflictException,
   InvalidParameterException,
+  ForbiddenException,
 } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
@@ -34,18 +35,18 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   }
 
   let creatorId;
-  let companies;
+  let company = null;
 
   if (newUser.creator) {
     const creator = await users.find(newUser.creator.id);
 
-    creatorId = creator.id;
-    companies = creator.companies;
-
-    if (!creator.companies.length) {
+    if (!creator.company) {
       // Нельзя создавать пользователей пока не создана администратором организация
       throw new InvalidParameterException('Не создана организация');
     }
+
+    creatorId = creator.id;
+    company = creator.company;
   }
 
   const passwordHash = await hashPassword(newUser.password);
@@ -53,7 +54,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
   const newUserObj: IDBUser = {
     id: '',
     name: newUser.name,
-    companies: companies || [],
+    company: company,
     password: passwordHash,
     role: newUser.role,
     creatorId: creatorId || '',
@@ -97,16 +98,9 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
   // Если передан новый пароль то хешируем и заменяем
   const passwordHash = userData.password ? await hashPassword(userData.password) : oldUser.password;
 
-  // Проверяем есть ли в базе переданные организации
-  const companyList: string[] = [];
-
-  if (userData?.companies) {
-    for await (const companyData of userData.companies) {
-      const company = await companies.find(companyData?.id);
-
-      company && companyList.push(company.id);
-    }
-  }
+  // Ссылочные поля надо проверять на существование в БД
+  // Проверяем есть ли в базе переданная организация
+  const newCompany = userData?.company ? (await companies.find(userData.company.id)).id : oldUser.company;
 
   // Проверяем есть ли в базе переданный creator
   const creatorId = userData?.creator ? (await users.find(userData.creator.id))?.id : oldUser.creatorId;
@@ -114,7 +108,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
   const newUser: IDBUser = {
     id: userId,
     name: userData.name || oldUser.name,
-    companies: companyList || oldUser.companies,
+    company: newCompany,
     password: passwordHash,
     role: userData.role || oldUser.role,
     creatorId,
@@ -150,13 +144,16 @@ const deleteOne = async (id: string): Promise<void> => {
 
   // TODO Если пользователь является админом организации то прерывать
   // удаление с соответствующим сообщением
+  if (user.role === 'SuperAdmin' || (user.role === 'Admin' && Boolean(user.company))) {
+    throw new ForbiddenException('Администратор не может быть удален');
+  }
+
   await users.delete(id);
 };
 
 const findOne = async (id: string): Promise<IUser | undefined> => {
   const db = getDb();
   const { users } = db;
-
   const user = await users.find(id);
 
   if (!user) {
@@ -212,9 +209,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
     let companyFound = true;
 
     if ('companyId' in newParams) {
-      if (newParams.companyId) {
-        companyFound = item.companies?.includes(newParams.companyId as string);
-      }
+      companyFound = item.company === newParams.companyId;
       delete newParams['companyId'];
     }
 
@@ -270,7 +265,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
 //   return Promise.all(pr);
 // };
 
-const addCompanyToUser = async (userId: string, companyId: string) => {
+/* const addCompanyToUser = async (userId: string, companyId: string) => {
   const db = getDb();
   const { users, companies } = db;
 
@@ -286,16 +281,10 @@ const addCompanyToUser = async (userId: string, companyId: string) => {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  if (user.companies?.some((i) => companyId === i)) {
-    throw new DataNotFoundException('Компания уже привязана к пользователю');
-  }
+  return await users.update({ ...user, company: company.id });
+}; */
 
-  const companyList = [...(user.companies || []), company.id];
-
-  return await users.update({ ...user, companies: companyList });
-};
-
-const removeCompanyFromUser = async (userId: string, companyName: string) => {
+/* const removeCompanyFromUser = async (userId: string, companyId: string) => {
   const db = getDb();
   const { users } = db;
 
@@ -305,7 +294,7 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
     throw new DataNotFoundException('Пользователь не найден');
   }
 
-  if (user.companies?.some((i) => companyName === i)) {
+  if (user.company === companyId) {
     throw new DataNotFoundException('Компания не привязана к пользователю');
   }
 
@@ -313,13 +302,13 @@ const removeCompanyFromUser = async (userId: string, companyName: string) => {
     ...user,
     companies: user.companies?.filter((i) => i === companyName),
   });
-};
+}; */
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
   const db = getDb();
   const { companies, users } = db;
 
-  const companyList = await getNamedEntity(user.companies, companies);
+  const company = user.company ? await getNamedEntity(user.company, companies) : void 0;
 
   const creator = await getNamedEntity(user.creatorId, users);
 
@@ -327,7 +316,7 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
   return {
     id: user.id,
     name: user.name,
-    companies: companyList,
+    company,
     role: user.role,
     creator,
     firstName: user.firstName,
@@ -340,14 +329,4 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
   };
 };
 
-export {
-  findOne,
-  findAll,
-  findByName,
-  addOne,
-  updateOne,
-  deleteOne,
-  addCompanyToUser,
-  removeCompanyFromUser,
-  getUserPassword,
-};
+export { findOne, findAll, findByName, addOne, updateOne, deleteOne, getUserPassword };

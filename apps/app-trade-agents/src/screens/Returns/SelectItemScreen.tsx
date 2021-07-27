@@ -28,7 +28,7 @@ const SelectItemScreen = () => {
         .filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, []);
+  }, [list?.data, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -72,7 +72,7 @@ const SelectItemScreen = () => {
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
           <View style={styles.details}>
-            <View style={styles.directionRow}>
+            <View style={styles.rowCenter}>
               <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
             </View>
           </View>

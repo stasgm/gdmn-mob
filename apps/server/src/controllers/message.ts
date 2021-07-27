@@ -8,7 +8,7 @@ import { messageService, companyService, userService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
-import { DataNotFoundException } from '../exceptions';
+import { DataNotFoundException, ForbiddenException } from '../exceptions';
 
 let clients: ((result: IMessage[]) => void)[] = [];
 
@@ -27,8 +27,12 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   //   ctx.throw(400, 'некорректный формат сообщения');
   // }
 
-  if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
-    ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
+  // if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
+  //   ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
+  // }
+
+  if (ctx.state.user.company.id !== message.head.company.id) {
+    throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   // try {
@@ -191,8 +195,12 @@ const publish = async (ctx: ParameterizedContext): Promise<void> => {
   //   ctx.throw(400, 'некорректный формат сообщения');
   // }
 
-  if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
-    ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
+  // if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
+  //   ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
+  // }
+
+  if (ctx.state.user.company.id !== message.head.company.id) {
+    throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   //try {

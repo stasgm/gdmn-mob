@@ -1,4 +1,4 @@
-import { ICompany, IDocument, IMessage, INamedEntity, IReferences, NewMessage } from '@lib/types';
+import { ICompany, IDocument, IMessage, INamedEntity, IReferences, NewMessage, ICmd, ICmdParams } from '@lib/types';
 
 // import { companyRefMock, depRefMock, docTypeRefMock, peopleRefMock, goodsRefMock } from './references';
 
@@ -26,24 +26,28 @@ const companies: ICompany[] = [
   { id: '6', name: 'Company 4', admin: user2 },
 ];
 
-export const newMessage: NewMessage<string> = {
+type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences;
+
+export const newMessage: NewMessage<MessageType> = {
   head: {
     appSystem: 'Inventory',
     company: companies[0] as INamedEntity,
     consumer: user1,
   },
-  status: 'recd',
+  status: 'DRAFT',
   body: {
-    type: 'cmd',
-    payload: 'get documents',
+    type: 'CMD',
+    payload: {
+      name: 'GET_DOCUMENTS',
+    },
   },
 };
 
 //export const messages: Omit<IMessage<string>, 'status'>[] = [
-export const messages: IMessage<string | IDocument[] | IReferences[]>[] = [
+export const messages: IMessage<MessageType>[] = [
   {
     id: '14',
-    status: 'recd',
+    status: 'READY',
     head: {
       appSystem: 'Inventory',
       company: companies[0] as INamedEntity,
@@ -52,8 +56,20 @@ export const messages: IMessage<string | IDocument[] | IReferences[]>[] = [
       dateTime: '2021-04-15T10:47:33.376Z',
     },
     body: {
-      type: 'cmd',
-      payload: 'get documents',
+      type: 'CMD',
+      payload: {
+        name: 'GET_DOCUMENTS',
+        params: [
+          {
+            dateBegin: '2021-07-06',
+            dateEnd: '2021-07-07',
+            documentType: {
+              id: '168063006',
+              name: 'Заявки на закупку ТМЦ',
+            },
+          },
+        ],
+      },
     },
   },
 ];

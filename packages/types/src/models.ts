@@ -1,28 +1,12 @@
-// Базовые типы
-export interface IEntity {
-  id: string;
-  creationDate?: string;
-  editionDate?: string;
-}
-
-export interface INamedEntity extends IEntity {
-  name: string;
-}
-
-export interface IExternalSystemProps {
-  externalId?: string;
-}
-
-export type DeviceState = 'NON-REGISTERED' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCKED';
-
-export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
+import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } from './common';
+import { IHeadMessage, IMessage } from './messages';
 
 // Типы для хранения данных в бд
 export interface IDBUser extends INamedEntity, IExternalSystemProps {
   password: string;
   creatorId: string;
   role: UserRole;
-  companies: string[]; // по умолчанию пустой массив
+  company: string | null; // по умолчанию null
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
@@ -31,6 +15,7 @@ export interface IDBUser extends INamedEntity, IExternalSystemProps {
 
 export interface IDBCompany extends INamedEntity, IExternalSystemProps {
   adminId: string;
+  city?: string;
 }
 
 export interface IDBDevice extends INamedEntity {
@@ -39,36 +24,29 @@ export interface IDBDevice extends INamedEntity {
   companyId: string;
 }
 
-export interface IDBDeviceBinding {
-  id: string;
+export interface IDBDeviceBinding extends IEntity {
   userId: string;
   deviceId: string;
   state: DeviceState;
 }
 
-export interface IDBActivationCode {
-  id?: string;
+export interface IDBActivationCode extends IEntity {
   code: string;
   date: string;
   deviceId: string;
 }
 
-interface IDBHeadMessage {
-  appSystem: string;
+// Messages
+export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer'> {
+  // appSystem: string;
   companyId: string;
   producerId: string;
   consumerId: string;
-  dateTime: string;
+  // dateTime: string;
 }
 
-export interface IDBMessage<T = any> {
-  id: string;
-  status: TStatusMessage;
+export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
-  body: {
-    type: TBodyType;
-    payload: T;
-  };
 }
 
 // Типы для передачи и хранения данных на клиенте
@@ -80,7 +58,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   email?: string;
   phoneNumber?: string;
   creator?: INamedEntity;
-  companies: INamedEntity[];
+  company?: INamedEntity;
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;
@@ -92,12 +70,7 @@ export interface ICompany extends Omit<IDBCompany, 'adminId'> {
   admin: INamedEntity;
 }
 
-export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name'>;
-
-export interface IMessageInfo {
-  uid: string;
-  date: Date;
-}
+export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city'>;
 
 export interface IDevice extends Omit<IDBDevice, 'companyId'> {
   company: INamedEntity;
@@ -110,45 +83,10 @@ export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'devic
   device: INamedEntity;
 }
 
-export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device'>;
+export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device' | 'state'>;
 
 export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
   device: INamedEntity;
 }
 
-interface IHeadMessage {
-  appSystem: string;
-  company: INamedEntity;
-  producer: INamedEntity;
-  consumer: INamedEntity;
-  dateTime: string;
-}
-
-export type TStatusMessage = 'recd' | 'procd';
-type TBodyType = 'cmd' | 'refs' | 'docs';
-
-export interface IMessage<T = any> {
-  id: string;
-  status: TStatusMessage;
-  head: IHeadMessage;
-  body: {
-    type: TBodyType;
-    payload: T;
-  };
-}
-
-export type NewMessage<T = any> = {
-  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-  status: TStatusMessage;
-  body: {
-    type: TBodyType;
-    payload: T;
-  };
-};
-
-export interface IDataMessage<T = any> {
-  id: string;
-  name: string;
-  type: string;
-  data: T;
-}
+export type NewActivationCode = Pick<IActivationCode, 'code'>;

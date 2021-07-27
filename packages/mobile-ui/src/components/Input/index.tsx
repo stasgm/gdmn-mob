@@ -13,7 +13,7 @@ interface Props {
   spellCheck?: boolean;
   maxLength?: number;
   autoCorrect?: boolean;
-  required?: boolaen;
+  required?: boolean;
   keyboardType?:
     | 'default'
     | 'email-address'
@@ -45,7 +45,6 @@ const Input: React.FC<Props> = ({
   returnKeyType,
   editable,
   disabled,
-  required,
 }) => {
   const { colors } = useTheme();
 

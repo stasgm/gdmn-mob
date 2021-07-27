@@ -1,4 +1,3 @@
-// import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useFormik } from 'formik';
@@ -11,16 +10,14 @@ import { useEffect } from 'react';
 
 import { authActions, useSelector, useDispatch } from '@lib/store';
 
-// import { useSelector, useDispatch, AppDispatch } from '../store';
-
 import Logo from '../components/Logo';
+
+import { adminPath } from '../utils/constants';
 
 const Login = () => {
   const dispatch = useDispatch();
 
   const { error, loading, status } = useSelector((state) => state.auth);
-
-  console.log(error, loading, status);
 
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
@@ -33,19 +30,13 @@ const Login = () => {
       password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values: IUserCredentials) => {
-      dispatch(authActions.signInWithDevice(values));
+      dispatch(authActions.signIn(values));
     },
   });
 
   useEffect(() => {
     dispatch(authActions.clearError());
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   if (device && !error) {
-  //     dispatch(authActions.signIn(formik.values));
-  //   }
-  // }, [device, error, formik.values, dispatch]);
 
   return (
     <>
@@ -136,7 +127,7 @@ const Login = () => {
             </Box>
             <Typography color="textSecondary" variant="body1">
               Ещё не с нами?{' '}
-              <Link component={RouterLink} to="/register" variant="h6">
+              <Link component={RouterLink} to={`${adminPath}/register`} variant="h6">
                 Зарегистрироваться
               </Link>
             </Typography>

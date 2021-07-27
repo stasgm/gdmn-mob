@@ -1,6 +1,8 @@
 import { IUser } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
+import { IPageParam } from '../../types';
+
 const init = createAction('USER/INIT')();
 const clearError = createAction('USER/CLEAR_ERROR')();
 
@@ -34,12 +36,17 @@ const removeUserAsync = createAsyncAction('USER/REMOVE', 'USER/REMOVE_SUCCESS', 
   string
 >();
 
+const setPageParam = createAction('USER/SET_PARAM')<IPageParam>();
+const clearPageParams = createAction('USER/CLEAR_PARAMS')();
+
 export const userActions = {
   fetchUsersAsync,
   fetchUserAsync,
   addUserAsync,
   updateUserAsync,
   removeUserAsync,
+  clearPageParams,
+  setPageParam,
   clearError,
   init,
 };

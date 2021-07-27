@@ -1,10 +1,8 @@
 import { IApiConfig } from '@lib/client-types';
-import { IDevice, IUser, ICompany } from '@lib/types';
+import { IDevice, IUser, ICompany, DeviceState } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { AuthState } from './types';
-
-const init = createAction('AUTH/INIT')<AuthState>();
+const init = createAction('AUTH/INIT')();
 const clearError = createAction('AUTH/CLEAR_ERROR')();
 
 const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
@@ -32,9 +30,15 @@ const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AU
 
 const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUTH/SIGNUP_FAILURE')<
   string | undefined,
-  IUser,
+  undefined,
   string
 >();
+
+const getDeviceStatusAsync = createAsyncAction(
+  'AUTH/GET_DEVICE_STATUS',
+  'AUTH/GET_DEVICE_STATUS_SUCCESS',
+  'AUTH/GET_DEVICE_STATUS_FAILURE',
+)<string, DeviceState | undefined, string>();
 
 export const actions = {
   init,
@@ -47,6 +51,7 @@ export const actions = {
   loginUserAsync,
   signUpAsync,
   activateDeviceAsync,
+  getDeviceStatusAsync,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

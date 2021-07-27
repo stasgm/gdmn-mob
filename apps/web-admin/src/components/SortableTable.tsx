@@ -3,8 +3,6 @@ import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import { IHeadCells } from '@lib/types';
-
 import {
   Box,
   Card,
@@ -20,17 +18,23 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
+import { IHeadCells } from '../types';
+import { adminPath } from '../utils/constants';
+import { isNamedEntity } from '../utils/helpers';
+
 type Order = 'asc' | 'desc';
 
 const useStyles = makeStyles(() => ({
   row: { height: 53 },
 }));
-interface props<T extends { id: string }> {
+
+interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
+  path: string;
 }
 
-function SortableTable<T extends { id: string }>({ data = [], headCells = [], ...rest }: props<T>) {
+function SortableTable<T extends { id: string }>({ data = [], headCells = [], path, ...rest }: IProps<T>) {
   const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -49,6 +53,8 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
 
     setSelectedUserIds(newSelectedUserIds);
   };
+
+  console.log('SortableTable data', data);
 
   const handleSelectOne = (_event: any, id: any) => {
     const selectedIndex = selectedUserIds.indexOf(id);
@@ -156,6 +162,27 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
             else {
               return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>;
             }
+<!--             const v = item[headCell.id];
+            const s = isNamedEntity(v) ? v.name : v;
+
+            return index ? (
+              <TableCell key={index}>{s}</TableCell>
+            ) : (
+              <TableCell key={index} style={{ padding: '0 16px' }}>
+                <Box
+                  sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  <NavLink to={`${adminPath}${path}${item.id}`}>
+                    <Typography color="textPrimary" variant="body1" key={item.id}>
+                      {s}
+                    </Typography>
+                  </NavLink>
+                </Box>
+              </TableCell>
+            ); -->
           })}
         </TableRow>
       ));

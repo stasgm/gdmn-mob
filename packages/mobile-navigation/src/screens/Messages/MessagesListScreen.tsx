@@ -1,20 +1,14 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { useNavigation } from '@react-navigation/core';
-// import { DrawerActions } from '@react-navigation/native';
 
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { IMessage } from '@lib/types';
 import { useSelector, messageActions, useDispatch } from '@lib/store';
-
-import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { useActionSheet, MenuButton, DrawerButton, globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
-  const { colors } = useTheme();
   const navigation = useNavigation();
 
   return (
@@ -23,17 +17,17 @@ const MessageItem = ({ item }: { item: IMessage }) => {
         navigation.navigate('MessageView', { id: item.id });
       }}
     >
-      <View style={[styles.item, { backgroundColor: colors.background }]}>
-        <View style={[styles.icon]}>
+      <View style={styles.item}>
+        <View style={[styles.icon, { backgroundColor: item.status === 'READY' ? '#E91E63' : '#06567D' }]}>
           <MaterialCommunityIcons name="message-text-outline" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <View style={styles.directionRow}>
-            <Text
-              style={[styles.name, { color: colors.text }]}
-            >{`${item.head.producer.name} > ${item.head.consumer.name}`}</Text>
+          <View style={styles.rowCenter}>
+            <Text style={styles.name}>{`${item.head.producer.name}  >>  ${item.head.consumer.name}`}</Text>
           </View>
-          <Text style={[styles.number, styles.field, { color: colors.text }]}>Сообщение от {item.head.dateTime}</Text>
+          <Text style={[styles.number, styles.field]}>
+            {`${item.body.type}, ${new Date(item.head.dateTime).toDateString()} (${item.status})`}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -42,8 +36,7 @@ const MessageItem = ({ item }: { item: IMessage }) => {
 
 const MessagesListScreen = () => {
   const { data, loading } = useSelector((state) => state.messages);
-  const { company } = { company: { id: '654', name: 'ОДО Амперсант', admin: 'Stas' } };
-  // const { company } = useSelector((state) => state.auth);
+  const { company } = useSelector((state) => state.auth);
   // const { colors } = useTheme();
 
   const dispatch = useDispatch();
@@ -89,9 +82,9 @@ const handleSend = async () => {
     //TODO systemId из конфига
     //company &&
     dispatch(
-      messageActions.fetchMsg({
-        companyId: company.id,
-        systemId: 'Inventory',
+      messageActions.fetchMessages({
+        companyId: company!.id,
+        systemId: 'gdmn-appl-request',
       }),
     );
   }, [company, dispatch]);
@@ -138,73 +131,19 @@ const handleSend = async () => {
 
   return (
     <>
-      <View style={styles.container}>
+      <AppScreen style={styles.contentTop}>
         <FlatList
           ref={ref}
           data={data}
           keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
-          ItemSeparatorComponent={ItemSeparator}
+          ItemSeparatorComponent={Divider}
           scrollEventThrottle={400}
-          onEndReached={() => ({})}
-          refreshControl={<RefreshControl refreshing={loading} title="Загрузка данных..." />}
           ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
         />
-      </View>
-      {/*
-      <FAB style={[styles.fabAdd, { backgroundColor: colors.primary }]} icon="dots-horizontal" onPress={actionsMenu} />
-      */}
+      </AppScreen>
     </>
   );
 };
 
 export default MessagesListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    margin: 5,
-  },
-  icon: {
-    alignItems: 'center',
-    backgroundColor: '#e91e63',
-    borderRadius: 18,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
-  },
-  details: {
-    margin: 8,
-    marginRight: 0,
-    flex: 1,
-  },
-  item: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    padding: 8,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  number: {
-    fontSize: 12,
-  },
-  directionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  emptyList: {
-    marginTop: 20,
-    textAlign: 'center',
-  },
-  field: {
-    opacity: 0.5,
-  },
-  fabAdd: {
-    bottom: 0,
-    margin: 20,
-    position: 'absolute',
-    right: 0,
-  },
-});

@@ -19,7 +19,13 @@ class Company extends BaseRequest {
 
       return {
         type: 'ADD_COMPANY',
-        company: { ...company, admin: mockUser, id: uuid() },
+        company: {
+          ...company,
+          admin: mockUser,
+          id: uuid(),
+          editionDate: new Date().toISOString(),
+          creationDate: new Date().toISOString(),
+        },
       } as types.IAddCompanyResponse;
     }
 
@@ -57,7 +63,7 @@ class Company extends BaseRequest {
       if (updatedCompany) {
         return {
           type: 'UPDATE_COMPANY',
-          company: updatedCompany,
+          company: { ...updatedCompany, editionDate: new Date().toISOString() },
         } as types.IUpdateCompanyResponse;
       }
 
@@ -163,14 +169,14 @@ class Company extends BaseRequest {
   };
 
   getCompanies = async (params?: Record<string, string | number>) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-    //   return {
-    //     type: 'GET_COMPANIES',
-    //     companies: mockCompanies,
-    //   } as types.IGetCompaniesResponse;
-    // }
+      return {
+        type: 'GET_COMPANIES',
+        companies: mockCompanies,
+      } as types.IGetCompaniesResponse;
+    }
 
     let paramText = params ? getParams(params) : '';
 

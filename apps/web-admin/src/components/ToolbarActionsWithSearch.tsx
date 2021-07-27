@@ -1,4 +1,4 @@
-import { Box, Card, TextField, InputAdornment, SvgIcon, IconButton } from '@material-ui/core';
+import { Box, Card, TextField, InputAdornment, IconButton } from '@material-ui/core';
 
 import { Search as SearchIcon } from 'react-feather';
 
@@ -6,7 +6,7 @@ import { IToolBarButton } from '../types';
 
 import ToolBarActions from './ToolBarActions';
 
-interface props {
+interface IProps {
   buttons: IToolBarButton[];
   searchTitle: string;
   valueRef: any;
@@ -15,7 +15,7 @@ interface props {
   keyPress: (key: string) => void;
 }
 
-const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnClick, keyPress, valueRef }: props) => {
+const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnClick, keyPress, valueRef }: IProps) => {
   return (
     <Card>
       <Box

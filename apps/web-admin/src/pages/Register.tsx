@@ -13,6 +13,8 @@ import { authActions, useThunkDispatch, useSelector } from '@lib/store';
 
 import Logo from '../components/Logo';
 
+import { adminPath } from '../utils/constants';
+
 const Register = () => {
   const navigate = useNavigate();
 
@@ -20,20 +22,16 @@ const Register = () => {
 
   const dispatch = useThunkDispatch();
 
-  console.log(error, loading, status);
-
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signUp(values));
 
-    console.log('res.type', res.type);
-    console.log(res);
     if (res.type === 'AUTH/SIGNUP_SUCCESS') {
-      navigate('/login');
+      navigate(`${adminPath}/login`);
     }
   };
 
   useEffect(() => {
-    // dispatch(authActions.authActions.clearError());
+    dispatch(authActions.clearError());
   }, [dispatch]);
 
   const formik = useFormik<IUserCredentials>({
@@ -191,7 +189,7 @@ const Register = () => {
             </Box>
             <Typography color="textSecondary" variant="body1">
               Зарегистрированы?{' '}
-              <Link component={RouterLink} to="/login" variant="h6">
+              <Link component={RouterLink} to={`${adminPath}/login`} variant="h6">
                 Войти
               </Link>
             </Typography>

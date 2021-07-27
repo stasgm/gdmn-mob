@@ -8,6 +8,8 @@ import LogoutIcon from '@material-ui/icons/ExitToAppOutlined';
 
 import { authActions } from '@lib/store';
 
+import { adminPath } from '../utils/constants';
+
 import Logo from './Logo';
 
 interface IProps {
@@ -22,13 +24,18 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
   return (
     <AppBar elevation={0} {...rest}>
       <Toolbar>
-        <RouterLink to="/">
+        <RouterLink to={`${adminPath}/`}>
           <Logo />
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />
         <Box
-          component="button"
-          sx={{ background: 'transparent', border: 'none', display: { xs: 'none', lg: 'block' }, color: 'white' }}
+          // component="button"
+          sx={{
+            background: 'transparent',
+            border: 'none',
+            //display: { xs: 'none', md: 'block', lg: 'block' },
+            color: 'white',
+          }}
         >
           <IconButton color="inherit">
             <Badge badgeContent={notifications.length} color="primary" variant="dot">
@@ -40,8 +47,13 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
           </IconButton>
         </Box>
         <Box
-          component="button"
-          sx={{ background: 'transparent', border: 'none', display: { xs: 'block', md: 'none' }, color: 'white' }}
+          // component="button"
+          sx={{
+            background: 'transparent',
+            border: 'none',
+            display: { xs: 'block', md: 'block', lg: 'none' },
+            color: 'white',
+          }}
         >
           <IconButton color="inherit" onClick={onMobileNavOpen}>
             <MenuIcon />

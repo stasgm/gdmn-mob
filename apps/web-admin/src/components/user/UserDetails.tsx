@@ -14,10 +14,19 @@ interface IProps {
 const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
-    initialValues: user,
+    initialValues: {
+      ...user,
+      name: user.name || '',
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      password: (user as NewUser).password || '',
+      phoneNumber: user.phoneNumber || '',
+      email: user.email || '',
+    },
     validationSchema: yup.object().shape({
       name: yup.string().required('Заполните это поле'),
-      password: yup.string().required('Заполните это поле'),
+      password:
+        Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
       onSubmit(values);
@@ -35,7 +44,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container spacing={3} item lg={8} md={6} xs={12}>
+              <Grid container spacing={3}>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}

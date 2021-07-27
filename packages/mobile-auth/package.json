@@ -22,6 +22,7 @@
     "@expo/vector-icons": "^12.0.4",
     "@expo/webpack-config": "^0.12.77",
     "@lib/client-types": "*",
+    "@lib/client-api": "*",
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@lib/types": "*",
