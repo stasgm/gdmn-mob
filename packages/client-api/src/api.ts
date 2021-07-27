@@ -119,6 +119,7 @@ const {
   server: { name, port, protocol },
   timeout,
   apiPath,
+  version,
 } = config;
 
 export default new Api({
@@ -126,6 +127,7 @@ export default new Api({
   timeout,
   protocol,
   port,
+  version,
   server: name,
   deviceId: undefined,
   debug: {
