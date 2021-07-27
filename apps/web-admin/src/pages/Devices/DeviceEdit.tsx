@@ -1,6 +1,6 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IDevice, NewDevice } from '@lib/types';
+import { IDevice, NewDevice, IActivationCode } from '@lib/types';
 import { useEffect } from 'react';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
@@ -8,6 +8,9 @@ import { useSelector, useDispatch, AppDispatch } from '../../store';
 import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
+
+import codeActions from '../../store/activationCode';
+import activationCodeSelectors from '../../store/activationCode/selectors';
 
 const DeviceEdit = () => {
   const { id: deviceId } = useParams();
@@ -18,6 +21,7 @@ const DeviceEdit = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
   const device = selectors.deviceById(deviceId);
+  const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
 
   useEffect(() => {
     dispatch(actions.fetchDeviceById(deviceId));
@@ -29,6 +33,10 @@ const DeviceEdit = () => {
 
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());
+  };
+
+  const handleCreateUid = (deviceId: string) => {
+    dispatch(deviceActions.(deviceId));
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
@@ -67,8 +75,14 @@ const DeviceEdit = () => {
         <CardHeader title={'Редактирование устройства'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <DeviceDetails device={device /*as IDevice*/} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
+      <DeviceDetails
+        device={device /*as IDevice*/}
+        activationCode={code}
+        loading={loading}
+        onSubmit={handleSubmit}
+        onCancel={goBack}
+      />
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} onCreateUid={handleCreateUid}/>
     </Box>
   );
 };
