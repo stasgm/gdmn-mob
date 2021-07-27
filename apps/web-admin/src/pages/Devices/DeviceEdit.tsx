@@ -67,7 +67,7 @@ const DeviceEdit = () => {
         <CardHeader title={'Редактирование устройства'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <DeviceDetails device={device} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
+      <DeviceDetails device={device /*as IDevice*/} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );

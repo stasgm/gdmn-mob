@@ -1,10 +1,12 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
 import { IDevice, INamedEntity } from '@lib/types';
-import { useFormik, Field } from 'formik';
+import { useFormik, FormikProvider, Field } from 'formik';
 import * as yup from 'yup';
 
 import { useEffect, useState } from 'react';
+
+import api from '@lib/client-api';
 
 import ComboBox from '../ComboBox';
 
@@ -17,54 +19,51 @@ interface IProps {
   onCancel: () => void;
 }
 
-// export interface IDeviceBindingFormik extends Omit<IDeviceBinding, 'state'> {
-//   state: INamedEntity;
-// }
+export interface IDeviceFormik extends Omit<IDevice, 'state'> {
+  state: INamedEntity;
+}
 
 const DeviceDetails = ({ device, loading, onSubmit, onCancel }: IProps) => {
+  const [devices, setDevices] = useState<INamedEntity[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(true);
 
-  // const initialValues: IDeviceFormik = {
-  //   ...deviceBinding,
-  //   user: deviceBinding.user || null,
-  //   device: deviceBinding.device || null,
-  //   state: { id: deviceBinding.state, name: deviceStates[deviceBinding.state] },
-  // };
+  useEffect(() => {
+    let unmounted = false;
+    const getDevices = async () => {
+      const res = await api.device.getDevices();
+      if (res.type === 'GET_DEVICES' && !unmounted) {
+        setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
+        setLoadingDevices(false);
+      }
+    };
+    getDevices();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 
-  const formik = useFormik<IDevice>({
+  const initialValues: IDeviceFormik = {
+    ...device,
+    // user: deviceBinding.user || null,
+    // device: deviceBinding.device || null,
+    state: { id: device.state, name: deviceStates[device.state] },
+  };
+
+  const formik = useFormik<IDeviceFormik>({
     enableReinitialize: true,
-    initialValues: device,
+    initialValues: initialValues,
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
       state: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      onSubmit(/*{*/ values /*, state: values.state /*.id*/ /*} as IDevice*/);
+      console.log(values);
+      onSubmit({ ...values, state: values.state.id } as IDevice); /*(values);*/
     },
   });
 
-  // useEffect(() => {
-  //   let unmounted = false;
-  //   const getDevices = async () => {
-  //     const res = await api.device.getDevices();
-  //     if (res.type === 'GET_DEVICES' && !unmounted) {
-  //       setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
-  //       setLoadingDevices(false);
-  //     }
-  //   };
-  //   getDevices();
-  //   return () => {
-  //     unmounted = true;
-  //   };
-  // }, []);
-
-  // const [devices, setDevices] = useState<INamedEntity[]>([]);
-
-  // const initialValues: IDeviceBindingFormik = {
-  //       state: { id: deviceBinding.state, name: deviceStates[deviceBinding.state] },
-  // };
-
   return (
-    <>
+    <FormikProvider value={formik}>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -74,7 +73,7 @@ const DeviceDetails = ({ device, loading, onSubmit, onCancel }: IProps) => {
         <form onSubmit={formik.handleSubmit}>
           <Card sx={{ p: 1 }}>
             <CardContent>
-              <Grid container spacing={3}>
+              <Grid container direction="column" item md={6} xs={12} spacing={3}>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
@@ -91,33 +90,16 @@ const DeviceDetails = ({ device, loading, onSubmit, onCancel }: IProps) => {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <TextField
-                    /*<Field*/
+                  <Field
                     component={ComboBox}
                     name="state"
                     label="Статус"
                     type="state"
-                    options={Object.entries(deviceStates).map((key) => ({ id: key[0], name: key[1] })) || []}
+                    options={Object.entries(deviceStates).map((key) => ({ id: key[0], name: key[1] })) || []} //+
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}
                     error={Boolean(formik.touched.state && formik.errors.state)}
                     disabled={loading}
-
-                    //error={formik.touched.state && Boolean(formik.errors.state)}
-                    //  fullWidth
-                    // name="state"
-                    // label="Статус"
-
-                    //required
-                    //variant="outlined"
-                    //options={devices?.map((d) => ({ id: d.id, state: d.state })) || []}
-                    //onBlur={formik.handleBlur}
-                    //onChange={formik.handleChange}
-                    //   type="state"
-                    //   disabled={loading}
-                    //  // value={formik.values.state}
-                    //   setFieldValue={formik.setFieldValue}
-                    //   error={Boolean(formik.touched.state && formik.errors.state)}
                   />
                 </Grid>
               </Grid>
@@ -134,7 +116,7 @@ const DeviceDetails = ({ device, loading, onSubmit, onCancel }: IProps) => {
           </Card>
         </form>
       </Box>
-    </>
+    </FormikProvider>
   );
 };
 
