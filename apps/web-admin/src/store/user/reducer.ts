@@ -71,6 +71,27 @@ const reducer: Reducer<IUserState, UserActionType> = (state = initialState, acti
         errorMessage: action.payload || 'error',
       };
 
+    case getType(userActions.removeUserAsync.request):
+      return {
+        ...state,
+        loading: true,
+        errorMessage: '',
+      };
+
+    case getType(userActions.removeUserAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: [...state.list.filter((i) => i.id !== action.payload)],
+      };
+
+    case getType(userActions.removeUserAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     // Получение компании
     case getType(userActions.fetchUserAsync.request):
       return { ...state, loading: true, errorMessage: '' };

@@ -6,6 +6,7 @@ import { IUser } from '@lib/types';
 import UserListTable from '../../components/user/UserListTable';
 import { IToolBarButton } from '../../types';
 import ToolbarActions from '../ToolBarActions';
+import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 
 interface IProps {
   users: IUser[];
@@ -15,13 +16,13 @@ const CompanyUsers = ({ users }: IProps) => {
   const navigate = useNavigate();
 
   const userButtons: IToolBarButton[] = [
-    {
-      name: 'Добавить',
-      color: 'primary',
-      variant: 'contained',
-      onClick: () => navigate('app/users/new'),
-      icon: <AddCircleOutlineIcon />,
-    },
+    // {
+    //   name: 'Добавить',
+    //   color: 'primary',
+    //   variant: 'contained',
+    //   onClick: () => navigate('app/users/new'),
+    //   icon: <AddCircleOutlineIcon />,
+    // },
   ];
 
   return (
@@ -32,7 +33,14 @@ const CompanyUsers = ({ users }: IProps) => {
       }}
     >
       <Container maxWidth={false}>
-        <ToolbarActions buttons={userButtons} />
+        {/* <ToolbarActions buttons={userButtons} /> */}
+        <ToolbarActionsWithSearch
+          buttons={userButtons}
+          title={'Найти устройство'}
+          onChangeValue={() => {
+            return;
+          }}
+        />
         <Box sx={{ pt: 2 }}>
           <UserListTable users={users} />
         </Box>
