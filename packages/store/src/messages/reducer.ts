@@ -5,15 +5,15 @@ import { getType } from 'typesafe-actions';
 
 import { actions, MsgActionType } from './actions';
 
-import { IMessagesState } from './types';
+import { MessagesState } from './types';
 
-const initialState: Readonly<IMessagesState> = {
+const initialState: Readonly<MessagesState> = {
   data: [],
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<IMessagesState, MsgActionType> = (state = initialState, action): IMessagesState => {
+const reducer: Reducer<MessagesState, MsgActionType> = (state = initialState, action): MessagesState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -24,11 +24,23 @@ const reducer: Reducer<IMessagesState, MsgActionType> = (state = initialState, a
         data: [...state.data.map((i) => (i.id === action.payload.id ? { ...i, status: action.payload.status } : i))],
       };
 
-    case getType(actions.deleteAllMessages):
-      return { ...state, data: [] };
+    case getType(actions.clearMessagesAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
 
-    case getType(actions.deleteMessage):
+    case getType(actions.clearMessagesAsync.success):
+      return { ...state, loading: false, data: [] };
+
+    case getType(actions.clearMessagesAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
+    case getType(actions.removeMessageAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.removeMessageAsync.success):
       return { ...state, data: [...state.data.filter((i) => i.id !== action.payload)] };
+
+    case getType(actions.removeMessageAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };

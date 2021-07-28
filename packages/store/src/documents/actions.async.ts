@@ -1,25 +1,59 @@
-import { ThunkAction } from 'redux-thunk';
-
+import api from '@lib/client-api';
 import { IDocument } from '@lib/types';
 import { sleep } from '@lib/client-api';
 
-import { IDocumentState } from './types';
+import { DocumentState } from './types';
 
-import { DocumentActionType, actions } from './actions';
+import { actions } from './actions';
+import { AppThunk } from '../types';
 
-export type AppThunk = ThunkAction<Promise<DocumentActionType>, IDocumentState, null, DocumentActionType>;
+import { ActionType } from 'typesafe-actions';
+
+//export type AppThunk = ThunkAction<Promise<DocumentActionType>, DocumentState, null, DocumentActionType>;
 
 export const addDocuments = (documents: IDocument[]): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.addDocumentsAsync.request(''));
 
-    await sleep(500);
-    //TODO: проверка
-    if (documents) {
+    try {
       return dispatch(actions.addDocumentsAsync.success(documents));
+    } catch {
+      return dispatch(actions.addDocumentsAsync.failure('something wrong'));
     }
+  };
+};
 
-    return dispatch(actions.addDocumentsAsync.failure('something wrong'));
+const removeDocument = (
+  documentId: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.removeDocumentAsync>>,
+  DocumentState,
+  ActionType<typeof actions.removeDocumentAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.removeDocumentAsync.request('Удаление документа'));
+
+    try {
+      return dispatch(actions.removeDocumentAsync.success(documentId));
+    } catch {
+      return dispatch(actions.removeDocumentAsync.failure('Ошибка удаления документа'));
+    }
+  }
+};
+
+const clearDocuments = (): AppThunk<
+  Promise<ActionType<typeof actions.clearDocumentsAsync>>,
+  DocumentState,
+  ActionType<typeof actions.clearDocumentsAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.clearDocumentsAsync.request('Удаление документов'));
+
+    try {
+      return dispatch(actions.clearDocumentsAsync.success());
+    } catch {
+      return dispatch(actions.clearDocumentsAsync.failure('Ошибка удаления документов'));
+    }
   };
 };
 
@@ -37,4 +71,4 @@ export const addDocuments = (documents: IDocument[]): AppThunk => {
 //   };
 // };
 
-export default { addDocuments };
+export default { addDocuments, removeDocument, clearDocuments };

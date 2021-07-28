@@ -121,7 +121,7 @@ const updateOne = async (message: IMessage): Promise<string> => {
  * Удаляет одно сообщениме
  * @param {string} id - идентификатор сообщения
  * */
-const deleteOne = async (messageId: string): Promise<void> => {
+const deleteOne = async (messageId: string): Promise<string> => {
   const db = getDb();
   const { messages } = db;
 
@@ -131,43 +131,45 @@ const deleteOne = async (messageId: string): Promise<void> => {
 
   await messages.delete(messageId);
 
+  return 'Сообщение удалено';
   //TODO ответ возвращать
 };
 
-/**
- * Удаляет одно сообщениме
- * @param {string} companyId - идентификатор организации
- * @param {string} uid - идентификатор сообщения
- * */
-const deleteByUid = async ({
-  companyId,
-  uid,
-  userId,
-}: {
-  companyId: string;
-  uid: string;
-  userId: string;
-}): Promise<void> => {
-  const db = getDb();
-  const { messages } = db;
+// /**
+//  * Удаляет одно сообщениме
+//  * @param {string} companyId - идентификатор организации
+//  * @param {string} uid - идентификатор сообщения
+//  * */
+// const deleteByUid = async ({
+//   companyId,
+//   uid,
+//   userId,
+// }: {
+//   companyId: string;
+//   uid: string;
+//   userId: string;
+// }): Promise<void> => {
+//   const db = getDb();
+//   const { messages } = db;
 
-  const messageObj = await messages.find(
-    (message) => message.head.companyId === companyId && message.head.consumerId === userId && message.id === uid,
-  );
+//   const messageObj = await messages.find(
+//     (message) => message.head.companyId === companyId && message.head.consumerId === userId && message.id === uid,
+//   );
 
-  if (!messageObj) {
-    throw new DataNotFoundException('Сообщение не найдено');
-  }
+//   if (!messageObj) {
+//     throw new DataNotFoundException('Сообщение не найдено');
+//   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return messages.delete(messageObj.id!);
-};
+//   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+//   return messages.delete(messageObj.id!);
+// };
 
-const deleteAll = async (): Promise<void> => {
+const deleteAll = async (): Promise<string> => {
   const db = getDb();
   const { messages } = db;
   messages.deleteAll();
 
+  return 'Сообщения удалены';
   //TODO Ответ возвращать
 };
 
@@ -223,4 +225,4 @@ export const makeDBNewMessage = async (message: NewMessage, producerId: string):
   };
 };
 
-export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteByUid, deleteAll };
+export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteAll };

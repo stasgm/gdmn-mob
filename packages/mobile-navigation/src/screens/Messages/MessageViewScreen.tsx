@@ -51,7 +51,7 @@ const MessageViewScreen = () => {
 
   const handleDelete = useCallback(() => {
     if (msg) {
-      dispatch(messageActions.deleteMessage(msg.id));
+      dispatch(messageActions.removeMessage(msg.id));
       navigation.goBack();
     }
   }, [dispatch]);

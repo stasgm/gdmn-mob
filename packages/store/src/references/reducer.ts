@@ -1,16 +1,16 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IReferenceState } from './types';
+import { ReferenceState } from './types';
 import { ReferenceActionType, actions } from './actions';
 
-const initialState: Readonly<IReferenceState> = {
+const initialState: Readonly<ReferenceState> = {
   list: {},
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<IReferenceState, ReferenceActionType> = (state = initialState, action): IReferenceState => {
+const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialState, action): ReferenceState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -32,6 +32,27 @@ const reducer: Reducer<IReferenceState, ReferenceActionType> = (state = initialS
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
+
+    case getType(actions.clearReferencesAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.clearReferencesAsync.success):
+      return { ...state, loading: false, list: {} };
+
+    case getType(actions.clearReferencesAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
+    case getType(actions.removeReferenceAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.removeReferenceAsync.success): {
+      const { [action.payload]: _, ...rest } = state.list;
+      return { ...state, list: rest };
+      //return { ...state, list: state.list?.filter(({ name }) => name.toString() !== action.payload) };
+    }
+
+    case getType(actions.removeReferenceAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
     //Добавление нескольких справочников
     case getType(actions.addReferencesAsync.request):

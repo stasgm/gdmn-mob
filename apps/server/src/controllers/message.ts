@@ -4,11 +4,11 @@ import { Context, ParameterizedContext } from 'koa';
 import { IResponse, IMessage, NewMessage } from '@lib/types';
 
 import log from '../utils/logger';
-import { messageService, companyService, userService } from '../services';
+import { messageService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
-import { DataNotFoundException, ForbiddenException } from '../exceptions';
+import { ForbiddenException } from '../exceptions';
 
 let clients: ((result: IMessage[]) => void)[] = [];
 
@@ -77,9 +77,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, id: uid } = ctx.params;
+  const { id: messageId } = ctx.params;
 
-  const userId = ctx.state.user.id;
+  //const userId = ctx.state.user.id;
 
   // const user = await userService.findOne(userId);
 
@@ -92,7 +92,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   //   userId = 'gdmn';
   // }
 
-  await messageService.deleteByUid({ companyId, uid, userId });
+  await messageService.deleteOne(messageId);
 
   ok(ctx as Context);
 
