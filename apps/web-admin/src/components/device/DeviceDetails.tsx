@@ -21,11 +21,12 @@ interface IProps {
   activationCode?: string;
   onSubmit: (values: IDevice) => void;
   onCancel: () => void;
-  onCreateUid?: (code?: string) => void;
+  onCreateUid?: (code: string) => void;
 }
 
 export interface IDeviceFormik extends Omit<IDevice, 'state'> {
   state: INamedEntity;
+  code: string;
 }
 
 // export interface IActivationCodeFormik extends Omit<IActivationCode, 'code'> {
@@ -56,7 +57,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
     // user: deviceBinding.user || null,
     // device: deviceBinding.device || null,
     state: { id: device.state, name: deviceStates[device.state] },
-    // code: activationCode,
+    code: activationCode || '',
   };
 
   // const initialCodes: IActivationCodeFormik = {
@@ -71,11 +72,11 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
       state: yup.object().required('Required'),
-      code: yup.string().required('Required'),
+      // code: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
       console.log(values);
-      onSubmit({ ...values, state: values.state.id } as IDevice); /*(values);*/
+      onSubmit({ name: values.name, state: values.state.id } as IDevice); /*(values);*/
     },
   });
 
@@ -132,17 +133,17 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
-                    error={formik.touched.state && Boolean(formik.errors.state)}
+                    error={formik.touched.code && Boolean(formik.errors.code)}
                     fullWidth
                     label="Код активации"
                     name="code"
-                    required
+                    // required
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     type="code"
                     disabled={loading}
-                    value={/*formiks.values.code*/ /*formik.code*/ activationCode}
+                    value={formik.values.code}
                   />
                 </Grid>
                 {/* <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}> */}
@@ -153,20 +154,21 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                       fullWidth
                       label="Номер"
                       name="uid"
-                      required
+                      // required
                       variant="outlined"
                       onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
                       type="uid"
-                      disabled={loading}
+                      disabled={true}
                       value={formik.values.uid}
                     />
                   </Grid>
                   {/*<Box>*/}
                     {/*{onCreateUid && (*/}
                       <Button
+                        disabled={!formik.values.code}
                         // component={RouterLink}
-                        onClick={() => onCreateUid(activationCode)}
+                        onClick={() => onCreateUid && onCreateUid(formik.values.code)}
                       >
                         <RefreshIcon />
                       </Button>

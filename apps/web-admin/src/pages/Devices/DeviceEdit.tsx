@@ -12,8 +12,6 @@ import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
 
-import codeActions from '../../store/activationCode';
-import { codesActions } from './actions';
 import activationCodeSelectors from '../../store/activationCode/selectors';
 
 const DeviceEdit = () => {
@@ -26,6 +24,8 @@ const DeviceEdit = () => {
   const { errorMessage, loading } = useSelector((state) => state.devices);
   const device = selectors.deviceById(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
+
+  console.log('5555', device?.uid);
 
   useEffect(() => {
     dispatch(actions.fetchDeviceById(deviceId));
@@ -40,6 +40,7 @@ const DeviceEdit = () => {
   };
 
   const handleCreateUid = (code: string) => {
+    console.log('handleCreateUid', code);
     dispatch(authActions.activateDevice(code));
   };
 
@@ -85,8 +86,9 @@ const DeviceEdit = () => {
         loading={loading}
         onSubmit={handleSubmit}
         onCancel={goBack}
+        onCreateUid={handleCreateUid}
       />
-      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} onCreateUid={handleCreateUid}/>
+      <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };

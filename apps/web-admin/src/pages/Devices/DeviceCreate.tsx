@@ -49,7 +49,7 @@ const DeviceCreate = () => {
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>
-        <DeviceDetails device={{ name: '' } as IDevice} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
+        <DeviceDetails device={{ name: '', state: 'NON-REGISTERED' } as IDevice} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
