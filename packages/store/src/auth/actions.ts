@@ -20,7 +20,7 @@ const activateDeviceAsync = createAsyncAction(
   'AUTH/ACTIVATE_DEVICE',
   'AUTH/ACTIVATE_DEVICE_SUCCESS',
   'AUTH/ACTIVATE_DEVICE_FAILURE',
-)<string | undefined, IDevice | null, string>();
+)<string | undefined, string | undefined, string>();
 
 const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AUTH/LOGIN_FAILURE')<
   string | undefined,

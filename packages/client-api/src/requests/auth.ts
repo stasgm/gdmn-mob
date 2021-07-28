@@ -187,7 +187,7 @@ class Auth extends BaseRequest {
       if (code === '1234') {
         return {
           type: 'VERIFY_CODE',
-          device: mockDevice,
+          uid: mockDevice.uid,
         } as types.IVerifyCodeResponse;
       }
       return {
@@ -199,19 +199,18 @@ class Auth extends BaseRequest {
     try {
       const body = { code };
 
-      const res = await this.api.axios.post<IResponse<IDevice>>('/auth/device/code', body);
+      const res = await this.api.axios.post<IResponse<string>>('/auth/device/code', body);
 
       const resData = res?.data;
 
       if (resData?.result) {
-        console.log('VERIFY_CODE data', resData.data);
         // if (resData?.data?.uid) {
         //   this.api.config.deviceId = resData.data.uid;
         //   console.log('this.api.config.deviceId set', this.api.config.deviceId);
         // }
         return {
           type: 'VERIFY_CODE',
-          device: resData?.data,
+          uid: resData?.data,
         } as types.IVerifyCodeResponse;
       }
 

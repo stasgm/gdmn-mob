@@ -1,13 +1,13 @@
-import api from '@lib/client-api';
+import api, { sleep } from '@lib/client-api';
 import { IDocument } from '@lib/types';
-import { sleep } from '@lib/client-api';
+
+import { ActionType } from 'typesafe-actions';
+
+import { AppThunk } from '../types';
 
 import { DocumentState } from './types';
 
 import { actions } from './actions';
-import { AppThunk } from '../types';
-
-import { ActionType } from 'typesafe-actions';
 
 //export type AppThunk = ThunkAction<Promise<DocumentActionType>, DocumentState, null, DocumentActionType>;
 
@@ -38,7 +38,7 @@ const removeDocument = (
     } catch {
       return dispatch(actions.removeDocumentAsync.failure('Ошибка удаления документа'));
     }
-  }
+  };
 };
 
 const clearDocuments = (): AppThunk<

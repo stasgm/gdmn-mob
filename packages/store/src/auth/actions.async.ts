@@ -43,7 +43,7 @@ const activateDevice = (
     const response = await api.auth.verifyCode(code);
 
     if (response.type === 'VERIFY_CODE') {
-      return dispatch(actions.activateDeviceAsync.success(response.device));
+      return dispatch(actions.activateDeviceAsync.success(response.uid));
     }
 
     if (response.type === 'ERROR') {
@@ -147,9 +147,15 @@ const signInWithDevice = (
   };
 };
 
-const getDeviceStatus = (uid: string): AppThunk => {
+const getDeviceStatus = (
+  uid: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.getDeviceStatusAsync>>,
+  AuthState,
+  ActionType<typeof actions.getDeviceStatusAsync>
+> => {
   return async (dispatch) => {
-    dispatch(actions.getDeviceStatusAsync.request(uid));
+    dispatch(actions.getDeviceStatusAsync.request('Получение статуса устройства'));
 
     const response = await api.auth.getDeviceStatus(uid);
 
@@ -158,10 +164,10 @@ const getDeviceStatus = (uid: string): AppThunk => {
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(actions.activateDeviceAsync.failure(response.message));
+      return dispatch(actions.getDeviceStatusAsync.failure(response.message));
     }
 
-    return dispatch(actions.activateDeviceAsync.failure('something wrong'));
+    return dispatch(actions.getDeviceStatusAsync.failure('Ошибка получения статуса устройства'));
   };
 };
 

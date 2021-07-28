@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useDispatch } from '@lib/store';
+import { authActions, useSelector, useDispatch, useThunkDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
@@ -14,9 +14,9 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { device, settings, user } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const [deviceId, setDeviceId] = useState<string | undefined | null>(settings?.deviceId);
+  const { settings, user } = useSelector((state) => state.auth);
+  const dispatch = useThunkDispatch();
+  const [deviceActivated, setDeviceActivated] = useState<undefined | boolean>(undefined);
 
   // console.log('deviceeee', device);
   // console.log('deviceId', deviceId);
@@ -25,51 +25,70 @@ const AuthNavigator: React.FC = () => {
   // console.log('api.config', api.config);
   // console.log('deviceStatus', deviceStatus);
 
-  useEffect(() => {
-    //При измении настроек подключения в хранилище записываем их в апи
-    api.config = { ...api.config, ...settings };
-  }, [settings]);
+  // useEffect(() => {
+  //   //При измении настроек подключения в хранилище записываем их в апи
+  //   api.config = { ...api.config, ...settings };
+  // }, [settings]);
 
-  useEffect(() => {
-    //При измении устройства записываем его uid в deviceId
-    setDeviceId(device?.uid);
-  }, [device?.uid]);
+  // useEffect(() => {
+  //   //При измении устройства записываем его uid в deviceId
+  //   setDeviceId(device?.uid);
+  // }, [device?.uid]);
 
-  useEffect(() => {
-    if (device?.uid) {
-      //При изменении устройства, запишем ид в настройки
-      dispatch(authActions.setSettings({ ...settings, deviceId: device?.uid } as IApiConfig));
-      //dispatch(authActions.getDeviceStatus(device?.uid));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [device?.uid, dispatch]);
+  // useEffect(() => {
+  //   if (device?.uid) {
+  //     //При изменении устройства, запишем ид в настройки
+  //     dispatch(authActions.setSettings({ ...settings, deviceId: device?.uid } as IApiConfig));
+  //     //dispatch(authActions.getDeviceStatus(device?.uid));
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [device?.uid, dispatch]);
 
-  useEffect(() => {
-    if (device?.state === 'NON-ACTIVATED' && !deviceId) {
-      setDeviceId(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [device?.state, dispatch]);
+  // useEffect(() => {
+  //   if (device?.state === 'NON-ACTIVATED' && !deviceId) {
+  //     setDeviceId(null);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [device?.state, dispatch]);
 
   const saveSettings = useCallback(
-    (newSettings: IApiConfig) => dispatch(authActions.setSettings(newSettings)),
+    (newSettings: IApiConfig) => {
+      dispatch(authActions.setSettings(newSettings));
+      api.config = { ...api.config, ...newSettings };
+    },
     [dispatch],
   );
 
-  const checkDevice = useCallback(
+  const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство, иначе переходим на окно ввода кода (deviceId = null)
-    () => (settings?.deviceId ? dispatch(authActions.checkDevice()) : setDeviceId(null)),
-    [dispatch, settings?.deviceId],
-  );
+    if (settings?.deviceId) {
+      const res = await dispatch(authActions.getDeviceStatus(settings?.deviceId));
+      setDeviceActivated(res.type === 'AUTH/GET_DEVICE_STATUS_SUCCESS');
+    } else {
+      setDeviceActivated(false);
+    }
+  }, [dispatch, settings?.deviceId]);
 
-  const activateDevice = useCallback((code: string) => dispatch(authActions.activateDevice(code)), [dispatch]);
+  const activateDevice = useCallback(
+    (code: string) => {
+      dispatch(authActions.activateDevice(code));
+      setDeviceActivated(true);
+    },
+    [dispatch],
+  );
 
   const disconnect = useCallback(() => {
     dispatch(authActions.disconnect());
-    setDeviceId(undefined);
+    setDeviceActivated(undefined);
   }, [dispatch]);
 
-  const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
+  const signIn = useCallback(
+    (credentials: IUserCredentials) => {
+      dispatch(authActions.signIn(credentials));
+      //dispatch(authActions.signIn(credentials));
+    },
+    [dispatch],
+  );
 
   const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);
 
@@ -108,7 +127,7 @@ const AuthNavigator: React.FC = () => {
 
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      {deviceId ? (
+      {deviceActivated ? (
         !user ? (
           <AuthStack.Screen
             name="Login"
@@ -122,7 +141,7 @@ const AuthNavigator: React.FC = () => {
             options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />
         )
-      ) : deviceId === undefined ? (
+      ) : deviceActivated === undefined ? (
         <>
           <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />

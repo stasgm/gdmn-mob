@@ -10,10 +10,17 @@ import { MessagesState } from './types';
 
 //type AppThunk = ThunkAction<Promise<MsgActionType>, MessagesState, null, MsgActionType>;
 
-const fetchMessages = ({ systemId, companyId }: { systemId: string; companyId: string }):  AppThunk<
+const fetchMessages = ({
+  systemId,
+  companyId,
+}: {
+  systemId: string;
+  companyId: string;
+}): AppThunk<
   Promise<ActionType<typeof actions.fetchMessagesAsync>>,
   MessagesState,
-  ActionType<typeof actions.fetchMessagesAsync>> => {
+  ActionType<typeof actions.fetchMessagesAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.fetchMessagesAsync.request(''));
 
@@ -45,9 +52,7 @@ const addMessages = (messages: IMessage[]): AppThunk => {
 //   Promise<ActionType<typeof actions.removeMessageAsync>>,
 //   MessagesState,
 //   ActionType<typeof actions.removeMessageAsync>>
-const removeMessage = (
-  messageId: string,
-): AppThunk => {
+const removeMessage = (messageId: string): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.removeMessageAsync.request('Удаление сообщения'));
 
