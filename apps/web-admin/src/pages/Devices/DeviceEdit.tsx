@@ -2,14 +2,18 @@ import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IDevice, NewDevice, IActivationCode } from '@lib/types';
 import { useEffect } from 'react';
+//import {authActions} from '@lib/store';
+//import {activateDevice} from '@lib/store';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
-import { useSelector, useDispatch, AppDispatch } from '../../store';
+import { /*authActions, */useSelector, useDispatch, AppDispatch } from '../../store';
+import { authActions } from '@lib/store';
 import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
 
 import codeActions from '../../store/activationCode';
+import { codesActions } from './actions';
 import activationCodeSelectors from '../../store/activationCode/selectors';
 
 const DeviceEdit = () => {
@@ -35,8 +39,8 @@ const DeviceEdit = () => {
     dispatch(actions.deviceActions.clearError());
   };
 
-  const handleCreateUid = (deviceId: string) => {
-    dispatch(deviceActions.(deviceId));
+  const handleCreateUid = (code: string) => {
+    dispatch(authActions.activateDevice(code));
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {

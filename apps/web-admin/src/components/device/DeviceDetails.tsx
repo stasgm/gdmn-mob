@@ -21,7 +21,7 @@ interface IProps {
   activationCode?: string;
   onSubmit: (values: IDevice) => void;
   onCancel: () => void;
-  onCreateUid?: (/*deviceId: string*/) => void;
+  onCreateUid?: (code?: string) => void;
 }
 
 export interface IDeviceFormik extends Omit<IDevice, 'state'> {
@@ -147,7 +147,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                 </Grid>
                 {/* <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}> */}
                 <Grid container item md={6} xs={12}>
-                  <Grid item md={10.65} xs={12}>
+                  <Grid item md={10 /*.65*/} xs={12}>
                     <TextField
                       error={formik.touched.uid && Boolean(formik.errors.uid)}
                       fullWidth
@@ -162,12 +162,16 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                       value={formik.values.uid}
                     />
                   </Grid>
-                  <Button
-                  // component={RouterLink}
-                   onClick={() => onCreateUid(/*device.id*/)}
-                  >
-                    <RefreshIcon />
-                  </Button>
+                  {/*<Box>*/}
+                    {/*{onCreateUid && (*/}
+                      <Button
+                        // component={RouterLink}
+                        onClick={() => onCreateUid(activationCode)}
+                      >
+                        <RefreshIcon />
+                      </Button>
+                   {/* )}*/}
+                    {/*</Box>*/}
                   {/* </Box> */}
                 </Grid>
               </Grid>
