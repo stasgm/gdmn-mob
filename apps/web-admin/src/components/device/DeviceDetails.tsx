@@ -147,8 +147,8 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                   />
                 </Grid>
                 {/* <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}> */}
-                <Grid container item md={6} xs={12}>
-                  <Grid item md={10 /*.65*/} xs={12}>
+                <Grid container direction="row" item /*md={6}*/ xs={12}>
+                  <Grid item md={10.68  } xs={9}>
                     <TextField
                       error={formik.touched.uid && Boolean(formik.errors.uid)}
                       fullWidth
@@ -164,16 +164,16 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                     />
                   </Grid>
                   {/*<Box>*/}
-                    {/*{onCreateUid && (*/}
-                      <Button
-                        disabled={!formik.values.code}
-                        // component={RouterLink}
-                        onClick={() => onCreateUid && onCreateUid(formik.values.code)}
-                      >
-                        <RefreshIcon />
-                      </Button>
-                   {/* )}*/}
-                    {/*</Box>*/}
+                  {/*{onCreateUid && (*/}
+                  <Button
+                    disabled={!formik.values.code}
+                    // component={RouterLink}
+                    onClick={() => onCreateUid && onCreateUid(formik.values.code)}
+                  >
+                    <RefreshIcon />
+                  </Button>
+                  {/* )}*/}
+                  {/*</Box>*/}
                   {/* </Box> */}
                 </Grid>
               </Grid>
