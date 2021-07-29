@@ -181,13 +181,15 @@ class Auth extends BaseRequest {
   // };
 
   verifyCode = async (code: string) => {
+    console.log('verifyCode api');
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (code === '1234') {
+      if (code === '1111') {
+        console.log('verifyCode code', code, mockDevice);
         return {
           type: 'VERIFY_CODE',
-          device: mockDevice,
+          uid: mockDevice.uid,
         } as types.IVerifyCodeResponse;
       }
       return {
@@ -199,19 +201,18 @@ class Auth extends BaseRequest {
     try {
       const body = { code };
 
-      const res = await this.api.axios.post<IResponse<IDevice>>('/auth/device/code', body);
+      const res = await this.api.axios.post<IResponse<string>>('/auth/device/code', body);
 
       const resData = res?.data;
 
       if (resData?.result) {
-        console.log('VERIFY_CODE data', resData.data);
         // if (resData?.data?.uid) {
         //   this.api.config.deviceId = resData.data.uid;
         //   console.log('this.api.config.deviceId set', this.api.config.deviceId);
         // }
         return {
           type: 'VERIFY_CODE',
-          device: resData?.data,
+          uid: resData?.data,
         } as types.IVerifyCodeResponse;
       }
 

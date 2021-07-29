@@ -1,13 +1,19 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IDevice, NewDevice } from '@lib/types';
+import { IDevice, NewDevice, IActivationCode } from '@lib/types';
 import { useEffect } from 'react';
+//import {authActions} from '@lib/store';
+//import {activateDevice} from '@lib/store';
+
+import { authActions } from '@lib/store';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
-import { useSelector, useDispatch, AppDispatch } from '../../store';
+import { /*authActions, */ useSelector, useDispatch, AppDispatch } from '../../store';
 import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
+
+import activationCodeSelectors from '../../store/activationCode/selectors';
 
 const DeviceEdit = () => {
   const { id: deviceId } = useParams();
@@ -18,6 +24,9 @@ const DeviceEdit = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
   const device = selectors.deviceById(deviceId);
+  const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
+
+  console.log('5555', device?.uid);
 
   useEffect(() => {
     dispatch(actions.fetchDeviceById(deviceId));
@@ -29,6 +38,11 @@ const DeviceEdit = () => {
 
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());
+  };
+
+  const handleCreateUid = (code: string) => {
+    console.log('handleCreateUid', code);
+    dispatch(authActions.activateDevice(code));
   };
 
   const handleSubmit = async (values: IDevice | NewDevice) => {
@@ -67,7 +81,14 @@ const DeviceEdit = () => {
         <CardHeader title={'Редактирование устройства'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <DeviceDetails device={device} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
+      <DeviceDetails
+        device={device /*as IDevice*/}
+        activationCode={code}
+        loading={loading}
+        onSubmit={handleSubmit}
+        onCancel={goBack}
+        onCreateUid={handleCreateUid}
+      />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );

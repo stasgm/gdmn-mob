@@ -10,11 +10,11 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name } = ctx.request.body as NewDevice;
+  const { name, state } = ctx.request.body as NewDevice;
 
   const company = ctx.state.user.company as INamedEntity;
 
-  const newDevice = await deviceService.addOne({ name, company });
+  const newDevice = await deviceService.addOne({ name, company, state });
 
   created(ctx as Context, newDevice);
 
@@ -65,7 +65,7 @@ const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
 
-  const device = await deviceService.findOneByUid(deviceId);
+  const device = await deviceService.findOne(deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -77,7 +77,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, uId, state, filterText, fromRecord, toRecord } = ctx.query;
+  const { companyId, uid, state, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -85,8 +85,8 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
     params.companyId = companyId;
   }
 
-  if (typeof uId === 'string') {
-    params.uId = uId;
+  if (typeof uid === 'string') {
+    params.uid = uid;
   }
 
   if (typeof state === 'string') {

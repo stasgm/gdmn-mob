@@ -25,12 +25,6 @@ const ProfileScreen = () => {
   const handleLogout = () => dispatch(authActions.logout());
   // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 
-  console.log('company1', company);
-
-  console.log('device1', device);
-
-  console.log('user1', user);
-
   return (
     <View style={styles.container}>
       <View style={[styles.profileContainer]}>

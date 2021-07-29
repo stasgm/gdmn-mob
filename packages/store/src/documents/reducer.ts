@@ -1,16 +1,16 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IDocumentState } from './types';
+import { DocumentState } from './types';
 import { DocumentActionType, actions } from './actions';
 
-const initialState: Readonly<IDocumentState> = {
+const initialState: Readonly<DocumentState> = {
   list: [],
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialState, action): IDocumentState => {
+const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialState, action): DocumentState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -21,8 +21,8 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
         list: action.payload,
       };
 
-    case getType(actions.deleteDocuments):
-      return { ...state, list: [] };
+    // case getType(actions.deleteDocuments):
+    //   return { ...state, list: [] };
 
     case getType(actions.addDocument):
       return {
@@ -36,15 +36,33 @@ const reducer: Reducer<IDocumentState, DocumentActionType> = (state = initialSta
         list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...action.payload.document } : doc)),
       };
 
-    case getType(actions.deleteDocument):
-      return { ...state, list: state.list.filter((document) => document.id !== action.payload) };
+    // case getType(actions.removeDocument):
+    //   return { ...state, list: state.list.filter((document) => document.id !== action.payload) };
+
+    case getType(actions.clearDocumentsAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.clearDocumentsAsync.success):
+      return { ...state, loading: false, list: [] };
+
+    case getType(actions.clearDocumentsAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
+    case getType(actions.removeDocumentAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.removeDocumentAsync.success):
+      return { ...state, loading: false, list: [...state.list.filter((i) => i.id !== action.payload)] };
+
+    case getType(actions.removeDocumentAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
 
     //Добавление нескольких документов
     case getType(actions.addDocumentsAsync.request):
-      return { ...state, loading: true };
+      return { ...state, loading: true, errorMessage: '' };
 
     case getType(actions.addDocumentsAsync.success):
       return {

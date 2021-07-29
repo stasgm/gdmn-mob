@@ -26,7 +26,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
     id: '',
     name: device.name,
     uid: '',
-    state: 'NON-REGISTERED',
+    state: device.state || 'NON-REGISTERED',
     companyId: device.company?.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
