@@ -69,6 +69,7 @@ const DeviceList = () => {
   };
 
   const handleCreateCode = (deviceId: string) => {
+    console.log('проверка', deviceId);
     dispatch(codeActions.createActivationCode(deviceId));
   };
 

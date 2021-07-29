@@ -60,6 +60,7 @@ class ActivationCode extends BaseRequest {
   };
 
   createActivationCode = async (deviceId: string): Promise<types.ICreateCodeResponse | error.INetworkError> => {
+    console.log('проверка 12');
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -80,6 +81,7 @@ class ActivationCode extends BaseRequest {
     }
 
     try {
+      console.log('проверка 1');
       const res = await this.api.axios.get<IResponse<IActivationCode>>(`/codes/device/${deviceId}/code`);
       const resData = res.data;
 
