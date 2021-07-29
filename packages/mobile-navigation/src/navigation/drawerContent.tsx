@@ -72,24 +72,31 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     */
     setLoading(true);
 
-    // const mes = await dispatch(
-    //   messageActions.fetchMessages({
-    //     companyId: company!.id,
-    //     systemId: 'gdmn-appl-request',
-    //   }),
-    // );
+    console.log('111');
 
-    // if (mes.type === 'MESSAGES/FETCH_SUCCESS' ) {
-    //   mes.payload?.forEach((message) => {
-    //     handleProccess(message);
-    //   })
-    // } else if (mes.type === 'MESSAGES/FETCH_FAILURE' ) {
-    //   Alert.alert('Ошибка!', mes.payload, [{ text: 'Закрыть' }]);
-    //   return;
-    // }
+    const mes = await dispatch(
+      messageActions.fetchMessages({
+        companyId: company!.id,
+        systemId: 'gdmn-appl-request',
+      }),
+    );
 
-    // await dispatch(referenceActions.clearReferences());
-    // await dispatch(documentActions.clearDocuments());
+    console.log('222');
+
+    if (mes.type === 'MESSAGES/FETCH_SUCCESS') {
+      console.log('333');
+      await dispatch(referenceActions.clearReferences());
+      await dispatch(documentActions.clearDocuments());
+
+      console.log('444');
+      mes.payload?.forEach((message) => {
+        console.log('555');
+        handleProccess(message);
+      });
+    } else if (mes.type === 'MESSAGES/FETCH_FAILURE') {
+      Alert.alert('Ошибка!', mes.payload, [{ text: 'Закрыть' }]);
+      return;
+    }
 
     /*
          await dispatch(

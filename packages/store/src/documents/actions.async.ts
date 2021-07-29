@@ -41,11 +41,13 @@ const removeDocument = (
   };
 };
 
-const clearDocuments = (): AppThunk<
-  Promise<ActionType<typeof actions.clearDocumentsAsync>>,
-  DocumentState,
-  ActionType<typeof actions.clearDocumentsAsync>
-> => {
+// <
+//   Promise<ActionType<typeof actions.clearDocumentsAsync>>,
+//   DocumentState,
+//   ActionType<typeof actions.clearDocumentsAsync>
+// >
+
+const clearDocuments = (): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.clearDocumentsAsync.request('Удаление документов'));
 
