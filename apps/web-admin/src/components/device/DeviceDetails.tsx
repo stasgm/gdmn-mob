@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { IDevice, INamedEntity, IActivationCode } from '@lib/types';
+import { IDevice, INamedEntity } from '@lib/types';
 import { useFormik, FormikProvider, Field } from 'formik';
 import * as yup from 'yup';
 
@@ -148,7 +148,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                 </Grid>
                 {/* <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}> */}
                 <Grid container direction="row" item /*md={6}*/ xs={12}>
-                  <Grid item md={10.68  } xs={9}>
+                  <Grid item md={10} xs={9}>
                     <TextField
                       error={formik.touched.uid && Boolean(formik.errors.uid)}
                       fullWidth

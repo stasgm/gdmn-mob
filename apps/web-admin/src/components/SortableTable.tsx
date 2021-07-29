@@ -20,7 +20,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { IHeadCells } from '../types';
 import { adminPath } from '../utils/constants';
-import { isNamedEntity } from '../utils/helpers';
+import { isDate, isNamedEntity } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
 
@@ -114,20 +114,6 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
     return stabilizedThis.map((el) => el[0]);
   }
 
-  function DeserializeProp<T>(propName: keyof T, value: T[keyof T]) {
-    switch (propName) {
-      case 'creationDate':
-      case 'editionDate':
-        return new Date(value || '').toLocaleString('ru', { hour12: false });
-
-      case 'admin':
-        return typeof value === 'object' ? ('name' in value ? value.name : '') : value;
-
-      default:
-        return value;
-    }
-  }
-
   const TableRows = () => {
     const userList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
@@ -142,28 +128,14 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
           </TableCell>
 
           {headCells.map((headCell, index) => {
-            if (index === 0)
-              return (
-                <TableCell style={{ padding: '0 16px' }}>
-                  <Box
-                    sx={{
-                      alignItems: 'center',
-                      display: 'flex',
-                    }}
-                  >
-                    <NavLink to={`/app/users/${item.id}`}>
-                      <Typography color="textPrimary" variant="body1" key={item.id}>
-                        {DeserializeProp<T>(headCell.id, item[headCell.id])}
-                      </Typography>
-                    </NavLink>
-                  </Box>
-                </TableCell>
-              );
-            else {
-              return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>;
-            }
-<!--             const v = item[headCell.id];
-            const s = isNamedEntity(v) ? v.name : v;
+            const v = item[headCell.id];
+            const s = isNamedEntity(v)
+              ? v.name
+              : isDate(v)
+              ? new Date(v as unknown as string).toLocaleString('en-US', { hour12: false })
+              : v;
+
+            //return new Date(value || '').toLocaleString('ru', { hour12: false });
 
             return index ? (
               <TableCell key={index}>{s}</TableCell>
@@ -182,7 +154,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
                   </NavLink>
                 </Box>
               </TableCell>
-            ); -->
+            );
           })}
         </TableRow>
       ));

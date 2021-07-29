@@ -5,9 +5,10 @@ import { useEffect } from 'react';
 //import {authActions} from '@lib/store';
 //import {activateDevice} from '@lib/store';
 
-import DeviceDetails from '../../components/device/DeviceDetails';
-import { /*authActions, */useSelector, useDispatch, AppDispatch } from '../../store';
 import { authActions } from '@lib/store';
+
+import DeviceDetails from '../../components/device/DeviceDetails';
+import { /*authActions, */ useSelector, useDispatch, AppDispatch } from '../../store';
 import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
