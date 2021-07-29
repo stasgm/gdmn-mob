@@ -185,7 +185,8 @@ class Company extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<ICompany[]>>(`/${this.api.config.version}/companies${paramText}`);
+      const res = await this.api.axios.get<IResponse<ICompany[]>>(`/companies${paramText}`);
+      ///${this.api.config.version}
       const resData = res.data;
 
       if (resData.result) {
