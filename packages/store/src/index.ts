@@ -17,7 +17,7 @@ import { TActions } from './types';
 const persistConfig = {
   key: 'auth',
   storage: AsyncStorage,
-  whitelist: ['user', 'settings', 'company'],
+  whitelist: ['user', 'settings', 'company', 'device'],
 };
 
 export const rootReducer = {

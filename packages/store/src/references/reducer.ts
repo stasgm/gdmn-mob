@@ -47,7 +47,7 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
 
     case getType(actions.removeReferenceAsync.success): {
       const { [action.payload]: _, ...rest } = state.list;
-      return { ...state, list: rest };
+      return { ...state, loading: false, list: rest };
       //return { ...state, list: state.list?.filter(({ name }) => name.toString() !== action.payload) };
     }
 

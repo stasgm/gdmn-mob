@@ -10,11 +10,17 @@ const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const disconnect = createAction('AUTH/DISCONNECT')();
 const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
 
-const checkDeviceAsync = createAsyncAction(
-  'AUTH/CHECK_DEVICE',
-  'AUTH/CHECK_DEVICE_SUCCESS',
-  'AUTH/CHECK_DEVICE_FAILURE',
-)<string | undefined, IDevice | null, string>();
+// const checkDeviceAsync = createAsyncAction(
+//   'AUTH/CHECK_DEVICE',
+//   'AUTH/CHECK_DEVICE_SUCCESS',
+//   'AUTH/CHECK_DEVICE_FAILURE',
+// )<string | undefined, IDevice | null, string>();
+
+const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
+  string | undefined,
+  IDevice | undefined,
+  string
+>();
 
 const activateDeviceAsync = createAsyncAction(
   'AUTH/ACTIVATE_DEVICE',
@@ -24,7 +30,7 @@ const activateDeviceAsync = createAsyncAction(
 
 const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AUTH/LOGIN_FAILURE')<
   string | undefined,
-  IUser | null,
+  IUser | undefined,
   string
 >();
 
@@ -47,7 +53,7 @@ export const actions = {
   disconnect,
   logout,
   setCompany,
-  checkDeviceAsync,
+  getDeviceByUidAsync,
   loginUserAsync,
   signUpAsync,
   activateDeviceAsync,

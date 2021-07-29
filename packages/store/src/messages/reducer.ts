@@ -37,7 +37,7 @@ const reducer: Reducer<MessagesState, MsgActionType> = (state = initialState, ac
       return { ...state, loading: true, errorMessage: '' };
 
     case getType(actions.removeMessageAsync.success):
-      return { ...state, data: [...state.data.filter((i) => i.id !== action.payload)] };
+      return { ...state, loading: false, data: [...state.data.filter((i) => i.id !== action.payload)] };
 
     case getType(actions.removeMessageAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };

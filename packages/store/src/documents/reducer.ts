@@ -52,7 +52,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       return { ...state, loading: true, errorMessage: '' };
 
     case getType(actions.removeDocumentAsync.success):
-      return { ...state, list: [...state.list.filter((i) => i.id !== action.payload)] };
+      return { ...state, loading: false, list: [...state.list.filter((i) => i.id !== action.payload)] };
 
     case getType(actions.removeDocumentAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
