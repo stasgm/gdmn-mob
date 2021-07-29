@@ -1,25 +1,60 @@
 import { ThunkAction } from 'redux-thunk';
 
-import { sleep } from '@lib/client-api';
+import { AppThunk } from '../types';
 import { IReferences } from '@lib/types';
 
 import { actions, ReferenceActionType } from './actions';
-import { IReferenceState } from './types';
+import { ActionType } from 'typesafe-actions';
+import { ReferenceState } from './types';
 
-export type AppThunk = ThunkAction<Promise<ReferenceActionType>, IReferenceState, null, ReferenceActionType>;
+//export type AppThunk = ThunkAction<Promise<ReferenceActionType>, IReferenceState, null, ReferenceActionType>;
 
 export const addReferences = (references: IReferences): AppThunk => {
   return async (dispatch) => {
-    dispatch(actions.addReferencesAsync.request(''));
+    dispatch(actions.addReferencesAsync.request('Добавление справочников'));
 
-    await sleep(1000);
-
-    //TODO: проверка
-    if (references) {
+    try {
       return dispatch(actions.addReferencesAsync.success(references));
+    } catch {
+      return dispatch(actions.addReferencesAsync.failure('Ошибка добавления справочника'));
     }
+  };
+};
 
-    return dispatch(actions.addReferencesAsync.failure('something wrong'));
+// <
+//   Promise<ActionType<typeof actions.removeReferenceAsync>>,
+//   ReferenceState,
+//   ActionType<typeof actions.removeReferenceAsync>>
+
+const removeReference = (
+  documentId: string,
+): AppThunk => {
+  return async (dispatch) => {
+    dispatch(actions.removeReferenceAsync.request('Удаление справочника'));
+
+    try {
+      return dispatch(actions.removeReferenceAsync.success(documentId));
+    } catch {
+      return dispatch(actions.removeReferenceAsync.failure('Ошибка удаления справочника'));
+    }
+  }
+};
+
+// <
+//   Promise<ActionType<typeof actions.clearReferencesAsync>>,
+//   ReferenceState,
+//   ActionType<typeof actions.clearReferencesAsync>
+// >
+
+const clearReferences = (): AppThunk => {
+  return async (dispatch) => {
+    dispatch(actions.clearReferencesAsync.request('Удаление справочников'));
+
+    try {
+      return dispatch(actions.clearReferencesAsync.success());
+    } catch {
+      return dispatch(actions.clearReferencesAsync.failure('Ошибка удаления справочников'));
+    }
   };
 };
 
@@ -38,4 +73,4 @@ export const addReferences = (references: IReferences): AppThunk => {
   };
 };*/
 
-export default { addReferences /*, addReference*/ };
+export default { addReferences, removeReference, clearReferences /*, addReference*/ };

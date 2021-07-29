@@ -51,7 +51,7 @@ const AppLoadScreen = (props: Props) => {
   }, [company, loadCompany]);
 
   useEffect(() => {
-    // Еслит компания получена то загружаем данные и входим в компанию
+    // Если компания получена то загружаем данные и входим в компанию
     userCompany && onSetCompany(userCompany);
   }, [userCompany, onSetCompany]);
 

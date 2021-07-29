@@ -4,11 +4,11 @@ import { Context, ParameterizedContext } from 'koa';
 import { IResponse, IMessage, NewMessage } from '@lib/types';
 
 import log from '../utils/logger';
-import { messageService, companyService, userService } from '../services';
+import { messageService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
-import { DataNotFoundException, ForbiddenException } from '../exceptions';
+import { ForbiddenException } from '../exceptions';
 
 let clients: ((result: IMessage[]) => void)[] = [];
 
@@ -56,38 +56,19 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId: companyName, appSystem } = ctx.params;
-  let userId = ctx.state.user.id;
+  const { companyId, appSystem } = ctx.params;
+  const userId = ctx.state.user.id;
 
-  const params: Record<string, string> = {};
+  //const params: Record<string, string> = {};
 
-  if (typeof companyName === 'string') {
-    params.name = companyName;
-  }
-
-  const company = await companyService.findOne(companyName);
-
-  if (!company) {
-    //ctx.throw(400, 'компания не найдена');
-    throw new DataNotFoundException('Компания не найдена');
-  }
-
-  const user = await userService.findOne(userId);
-
-  if (!user) {
-    // ctx.throw(400, 'Пользователь не найден');
-    throw new DataNotFoundException('Пользователь не найден');
-  }
-
-  if (user.name === 'gdmn') {
-    // TODO переделать
-    userId = 'gdmn';
-  }
+  // if (typeof companyName === 'string') {
+  //   params.name = companyName;
+  // }
 
   const messageList = await messageService.FindMany({
     appSystem,
-    companyId: company.id,
-    userId,
+    companyId,
+    consumerId: userId,
   });
 
   ok(ctx as Context, messageList);
@@ -96,9 +77,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, id: uid } = ctx.params;
+  const { id: messageId } = ctx.params;
 
-  const userId = ctx.state.user.id;
+  //const userId = ctx.state.user.id;
 
   // const user = await userService.findOne(userId);
 
@@ -111,7 +92,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   //   userId = 'gdmn';
   // }
 
-  await messageService.deleteByUid({ companyId, uid, userId });
+  await messageService.deleteOne(messageId);
 
   ok(ctx as Context);
 
@@ -135,7 +116,7 @@ const subscribe = async (ctx: ParameterizedContext): Promise<void> => {
   const messageList = await messageService.FindMany({
     appSystem,
     companyId,
-    userId,
+    consumerId: userId,
   });
 
   ok(ctx as Context, messageList);

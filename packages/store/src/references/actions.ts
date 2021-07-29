@@ -19,6 +19,18 @@ const addReferencesAsync = createAsyncAction('REFERENCES/ADD', 'REFERENCES/ADD_S
   string
 >();
 
+const removeReferenceAsync = createAsyncAction(
+  'REFERENCES/REMOVE_REFERENCE',
+  'REFERENCES/REMOVE_REFERENCE_SUCCESS',
+  'REFERENCES/REMOVE_REFERENCE_FAILURE',
+)<string | undefined, string, string>();
+
+const clearReferencesAsync = createAsyncAction(
+  'REFERENCES/CLEAR_REFERENCES',
+  'REFERENCES/CLEAR_REFERENCES_SUCCESS',
+  'REFERENCES/CLEAR_REFERENCES_FAILURE',
+)<string | undefined, undefined, string>();
+
 /*const addReferenceAsync = createAsyncAction(
   'REFERENCES/ADD_ONE',
   'REFERENCES/ADD_ONE_SUCCESS',
@@ -31,6 +43,8 @@ export const actions = {
   updateList,
   deleteReference,
   deleteAllReferences,
+  removeReferenceAsync,
+  clearReferencesAsync,
   clearError,
   init,
 };

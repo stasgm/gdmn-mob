@@ -3,6 +3,7 @@ export interface IApiConfig {
   server: string;
   port: number;
   timeout: number;
+  version: string;
   apiPath: string;
   deviceId?: string;
   debug?: {
