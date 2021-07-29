@@ -1,13 +1,13 @@
-import { IDevice, IUser, ICompany, DeviceState } from '@lib/types';
+import { IDevice, IUser, ICompany } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
 export type AuthState = {
-  readonly user: IUser | null | undefined;
-  readonly device: IDevice | null | undefined;
-  readonly company: ICompany | null | undefined;
-  readonly settings: IApiConfig | undefined;
+  readonly user: IUser | undefined;
+  readonly device: IDevice | undefined;
+  readonly company: ICompany | undefined;
+  readonly settings: IApiConfig;
   readonly loading: boolean;
   readonly error: boolean;
   readonly status: string;
-  readonly deviceStatus: DeviceState | undefined;
+  readonly connectionStatus: 'not-connected' | 'connected' | 'not-activated';
 };

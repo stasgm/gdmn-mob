@@ -181,7 +181,9 @@ const verifyCode = async (code: string) => {
 
   await codes.delete((i) => i.code === code);
 
-  return await devices.find(device.id);
+  const updatedDevice = await devices.find(device.id);
+
+  return updatedDevice.uid;
 };
 
 const logout = async (userId: string) => {

@@ -4,14 +4,17 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
 import Constants from 'expo-constants';
 
-import { useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
+import { useThunkDispatch, useSelector, documentActions, referenceActions, messageActions } from '@lib/store';
+
+import { BodyType, IDocument, IMessage, IReferences } from '@lib/types';
+import { Alert } from 'react-native';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -24,9 +27,37 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const dispatch = useThunkDispatch();
 
   const [isLoading, setLoading] = useState(false);
+
+  const handleProccess = useCallback(async (msg: IMessage) => {
+    if (!msg) {
+      return;
+    }
+
+    switch (msg.body.type as BodyType) {
+      case 'CMD':
+        //TODO: обработка
+        break;
+
+      case 'REFS':
+        //TODO: проверка данных, приведение к типу
+        dispatch(referenceActions.updateList(msg.body.payload as IReferences));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+        break;
+
+      case 'DOCS':
+        //TODO: проверка данных, приведение к типу
+        dispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+        break;
+
+      default:
+        Alert.alert('Предупреждение!', 'Неизвестный тип сообщения', [{ text: 'Закрыть' }]);
+        break;
+    }
+  }, []);
 
   const handleUpdate = async () => {
     // Загрузка данных
@@ -42,8 +73,25 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     */
     setLoading(true);
 
-    await dispatch(referenceActions.deleteAllReferences());
-    await dispatch(documentActions.deleteDocuments());
+    // const mes = await dispatch(
+    //   messageActions.fetchMessages({
+    //     companyId: company!.id,
+    //     systemId: 'gdmn-appl-request',
+    //   }),
+    // );
+
+    // if (mes.type === 'MESSAGES/FETCH_SUCCESS' ) {
+    //   mes.payload?.forEach((message) => {
+    //     handleProccess(message);
+    //   })
+    // } else if (mes.type === 'MESSAGES/FETCH_FAILURE' ) {
+    //   Alert.alert('Ошибка!', mes.payload, [{ text: 'Закрыть' }]);
+    //   return;
+    // }
+
+    // await dispatch(referenceActions.clearReferences());
+    // await dispatch(documentActions.clearDocuments());
+
     /*
          await dispatch(
           referenceActions.addReferences({
