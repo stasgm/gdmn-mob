@@ -14,7 +14,7 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { settings, user, deviceStatus } = useSelector((state) => state.auth);
+  const { settings, user, connectionStatus } = useSelector((state) => state.auth);
   const dispatch = useThunkDispatch();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const AuthNavigator: React.FC = () => {
 
   const checkDevice = useCallback(() => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
-    //иначе deviceStatus = 'not-activated', переходим на окно ввода кода
+    //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
     dispatch(authActions.getDeviceStatus(settings?.deviceId));
     //Получим устройство по uid
     if (settings?.deviceId) {
@@ -90,15 +90,15 @@ const AuthNavigator: React.FC = () => {
   );
 
   /*
-    Если deviceStatus = 'init', то переходим на окно с подключеним
-    Если deviceStatus = 'active' и user undefined то переходим на окно входа пользователя
-    Если deviceStatus = 'active' и есть user, то переходим на окно с компаниями
-    Если deviceStatus = 'not-activated', то переходим на окно активации устройства
+    Если connectionStatus = 'not-connected', то переходим на окно с подключеним
+    Если connectionStatus = 'connected' и user undefined то переходим на окно входа пользователя
+    Если connectionStatus = 'connected' и есть user, то переходим на окно с компаниями
+    Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
 
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      {deviceStatus === 'active' ? (
+      {connectionStatus === 'connected' ? (
         !user ? (
           <AuthStack.Screen
             name="Login"
@@ -112,7 +112,7 @@ const AuthNavigator: React.FC = () => {
             options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />
         )
-      ) : deviceStatus === 'init' ? (
+      ) : connectionStatus === 'not-connected' ? (
         <>
           <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           <AuthStack.Screen name="Config" component={CongfigWithParams} />

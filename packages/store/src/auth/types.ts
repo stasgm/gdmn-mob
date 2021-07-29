@@ -9,5 +9,5 @@ export type AuthState = {
   readonly loading: boolean;
   readonly error: boolean;
   readonly status: string;
-  readonly deviceStatus: 'init' | 'active' | 'not-activated';
+  readonly connectionStatus: 'not-connected' | 'connected' | 'not-activated';
 };

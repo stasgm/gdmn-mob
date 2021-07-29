@@ -18,7 +18,7 @@ const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
-  deviceStatus: 'init',
+  connectionStatus: 'not-connected',
   settings: {
     apiPath,
     port,
@@ -61,7 +61,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         error: false,
         status: '',
         loading: false,
-        deviceStatus: 'active',
+        connectionStatus: 'connected',
       };
 
     case getType(actions.activateDeviceAsync.failure):
@@ -93,10 +93,17 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, company: action.payload };
 
     case getType(actions.disconnect):
-      return { ...state, device: undefined, deviceStatus: 'init', error: false, status: '', loading: false };
+      return {
+        ...state,
+        device: undefined,
+        connectionStatus: 'not-connected',
+        error: false,
+        status: '',
+        loading: false,
+      };
 
     case getType(actions.getDeviceStatusAsync.request):
-      return { ...state, loading: true, deviceStatus: 'init', status: '', error: false };
+      return { ...state, loading: true, connectionStatus: 'not-connected', status: '', error: false };
 
     case getType(actions.getDeviceStatusAsync.success):
       return {
@@ -104,11 +111,11 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         loading: false,
         status: '',
         error: false,
-        deviceStatus: action.payload === 'ACTIVE' ? 'active' : 'not-activated',
+        connectionStatus: action.payload === 'ACTIVE' ? 'connected' : 'not-activated',
       };
 
     case getType(actions.getDeviceStatusAsync.failure):
-      return { ...state, loading: false, status: action.payload, deviceStatus: 'init', error: true };
+      return { ...state, loading: false, status: action.payload, connectionStatus: 'not-connected', error: true };
 
     default:
       return state;
