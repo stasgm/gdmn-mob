@@ -76,7 +76,7 @@ class Message extends BaseRequest {
     } as error.INetworkError;
   };
 
-  removeMessage = async (companyId: string, uid: string) => {
+  removeMessage = async (messageId: string) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -85,7 +85,7 @@ class Message extends BaseRequest {
       } as types.IRemoveMessageResponse;
     }
 
-    const res = await this.api.axios.delete<IResponse<void>>(`/messages/${companyId}/${uid}`);
+    const res = await this.api.axios.delete<IResponse<void>>(`/messages/${messageId}`);
     const resData = res.data;
 
     if (resData.result) {

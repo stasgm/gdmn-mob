@@ -16,12 +16,17 @@ import {
   TableSortLabel,
   Typography,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 
 import { IHeadCells } from '../types';
 import { adminPath } from '../utils/constants';
-import { isNamedEntity } from '../utils/helpers';
+import { isDate, isNamedEntity } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
+
+const useStyles = makeStyles(() => ({
+  row: { height: 53 },
+}));
 
 interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
@@ -34,7 +39,8 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof T>(headCells[0].id);
+  const [orderBy, setOrderBy] = useState<keyof T>(); //headCells[0].id
+  const classes = useStyles();
 
   const handleSelectAll = (event: any) => {
     let newSelectedUserIds;
@@ -112,7 +118,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
     const userList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
       .map((item: T) => (
-        <TableRow hover key={item.id} selected={selectedUserIds.indexOf(item.id) !== -1}>
+        <TableRow className={classes.row} hover key={item.id} selected={selectedUserIds.indexOf(item.id) !== -1}>
           <TableCell padding="checkbox">
             <Checkbox
               checked={selectedUserIds.indexOf(item.id) !== -1}
@@ -123,7 +129,13 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
 
           {headCells.map((headCell, index) => {
             const v = item[headCell.id];
-            const s = isNamedEntity(v) ? v.name : v;
+            const s = isNamedEntity(v)
+              ? v.name
+              : isDate(v)
+              ? new Date(v as unknown as string).toLocaleString('en-US', { hour12: false })
+              : v;
+
+            //return new Date(value || '').toLocaleString('ru', { hour12: false });
 
             return index ? (
               <TableCell key={index}>{s}</TableCell>
@@ -181,7 +193,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
                     <TableSortLabel
                       active={orderBy === headCell.id}
                       direction={orderBy === headCell.id ? order : 'asc'}
-                      onClick={() => handleSortRequest(headCell.id)}
+                      onClick={headCell.sortEnable ? () => handleSortRequest(headCell.id) : undefined}
                     >
                       {headCell.label}
                     </TableSortLabel>

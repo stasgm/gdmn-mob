@@ -38,7 +38,6 @@ const getMessage: Config = {
 const removeMessage: Config = {
   validate: {
     params: Joi.object({
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор сообщения')),
     }),
   },

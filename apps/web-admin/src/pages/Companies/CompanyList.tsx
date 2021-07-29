@@ -72,7 +72,7 @@ const CompanyList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: fetchCompanies,
+      onClick: () => fetchCompanies(),
       icon: <CachedIcon />,
     },
     // {

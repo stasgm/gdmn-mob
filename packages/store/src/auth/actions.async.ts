@@ -8,25 +8,49 @@ import { AppThunk } from '../types';
 import { AuthState } from './types';
 import { actions } from './actions';
 
-const checkDevice = (): AppThunk<
-  Promise<ActionType<typeof actions.checkDeviceAsync>>,
+// const checkDevice = (): AppThunk<
+//   Promise<ActionType<typeof actions.checkDeviceAsync>>,
+//   AuthState,
+//   ActionType<typeof actions.checkDeviceAsync>
+// > => {
+//   return async (dispatch) => {
+//     dispatch(actions.checkDeviceAsync.request(''));
+
+//     const response = await api.device.getDevice();
+
+//     if (response.type === 'GET_DEVICE') {
+//       return dispatch(actions.checkDeviceAsync.success(response.device));
+//     }
+
+//     if (response.type === 'ERROR') {
+//       return dispatch(actions.checkDeviceAsync.failure(response.message));
+//     }
+
+//     return dispatch(actions.checkDeviceAsync.failure('something wrong'));
+//   };
+// };
+
+const getDeviceByUid = (
+  uid: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
-  ActionType<typeof actions.checkDeviceAsync>
+  ActionType<typeof actions.getDeviceByUidAsync>
 > => {
   return async (dispatch) => {
-    dispatch(actions.checkDeviceAsync.request(''));
+    dispatch(actions.getDeviceByUidAsync.request(''));
 
-    const response = await api.device.getDevice();
+    const response = await api.device.getDevices({ uid });
 
-    if (response.type === 'GET_DEVICE') {
-      return dispatch(actions.checkDeviceAsync.success(response.device));
+    if (response.type === 'GET_DEVICES') {
+      return dispatch(actions.getDeviceByUidAsync.success(response.devices[0]));
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(actions.checkDeviceAsync.failure(response.message));
+      return dispatch(actions.getDeviceByUidAsync.failure(response.message));
     }
 
-    return dispatch(actions.checkDeviceAsync.failure('something wrong'));
+    return dispatch(actions.getDeviceByUidAsync.failure('something wrong'));
   };
 };
 
@@ -43,7 +67,7 @@ const activateDevice = (
     const response = await api.auth.verifyCode(code);
 
     if (response.type === 'VERIFY_CODE') {
-      return dispatch(actions.activateDeviceAsync.success(response.device));
+      return dispatch(actions.activateDeviceAsync.success(response.uid));
     }
 
     if (response.type === 'ERROR') {
@@ -107,62 +131,72 @@ const signIn = (
   };
 };
 
-const signInWithDevice = (
-  credentials: IUserCredentials,
+// const signInWithDevice = (
+//   credentials: IUserCredentials,
+// ): AppThunk<
+//   Promise<ActionType<typeof actions.loginUserAsync | typeof actions.checkDeviceAsync>>,
+//   AuthState,
+//   ActionType<typeof actions.loginUserAsync | typeof actions.checkDeviceAsync>
+// > => {
+//   return async (dispatch) => {
+//     //Если устройство найдено, то проверяем пользователя, иначе возвращаем ошибку устройства
+//     //Если пользователь найден, записываем в хранилище объект пользователя, иначе возвращаем ошибку идентификации
+//     dispatch(actions.checkDeviceAsync.request(''));
+
+//     const responseDevice = await api.device.getDevice();
+
+//     if (responseDevice.type === 'GET_DEVICE') {
+//       dispatch(actions.checkDeviceAsync.success(responseDevice.device));
+
+//       dispatch(actions.loginUserAsync.request(''));
+
+//       const responseLogin = await api.auth.login(credentials);
+
+//       if (responseLogin.type === 'LOGIN') {
+//         return dispatch(actions.loginUserAsync.success(responseLogin.user));
+//       }
+
+//       if (responseLogin.type === 'ERROR') {
+//         return dispatch(actions.loginUserAsync.failure(responseLogin.message));
+//       }
+
+//       return dispatch(actions.loginUserAsync.failure('something wrong'));
+//     }
+
+//     if (responseDevice.type === 'ERROR') {
+//       return dispatch(actions.checkDeviceAsync.failure(responseDevice.message));
+//     }
+
+//     return dispatch(actions.checkDeviceAsync.failure('something wrong'));
+//   };
+// };
+
+const getDeviceStatus = (
+  uid?: string,
 ): AppThunk<
-  Promise<ActionType<typeof actions.loginUserAsync | typeof actions.checkDeviceAsync>>,
+  Promise<ActionType<typeof actions.getDeviceStatusAsync>>,
   AuthState,
-  ActionType<typeof actions.loginUserAsync | typeof actions.checkDeviceAsync>
+  ActionType<typeof actions.getDeviceStatusAsync>
 > => {
   return async (dispatch) => {
-    //Если устройство найдено, то проверяем пользователя, иначе возвращаем ошибку устройства
-    //Если пользователь найден, записываем в хранилище объект пользователя, иначе возвращаем ошибку идентификации
-    dispatch(actions.checkDeviceAsync.request(''));
+    dispatch(actions.getDeviceStatusAsync.request('Получение статуса устройства'));
 
-    const responseDevice = await api.device.getDevice();
+    if (uid) {
+      const response = await api.auth.getDeviceStatus(uid);
 
-    if (responseDevice.type === 'GET_DEVICE') {
-      dispatch(actions.checkDeviceAsync.success(responseDevice.device));
-
-      dispatch(actions.loginUserAsync.request(''));
-
-      const responseLogin = await api.auth.login(credentials);
-
-      if (responseLogin.type === 'LOGIN') {
-        return dispatch(actions.loginUserAsync.success(responseLogin.user));
+      if (response.type === 'GET_DEVICE_STATUS') {
+        return dispatch(actions.getDeviceStatusAsync.success(response.status));
       }
 
-      if (responseLogin.type === 'ERROR') {
-        return dispatch(actions.loginUserAsync.failure(responseLogin.message));
+      if (response.type === 'ERROR') {
+        return dispatch(actions.getDeviceStatusAsync.failure(response.message));
       }
-
-      return dispatch(actions.loginUserAsync.failure('something wrong'));
+    } else {
+      return dispatch(actions.getDeviceStatusAsync.success('NON-ACTIVATED'));
     }
 
-    if (responseDevice.type === 'ERROR') {
-      return dispatch(actions.checkDeviceAsync.failure(responseDevice.message));
-    }
-
-    return dispatch(actions.checkDeviceAsync.failure('something wrong'));
+    return dispatch(actions.getDeviceStatusAsync.failure('Ошибка получения статуса устройства'));
   };
 };
 
-const getDeviceStatus = (uid: string): AppThunk => {
-  return async (dispatch) => {
-    dispatch(actions.getDeviceStatusAsync.request(uid));
-
-    const response = await api.auth.getDeviceStatus(uid);
-
-    if (response.type === 'GET_DEVICE_STATUS') {
-      return dispatch(actions.getDeviceStatusAsync.success(response.status));
-    }
-
-    if (response.type === 'ERROR') {
-      return dispatch(actions.activateDeviceAsync.failure(response.message));
-    }
-
-    return dispatch(actions.activateDeviceAsync.failure('something wrong'));
-  };
-};
-
-export default { checkDevice, activateDevice, signUp, signIn, signInWithDevice, getDeviceStatus };
+export default { getDeviceByUid, activateDevice, signUp, signIn, getDeviceStatus };

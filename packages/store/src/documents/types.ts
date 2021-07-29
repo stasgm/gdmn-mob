@@ -1,6 +1,6 @@
 import { IDocument } from '@lib/types';
 
-export type IDocumentState = {
+export type DocumentState = {
   readonly list: IDocument[];
   readonly loading: boolean;
   readonly errorMessage: string;
