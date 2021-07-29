@@ -7,15 +7,17 @@ import User from './user.router';
 import Message from './message.router';
 import DeviceBinding from './devicebinding.router';
 
-const rootRouter = new Router({ prefix: '/api/:v' });
+const rootRouter = new Router({ prefix: '/api' });
 
-rootRouter.param('v', (version, ctx, next) => {
-  console.log('router_version', version);
+//const rootRouter = new Router({ prefix: '/api/:v' });
 
-  ctx.query.version = version;
+// rootRouter.param('v', (version, ctx, next) => {
+//   console.log('router_version', version);
 
-  return next();
-});
+//   ctx.query.version = version;
+
+//   return next();
+// });
 
 rootRouter
   .use(Auth.middleware())
