@@ -97,7 +97,7 @@ const removeUser = (id: string): AppThunk => {
     const response = await api.user.removeUser(id);
 
     if (response.type === 'REMOVE_USER') {
-      return dispatch(userActions.removeUserAsync.success());
+      return dispatch(userActions.removeUserAsync.success(id));
     }
 
     if (response.type === 'ERROR') {

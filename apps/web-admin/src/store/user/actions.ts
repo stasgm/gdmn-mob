@@ -32,7 +32,7 @@ const updateUserAsync = createAsyncAction('USER/UPDATE', 'USER/UPDATE_SUCCESS', 
 
 const removeUserAsync = createAsyncAction('USER/REMOVE', 'USER/REMOVE_SUCCESS', 'USER/REMOVE_FAILURE')<
   string | undefined,
-  undefined,
+  string,
   string
 >();
 

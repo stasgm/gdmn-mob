@@ -94,7 +94,7 @@ const removeDevice = (id: string): AppThunk => {
     const response = await api.device.removeDevice(id);
 
     if (response.type === 'REMOVE_DEVICE') {
-      return dispatch(deviceActions.removeDeviceAsync.success());
+      return dispatch(deviceActions.removeDeviceAsync.success(id));
     }
 
     if (response.type === 'ERROR') {

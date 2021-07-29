@@ -30,7 +30,7 @@ const updateDeviceAsync = createAsyncAction('DEVICE/UPDATE', 'DEVICE/UPDATE_SUCC
 
 const removeDeviceAsync = createAsyncAction('DEVICE/REMOVE', 'DEVICE/REMOVE_SUCCESS', 'DEVICE/REMOVE_FAILURE')<
   string | undefined,
-  undefined,
+  string,
   string
 >();
 

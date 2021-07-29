@@ -70,6 +70,27 @@ const reducer: Reducer<IDeviceState, DeviceActionType> = (state = initialState, 
         errorMessage: action.payload || 'error',
       };
 
+    case getType(deviceActions.removeDeviceAsync.request):
+      return {
+        ...state,
+        loading: true,
+        errorMessage: '',
+      };
+
+    case getType(deviceActions.removeDeviceAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: [...state.list.filter((i) => i.id !== action.payload)],
+      };
+
+    case getType(deviceActions.removeDeviceAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     // Получение компании
     case getType(deviceActions.fetchDeviceAsync.request):
       return { ...state, loading: true, errorMessage: '' };
