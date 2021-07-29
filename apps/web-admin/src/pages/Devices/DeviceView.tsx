@@ -1,5 +1,5 @@
-import { useCallback, useEffect } from 'react';
-import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
+import { useCallback, useEffect, useRef } from 'react';
+import { Box, CardHeader, IconButton, CircularProgress, Container } from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -7,6 +7,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { IUser } from '@lib/types';
+
+import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 
 import { useSelector, useDispatch } from '../../store';
 import deviceActions from '../../store/device';
@@ -32,6 +34,7 @@ const DeviceView = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { list } = useSelector((state) => state.users);
+  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { loading, errorMessage } = useSelector((state) => state.devices);
 
@@ -65,6 +68,49 @@ const DeviceView = () => {
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  const fetchUsers = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(userActions.fetchUsers('', filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
+
+  // useEffect(() => {
+  //   fetchUsers();
+  // }, [fetchUsers]);
+
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value;
+
+    if (inputValue) return;
+
+    fetchUsers('');
+  };
+
+  const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchUsers(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
+    const inputValue = valueRef?.current?.value;
+
+    fetchUsers(inputValue);
+  };
+
+  const userButtons: IToolBarButton[] = [
+    // {
+    //   name: 'Добавить',
+    //   color: 'primary',
+    //   variant: 'contained',
+    //   onClick: () => navigate('app/users/new'),
+    //   icon: <AddCircleOutlineIcon />,
+    // },
+  ];
 
   const handleClearError = () => {
     dispatch(deviceActions.deviceActions.clearError());
@@ -160,10 +206,25 @@ const DeviceView = () => {
           <DeviceDetailsView device={device} activationCode={code} />
         </Box>
       </Box>
-      <Box sx={{ p: 3 }}>
+      <Box>
         <CardHeader title={'Пользователи устройства'} sx={{ mx: 2 }} />
         {/* <UserListTable users={users} /> */}
-        <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
+
+        <Container maxWidth={false}>
+          {/* <ToolbarActions buttons={userButtons} /> */}
+          <ToolbarActionsWithSearch
+            buttons={userButtons}
+            searchTitle={'Найти устройство'}
+            valueRef={valueRef}
+            updateInput={handleUpdateInput}
+            searchOnClick={handleSearchClick}
+            keyPress={handleKeyPress}
+          />
+          <Box /*sx={{ pt: 2 }}*/>
+            {/* <UserListTable users={users} /> */}
+            <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
+          </Box>
+        </Container>
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>

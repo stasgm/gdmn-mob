@@ -32,7 +32,23 @@ const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
   //   fetchDevices();
   // }, [fetchDevices]);
 
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value;
+
+    if (inputValue) return;
+
+    fetchDevices('');
+  };
+
   const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchDevices(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
     const inputValue = valueRef?.current?.value;
 
     fetchDevices(inputValue);
@@ -65,11 +81,11 @@ const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
       <Container maxWidth={false}>
         <ToolbarActionsWithSearch
           buttons={deviceButtons}
-          title={'Найти устройство'}
+          searchTitle={'Найти устройство'}
+          valueRef={valueRef}
+          updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}
-          onChangeValue={() => {
-            return;
-          }}
+          keyPress={handleKeyPress}
         />
         <Box sx={{ pt: 2 }}>
           {/* <DeviceBindingListTable deviceBindings={userDevices} limitRows={5} /> */}

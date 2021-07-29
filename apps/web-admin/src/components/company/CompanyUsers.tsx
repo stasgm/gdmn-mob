@@ -33,7 +33,23 @@ const CompanyUsers = ({ users }: IProps) => {
   //   fetchUsers();
   // }, [fetchUsers]);
 
+  const handleUpdateInput = (value: string) => {
+    const inputValue: string = value;
+
+    if (inputValue) return;
+
+    fetchUsers('');
+  };
+
   const handleSearchClick = () => {
+    const inputValue = valueRef?.current?.value;
+
+    fetchUsers(inputValue);
+  };
+
+  const handleKeyPress = (key: string) => {
+    if (key !== 'Enter') return;
+
     const inputValue = valueRef?.current?.value;
 
     fetchUsers(inputValue);
@@ -69,11 +85,11 @@ const CompanyUsers = ({ users }: IProps) => {
         {/* <ToolbarActions buttons={userButtons} /> */}
         <ToolbarActionsWithSearch
           buttons={userButtons}
-          title={'Найти устройство'}
+          searchTitle={'Найти устройство'}
+          valueRef={valueRef}
+          updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}
-          onChangeValue={() => {
-            return;
-          }}
+          keyPress={handleKeyPress}
         />
         <Box /*sx={{ pt: 2 }}*/>
           {/* <UserListTable users={users} /> */}
