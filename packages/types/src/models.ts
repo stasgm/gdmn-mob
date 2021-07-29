@@ -76,7 +76,7 @@ export interface IDevice extends Omit<IDBDevice, 'companyId'> {
   company: INamedEntity;
 }
 
-export type NewDevice = Pick<IDevice, 'name' | 'company'>;
+export type NewDevice = Pick<IDevice, 'name' | 'company' | 'state'>;
 
 export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'deviceId'> {
   user: INamedEntity;

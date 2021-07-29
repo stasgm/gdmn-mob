@@ -181,10 +181,12 @@ class Auth extends BaseRequest {
   // };
 
   verifyCode = async (code: string) => {
+    console.log('verifyCode api');
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (code === '1234') {
+      if (code === '1111') {
+        console.log('verifyCode code', code, mockDevice);
         return {
           type: 'VERIFY_CODE',
           uid: mockDevice.uid,

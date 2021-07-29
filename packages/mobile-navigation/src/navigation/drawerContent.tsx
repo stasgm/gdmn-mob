@@ -5,7 +5,7 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
@@ -14,7 +14,6 @@ import Constants from 'expo-constants';
 import { useThunkDispatch, useSelector, documentActions, referenceActions, messageActions } from '@lib/store';
 
 import { BodyType, IDocument, IMessage, IReferences } from '@lib/types';
-import { Alert } from 'react-native';
 
 interface ICutsomProps {
   onSync?: () => void;

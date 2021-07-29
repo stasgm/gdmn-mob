@@ -1,11 +1,9 @@
-import { ThunkAction } from 'redux-thunk';
 
-import { AppThunk } from '../types';
 import { IReferences } from '@lib/types';
 
-import { actions, ReferenceActionType } from './actions';
-import { ActionType } from 'typesafe-actions';
-import { ReferenceState } from './types';
+import { AppThunk } from '../types';
+
+import { actions } from './actions';
 
 //export type AppThunk = ThunkAction<Promise<ReferenceActionType>, IReferenceState, null, ReferenceActionType>;
 
@@ -26,9 +24,7 @@ export const addReferences = (references: IReferences): AppThunk => {
 //   ReferenceState,
 //   ActionType<typeof actions.removeReferenceAsync>>
 
-const removeReference = (
-  documentId: string,
-): AppThunk => {
+const removeReference = (documentId: string): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.removeReferenceAsync.request('Удаление справочника'));
 
@@ -37,7 +33,7 @@ const removeReference = (
     } catch {
       return dispatch(actions.removeReferenceAsync.failure('Ошибка удаления справочника'));
     }
-  }
+  };
 };
 
 // <
