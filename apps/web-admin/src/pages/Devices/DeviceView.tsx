@@ -6,20 +6,24 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
+import { IUser } from '@lib/types';
+
 import { useSelector, useDispatch } from '../../store';
 import deviceActions from '../../store/device';
 import userActions from '../../store/user';
 import codeActions from '../../store/activationCode';
 import bindingActions from '../../store/deviceBinding';
-import { IToolBarButton } from '../../types';
+import { IToolBarButton, IHeadCells } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 // eslint-disable-next-line import/namespace
 import DeviceDetailsView from '../../components/device/DeviceDetailsView';
-import UserListTable from '../../components/user/UserListTable';
+//import UserListTable from '../../components/user/UserListTable';
 import userSelectors from '../../store/user/selectors';
 import deviceSelectors from '../../store/device/selectors';
 import activationCodeSelectors from '../../store/activationCode/selectors';
 import SnackBar from '../../components/SnackBar';
+
+import SortableTable from '../../components/SortableTable';
 
 import { adminPath } from '../../utils/constants';
 
@@ -27,6 +31,7 @@ const DeviceView = () => {
   const { id: deviceId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { list } = useSelector((state) => state.users);
 
   const { loading, errorMessage } = useSelector((state) => state.devices);
 
@@ -107,6 +112,16 @@ const DeviceView = () => {
     },
   ];
 
+  // const headCells: IHeadCells<IUser>[] = [
+  const headCells: IHeadCells<IUser>[] = [
+    { id: 'name', label: 'Пользователь', sortEnable: true },
+    { id: 'lastName', label: 'Фамилия', sortEnable: true },
+    { id: 'firstName', label: 'Имя', sortEnable: true },
+    { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+  ];
+
   return (
     <>
       <Box
@@ -145,9 +160,10 @@ const DeviceView = () => {
           <DeviceDetailsView device={device} activationCode={code} />
         </Box>
       </Box>
-      <Box>
+      <Box sx={{ p: 3 }}>
         <CardHeader title={'Пользователи устройства'} sx={{ mx: 2 }} />
-        <UserListTable users={users} />
+        {/* <UserListTable users={users} /> */}
+        <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
