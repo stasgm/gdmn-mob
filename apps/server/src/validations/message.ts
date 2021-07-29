@@ -7,12 +7,21 @@ const newMessage: Config = {
     type: 'json',
     body: Joi.object({
       head: Joi.object({
-        company: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+        company: Joi.object({
+          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+        }),
+        appSystem: Joi.string().optional(),
+        producer: Joi.object().optional(),
+        consumer: Joi.object().optional(),
+        dateTime: Joi.string().optional(),
       }),
       body: Joi.object({
         type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-        payload: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+        payload: Joi.object().required().error(new InvalidParameterException('Некорректный формат сообщения')),
       }),
+      id: Joi.string().optional(),
+      status: Joi.string().optional(),
     }),
   },
 };
