@@ -76,7 +76,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
     }),
     onSubmit: (values) => {
       console.log(values);
-      onSubmit({ name: values.name, state: values.state.id } as IDevice); /*(values);*/
+      onSubmit({ id: values.id, name: values.name, state: values.state.id, uid: values.uid } as IDevice); /*(values);*/
     },
   });
 
@@ -148,7 +148,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                 </Grid>
                 {/* <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}> */}
                 <Grid container direction="row" item /*md={6}*/ xs={12}>
-                  <Grid item md={10} xs={9}>
+                  <Grid item md={12} xs={12}>
                     <TextField
                       error={formik.touched.uid && Boolean(formik.errors.uid)}
                       fullWidth
@@ -165,13 +165,13 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                   </Grid>
                   {/*<Box>*/}
                   {/*{onCreateUid && (*/}
-                  <Button
+                  {/* <Button
                     disabled={!formik.values.code}
                     // component={RouterLink}
-                    onClick={() => onCreateUid && onCreateUid(formik.values.code)}
+                    // onClick={() => onCreateUid && onCreateUid(formik.values.code)}
                   >
                     <RefreshIcon />
-                  </Button>
+                  </Button> */}
                   {/* )}*/}
                   {/*</Box>*/}
                   {/* </Box> */}

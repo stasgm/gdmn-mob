@@ -87,6 +87,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     name: companyData.name || companyObj.name,
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
+    city: companyData.city,
     creationDate: companyObj.creationDate,
     editionDate: new Date().toISOString(),
   };
