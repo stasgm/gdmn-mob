@@ -22,6 +22,8 @@ export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdPa
   params?: T;
 }
 
+export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences;
+
 /* const cmd1: ICmd<ICmdParams[]> = {
   name: 'GET_DOCUMENTS',
   params: [

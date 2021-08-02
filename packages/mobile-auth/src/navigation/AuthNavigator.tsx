@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useThunkDispatch } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
@@ -15,11 +15,12 @@ const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
   const { settings, user, connectionStatus } = useSelector((state) => state.auth);
-  const dispatch = useThunkDispatch();
+  const dispatch = useAuthThunkDispatch();
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...settings };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveSettings = useCallback(
@@ -35,10 +36,11 @@ const AuthNavigator: React.FC = () => {
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
     dispatch(authActions.getDeviceStatus(settings?.deviceId));
     //Получим устройство по uid
-    if (settings?.deviceId) {
+    if (settings?.deviceId && user) {
+      console.log('getDeviceByUid');
       dispatch(authActions.getDeviceByUid(settings.deviceId));
     }
-  }, [dispatch, settings?.deviceId]);
+  }, [dispatch, settings?.deviceId, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
@@ -48,7 +50,6 @@ const AuthNavigator: React.FC = () => {
         //то запишем uId в конфиг api и в настройки
         dispatch(authActions.setSettings({ ...settings, deviceId: res.payload }));
         api.config.deviceId = res.payload;
-        dispatch(authActions.getDeviceByUid(res.payload));
       }
     },
     [dispatch, settings],
@@ -58,7 +59,15 @@ const AuthNavigator: React.FC = () => {
     dispatch(authActions.disconnect());
   }, [dispatch]);
 
-  const signIn = useCallback((credentials: IUserCredentials) => dispatch(authActions.signIn(credentials)), [dispatch]);
+  const signIn = useCallback(
+    async (credentials: IUserCredentials) => {
+      const res = await dispatch(authActions.signIn(credentials));
+      if (settings?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
+        dispatch(authActions.getDeviceByUid(settings.deviceId));
+      }
+    },
+    [dispatch, settings.deviceId],
+  );
 
   const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);
 

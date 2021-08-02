@@ -154,6 +154,7 @@ const deleteOne = async (id: string): Promise<void> => {
 const findOne = async (id: string): Promise<IUser | undefined> => {
   const db = getDb();
   const { users } = db;
+
   const user = await users.find(id);
 
   if (!user) {

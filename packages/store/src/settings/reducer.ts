@@ -5,7 +5,7 @@ import { ISettings, IBaseSettings } from '@lib/types';
 
 import { actions, SettingsActionType } from './actions';
 
-import { ISettingsState } from './types';
+import { SettingsState } from './types';
 
 const baseSettings: ISettings<IBaseSettings> = {
   serverAutoCheck: {
@@ -24,13 +24,13 @@ const baseSettings: ISettings<IBaseSettings> = {
   },
 };
 
-const initialState: Readonly<ISettingsState> = {
+const initialState: Readonly<SettingsState> = {
   data: baseSettings,
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<ISettingsState, SettingsActionType> = (state = initialState, action): ISettingsState => {
+const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialState, action): SettingsState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;

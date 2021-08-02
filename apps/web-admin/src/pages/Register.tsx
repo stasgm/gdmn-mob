@@ -7,7 +7,7 @@ import { IUserCredentials } from '@lib/types';
 
 import { useEffect } from 'react';
 
-import { authActions, useThunkDispatch, useSelector } from '@lib/store';
+import { authActions, useAuthThunkDispatch, useSelector } from '@lib/store';
 
 // import { useDispatch, useSelector } from '../store';
 
@@ -20,7 +20,7 @@ const Register = () => {
 
   const { error, loading, status } = useSelector((state) => state.auth); //{ error: false, loading: false, status: '' };
 
-  const dispatch = useThunkDispatch();
+  const dispatch = useAuthThunkDispatch();
 
   const handleSubmit = async (values: IUserCredentials) => {
     const res = await dispatch(authActions.signUp(values));
