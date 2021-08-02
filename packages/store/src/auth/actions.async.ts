@@ -3,10 +3,18 @@ import api from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
 
+import { ThunkDispatch } from 'redux-thunk';
+
+import { useDispatch } from 'react-redux';
+
 import { AppThunk } from '../types';
 
 import { AuthState } from './types';
-import { actions } from './actions';
+import { actions, AuthActionType } from './actions';
+
+export type AuthDispatch = ThunkDispatch<AuthState, any, AuthActionType>;
+
+export const useAuthThunkDispatch = () => useDispatch<AuthDispatch>();
 
 // const checkDevice = (): AppThunk<
 //   Promise<ActionType<typeof actions.checkDeviceAsync>>,
@@ -199,4 +207,4 @@ const getDeviceStatus = (
   };
 };
 
-export default { getDeviceByUid, activateDevice, signUp, signIn, getDeviceStatus };
+export default { getDeviceByUid, activateDevice, signUp, signIn, getDeviceStatus, useAuthThunkDispatch };

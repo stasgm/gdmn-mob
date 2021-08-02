@@ -18,7 +18,10 @@ const newMessage: Config = {
       }),
       body: Joi.object({
         type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-        payload: Joi.object().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+        payload: Joi.alternatives()
+          .try(Joi.object(), Joi.array())
+          .required()
+          .error(new InvalidParameterException('Некорректный формат сообщения')),
       }),
       id: Joi.string().optional(),
       status: Joi.string().optional(),

@@ -9,11 +9,15 @@ import { StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
+import api from '@lib/client-api';
+
 import Constants from 'expo-constants';
 
-import { useThunkDispatch, useSelector, documentActions, referenceActions, messageActions } from '@lib/store';
+import { useDispatch, useSelector, documentActions, referenceActions, messageActions } from '@lib/store';
 
 import { BodyType, IDocument, IMessage, IReferences } from '@lib/types';
+import { useRefThunkDispatch } from '@lib/store/src/references/actions.async';
+import { useDocThunkDispatch } from '@lib/store/src/documents/actions.async';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -26,7 +30,9 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
-  const dispatch = useThunkDispatch();
+  const refDispatch = useRefThunkDispatch();
+  const docDispatch = useDocThunkDispatch();
+  const dispatch = useDispatch();
 
   const [isLoading, setLoading] = useState(false);
 
@@ -59,6 +65,10 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   }, []);
 
   const handleUpdate = async () => {
+    if (!company || !user) {
+      return;
+    }
+
     // Загрузка данных
     if (onSync) {
       // Если передан внешний обработчик то вызываем
@@ -74,39 +84,79 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
 
     console.log('111');
 
-    const mes = await dispatch(
-      messageActions.fetchMessages({
-        companyId: company!.id,
-        systemId: 'gdmn-appl-request',
-      }),
+    const messageSendDoc: IMessage['body'] = {
+      type: 'DOCS',
+      payload: applDocuments,
+    };
+
+    await api.message.sendMessages(
+      'gdmn-appl-request',
+      { id: company.id, name: company.name },
+      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+      messageSendDoc,
     );
+
+    const mes = await api.message.getMessages({ systemName: 'gdmn-appl-request', companyId: company.id });
 
     console.log('222');
 
-    if (mes.type === 'MESSAGES/FETCH_SUCCESS') {
+    if (mes.type === 'GET_MESSAGES') {
       console.log('333');
-      await dispatch(referenceActions.clearReferences());
-      await dispatch(documentActions.clearDocuments());
+      await refDispatch(referenceActions.clearReferences());
+      await docDispatch(documentActions.clearDocuments());
 
       console.log('444');
-      mes.payload?.forEach((message) => {
-        console.log('555');
+      mes.messageList?.forEach((message) => {
+        console.log('555', message.body.type);
         handleProccess(message);
       });
-    } else if (mes.type === 'MESSAGES/FETCH_FAILURE') {
-      Alert.alert('Ошибка!', mes.payload, [{ text: 'Закрыть' }]);
+    } else if (mes.type === 'ERROR') {
+      Alert.alert('Ошибка!', mes.message, [{ text: 'Закрыть' }]);
       return;
     }
 
-    /*
-         await dispatch(
-          referenceActions.addReferences({
-            [refApplStatuses.name]: refApplStatuses,
-            [refEmplyees.name]: refEmplyees,
-          }),
-          );
-          await dispatch(documentActions.addDocuments(applDocuments));
-      */
+    const messageGetRef: IMessage['body'] = {
+      type: 'CMD',
+      payload: {
+        name: 'GET_REF',
+        params: { data: ['Employees', 'Statuses', 'DocTypes'] },
+      },
+    };
+
+    const db = new Date();
+    const de = new Date();
+    de.setDate(de.getDate() + 1);
+
+    const messageGetDoc: IMessage['body'] = {
+      type: 'CMD',
+      payload: {
+        name: 'GET_DOCUMENTS',
+        params: [
+          {
+            dateBegin: db.toISOString(),
+            dateEnd: de.toISOString(),
+            documentType: {
+              id: '168063006',
+              name: 'Заявки на закупку ТМЦ',
+            },
+          },
+        ],
+      },
+    };
+
+    await api.message.sendMessages(
+      'gdmn-appl-request',
+      { id: company.id, name: company.name },
+      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+      messageGetRef,
+    );
+
+    await api.message.sendMessages(
+      'gdmn-appl-request',
+      { id: company.id, name: company.name },
+      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+      messageGetDoc,
+    );
 
     setLoading(false);
   };
@@ -231,3 +281,135 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
 });
+
+// Документы Appl
+export const applDocuments = [
+  {
+    id: '172846156',
+    number: '104',
+    documentDate: '2021-06-07',
+    documentType: {
+      id: '168063006',
+      name: 'Заявки на закупку ТМЦ',
+    },
+    status: 'DRAFT',
+    head: {
+      applStatus: {
+        id: '168062979',
+        name: 'Согласован инженерной службой',
+      },
+      purchaseType: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      dept: {
+        id: '169853581',
+        name: 'СХЦ Новополесский-Агро',
+      },
+      purpose: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      justification: 'Текущий ремонт зерноуборочных комбайнов',
+      sysApplicant: {
+        id: '169967847',
+        name: 'Андрухович Александр Михайлович',
+      },
+      applicant: {
+        id: '169967847',
+        name: 'Андрухович Александр Михайлович',
+      },
+      specPreAgree: {
+        id: '151211855',
+        name: 'Самусевич Александр Николаевич',
+      },
+      specAgreeEngin: {
+        id: '149876722',
+        name: 'Реут Валерий Валентинович',
+      },
+      verificationDate: '2021-06-21',
+      faGood: {
+        id: '170039555',
+        name: '"Комбаин з/у КЗС-1218 -03 """"Палессе"""""',
+      },
+      faGoodNumber: '13316',
+      cancelReason: 'Текущий ремонт ЧЕГО????',
+    },
+    lines: [
+      {
+        id: '172846487',
+        orderNum: 1,
+        goodName: '30.01.2199 Амортизатор маховика',
+        quantity: 200,
+        value: {
+          id: '3000001',
+          name: 'шт.',
+        },
+      },
+    ],
+  },
+  {
+    id: '174360229',
+    number: '473',
+    documentDate: '2021-06-07',
+    documentType: {
+      id: '168063006',
+      name: 'Заявки на закупку ТМЦ',
+    },
+    status: 'DRAFT',
+    head: {
+      applStatus: {
+        id: '168062979',
+        name: 'Согласован инженерной службой',
+      },
+      purchaseType: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      dept: {
+        id: '147095763',
+        name: 'СХЦ "Величковичи"',
+      },
+      purpose: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      justification:
+        'Просим Вас закупить данный компрессор на трактор который задействован на внесении минеральных удобрений.',
+      sysApplicant: {
+        id: '153741215',
+        name: 'Игнашевич Сергей  Васильевич',
+      },
+      applicant: {
+        id: '153741215',
+        name: 'Игнашевич Сергей  Васильевич',
+      },
+      specPreAgree: {
+        id: '151211855',
+        name: 'Самусевич Александр Николаевич',
+      },
+      specAgreeEngin: {
+        id: '149876722',
+        name: 'Реут Валерий Валентинович',
+      },
+      verificationDate: '2021-06-21',
+      faGood: {
+        id: '151911169',
+        name: 'ТРАКТОР БЕЛАРУС-1221.2',
+      },
+      faGoodNumber: '701442',
+    },
+    lines: [
+      {
+        id: '174361484',
+        orderNum: 1,
+        goodName: 'Компрессор Д-260 А29.05.000 БЗА',
+        quantity: 1,
+        value: {
+          id: '3000001',
+          name: 'шт.',
+        },
+      },
+    ],
+  },
+];

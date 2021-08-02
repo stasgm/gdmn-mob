@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useThunkDispatch } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
@@ -15,11 +15,12 @@ const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
   const { settings, user, connectionStatus } = useSelector((state) => state.auth);
-  const dispatch = useThunkDispatch();
+  const dispatch = useAuthThunkDispatch();
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...settings };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveSettings = useCallback(
@@ -65,7 +66,7 @@ const AuthNavigator: React.FC = () => {
         dispatch(authActions.getDeviceByUid(settings.deviceId));
       }
     },
-    [dispatch],
+    [dispatch, settings.deviceId],
   );
 
   const logout = useCallback(() => dispatch(authActions.logout()), [dispatch]);

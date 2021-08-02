@@ -15,44 +15,16 @@ let clients: ((result: IMessage[]) => void)[] = [];
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const message = ctx.request.body as NewMessage;
 
-  // if (!message.head) {
-  //   ctx.throw(400, 'отсутствует заголовок сообщения');
-  // }
-
-  // if (!message.body) {
-  //   ctx.throw(400, 'отсутствует сообщение');
-  //  }
-
-  // if (!(message.body.type && message.body.payload && message.head.company)) {
-  //   ctx.throw(400, 'некорректный формат сообщения');
-  // }
-
-  // if (!(ctx.state.user.companies as string[]).find((item) => item === message.head.company.id)) {
-  //   ctx.throw(403, 'Пользователь не входит в организацию указанную в заголовке сообщения');
-  // }
-
   if (ctx.state.user.company.id !== message.head.company.id) {
     throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
-  // try {
   const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
-
-  // const result: IResponse<{ uid: string; date: Date }> = {
-  //   result: true,
-  //   data: { uid: messageId, date: new Date() },
-  // };
 
   const resultData = { uid: messageId, date: new Date() };
   created(ctx as Context, resultData);
-  // ctx.status = 201;
-  // ctx.body = result;
 
   log.info('newMessage: message is successfully created');
-
-  // } catch (err) {
-  //   ctx.throw(400, err.message);
-  // }
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {

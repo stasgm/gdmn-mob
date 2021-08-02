@@ -132,9 +132,8 @@ class Device extends BaseRequest {
 
     try {
       // || this.api.deviceId
-      const res = await this.api.axios.get<IResponse<IDevice>>(
-        `/${this.api.config.version}/devices/${deviceId || this.api.config.deviceId}`,
-      );
+      const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
+      //${this.api.config.version}
 
       const resData = res?.data;
 

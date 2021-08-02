@@ -1,8 +1,6 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-// import { messages } from '@lib/mock';
-
 import { actions, MsgActionType } from './actions';
 
 import { MessagesState } from './types';

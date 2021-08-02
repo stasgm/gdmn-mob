@@ -9,9 +9,9 @@ import { persistReducer } from 'redux-persist';
 
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
-import { reducer as msgReducer } from './messages';
 import { reducer as referenceReducer } from './references';
 import { reducer as settingsReducer } from './settings';
+import { reducer as msgReducer } from './messages';
 import { TActions } from './types';
 
 const persistConfig = {
