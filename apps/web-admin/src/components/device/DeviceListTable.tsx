@@ -137,8 +137,8 @@ const DeviceListTable = ({
         <TableCell>{device.uid}</TableCell>
         <TableCell>{device.state}</TableCell>
         <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
-        {/* <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell> */}
-        <TableCell>{device.editionDate}</TableCell>
+        <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        {/* <TableCell>{device.editionDate}</TableCell> */}
         <TableCell>
           <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
             <Box style={{ width: '40px' }}>{activationCodes.find((a) => a.device.id === device.id)?.code}</Box>
