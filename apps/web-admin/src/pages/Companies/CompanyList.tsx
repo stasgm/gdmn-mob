@@ -130,7 +130,7 @@ const CompanyList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <SortableTable<ICompany> headCells={headCells} data={list} />
+              <SortableTable<ICompany> headCells={headCells} data={list} path={'/app/companies/'} />
             </Box>
           )}
         </Container>

@@ -3,7 +3,7 @@ import { View, Text, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { BodyType, IReferences } from '@lib/types';
+import { BodyType, IDocument, IReferences } from '@lib/types';
 import { messageActions, referenceActions, documentActions, useDispatch, messageSelectors } from '@lib/store';
 import { AppScreen, BackButton, MenuButton, SubTitle, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
 
@@ -34,13 +34,13 @@ const MessageViewScreen = () => {
       case 'REFS':
         //TODO: проверка данных, приведение к типу
         dispatch(referenceActions.updateList(msg.body.payload as IReferences));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
         break;
 
       case 'DOCS':
         //TODO: проверка данных, приведение к типу
-        dispatch(documentActions.setDocuments(msg.body.payload));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'procd' }));
+        dispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
+        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
         break;
 
       default:
@@ -51,7 +51,7 @@ const MessageViewScreen = () => {
 
   const handleDelete = useCallback(() => {
     if (msg) {
-      dispatch(messageActions.deleteMessage(msg.id));
+      dispatch(messageActions.removeMessage(msg.id));
       navigation.goBack();
     }
   }, [dispatch]);
@@ -112,7 +112,7 @@ const MessageViewScreen = () => {
           <Text style={[styles.textBold, styles.title]}>Содержимое</Text>
           <Divider />
           <Text style={styles.field}>
-            {typeof msg.body.payload !== 'object' ? msg.body.payload.toString() : '[данные]'}
+            {typeof msg.body.payload !== 'object' ? (msg.body.payload as any).toString() : '[данные]'}
           </Text>
         </View>
       </View>

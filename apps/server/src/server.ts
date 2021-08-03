@@ -82,6 +82,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         directives: {
           defaultSrc: ['*'],
           styleSrc: ["'unsafe-inline'"],
+          imgSrc: ['*', 'data:'],
         },
       }),
     )

@@ -20,18 +20,21 @@ import { makeStyles } from '@material-ui/styles';
 
 import { IHeadCells } from '../types';
 import { adminPath } from '../utils/constants';
+import { isDate, isNamedEntity } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
 
 const useStyles = makeStyles(() => ({
   row: { height: 53 },
 }));
-interface props<T extends { id: string }> {
+
+interface IProps<T extends { id: string }> {
   headCells: IHeadCells<T>[];
   data: T[];
+  path: string;
 }
 
-function SortableTable<T extends { id: string }>({ data = [], headCells = [], ...rest }: props<T>) {
+function SortableTable<T extends { id: string }>({ data = [], headCells = [], path, ...rest }: IProps<T>) {
   const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -50,6 +53,8 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
 
     setSelectedUserIds(newSelectedUserIds);
   };
+
+  console.log('SortableTable data', data);
 
   const handleSelectOne = (_event: any, id: any) => {
     const selectedIndex = selectedUserIds.indexOf(id);
@@ -109,20 +114,6 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
     return stabilizedThis.map((el) => el[0]);
   }
 
-  function DeserializeProp<T>(propName: keyof T, value: T[keyof T]) {
-    switch (propName) {
-      case 'creationDate':
-      case 'editionDate':
-        return new Date(value || '').toLocaleString('ru', { hour12: false });
-
-      case 'admin':
-        return typeof value === 'object' ? ('name' in value ? value.name : '') : value;
-
-      default:
-        return value;
-    }
-  }
-
   const TableRows = () => {
     const userList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
@@ -137,26 +128,33 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], ..
           </TableCell>
 
           {headCells.map((headCell, index) => {
-            if (index === 0)
-              return (
-                <TableCell style={{ padding: '0 16px' }}>
-                  <Box
-                    sx={{
-                      alignItems: 'center',
-                      display: 'flex',
-                    }}
-                  >
-                    <NavLink to={`${adminPath}/app/users/${item.id}`}>
-                      <Typography color="textPrimary" variant="body1" key={item.id}>
-                        {DeserializeProp<T>(headCell.id, item[headCell.id])}
-                      </Typography>
-                    </NavLink>
-                  </Box>
-                </TableCell>
-              );
-            else {
-              return <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>;
-            }
+            const v = item[headCell.id];
+            const s = isNamedEntity(v)
+              ? v.name
+              : isDate(v)
+              ? new Date(v as unknown as string).toLocaleString('en-US', { hour12: false })
+              : v;
+
+            //return new Date(value || '').toLocaleString('ru', { hour12: false });
+
+            return index ? (
+              <TableCell key={index}>{s}</TableCell>
+            ) : (
+              <TableCell key={index} style={{ padding: '0 16px' }}>
+                <Box
+                  sx={{
+                    alignItems: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  <NavLink to={`${adminPath}${path}${item.id}`}>
+                    <Typography color="textPrimary" variant="body1" key={item.id}>
+                      {s}
+                    </Typography>
+                  </NavLink>
+                </Box>
+              </TableCell>
+            );
           })}
         </TableRow>
       ));

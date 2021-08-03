@@ -43,7 +43,7 @@ export interface ICreateCodeResponse extends IAuthQueryResponse {
 
 export interface IVerifyCodeResponse extends IAuthQueryResponse {
   type: 'VERIFY_CODE';
-  device: IDevice;
+  uid: string;
 }
 
 export interface IDeviceStatusResponse extends IAuthQueryResponse {
