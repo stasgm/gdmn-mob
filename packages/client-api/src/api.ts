@@ -34,7 +34,8 @@ class Api extends BaseApi {
     // this._deviceId = undefined; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
-      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
+      // eslint-disable-next-line max-len
+      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}/${this._config.version}`,
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
@@ -64,6 +65,7 @@ class Api extends BaseApi {
         }
 
         console.info('✉️ request', request);
+
         return request;
       },
       (error) => {
