@@ -60,7 +60,6 @@ class Device extends BaseRequest {
     }
 
     try {
-      console.log('update device', device);
       const res = await this.api.axios.patch<IResponse<IDevice>>(`/devices/${device.id}`, device);
       const resData = res.data;
 
@@ -134,7 +133,7 @@ class Device extends BaseRequest {
     try {
       // || this.api.deviceId
       const res = await this.api.axios.get<IResponse<IDevice>>(
-        `/${this.api.config.version}/devices/${deviceId || this.api.config.deviceId}`,
+        `/devices/${deviceId || this.api.config.deviceId}`, ///${this.api.config.version}
       );
 
       const resData = res?.data;

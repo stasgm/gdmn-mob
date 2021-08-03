@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { authActions } from '@lib/store';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
-import { /*authActions, */ useSelector, useDispatch, AppDispatch } from '../../store';
+import {/* authActions,*/ useSelector, useDispatch, AppDispatch } from '../../store';
 import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';
@@ -87,7 +87,7 @@ const DeviceEdit = () => {
         loading={loading}
         onSubmit={handleSubmit}
         onCancel={goBack}
-        // onCreateUid={handleCreateUid}
+        //onCreateUid={handleCreateUid}
       />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>

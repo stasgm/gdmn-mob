@@ -21,7 +21,7 @@ interface IProps {
   activationCode?: string;
   onSubmit: (values: IDevice) => void;
   onCancel: () => void;
-  onCreateUid?: (code: string) => void;
+  //onCreateUid?: (code: string) => void;
 }
 
 export interface IDeviceFormik extends Omit<IDevice, 'state'> {
@@ -33,7 +33,7 @@ export interface IDeviceFormik extends Omit<IDevice, 'state'> {
 //   code: INamedEntity;
 // }
 
-const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, onCreateUid }: IProps) => {
+const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*, onCreateUid*/ }: IProps) => {
   const [devices, setDevices] = useState<INamedEntity[]>([]);
   const [loadingDevices, setLoadingDevices] = useState(true);
 
@@ -75,7 +75,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
       // code: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      console.log(values);
       onSubmit({ id: values.id, name: values.name, state: values.state.id, uid: values.uid } as IDevice); /*(values);*/
     },
   });
@@ -142,7 +141,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     type="code"
-                    disabled={loading}
+                    disabled={true}
                     value={formik.values.code}
                   />
                 </Grid>
@@ -163,18 +162,18 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel, on
                       value={formik.values.uid}
                     />
                   </Grid>
-                  {/*<Box>*/}
-                  {/*{onCreateUid && (*/}
-                  {/* <Button
+                  {/* <Box>
+                  {onCreateUid && (
+                  <Button
                     disabled={!formik.values.code}
                     // component={RouterLink}
-                    // onClick={() => onCreateUid && onCreateUid(formik.values.code)}
+                     onClick={() => onCreateUid && onCreateUid(formik.values.code)}
                   >
                     <RefreshIcon />
-                  </Button> */}
-                  {/* )}*/}
-                  {/*</Box>*/}
-                  {/* </Box> */}
+                  </Button>
+                  )}
+                  {/*</Box>*//*}
+                  </Box> */}
                 </Grid>
               </Grid>
             </CardContent>

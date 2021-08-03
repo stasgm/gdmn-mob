@@ -8,6 +8,8 @@ import CachedIcon from '@material-ui/icons/Cached';
 // import ImportExportIcon from '@material-ui/icons/ImportExport';
 import { IDevice } from '@lib/types';
 
+import { authActions } from '@lib/store';
+
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
@@ -52,7 +54,6 @@ const DeviceList = () => {
 
   const handleSearchClick = () => {
     const inputValue = valueRef?.current?.value;
-
     fetchDevices(inputValue);
   };
 
@@ -60,7 +61,6 @@ const DeviceList = () => {
     if (key !== 'Enter') return;
 
     const inputValue = valueRef?.current?.value;
-
     fetchDevices(inputValue);
   };
 
@@ -69,8 +69,12 @@ const DeviceList = () => {
   };
 
   const handleCreateCode = (deviceId: string) => {
-    console.log('проверка', deviceId);
     dispatch(codeActions.createActivationCode(deviceId));
+  };
+
+  const handleCreateUid = async (code: string, deviceId: string) => {
+    await dispatch(authActions.activateDevice(code));
+    dispatch(actions.fetchDeviceById(deviceId));
   };
 
   // const handleSubmit = async (values: IDevice | NewDevice) => {
@@ -84,7 +88,7 @@ const DeviceList = () => {
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: fetchDevices,
+      onClick: () => fetchDevices(),
       icon: <CachedIcon />,
     },
     // {
@@ -141,7 +145,12 @@ const DeviceList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <DeviceListTable devices={list} activationCodes={activationCodes} onCreateCode={handleCreateCode} />
+              <DeviceListTable
+                devices={list}
+                activationCodes={activationCodes}
+                onCreateCode={handleCreateCode}
+                onCreateUid={handleCreateUid}
+              />
               {/* <SortableTable<IDevice> headCells={headCells} data={list} /> */}
             </Box>
           )}

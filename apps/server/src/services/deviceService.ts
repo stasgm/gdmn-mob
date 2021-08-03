@@ -68,7 +68,7 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
     state: deviceData.state || oldDevice.state,
     uid: deviceData.uid || oldDevice.uid,
     companyId,
-    creationDate: deviceData.creationDate,
+    creationDate: oldDevice.creationDate,
     editionDate: new Date().toISOString(),
   };
 

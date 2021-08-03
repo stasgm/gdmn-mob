@@ -38,8 +38,6 @@ const getActivationCodes = async (ctx: ParameterizedContext): Promise<void> => {
 const getActivationCode = async (ctx: ParameterizedContext): Promise<void> => {
   const { deviceId } = ctx.params;
 
-  console.log('проверка', deviceId);
-
   const code = await activationCodeService.genActivationCode(deviceId);
 
   created(ctx as Context, code);

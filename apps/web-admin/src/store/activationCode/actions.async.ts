@@ -48,13 +48,11 @@ const fetchActivationCodes = (deviceId?: string): AppThunk => {
 /*CREATE*/
 
 const createActivationCode = (deviceId: string): AppThunk => {
-  console.log('проверка 13');
   return async (dispatch) => {
     dispatch(activationCodeActions.createCodeAsync.request(''));
 
     const response = await api.activationCode.createActivationCode(deviceId);
 
-    console.log('проверка 14');
     if (response.type === 'CREATE_CODE') {
       return dispatch(activationCodeActions.createCodeAsync.success(response.code));
     }
