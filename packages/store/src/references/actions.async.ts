@@ -13,6 +13,24 @@ export type RefDispatch = ThunkDispatch<ReferenceState, any, ReferenceActionType
 
 export const useRefThunkDispatch = () => useDispatch<RefDispatch>();
 
+export const setReferences = (
+  references: IReferences,
+): AppThunk<
+  Promise<ActionType<typeof actions.setReferencesAsync>>,
+  ReferenceState,
+  ActionType<typeof actions.setReferencesAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setReferencesAsync.request(''));
+
+    try {
+      return dispatch(actions.setReferencesAsync.success(references));
+    } catch {
+      return dispatch(actions.setReferencesAsync.failure('Ошибка записи справочников'));
+    }
+  };
+};
+
 export const addReferences = (
   references: IReferences,
 ): AppThunk<
@@ -80,4 +98,10 @@ const clearReferences = (): AppThunk<
   };
 };*/
 
-export default { addReferences, removeReference, clearReferences, useRefThunkDispatch /*, addReference*/ };
+export default {
+  setReferences,
+  addReferences,
+  removeReference,
+  clearReferences,
+  useRefThunkDispatch,
+};

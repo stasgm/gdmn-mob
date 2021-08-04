@@ -15,10 +15,21 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.updateList):
+    case getType(actions.setReferencesAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.setReferencesAsync.success):
       return {
         ...state,
+        loading: false,
         list: action.payload,
+      };
+
+    case getType(actions.setReferencesAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
       };
 
     case getType(actions.deleteReference): {

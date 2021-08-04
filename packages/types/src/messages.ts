@@ -13,7 +13,7 @@ export interface IHeadMessage {
 export interface ICmdParams<T = any> {
   dateBegin: string;
   dateEnd: string;
-  documentType: INamedEntity;
+  documentType?: INamedEntity;
   data?: T;
 }
 
