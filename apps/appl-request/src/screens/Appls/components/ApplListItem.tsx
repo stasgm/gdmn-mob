@@ -12,7 +12,16 @@ import { ApplsStackParamList } from '../../../navigation/Root/types';
 // eslint-disable-next-line import/no-cycle
 import { ApplListRenderItemProps } from '../ApplListScreen';
 
-const ApplListItem = ({ id, title, subtitle, description, status, lineCount, applStatus }: ApplListRenderItemProps) => {
+const ApplListItem = ({
+  id,
+  title,
+  subtitle,
+  description,
+  status,
+  lineCount,
+  applStatus,
+  errorMessage,
+}: ApplListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ApplsStackParamList, 'ApplList'>>();
 
@@ -38,6 +47,7 @@ const ApplListItem = ({ id, title, subtitle, description, status, lineCount, app
             </View>
           </View>
           <Text style={[styles.number, styles.field]}>{description}</Text>
+          {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage}</Text>}
         </View>
       </View>
     </TouchableOpacity>
@@ -60,6 +70,10 @@ const localStyles = StyleSheet.create({
     width: 5,
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
+  },
+  error: {
+    color: 'red',
+    textAlign: 'right',
   },
 });
 

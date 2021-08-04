@@ -4,17 +4,15 @@ import { FlatList, RefreshControl, Text } from 'react-native';
 import { ItemSeparator } from '@lib/mobile-ui/src/components';
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
 import { useNavigation } from '@react-navigation/core';
-import { MenuButton, DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
-
 import { documentsMock } from '@lib/mock';
+import { MenuButton, DrawerButton, AppScreen, useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
 /*
 import { useRoute, RouteProp } from '@react-navigation/native';
 
 import { DocumentsTabsStackParamsList } from '../../navigation/Root/types'; */
 
-import { styles } from './styles';
+// import { styles } from './styles';
 import DocumentItem from './components/DocumentItem';
 
 const DocumentListScreen = () => {
@@ -79,7 +77,7 @@ const DocumentListScreen = () => {
   const ref = useRef<FlatList<IDocument>>(null);
 
   return (
-    <>
+    <AppScreen style={styles.contentTop}>
       <FlatList
         ref={ref}
         data={list}
@@ -92,7 +90,7 @@ const DocumentListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-    </>
+    </AppScreen>
   );
 };
 

@@ -34,11 +34,10 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
-  // const dispatch = useDispatch();
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleProccess = useCallback(async (msg: IMessage) => {
+  const processMessage = useCallback(async (msg: IMessage) => {
     if (!msg) {
       return;
     }
@@ -50,6 +49,12 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
 
       case 'REFS': {
         //TODO: проверка данных, приведение к типу
+        const clearRefResponse = await refDispatch(referenceActions.clearReferences());
+
+        if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
+          break;
+        }
+
         const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
 
         //Если удачно сохранились справочники, удаляем сообщение в json
@@ -61,21 +66,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       }
 
       case 'DOCS': {
-        //TODO: проверка данных, приведение к типу
-        //Если пришел документ со статусом PROCESSED, то меняем только статус в хранилище на PROCESSED
-        //Если в хранилище у документа статус не DRAFT, оставляем его как есть, иначе перезаписываем
-        const newDocs: IDocument[] = (msg.body.payload as IDocument[]).map((newDoc) => {
-          const oldDoc = documents.find((d) => d.id === newDoc.id);
-          return !oldDoc
-            ? newDoc
-            : newDoc.status === 'PROCESSED'
-            ? { ...oldDoc, status: 'PROCESSED', errorMessage: newDoc.errorMessage }
-            : oldDoc.status !== 'DRAFT'
-            ? oldDoc
-            : newDoc;
-        });
-
-        const setDocResponse = await docDispatch(documentActions.setDocuments(newDocs));
+        const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
@@ -91,9 +82,9 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     }
   }, []);
 
-  const up = async (arr: IMessage[]) => {
+  const processMessages = async (arr: IMessage[]) => {
     arr?.forEach((message) => {
-      handleProccess(message);
+      processMessage(message);
     });
   };
 
@@ -150,12 +141,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     //  справочники: очищаем старые и записываем в хранилище новые данные
     //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
     if (getMessagesResponse.type === 'GET_MESSAGES') {
-      await refDispatch(referenceActions.clearReferences());
-      // await docDispatch(documentActions.clearDocuments());
-      // getMessagesResponse.messageList?.forEach((message) => {
-      //   handleProccess(message);
-      // });
-      await up(getMessagesResponse.messageList);
+      await processMessages(getMessagesResponse.messageList);
     } else if (getMessagesResponse.type === 'ERROR') {
       Alert.alert('Ошибка!', getMessagesResponse.message, [{ text: 'Закрыть' }]);
       return;
