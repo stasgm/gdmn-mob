@@ -66,6 +66,11 @@ const ApplListScreen = () => {
         ? list.filter((e) => e.status === 'PROCESSED')
         : [];
 
+    console.log(
+      'resss',
+      res.filter((r) => r.head === undefined),
+    );
+
     return res.map(
       (i) =>
         ({

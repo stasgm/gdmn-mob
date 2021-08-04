@@ -16,6 +16,24 @@ export type DocDispatch = ThunkDispatch<DocumentState, any, DocumentActionType>;
 
 export const useDocThunkDispatch = () => useDispatch<DocDispatch>();
 
+export const setDocuments = (
+  documents: IDocument[],
+): AppThunk<
+  Promise<ActionType<typeof actions.setDocumentsAsync>>,
+  DocumentState,
+  ActionType<typeof actions.setDocumentsAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setDocumentsAsync.request(''));
+
+    try {
+      return dispatch(actions.setDocumentsAsync.success(documents));
+    } catch {
+      return dispatch(actions.setDocumentsAsync.failure('Ошибка записи докмуентов'));
+    }
+  };
+};
+
 export const addDocuments = (
   documents: IDocument[],
 ): AppThunk<
@@ -82,4 +100,4 @@ const clearDocuments = (): AppThunk<
 //   };
 // };
 
-export default { addDocuments, removeDocument, clearDocuments, useDocThunkDispatch };
+export default { setDocuments, addDocuments, removeDocument, clearDocuments, useDocThunkDispatch };

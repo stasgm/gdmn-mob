@@ -15,11 +15,28 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.setDocuments):
+    case getType(actions.setDocumentsAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.setDocumentsAsync.success):
       return {
         ...state,
+        loading: false,
         list: action.payload,
       };
+
+    case getType(actions.setDocumentsAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    // case getType(actions.setDocuments):
+    //   return {
+    //     ...state,
+    //     list: action.payload.map((doc) => state.list.find((d) => d.id === doc.id && d.status !== 'DRAFT') || doc),
+    //   };
 
     // case getType(actions.deleteDocuments):
     //   return { ...state, list: [] };
