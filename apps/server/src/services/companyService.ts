@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
+import { ICompany, IDBCompany, INamedEntity, NewCompany, IUser, NewUser } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -9,6 +9,7 @@ import { updateOne as updateUserCompany } from './userService';
 import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
+// import { user } from './data/user';
 
 // const db = getDb();
 // const { companies, users } = db;
@@ -111,14 +112,54 @@ const deleteOne = async (id: string): Promise<string> => {
   */
   const db = getDb();
   const { companies } = db;
+  const { users } = getDb();
+  const { devices } = getDb();
+  const { codes } = getDb();
+  const { deviceBindings } = getDb();
 
   const companyObj = await companies.find(id);
+  const user = await users.find(id);
+  // const deviceList = /*await*/ devices.filter((device) => device.companyId === id);
+
+  let deviceList;
+  deviceList = await devices.read();
+  deviceList = deviceList.filter((item) => {
+    item.companyId === id;
+  });
+
+  const deviceeList = (await devices.read()).filter(
+    (i) => i.companyId === id, //appSystem && i.head.companyId === companyId && i.head.consumerId === consumerId,
+  );
+
+  console.log('deviceeList', deviceeList);
+
+  //await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === deviceeList.id);
+
+  console.log('deviceList', deviceList);
+
+  await companies.delete(id);
+  // console.log('qwe', device.deviceId);
+  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === device.id); // && device.companyId === id);
 
   if (!companyObj) {
     throw new DataNotFoundException('Компания не найдена');
   }
+  // await companies.delete(id);
 
-  await companies.delete(id);
+  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === device.id); // && device.companyId === id);
+  //  device
+
+  // await deviceBindings.delete(
+  //   (deviceBinding) => deviceBinding.userId === user.id && user.company === id && user.role !== 'Admin');
+  //
+  // await users.delete((user) => user.company === id && user.role !== 'Admin');
+  // await devices.delete((device) => device.companyId === id);
+  //
+  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === device.id && device.companyId === id);
+  //await deviceBindings.delete(({ deviceBinding, user }) => deviceBinding.deviceId === deviceId);
+  // await devices.delete((device) => device.id === deviceId);
+  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === deviceId);
+  // await codes.delete((activationCode) => activationCode.deviceId === deviceId);
   return 'Компания удалена';
 };
 
