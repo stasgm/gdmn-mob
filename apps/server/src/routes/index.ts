@@ -8,17 +8,17 @@ import Message from './message.router';
 import DeviceBinding from './devicebinding.router';
 import ActivationCode from './activationCode.router';
 
-const rootRouter = new Router({ prefix: '/api' });
+//const rootRouter = new Router({ prefix: '/api' });
 
-//const rootRouter = new Router({ prefix: '/api/:v' });
+const rootRouter = new Router({ prefix: '/api/:v' });
 
-// rootRouter.param('v', (version, ctx, next) => {
-//   console.log('router_version', version);
+rootRouter.param('v', (version, ctx, next) => {
+  console.log('router_version', version);
 
-//   ctx.query.version = version;
+  ctx.query.version = version;
 
-//   return next();
-// });
+  return next();
+});
 
 rootRouter
   .use(Auth.middleware())
