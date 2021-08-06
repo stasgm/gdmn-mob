@@ -55,15 +55,12 @@ class Api extends BaseApi {
 
     this._axios.interceptors.request.use(
       (request) => {
-        console.log('interceptors deviceId', this._config.deviceId);
-        console.log('interceptors condig', this._config);
         if (this._config.deviceId) {
           // Добавляем device_ID
           request.params.deviceId = this._config.deviceId;
-          console.log('request.params.deviceId', request.params.deviceId);
         }
 
-        console.info('✉️ request', request);
+        console.info('✉️ request', request.url);
         return request;
       },
       (error) => {
@@ -78,7 +75,7 @@ class Api extends BaseApi {
 
     this._axios.interceptors.response.use(
       (response) => {
-        console.info('✉️ response', response);
+        console.info('✉️ response', response.status);
         return response;
       },
       (error) => {

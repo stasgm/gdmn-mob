@@ -1,6 +1,6 @@
 import { IBaseSettings, ISettings } from '@lib/types';
 
-export type ISettingsState = {
+export type SettingsState = {
   readonly data: ISettings<IBaseSettings>;
   readonly loading: boolean;
   readonly errorMessage: string;

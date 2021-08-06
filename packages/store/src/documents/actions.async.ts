@@ -1,17 +1,46 @@
-import api, { sleep } from '@lib/client-api';
 import { IDocument } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
+
+import { ThunkDispatch } from 'redux-thunk';
+
+import { useDispatch } from 'react-redux';
 
 import { AppThunk } from '../types';
 
 import { DocumentState } from './types';
 
-import { actions } from './actions';
+import { actions, DocumentActionType } from './actions';
 
-//export type AppThunk = ThunkAction<Promise<DocumentActionType>, DocumentState, null, DocumentActionType>;
+export type DocDispatch = ThunkDispatch<DocumentState, any, DocumentActionType>;
 
-export const addDocuments = (documents: IDocument[]): AppThunk => {
+export const useDocThunkDispatch = () => useDispatch<DocDispatch>();
+
+export const setDocuments = (
+  documents: IDocument[],
+): AppThunk<
+  Promise<ActionType<typeof actions.setDocumentsAsync>>,
+  DocumentState,
+  ActionType<typeof actions.setDocumentsAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setDocumentsAsync.request(''));
+
+    try {
+      return dispatch(actions.setDocumentsAsync.success(documents));
+    } catch {
+      return dispatch(actions.setDocumentsAsync.failure('Ошибка записи докмуентов'));
+    }
+  };
+};
+
+export const addDocuments = (
+  documents: IDocument[],
+): AppThunk<
+  Promise<ActionType<typeof actions.addDocumentsAsync>>,
+  DocumentState,
+  ActionType<typeof actions.addDocumentsAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.addDocumentsAsync.request(''));
 
@@ -71,4 +100,4 @@ const clearDocuments = (): AppThunk<
 //   };
 // };
 
-export default { addDocuments, removeDocument, clearDocuments };
+export default { setDocuments, addDocuments, removeDocument, clearDocuments, useDocThunkDispatch };

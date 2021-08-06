@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useLayoutEffect } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Divider, useTheme, Dialog, Portal, Paragraph, Button, TextInput } from 'react-native-paper';
+import { Divider, useTheme, Dialog, Button, TextInput } from 'react-native-paper';
 
-import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import {
   AppScreen,
@@ -34,12 +34,14 @@ const ApplViewScreen = () => {
   const [refuseReason, setRefuseReason] = React.useState('');
 
   const appl = docSelectors.selectByDocType<IApplDocument>('Заявки на закупку ТМЦ').find((e) => e.id === id);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     setRefuseReason(appl?.head.cancelReason || '');
   }, [appl?.head.cancelReason]);
 
-  const refApplStatuses = refSelectors.selectByName<INamedEntity>('Statuses').data;
+  //TODO Если справочник статусов не загружен, будет ошибка!!!
+  const refApplStatuses = refSelectors.selectByName<INamedEntity>('Statuses')?.data;
 
   const isBlocked = !['DRAFT', 'READY'].includes(appl?.status || 'DRAFT'); // Заблокировано если статус не Черновик или не Готово
 
@@ -54,13 +56,18 @@ const ApplViewScreen = () => {
     const newDocument: IApplDocument = {
       ...appl,
       status: 'READY',
-      head: { ...appl.head, applStatus: statusRefused, cancelReason: refuseReason },
+      head: {
+        ...appl.head,
+        applStatus: statusRefused,
+        cancelReason: refuseReason,
+        specCancel: user && { id: user.id, name: user.name },
+      },
     };
 
     dispatch(documentActions.updateDocument({ docId: id, document: newDocument }));
 
     navigation.goBack();
-  }, [appl, dispatch, id, navigation, refuseReason, statusRefused]);
+  }, [appl, dispatch, id, navigation, refuseReason, statusRefused, user]);
 
   const handleAccept = useCallback(() => {
     if (!id || !appl) {
@@ -70,13 +77,18 @@ const ApplViewScreen = () => {
     const newDocument: IApplDocument = {
       ...appl,
       status: 'READY',
-      head: { ...appl.head, applStatus: statusAccepted, cancelReason: '' },
+      head: {
+        ...appl.head,
+        applStatus: statusAccepted,
+        cancelReason: '',
+        specApprove: user && { id: user.id, name: user.name },
+      },
     };
 
     dispatch(documentActions.updateDocument({ docId: id, document: newDocument }));
 
     navigation.goBack();
-  }, [appl, dispatch, id, navigation, statusAccepted]);
+  }, [appl, dispatch, id, navigation, statusAccepted, user]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -1,22 +1,20 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { useThunkDispatch, documentActions, referenceActions, messageActions, useSelector  } from '@lib/store';
 
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { persistor, store } from './src/store';
 
-import { applMessages, applDocuments, applRefs } from './src/store/mock';
+// import { applMessages, applDocuments, applRefs } from './src/store/mock';
 
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
 
 const Root = React.memo(() => {
-
   const [isLoading, setLoading] = useState(false);
-  const { company } = useSelector((state) => state.auth);
+  // const { company } = useSelector((state) => state.auth);
 
   const navItems: INavItem[] = useMemo(
     () => [
