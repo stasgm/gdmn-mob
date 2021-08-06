@@ -150,9 +150,8 @@ const deleteOne = async (id: string): Promise<void> => {
   if (user.role === 'SuperAdmin' || (user.role === 'Admin' && Boolean(user.company))) {
     throw new ForbiddenException('Администратор не может быть удален');
   }
-
-  await users.delete(id);
   await deviceBindings.delete((deviceBinding) => deviceBinding.userId === user.id);
+  await users.delete(id);
 };
 
 const findOne = async (id: string): Promise<IUser | undefined> => {
@@ -213,11 +212,9 @@ const findAll = async (ctx: ParameterizedContext, params: Record<string, string 
     if (ctx.state.user.role === 'Admin') {
       userList = (await users.read()).filter((item) => item.role !== 'SuperAdmin');
 
-      if (ctx.state.user.role === 'Admin') {
-        userList = userList.filter(
-          (ite) => (ctx.state.user.name === ite.name && ite.role === 'Admin') || ctx.state.user.id === ite.creatorId,
-        );
-      }
+      userList = userList.filter(
+        (ite) => (ctx.state.user.name === ite.name && ite.role === 'Admin') || ctx.state.user.id === ite.creatorId,
+      );
     } else {
       userList = await users.read();
     }
