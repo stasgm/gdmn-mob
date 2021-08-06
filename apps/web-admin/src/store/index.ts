@@ -3,6 +3,8 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 
+import { persistStore } from 'redux-persist';
+
 import companyReducer from './company/reducer';
 import { CompanyActionType } from './company/actions';
 import userReducer from './user/reducer';
@@ -34,6 +36,7 @@ const rootReducer = combineReducers(reducers);
 export type RootState = ReturnType<typeof store.getState>;
 export type AppState = ReturnType<typeof rootReducer> & RootState;
 export const { store } = configureStore(reducers);
+export const persistor = persistStore(store);
 
 export type AppDispatch = ThunkDispatch<AppState & RootState, any, TActions>;
 
