@@ -53,8 +53,6 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
     setSelectedItemIds(newSelectedItemIds);
   };
 
-  console.log('SortableTable data', data);
-
   const handleSelectOne = (_event: any, id: any) => {
     const selectedIndex = selectedItemIds.indexOf(id);
     let newSelectedItemIds: any = [];
@@ -153,7 +151,6 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
                   }}
                 >
                   <NavLink to={`${adminPath}${path}${item.id}`}>
-                    {console.log(`${adminPath}${path}${item.id}`)}
                     <Typography color="textPrimary" variant="body1" key={item.id}>
                       {DeserializeProp<T>(headCell.id, item[headCell.id])}
                     </Typography>
