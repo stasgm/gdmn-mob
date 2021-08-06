@@ -19,6 +19,8 @@ import { getDb } from './dao/db';
 
 import { users as mockUsers } from './data/user';
 
+import { Context, ParameterizedContext } from 'koa';
+
 /**
  * Добавляет одного пользователя
  * @param newUser - пользователь
@@ -191,20 +193,36 @@ const getUserPassword = async (id: string): Promise<string> => {
   return user.password;
 };
 
-const findAll = async (params: Record<string, string | number>): Promise<IUser[]> => {
+const findAll = async (ctx: ParameterizedContext, params: Record<string, string | number>): Promise<IUser[]> => {
   const db = getDb();
   const { users } = db;
 
   //console.log('findAll', DB);
 
+  // let userList;
+  // if (process.env.MOCK) {
+  //   userList = mockUsers;
+  // } else {
+  //   userList = await users.read();
+  // }
+
   let userList;
   if (process.env.MOCK) {
     userList = mockUsers;
   } else {
-    userList = await users.read();
+    if (ctx.state.user.role === 'Admin') {
+      userList = (await users.read()).filter((item) => item.role !== 'SuperAdmin');
+
+      if (ctx.state.user.role === 'Admin') {
+        userList = userList.filter(
+          (ite) => (ctx.state.user.name === ite.name && ite.role === 'Admin') || ctx.state.user.id === ite.creatorId,
+        );
+      }
+    } else {
+      userList = await users.read();
+    }
   }
 
-  //const userList = await users.read((item) => {
   userList = userList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 

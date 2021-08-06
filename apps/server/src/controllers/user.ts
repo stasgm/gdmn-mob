@@ -97,13 +97,13 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   let users;
   switch (version) {
     case '1.0.0':
-      users = await userService.findAll(params);
+      users = await userService.findAll(ctx, params);
       break;
     case '2.0.0':
       // call another service f.e. userService_v2
       break;
     default:
-      users = await userService.findAll(params);
+      users = await userService.findAll(ctx, params);
       break;
   }
   //const users = await userService.findAll(params);
