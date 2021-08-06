@@ -1,4 +1,4 @@
-# gdmn-mob
+# GDMN-MOB
 
 ## Установка
 
