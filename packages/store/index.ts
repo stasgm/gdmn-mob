@@ -14,3 +14,4 @@ export { useRefThunkDispatch } from './src/references';
 export { default as refSelectors } from './src/references/selectors';
 export { default as settingsActions } from './src/settings';
 export { useSettingThunkDispatch } from './src/settings';
+export { default as appActions } from './src/app';

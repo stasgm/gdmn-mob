@@ -64,6 +64,7 @@ const ApplListScreen = () => {
 
   const list = docSelectors
     .selectByDocType<IApplDocument>('Заявки на закупку ТМЦ')
+    .filter((d) => !!d.head) //временно не выводить документы, если нет head
     .sort((a, b) => (a.number > b.number ? -1 : 1))
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 

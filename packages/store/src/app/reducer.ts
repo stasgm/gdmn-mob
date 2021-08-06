@@ -31,7 +31,7 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       return {
         ...state,
         loading: action.payload.loading,
-        errorMessage: action.payload.errorMessage,
+        errorMessage: action.payload.errorMessage || '',
       };
 
     default:
