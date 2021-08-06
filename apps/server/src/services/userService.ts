@@ -135,6 +135,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
 const deleteOne = async (id: string): Promise<void> => {
   const db = getDb();
   const { users } = db;
+  const { deviceBindings } = getDb();
 
   const user = await users.find(id);
 
@@ -149,11 +150,13 @@ const deleteOne = async (id: string): Promise<void> => {
   }
 
   await users.delete(id);
+  await deviceBindings.delete((deviceBinding) => deviceBinding.userId === user.id);
 };
 
 const findOne = async (id: string): Promise<IUser | undefined> => {
   const db = getDb();
   const { users } = db;
+
   const user = await users.find(id);
 
   if (!user) {

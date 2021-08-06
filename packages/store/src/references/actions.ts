@@ -2,7 +2,7 @@ import { IReferences } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('REFERENCES/INIT')();
-const updateList = createAction('REFERENCES/UPDATE_LIST')<IReferences>();
+// const setList = createAction('REFERENCES/UPDATE_LIST')<IReferences>();
 const deleteReference = createAction('REFERENCES/DELETE')<string>();
 const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
 const clearError = createAction('REFERENCES/CLEAR_ERROR')();
@@ -12,6 +12,12 @@ const clearError = createAction('REFERENCES/CLEAR_ERROR')();
   'REFERENCES/ADD_MANY_SUCCESS',
   'REFERENCES/ADD_MANY_FAILURE',
 )<string | undefined, IReferences, string>();*/
+
+const setReferencesAsync = createAsyncAction(
+  'REFERENCES/SET_ALL',
+  'REFERENCES/SET_ALL_SUCCESS',
+  'REFERENCES/SET_ALL_FAILURE',
+)<string | undefined, IReferences, string>();
 
 const addReferencesAsync = createAsyncAction('REFERENCES/ADD', 'REFERENCES/ADD_SUCCESS', 'REFERENCES/ADD_FAILURE')<
   string | undefined,
@@ -40,7 +46,7 @@ const clearReferencesAsync = createAsyncAction(
 export const actions = {
   addReferencesAsync,
   //addReferenceAsync,
-  updateList,
+  setReferencesAsync,
   deleteReference,
   deleteAllReferences,
   removeReferenceAsync,

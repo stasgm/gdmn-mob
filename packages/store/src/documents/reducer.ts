@@ -1,6 +1,8 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
+import { StatusType } from '@lib/types';
+
 import { DocumentState } from './types';
 import { DocumentActionType, actions } from './actions';
 
@@ -15,11 +17,51 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.setDocuments):
+    case getType(actions.setDocumentsAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.setDocumentsAsync.success): {
+      const docsFromBack = action.payload;
+
+      //Документы, которые есть только в мобильном
+      const oldDocs = state.list.filter((oldDoc) => !docsFromBack.find((d) => d.id === oldDoc.id));
+
+      const newDocs = docsFromBack
+        .map((newDoc) => {
+          const oldDoc = state.list.find((d) => d.id === newDoc.id);
+          return oldDoc === undefined
+            ? newDoc
+            : newDoc.status === 'PROCESSED'
+            ? {
+                ...oldDoc,
+                status: (newDoc.errorMessage ? 'DRAFT' : 'PROCESSED') as StatusType,
+                errorMessage: newDoc.errorMessage,
+              }
+            : oldDoc.status !== 'DRAFT'
+            ? oldDoc
+            : newDoc;
+        })
+        .concat(oldDocs);
+
       return {
         ...state,
-        list: action.payload,
+        loading: false,
+        list: newDocs,
       };
+    }
+
+    case getType(actions.setDocumentsAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    // case getType(actions.setDocuments):
+    //   return {
+    //     ...state,
+    //     list: action.payload.map((doc) => state.list.find((d) => d.id === doc.id && d.status !== 'DRAFT') || doc),
+    //   };
 
     // case getType(actions.deleteDocuments):
     //   return { ...state, list: [] };

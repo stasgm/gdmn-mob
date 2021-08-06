@@ -13,7 +13,7 @@ export interface IHeadMessage {
 export interface ICmdParams<T = any> {
   dateBegin: string;
   dateEnd: string;
-  documentType: INamedEntity;
+  documentType?: INamedEntity;
   data?: T;
 }
 
@@ -21,6 +21,8 @@ export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdPa
   name: string;
   params?: T;
 }
+
+export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences;
 
 /* const cmd1: ICmd<ICmdParams[]> = {
   name: 'GET_DOCUMENTS',

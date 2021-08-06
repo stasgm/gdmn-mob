@@ -34,8 +34,7 @@ class Api extends BaseApi {
     // this._deviceId = undefined; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
-      // eslint-disable-next-line max-len
-      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}/${this._config.version}`,
+      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
@@ -56,16 +55,12 @@ class Api extends BaseApi {
 
     this._axios.interceptors.request.use(
       (request) => {
-        console.log('interceptors deviceId', this._config.deviceId);
-        console.log('interceptors condig', this._config);
         if (this._config.deviceId) {
           // Добавляем device_ID
           request.params.deviceId = this._config.deviceId;
-          console.log('request.params.deviceId', request.params.deviceId);
         }
 
-        console.info('✉️ request', request);
-
+        console.info('✉️ request', request.url);
         return request;
       },
       (error) => {
@@ -80,7 +75,7 @@ class Api extends BaseApi {
 
     this._axios.interceptors.response.use(
       (response) => {
-        console.info('✉️ response', response);
+        console.info('✉️ response', response.status);
         return response;
       },
       (error) => {

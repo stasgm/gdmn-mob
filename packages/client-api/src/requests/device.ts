@@ -133,6 +133,7 @@ class Device extends BaseRequest {
     try {
       // || this.api.deviceId
       const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
+      //${this.api.config.version}
 
       const resData = res?.data;
 
@@ -181,7 +182,7 @@ class Device extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
+      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`); ///${this.api.config.version}
       const resData = res.data;
 
       if (resData.result) {

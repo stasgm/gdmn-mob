@@ -25,6 +25,12 @@ const fetchMessagesAsync = createAsyncAction('MESSAGES/FETCH', 'MESSAGES/FETCH_S
   string
 >();
 
+// const sendMessagesAsync = createAsyncAction('MESSAGES/SEND', 'MESSAGES/SEND_SUCCESS', 'MESSAGES/SEND_FAILURE')<
+//   string | undefined,
+//   IMessage[],
+//   string
+// >();
+
 export const actions = {
   fetchMessagesAsync,
   updateStatusMessage,

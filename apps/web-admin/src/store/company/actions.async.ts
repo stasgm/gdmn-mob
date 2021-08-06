@@ -94,7 +94,7 @@ const removeCompany = (id: string): AppThunk => {
     const response = await api.company.removeCompany(id);
 
     if (response.type === 'REMOVE_COMPANY') {
-      return dispatch(companyActions.removeCompanyAsync.success());
+      return dispatch(companyActions.removeCompanyAsync.success(id));
     }
 
     if (response.type === 'ERROR') {

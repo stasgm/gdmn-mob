@@ -30,7 +30,7 @@ const updateCompanyAsync = createAsyncAction('COMPANY/UPDATE', 'COMPANY/UPDATE_S
 
 const removeCompanyAsync = createAsyncAction('COMPANY/REMOVE', 'COMPANY/REMOVE_SUCCESS', 'COMPANY/REMOVE_FAILURE')<
   string | undefined,
-  undefined,
+  string,
   string
 >();
 

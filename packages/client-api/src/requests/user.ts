@@ -192,7 +192,7 @@ class User extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`);
+      const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`); ///${this.api.config.version}
       const resData = res.data;
 
       if (resData.result) {

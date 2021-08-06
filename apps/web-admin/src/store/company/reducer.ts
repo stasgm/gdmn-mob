@@ -70,6 +70,27 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
         errorMessage: action.payload || 'error',
       };
 
+    case getType(companyActions.removeCompanyAsync.request):
+      return {
+        ...state,
+        loading: true,
+        errorMessage: '',
+      };
+
+    case getType(companyActions.removeCompanyAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: [...state.list.filter((i) => i.id !== action.payload)],
+      };
+
+    case getType(companyActions.removeCompanyAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     // Получение компании
     case getType(companyActions.fetchCompanyAsync.request):
       return { ...state, loading: true, errorMessage: '' };

@@ -2,7 +2,7 @@ import { IEntity, IDocument } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('DOCUMENT/INIT')();
-const setDocuments = createAction('DOCUMENT/SET_ALL')<IDocument[]>();
+//const setDocuments = createAction('DOCUMENT/SET_ALL')<IDocument[]>();
 // const deleteDocuments = createAction('DOCUMENT/DELETE_ALL')();
 
 const addDocument = createAction('DOCUMENT/ADD_ONE')<IDocument>();
@@ -14,6 +14,12 @@ const updateDocumentLine = createAction('DOCUMENT_LINE/UPDATE_LINE_ONE')<{ docId
 const deleteDocumentLine = createAction('DOCUMENT_LINE/DELETE_LINE_ONE')<{ docId: string; lineId: string }>();
 
 const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
+
+const setDocumentsAsync = createAsyncAction(
+  'DOCUMENTS/SET_ALL',
+  'DOCUMENTS/SET_ALL_SUCCESS',
+  'DOCUMENTS/SET_ALL_FAILURE',
+)<string | undefined, IDocument[], string>();
 
 const addDocumentsAsync = createAsyncAction(
   'DOCUMENTS/ADD_MANY',
@@ -43,7 +49,7 @@ export const actions = {
   init,
   addDocumentsAsync,
   clearDocumentsAsync,
-  setDocuments,
+  setDocumentsAsync,
   addDocument,
   updateDocument,
   removeDocumentAsync,

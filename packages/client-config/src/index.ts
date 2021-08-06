@@ -7,7 +7,7 @@ export interface IEnvConfig {
     name: string;
     port: number;
   };
-  version: string;
+  version?: string;
   timeout: number;
   apiPath: string;
   debug: {

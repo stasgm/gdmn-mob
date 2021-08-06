@@ -9,11 +9,15 @@ import { StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 
+import api from '@lib/client-api';
+
 import Constants from 'expo-constants';
 
-import { useThunkDispatch, useSelector, documentActions, referenceActions, messageActions } from '@lib/store';
+import { useSelector, documentActions, referenceActions } from '@lib/store';
 
 import { BodyType, IDocument, IMessage, IReferences } from '@lib/types';
+import { useRefThunkDispatch } from '@lib/store/src/references/actions.async';
+import { useDocThunkDispatch } from '@lib/store/src/documents/actions.async';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -26,11 +30,14 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
-  const dispatch = useThunkDispatch();
+  const { list: documents } = useSelector((state) => state.documents);
+
+  const refDispatch = useRefThunkDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleProccess = useCallback(async (msg: IMessage) => {
+  const processMessage = useCallback(async (msg: IMessage) => {
     if (!msg) {
       return;
     }
@@ -40,17 +47,34 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
         //TODO: обработка
         break;
 
-      case 'REFS':
+      case 'REFS': {
         //TODO: проверка данных, приведение к типу
-        dispatch(referenceActions.updateList(msg.body.payload as IReferences));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
-        break;
+        const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
-      case 'DOCS':
-        //TODO: проверка данных, приведение к типу
-        dispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+        if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
+          break;
+        }
+
+        const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
+
+        //Если удачно сохранились справочники, удаляем сообщение в json
+        if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
+          await api.message.removeMessage(msg.id);
+        }
+        //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
         break;
+      }
+
+      case 'DOCS': {
+        const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
+
+        //Если удачно сохранились документы, удаляем сообщение в json
+        if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
+          await api.message.removeMessage(msg.id);
+        }
+        //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+        break;
+      }
 
       default:
         Alert.alert('Предупреждение!', 'Неизвестный тип сообщения', [{ text: 'Закрыть' }]);
@@ -58,7 +82,17 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     }
   }, []);
 
+  const processMessages = async (arr: IMessage[]) => {
+    arr?.forEach((message) => {
+      processMessage(message);
+    });
+  };
+
   const handleUpdate = async () => {
+    if (!company || !user) {
+      return;
+    }
+
     // Загрузка данных
     if (onSync) {
       // Если передан внешний обработчик то вызываем
@@ -72,34 +106,78 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     */
     setLoading(true);
 
-    // const mes = await dispatch(
-    //   messageActions.fetchMessages({
-    //     companyId: company!.id,
-    //     systemId: 'gdmn-appl-request',
-    //   }),
-    // );
+    const docForSending = documents.filter((doc) => doc.status === 'READY');
 
-    // if (mes.type === 'MESSAGES/FETCH_SUCCESS' ) {
-    //   mes.payload?.forEach((message) => {
-    //     handleProccess(message);
-    //   })
-    // } else if (mes.type === 'MESSAGES/FETCH_FAILURE' ) {
-    //   Alert.alert('Ошибка!', mes.payload, [{ text: 'Закрыть' }]);
-    //   return;
-    // }
+    if (docForSending.length) {
+      //Формируем сообщение с документами со статусом 'READY'
+      const messageSendDoc: IMessage['body'] = {
+        type: 'DOCS',
+        payload: docForSending,
+      };
 
-    // await dispatch(referenceActions.clearReferences());
-    // await dispatch(documentActions.clearDocuments());
+      //1. Отправляем документы
+      const sendDocMessage = await api.message.sendMessages(
+        'gdmn-appl-request',
+        { id: company.id, name: company.name },
+        { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+        messageSendDoc,
+      );
 
-    /*
-         await dispatch(
-          referenceActions.addReferences({
-            [refApplStatuses.name]: refApplStatuses,
-            [refEmplyees.name]: refEmplyees,
-          }),
-          );
-          await dispatch(documentActions.addDocuments(applDocuments));
-      */
+      //Если документы отправлены успешно, то меняем статус документов на 'SENT'
+      if (sendDocMessage.type === 'SEND_MESSAGE') {
+        await docDispatch(
+          documentActions.setDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
+        );
+      }
+    }
+
+    //2. Получаем все сообщения для мобильного
+    const getMessagesResponse = await api.message.getMessages({
+      systemName: 'gdmn-appl-request',
+      companyId: company.id,
+    });
+
+    //Если сообщения получены, то
+    //  справочники: очищаем старые и записываем в хранилище новые данные
+    //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+    if (getMessagesResponse.type === 'GET_MESSAGES') {
+      await processMessages(getMessagesResponse.messageList);
+    } else if (getMessagesResponse.type === 'ERROR') {
+      Alert.alert('Ошибка!', getMessagesResponse.message, [{ text: 'Закрыть' }]);
+      return;
+    }
+
+    //Формируем запрос на получение справочников для следующего раза
+    const messageGetRef: IMessage['body'] = {
+      type: 'CMD',
+      payload: {
+        name: 'GET_REF',
+      },
+    };
+
+    //Формируем запрос на получение документов для следующего раза
+    const messageGetDoc: IMessage['body'] = {
+      type: 'CMD',
+      payload: {
+        name: 'GET_DOCUMENTS',
+      },
+    };
+
+    //3. Отправляем запрос на получение справочников
+    await api.message.sendMessages(
+      'gdmn-appl-request',
+      { id: company.id, name: company.name },
+      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+      messageGetRef,
+    );
+
+    //4. Отправляем запрос на получение документов
+    await api.message.sendMessages(
+      'gdmn-appl-request',
+      { id: company.id, name: company.name },
+      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+      messageGetDoc,
+    );
 
     setLoading(false);
   };
@@ -224,3 +302,135 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
 });
+
+// Документы Appl
+export const applDocuments = [
+  {
+    id: '172846156',
+    number: '104',
+    documentDate: '2021-06-07',
+    documentType: {
+      id: '168063006',
+      name: 'Заявки на закупку ТМЦ',
+    },
+    status: 'DRAFT',
+    head: {
+      applStatus: {
+        id: '168062979',
+        name: 'Согласован инженерной службой',
+      },
+      purchaseType: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      dept: {
+        id: '169853581',
+        name: 'СХЦ Новополесский-Агро',
+      },
+      purpose: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      justification: 'Текущий ремонт зерноуборочных комбайнов',
+      sysApplicant: {
+        id: '169967847',
+        name: 'Андрухович Александр Михайлович',
+      },
+      applicant: {
+        id: '169967847',
+        name: 'Андрухович Александр Михайлович',
+      },
+      specPreAgree: {
+        id: '151211855',
+        name: 'Самусевич Александр Николаевич',
+      },
+      specAgreeEngin: {
+        id: '149876722',
+        name: 'Реут Валерий Валентинович',
+      },
+      verificationDate: '2021-06-21',
+      faGood: {
+        id: '170039555',
+        name: '"Комбаин з/у КЗС-1218 -03 """"Палессе"""""',
+      },
+      faGoodNumber: '13316',
+      cancelReason: 'Текущий ремонт ЧЕГО????',
+    },
+    lines: [
+      {
+        id: '172846487',
+        orderNum: 1,
+        goodName: '30.01.2199 Амортизатор маховика',
+        quantity: 200,
+        value: {
+          id: '3000001',
+          name: 'шт.',
+        },
+      },
+    ],
+  },
+  {
+    id: '174360229',
+    number: '473',
+    documentDate: '2021-06-07',
+    documentType: {
+      id: '168063006',
+      name: 'Заявки на закупку ТМЦ',
+    },
+    status: 'DRAFT',
+    head: {
+      applStatus: {
+        id: '168062979',
+        name: 'Согласован инженерной службой',
+      },
+      purchaseType: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      dept: {
+        id: '147095763',
+        name: 'СХЦ "Величковичи"',
+      },
+      purpose: {
+        id: '168353581',
+        name: 'Механизация',
+      },
+      justification:
+        'Просим Вас закупить данный компрессор на трактор который задействован на внесении минеральных удобрений.',
+      sysApplicant: {
+        id: '153741215',
+        name: 'Игнашевич Сергей  Васильевич',
+      },
+      applicant: {
+        id: '153741215',
+        name: 'Игнашевич Сергей  Васильевич',
+      },
+      specPreAgree: {
+        id: '151211855',
+        name: 'Самусевич Александр Николаевич',
+      },
+      specAgreeEngin: {
+        id: '149876722',
+        name: 'Реут Валерий Валентинович',
+      },
+      verificationDate: '2021-06-21',
+      faGood: {
+        id: '151911169',
+        name: 'ТРАКТОР БЕЛАРУС-1221.2',
+      },
+      faGoodNumber: '701442',
+    },
+    lines: [
+      {
+        id: '174361484',
+        orderNum: 1,
+        goodName: 'Компрессор Д-260 А29.05.000 БЗА',
+        quantity: 1,
+        value: {
+          id: '3000001',
+          name: 'шт.',
+        },
+      },
+    ],
+  },
+];

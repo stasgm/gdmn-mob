@@ -1,13 +1,43 @@
-
 import { IReferences } from '@lib/types';
+import { ThunkDispatch } from 'redux-thunk';
+import { useDispatch } from 'react-redux';
+
+import { ActionType } from 'typesafe-actions';
 
 import { AppThunk } from '../types';
 
-import { actions } from './actions';
+import { actions, ReferenceActionType } from './actions';
+import { ReferenceState } from './types';
 
-//export type AppThunk = ThunkAction<Promise<ReferenceActionType>, IReferenceState, null, ReferenceActionType>;
+export type RefDispatch = ThunkDispatch<ReferenceState, any, ReferenceActionType>;
 
-export const addReferences = (references: IReferences): AppThunk => {
+export const useRefThunkDispatch = () => useDispatch<RefDispatch>();
+
+export const setReferences = (
+  references: IReferences,
+): AppThunk<
+  Promise<ActionType<typeof actions.setReferencesAsync>>,
+  ReferenceState,
+  ActionType<typeof actions.setReferencesAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setReferencesAsync.request(''));
+
+    try {
+      return dispatch(actions.setReferencesAsync.success(references));
+    } catch {
+      return dispatch(actions.setReferencesAsync.failure('Ошибка записи справочников'));
+    }
+  };
+};
+
+export const addReferences = (
+  references: IReferences,
+): AppThunk<
+  Promise<ActionType<typeof actions.addReferencesAsync>>,
+  ReferenceState,
+  ActionType<typeof actions.addReferencesAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.addReferencesAsync.request('Добавление справочников'));
 
@@ -19,12 +49,13 @@ export const addReferences = (references: IReferences): AppThunk => {
   };
 };
 
-// <
-//   Promise<ActionType<typeof actions.removeReferenceAsync>>,
-//   ReferenceState,
-//   ActionType<typeof actions.removeReferenceAsync>>
-
-const removeReference = (documentId: string): AppThunk => {
+const removeReference = (
+  documentId: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.removeReferenceAsync>>,
+  ReferenceState,
+  ActionType<typeof actions.removeReferenceAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.removeReferenceAsync.request('Удаление справочника'));
 
@@ -36,13 +67,11 @@ const removeReference = (documentId: string): AppThunk => {
   };
 };
 
-// <
-//   Promise<ActionType<typeof actions.clearReferencesAsync>>,
-//   ReferenceState,
-//   ActionType<typeof actions.clearReferencesAsync>
-// >
-
-const clearReferences = (): AppThunk => {
+const clearReferences = (): AppThunk<
+  Promise<ActionType<typeof actions.clearReferencesAsync>>,
+  ReferenceState,
+  ActionType<typeof actions.clearReferencesAsync>
+> => {
   return async (dispatch) => {
     dispatch(actions.clearReferencesAsync.request('Удаление справочников'));
 
@@ -69,4 +98,10 @@ const clearReferences = (): AppThunk => {
   };
 };*/
 
-export default { addReferences, removeReference, clearReferences /*, addReference*/ };
+export default {
+  setReferences,
+  addReferences,
+  removeReference,
+  clearReferences,
+  useRefThunkDispatch,
+};

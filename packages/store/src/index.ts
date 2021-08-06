@@ -9,24 +9,42 @@ import { persistReducer } from 'redux-persist';
 
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
-import { reducer as msgReducer } from './messages';
 import { reducer as referenceReducer } from './references';
 import { reducer as settingsReducer } from './settings';
+import { reducer as msgReducer } from './messages';
 import { TActions } from './types';
 
-const persistConfig = {
+const persistAuthConfig = {
   key: 'auth',
   storage: AsyncStorage,
   whitelist: ['user', 'settings', 'company', 'device'],
 };
 
+const persistDocsConfig = {
+  key: 'documents',
+  storage: AsyncStorage,
+  whitelist: ['list'],
+};
+
+const persistRefsConfig = {
+  key: 'references',
+  storage: AsyncStorage,
+  whitelist: ['list'],
+};
+
+const persistSettingsConfig = {
+  key: 'settings',
+  storage: AsyncStorage,
+  whitelist: ['data'],
+};
+
 export const rootReducer = {
-  auth: persistReducer(persistConfig, authReducer),
+  auth: persistReducer(persistAuthConfig, authReducer),
   // auth: authReducer,
   messages: msgReducer,
-  references: referenceReducer,
-  documents: documentReducer,
-  settings: settingsReducer,
+  references: persistReducer(persistRefsConfig, referenceReducer),
+  documents: persistReducer(persistDocsConfig, documentReducer),
+  settings: persistReducer(persistSettingsConfig, settingsReducer),
 };
 
 type AppReducers<S, A extends AnyAction> = { [key: string]: Reducer<S, A> };
