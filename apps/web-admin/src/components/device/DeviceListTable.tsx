@@ -23,6 +23,8 @@ import { IDevice, IActivationCode } from '@lib/types';
 
 // import activationCode from '../../store/activationCode';
 
+import { activationCode2 } from '@lib/mock';
+
 import { adminPath } from '../../utils/constants';
 
 interface IProps {
@@ -32,6 +34,7 @@ interface IProps {
   limitRows?: number;
   onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
+  onCreateUid?: (code?: string, deviceId?: string) => void;
 }
 
 const DeviceListTable = ({
@@ -41,6 +44,7 @@ const DeviceListTable = ({
   selectedDevices = [],
   limitRows = 0,
   onCreateCode,
+  onCreateUid,
 }: IProps) => {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<IDevice[]>(selectedDevices);
   const [limit, setLimit] = useState(10);
@@ -105,57 +109,77 @@ const DeviceListTable = ({
   }, [limitRows, selectedDeviceIds.length, selectedDevices]);
 
   const TableRows = () => {
-    const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => (
-      <TableRow hover key={device.id} selected={selectedDeviceIds.findIndex((d) => d.id === device?.id) !== -1}>
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={
-              selectedDeviceIds
-                .map((item: IDevice) => {
-                  return item.id;
-                })
-                .indexOf(device.id) !== -1
-            }
-            onChange={(event) => handleSelectOne(event, device)}
-            value="true"
-          />
-        </TableCell>
-        <TableCell style={{ padding: '0 16px' }}>
-          <Box
-            sx={{
-              alignItems: 'center',
-              display: 'flex',
-            }}
-          >
-            <NavLink to={`${adminPath}/app/devices/${device.id}`}>
-              <Typography color="textPrimary" variant="body1" key={device.id}>
-                {device.name}
-              </Typography>
-            </NavLink>
-          </Box>
-        </TableCell>
-        <TableCell>{device.uid}</TableCell>
-        <TableCell>{device.state}</TableCell>
-        <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
-        {/* <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell> */}
-        <TableCell>{device.editionDate}</TableCell>
-        <TableCell>
-          <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-            <Box style={{ width: '40px' }}>{activationCodes.find((a) => a.device.id === device.id)?.code}</Box>
-            <Box>
-              {onCreateCode && (
-                <Button
-                  // component={RouterLink}
-                  onClick={() => onCreateCode(device.id)}
-                >
-                  <RefreshIcon />
-                </Button>
-              )}
+    const deviceList = devices.slice(page * limit, page * limit + limit).map((device: IDevice) => {
+      const code = activationCodes.find((a) => a.device.id === device.id)?.code;
+
+      return (
+        <TableRow hover key={device.id} selected={selectedDeviceIds.findIndex((d) => d.id === device?.id) !== -1}>
+          <TableCell padding="checkbox">
+            <Checkbox
+              checked={
+                selectedDeviceIds
+                  .map((item: IDevice) => {
+                    return item.id;
+                  })
+                  .indexOf(device.id) !== -1
+              }
+              onChange={(event) => handleSelectOne(event, device)}
+              value="true"
+            />
+          </TableCell>
+          <TableCell style={{ padding: '0 16px' }}>
+            <Box
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+              }}
+            >
+              <NavLink to={`${adminPath}/app/devices/${device.id}`}>
+                <Typography color="textPrimary" variant="body1" key={device.id}>
+                  {device.name}
+                </Typography>
+              </NavLink>
             </Box>
-          </Box>
-        </TableCell>
-      </TableRow>
-    ));
+          </TableCell>
+          {/* <TableCell>{device.uid}</TableCell> */}
+          <TableCell>
+            <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <Box style={{ width: '275px' }}>{device.uid}</Box>
+              <Box>
+                {onCreateUid && (
+                  <Button
+                    // component={RouterLink}
+                    onClick={() => onCreateUid && onCreateUid(code, device.id)} //formik.values.code
+                  >
+                    <RefreshIcon />
+                  </Button>
+                )}
+                {/*</Box>*/}
+              </Box>
+            </Box>
+          </TableCell>
+          <TableCell>{device.state}</TableCell>
+          <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+          <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+          {/* <TableCell>{device.editionDate}</TableCell> */}
+          <TableCell>
+            <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <Box style={{ width: '40px' }}>{/*activationCodes.find((a) => a.device.id === device.id)?.*/ code}</Box>
+              <Box>
+                {onCreateCode && (
+                  <Button
+                    // component={RouterLink}
+                    onClick={() => onCreateCode(device.id)}
+                  >
+                    <RefreshIcon />
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          </TableCell>
+        </TableRow>
+      );
+    });
 
     const emptyRows = limit - Math.min(limit, devices.length - page * limit);
 

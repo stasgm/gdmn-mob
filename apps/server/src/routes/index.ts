@@ -6,6 +6,7 @@ import Device from './device.router';
 import User from './user.router';
 import Message from './message.router';
 import DeviceBinding from './devicebinding.router';
+import ActivationCode from './activationCode.router';
 
 const rootRouter = new Router({ prefix: '/api' });
 
@@ -24,6 +25,7 @@ rootRouter
   .use(Company.middleware())
   .use(Device.middleware())
   .use(User.middleware())
+  .use(ActivationCode.middleware())
   .use(Message.middleware())
   .use(DeviceBinding.middleware());
 
