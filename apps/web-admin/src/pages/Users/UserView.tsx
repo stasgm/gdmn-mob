@@ -4,13 +4,17 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+
+import { IDeviceBinding, IDevice } from '@lib/types';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
+import deviceSelectors from '../../store/device/selectors';
 import bindingSelectors from '../../store/deviceBinding/selectors';
 import bindingActions from '../../store/deviceBinding';
+import deviceActions from '../../store/device';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 import UserDetailsView from '../../components/user/UserDetailsView';
@@ -29,7 +33,9 @@ const UserView = () => {
   const { loading, errorMessage } = useSelector((state) => state.users);
   const user = selectors.userById(userId);
 
-  const userDevices = bindingSelectors.bindingsByUserId(userId);
+  const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
+
+  const { list } = useSelector((state) => state.devices);
 
   const handleCancel = () => {
     navigate(-1);
@@ -50,6 +56,7 @@ const UserView = () => {
   const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
+    dispatch(deviceActions.fetchDevices());
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -63,6 +70,27 @@ const UserView = () => {
       navigate(-1);
     }
   };
+
+  // const userDevices = userBindingDevices.map((binding: IDeviceBinding) => {
+  //   return list.find((a) => binding.device.id === a.id);
+  // });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const userDevices: IDevice[] = [];
+
+  const data = useMemo(
+    () =>
+      userBindingDevices.forEach((binding: IDeviceBinding) => {
+        const dev = list.find((a) => binding.device.id === a.id);
+        // /*return*/ list.find((a) => binding.device.id === a.id);
+        console.log('dev', dev);
+        if (dev) {
+          userDevices.push(dev);
+        }
+        return { dev };
+      }),
+    [userBindingDevices, userDevices, list],
+  );
 
   if (!user) {
     return (
@@ -146,7 +174,7 @@ const UserView = () => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices userDevices={userDevices} onAddDevice={handleAddDevice} />
+        <UserDevices userDevices={userDevices} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>

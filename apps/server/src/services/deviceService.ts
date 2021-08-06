@@ -1,4 +1,4 @@
-import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
+import { IDBDevice, IDevice, INamedEntity, NewDevice, IDBActivationCode, IActivationCode } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
@@ -44,7 +44,7 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
  * */
 const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>) => {
   const { devices, companies } = getDb();
-
+  console.log('update', id);
   const oldDevice = await devices.find(id);
 
   if (!oldDevice) {
@@ -68,7 +68,7 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
     state: deviceData.state || oldDevice.state,
     uid: deviceData.uid || oldDevice.uid,
     companyId,
-    creationDate: deviceData.creationDate,
+    creationDate: oldDevice.creationDate,
     editionDate: new Date().toISOString(),
   };
 
@@ -85,12 +85,16 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
   const { devices } = getDb();
+  const { codes } = getDb();
+  const { deviceBindings } = getDb();
 
   if (!(await devices.find((device) => device.id === deviceId))) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
   await devices.delete((device) => device.id === deviceId);
+  await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === deviceId);
+  await codes.delete((activationCode) => activationCode.deviceId === deviceId);
 };
 
 const findOne = async (id: string): Promise<IDevice | undefined> => {

@@ -153,6 +153,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
                   }}
                 >
                   <NavLink to={`${adminPath}${path}${item.id}`}>
+                    {console.log(`${adminPath}${path}${item.id}`)}
                     <Typography color="textPrimary" variant="body1" key={item.id}>
                       {DeserializeProp<T>(headCell.id, item[headCell.id])}
                     </Typography>

@@ -37,7 +37,6 @@ const AuthNavigator: React.FC = () => {
     dispatch(authActions.getDeviceStatus(settings?.deviceId));
     //Получим устройство по uid
     if (settings?.deviceId && user) {
-      console.log('getDeviceByUid');
       dispatch(authActions.getDeviceByUid(settings.deviceId));
     }
   }, [dispatch, settings?.deviceId, user]);

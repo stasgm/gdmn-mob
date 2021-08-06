@@ -41,7 +41,6 @@ const DeviceView = () => {
   const device = deviceSelectors.deviceById(deviceId);
   const users = userSelectors.usersByDeviceId(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
-  /*  console.log('activationCodes', activationCodes);*/
 
   const handleCancel = () => {
     navigate(-1);

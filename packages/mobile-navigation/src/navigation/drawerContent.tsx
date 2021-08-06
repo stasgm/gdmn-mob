@@ -13,7 +13,7 @@ import api from '@lib/client-api';
 
 import Constants from 'expo-constants';
 
-import { useDispatch, useSelector, documentActions, referenceActions, messageActions } from '@lib/store';
+import { useSelector, documentActions, referenceActions } from '@lib/store';
 
 import { BodyType, IDocument, IMessage, IReferences } from '@lib/types';
 import { useRefThunkDispatch } from '@lib/store/src/references/actions.async';
@@ -30,13 +30,14 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
 
   const { user, company } = useSelector((state) => state.auth);
+  const { list: documents } = useSelector((state) => state.documents);
+
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
-  const dispatch = useDispatch();
 
   const [isLoading, setLoading] = useState(false);
 
-  const handleProccess = useCallback(async (msg: IMessage) => {
+  const processMessage = useCallback(async (msg: IMessage) => {
     if (!msg) {
       return;
     }
@@ -46,23 +47,46 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
         //TODO: обработка
         break;
 
-      case 'REFS':
+      case 'REFS': {
         //TODO: проверка данных, приведение к типу
-        dispatch(referenceActions.updateList(msg.body.payload as IReferences));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
-        break;
+        const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
-      case 'DOCS':
-        //TODO: проверка данных, приведение к типу
-        dispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
-        dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+        if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
+          break;
+        }
+
+        const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
+
+        //Если удачно сохранились справочники, удаляем сообщение в json
+        if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
+          await api.message.removeMessage(msg.id);
+        }
+        //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
         break;
+      }
+
+      case 'DOCS': {
+        const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
+
+        //Если удачно сохранились документы, удаляем сообщение в json
+        if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
+          await api.message.removeMessage(msg.id);
+        }
+        //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+        break;
+      }
 
       default:
         Alert.alert('Предупреждение!', 'Неизвестный тип сообщения', [{ text: 'Закрыть' }]);
         break;
     }
   }, []);
+
+  const processMessages = async (arr: IMessage[]) => {
+    arr?.forEach((message) => {
+      processMessage(message);
+    });
+  };
 
   const handleUpdate = async () => {
     if (!company || !user) {
@@ -82,68 +106,64 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     */
     setLoading(true);
 
-    console.log('111');
+    const docForSending = documents.filter((doc) => doc.status === 'READY');
 
-    const messageSendDoc: IMessage['body'] = {
-      type: 'DOCS',
-      payload: applDocuments,
-    };
+    if (docForSending.length) {
+      //Формируем сообщение с документами со статусом 'READY'
+      const messageSendDoc: IMessage['body'] = {
+        type: 'DOCS',
+        payload: docForSending,
+      };
 
-    await api.message.sendMessages(
-      'gdmn-appl-request',
-      { id: company.id, name: company.name },
-      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
-      messageSendDoc,
-    );
+      //1. Отправляем документы
+      const sendDocMessage = await api.message.sendMessages(
+        'gdmn-appl-request',
+        { id: company.id, name: company.name },
+        { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+        messageSendDoc,
+      );
 
-    const mes = await api.message.getMessages({ systemName: 'gdmn-appl-request', companyId: company.id });
+      //Если документы отправлены успешно, то меняем статус документов на 'SENT'
+      if (sendDocMessage.type === 'SEND_MESSAGE') {
+        await docDispatch(
+          documentActions.setDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
+        );
+      }
+    }
 
-    console.log('222');
+    //2. Получаем все сообщения для мобильного
+    const getMessagesResponse = await api.message.getMessages({
+      systemName: 'gdmn-appl-request',
+      companyId: company.id,
+    });
 
-    if (mes.type === 'GET_MESSAGES') {
-      console.log('333');
-      await refDispatch(referenceActions.clearReferences());
-      await docDispatch(documentActions.clearDocuments());
-
-      console.log('444');
-      mes.messageList?.forEach((message) => {
-        console.log('555', message.body.type);
-        handleProccess(message);
-      });
-    } else if (mes.type === 'ERROR') {
-      Alert.alert('Ошибка!', mes.message, [{ text: 'Закрыть' }]);
+    //Если сообщения получены, то
+    //  справочники: очищаем старые и записываем в хранилище новые данные
+    //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+    if (getMessagesResponse.type === 'GET_MESSAGES') {
+      await processMessages(getMessagesResponse.messageList);
+    } else if (getMessagesResponse.type === 'ERROR') {
+      Alert.alert('Ошибка!', getMessagesResponse.message, [{ text: 'Закрыть' }]);
       return;
     }
 
+    //Формируем запрос на получение справочников для следующего раза
     const messageGetRef: IMessage['body'] = {
       type: 'CMD',
       payload: {
         name: 'GET_REF',
-        params: { data: ['Employees', 'Statuses', 'DocTypes'] },
       },
     };
 
-    const db = new Date();
-    const de = new Date();
-    de.setDate(de.getDate() + 1);
-
+    //Формируем запрос на получение документов для следующего раза
     const messageGetDoc: IMessage['body'] = {
       type: 'CMD',
       payload: {
         name: 'GET_DOCUMENTS',
-        params: [
-          {
-            dateBegin: db.toISOString(),
-            dateEnd: de.toISOString(),
-            documentType: {
-              id: '168063006',
-              name: 'Заявки на закупку ТМЦ',
-            },
-          },
-        ],
       },
     };
 
+    //3. Отправляем запрос на получение справочников
     await api.message.sendMessages(
       'gdmn-appl-request',
       { id: company.id, name: company.name },
@@ -151,6 +171,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       messageGetRef,
     );
 
+    //4. Отправляем запрос на получение документов
     await api.message.sendMessages(
       'gdmn-appl-request',
       { id: company.id, name: company.name },

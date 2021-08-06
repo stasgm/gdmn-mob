@@ -2,8 +2,17 @@ import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors, useSelector } from '@lib/store';
-import { globalStyles as styles, DrawerButton, FilterButtons, Status, AppScreen, SubTitle } from '@lib/mobile-ui';
+import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import {
+  globalStyles as styles,
+  DrawerButton,
+  FilterButtons,
+  Status,
+  AppScreen,
+  SubTitle,
+  MenuButton,
+  useActionSheet,
+} from '@lib/mobile-ui';
 
 import { StatusType } from '@lib/types';
 
@@ -25,6 +34,7 @@ export interface ApplListItemProps {
   applStatus: string;
   isFromRoute?: boolean;
   lineCount?: number;
+  errorMessage?: string;
 }
 export interface ApplListRenderItemProps extends ApplListItemProps {
   id: string;
@@ -47,11 +57,14 @@ const renderItem: ListRenderItem<ApplListRenderItemProps> = ({ item }) => {
 
 const ApplListScreen = () => {
   const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+  const dispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
     .selectByDocType<IApplDocument>('Заявки на закупку ТМЦ')
+    .sort((a, b) => (a.number > b.number ? -1 : 1))
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
@@ -79,6 +92,7 @@ const ApplListScreen = () => {
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
           description: shortenString(i.head.justification, 90),
           lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
         } as ApplListRenderItemProps),
     );
   }, [status, list]);
@@ -115,6 +129,35 @@ const ApplListScreen = () => {
       headerLeft: () => <DrawerButton />,
     });
   }, [handleAddDocument, navigation]);
+
+  const handleReset = useCallback(() => {
+    dispatch(documentActions.init());
+  }, [dispatch]);
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      // {
+      //   title: 'Загрузить',
+      //   onPress: handleLoad,
+      // },
+      {
+        title: 'Удалить все',
+        type: 'destructive',
+        onPress: handleReset,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleReset, showActionSheet]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+    });
+  }, [navigation, actionsMenu]);
 
   return (
     <AppScreen>

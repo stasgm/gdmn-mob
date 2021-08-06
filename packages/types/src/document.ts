@@ -25,6 +25,7 @@ interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {
   documentType: INamedEntity;
   status: StatusType;
   metadata?: IDocfMetadata<T, K>;
+  errorMessage?: string;
   head?: T;
   lines?: K[];
 }

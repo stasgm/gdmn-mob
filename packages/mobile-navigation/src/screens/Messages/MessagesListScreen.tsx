@@ -100,7 +100,7 @@ const handleSend = async () => {
   }, [dispatch]);
 
   const handleDeleteAll = useCallback(() => {
-    dispatch(messageActions.deleteAllMessages());
+    // dispatch(messageActions.deleteAllMessages());
   }, [dispatch]);
 
   const actionsMenu = useCallback(() => {

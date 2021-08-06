@@ -60,7 +60,7 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
   }))(MenuItem);
 
   const buttonsList = (
-    <>
+    <Box>
       {buttons.map((button: IToolBarButton) => (
         <StyledMenuItem key={button.name} color="primary" onClick={button.onClick}>
           <Icon color="primary" sx={{ display: 'flex', marginRight: 1 }}>
@@ -69,7 +69,7 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
           <ListItemText primary={button.name} />
         </StyledMenuItem>
       ))}
-    </>
+    </Box>
   );
 
   const iconButtonList = (
