@@ -2,6 +2,8 @@ import { Joi, Config } from 'koa-joi-router';
 
 import { InvalidParameterException } from '../exceptions';
 
+import * as urlValidation from './url';
+
 const addDevice: Config = {
   validate: {
     type: 'json',
@@ -16,6 +18,7 @@ const addDevice: Config = {
 const updateDevice: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
     type: 'json',
@@ -26,6 +29,7 @@ const updateDevice: Config = {
 const removeDevice: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
   },
@@ -34,6 +38,7 @@ const removeDevice: Config = {
 const getDevice: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
   },
@@ -42,6 +47,7 @@ const getDevice: Config = {
 const getUsersByDevice: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
     }),
   },

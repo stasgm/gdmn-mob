@@ -48,9 +48,9 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   passport.deserializeUser(async (id: string, done) => {
     try {
-      console.log('id', id);
+      //console.log('id', id);
       const user = await userService.findOne(id);
-      console.log('user', user);
+      //console.log('user', user);
       done(null, user);
     } catch (err) {
       done(err);

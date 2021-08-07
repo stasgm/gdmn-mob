@@ -2,6 +2,8 @@ import { Joi, Config } from 'koa-joi-router';
 
 import { InvalidParameterException } from '../exceptions';
 
+import * as urlValidation from './url';
+
 const addUser: Config = {
   validate: {
     type: 'json',
@@ -18,6 +20,7 @@ const addUser: Config = {
 const updateUser: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
     type: 'json',
@@ -28,6 +31,7 @@ const updateUser: Config = {
 const removeUser: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },
@@ -36,6 +40,7 @@ const removeUser: Config = {
 const getUser: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },

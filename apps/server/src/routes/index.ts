@@ -8,11 +8,11 @@ import Message from './message.router';
 import DeviceBinding from './devicebinding.router';
 import ActivationCode from './activationCode.router';
 
-//const rootRouter = new Router({ prefix: '/api' });
+const rootRouter = new Router();
 
-const rootRouter = new Router({ prefix: '/api/:v' });
+rootRouter.prefix('/api/:version');
 
-rootRouter.param('v', (version, ctx, next) => {
+rootRouter.param('version', (version, ctx, next) => {
   console.log('router_version', version);
 
   ctx.query.version = version;

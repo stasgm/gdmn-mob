@@ -2,6 +2,8 @@ import { Joi, Config } from 'koa-joi-router';
 
 import { InvalidParameterException } from '../exceptions';
 
+import * as urlValidation from './url';
+
 const newMessage: Config = {
   validate: {
     type: 'json',
@@ -32,6 +34,7 @@ const newMessage: Config = {
 const getMessage: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
       appSystem: Joi.string().required().error(new InvalidParameterException('Не указана система')),
     }),
@@ -41,6 +44,7 @@ const getMessage: Config = {
 const removeMessage: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор сообщения')),
     }),
   },

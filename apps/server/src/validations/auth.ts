@@ -2,6 +2,8 @@ import { Joi, Config } from 'koa-joi-router';
 
 import { InvalidParameterException } from '../exceptions';
 
+import * as urlValidation from './url';
+
 const login: Config = {
   validate: {
     /* query: {
@@ -37,6 +39,7 @@ const verifyCode: Config = {
 const getActivationCode: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       deviceId: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
     }),
   },
@@ -53,6 +56,7 @@ const checkDevice: Config = {
 const getDeviceStatus: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
     }),
   },
