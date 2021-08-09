@@ -33,7 +33,8 @@ class Api extends BaseApi {
     this._config = config;
 
     this._axios = axios.create({
-      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`,
+      // eslint-disable-next-line max-len
+      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}/${this._config.version}`,
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
@@ -58,7 +59,7 @@ class Api extends BaseApi {
           request.params.deviceId = this._config.deviceId;
         }
 
-        console.info('✉️ request', request.url);
+        console.info('✉️ request', request);
         return request;
       },
       (error) => {

@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany } from '@lib/types';
+import { ICompany, IDBCompany, INamedEntity, NewCompany, IUser, NewUser, IDBDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -10,8 +10,6 @@ import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
 
-// const db = getDb();
-// const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
@@ -24,7 +22,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies, users } = getDb();
+  const { companies } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
@@ -46,15 +44,6 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   // Добавляем к текущему
   //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
-  //TODO переделать на updateCompany
-
-  // TODO Временно! Добавляем к пользователю gdmn
-  const user = await users.find((i) => i.name === 'gdmn');
-
-  if (user) {
-    //await addCompanyToUser(user.id, createdCompany.id);
-    await updateUserCompany(user.id, { id: user.id, company: createdCompany });
-  }
 
   const retCompany = await makeCompany(createdCompany);
 
@@ -87,6 +76,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     name: companyData.name || companyObj.name,
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
+    city: companyData.city,
     creationDate: companyObj.creationDate,
     editionDate: new Date().toISOString(),
   };
@@ -110,6 +100,10 @@ const deleteOne = async (id: string): Promise<string> => {
   */
   const db = getDb();
   const { companies } = db;
+  const { users } = getDb();
+  const { devices } = getDb();
+  const { codes } = getDb();
+  const { deviceBindings } = getDb();
 
   const companyObj = await companies.find(id);
 
@@ -117,7 +111,22 @@ const deleteOne = async (id: string): Promise<string> => {
     throw new DataNotFoundException('Компания не найдена');
   }
 
+  const devicesByCompany = await devices.read((item) => item.companyId === id);
+
+  const delDevices = async (deviceList: IDBDevice[]) => {
+    for (const item of deviceList) {
+      await deviceBindings.delete((b) => b.deviceId === item.id);
+      await codes.delete((c) => c.deviceId === item.id);
+      await devices.delete((i) => i.id === item.id);
+    }
+  };
+
+  delDevices(devicesByCompany);
+
+  await users.delete((user) => user.company === id && user.role !== 'Admin');
+
   await companies.delete(id);
+
   return 'Компания удалена';
 };
 
@@ -172,7 +181,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     companyList = await companies.read();
   }
 
-  //const companyList = await companies?.read((item) => {
   companyList = companyList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
     //const newParams = Object.assign({}, params);
@@ -193,14 +201,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     }
     */
 
-    /*name обработается в extraPredicate */
-    // let nameFound = true;
-
-    // if ('name' in newParams) {
-    //   nameFound = item.name === newParams.name;
-    //   delete newParams['name'];
-    // }
-
     /** filtering data */
     let filteredCompanies = true;
     if ('filterText' in newParams) {
@@ -208,11 +208,8 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
       if (filterText) {
         const name = item.name.toUpperCase();
-        //const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
-        //const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
 
         filteredCompanies = name.includes(filterText);
-        // || firstname.includes(filterText) || lastName.includes(filterText);
       }
       delete newParams['filterText'];
     }

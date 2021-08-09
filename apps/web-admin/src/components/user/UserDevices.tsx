@@ -1,6 +1,6 @@
 import { Box, Container } from '@material-ui/core';
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
-import { IDeviceBinding } from '@lib/types';
+import { IDeviceBinding, IDevice } from '@lib/types';
 
 import { useCallback, useEffect, useRef } from 'react';
 import SortableTable from '../../components/SortableTable';
@@ -12,12 +12,13 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 
 interface IProps {
-  userDevices: IDeviceBinding[];
+  userDevices: IDevice[];
+  userBindingDevices: IDeviceBinding[];
   onAddDevice: () => void;
 }
 
-const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
-  //const { list /*, loading, errorMessage */} = useSelector((state) => state.devices);
+const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) => {
+  //const { list /*, loading, errorMessage */ } = useSelector((state) => state.devices);
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
@@ -27,6 +28,8 @@ const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
     },
     [dispatch],
   );
+
+  //const devices
 
   // useEffect(() => {
   //   fetchDevices();
@@ -64,8 +67,8 @@ const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
     },
   ];
 
-  const headCells: IHeadCells<IDeviceBinding>[] = [
-    { id: 'device', label: 'Наименование', sortEnable: true },
+  const headCells: IHeadCells<IDevice>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
     { id: 'state', label: 'Состояние', sortEnable: true },
     { id: 'creationDate', label: 'Дата создания', sortEnable: false },
     { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
@@ -89,7 +92,12 @@ const UserDevices = ({ userDevices, onAddDevice }: IProps) => {
         />
         <Box sx={{ pt: 2 }}>
           {/* <DeviceBindingListTable deviceBindings={userDevices} limitRows={5} /> */}
-          <SortableTable<IDeviceBinding> headCells={headCells} data={userDevices} path={'/app/devices/'} />
+          <SortableTable<IDevice>
+            headCells={headCells}
+            data={userDevices}
+            // data={userBindingDevices}
+            path={'/app/devices/'}
+          />
         </Box>
       </Container>
     </Box>

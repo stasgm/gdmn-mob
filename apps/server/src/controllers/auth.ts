@@ -11,7 +11,7 @@ import { created, ok } from '../utils/apiHelpers';
  * */
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password } = ctx.request.body as IUserCredentials;
-
+  console.log('signUp', name);
   await authService.signUp({
     password,
     name,

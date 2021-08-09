@@ -2,12 +2,14 @@ import { Joi, Config } from 'koa-joi-router';
 
 import { InvalidParameterException } from '../exceptions';
 
+import * as urlValidation from './url';
+
 const addCompany: Config = {
   validate: {
     type: 'json',
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не указано название компании')),
-      city: Joi.string().optional(),
+      city: Joi.string().allow('', null),
     }),
   },
 };
@@ -15,6 +17,7 @@ const addCompany: Config = {
 const updateCompany: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор организации')),
     }),
     type: 'json',
@@ -25,6 +28,7 @@ const updateCompany: Config = {
 const removeCompany: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор организации')),
     }),
   },
@@ -33,6 +37,7 @@ const removeCompany: Config = {
 const getCompany: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор организации')),
     }),
   },

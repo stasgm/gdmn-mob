@@ -2,6 +2,8 @@ import { Joi, Config } from 'koa-joi-router';
 
 import { InvalidParameterException } from '../exceptions';
 
+import * as urlValidation from './url';
+
 const bindingDevice: Config = {
   validate: {
     type: 'json',
@@ -16,6 +18,7 @@ const bindingDevice: Config = {
 const updateDeviceBinding: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор связи')),
     }),
     type: 'json',
@@ -26,6 +29,7 @@ const updateDeviceBinding: Config = {
 const getDeviceBinding: Config = {
   validate: {
     params: Joi.object({
+      ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор связи')),
     }),
   },

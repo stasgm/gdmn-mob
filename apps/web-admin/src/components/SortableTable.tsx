@@ -20,7 +20,6 @@ import { makeStyles } from '@material-ui/styles';
 
 import { IHeadCells } from '../types';
 import { adminPath } from '../utils/constants';
-import { isDate, isNamedEntity } from '../utils/helpers';
 
 type Order = 'asc' | 'desc';
 
@@ -35,7 +34,7 @@ interface IProps<T extends { id: string }> {
 }
 
 function SortableTable<T extends { id: string }>({ data = [], headCells = [], path, ...rest }: IProps<T>) {
-  const [selectedUserIds, setSelectedUserIds] = useState<any>([]);
+  const [selectedItemIds, setSelectedItemIds] = useState<any>([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState<Order>('asc');
@@ -43,37 +42,35 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
   const classes = useStyles();
 
   const handleSelectAll = (event: any) => {
-    let newSelectedUserIds;
+    let newSelectedItemIds;
 
     if (event.target.checked) {
-      newSelectedUserIds = data.map((user: any) => user.id);
+      newSelectedItemIds = data.map((item: any) => item.id);
     } else {
-      newSelectedUserIds = [];
+      newSelectedItemIds = [];
     }
 
-    setSelectedUserIds(newSelectedUserIds);
+    setSelectedItemIds(newSelectedItemIds);
   };
 
-  console.log('SortableTable data', data);
-
   const handleSelectOne = (_event: any, id: any) => {
-    const selectedIndex = selectedUserIds.indexOf(id);
-    let newSelectedUserIds: any = [];
+    const selectedIndex = selectedItemIds.indexOf(id);
+    let newSelectedItemIds: any = [];
 
     if (selectedIndex === -1) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds, id);
+      newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds, id);
     } else if (selectedIndex === 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(1));
-    } else if (selectedIndex === selectedUserIds.length - 1) {
-      newSelectedUserIds = newSelectedUserIds.concat(selectedUserIds.slice(0, -1));
+      newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds.slice(1));
+    } else if (selectedIndex === selectedItemIds.length - 1) {
+      newSelectedItemIds = newSelectedItemIds.concat(selectedItemIds.slice(0, -1));
     } else if (selectedIndex > 0) {
-      newSelectedUserIds = newSelectedUserIds.concat(
-        selectedUserIds.slice(0, selectedIndex),
-        selectedUserIds.slice(selectedIndex + 1),
+      newSelectedItemIds = newSelectedItemIds.concat(
+        selectedItemIds.slice(0, selectedIndex),
+        selectedItemIds.slice(selectedIndex + 1),
       );
     }
 
-    setSelectedUserIds(newSelectedUserIds);
+    setSelectedItemIds(newSelectedItemIds);
   };
 
   const handleLimitChange = (event: any) => {
@@ -114,31 +111,37 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
     return stabilizedThis.map((el) => el[0]);
   }
 
+  function DeserializeProp<T>(propName: keyof T, value: any) {
+    /** Если в наименовании содержится цифра, то значение преобразоывается в дату */
+    if (propName === 'name') return value;
+
+    if (!isNaN(new Date(value).getDate())) {
+      return new Date(value || '').toLocaleString('ru', { hour12: false });
+    }
+
+    if (typeof value === 'object' && 'name' in value) {
+      return value.name;
+    }
+
+    return value;
+  }
+
   const TableRows = () => {
-    const userList = SortedTableRows<T>(data)
+    const itemList = SortedTableRows<T>(data)
       .slice(page * limit, page * limit + limit)
       .map((item: T) => (
-        <TableRow className={classes.row} hover key={item.id} selected={selectedUserIds.indexOf(item.id) !== -1}>
+        <TableRow className={classes.row} hover key={item.id} selected={selectedItemIds.indexOf(item.id) !== -1}>
           <TableCell padding="checkbox">
             <Checkbox
-              checked={selectedUserIds.indexOf(item.id) !== -1}
+              checked={selectedItemIds.indexOf(item.id) !== -1}
               onChange={(event) => handleSelectOne(event, item.id)}
               value="true"
             />
           </TableCell>
 
           {headCells.map((headCell, index) => {
-            const v = item[headCell.id];
-            const s = isNamedEntity(v)
-              ? v.name
-              : isDate(v)
-              ? new Date(v as unknown as string).toLocaleString('en-US', { hour12: false })
-              : v;
-
-            //return new Date(value || '').toLocaleString('ru', { hour12: false });
-
             return index ? (
-              <TableCell key={index}>{s}</TableCell>
+              <TableCell key={index}>{DeserializeProp<T>(headCell.id, item[headCell.id])}</TableCell>
             ) : (
               <TableCell key={index} style={{ padding: '0 16px' }}>
                 <Box
@@ -149,7 +152,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
                 >
                   <NavLink to={`${adminPath}${path}${item.id}`}>
                     <Typography color="textPrimary" variant="body1" key={item.id}>
-                      {s}
+                      {DeserializeProp<T>(headCell.id, item[headCell.id])}
                     </Typography>
                   </NavLink>
                 </Box>
@@ -163,7 +166,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
 
     return (
       <>
-        {userList}
+        {itemList}
         {emptyRows > 0 && page > 0 && (
           <TableRow style={{ height: 53 * emptyRows }}>
             <TableCell colSpan={4} />
@@ -182,9 +185,9 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedUserIds.length === data.length}
+                    checked={selectedItemIds.length === data.length}
                     color="primary"
-                    indeterminate={selectedUserIds.length > 0 && selectedUserIds.length < data.length}
+                    indeterminate={selectedItemIds.length > 0 && selectedItemIds.length < data.length}
                     onChange={handleSelectAll}
                   />
                 </TableCell>

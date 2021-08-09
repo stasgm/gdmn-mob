@@ -12,6 +12,7 @@ const {
   server: { name, port, protocol },
   timeout,
   apiPath,
+  version,
 } = config;
 
 const initialState: Readonly<AuthState> = {
@@ -22,6 +23,7 @@ const initialState: Readonly<AuthState> = {
   settings: {
     apiPath,
     port,
+    version,
     protocol,
     server: name,
     timeout,
