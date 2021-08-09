@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany, IUser, NewUser } from '@lib/types';
+import { ICompany, IDBCompany, INamedEntity, NewCompany, IUser, NewUser, IDBDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -9,10 +9,7 @@ import { updateOne as updateUserCompany } from './userService';
 import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
-// import { user } from './data/user';
 
-// const db = getDb();
-// const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
@@ -25,7 +22,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies, users } = getDb();
+  const { companies } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
@@ -47,15 +44,6 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   // Добавляем к текущему
   //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
-  //TODO переделать на updateCompany
-
-  // TODO Временно! Добавляем к пользователю gdmn
-  const user = await users.find((i) => i.name === 'gdmn');
-
-  if (user) {
-    //await addCompanyToUser(user.id, createdCompany.id);
-    await updateUserCompany(user.id, { id: user.id, company: createdCompany });
-  }
 
   const retCompany = await makeCompany(createdCompany);
 
@@ -118,48 +106,27 @@ const deleteOne = async (id: string): Promise<string> => {
   const { deviceBindings } = getDb();
 
   const companyObj = await companies.find(id);
-  const user = await users.find(id);
-  // const deviceList = /*await*/ devices.filter((device) => device.companyId === id);
-
-  let deviceList;
-  deviceList = await devices.read();
-  deviceList = deviceList.filter((item) => {
-    item.companyId === id;
-  });
-
-  const deviceeList = (await devices.read()).filter(
-    (i) => i.companyId === id, //appSystem && i.head.companyId === companyId && i.head.consumerId === consumerId,
-  );
-
-  console.log('deviceeList', deviceeList);
-
-  //await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === deviceeList.id);
-
-  console.log('deviceList', deviceList);
-
-  await companies.delete(id);
-  // console.log('qwe', device.deviceId);
-  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === device.id); // && device.companyId === id);
 
   if (!companyObj) {
     throw new DataNotFoundException('Компания не найдена');
   }
-  // await companies.delete(id);
 
-  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === device.id); // && device.companyId === id);
-  //  device
+  const devicesByCompany = await devices.read((item) => item.companyId === id);
 
-  // await deviceBindings.delete(
-  //   (deviceBinding) => deviceBinding.userId === user.id && user.company === id && user.role !== 'Admin');
-  //
-  // await users.delete((user) => user.company === id && user.role !== 'Admin');
-  // await devices.delete((device) => device.companyId === id);
-  //
-  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === device.id && device.companyId === id);
-  //await deviceBindings.delete(({ deviceBinding, user }) => deviceBinding.deviceId === deviceId);
-  // await devices.delete((device) => device.id === deviceId);
-  // await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === deviceId);
-  // await codes.delete((activationCode) => activationCode.deviceId === deviceId);
+  const delDevices = async (deviceList: IDBDevice[]) => {
+    for (const item of deviceList) {
+      await deviceBindings.delete((b) => b.deviceId === item.id);
+      await codes.delete((c) => c.deviceId === item.id);
+      await devices.delete((i) => i.id === item.id);
+    }
+  };
+
+  delDevices(devicesByCompany);
+
+  await users.delete((user) => user.company === id && user.role !== 'Admin');
+
+  await companies.delete(id);
+
   return 'Компания удалена';
 };
 
@@ -214,7 +181,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     companyList = await companies.read();
   }
 
-  //const companyList = await companies?.read((item) => {
   companyList = companyList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
     //const newParams = Object.assign({}, params);
@@ -235,14 +201,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     }
     */
 
-    /*name обработается в extraPredicate */
-    // let nameFound = true;
-
-    // if ('name' in newParams) {
-    //   nameFound = item.name === newParams.name;
-    //   delete newParams['name'];
-    // }
-
     /** filtering data */
     let filteredCompanies = true;
     if ('filterText' in newParams) {
@@ -250,11 +208,8 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
       if (filterText) {
         const name = item.name.toUpperCase();
-        //const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
-        //const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
 
         filteredCompanies = name.includes(filterText);
-        // || firstname.includes(filterText) || lastName.includes(filterText);
       }
       delete newParams['filterText'];
     }

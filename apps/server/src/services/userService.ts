@@ -148,9 +148,8 @@ const deleteOne = async (id: string): Promise<void> => {
   if (user.role === 'SuperAdmin' || (user.role === 'Admin' && Boolean(user.company))) {
     throw new ForbiddenException('Администратор не может быть удален');
   }
-
-  await users.delete(id);
   await deviceBindings.delete((deviceBinding) => deviceBinding.userId === user.id);
+  await users.delete(id);
 };
 
 const findOne = async (id: string): Promise<IUser | undefined> => {
@@ -196,8 +195,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
   const db = getDb();
   const { users } = db;
 
-  //console.log('findAll', DB);
-
   let userList;
   if (process.env.MOCK) {
     userList = mockUsers;
@@ -205,7 +202,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
     userList = await users.read();
   }
 
-  //const userList = await users.read((item) => {
   userList = userList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 

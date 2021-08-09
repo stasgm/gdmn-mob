@@ -84,9 +84,7 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
  * @param {string} id - идентификатор устройства
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
-  const { devices } = getDb();
-  const { codes } = getDb();
-  const { deviceBindings } = getDb();
+  const { devices, codes, deviceBindings } = getDb();
 
   if (!(await devices.find((device) => device.id === deviceId))) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -100,13 +98,7 @@ const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
 const findOne = async (id: string): Promise<IDevice | undefined> => {
   const { devices } = getDb();
 
-  //let device: IDBDevice | undefined;
-
-  // if (id === 'WEB') {
-  //   device = await devices.find((e) => e.uid === id);
-  // } else {
   const device = await devices.find(id);
-  //}
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -136,31 +128,16 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
     deviceList = await devices.read();
   }
 
-  //const deviceList = await devices.read((item) => {
   deviceList = deviceList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
     let companyFound = true;
 
     if ('companyId' in newParams) {
-      companyFound = item.companyId?.includes(newParams.companyId as string);
+      companyFound = item.companyId === newParams.companyId;
+      console.log('companyFound', item.companyId, newParams.companyId);
       delete newParams['companyId'];
     }
-
-    /*state и uId обработается в extraPredicate */
-    // let uIdFound = true;
-
-    // if ('uId' in newParams) {
-    //   uIdFound = item.uid === newParams.uId;
-    //   delete newParams['uId'];
-    // }
-
-    // let stateFound = true;
-
-    // if ('state' in newParams) {
-    //   stateFound = item.state === newParams.state;
-    //   delete newParams['state'];
-    // }
 
     /** filtering data */
     let filteredDevices = true;
