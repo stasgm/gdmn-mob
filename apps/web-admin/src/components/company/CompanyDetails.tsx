@@ -19,7 +19,6 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      console.log(values);
       onSubmit(values);
     },
   });

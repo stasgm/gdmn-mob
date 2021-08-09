@@ -50,18 +50,19 @@ const removeMessage: Config = {
   },
 };
 
-const publish: Config = {
-  validate: {
-    type: 'json',
-    body: Joi.object({
-      head: Joi.object({
-        company: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-      }),
-      body: Joi.object({
-        type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-        payload: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-      }),
-    }),
-  },
-};
-export { newMessage, getMessage, removeMessage, publish };
+// const publish: Config = {
+//   validate: {
+//     type: 'json',
+//     body: Joi.object({
+//       head: Joi.object({
+//         company: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+//       }),
+//       body: Joi.object({
+//         type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+//         payload: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+//       }),
+//     }),
+//   },
+// };
+
+export { newMessage, getMessage, removeMessage };

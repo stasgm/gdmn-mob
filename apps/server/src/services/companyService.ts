@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany, IUser, NewUser, IDBDevice } from '@lib/types';
+import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 

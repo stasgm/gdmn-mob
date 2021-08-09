@@ -29,7 +29,7 @@ export const setDocuments = (
     try {
       return dispatch(actions.setDocumentsAsync.success(documents));
     } catch {
-      return dispatch(actions.setDocumentsAsync.failure('Ошибка записи докмуентов'));
+      return dispatch(actions.setDocumentsAsync.failure('Ошибка записи документов'));
     }
   };
 };
@@ -48,6 +48,24 @@ export const addDocuments = (
       return dispatch(actions.addDocumentsAsync.success(documents));
     } catch {
       return dispatch(actions.addDocumentsAsync.failure('something wrong'));
+    }
+  };
+};
+
+export const updateDocuments = (
+  documents: IDocument[],
+): AppThunk<
+  Promise<ActionType<typeof actions.updateDocumentsAsync>>,
+  DocumentState,
+  ActionType<typeof actions.updateDocumentsAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.updateDocumentsAsync.request(''));
+
+    try {
+      return dispatch(actions.updateDocumentsAsync.success(documents));
+    } catch {
+      return dispatch(actions.updateDocumentsAsync.failure('Ошибка обновления документов'));
     }
   };
 };
@@ -100,4 +118,4 @@ const clearDocuments = (): AppThunk<
 //   };
 // };
 
-export default { setDocuments, addDocuments, removeDocument, clearDocuments, useDocThunkDispatch };
+export default { setDocuments, addDocuments, updateDocuments, removeDocument, clearDocuments, useDocThunkDispatch };

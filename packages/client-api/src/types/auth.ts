@@ -1,4 +1,4 @@
-import { DeviceState, IDevice, IUser } from '@lib/types';
+import { DeviceState, IUser } from '@lib/types';
 
 export interface IAuthQueryResponse {
   type:
