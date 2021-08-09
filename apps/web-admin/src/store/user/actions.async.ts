@@ -108,4 +108,22 @@ const removeUser = (id: string): AppThunk => {
   };
 };
 
+// const addPageParams = (user: IUser): AppThunk => {
+//   return async (dispatch) => {
+//     dispatch(userActions.setPageParam.request(''));
+
+//     const response = await api.user.addUser(user);
+
+//     if (response.type === 'SET_PARAM') {
+//       return dispatch(userActions.addUserAsync.success(response.user));
+//     }
+
+//     if (response.type === 'ERROR') {
+//       return dispatch(userActions.addUserAsync.failure(response.message));
+//     }
+
+//     return dispatch(userActions.addUserAsync.failure('something wrong'));
+//   };
+// };
+
 export default { fetchUsers, fetchUserById, addUser, updateUser, removeUser };

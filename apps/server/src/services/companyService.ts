@@ -98,12 +98,8 @@ const deleteOne = async (id: string): Promise<string> => {
     2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
-  const db = getDb();
-  const { companies } = db;
-  const { users } = getDb();
-  const { devices } = getDb();
-  const { codes } = getDb();
-  const { deviceBindings } = getDb();
+
+  const { companies, users, devices, codes, deviceBindings } = getDb();
 
   const companyObj = await companies.find(id);
 
