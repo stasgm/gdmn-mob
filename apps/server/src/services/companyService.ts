@@ -48,15 +48,6 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   // Добавляем к текущему
   //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
-  //TODO переделать на updateCompany
-
-  // TODO Временно! Добавляем к пользователю gdmn
-  const user = await users.find((i) => i.name === 'gdmn');
-
-  if (user) {
-    //await addCompanyToUser(user.id, createdCompany.id);
-    await updateUserCompany(user.id, { id: user.id, company: createdCompany });
-  }
 
   const retCompany = await makeCompany(createdCompany);
 
