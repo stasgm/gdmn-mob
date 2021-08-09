@@ -84,9 +84,7 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
  * @param {string} id - идентификатор устройства
  * */
 const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
-  const { devices } = getDb();
-  const { codes } = getDb();
-  const { deviceBindings } = getDb();
+  const { devices, codes, deviceBindings } = getDb();
 
   if (!(await devices.find((device) => device.id === deviceId))) {
     throw new DataNotFoundException('Устройство не найдено');

@@ -19,8 +19,6 @@ import { getDb } from './dao/db';
 
 import { users as mockUsers } from './data/user';
 
-import { Context, ParameterizedContext } from 'koa';
-
 /**
  * Добавляет одного пользователя
  * @param newUser - пользователь

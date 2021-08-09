@@ -9,11 +9,7 @@ import { updateOne as updateUserCompany } from './userService';
 import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
-// import { deviceBindingService } from '.';
-// import { user } from './data/user';
 
-// const db = getDb();
-// const { companies, users } = db;
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
@@ -26,7 +22,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies, users } = getDb();
+  const { companies } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
@@ -111,15 +107,16 @@ const deleteOne = async (id: string): Promise<string> => {
 
   const companyObj = await companies.find(id);
 
+  if (!companyObj) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
+
   const devicesByCompany = await devices.read((item) => item.companyId === id);
 
   const delDevices = async (deviceList: IDBDevice[]) => {
     for (const item of deviceList) {
-      // eslint-disable-next-line no-await-in-loop
       await deviceBindings.delete((b) => b.deviceId === item.id);
-      // eslint-disable-next-line no-await-in-loop
       await codes.delete((c) => c.deviceId === item.id);
-      // eslint-disable-next-line no-await-in-loop
       await devices.delete((i) => i.id === item.id);
     }
   };
@@ -129,10 +126,6 @@ const deleteOne = async (id: string): Promise<string> => {
   await users.delete((user) => user.company === id && user.role !== 'Admin');
 
   await companies.delete(id);
-
-  if (!companyObj) {
-    throw new DataNotFoundException('Компания не найдена');
-  }
 
   return 'Компания удалена';
 };
@@ -188,7 +181,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     companyList = await companies.read();
   }
 
-  //const companyList = await companies?.read((item) => {
   companyList = companyList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
     //const newParams = Object.assign({}, params);
@@ -209,14 +201,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     }
     */
 
-    /*name обработается в extraPredicate */
-    // let nameFound = true;
-
-    // if ('name' in newParams) {
-    //   nameFound = item.name === newParams.name;
-    //   delete newParams['name'];
-    // }
-
     /** filtering data */
     let filteredCompanies = true;
     if ('filterText' in newParams) {
@@ -224,11 +208,8 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
       if (filterText) {
         const name = item.name.toUpperCase();
-        //const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
-        //const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
 
         filteredCompanies = name.includes(filterText);
-        // || firstname.includes(filterText) || lastName.includes(filterText);
       }
       delete newParams['filterText'];
     }
