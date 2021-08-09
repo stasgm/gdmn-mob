@@ -3,6 +3,7 @@ import { IHeadMessage, IMessage } from './messages';
 
 // Типы для хранения данных в бд
 export interface IDBUser extends INamedEntity, IExternalSystemProps {
+  alias?: string;
   password: string;
   creatorId: string;
   role: UserRole;
@@ -51,6 +52,7 @@ export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
 
 // Типы для передачи и хранения данных на клиенте
 export interface IUser extends INamedEntity, IExternalSystemProps {
+  alias?: string;
   role: UserRole;
   firstName?: string;
   lastName?: string;

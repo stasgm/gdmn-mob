@@ -31,7 +31,6 @@ class Api extends BaseApi {
   constructor(config: IApiConfig) {
     super();
     this._config = config;
-    // this._deviceId = undefined; // TODO убрать web  || 'WEB'
 
     this._axios = axios.create({
       // eslint-disable-next-line max-len
@@ -39,7 +38,6 @@ class Api extends BaseApi {
       url: this._config.apiPath,
       timeout: config.timeout,
       withCredentials: true,
-      //headers: { 'Access-Control-Allow-Origin': 'http://192.168.0.61:8080' },
     });
 
     this.auth = new Auth(this);
@@ -61,7 +59,7 @@ class Api extends BaseApi {
           request.params.deviceId = this._config.deviceId;
         }
 
-        console.info('✉️ request', request);
+        console.info('✉️ request', request.url);
         return request;
       },
       (error) => {
@@ -95,21 +93,9 @@ class Api extends BaseApi {
     return this._config;
   }
 
-  // set deviceId(deviceId: string | undefined) {
-  //   this._deviceId = deviceId;
-  // }
-
-  // get deviceId() {
-  //   return this._deviceId;
-  // }
-
   get axios() {
     return this._axios;
   }
-
-  /*   getUrl = () => {
-      return `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}`;
-    }; */
 }
 
 const {
@@ -131,6 +117,5 @@ export default new Api({
   debug: {
     isMock: useMockup,
     mockDelay: 1000,
-    // mockDeviceId: deviceId,
   },
 });

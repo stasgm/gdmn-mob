@@ -1,4 +1,4 @@
-import { IDBDevice, IDevice, INamedEntity, NewDevice, IDBActivationCode, IActivationCode } from '@lib/types';
+import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
@@ -135,7 +135,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
 
     if ('companyId' in newParams) {
       companyFound = item.companyId === newParams.companyId;
-      console.log('companyFound', item.companyId, newParams.companyId);
       delete newParams['companyId'];
     }
 

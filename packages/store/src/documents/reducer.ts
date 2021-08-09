@@ -57,6 +57,23 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         errorMessage: action.payload || 'error',
       };
 
+    case getType(actions.updateDocumentsAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.updateDocumentsAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: state.list.map((l) => action.payload.find((d) => d.id === l.id) || l),
+      };
+
+    case getType(actions.updateDocumentsAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     // case getType(actions.setDocuments):
     //   return {
     //     ...state,

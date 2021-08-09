@@ -1,21 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Provider } from 'react-redux';
 
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-
 import { PersistGate } from 'redux-persist/integration/react';
-
 import { persistor, store } from './src/store';
-
-// import { applMessages, applDocuments, applRefs } from './src/store/mock';
-
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
 
-const Root = React.memo(() => {
-  const [isLoading, setLoading] = useState(false);
-  // const { company } = useSelector((state) => state.auth);
-
+const Root = () => {
   const navItems: INavItem[] = useMemo(
     () => [
       {
@@ -51,9 +43,8 @@ const Root = React.memo(() => {
 
   return (
     // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне
-    <MobileApp items={navItems} syncing={isLoading} />
-  );
-});
+    <MobileApp items={navItems}/>
+  )};
 
 const App = () => (
   <Provider store={store}>

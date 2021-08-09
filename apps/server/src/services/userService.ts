@@ -66,6 +66,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
 
   const newUserObj: IDBUser = {
     id: '',
+    alias: newUser.alias,
     name: newUser.name,
     company: company,
     password: passwordHash,
@@ -120,6 +121,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
 
   const newUser: IDBUser = {
     id: userId,
+    alias: userData.alias || oldUser.alias,
     name: userData.name || oldUser.name,
     company: newCompany,
     password: passwordHash,
@@ -327,6 +329,7 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: user.id,
+    alias: user.alias,
     name: user.name,
     company,
     role: user.role,

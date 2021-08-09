@@ -8,21 +8,21 @@ import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
-import api from '@lib/client-api';
+import { useSync } from './hooks';
 
 export interface IApp {
   items?: INavItem[];
   store?: Store<any, any>;
   onSync?: () => void;
-  syncing?: boolean;
 }
 
-const AppRoot = ({ items, onSync, syncing }: Omit<IApp, 'store'>) => {
+const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
+  const syncData = useSync(onSync);
+
   return (
     <DrawerNavigator
       items={items}
-      onSyncClick={api.config.debug?.isMock ? onSync : undefined}
-      syncing={api.config.debug?.isMock ? syncing : undefined}
+      onSyncClick={syncData}
     />
   );
 };

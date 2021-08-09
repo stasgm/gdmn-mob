@@ -6,7 +6,6 @@ import { config } from '@lib/client-config';
 
 import { AuthState } from './types';
 import { AuthActionType, actions } from './actions';
-// import { config } from '@lib/mock';
 
 const {
   server: { name, port, protocol },
@@ -97,6 +96,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.disconnect):
       return {
         ...state,
+        user: undefined,
         device: undefined,
         connectionStatus: 'not-connected',
         error: false,

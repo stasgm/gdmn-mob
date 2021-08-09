@@ -1,5 +1,6 @@
 {
   "expo": {
+    "backUserAlias": "gdmn-appl-request",
     "name": "GDMN Заявки на закупку",
     "slug": "gdmn-appl-request",
     "version": "0.0.1",

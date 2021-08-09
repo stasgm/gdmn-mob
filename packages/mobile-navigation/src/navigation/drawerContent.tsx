@@ -4,20 +4,12 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import React, { useCallback, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
-
-import api from '@lib/client-api';
-
 import Constants from 'expo-constants';
-
-import { useSelector, documentActions, referenceActions } from '@lib/store';
-
-import { BodyType, IDocument, IMessage, IReferences } from '@lib/types';
-import { useRefThunkDispatch } from '@lib/store/src/references/actions.async';
-import { useDocThunkDispatch } from '@lib/store/src/documents/actions.async';
+import { useSelector } from '@lib/store';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -28,159 +20,166 @@ type Props = DrawerContentComponentProps<DrawerContentOptions> & ICutsomProps;
 
 export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
-
+  const { loading, errorMessage } = useSelector((state) => state.app);
   const { user, company } = useSelector((state) => state.auth);
-  const { list: documents } = useSelector((state) => state.documents);
 
-  const refDispatch = useRefThunkDispatch();
-  const docDispatch = useDocThunkDispatch();
+  // const handleUpdate = async () => {
+  //   const isLoading = useSync({ systemName: 'gdmn-appl-request', consumer: { id: 'gdmn', name: 'gdmn' }, onSync });
 
-  const [isLoading, setLoading] = useState(false);
+  //   setLoading(isLoading);
+  // };
 
-  const processMessage = useCallback(async (msg: IMessage) => {
-    if (!msg) {
-      return;
-    }
+  //const { list: documents } = useSelector((state) => state.documents);
 
-    switch (msg.body.type as BodyType) {
-      case 'CMD':
-        //TODO: обработка
-        break;
+  // const refDispatch = useRefThunkDispatch();
+  // const docDispatch = useDocThunkDispatch();
 
-      case 'REFS': {
-        //TODO: проверка данных, приведение к типу
-        const clearRefResponse = await refDispatch(referenceActions.clearReferences());
+  // const [isLoading, setLoading] = useState(false);
 
-        if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
-          break;
-        }
+  // const processMessage = useCallback(async (msg: IMessage) => {
+  //   if (!msg) {
+  //     return;
+  //   }
 
-        const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
+  //   switch (msg.body.type as BodyType) {
+  //     case 'CMD':
+  //       //TODO: обработка
+  //       break;
 
-        //Если удачно сохранились справочники, удаляем сообщение в json
-        if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-          await api.message.removeMessage(msg.id);
-        }
-        //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
-        break;
-      }
+  //     case 'REFS': {
+  //       //TODO: проверка данных, приведение к типу
+  //       const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
-      case 'DOCS': {
-        const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
+  //       if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
+  //         break;
+  //       }
 
-        //Если удачно сохранились документы, удаляем сообщение в json
-        if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          await api.message.removeMessage(msg.id);
-        }
-        //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
-        break;
-      }
+  //       const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
 
-      default:
-        Alert.alert('Предупреждение!', 'Неизвестный тип сообщения', [{ text: 'Закрыть' }]);
-        break;
-    }
-  }, []);
+  //       //Если удачно сохранились справочники, удаляем сообщение в json
+  //       if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
+  //         await api.message.removeMessage(msg.id);
+  //       }
+  //       //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+  //       break;
+  //     }
 
-  const processMessages = async (arr: IMessage[]) => {
-    arr?.forEach((message) => {
-      processMessage(message);
-    });
-  };
+  //     case 'DOCS': {
+  //       const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
-  const handleUpdate = async () => {
-    if (!company || !user) {
-      return;
-    }
+  //       //Если удачно сохранились документы, удаляем сообщение в json
+  //       if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
+  //         await api.message.removeMessage(msg.id);
+  //       }
+  //       //dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
+  //       break;
+  //     }
 
-    // Загрузка данных
-    if (onSync) {
-      // Если передан внешний обработчик то вызываем
-      return onSync();
-    }
+  //     default:
+  //       Alert.alert('Предупреждение!', 'Неизвестный тип сообщения', [{ text: 'Закрыть' }]);
+  //       break;
+  //   }
+  // }, []);
 
-    /*
-      Поддержка платформы:
-      - загрузка сообщений
-      - обработка сообщение
-    */
-    setLoading(true);
+  // const processMessages = async (arr: IMessage[]) => {
+  //   arr?.forEach((message) => {
+  //     processMessage(message);
+  //   });
+  // };
 
-    const docForSending = documents.filter((doc) => doc.status === 'READY');
+  // const handleUpdate = async () => {
+  //   if (!company || !user) {
+  //     return;
+  //   }
 
-    if (docForSending.length) {
-      //Формируем сообщение с документами со статусом 'READY'
-      const messageSendDoc: IMessage['body'] = {
-        type: 'DOCS',
-        payload: docForSending,
-      };
+  //   // Загрузка данных
+  //   if (onSync) {
+  //     // Если передан внешний обработчик то вызываем
+  //     return onSync();
+  //   }
 
-      //1. Отправляем документы
-      const sendDocMessage = await api.message.sendMessages(
-        'gdmn-appl-request',
-        { id: company.id, name: company.name },
-        { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
-        messageSendDoc,
-      );
+  //   /*
+  //     Поддержка платформы:
+  //     - загрузка сообщений
+  //     - обработка сообщение
+  //   */
+  //   setLoading(true);
 
-      //Если документы отправлены успешно, то меняем статус документов на 'SENT'
-      if (sendDocMessage.type === 'SEND_MESSAGE') {
-        await docDispatch(
-          documentActions.setDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
-        );
-      }
-    }
+  //   const docForSending = documents.filter((doc) => doc.status === 'READY');
 
-    //2. Получаем все сообщения для мобильного
-    const getMessagesResponse = await api.message.getMessages({
-      systemName: 'gdmn-appl-request',
-      companyId: company.id,
-    });
+  //   if (docForSending.length) {
+  //     //Формируем сообщение с документами со статусом 'READY'
+  //     const messageSendDoc: IMessage['body'] = {
+  //       type: 'DOCS',
+  //       payload: docForSending,
+  //     };
 
-    //Если сообщения получены, то
-    //  справочники: очищаем старые и записываем в хранилище новые данные
-    //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
-    if (getMessagesResponse.type === 'GET_MESSAGES') {
-      await processMessages(getMessagesResponse.messageList);
-    } else if (getMessagesResponse.type === 'ERROR') {
-      Alert.alert('Ошибка!', getMessagesResponse.message, [{ text: 'Закрыть' }]);
-      return;
-    }
+  //     //1. Отправляем документы
+  //     const sendDocMessage = await api.message.sendMessages(
+  //       'gdmn-appl-request',
+  //       { id: company.id, name: company.name },
+  //       { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+  //       messageSendDoc,
+  //     );
 
-    //Формируем запрос на получение справочников для следующего раза
-    const messageGetRef: IMessage['body'] = {
-      type: 'CMD',
-      payload: {
-        name: 'GET_REF',
-      },
-    };
+  //     //Если документы отправлены успешно, то меняем статус документов на 'SENT'
+  //     if (sendDocMessage.type === 'SEND_MESSAGE') {
+  //       await docDispatch(
+  //         documentActions.setDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
+  //       );
+  //     }
+  //   }
 
-    //Формируем запрос на получение документов для следующего раза
-    const messageGetDoc: IMessage['body'] = {
-      type: 'CMD',
-      payload: {
-        name: 'GET_DOCUMENTS',
-      },
-    };
+  //   //2. Получаем все сообщения для мобильного
+  //   const getMessagesResponse = await api.message.getMessages({
+  //     systemName: 'gdmn-appl-request',
+  //     companyId: company.id,
+  //   });
 
-    //3. Отправляем запрос на получение справочников
-    await api.message.sendMessages(
-      'gdmn-appl-request',
-      { id: company.id, name: company.name },
-      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
-      messageGetRef,
-    );
+  //   //Если сообщения получены, то
+  //   //  справочники: очищаем старые и записываем в хранилище новые данные
+  //   //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+  //   if (getMessagesResponse.type === 'GET_MESSAGES') {
+  //     await processMessages(getMessagesResponse.messageList);
+  //   } else if (getMessagesResponse.type === 'ERROR') {
+  //     Alert.alert('Ошибка!', getMessagesResponse.message, [{ text: 'Закрыть' }]);
+  //     return;
+  //   }
 
-    //4. Отправляем запрос на получение документов
-    await api.message.sendMessages(
-      'gdmn-appl-request',
-      { id: company.id, name: company.name },
-      { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
-      messageGetDoc,
-    );
+  //   //Формируем запрос на получение справочников для следующего раза
+  //   const messageGetRef: IMessage['body'] = {
+  //     type: 'CMD',
+  //     payload: {
+  //       name: 'GET_REF',
+  //     },
+  //   };
 
-    setLoading(false);
-  };
+  //   //Формируем запрос на получение документов для следующего раза
+  //   const messageGetDoc: IMessage['body'] = {
+  //     type: 'CMD',
+  //     payload: {
+  //       name: 'GET_DOCUMENTS',
+  //     },
+  //   };
+
+  //   //3. Отправляем запрос на получение справочников
+  //   await api.message.sendMessages(
+  //     'gdmn-appl-request',
+  //     { id: company.id, name: company.name },
+  //     { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+  //     messageGetRef,
+  //   );
+
+  //   //4. Отправляем запрос на получение документов
+  //   await api.message.sendMessages(
+  //     'gdmn-appl-request',
+  //     { id: company.id, name: company.name },
+  //     { id: '1425a8c0-f142-11eb-8521-edeb717198b0', name: 'gdmn' },
+  //     messageGetDoc,
+  //   );
+
+  //   setLoading(false);
+  // };
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -211,6 +210,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
               transform: [{ translateX }],
             },
           ]}
+          pointerEvents={loading ? 'none' : 'auto'}
         >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />
@@ -233,11 +233,11 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       </DrawerContentScrollView>
       {/* <Divider /> */}
       <View style={styles.systemInfo}>
-        <TouchableOpacity disabled={syncing || isLoading} onPress={handleUpdate}>
+        <TouchableOpacity disabled={loading} onPress={onSync}>
           <Avatar.Icon size={50} icon="cloud-refresh" />
         </TouchableOpacity>
         <View style={styles.updateSection}>
-          <Caption style={styles.caption}>{syncing || isLoading ? 'загрузка данных...' : ''}</Caption>
+          <Caption style={styles.caption}>{loading ? 'Синхронизация данных...' : ''}</Caption>
           <Caption style={styles.caption}>
             Версия программы: {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
           </Caption>
@@ -303,134 +303,134 @@ const styles = StyleSheet.create({
   },
 });
 
-// Документы Appl
-export const applDocuments = [
-  {
-    id: '172846156',
-    number: '104',
-    documentDate: '2021-06-07',
-    documentType: {
-      id: '168063006',
-      name: 'Заявки на закупку ТМЦ',
-    },
-    status: 'DRAFT',
-    head: {
-      applStatus: {
-        id: '168062979',
-        name: 'Согласован инженерной службой',
-      },
-      purchaseType: {
-        id: '168353581',
-        name: 'Механизация',
-      },
-      dept: {
-        id: '169853581',
-        name: 'СХЦ Новополесский-Агро',
-      },
-      purpose: {
-        id: '168353581',
-        name: 'Механизация',
-      },
-      justification: 'Текущий ремонт зерноуборочных комбайнов',
-      sysApplicant: {
-        id: '169967847',
-        name: 'Андрухович Александр Михайлович',
-      },
-      applicant: {
-        id: '169967847',
-        name: 'Андрухович Александр Михайлович',
-      },
-      specPreAgree: {
-        id: '151211855',
-        name: 'Самусевич Александр Николаевич',
-      },
-      specAgreeEngin: {
-        id: '149876722',
-        name: 'Реут Валерий Валентинович',
-      },
-      verificationDate: '2021-06-21',
-      faGood: {
-        id: '170039555',
-        name: '"Комбаин з/у КЗС-1218 -03 """"Палессе"""""',
-      },
-      faGoodNumber: '13316',
-      cancelReason: 'Текущий ремонт ЧЕГО????',
-    },
-    lines: [
-      {
-        id: '172846487',
-        orderNum: 1,
-        goodName: '30.01.2199 Амортизатор маховика',
-        quantity: 200,
-        value: {
-          id: '3000001',
-          name: 'шт.',
-        },
-      },
-    ],
-  },
-  {
-    id: '174360229',
-    number: '473',
-    documentDate: '2021-06-07',
-    documentType: {
-      id: '168063006',
-      name: 'Заявки на закупку ТМЦ',
-    },
-    status: 'DRAFT',
-    head: {
-      applStatus: {
-        id: '168062979',
-        name: 'Согласован инженерной службой',
-      },
-      purchaseType: {
-        id: '168353581',
-        name: 'Механизация',
-      },
-      dept: {
-        id: '147095763',
-        name: 'СХЦ "Величковичи"',
-      },
-      purpose: {
-        id: '168353581',
-        name: 'Механизация',
-      },
-      justification:
-        'Просим Вас закупить данный компрессор на трактор который задействован на внесении минеральных удобрений.',
-      sysApplicant: {
-        id: '153741215',
-        name: 'Игнашевич Сергей  Васильевич',
-      },
-      applicant: {
-        id: '153741215',
-        name: 'Игнашевич Сергей  Васильевич',
-      },
-      specPreAgree: {
-        id: '151211855',
-        name: 'Самусевич Александр Николаевич',
-      },
-      specAgreeEngin: {
-        id: '149876722',
-        name: 'Реут Валерий Валентинович',
-      },
-      verificationDate: '2021-06-21',
-      faGood: {
-        id: '151911169',
-        name: 'ТРАКТОР БЕЛАРУС-1221.2',
-      },
-      faGoodNumber: '701442',
-    },
-    lines: [
-      {
-        id: '174361484',
-        orderNum: 1,
-        goodName: 'Компрессор Д-260 А29.05.000 БЗА',
-        quantity: 1,
-        value: {
-          id: '3000001',
-          name: 'шт.',
-        },
-      },
-    ],
-  },
-];
+// // Документы Appl
+// export const applDocuments = [
+//   {
+//     id: '172846156',
+//     number: '104',
+//     documentDate: '2021-06-07',
+//     documentType: {
+//       id: '168063006',
+//       name: 'Заявки на закупку ТМЦ',
+//     },
+//     status: 'DRAFT',
+//     head: {
+//       applStatus: {
+//         id: '168062979',
+//         name: 'Согласован инженерной службой',
+//       },
+//       purchaseType: {
+//         id: '168353581',
+//         name: 'Механизация',
+//       },
+//       dept: {
+//         id: '169853581',
+//         name: 'СХЦ Новополесский-Агро',
+//       },
+//       purpose: {
+//         id: '168353581',
+//         name: 'Механизация',
+//       },
+//       justification: 'Текущий ремонт зерноуборочных комбайнов',
+//       sysApplicant: {
+//         id: '169967847',
+//         name: 'Андрухович Александр Михайлович',
+//       },
+//       applicant: {
+//         id: '169967847',
+//         name: 'Андрухович Александр Михайлович',
+//       },
+//       specPreAgree: {
+//         id: '151211855',
+//         name: 'Самусевич Александр Николаевич',
+//       },
+//       specAgreeEngin: {
+//         id: '149876722',
+//         name: 'Реут Валерий Валентинович',
+//       },
+//       verificationDate: '2021-06-21',
+//       faGood: {
+//         id: '170039555',
+//         name: '"Комбаин з/у КЗС-1218 -03 """"Палессе"""""',
+//       },
+//       faGoodNumber: '13316',
+//       cancelReason: 'Текущий ремонт ЧЕГО????',
+//     },
+//     lines: [
+//       {
+//         id: '172846487',
+//         orderNum: 1,
+//         goodName: '30.01.2199 Амортизатор маховика',
+//         quantity: 200,
+//         value: {
+//           id: '3000001',
+//           name: 'шт.',
+//         },
+//       },
+//     ],
+//   },
+//   {
+//     id: '174360229',
+//     number: '473',
+//     documentDate: '2021-06-07',
+//     documentType: {
+//       id: '168063006',
+//       name: 'Заявки на закупку ТМЦ',
+//     },
+//     status: 'DRAFT',
+//     head: {
+//       applStatus: {
+//         id: '168062979',
+//         name: 'Согласован инженерной службой',
+//       },
+//       purchaseType: {
+//         id: '168353581',
+//         name: 'Механизация',
+//       },
+//       dept: {
+//         id: '147095763',
+//         name: 'СХЦ "Величковичи"',
+//       },
+//       purpose: {
+//         id: '168353581',
+//         name: 'Механизация',
+//       },
+//       justification:
+//         'Просим Вас закупить данный компрессор на трактор который задействован на внесении минеральных удобрений.',
+//       sysApplicant: {
+//         id: '153741215',
+//         name: 'Игнашевич Сергей  Васильевич',
+//       },
+//       applicant: {
+//         id: '153741215',
+//         name: 'Игнашевич Сергей  Васильевич',
+//       },
+//       specPreAgree: {
+//         id: '151211855',
+//         name: 'Самусевич Александр Николаевич',
+//       },
+//       specAgreeEngin: {
+//         id: '149876722',
+//         name: 'Реут Валерий Валентинович',
+//       },
+//       verificationDate: '2021-06-21',
+//       faGood: {
+//         id: '151911169',
+//         name: 'ТРАКТОР БЕЛАРУС-1221.2',
+//       },
+//       faGoodNumber: '701442',
+//     },
+//     lines: [
+//       {
+//         id: '174361484',
+//         orderNum: 1,
+//         goodName: 'Компрессор Д-260 А29.05.000 БЗА',
+//         quantity: 1,
+//         value: {
+//           id: '3000001',
+//           name: 'шт.',
+//         },
+//       },
+//     ],
+//   },
+// ];

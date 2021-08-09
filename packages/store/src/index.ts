@@ -12,6 +12,7 @@ import { reducer as authReducer } from './auth';
 import { reducer as referenceReducer } from './references';
 import { reducer as settingsReducer } from './settings';
 import { reducer as msgReducer } from './messages';
+import { reducer as appReducer } from './app';
 import { TActions } from './types';
 
 const persistAuthConfig = {
@@ -38,6 +39,12 @@ const persistSettingsConfig = {
   whitelist: ['data'],
 };
 
+const persistAppConfig = {
+  key: 'app',
+  storage: AsyncStorage,
+  whitelist: ['formParams'],
+};
+
 export const rootReducer = {
   auth: persistReducer(persistAuthConfig, authReducer),
   // auth: authReducer,
@@ -45,6 +52,7 @@ export const rootReducer = {
   references: persistReducer(persistRefsConfig, referenceReducer),
   documents: persistReducer(persistDocsConfig, documentReducer),
   settings: persistReducer(persistSettingsConfig, settingsReducer),
+  app: appReducer,
 };
 
 type AppReducers<S, A extends AnyAction> = { [key: string]: Reducer<S, A> };
