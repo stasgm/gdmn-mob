@@ -25,6 +25,9 @@ const AuthNavigator: React.FC = () => {
 
   const saveSettings = useCallback(
     (newSettings: IApiConfig) => {
+      if (newSettings.deviceId === '') {
+        disconnect();
+      }
       dispatch(authActions.setSettings(newSettings));
       api.config = { ...api.config, ...newSettings };
     },

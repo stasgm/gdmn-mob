@@ -5,7 +5,6 @@ export const roleBasedParamsMiddlware = async (ctx: Context, next: Next): Promis
   const user = ctx.state.user as IUser;
 
   if (user?.role !== 'SuperAdmin') {
-
     if (user?.role === 'Admin' && !user.company) {
       ctx.request.query.companyId = '-1';
     } else {

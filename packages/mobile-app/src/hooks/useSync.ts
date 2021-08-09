@@ -3,21 +3,18 @@ import { useDispatch, useDocThunkDispatch, useRefThunkDispatch } from '@lib/stor
 import { useSelector, documentActions, referenceActions, appActions } from '@lib/store';
 import { BodyType, IDocument, IMessage, INamedEntity, IReferences } from '@lib/types';
 import api from '@lib/client-api';
+import Constants from 'expo-constants';
 
-interface IUseSyncProps {
-  systemName: string;
-  consumer: INamedEntity;
-  onSync?: () => void;
-  setLoading?: (value: boolean) => void;
-}
-
-const useSync = ({ systemName, onSync, consumer }: IUseSyncProps): () => void => {
+const useSync = (onSync?: () => void): () => void => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const dispatch = useDispatch();
 
   const { user, company } = useSelector((state) => state.auth);
   const { list: documents } = useSelector((state) => state.documents);
+
+  const systemName = Constants.manifest?.extra?.backUserAlias;
+  const consumer: INamedEntity = { id: '-1', name: systemName };
 
   const sync = () => {
     dispatch(appActions.setLoading({ loading: true }));
@@ -59,8 +56,9 @@ const useSync = ({ systemName, onSync, consumer }: IUseSyncProps): () => void =>
         );
 
         if (sendMessageResponse.type === 'SEND_MESSAGE') {
+          console.log('readyDocs', readyDocs.length, documents.length);
           await docDispatch(
-            documentActions.setDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
+            documentActions.updateDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
           );
         }
       }

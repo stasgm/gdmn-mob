@@ -27,6 +27,12 @@ const addDocumentsAsync = createAsyncAction(
   'DOCUMENTS/ADD_MANY_FAILURE',
 )<string | undefined, IDocument[], string>();
 
+const updateDocumentsAsync = createAsyncAction(
+  'DOCUMENTS/UPDATE_MANY',
+  'DOCUMENTS/UPDATE_MANY_SUCCESS',
+  'DOCUMENTS/UPDATE_MANY_FAILURE',
+)<string | undefined, IDocument[], string>();
+
 const removeDocumentAsync = createAsyncAction(
   'DOCUMENTS/REMOVE_DOCUMENT',
   'DOCUMENTS/REMOVE_DOCUMENT_SUCCESS',
@@ -51,13 +57,13 @@ export const actions = {
   clearDocumentsAsync,
   setDocumentsAsync,
   addDocument,
+  updateDocumentsAsync,
   updateDocument,
   removeDocumentAsync,
   addDocumentLine,
   updateDocumentLine,
   deleteDocumentLine,
   clearError,
-  // init,
 };
 
 export type DocumentActionType = ActionType<typeof actions>;

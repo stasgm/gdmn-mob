@@ -59,7 +59,7 @@ class Api extends BaseApi {
           request.params.deviceId = this._config.deviceId;
         }
 
-        console.info('✉️ request', request);
+        console.info('✉️ request', request.url);
         return request;
       },
       (error) => {

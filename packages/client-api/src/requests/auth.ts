@@ -1,4 +1,4 @@
-import { DeviceState, IDevice, IResponse, IUser, IUserCredentials } from '@lib/types';
+import { DeviceState, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';

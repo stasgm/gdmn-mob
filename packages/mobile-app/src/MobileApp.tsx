@@ -17,7 +17,7 @@ export interface IApp {
 }
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
-  const syncData = useSync({ systemName: 'gdmn-appl-request', consumer: { id: 'gdmn', name: 'gdmn' }, onSync });
+  const syncData = useSync(onSync);
 
   return (
     <DrawerNavigator
