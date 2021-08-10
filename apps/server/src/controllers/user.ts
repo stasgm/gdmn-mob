@@ -10,7 +10,7 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException } from '../exceptions';
 
 const addUser = async (ctx: ParameterizedContext): Promise<void> => {
-  const { externalId, name, password, firstName, lastName, phoneNumber, email } = ctx.request.body as NewUser;
+  const { externalId, name, password, firstName, lastName, phoneNumber, email, alias } = ctx.request.body as NewUser;
 
   const creator = ctx.state.user as IUser;
 
@@ -18,6 +18,7 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
     externalId,
     password,
     name,
+    alias,
     firstName,
     lastName,
     phoneNumber,
