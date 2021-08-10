@@ -22,6 +22,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       password: (user as NewUser).password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
+      alias: user.alias || '',
     },
     validationSchema: yup.object().shape({
       name: yup.string().required('Заполните это поле'),
@@ -134,6 +135,20 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     type="email"
                     disabled={loading}
                     value={formik.values.email}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.alias && Boolean(formik.errors.alias)}
+                    fullWidth
+                    label="Alias"
+                    name="alias"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="alias"
+                    disabled={loading}
+                    value={formik.values.alias}
                   />
                 </Grid>
               </Grid>
