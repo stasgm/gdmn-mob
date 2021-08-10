@@ -10,18 +10,19 @@ import actions from '../../store/deviceBinding';
 import selectors from '../../store/deviceBinding/selectors';
 
 const BindingEdit = () => {
-  const { id: userId, deviceid } = useParams();
-
+  // { id: userId, deviceid } = useParams();
+  const { bindingid } = useParams();
   const navigate = useNavigate();
 
   const dispatch: AppDispatch = useDispatch();
 
   const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
-  const binding = selectors.bindingsByDeviceIdAndUserId(deviceid, userId);
+  const binding = selectors.bindingById(bindingid);
+  //selectors.bindingsByDeviceIdAndUserId(deviceid, userId);
 
   useEffect(() => {
-    dispatch(actions.fetchDeviceBindings(userId));
-  }, [dispatch, userId]);
+    dispatch(actions.fetchDeviceBindingById(bindingid));
+  }, [dispatch, bindingid]);
 
   const goBack = () => {
     navigate(-1);
@@ -32,6 +33,7 @@ const BindingEdit = () => {
   };
 
   const handleSubmit = async (values: NewDeviceBinding | IDeviceBinding) => {
+    console.log('values', values);
     const res = await dispatch(actions.updateDeviceBinding(values as IDeviceBinding));
     if (res.type === 'DEVICEBINDING/UPDATE_SUCCES') {
       goBack();

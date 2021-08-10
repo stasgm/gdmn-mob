@@ -20,15 +20,15 @@ const addDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceBindingId } = ctx.params;
-  const { companyId } = ctx.query;
+  // const { companyId } = ctx.query;
 
   const deviceBindingData = ctx.request.body as Partial<IDeviceBinding>;
 
   const params: Record<string, string> = {};
 
-  if (companyId && typeof companyId === 'string') {
-    params.companyId = companyId;
-  }
+  // if (companyId && typeof companyId === 'string') {
+  //   params.companyId = companyId;
+  // }
 
   const updatedDeviceBinding = await deviceBindingService.updateOne(deviceBindingId, deviceBindingData, params);
 

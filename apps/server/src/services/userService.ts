@@ -1,4 +1,5 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
+import { Context } from 'koa';
 
 //import { DB } from '@lib/mock';
 
@@ -26,29 +27,10 @@ import { users as mockUsers } from './data/user';
  * */
 const addOne = async (newUser: NewUser): Promise<IUser> => {
   const { users } = getDb();
-
- // const { companies } = getDb();
- // const companiesDb = await companies.read((item) => item.id === id);
-
-  /*const*/ //let user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase());
-
-  // const user = await users.find(
-  //   (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === newUser.company?.name,
-  // );
-
-  const user = (await users.read()).find(
-    (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === newUser.company?.id,
-  );
-  // const user = await users.find(
-  //   (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === newUser.company?.id,
-  // );
-  if (user) {
-    // TODO проверять по каждой организации
-    throw new ConflictException('Пользователь с таким именем уже существует');
-  }
+  const { companies } = getDb();
 
   let creatorId;
-  let company = null;
+  let company: string | null = null;
 
   if (newUser.creator) {
     const creator = await users.find(newUser.creator.id);
@@ -60,6 +42,13 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
 
     creatorId = creator.id;
     company = creator.company;
+  }
+
+  const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === company);
+
+  if (user) {
+    // TODO проверять по каждой организации
+    throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(newUser.password);

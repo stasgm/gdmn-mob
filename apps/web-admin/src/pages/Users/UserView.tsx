@@ -46,7 +46,7 @@ const UserView = () => {
   };
 
   const handleAddDevice = () => {
-    navigate(`${adminPath}/app/users/${userId}/devices/new`);
+    navigate(`${adminPath}/app/users/${userId}/binding/new`);
   };
 
   const handleClearError = () => {

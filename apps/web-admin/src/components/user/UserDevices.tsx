@@ -67,12 +67,19 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
     },
   ];
 
-  const headCells: IHeadCells<IDevice>[] = [
-    { id: 'name', label: 'Наименование', sortEnable: true },
-    { id: 'state', label: 'Состояние', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
-  ];
+  // const headCells: IHeadCells<IDevice>[] = [
+  //   { id: 'name', label: 'Наименование', sortEnable: true },
+  //   { id: 'state', label: 'Состояние', sortEnable: true },
+  //   { id: 'creationDate', label: 'Дата создания', sortEnable: false },
+  //   { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+  // ];
+
+  // const headCells: IHeadCells<IDeviceBinding>[] = [
+  //   { id: 'name', label: 'Наименование', sortEnable: true },
+  //   { id: 'state', label: 'Состояние', sortEnable: true },
+  //   { id: 'creationDate', label: 'Дата создания', sortEnable: false },
+  //   { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+  // ];
 
   return (
     <Box
@@ -91,13 +98,13 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
           keyPress={handleKeyPress}
         />
         <Box sx={{ pt: 2 }}>
-          {/* <DeviceBindingListTable deviceBindings={userDevices} limitRows={5} /> */}
-          <SortableTable<IDevice>
+          <DeviceBindingListTable deviceBindings={userBindingDevices} limitRows={5} />
+          {/* <SortableTable<IDevice>
             headCells={headCells}
             data={userDevices}
             // data={userBindingDevices}
             path={'/app/devices/'}
-          />
+          /> */}
         </Box>
       </Container>
     </Box>

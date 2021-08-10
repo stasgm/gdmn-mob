@@ -127,7 +127,7 @@ const DeviceBindingListTable = ({
               display: 'flex',
             }}
           >
-            <NavLink to={`${adminPath}/app/users/${binding.user.id}/devices/${binding.device.id}`}>
+            <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}>
               <Typography color="textPrimary" variant="body1" key={binding.id}>
                 {binding.device?.name}
               </Typography>
