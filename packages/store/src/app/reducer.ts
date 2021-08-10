@@ -8,6 +8,7 @@ const initialState: Readonly<IAppState> = {
   loading: false,
   errorMessage: '',
   formParams: {},
+  errorList: [],
 };
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
@@ -30,8 +31,14 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
     case getType(appActions.setLoading):
       return {
         ...state,
-        loading: action.payload.loading,
-        errorMessage: action.payload.errorMessage || '',
+        loading: action.payload,
+      };
+
+    case getType(appActions.setErrorMessage):
+      return {
+        ...state,
+        errorMessage: action.payload,
+        errorList: [...state.errorList, action.payload],
       };
 
     default:
