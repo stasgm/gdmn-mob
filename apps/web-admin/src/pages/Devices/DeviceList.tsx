@@ -38,6 +38,11 @@ const DeviceList = () => {
     [dispatch],
   );
 
+  const fetchActivationCodes = useCallback((deviceId?: string) => {
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
+    },
+    [dispatch],
+  );
   useEffect(() => {
     /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
     //!list?.length && fetchDevices();
@@ -70,11 +75,13 @@ const DeviceList = () => {
 
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
+    fetchActivationCodes(deviceId);
   };
 
   const handleCreateUid = async (code: string, deviceId: string) => {
     await dispatch(authActions.activateDevice(code));
     dispatch(actions.fetchDeviceById(deviceId));
+    fetchActivationCodes(deviceId);
   };
 
   // const handleSubmit = async (values: IDevice | NewDevice) => {
