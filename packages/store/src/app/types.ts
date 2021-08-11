@@ -5,6 +5,7 @@ export interface IFormParam {
 export interface IAppState {
   loading: boolean;
   errorMessage: string;
+  errorList: string[];
   formParams?: IFormParam;
 }
 

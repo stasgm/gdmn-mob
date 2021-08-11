@@ -8,7 +8,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 // import ImportExportIcon from '@material-ui/icons/ImportExport';
 import { IDevice } from '@lib/types';
 
-import { authActions } from '@lib/store';
+import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
@@ -24,6 +24,7 @@ const DeviceList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const authDispatch = useAuthThunkDispatch();
 
   const { list, loading, errorMessage } = useSelector((state) => state.devices);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
@@ -39,8 +40,6 @@ const DeviceList = () => {
   );
 
   useEffect(() => {
-    /* Загружаем данные при загрузке компонента. В дальенйшем надо загружать при открытии приложения */
-    //!list?.length && fetchDevices();
     fetchDevices();
   }, [fetchDevices]);
 
@@ -73,16 +72,9 @@ const DeviceList = () => {
   };
 
   const handleCreateUid = async (code: string, deviceId: string) => {
-    await dispatch(authActions.activateDevice(code));
+    await authDispatch(authActions.activateDevice(code));
     dispatch(actions.fetchDeviceById(deviceId));
   };
-
-  // const handleSubmit = async (values: IDevice | NewDevice) => {
-  //   const res = await dispatch(actions.updateDevice(values as IDevice));
-  //   if (res.type === 'DEVICE/UPDATE_SUCCESS') {
-  //     goBack();
-  //   }
-  // };
 
   const buttons: IToolBarButton[] = [
     {
@@ -113,12 +105,6 @@ const DeviceList = () => {
       icon: <AddCircleOutlineIcon />,
     },
   ];
-
-  // const headCells: IHeadCells<IDevice>[] = [
-  //   { id: 'name', label: 'Наименование', sortEnable: true },
-  //   { id: 'uid', label: 'Номер', sortEnable: true },
-  //   { id: 'state', label: 'Состояние', sortEnable: false },
-  // ];
 
   return (
     <>

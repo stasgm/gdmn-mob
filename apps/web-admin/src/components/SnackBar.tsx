@@ -10,10 +10,10 @@ const SnackBar = ({ errorMessage, onClearError }: props) => {
   const [openAlert, setOpenAlert] = useState(false);
 
   const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    onClearError;
+    // if (reason === 'clickaway') {
+    //   return;
+    // }
+    onClearError();
     setOpenAlert(false);
   };
 

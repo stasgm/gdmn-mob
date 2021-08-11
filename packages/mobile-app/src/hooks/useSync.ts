@@ -4,6 +4,7 @@ import { useSelector, documentActions, referenceActions, appActions } from '@lib
 import { BodyType, IDocument, IMessage, INamedEntity, IReferences } from '@lib/types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
+import { Alert } from 'react-native';
 
 const useSync = (onSync?: () => void): () => void => {
   const docDispatch = useDocThunkDispatch();
@@ -13,15 +14,18 @@ const useSync = (onSync?: () => void): () => void => {
   const { user, company } = useSelector((state) => state.auth);
   const { list: documents } = useSelector((state) => state.documents);
 
-  const systemName = Constants.manifest?.extra?.backUserAlias;
+  const systemName = Constants.manifest?.extra?.slug;
   const consumer: INamedEntity = { id: '-1', name: systemName };
 
   const sync = () => {
-    dispatch(appActions.setLoading({ loading: true }));
-
     if (!company || !user) {
       return;
     }
+
+    dispatch(appActions.setLoading(true));
+    dispatch(appActions.setErrorList([]));
+
+    const errList: string[] = [];
 
     /*
       Поддержка платформы:
@@ -56,10 +60,17 @@ const useSync = (onSync?: () => void): () => void => {
         );
 
         if (sendMessageResponse.type === 'SEND_MESSAGE') {
-          console.log('readyDocs', readyDocs.length, documents.length);
-          await docDispatch(
+          const updateDocResponse = await docDispatch(
             documentActions.updateDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
           );
+
+          if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
+            errList.push(updateDocResponse.payload);
+            // dispatch(appActions.setErrorMessage(updateDocResponse.payload));
+          }
+        } else {
+          errList.push(sendMessageResponse.message);
+          // dispatch(appActions.setErrorMessage(sendMessageResponse.message));
         }
       }
 
@@ -73,11 +84,11 @@ const useSync = (onSync?: () => void): () => void => {
       //  справочники: очищаем старые и записываем в хранилище новые данные
       //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
       if (getMessagesResponse.type === 'GET_MESSAGES') {
-        await processMessages(getMessagesResponse.messageList);
-      } else if (getMessagesResponse.type === 'ERROR') {
-        //Alert.alert('Ошибка!', getMessagesResponse.message, [{ text: 'Закрыть' }]);
-        dispatch(appActions.setLoading({ loading: false, errorMessage: getMessagesResponse.message }));
-        return;
+        //await processMessages(getMessagesResponse.messageList);
+        await Promise.all(getMessagesResponse.messageList?.map(message => processMessage(message, errList)))
+      } else {
+        errList.push(getMessagesResponse.message);
+        //dispatch(appActions.setErrorMessage(getMessagesResponse.message));
       }
 
       //Формируем запрос на получение справочников для следующего раза
@@ -97,30 +108,47 @@ const useSync = (onSync?: () => void): () => void => {
       };
 
       //3. Отправляем запрос на получение справочников
-      await api.message.sendMessages(
+      const sendMesRefResponse = await api.message.sendMessages(
         systemName,
         messageCompany,
         consumer,
         messageGetRef,
       );
 
+      if (sendMesRefResponse.type === 'ERROR') {
+        errList.push(sendMesRefResponse.message);
+        //dispatch(appActions.setErrorMessage(sendMesRefResponse.message));
+      }
+
       //4. Отправляем запрос на получение документов
-      await api.message.sendMessages(
+      const sendMesDocRespone = await api.message.sendMessages(
         systemName,
         messageCompany,
         consumer,
         messageGetDoc,
       );
 
-      dispatch(appActions.setLoading({ loading: false }));
+      if (sendMesDocRespone.type === 'ERROR') {
+        errList.push(sendMesDocRespone.message);
+        // dispatch(appActions.setErrorMessage(sendMesDocRespone.message));
+      }
+
+      dispatch(appActions.setLoading(false));
+      dispatch(appActions.setErrorList(errList));
+
+     console.log('err000', errList);
+
+      if (errList?.length) {
+        Alert.alert('Внимание!', 'Во время синхронизации произошли ошибки...', [{ text: 'OK' }]);
+      }
     };
 
     syncData();
   };
 
-  const processMessages = async (arr: IMessage[]) => await Promise.all(arr?.map( message => processMessage(message) ) );
+  // const processMessages = async (arr: IMessage[]) => await Promise.all(arr?.map( message => processMessage(message) ) );
 
-  const processMessage = async (msg: IMessage) => {
+  const processMessage = async (msg: IMessage, errList: string[]) => {
     if (!msg) {
       return;
     }
@@ -132,34 +160,49 @@ const useSync = (onSync?: () => void): () => void => {
 
       case 'REFS': {
         //TODO: проверка данных, приведение к типу
+
+        //Удаляем старые справочники из хранилища
         const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
         if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
+          errList.push(clearRefResponse.payload);
+          //dispatch(appActions.setErrorMessage(clearRefResponse.payload));
           break;
         }
 
+        //Записываем новые спарвочники из сообщения
         const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
 
         //Если удачно сохранились справочники, удаляем сообщение в json
         if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
           await api.message.removeMessage(msg.id);
+        } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
+          errList.push(setRefResponse.payload);
+          //dispatch(appActions.setErrorMessage(setRefResponse.payload));
         }
+
         break;
       }
 
       case 'DOCS': {
         const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
+        console.log('setDocResponse', setDocResponse);
+
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
           await api.message.removeMessage(msg.id);
+        } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
+          errList.push(setDocResponse.payload);
+          //dispatch(appActions.setErrorMessage(setDocResponse.payload));
         }
+
         break;
       }
 
       default:
-        // Alert.alert('Предупреждение!', 'Неизвестный тип сообщения', [{ text: 'Закрыть' }]);
-        dispatch(appActions.setLoading({ loading: false, errorMessage: 'Неизвестный тип сообщения' }));
+        errList.push('Неизвестный тип сообщения');
+        //dispatch(appActions.setErrorMessage('Неизвестный тип сообщения'));
         break;
     }
   };
