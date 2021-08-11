@@ -1,6 +1,11 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
 import { IDevice, IDeviceBinding } from '@lib/types';
+
+import { NavLink } from 'react-router-dom';
+
+import { adminPath } from '../../utils/constants';
+
 /* import activationCode from '../../store/activationCode';*/
 
 /*import { activationCodes } from '@lib/mock';*/
@@ -25,19 +30,23 @@ const DeviceBindingDetailsView = ({ deviceBinding }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {deviceBinding.state}
-                </Typography>
+                <NavLink to={`${adminPath}/app/devices/${deviceBinding.device.id}`} key={deviceBinding.device.id}>
+                  <Typography color="textPrimary" variant="h4" key={deviceBinding.device.id} gutterBottom>
+                    {deviceBinding.device.name}
+                  </Typography>
+                </NavLink>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Номер
+                  Пользователь
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {deviceBinding.state}
-                </Typography>
+                <NavLink to={`${adminPath}/app/users/${deviceBinding.user.id}`} key={deviceBinding.user.id}>
+                  <Typography color="textPrimary" variant="h4" key={deviceBinding.user.id} gutterBottom>
+                    {deviceBinding.user.name}
+                  </Typography>
+                </NavLink>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
