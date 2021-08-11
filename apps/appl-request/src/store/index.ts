@@ -11,7 +11,7 @@ import { AppActionType } from './app/actions';
 type TActions = AppActionType;
 
 export const combinedReducer = {
-  app: appReducer,
+  //app: appReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
