@@ -34,11 +34,10 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
         loading: action.payload,
       };
 
-    case getType(appActions.setErrorMessage):
+    case getType(appActions.setErrorList):
       return {
         ...state,
-        errorMessage: action.payload,
-        errorList: [...state.errorList, action.payload],
+        errorList: action.payload,
       };
 
     default:

@@ -42,7 +42,7 @@ const persistSettingsConfig = {
 const persistAppConfig = {
   key: 'app',
   storage: AsyncStorage,
-  whitelist: ['formParams'],
+  whitelist: ['formParams', 'errorList'],
 };
 
 export const rootReducer = {
@@ -52,7 +52,7 @@ export const rootReducer = {
   references: persistReducer(persistRefsConfig, referenceReducer),
   documents: persistReducer(persistDocsConfig, documentReducer),
   settings: persistReducer(persistSettingsConfig, settingsReducer),
-  app: appReducer,
+  app: persistReducer(persistAppConfig, appReducer),
 };
 
 type AppReducers<S, A extends AnyAction> = { [key: string]: Reducer<S, A> };

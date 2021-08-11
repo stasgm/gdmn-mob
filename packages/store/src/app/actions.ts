@@ -7,14 +7,14 @@ const init = createAction('APP/INIT')();
 const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
 const clearFormParams = createAction('APP/CLEAN_FORM_PARAMS')();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
-const setErrorMessage = createAction('APP/SET_ERROR')<string>();
+const setErrorList = createAction('APP/SET_ERROR_LIST')<string[]>();
 
 export const appActions = {
   init,
   setFormParams,
   clearFormParams,
   setLoading,
-  setErrorMessage,
+  setErrorList,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

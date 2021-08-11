@@ -13,16 +13,19 @@ const useSync = (onSync?: () => void): () => void => {
 
   const { user, company } = useSelector((state) => state.auth);
   const { list: documents } = useSelector((state) => state.documents);
-  const { errorList } = useSelector((state) => state.app);
 
-  const systemName = Constants.manifest?.extra?.backUserAlias;
+  const systemName = Constants.manifest?.extra?.slug;
   const consumer: INamedEntity = { id: '-1', name: systemName };
 
   const sync = () => {
-    dispatch(appActions.setLoading(true));
     if (!company || !user) {
       return;
     }
+
+    dispatch(appActions.setLoading(true));
+    dispatch(appActions.setErrorList([]));
+
+    const errList: string[] = [];
 
     /*
       Поддержка платформы:
@@ -62,10 +65,12 @@ const useSync = (onSync?: () => void): () => void => {
           );
 
           if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
-            dispatch(appActions.setErrorMessage(updateDocResponse.payload));
+            errList.push(updateDocResponse.payload);
+            // dispatch(appActions.setErrorMessage(updateDocResponse.payload));
           }
         } else {
-          dispatch(appActions.setErrorMessage(sendMessageResponse.message));
+          errList.push(sendMessageResponse.message);
+          // dispatch(appActions.setErrorMessage(sendMessageResponse.message));
         }
       }
 
@@ -80,10 +85,10 @@ const useSync = (onSync?: () => void): () => void => {
       //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
       if (getMessagesResponse.type === 'GET_MESSAGES') {
         //await processMessages(getMessagesResponse.messageList);
-        await Promise.all(getMessagesResponse.messageList?.map(message => processMessage(message)))
+        await Promise.all(getMessagesResponse.messageList?.map(message => processMessage(message, errList)))
       } else {
-        dispatch(appActions.setErrorMessage(getMessagesResponse.message));
-        return;
+        errList.push(getMessagesResponse.message);
+        //dispatch(appActions.setErrorMessage(getMessagesResponse.message));
       }
 
       //Формируем запрос на получение справочников для следующего раза
@@ -111,7 +116,8 @@ const useSync = (onSync?: () => void): () => void => {
       );
 
       if (sendMesRefResponse.type === 'ERROR') {
-        dispatch(appActions.setErrorMessage(sendMesRefResponse.message));
+        errList.push(sendMesRefResponse.message);
+        //dispatch(appActions.setErrorMessage(sendMesRefResponse.message));
       }
 
       //4. Отправляем запрос на получение документов
@@ -123,12 +129,16 @@ const useSync = (onSync?: () => void): () => void => {
       );
 
       if (sendMesDocRespone.type === 'ERROR') {
-        dispatch(appActions.setErrorMessage(sendMesDocRespone.message));
+        errList.push(sendMesDocRespone.message);
+        // dispatch(appActions.setErrorMessage(sendMesDocRespone.message));
       }
 
       dispatch(appActions.setLoading(false));
+      dispatch(appActions.setErrorList(errList));
 
-      if (errorList?.length) {
+     console.log('err000', errList);
+
+      if (errList?.length) {
         Alert.alert('Внимание!', 'Во время синхронизации произошли ошибки...', [{ text: 'OK' }]);
       }
     };
@@ -138,7 +148,7 @@ const useSync = (onSync?: () => void): () => void => {
 
   // const processMessages = async (arr: IMessage[]) => await Promise.all(arr?.map( message => processMessage(message) ) );
 
-  const processMessage = async (msg: IMessage) => {
+  const processMessage = async (msg: IMessage, errList: string[]) => {
     if (!msg) {
       return;
     }
@@ -155,7 +165,8 @@ const useSync = (onSync?: () => void): () => void => {
         const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
         if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
-          dispatch(appActions.setErrorMessage(clearRefResponse.payload));
+          errList.push(clearRefResponse.payload);
+          //dispatch(appActions.setErrorMessage(clearRefResponse.payload));
           break;
         }
 
@@ -166,7 +177,8 @@ const useSync = (onSync?: () => void): () => void => {
         if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
           await api.message.removeMessage(msg.id);
         } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
-          dispatch(appActions.setErrorMessage(setRefResponse.payload));
+          errList.push(setRefResponse.payload);
+          //dispatch(appActions.setErrorMessage(setRefResponse.payload));
         }
 
         break;
@@ -175,18 +187,22 @@ const useSync = (onSync?: () => void): () => void => {
       case 'DOCS': {
         const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
+        console.log('setDocResponse', setDocResponse);
+
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
           await api.message.removeMessage(msg.id);
         } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
-          dispatch(appActions.setErrorMessage(setDocResponse.payload));
+          errList.push(setDocResponse.payload);
+          //dispatch(appActions.setErrorMessage(setDocResponse.payload));
         }
 
         break;
       }
 
       default:
-        dispatch(appActions.setErrorMessage('Неизвестный тип сообщения'));
+        errList.push('Неизвестный тип сообщения');
+        //dispatch(appActions.setErrorMessage('Неизвестный тип сообщения'));
         break;
     }
   };

@@ -20,7 +20,7 @@ type Props = DrawerContentComponentProps<DrawerContentOptions> & ICutsomProps;
 
 export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
-  const { loading, errorMessage } = useSelector((state) => state.app);
+  const { loading, errorList } = useSelector((state) => state.app);
   const { user, company } = useSelector((state) => state.auth);
 
   // const handleUpdate = async () => {
