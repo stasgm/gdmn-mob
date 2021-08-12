@@ -14,10 +14,10 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import codeActions from '../../store/activationCode';
-import { /*IHeadCells,*/ IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-// import SortableTable from '../../components/SortableTable';
+import SortableTable from '../../components/SortableTable';
 import DeviceListTable from '../../components/device/DeviceListTable';
 
 const DeviceList = () => {
@@ -121,11 +121,11 @@ const DeviceList = () => {
     },
   ];
 
-  // const headCells: IHeadCells<IDevice>[] = [
-  //   { id: 'name', label: 'Наименование', sortEnable: true },
-  //   { id: 'uid', label: 'Номер', sortEnable: true },
-  //   { id: 'state', label: 'Состояние', sortEnable: false },
-  // ];
+  const headCells: IHeadCells<IDevice>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'uid', label: 'Номер', sortEnable: true },
+    { id: 'state', label: 'Состояние', sortEnable: false },
+  ];
 
   return (
     <>
@@ -158,7 +158,7 @@ const DeviceList = () => {
                 onCreateCode={handleCreateCode}
                 onCreateUid={handleCreateUid}
               />
-              {/* <SortableTable<IDevice> headCells={headCells} data={list} /> */}
+              <SortableTable<IDevice> headCells={headCells} data={list} />
             </Box>
           )}
         </Container>

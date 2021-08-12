@@ -3,15 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { IUser, NewUser } from '@lib/types';
 import { useEffect } from 'react';
 
-import UserDetails from '../../components/user/UserDetails';
+import UserPasswordDetails from '../../components/user/UserPasswordDetails';
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
 import SnackBar from '../../components/SnackBar';
 
-import { adminPath } from '../../utils/constants';
-
-const UserEdit = () => {
+const UserPasswordEdit = () => {
   const { id: userId } = useParams();
 
   const navigate = useNavigate();
@@ -38,10 +36,6 @@ const UserEdit = () => {
     if (res.type === 'USER/UPDATE_SUCCESS') {
       goBack();
     }
-  };
-
-  const handleEdit = () => {
-    navigate(`${adminPath}/app/users/${userId}/edit/password`);
   };
 
   if (!user) {
@@ -73,10 +67,10 @@ const UserEdit = () => {
         <CardHeader title={'Редактирование пользователя'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={goBack} onChange={handleEdit} />
+      <UserPasswordDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
 };
 
-export default UserEdit;
+export default UserPasswordEdit;

@@ -40,7 +40,7 @@ const CompanyView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/companies/edit/${companyId}`);
+    navigate(`${adminPath}/app/companies/${companyId}/edit`);
   };
 
   const handleDelete = async () => {

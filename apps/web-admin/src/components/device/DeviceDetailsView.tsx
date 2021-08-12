@@ -1,6 +1,9 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
 import { IDevice } from '@lib/types';
+
+import { deviceStates } from '../../utils/constants';
+
 /* import activationCode from '../../store/activationCode';*/
 
 /*import { activationCodes } from '@lib/mock';*/
@@ -46,7 +49,7 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {device.state}
+                  {deviceStates[device.state]}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>

@@ -9,7 +9,7 @@ import SnackBar from '../../components/SnackBar';
 import actions from '../../store/deviceBinding';
 import selectors from '../../store/deviceBinding/selectors';
 
-const BindingEdit = () => {
+const UserDeviceEdit = () => {
   // { id: userId, deviceid } = useParams();
   const { bindingid } = useParams();
   const navigate = useNavigate();
@@ -80,4 +80,4 @@ const BindingEdit = () => {
   );
 };
 
-export default BindingEdit;
+export default UserDeviceEdit;

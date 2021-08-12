@@ -1,5 +1,8 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
+import { adminPath } from '../../utils/constants';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import { IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
@@ -9,9 +12,12 @@ interface IProps {
   user: IUser | NewUser;
   onSubmit: (values: IUser | NewUser) => void;
   onCancel: () => void;
+  onChange: () => void;
 }
 
-const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
+const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) => {
+  const navigate = useNavigate();
+
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
     initialValues: {
@@ -33,6 +39,10 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       onSubmit(values);
     },
   });
+  // const handleEdit = () => {
+
+  //   navigate(`${adminPath}/app/users/${user.id}/edit/password`);
+  // };
 
   return (
     <>
@@ -155,6 +165,9 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
             </CardContent>
             <Divider />
             <>
+              <Button color="primary" disabled={loading} onClick={onChange} variant="contained" sx={{ m: 1 }}>
+                Сменить пароль
+              </Button>
               <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
                 Сохранить
               </Button>

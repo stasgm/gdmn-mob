@@ -50,7 +50,7 @@ const UserDeviceView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/edit/${bindingid}`);
+    navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/${bindingid}/edit`);
     // <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}></NavLink>
   };
 

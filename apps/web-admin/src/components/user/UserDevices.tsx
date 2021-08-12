@@ -10,6 +10,9 @@ import { IHeadCells, IToolBarButton } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
+import actionsBinding from '../../store/deviceBinding';
+import { deviceBinding } from '@lib/mock';
+import { deviceStates } from '../../utils/constants';
 
 interface IProps {
   userDevices: IDevice[];
@@ -29,7 +32,12 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
     [dispatch],
   );
 
-  //const devices
+  const fetchDeviceBindings = useCallback(
+    (userId?: string) => {
+      dispatch(actionsBinding.fetchDeviceBindings(userId));
+    },
+    [dispatch],
+  );
 
   // useEffect(() => {
   //   fetchDevices();
@@ -40,13 +48,13 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
 
     if (inputValue) return;
 
-    fetchDevices('');
+    fetchDeviceBindings('');
   };
 
   const handleSearchClick = () => {
     const inputValue = valueRef?.current?.value;
 
-    fetchDevices(inputValue);
+    fetchDeviceBindings(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
@@ -54,7 +62,7 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
 
     const inputValue = valueRef?.current?.value;
 
-    fetchDevices(inputValue);
+    fetchDeviceBindings(inputValue);
   };
 
   const deviceButtons: IToolBarButton[] = [
@@ -74,12 +82,12 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
   //   { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
   // ];
 
-  // const headCells: IHeadCells<IDeviceBinding>[] = [
-  //   { id: 'name', label: 'Наименование', sortEnable: true },
-  //   { id: 'state', label: 'Состояние', sortEnable: true },
-  //   { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-  //   { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
-  // ];
+  const headCells: IHeadCells<IDeviceBinding>[] = [
+    { id: 'device', label: 'Наименование', sortEnable: true },
+    { id: 'state', label: 'Состояние', sortEnable: true },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+  ];
 
   return (
     <Box
@@ -98,13 +106,13 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
           keyPress={handleKeyPress}
         />
         <Box sx={{ pt: 2 }}>
-          <DeviceBindingListTable deviceBindings={userBindingDevices} limitRows={5} />
-          {/* <SortableTable<IDevice>
+          {/* <DeviceBindingListTable deviceBindings={userBindingDevices} limitRows={5} /> */}
+          <SortableTable<IDeviceBinding>
             headCells={headCells}
-            data={userDevices}
-            // data={userBindingDevices}
-            path={'/app/devices/'}
-          /> */}
+            data={userBindingDevices}
+            path={`/app/users/${deviceBinding.user.id}/binding/`}
+            // path={'/:id/binding/:bindingid'}
+          />
         </Box>
       </Container>
     </Box>

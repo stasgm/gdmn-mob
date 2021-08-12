@@ -42,7 +42,7 @@ const UserView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/users/edit/${userId}`);
+    navigate(`${adminPath}/app/users/${userId}/edit`);
   };
 
   const handleAddDevice = () => {

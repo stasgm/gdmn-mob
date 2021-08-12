@@ -61,6 +61,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   phoneNumber?: string;
   creator?: INamedEntity;
   company?: INamedEntity;
+  password?: string;
 }
 
 // export type NewUser = Pick<IUser, 'name' | 'externalId'>;

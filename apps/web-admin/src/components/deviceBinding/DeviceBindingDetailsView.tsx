@@ -4,11 +4,7 @@ import { IDevice, IDeviceBinding } from '@lib/types';
 
 import { NavLink } from 'react-router-dom';
 
-import { adminPath } from '../../utils/constants';
-
-/* import activationCode from '../../store/activationCode';*/
-
-/*import { activationCodes } from '@lib/mock';*/
+import { deviceStates, adminPath } from '../../utils/constants';
 
 interface IProps {
   deviceBinding: IDeviceBinding;
@@ -55,7 +51,7 @@ const DeviceBindingDetailsView = ({ deviceBinding }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {deviceBinding.state}
+                  {deviceStates[deviceBinding.state]}
                 </Typography>
               </Grid>
             </Grid>

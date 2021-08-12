@@ -68,7 +68,7 @@ const CompanyList = () => {
     dispatch(actions.companyActions.clearError());
   };
 
-  const funct = () => {
+  const handleAddCompany = () => {
     if (list.length) {
       dispatch(actions.companyActions.setError());
     } else {
@@ -101,7 +101,7 @@ const CompanyList = () => {
       name: 'Добавить',
       color: 'primary',
       variant: 'contained',
-      onClick: funct,
+      onClick: handleAddCompany,
       icon: <AddCircleOutlineIcon />,
     },
   ];

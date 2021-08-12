@@ -5,6 +5,8 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import RefreshIcon from '@material-ui/icons/Refresh';
 
+import Tooltip from '@material-ui/core/Tooltip';
+
 import {
   Box,
   Button,
@@ -21,11 +23,7 @@ import {
 
 import { IDevice, IActivationCode } from '@lib/types';
 
-// import activationCode from '../../store/activationCode';
-
-import { activationCode2 } from '@lib/mock';
-
-import { adminPath } from '../../utils/constants';
+import { deviceStates, adminPath } from '../../utils/constants';
 
 interface IProps {
   devices: IDevice[];
@@ -147,32 +145,34 @@ const DeviceListTable = ({
               <Box style={{ width: '275px' }}>{device.uid}</Box>
               <Box>
                 {onCreateUid && (
-                  <Button
-                    // component={RouterLink}
-                    onClick={() => onCreateUid && onCreateUid(code, device.id)} //formik.values.code
-                  >
-                    <RefreshIcon />
-                  </Button>
+                  <Tooltip title="Создать UID">
+                    <Button
+                      // component={RouterLink}
+                      onClick={() => onCreateUid && onCreateUid(code, device.id)} //formik.values.code
+                    >
+                      <RefreshIcon />
+                    </Button>
+                  </Tooltip>
                 )}
-                {/*</Box>*/}
               </Box>
             </Box>
           </TableCell>
-          <TableCell>{device.state}</TableCell>
+          <TableCell>{deviceStates[device.state]}</TableCell>
           <TableCell>{new Date(device.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
           <TableCell>{new Date(device.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
-          {/* <TableCell>{device.editionDate}</TableCell> */}
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box style={{ width: '40px' }}>{/*activationCodes.find((a) => a.device.id === device.id)?.*/ code}</Box>
               <Box>
                 {onCreateCode && (
-                  <Button
-                    // component={RouterLink}
-                    onClick={() => onCreateCode(device.id)}
-                  >
-                    <RefreshIcon />
-                  </Button>
+                  <Tooltip title="Создать код">
+                    <Button
+                      // component={RouterLink}
+                      onClick={() => onCreateCode(device.id)}
+                    >
+                      <RefreshIcon />
+                    </Button>
+                  </Tooltip>
                 )}
               </Box>
             </Box>

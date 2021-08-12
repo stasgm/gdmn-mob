@@ -47,7 +47,7 @@ const DeviceView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/devices/edit/${deviceId}`);
+    navigate(`${adminPath}/app/devices/${deviceId}/edit`);
   };
 
   const handleDelete = async () => {
