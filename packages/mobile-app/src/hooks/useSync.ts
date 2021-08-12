@@ -187,8 +187,6 @@ const useSync = (onSync?: () => void): () => void => {
       case 'DOCS': {
         const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
-        console.log('setDocResponse', setDocResponse);
-
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
           await api.message.removeMessage(msg.id);
