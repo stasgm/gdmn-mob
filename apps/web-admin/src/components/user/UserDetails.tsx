@@ -165,7 +165,14 @@ const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) =>
             </CardContent>
             <Divider />
             <>
-              <Button color="primary" disabled={loading} onClick={onChange} variant="contained" sx={{ m: 1 }}>
+              <Button
+                color="primary"
+                disabled={loading}
+                // onClick={() => onChange()}
+                onClick={onChange}
+                variant="contained"
+                sx={{ m: 1 }}
+              >
                 Сменить пароль
               </Button>
               <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>

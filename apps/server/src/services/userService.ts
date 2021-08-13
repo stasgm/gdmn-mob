@@ -44,7 +44,9 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     company = creator.company;
   }
 
-  const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === company);
+  const user = await users.find(
+    (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && (i.company === company || i.role === 'Admin'),
+  );
 
   if (user) {
     // TODO проверять по каждой организации

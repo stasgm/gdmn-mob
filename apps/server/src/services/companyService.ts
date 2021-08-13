@@ -117,6 +117,15 @@ const deleteOne = async (id: string): Promise<string> => {
     }
   };
 
+  const delDevices2 = async (deviceList: IDBDevice[]) => {
+    const promises = deviceList.map(async (item) => {
+      await deviceBindings.delete((b) => b.deviceId === item.id);
+      await codes.delete((c) => c.deviceId === item.id);
+      await devices.delete((i) => i.id === item.id);
+    });
+    await Promise.all(promises);
+  };
+
   delDevices(devicesByCompany);
 
   await users.delete((user) => user.company === id && user.role !== 'Admin');

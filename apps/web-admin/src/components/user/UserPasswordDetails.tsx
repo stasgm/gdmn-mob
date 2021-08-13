@@ -42,21 +42,6 @@ const UserPasswordDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
               <Grid container spacing={3}>
                 <Grid item md={6} xs={12}>
                   <TextField
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    fullWidth
-                    label="Пользователь"
-                    name="name"
-                    required
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="name"
-                    disabled={loading}
-                    value={formik.values.name}
-                  />
-                </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
                     error={formik.touched.password && Boolean(formik.errors.password)}
                     fullWidth
                     required
