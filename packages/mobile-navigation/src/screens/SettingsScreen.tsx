@@ -28,10 +28,7 @@ const SettingsSceen = () => {
     dispatch(settingsActions.updateSettings({ optionName, value }));
   };
 
-  console.log('data', data);
-
   const handleReset = useCallback(() => {
-    console.log('111111');
     dispatch(settingsActions.init());
   }, [dispatch]);
 
@@ -76,7 +73,7 @@ const SettingsSceen = () => {
         <Text style={[styles.title]}>Настройки приложения</Text>
         <Divider />
         <View>
-          {Object.entries(data).map(([key, item]) => {
+          {Object.entries(data).filter(([key, item]) => item.visible).map(([key, item]) => {
             return (
               <View key={key}>
                 <SettingsItem

@@ -27,7 +27,9 @@ import { users as mockUsers } from './data/user';
 const addOne = async (newUser: NewUser): Promise<IUser> => {
   const { users } = getDb();
 
-  const user = await users.find((i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === newUser.company?.id);
+  const user = await users.find(
+    (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === newUser.company?.id,
+  );
 
   if (user) {
     // TODO проверять по каждой организации

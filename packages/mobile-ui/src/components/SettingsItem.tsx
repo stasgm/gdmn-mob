@@ -2,8 +2,6 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Subheading, Switch, TextInput, useTheme } from 'react-native-paper';
 
-import Input from './Input';
-
 type Props = {
   label: string;
   value: boolean | number | undefined;

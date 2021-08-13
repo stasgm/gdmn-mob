@@ -21,6 +21,7 @@ const baseSettings: ISettings<IBaseSettings> = {
     data: true,
     type: 'boolean',
     sortOrder: 2,
+    visible: true,
   },
   cleanDocTime: {
     id: '3',
@@ -28,6 +29,7 @@ const baseSettings: ISettings<IBaseSettings> = {
     data: 30,
     type: 'number',
     sortOrder: 3,
+    visible: true,
   },
 };
 
