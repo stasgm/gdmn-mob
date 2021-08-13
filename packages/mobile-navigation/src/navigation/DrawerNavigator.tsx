@@ -27,12 +27,12 @@ const baseNavList: INavItem[] = [
     icon: 'file-cabinet',
     title: 'Справочники',
   },
-  {
-    name: 'Messages',
-    component: MessagesNavigator,
-    icon: 'message-text-outline',
-    title: 'Сообщения',
-  },
+  // {
+  //   name: 'Messages',
+  //   component: MessagesNavigator,
+  //   icon: 'message-text-outline',
+  //   title: 'Сообщения',
+  // },
   {
     name: 'Settings',
     component: SettingsNavigator,

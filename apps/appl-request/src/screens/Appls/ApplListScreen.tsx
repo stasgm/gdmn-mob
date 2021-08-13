@@ -121,15 +121,15 @@ const ApplListScreen = () => {
     [filteredList],
   );
 
-  const handleAddDocument = useCallback(() => {
-    navigation.navigate('ApplView');
-  }, [navigation]);
+  // const handleAddDocument = useCallback(() => {
+  //   navigation.navigate('ApplView');
+  // }, [navigation]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
-    });
-  }, [handleAddDocument, navigation]);
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerLeft: () => <DrawerButton />,
+  //   });
+  // }, [handleAddDocument, navigation]);
 
   const handleReset = useCallback(() => {
     dispatch(documentActions.init());

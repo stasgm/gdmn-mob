@@ -22,6 +22,13 @@ const baseSettings: ISettings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 2,
   },
+  cleanDocTime: {
+    id: '3',
+    description: 'Время хранения документов в архиве, дн.',
+    data: 30,
+    type: 'number',
+    sortOrder: 3,
+  },
 };
 
 const initialState: Readonly<SettingsState> = {
@@ -35,7 +42,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.updateSettings): {
+    case getType(actions.updateSettings):
       return {
         ...state,
         data: {
@@ -43,7 +50,6 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
           [action.payload.optionName]: action.payload.value,
         },
       };
-    }
 
     case getType(actions.deleteAllSettings):
       return { ...state, data: {} };
