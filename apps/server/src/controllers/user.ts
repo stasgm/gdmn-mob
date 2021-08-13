@@ -100,16 +100,19 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   let users;
   switch (version) {
     case '1.0.0':
-      users = await verUsers.v1.myFunction(params);
+      users = await userService.findAll(params);
+      /** example for versioning */
+      //users = await verUsers.v1.myFunction(params);
       break;
     case '2.0.0':
-      users = await verUsers.v2.myFunction(params);
+      users = await userService.findAll(params);
+      /** example for versioning */
+      //users = await verUsers.v2.myFunction(params);
       break;
     default:
       users = await userService.findAll(params);
       break;
   }
-  //const users = await userService.findAll(params);
 
   ok(ctx as Context, users);
 
