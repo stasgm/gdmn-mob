@@ -15,6 +15,7 @@ type ISettings<T = Record<string, string>> = {
 interface IBaseSettings {
   serverAutoCheck: boolean;
   refLoadType: boolean;
+  cleanDocTime: number;
 }
 
 // Example

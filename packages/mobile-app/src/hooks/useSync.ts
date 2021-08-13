@@ -1,7 +1,7 @@
 import { useDispatch, useDocThunkDispatch, useRefThunkDispatch } from '@lib/store';
 
 import { useSelector, documentActions, referenceActions, appActions } from '@lib/store';
-import { BodyType, IDocument, IMessage, INamedEntity, IReferences } from '@lib/types';
+import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOption } from '@lib/types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
@@ -13,6 +13,10 @@ const useSync = (onSync?: () => void): () => void => {
 
   const { user, company } = useSelector((state) => state.auth);
   const { list: documents } = useSelector((state) => state.documents);
+  const { data: settings } = useSelector((state) => state.settings);
+
+  const cleanDocTime = (settings['cleanDocTime'] as ISettingsOption<number>).data;
+  const refLoadType = (settings['refLoadType'] as ISettingsOption<boolean>).data;
 
   const systemName = Constants.manifest?.extra?.slug;
   const consumer: INamedEntity = { id: '-1', name: systemName };
@@ -66,11 +70,9 @@ const useSync = (onSync?: () => void): () => void => {
 
           if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
             errList.push(updateDocResponse.payload);
-            // dispatch(appActions.setErrorMessage(updateDocResponse.payload));
           }
         } else {
           errList.push(sendMessageResponse.message);
-          // dispatch(appActions.setErrorMessage(sendMessageResponse.message));
         }
       }
 
@@ -84,11 +86,9 @@ const useSync = (onSync?: () => void): () => void => {
       //  справочники: очищаем старые и записываем в хранилище новые данные
       //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
       if (getMessagesResponse.type === 'GET_MESSAGES') {
-        //await processMessages(getMessagesResponse.messageList);
         await Promise.all(getMessagesResponse.messageList?.map(message => processMessage(message, errList)))
       } else {
         errList.push(getMessagesResponse.message);
-        //dispatch(appActions.setErrorMessage(getMessagesResponse.message));
       }
 
       //Формируем запрос на получение справочников для следующего раза
@@ -117,7 +117,6 @@ const useSync = (onSync?: () => void): () => void => {
 
       if (sendMesRefResponse.type === 'ERROR') {
         errList.push(sendMesRefResponse.message);
-        //dispatch(appActions.setErrorMessage(sendMesRefResponse.message));
       }
 
       //4. Отправляем запрос на получение документов
@@ -130,13 +129,22 @@ const useSync = (onSync?: () => void): () => void => {
 
       if (sendMesDocRespone.type === 'ERROR') {
         errList.push(sendMesDocRespone.message);
-        // dispatch(appActions.setErrorMessage(sendMesDocRespone.message));
+      }
+
+      if (cleanDocTime > 0) {
+        //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
+        const maxDocDate = new Date();
+        maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+
+        const delPromises = documents.filter((d) => d.status === 'PROCESSED' && new Date(d.documentDate) <= maxDocDate).map(async (d) => {
+          await docDispatch(documentActions.removeDocument(d.id));
+        });
+
+        await Promise.all(delPromises);
       }
 
       dispatch(appActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
-
-     console.log('err000', errList);
 
       if (errList?.length) {
         Alert.alert('Внимание!', 'Во время синхронизации произошли ошибки...', [{ text: 'OK' }]);
@@ -145,8 +153,6 @@ const useSync = (onSync?: () => void): () => void => {
 
     syncData();
   };
-
-  // const processMessages = async (arr: IMessage[]) => await Promise.all(arr?.map( message => processMessage(message) ) );
 
   const processMessage = async (msg: IMessage, errList: string[]) => {
     if (!msg) {
@@ -161,24 +167,34 @@ const useSync = (onSync?: () => void): () => void => {
       case 'REFS': {
         //TODO: проверка данных, приведение к типу
 
-        //Удаляем старые справочники из хранилища
-        const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
-        if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
-          errList.push(clearRefResponse.payload);
-          //dispatch(appActions.setErrorMessage(clearRefResponse.payload));
-          break;
-        }
+        if (refLoadType) {
+          //Записываем новые справочники из сообщения
+          const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
 
-        //Записываем новые спарвочники из сообщения
-        const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
+          //Если удачно сохранились справочники, удаляем сообщение в json
+          if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
+            await api.message.removeMessage(msg.id);
+          } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
+            errList.push(setRefResponse.payload);
+          }
+          // //Удаляем старые справочники из хранилища
+          // const clearRefResponse = await refDispatch(referenceActions.clearReferences());
 
-        //Если удачно сохранились справочники, удаляем сообщение в json
-        if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-          await api.message.removeMessage(msg.id);
-        } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
-          errList.push(setRefResponse.payload);
-          //dispatch(appActions.setErrorMessage(setRefResponse.payload));
+          // if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
+          //   errList.push(clearRefResponse.payload);
+          //   break;
+          // }
+        } else {
+          //Записываем новые справочники из сообщения
+          const addRefResponse = await refDispatch(referenceActions.addReferences(msg.body.payload as IReferences));
+
+          //Если удачно сохранились справочники, удаляем сообщение в json
+          if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
+            await api.message.removeMessage(msg.id);
+          } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
+            errList.push(addRefResponse.payload);
+          }
         }
 
         break;
@@ -187,14 +203,11 @@ const useSync = (onSync?: () => void): () => void => {
       case 'DOCS': {
         const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
-        console.log('setDocResponse', setDocResponse);
-
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
           await api.message.removeMessage(msg.id);
         } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
           errList.push(setDocResponse.payload);
-          //dispatch(appActions.setErrorMessage(setDocResponse.payload));
         }
 
         break;
@@ -202,7 +215,6 @@ const useSync = (onSync?: () => void): () => void => {
 
       default:
         errList.push('Неизвестный тип сообщения');
-        //dispatch(appActions.setErrorMessage('Неизвестный тип сообщения'));
         break;
     }
   };

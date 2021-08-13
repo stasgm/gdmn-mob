@@ -56,6 +56,7 @@ const ApplViewScreen = () => {
     const newDocument: IApplDocument = {
       ...appl,
       status: 'READY',
+      errorMessage: undefined,
       head: {
         ...appl.head,
         applStatus: statusRefused,
@@ -77,6 +78,7 @@ const ApplViewScreen = () => {
     const newDocument: IApplDocument = {
       ...appl,
       status: 'READY',
+      errorMessage: undefined,
       head: {
         ...appl.head,
         applStatus: statusAccepted,
