@@ -27,12 +27,12 @@ const baseNavList: INavItem[] = [
     icon: 'file-cabinet',
     title: 'Справочники',
   },
-  {
-    name: 'Messages',
-    component: MessagesNavigator,
-    icon: 'message-text-outline',
-    title: 'Сообщения',
-  },
+  // {
+  //   name: 'Messages',
+  //   component: MessagesNavigator,
+  //   icon: 'message-text-outline',
+  //   title: 'Сообщения',
+  // },
   {
     name: 'Settings',
     component: SettingsNavigator,
@@ -54,7 +54,7 @@ export interface IProps {
 
 const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
   const { colors } = useTheme();
-  const { loading, errorMessage } = useSelector((state) => state.app);
+  const { loading } = useSelector((state) => state.app);
 
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
 

@@ -47,7 +47,7 @@ const ApplListItem = ({
             </View>
           </View>
           <Text style={[styles.number, styles.field]}>{description}</Text>
-          {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage}</Text>}
+          {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage || ''}</Text>}
         </View>
       </View>
     </TouchableOpacity>

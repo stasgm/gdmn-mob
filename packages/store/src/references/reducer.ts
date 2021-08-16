@@ -3,6 +3,7 @@ import { getType } from 'typesafe-actions';
 
 import { ReferenceState } from './types';
 import { ReferenceActionType, actions } from './actions';
+import { IReference, IReferenceData, IReferences } from '@lib/types';
 
 const initialState: Readonly<ReferenceState> = {
   list: {},
@@ -69,12 +70,22 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
     case getType(actions.addReferencesAsync.request):
       return { ...state, loading: true };
 
-    case getType(actions.addReferencesAsync.success):
+    case getType(actions.addReferencesAsync.success): {
+      const newRefs = Object.entries(action.payload).reduce((refs, [field, newRef]) => {
+        const oldRef = state.list[field];
+        const ref = { ...newRef, data: newRef.data.map((r) => {
+          const oldItem = oldRef.data.find((i) => i.id === r.id);
+          return oldItem ? oldItem : r;
+        }) };
+        return { ...refs, [field]: ref };
+      }, {});
+
       return {
         ...state,
         loading: false,
-        list: { ...state.list, ...action.payload },
+        list: { ...state.list, ...newRefs },
       };
+    }
 
     case getType(actions.addReferencesAsync.failure):
       return {

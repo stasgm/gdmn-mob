@@ -29,7 +29,8 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       const newDocs = docsFromBack
         .map((newDoc) => {
           const oldDoc = state.list.find((d) => d.id === newDoc.id);
-          return oldDoc === undefined
+
+          return !oldDoc
             ? newDoc
             : newDoc.status === 'PROCESSED'
             ? {
@@ -39,7 +40,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
               }
             : oldDoc.status !== 'DRAFT'
             ? oldDoc
-            : newDoc;
+            : { ...newDoc, errorMessage: oldDoc.errorMessage };
         })
         .concat(oldDocs);
 
