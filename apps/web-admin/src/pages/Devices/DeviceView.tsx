@@ -1,5 +1,16 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { Box, CardHeader, IconButton, CircularProgress, Container } from '@material-ui/core';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Box,
+  Button,
+  CardHeader,
+  IconButton,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+} from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -42,6 +53,8 @@ const DeviceView = () => {
   const users = userSelectors.usersByDeviceId(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
 
+  const [open, setOpen] = useState(false);
+
   const handleCancel = () => {
     navigate(-1);
   };
@@ -51,6 +64,7 @@ const DeviceView = () => {
   };
 
   const handleDelete = async () => {
+    setOpen(false);
     const res = await dispatch(deviceActions.removeDevice(deviceId));
     if (res.type === 'DEVICE/REMOVE_SUCCESS') {
       navigate(-1);
@@ -74,6 +88,14 @@ const DeviceView = () => {
     },
     [dispatch],
   );
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   // useEffect(() => {
   //   fetchUsers();
@@ -152,7 +174,7 @@ const DeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleDelete,
+      onClick: handleClickOpen, //handleDelete,
       icon: <DeleteIcon />,
     },
   ];
@@ -169,6 +191,21 @@ const DeviceView = () => {
 
   return (
     <>
+      <Box>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText color="black">Удалить устройство?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelete} color="primary">
+              Да
+            </Button>
+            <Button onClick={handleClose} color="primary" /*autoFocus*/>
+              Нет
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
       <Box
         sx={{
           p: 3,
