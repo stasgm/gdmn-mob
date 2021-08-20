@@ -73,7 +73,7 @@ const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
-  const { deviceId, companyId, userId, state } = ctx.query;
+  const { deviceId, companyId, userId, state, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -91,6 +91,18 @@ const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (typeof state === 'string') {
     params.state = state;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string') {
+    params.fromRecord = fromRecord;
+  }
+
+  if (typeof toRecord === 'string') {
+    params.toRecord = toRecord;
   }
 
   const deviceBindingList = await deviceBindingService.findAll(params);

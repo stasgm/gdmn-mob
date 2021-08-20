@@ -33,8 +33,8 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
   );
 
   const fetchDeviceBindings = useCallback(
-    (userId?: string) => {
-      dispatch(actionsBinding.fetchDeviceBindings(userId));
+    (userId?: string, filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actionsBinding.fetchDeviceBindings(userId, /* '',*/ filterText, fromRecord, toRecord));
     },
     [dispatch],
   );
@@ -111,7 +111,6 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
             headCells={headCells}
             data={userBindingDevices}
             path={`/app/users/${deviceBinding.user.id}/binding/`}
-            // path={'/:id/binding/:bindingid'}
           />
         </Box>
       </Container>

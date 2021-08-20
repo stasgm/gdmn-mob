@@ -154,7 +154,21 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
     //   delete newParams['state'];
     // }
 
-    return userFound && deviceFound && extraPredicate(item, newParams);
+    /** filtering data */
+    let filteredDeviceBindings = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        // const name = item.device.name.toUpperCase();
+        const state = typeof item.state === 'string' ? item.state.toUpperCase() : '';
+
+        filteredDeviceBindings = /*name.includes(filterText) ||*/ state.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return userFound && deviceFound && extraPredicate(item, newParams) && filteredDeviceBindings;
   });
 
   const newParams = { ...params };
