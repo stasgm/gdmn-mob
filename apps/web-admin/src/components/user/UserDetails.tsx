@@ -2,6 +2,7 @@ import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@mater
 
 import { adminPath } from '../../utils/constants';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
 
 import { IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik } from 'formik';
@@ -17,6 +18,7 @@ interface IProps {
 
 const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
@@ -25,7 +27,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) =>
       name: user.name || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      password: (user as NewUser).password || '',
+      // password: (user as NewUser).password || '',
+      password: user.password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
       alias: user.alias || '',
@@ -39,6 +42,10 @@ const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) =>
       onSubmit(values);
     },
   });
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
   // const handleEdit = () => {
 
   //   navigate(`${adminPath}/app/users/${user.id}/edit/password`);
@@ -175,6 +182,61 @@ const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) =>
               >
                 Сменить пароль
               </Button>
+
+              <Button
+                color="primary"
+                disabled={loading}
+                // onClick={() => onChange()}
+                onClick={handleClickOpen}
+                variant="contained"
+                sx={{ m: 1 }}
+              >
+                Сменить
+              </Button>
+
+              <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
+                Сохранить
+              </Button>
+              <Button color="secondary" variant="contained" onClick={onCancel} disabled={loading}>
+                Отмена
+              </Button>
+            </>
+          </Card>
+        </form>
+      </Box>
+
+      <Box
+        sx={{
+          backgroundColor: 'background.default',
+          minHeight: '100%',
+        }}
+        display="none"
+      >
+        <form onSubmit={formik.handleSubmit}>
+          <Card sx={{ p: 1 }}>
+            <CardContent>
+              <Grid container spacing={3}>
+                {Object.keys(user).length != 0 && (
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={formik.touched.password && Boolean(formik.errors.password)}
+                      fullWidth
+                      required
+                      label="Пароль"
+                      name="password"
+                      variant="outlined"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="password"
+                      disabled={loading}
+                      value={formik.values.password}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+            <Divider />
+            <>
               <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
                 Сохранить
               </Button>

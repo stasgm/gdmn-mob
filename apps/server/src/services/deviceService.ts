@@ -4,6 +4,8 @@ import { ConflictException, DataNotFoundException } from '../exceptions';
 
 import { extraPredicate } from '../utils/helpers';
 
+import { deviceStates } from '../utils/constants';
+
 import { getDb } from './dao/db';
 
 import { devices as mockDevices } from './data/devices';
@@ -146,7 +148,8 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
       if (filterText) {
         const name = item.name.toUpperCase();
         const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
-        const state = typeof item.state === 'string' ? item.state.toUpperCase() : '';
+        const newState = deviceStates[item.state];
+        const state = typeof newState === 'string' ? newState.toUpperCase() : '';
 
         filteredDevices = name.includes(filterText) || uid.includes(filterText) || state.includes(filterText);
       }

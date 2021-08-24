@@ -79,7 +79,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, uid, state, filterText, fromRecord, toRecord } = ctx.query;
 
-  const params: Record<string, string> = {};
+  const params: Record<string, string | number> = {};
 
   if (typeof companyId === 'string') {
     params.companyId = companyId;

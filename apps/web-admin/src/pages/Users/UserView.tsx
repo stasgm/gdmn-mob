@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  DialogTitle,
 } from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -158,16 +159,17 @@ const UserView = () => {
   return (
     <>
       <Box>
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose}  aria-labelledby="alert-dialog-title">
+          <DialogTitle id="alert-dialog-title">{'Подтверждение действия'}</DialogTitle>
           <DialogContent>
-            <DialogContentText color="black">Удалить пользователя?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDelete} color="primary">
-              Да
+            <Button onClick={handleDelete} color="secondary" variant="contained">
+              Удалить
             </Button>
-            <Button onClick={handleClose} color="primary" /*autoFocus*/>
-              Нет
+            <Button onClick={handleClose} color="primary" variant="contained" /*autoFocus*/>
+              Отмена
             </Button>
           </DialogActions>
         </Dialog>

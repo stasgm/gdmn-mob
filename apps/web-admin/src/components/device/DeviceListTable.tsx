@@ -142,10 +142,9 @@ const DeviceListTable = ({
           {/* <TableCell>{device.uid}</TableCell> */}
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <Box style={{ width: '275px' }}>{device.uid}</Box>
               <Box>
                 {onCreateUid && (
-                  <Tooltip title="Создать UID">
+                  <Tooltip title="Создать номер">
                     <Button
                       // component={RouterLink}
                       onClick={() => onCreateUid && onCreateUid(code, device.id)} //formik.values.code
@@ -155,6 +154,7 @@ const DeviceListTable = ({
                   </Tooltip>
                 )}
               </Box>
+              <Box /*style={{ width: '275px' }}*/>{device.uid}</Box>
             </Box>
           </TableCell>
           <TableCell>{deviceStates[device.state]}</TableCell>

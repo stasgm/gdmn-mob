@@ -33,8 +33,8 @@ const UserDevices = ({ userDevices, userBindingDevices, onAddDevice }: IProps) =
   );
 
   const fetchDeviceBindings = useCallback(
-    (userId?: string, filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actionsBinding.fetchDeviceBindings(userId, /* '',*/ filterText, fromRecord, toRecord));
+    (/*userId?: string,*/ filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actionsBinding.fetchDeviceBindings(/*userId,*/ /* '',*/ undefined, filterText, fromRecord, toRecord));
     },
     [dispatch],
   );

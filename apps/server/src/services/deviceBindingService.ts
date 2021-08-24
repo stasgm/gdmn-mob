@@ -3,6 +3,8 @@ import { IDBDeviceBinding, IDeviceBinding, INamedEntity, NewDeviceBinding } from
 import { ConflictException, DataNotFoundException } from '../exceptions';
 import { asyncFilter, extraPredicate } from '../utils/helpers';
 
+import { deviceStates } from '../utils/constants';
+
 import { getDb } from './dao/db';
 
 /**
@@ -161,7 +163,14 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
 
       if (filterText) {
         // const name = item.device.name.toUpperCase();
-        const state = typeof item.state === 'string' ? item.state.toUpperCase() : '';
+        const newState = deviceStates[item.state];
+        const state = typeof newState === 'string' ? newState.toUpperCase() : '';
+        // ite m.
+        const device = await devices.find(item?.deviceId);
+        //const deviceList = devices.find(item?.deviceId);
+        const name = device.name.toUpperCase();
+
+        // const deviceEntity: INamedEntity = device && { id: device.id, name: device.name };
 
         filteredDeviceBindings = /*name.includes(filterText) ||*/ state.includes(filterText);
       }
