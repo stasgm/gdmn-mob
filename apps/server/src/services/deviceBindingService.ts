@@ -125,7 +125,7 @@ const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[]> => {
-  const { deviceBindings, devices } = getDb();
+  const { deviceBindings, devices, users } = getDb();
 
   let deviceBindingList = await deviceBindings.read((item) => {
     const newParams = { ...params };
@@ -148,44 +148,48 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
       delete newParams['companyId'];
     }
 
-    /*state обработается в extraPredicate */
-    // let stateFound = true;
+    delete newParams['filterText'];
 
-    // if ('state' in newParams) {
-    //   stateFound = item.state === newParams.state;
-    //   delete newParams['state'];
-    // }
-
-    /** filtering data */
-    let filteredDeviceBindings = true;
-    if ('filterText' in newParams) {
-      const filterText: string = (newParams.filterText as string).toUpperCase();
-
-      if (filterText) {
-        // const name = item.device.name.toUpperCase();
-        const newState = deviceStates[item.state];
-        const state = typeof newState === 'string' ? newState.toUpperCase() : '';
-        // ite m.
-        const device = await devices.find(item?.deviceId);
-        //const deviceList = devices.find(item?.deviceId);
-        const name = device.name.toUpperCase();
-
-        // const deviceEntity: INamedEntity = device && { id: device.id, name: device.name };
-
-        filteredDeviceBindings = /*name.includes(filterText) ||*/ state.includes(filterText);
-      }
-      delete newParams['filterText'];
-    }
-
-    return userFound && deviceFound && extraPredicate(item, newParams) && filteredDeviceBindings;
+    return userFound && deviceFound && extraPredicate(item, newParams);
   });
 
   const newParams = { ...params };
 
-  if ('companyId' in newParams) {
+  if ('companyId' in newParams || 'filterText' in newParams) {
     deviceBindingList = await asyncFilter(deviceBindingList, async (i: IDBDeviceBinding) => {
+      const newParams = { ...params };
+
       const device = await devices.find(i.deviceId);
-      return device?.companyId === newParams.companyId;
+
+      let companyIdFound = true;
+
+      if ('companyId' in newParams) {
+        companyIdFound = device?.companyId === newParams.companyId;
+        delete newParams['companyId'];
+      }
+
+      let filteredCompanies = true;
+
+      if ('filterText' in newParams) {
+        const filterText: string = (newParams.filterText as string).toUpperCase();
+
+        if (filterText) {
+          const state = deviceStates[i.state].toUpperCase();
+          const deviceName = device.name.toUpperCase();
+          const creationDate = new Date(i.creationDate || '').toLocaleString('ru', { hour12: false });
+          const editionDate = new Date(i.editionDate || '').toLocaleString('ru', { hour12: false });
+
+          filteredCompanies =
+            deviceName.includes(filterText) ||
+            state.includes(filterText) ||
+            creationDate.includes(filterText) ||
+            editionDate.includes(filterText);
+        }
+
+        delete newParams['filterText'];
+      }
+
+      return companyIdFound && filteredCompanies;
     });
   }
 

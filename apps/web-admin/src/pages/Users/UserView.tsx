@@ -46,7 +46,7 @@ const UserView = () => {
 
   const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
 
-  const { list } = useSelector((state) => state.devices);
+  // const { list } = useSelector((state) => state.devices);
 
   const [open, setOpen] = useState(false);
 
@@ -69,7 +69,7 @@ const UserView = () => {
   const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
-    dispatch(deviceActions.fetchDevices());
+    // dispatch(deviceActions.fetchDevices());
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -93,26 +93,22 @@ const UserView = () => {
     setOpen(false);
   };
 
-  // const userDevices = userBindingDevices.map((binding: IDeviceBinding) => {
-  //   return list.find((a) => binding.device.id === a.id);
-  // });
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const userDevices: IDevice[] = [];
+  // const userDevices: IDevice[] = [];
 
-  const data = useMemo(
-    () =>
-      userBindingDevices.forEach((binding: IDeviceBinding) => {
-        const dev = list.find((a) => binding.device.id === a.id);
-        // /*return*/ list.find((a) => binding.device.id === a.id);
-        console.log('dev', dev);
-        if (dev) {
-          userDevices.push(dev);
-        }
-        return { dev };
-      }),
-    [userBindingDevices, userDevices, list],
-  );
+  // const data = useMemo(
+  //   () =>
+  //     userBindingDevices.forEach((binding: IDeviceBinding) => {
+  //       const dev = list.find((a) => binding.device.id === a.id);
+  //       // /*return*/ list.find((a) => binding.device.id === a.id);
+  //       console.log('dev', dev);
+  //       if (dev) {
+  //         userDevices.push(dev);
+  //       }
+  //       return { dev };
+  //     }),
+  //   [userBindingDevices, userDevices, list],
+  // );
 
   if (!user) {
     return (
@@ -159,7 +155,7 @@ const UserView = () => {
   return (
     <>
       <Box>
-        <Dialog open={open} onClose={handleClose}  aria-labelledby="alert-dialog-title">
+        <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title">
           <DialogTitle id="alert-dialog-title">{'Подтверждение действия'}</DialogTitle>
           <DialogContent>
             <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
@@ -212,7 +208,7 @@ const UserView = () => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices userDevices={userDevices} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
+        <UserDevices userId={userId} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
