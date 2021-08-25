@@ -227,8 +227,15 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
         const name = item.name.toUpperCase();
         const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
         const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
-        filteredUsers = name.includes(filterText) || firstname.includes(filterText) || lastName.includes(filterText);
+        filteredUsers =
+          name.includes(filterText) ||
+          firstname.includes(filterText) ||
+          lastName.includes(filterText) ||
+          creationDate.includes(filterText) ||
+          editionDate.includes(filterText);
       }
       delete newParams['filterText'];
     }

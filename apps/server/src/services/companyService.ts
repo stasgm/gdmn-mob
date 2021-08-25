@@ -213,8 +213,11 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
       if (filterText) {
         const name = item.name.toUpperCase();
+        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
-        filteredCompanies = name.includes(filterText);
+        filteredCompanies =
+          name.includes(filterText) || creationDate.includes(filterText) || editionDate.includes(filterText);
       }
       delete newParams['filterText'];
     }

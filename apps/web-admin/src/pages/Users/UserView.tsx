@@ -156,15 +156,14 @@ const UserView = () => {
     <>
       <Box>
         <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title">
-          <DialogTitle id="alert-dialog-title">{'Подтверждение действия'}</DialogTitle>
           <DialogContent>
             <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDelete} color="secondary" variant="contained">
+            <Button onClick={handleDelete} color="primary" variant="contained">
               Удалить
             </Button>
-            <Button onClick={handleClose} color="primary" variant="contained" /*autoFocus*/>
+            <Button onClick={handleClose} color="secondary" variant="contained">
               Отмена
             </Button>
           </DialogActions>

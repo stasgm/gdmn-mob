@@ -150,8 +150,15 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
         const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
         const newState = deviceStates[item.state];
         const state = typeof newState === 'string' ? newState.toUpperCase() : '';
+        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+         const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
-        filteredDevices = name.includes(filterText) || uid.includes(filterText) || state.includes(filterText);
+        filteredDevices =
+          name.includes(filterText) ||
+          uid.includes(filterText) ||
+          state.includes(filterText) ||
+          creationDate.includes(filterText) ||
+          editionDate.includes(filterText);
       }
       delete newParams['filterText'];
     }
