@@ -15,9 +15,14 @@ const DeviceCreate = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.devices);
 
+  // useEffect(() => {
+  //   dispatch(actions.deviceActions.clearError());
+  // }, [dispatch]);
+
   const goBack = () => {
+    dispatch(actions.deviceActions.clearError());
     navigate(-1);
-  };
+  }; // [dispatch]);
 
   const handleClearError = () => {
     dispatch(actions.deviceActions.clearError());

@@ -1,7 +1,6 @@
-//import { v1 as uuidv1 } from 'uuid';
 import { Context, ParameterizedContext } from 'koa';
 
-import { IMessage, NewMessage } from '@lib/types';
+import { NewMessage } from '@lib/types';
 
 import log from '../utils/logger';
 import { messageService } from '../services';
@@ -9,8 +8,6 @@ import { messageService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
 
 import { ForbiddenException } from '../exceptions';
-
-const clients: ((result: IMessage[]) => void)[] = [];
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const message = ctx.request.body as NewMessage;

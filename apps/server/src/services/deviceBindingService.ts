@@ -3,6 +3,8 @@ import { IDBDeviceBinding, IDeviceBinding, INamedEntity, NewDeviceBinding } from
 import { ConflictException, DataNotFoundException } from '../exceptions';
 import { asyncFilter, extraPredicate } from '../utils/helpers';
 
+import { deviceStates } from '../utils/constants';
+
 import { getDb } from './dao/db';
 
 /**
@@ -63,19 +65,19 @@ const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>,
     throw new DataNotFoundException('Связь с устройством не найдена');
   }
 
-  const deviceId = deviceBindingData.device
-    ? (await companies.find(deviceBindingData.device.id))?.id
-    : oldDeviceBinding.deviceId;
+  // const deviceId = deviceBindingData.device
+  //   ? (await devices.find(deviceBindingData.device.id))?.id
+  //   : oldDeviceBinding.deviceId;
 
-  if (params) {
-    if ('companyId' in params) {
-      const device = await devices.find(deviceId);
+  // if (params) {
+  //   if ('companyId' in params) {
+  //     const device = await devices.find(deviceId);
 
-      if (device.companyId !== params.companyID) {
-        throw new DataNotFoundException('Устройство не может быть обновлено');
-      }
-    }
-  }
+  //     if (device.companyId !== params.companyID) {
+  //       throw new DataNotFoundException('Устройство не может быть обновлено');
+  //     }
+  //   }
+  // }
 
   //TODO добавить проверку, что пользователь из компании
 
@@ -123,7 +125,7 @@ const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[]> => {
-  const { deviceBindings, devices } = getDb();
+  const { deviceBindings, devices, users } = getDb();
 
   let deviceBindingList = await deviceBindings.read((item) => {
     const newParams = { ...params };
@@ -146,23 +148,48 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
       delete newParams['companyId'];
     }
 
-    /*state обработается в extraPredicate */
-    // let stateFound = true;
-
-    // if ('state' in newParams) {
-    //   stateFound = item.state === newParams.state;
-    //   delete newParams['state'];
-    // }
+    delete newParams['filterText'];
 
     return userFound && deviceFound && extraPredicate(item, newParams);
   });
 
   const newParams = { ...params };
 
-  if ('companyId' in newParams) {
+  if ('companyId' in newParams || 'filterText' in newParams) {
     deviceBindingList = await asyncFilter(deviceBindingList, async (i: IDBDeviceBinding) => {
+      const newParams = { ...params };
+
       const device = await devices.find(i.deviceId);
-      return device?.companyId === newParams.companyId;
+
+      let companyIdFound = true;
+
+      if ('companyId' in newParams) {
+        companyIdFound = device?.companyId === newParams.companyId;
+        delete newParams['companyId'];
+      }
+
+      let filteredCompanies = true;
+
+      if ('filterText' in newParams) {
+        const filterText: string = (newParams.filterText as string).toUpperCase();
+
+        if (filterText) {
+          const state = deviceStates[i.state].toUpperCase();
+          const deviceName = device.name.toUpperCase();
+          const creationDate = new Date(i.creationDate || '').toLocaleString('ru', { hour12: false });
+          const editionDate = new Date(i.editionDate || '').toLocaleString('ru', { hour12: false });
+
+          filteredCompanies =
+            deviceName.includes(filterText) ||
+            state.includes(filterText) ||
+            creationDate.includes(filterText) ||
+            editionDate.includes(filterText);
+        }
+
+        delete newParams['filterText'];
+      }
+
+      return companyIdFound && filteredCompanies;
     });
   }
 

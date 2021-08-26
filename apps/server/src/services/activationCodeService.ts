@@ -36,6 +36,8 @@ const genActivationCode = async (deviceId: string) => {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
+  await codes.delete((activationCode) => activationCode.deviceId === deviceId);
+
   // const code = Math.random()
   //   .toString(36)
   //   .substr(3, 6);

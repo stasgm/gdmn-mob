@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { DeviceState } from '@lib/types';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -19,7 +20,7 @@ import {
 import { makeStyles } from '@material-ui/styles';
 
 import { IHeadCells } from '../types';
-import { adminPath } from '../utils/constants';
+import { deviceStates, adminPath } from '../utils/constants';
 
 type Order = 'asc' | 'desc';
 
@@ -118,6 +119,10 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
     if (!isNaN(new Date(value).getDate())) {
       return new Date(value || '').toLocaleString('ru', { hour12: false });
     }
+
+    if (propName === 'state') {
+      return deviceStates[value as DeviceState];
+    } // для поля Состояние в устройстве
 
     if (typeof value === 'object' && 'name' in value) {
       return value.name;

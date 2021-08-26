@@ -127,7 +127,7 @@ const DeviceBindingListTable = ({
               display: 'flex',
             }}
           >
-            <NavLink to={`${adminPath}/app/users/${binding.user.id}/devices/${binding.device.id}`}>
+            <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}>
               <Typography color="textPrimary" variant="body1" key={binding.id}>
                 {binding.device?.name}
               </Typography>
@@ -135,8 +135,8 @@ const DeviceBindingListTable = ({
           </Box>
         </TableCell>
         <TableCell>{deviceStates[binding.state]}</TableCell>
-        <TableCell>{new Date(binding.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
-        <TableCell>{new Date(binding.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(binding.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+        <TableCell>{new Date(binding.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
       </TableRow>
     ));
 

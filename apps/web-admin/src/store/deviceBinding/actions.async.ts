@@ -9,11 +9,22 @@ import { deviceBindingActions, DeviceBindingActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<DeviceBindingActionType>, AppState, null, DeviceBindingActionType>;
 
-const fetchDeviceBindings = (userId?: string): AppThunk => {
+const fetchDeviceBindings = (
+  userId?: string,
+  filterText?: string,
+  fromRecord?: number,
+  toRecord?: number,
+): AppThunk => {
   return async (dispatch) => {
     dispatch(deviceBindingActions.fetchDeviceBindingsAsync.request(''));
 
-    const response = await api.deviceBinding.getDeviceBindings(userId ? { userId: userId } : undefined);
+    const params: Record<string, string | number> = {};
+    if (userId) params.userId = userId;
+    if (filterText) params.filterText = filterText;
+    if (fromRecord) params.fromRecord = fromRecord;
+    if (toRecord) params.toRecord = toRecord;
+
+    const response = await api.deviceBinding.getDeviceBindings(/*userId ? { userId: userId } : undefined*/ params);
 
     if (response.type === 'GET_DEVICEBINDINGS') {
       return dispatch(deviceBindingActions.fetchDeviceBindingsAsync.success(response.deviceBindings));

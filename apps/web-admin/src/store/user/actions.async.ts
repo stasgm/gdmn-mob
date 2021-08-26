@@ -2,8 +2,6 @@ import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 import { IUser, NewUser } from '@lib/types';
 
-import { X } from 'react-feather';
-
 import { AppState } from '../';
 
 import { userActions, UserActionType } from './actions';
@@ -107,5 +105,23 @@ const removeUser = (id: string): AppThunk => {
     return dispatch(userActions.removeUserAsync.failure('Ошибка удаления компании'));
   };
 };
+
+// const addPageParams = (user: IUser): AppThunk => {
+//   return async (dispatch) => {
+//     dispatch(userActions.setPageParam.request(''));
+
+//     const response = await api.user.addUser(user);
+
+//     if (response.type === 'SET_PARAM') {
+//       return dispatch(userActions.addUserAsync.success(response.user));
+//     }
+
+//     if (response.type === 'ERROR') {
+//       return dispatch(userActions.addUserAsync.failure(response.message));
+//     }
+
+//     return dispatch(userActions.addUserAsync.failure('something wrong'));
+//   };
+// };
 
 export default { fetchUsers, fetchUserById, addUser, updateUser, removeUser };

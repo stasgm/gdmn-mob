@@ -166,7 +166,7 @@ class DeviceBinding extends BaseRequest {
     * @returns
     */
   getDeviceBindings = async (
-    params?: Record<string, string>,
+    params?: Record<string, string | number>,
   ): Promise<types.IGetDeviceBindingsResponse | error.INetworkError> => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);

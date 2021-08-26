@@ -18,6 +18,9 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
     case getType(companyActions.clearError):
       return { ...state, errorMessage: '' };
 
+    case getType(companyActions.setError):
+      return { ...state, errorMessage: 'Компания уже существует' };
+
     case getType(companyActions.fetchCompaniesAsync.request):
       return { ...state, loading: true, list: [], errorMessage: '' };
 

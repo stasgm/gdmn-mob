@@ -1,5 +1,16 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { Box, CardHeader, IconButton, CircularProgress, Container } from '@material-ui/core';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Box,
+  Button,
+  CardHeader,
+  IconButton,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+} from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
@@ -33,7 +44,6 @@ const DeviceView = () => {
   const { id: deviceId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { list } = useSelector((state) => state.users);
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { loading, errorMessage } = useSelector((state) => state.devices);
@@ -42,15 +52,18 @@ const DeviceView = () => {
   const users = userSelectors.usersByDeviceId(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
 
+  const [open, setOpen] = useState(false);
+
   const handleCancel = () => {
     navigate(-1);
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/devices/edit/${deviceId}`);
+    navigate(`${adminPath}/app/devices/${deviceId}/edit`);
   };
 
   const handleDelete = async () => {
+    setOpen(false);
     const res = await dispatch(deviceActions.removeDevice(deviceId));
     if (res.type === 'DEVICE/REMOVE_SUCCESS') {
       navigate(-1);
@@ -74,6 +87,14 @@ const DeviceView = () => {
     },
     [dispatch],
   );
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   // useEffect(() => {
   //   fetchUsers();
@@ -152,7 +173,7 @@ const DeviceView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleDelete,
+      onClick: handleClickOpen, //handleDelete,
       icon: <DeleteIcon />,
     },
   ];
@@ -169,6 +190,21 @@ const DeviceView = () => {
 
   return (
     <>
+      <Box>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogContent>
+            <DialogContentText color="black">Вы действительно хотите удалить устройство?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelete} color="primary" variant="contained">
+              Удалить
+            </Button>
+            <Button onClick={handleClose} color="secondary" variant="contained">
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
       <Box
         sx={{
           p: 3,
