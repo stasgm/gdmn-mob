@@ -4,10 +4,6 @@ import { IDevice, INamedEntity } from '@lib/types';
 import { useFormik, FormikProvider, Field } from 'formik';
 import * as yup from 'yup';
 
-import { useEffect, useState } from 'react';
-
-import api from '@lib/client-api';
-
 import ComboBox from '../ComboBox';
 
 import { deviceStates } from '../../utils/constants';
@@ -31,24 +27,6 @@ export interface IDeviceFormik extends Omit<IDevice, 'state'> {
 // }
 
 const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*, onCreateUid*/ }: IProps) => {
-  const [devices, setDevices] = useState<INamedEntity[]>([]);
-  const [loadingDevices, setLoadingDevices] = useState(true);
-
-  useEffect(() => {
-    let unmounted = false;
-    const getDevices = async () => {
-      const res = await api.device.getDevices();
-      if (res.type === 'GET_DEVICES' && !unmounted) {
-        setDevices(res.devices.map((d) => ({ id: d.id, name: d.name })));
-        setLoadingDevices(false);
-      }
-    };
-    getDevices();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
-
   const initialValues: IDeviceFormik = {
     ...device,
     // user: deviceBinding.user || null,
@@ -56,12 +34,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
     state: { id: device.state, name: deviceStates[device.state] },
     code: activationCode || '',
   };
-
-  // const initialCodes: IActivationCodeFormik = {
-  //   //...activationCode,
-  //   // activationCode: activationCode.code || null,
-  //   code: activationCode,
-  // };
 
   const formik = useFormik<IDeviceFormik>({
     enableReinitialize: true,
@@ -75,17 +47,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
       onSubmit({ id: values.id, name: values.name, state: values.state.id, uid: values.uid } as IDevice); /*(values);*/
     },
   });
-
-  // const formiks = useFormik<IActivationCode>({
-  //   enableReinitialize: true,
-  //   initialValues: initialCodes,
-  //   validationSchema: yup.object().shape({
-  //     code: yup.string().required('Required'),
-  //   }),
-  //   onSubmit: (values) => {
-  //     onSubmit(values);
-  //   },
-  // });
 
   return (
     <FormikProvider value={formik}>
@@ -159,19 +120,6 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
                       value={formik.values.uid}
                     />
                   </Grid>
-                  {/* <Box>
-                  {onCreateUid && (
-                  <Button
-                    disabled={!formik.values.code}
-                    // component={RouterLink}
-                     onClick={() => onCreateUid && onCreateUid(formik.values.code)}
-                  >
-                    <RefreshIcon />
-                  </Button>
-                  )}
-                  {/*</Box>*/
-                  /*}
-                  </Box> */}
                 </Grid>
               </Grid>
             </CardContent>
