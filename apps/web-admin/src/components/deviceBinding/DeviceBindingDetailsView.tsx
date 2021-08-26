@@ -1,19 +1,17 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { IDevice } from '@lib/types';
+import { IDeviceBinding } from '@lib/types';
 
-import { deviceStates } from '../../utils/constants';
+import { NavLink } from 'react-router-dom';
 
-/* import activationCode from '../../store/activationCode';*/
-
-/*import { activationCodes } from '@lib/mock';*/
+import { deviceStates, adminPath } from '../../utils/constants';
 
 interface IProps {
-  device: IDevice;
+  deviceBinding: IDeviceBinding;
   activationCode?: string;
 }
 
-const DeviceDetailsView = ({ device, activationCode }: IProps) => {
+const DeviceBindingDetailsView = ({ deviceBinding }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -28,19 +26,23 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {device.name}
-                </Typography>
+                <NavLink to={`${adminPath}/app/devices/${deviceBinding.device.id}`} key={deviceBinding.device.id}>
+                  <Typography color="textPrimary" variant="h4" key={deviceBinding.device.id} gutterBottom>
+                    {deviceBinding.device.name}
+                  </Typography>
+                </NavLink>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Номер
+                  Пользователь
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {device.uid}
-                </Typography>
+                <NavLink to={`${adminPath}/app/users/${deviceBinding.user.id}`} key={deviceBinding.user.id}>
+                  <Typography color="textPrimary" variant="h4" key={deviceBinding.user.id} gutterBottom>
+                    {deviceBinding.user.name}
+                  </Typography>
+                </NavLink>
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
@@ -49,18 +51,7 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {deviceStates[device.state]}
-                </Typography>
-              </Grid>
-              <Grid item md={2} xs={6}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Код активации
-                </Typography>
-              </Grid>
-              <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {activationCode}
-                  {/*activationCode.code*/}
+                  {deviceStates[deviceBinding.state]}
                 </Typography>
               </Grid>
             </Grid>
@@ -71,4 +62,4 @@ const DeviceDetailsView = ({ device, activationCode }: IProps) => {
   );
 };
 
-export default DeviceDetailsView;
+export default DeviceBindingDetailsView;

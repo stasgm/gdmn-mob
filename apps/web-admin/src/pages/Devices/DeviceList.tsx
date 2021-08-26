@@ -5,8 +5,6 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
-import { IDevice } from '@lib/types';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
 
@@ -14,10 +12,9 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import codeActions from '../../store/activationCode';
-import { /*IHeadCells,*/ IToolBarButton } from '../../types';
+import { IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-// import SortableTable from '../../components/SortableTable';
 import DeviceListTable from '../../components/device/DeviceListTable';
 
 const DeviceList = () => {
@@ -39,6 +36,12 @@ const DeviceList = () => {
     [dispatch],
   );
 
+  const fetchActivationCodes = useCallback(
+    (deviceId?: string) => {
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
+    },
+    [dispatch],
+  );
   useEffect(() => {
     fetchDevices();
   }, [fetchDevices]);
@@ -69,11 +72,13 @@ const DeviceList = () => {
 
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
+    fetchActivationCodes(deviceId);
   };
 
   const handleCreateUid = async (code: string, deviceId: string) => {
     await authDispatch(authActions.activateDevice(code));
     dispatch(actions.fetchDeviceById(deviceId));
+    fetchActivationCodes(deviceId);
   };
 
   const buttons: IToolBarButton[] = [
@@ -137,7 +142,6 @@ const DeviceList = () => {
                 onCreateCode={handleCreateCode}
                 onCreateUid={handleCreateUid}
               />
-              {/* <SortableTable<IDevice> headCells={headCells} data={list} /> */}
             </Box>
           )}
         </Container>

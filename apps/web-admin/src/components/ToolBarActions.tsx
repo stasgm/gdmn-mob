@@ -2,9 +2,7 @@ import React from 'react';
 import { Button, Box, IconButton, Toolbar, Menu, MenuProps, Icon } from '@material-ui/core';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import MenuItem from '@material-ui/core/MenuItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import PropTypes from 'prop-types';
 
 import { withStyles } from '@material-ui/styles';
 

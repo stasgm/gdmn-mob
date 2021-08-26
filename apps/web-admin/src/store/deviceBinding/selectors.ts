@@ -1,5 +1,9 @@
 import { useSelector } from '../';
 
+const bindingById = (id: string) => {
+  return useSelector((state) => state.deviceBindings.list.find((d) => d.id === id));
+};
+
 const bindingsByUserId = (userId: string) => {
   return useSelector((state) => state.deviceBindings.list.filter((u) => u.user.id === userId));
 };
@@ -14,4 +18,4 @@ const bindingsByDeviceIdAndUserId = (deviceId: string, userId: string) => {
   );
 };
 
-export default { bindingsByUserId, bindingsByDeviceId, bindingsByDeviceIdAndUserId };
+export default { bindingById, bindingsByUserId, bindingsByDeviceId, bindingsByDeviceIdAndUserId };

@@ -1,39 +1,76 @@
 import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } from './common';
 import { IHeadMessage, IMessage } from './messages';
 
-// Типы для хранения данных в бд
-export interface IDBUser extends INamedEntity, IExternalSystemProps {
+// Типы для передачи и хранения данных на клиенте
+export interface IUser extends INamedEntity, IExternalSystemProps {
   alias?: string;
-  password: string;
-  creatorId: string;
   role: UserRole;
-  company: string | null; // по умолчанию null
   firstName?: string;
   lastName?: string;
-  phoneNumber?: string;
+  surName?: string;
   email?: string;
+  phoneNumber?: string;
+  creator?: INamedEntity;
+  company?: INamedEntity;
+  password?: string;
 }
 
-export interface IDBCompany extends INamedEntity, IExternalSystemProps {
-  adminId: string;
+export type NewUser = Omit<IUser, 'id'> & { password: string };
+
+export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
+
+export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;
+  admin: INamedEntity;
 }
 
-export interface IDBDevice extends INamedEntity {
+export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city'>;
+
+export interface IDevice extends INamedEntity {
   uid: string;
   state: DeviceState;
+  company: INamedEntity;
+}
+
+export type NewDevice = Pick<IDevice, 'name' | 'company' | 'state'>;
+
+export interface IDeviceBinding extends IEntity {
+  state: DeviceState;
+  user: INamedEntity;
+  device: INamedEntity;
+}
+
+export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device' | 'state'>;
+
+export interface IActivationCode extends IEntity {
+  code: string;
+  date: string;
+  device: INamedEntity;
+}
+
+export type NewActivationCode = Pick<IActivationCode, 'code'>;
+
+// Типы для хранения данных в бд
+export interface IDBUser extends Omit<IUser, 'creator' | 'company'> {
+  password: string;
+  creatorId: string;
+  company: string | null; // по умолчанию null
+}
+
+export interface IDBCompany extends Omit<ICompany, 'admin'> {
+  adminId: string;
+}
+
+export interface IDBDevice extends Omit<IDevice, 'company'> {
   companyId: string;
 }
 
-export interface IDBDeviceBinding extends IEntity {
+export interface IDBDeviceBinding extends Omit<IDeviceBinding, 'user' | 'device'> {
   userId: string;
   deviceId: string;
-  state: DeviceState;
 }
 
-export interface IDBActivationCode extends IEntity {
-  code: string;
-  date: string;
+export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
   deviceId: string;
 }
 
@@ -49,46 +86,3 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
 export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
 }
-
-// Типы для передачи и хранения данных на клиенте
-export interface IUser extends INamedEntity, IExternalSystemProps {
-  alias?: string;
-  role: UserRole;
-  firstName?: string;
-  lastName?: string;
-  surName?: string;
-  email?: string;
-  phoneNumber?: string;
-  creator?: INamedEntity;
-  company?: INamedEntity;
-}
-
-// export type NewUser = Pick<IUser, 'name' | 'externalId'>;
-export type NewUser = Omit<IUser, 'id'> & { password: string };
-
-export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
-
-export interface ICompany extends Omit<IDBCompany, 'adminId'> {
-  admin: INamedEntity;
-}
-
-export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city'>;
-
-export interface IDevice extends Omit<IDBDevice, 'companyId'> {
-  company: INamedEntity;
-}
-
-export type NewDevice = Pick<IDevice, 'name' | 'company' | 'state'>;
-
-export interface IDeviceBinding extends Omit<IDBDeviceBinding, 'userId' | 'deviceId'> {
-  user: INamedEntity;
-  device: INamedEntity;
-}
-
-export type NewDeviceBinding = Pick<IDeviceBinding, 'user' | 'device' | 'state'>;
-
-export interface IActivationCode extends Omit<IDBActivationCode, 'deviceId'> {
-  device: INamedEntity;
-}
-
-export type NewActivationCode = Pick<IActivationCode, 'code'>;

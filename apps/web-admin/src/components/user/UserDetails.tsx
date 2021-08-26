@@ -1,5 +1,7 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
+import { useState } from 'react';
+
 import { IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
@@ -12,6 +14,8 @@ interface IProps {
 }
 
 const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
+  const [open, setOpen] = useState(false);
+
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
     initialValues: {
@@ -19,7 +23,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       name: user.name || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      password: (user as NewUser).password || '',
+      // password: (user as NewUser).password || '',
+      password: user.password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
       alias: user.alias || '',
@@ -33,6 +38,15 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       onSubmit(values);
     },
   });
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClickClose = () => {
+    setOpen(false);
+    formik.values.password = '';
+  };
 
   return (
     <>
@@ -151,16 +165,61 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.alias}
                   />
                 </Grid>
+                {Object.keys(user).length != 0 && (
+                  <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
+                    <TextField
+                      error={formik.touched.password && Boolean(formik.errors.password)}
+                      fullWidth
+                      required={'true' && Boolean(open)}
+                      label="Пароль"
+                      name="password"
+                      variant="outlined"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="password"
+                      disabled={loading}
+                      value={formik.values.password}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
             <Divider />
             <>
-              <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
-                Сохранить
-              </Button>
-              <Button color="secondary" variant="contained" onClick={onCancel} disabled={loading}>
-                Отмена
-              </Button>
+              <Grid container>
+                <Grid display={open ? 'none' : 'block'}>
+                  {Object.keys(user).length != 0 && (
+                    <Button
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleClickOpen}
+                      variant="contained"
+                      sx={{ m: 1 }}
+                    >
+                      Сменить пароль
+                    </Button>
+                  )}
+                </Grid>
+                <Grid display={open ? 'block' : 'none'}>
+                  {Object.keys(user).length != 0 && (
+                    <Button
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleClickClose}
+                      variant="contained"
+                      sx={{ m: 1 }}
+                    >
+                      Отменить смену пароля
+                    </Button>
+                  )}
+                </Grid>
+                <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
+                  Сохранить
+                </Button>
+                <Button color="secondary" variant="contained" sx={{ m: 1 }} onClick={onCancel} disabled={loading}>
+                  Отмена
+                </Button>
+              </Grid>
             </>
           </Card>
         </form>

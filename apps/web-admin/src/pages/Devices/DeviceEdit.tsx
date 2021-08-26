@@ -1,14 +1,10 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IDevice, NewDevice, IActivationCode } from '@lib/types';
+import { IDevice, NewDevice } from '@lib/types';
 import { useEffect } from 'react';
-//import {authActions} from '@lib/store';
-//import {activateDevice} from '@lib/store';
-
-import { authActions } from '@lib/store';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
-import {/* authActions,*/ useSelector, useDispatch, AppDispatch } from '../../store';
+import { useSelector, useDispatch, AppDispatch } from '../../store';
 import SnackBar from '../../components/SnackBar';
 import selectors from '../../store/device/selectors';
 import actions from '../../store/device';

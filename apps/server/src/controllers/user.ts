@@ -9,8 +9,6 @@ import { created, ok } from '../utils/apiHelpers';
 
 import { DataNotFoundException } from '../exceptions';
 
-import * as verUsers from './verUser';
-
 const addUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { externalId, name, password, firstName, lastName, phoneNumber, email, alias } = ctx.request.body as NewUser;
 
