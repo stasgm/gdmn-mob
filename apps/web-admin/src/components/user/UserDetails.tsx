@@ -1,5 +1,9 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
+import { adminPath } from '../../utils/constants';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+
 import { IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
@@ -9,9 +13,20 @@ interface IProps {
   user: IUser | NewUser;
   onSubmit: (values: IUser | NewUser) => void;
   onCancel: () => void;
+  onChange: () => void;
 }
 
-const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
+const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) => {
+  const navigate = useNavigate();
+  //const [open, setOpen] = useState(false);
+  // let a = 'none';
+
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
     initialValues: {
@@ -19,7 +34,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       name: user.name || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      password: (user as NewUser).password || '',
+      // password: (user as NewUser).password || '',
+      password: user.password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
       alias: user.alias || '',
@@ -33,6 +49,15 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       onSubmit(values);
     },
   });
+
+  // const handleClickOpen = () => {
+  //   a = 'block';
+  //   return a;
+  // };
+  // const handleEdit = () => {
+
+  //   navigate(`${adminPath}/app/users/${user.id}/edit/password`);
+  // };
 
   return (
     <>
@@ -151,10 +176,42 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.alias}
                   />
                 </Grid>
+                {Object.keys(user).length != 0 && (
+                  <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
+                    <TextField
+                      error={formik.touched.password && Boolean(formik.errors.password)}
+                      fullWidth
+                      required={'true' && Boolean(open)}
+                      label="Пароль"
+                      name="password"
+                      variant="outlined"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="password"
+                      disabled={loading}
+                      value={formik.values.password}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
             <Divider />
             <>
+              {/* <Button
+                color="primary"
+                disabled={loading}
+                // onClick={() => onChange()}
+                onClick={onChange}
+                variant="contained"
+                sx={{ m: 1 }}
+              >
+                Сменить пароль
+              </Button> */}
+              {Object.keys(user).length != 0 && (
+                <Button color="primary" disabled={loading} onClick={handleClickOpen} variant="contained" sx={{ m: 1 }}>
+                  Сменить пароль
+                </Button>
+              )}
               <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
                 Сохранить
               </Button>

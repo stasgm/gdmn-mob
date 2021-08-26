@@ -1,10 +1,21 @@
-import { Box, CardHeader, IconButton, CircularProgress } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  CardHeader,
+  IconButton,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { IDeviceBinding, IDevice } from '@lib/types';
 
@@ -35,18 +46,20 @@ const UserView = () => {
 
   const userBindingDevices = bindingSelectors.bindingsByUserId(userId);
 
-  const { list } = useSelector((state) => state.devices);
+  // const { list } = useSelector((state) => state.devices);
+
+  const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
     navigate(-1);
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/users/edit/${userId}`);
+    navigate(`${adminPath}/app/users/${userId}/edit`);
   };
 
   const handleAddDevice = () => {
-    navigate(`${adminPath}/app/users/${userId}/devices/new`);
+    navigate(`${adminPath}/app/users/${userId}/binding/new`);
   };
 
   const handleClearError = () => {
@@ -56,7 +69,7 @@ const UserView = () => {
   const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
-    dispatch(deviceActions.fetchDevices());
+    // dispatch(deviceActions.fetchDevices());
   }, [dispatch, userId]);
 
   useEffect(() => {
@@ -65,32 +78,37 @@ const UserView = () => {
   }, [refreshData]);
 
   const handleDelete = async () => {
+    setOpen(false);
     const res = await dispatch(actions.removeUser(userId));
     if (res.type === 'USER/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };
 
-  // const userDevices = userBindingDevices.map((binding: IDeviceBinding) => {
-  //   return list.find((a) => binding.device.id === a.id);
-  // });
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const userDevices: IDevice[] = [];
+  // const userDevices: IDevice[] = [];
 
-  const data = useMemo(
-    () =>
-      userBindingDevices.forEach((binding: IDeviceBinding) => {
-        const dev = list.find((a) => binding.device.id === a.id);
-        // /*return*/ list.find((a) => binding.device.id === a.id);
-        console.log('dev', dev);
-        if (dev) {
-          userDevices.push(dev);
-        }
-        return { dev };
-      }),
-    [userBindingDevices, userDevices, list],
-  );
+  // const data = useMemo(
+  //   () =>
+  //     userBindingDevices.forEach((binding: IDeviceBinding) => {
+  //       const dev = list.find((a) => binding.device.id === a.id);
+  //       // /*return*/ list.find((a) => binding.device.id === a.id);
+  //       console.log('dev', dev);
+  //       if (dev) {
+  //         userDevices.push(dev);
+  //       }
+  //       return { dev };
+  //     }),
+  //   [userBindingDevices, userDevices, list],
+  // );
 
   if (!user) {
     return (
@@ -129,13 +147,28 @@ const UserView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: () => handleDelete(),
+      onClick: () => handleClickOpen(), //handleDelete(),
       icon: <DeleteIcon />,
     },
   ];
 
   return (
     <>
+      <Box>
+        <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title">
+          <DialogContent>
+            <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelete} color="primary" variant="contained">
+              Удалить
+            </Button>
+            <Button onClick={handleClose} color="secondary" variant="contained">
+              Отмена
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
       <Box
         sx={{
           p: 3,
@@ -174,7 +207,7 @@ const UserView = () => {
       </Box>
       <Box>
         <CardHeader title={'Устройства пользователя'} sx={{ mx: 2 }} />
-        <UserDevices userDevices={userDevices} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
+        <UserDevices userId={userId} userBindingDevices={userBindingDevices} onAddDevice={handleAddDevice} />
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>

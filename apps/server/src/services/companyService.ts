@@ -98,12 +98,8 @@ const deleteOne = async (id: string): Promise<string> => {
     2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
-  const db = getDb();
-  const { companies } = db;
-  const { users } = getDb();
-  const { devices } = getDb();
-  const { codes } = getDb();
-  const { deviceBindings } = getDb();
+
+  const { companies, users, devices, codes, deviceBindings } = getDb();
 
   const companyObj = await companies.find(id);
 
@@ -120,6 +116,15 @@ const deleteOne = async (id: string): Promise<string> => {
       await devices.delete((i) => i.id === item.id);
     }
   };
+
+  // const delDevices2 = async (deviceList: IDBDevice[]) => {
+  //   const promises = deviceList.map(async (item) => {
+  //     await deviceBindings.delete((b) => b.deviceId === item.id);
+  //     await codes.delete((c) => c.deviceId === item.id);
+  //     await devices.delete((i) => i.id === item.id);
+  //   });
+  //   await Promise.all(promises);
+  // };
 
   delDevices(devicesByCompany);
 
@@ -208,8 +213,11 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
       if (filterText) {
         const name = item.name.toUpperCase();
+        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
-        filteredCompanies = name.includes(filterText);
+        filteredCompanies =
+          name.includes(filterText) || creationDate.includes(filterText) || editionDate.includes(filterText);
       }
       delete newParams['filterText'];
     }

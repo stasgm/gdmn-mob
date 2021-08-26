@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-// import ImportExportIcon from '@material-ui/icons/ImportExport';
 import { IDevice } from '@lib/types';
 
 import { authActions, useAuthThunkDispatch } from '@lib/store';
@@ -14,7 +13,7 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import codeActions from '../../store/activationCode';
-import { /*IHeadCells,*/ IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 // import SortableTable from '../../components/SortableTable';
@@ -39,6 +38,12 @@ const DeviceList = () => {
     [dispatch],
   );
 
+  const fetchActivationCodes = useCallback(
+    (deviceId?: string) => {
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
+    },
+    [dispatch],
+  );
   useEffect(() => {
     fetchDevices();
   }, [fetchDevices]);
@@ -69,11 +74,13 @@ const DeviceList = () => {
 
   const handleCreateCode = (deviceId: string) => {
     dispatch(codeActions.createActivationCode(deviceId));
+    fetchActivationCodes(deviceId);
   };
 
   const handleCreateUid = async (code: string, deviceId: string) => {
     await authDispatch(authActions.activateDevice(code));
     dispatch(actions.fetchDeviceById(deviceId));
+    fetchActivationCodes(deviceId);
   };
 
   const buttons: IToolBarButton[] = [
@@ -104,6 +111,14 @@ const DeviceList = () => {
       onClick: () => navigate(`${location.pathname}/new`),
       icon: <AddCircleOutlineIcon />,
     },
+  ];
+
+  const headCells: IHeadCells<IDevice>[] = [
+    { id: 'name', label: 'Наименование', sortEnable: true },
+    { id: 'uid', label: 'Номер', sortEnable: true },
+    { id: 'state', label: 'Состояние', sortEnable: false },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
   ];
 
   return (

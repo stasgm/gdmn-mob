@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
+import { Box, Container, Alert } from '@material-ui/core';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -68,6 +68,14 @@ const CompanyList = () => {
     dispatch(actions.companyActions.clearError());
   };
 
+  const handleAddCompany = () => {
+    if (list.length) {
+      dispatch(actions.companyActions.setError());
+    } else {
+      return navigate(`${location.pathname}/new`);
+    }
+  };
+
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
@@ -93,7 +101,7 @@ const CompanyList = () => {
       name: 'Добавить',
       color: 'primary',
       variant: 'contained',
-      onClick: () => navigate(`${location.pathname}/new`),
+      onClick: handleAddCompany,
       icon: <AddCircleOutlineIcon />,
     },
   ];

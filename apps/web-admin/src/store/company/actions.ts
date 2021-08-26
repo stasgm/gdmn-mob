@@ -3,6 +3,7 @@ import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('COMPANY/INIT')();
 const clearError = createAction('COMPANY/CLEAR_ERROR')();
+const setError = createAction('COMPANY/SET_ERROR')();
 
 const fetchCompaniesAsync = createAsyncAction(
   'COMPANY/FETCH_COMPANIES',
@@ -42,6 +43,7 @@ export const companyActions = {
   removeCompanyAsync,
   clearError,
   init,
+  setError,
 };
 
 export type CompanyActionType = ActionType<typeof companyActions>;

@@ -1,4 +1,5 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
+import { Context } from 'koa';
 
 //import { DB } from '@lib/mock';
 
@@ -27,17 +28,8 @@ import { users as mockUsers } from './data/user';
 const addOne = async (newUser: NewUser): Promise<IUser> => {
   const { users } = getDb();
 
-  const user = await users.find(
-    (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && i.company === newUser.company?.id,
-  );
-
-  if (user) {
-    // TODO проверять по каждой организации
-    throw new ConflictException('Пользователь с таким именем уже существует');
-  }
-
   let creatorId;
-  let company = null;
+  let company: string | null = null;
 
   if (newUser.creator) {
     const creator = await users.find(newUser.creator.id);
@@ -49,6 +41,15 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
 
     creatorId = creator.id;
     company = creator.company;
+  }
+
+  const user = await users.find(
+    (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && (i.company === company || i.role === 'Admin'),
+  );
+
+  if (user) {
+    // TODO проверять по каждой организации
+    throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
   const passwordHash = await hashPassword(newUser.password);
@@ -225,8 +226,15 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
         const name = item.name.toUpperCase();
         const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
         const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
-        filteredUsers = name.includes(filterText) || firstname.includes(filterText) || lastName.includes(filterText);
+        filteredUsers =
+          name.includes(filterText) ||
+          firstname.includes(filterText) ||
+          lastName.includes(filterText) ||
+          creationDate.includes(filterText) ||
+          editionDate.includes(filterText);
       }
       delete newParams['filterText'];
     }
@@ -250,62 +258,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
 
   return Promise.all(pr);
 };
-
-// /**
-//  * Возвращает список устройств пользователя
-//  * @param {string} id - идентификатор пользователя
-//  * */
-// const findDevices = async (userId: string) => {
-//   const user = await users.find(userId);
-
-//   if (!user) {
-//     throw new DataNotFoundException('Пользователь не найден');
-//   }
-
-//   const deviceList = await devices.read();
-//   const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
-
-//   return Promise.all(pr);
-// };
-
-/* const addCompanyToUser = async (userId: string, companyId: string) => {
-  const db = getDb();
-  const { users, companies } = db;
-
-  const user = await users.find(userId);
-
-  if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
-  }
-
-  const company = await companies.find(companyId);
-
-  if (!company) {
-    throw new DataNotFoundException('Компания не найдена');
-  }
-
-  return await users.update({ ...user, company: company.id });
-}; */
-
-/* const removeCompanyFromUser = async (userId: string, companyId: string) => {
-  const db = getDb();
-  const { users } = db;
-
-  const user = await users.find(userId);
-
-  if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
-  }
-
-  if (user.company === companyId) {
-    throw new DataNotFoundException('Компания не привязана к пользователю');
-  }
-
-  return users.update({
-    ...user,
-    companies: user.companies?.filter((i) => i === companyName),
-  });
-}; */
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
   const db = getDb();

@@ -10,7 +10,7 @@ const routes: PartialRouteObject[] = [
   { path: '/', element: <CompanyList /> },
   { path: '/new', element: <CompanyCreate /> },
   { path: '/:id', element: <CompanyView /> },
-  { path: '/edit/:id', element: <CompanyEdit /> },
+  { path: '/:id/edit', element: <CompanyEdit /> },
   { path: '*', element: <Navigate to="/" /> },
 ];
 

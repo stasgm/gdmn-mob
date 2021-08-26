@@ -107,8 +107,8 @@ const CompanyListTable = ({ companies = [], ...rest }: props) => {
             </NavLink>
           </Box>
         </TableCell>
-        <TableCell>{new Date(company.creationDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
-        <TableCell>{new Date(company.editionDate || '').toLocaleString('en-US', { hour12: false })}</TableCell>
+        <TableCell>{new Date(company.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+        <TableCell>{new Date(company.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
       </TableRow>
     ));
 

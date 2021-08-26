@@ -5,7 +5,6 @@ import {
   CardHeader,
   IconButton,
   CircularProgress,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -33,15 +32,17 @@ import DeviceDetailsView from '../../components/device/DeviceDetailsView';
 //import UserListTable from '../../components/user/UserListTable';
 import userSelectors from '../../store/user/selectors';
 import deviceSelectors from '../../store/device/selectors';
+import deviceBindingSelectors from '../../store/deviceBinding/selectors';
 import activationCodeSelectors from '../../store/activationCode/selectors';
 import SnackBar from '../../components/SnackBar';
 
 import SortableTable from '../../components/SortableTable';
 
 import { adminPath } from '../../utils/constants';
+import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
 
-const DeviceView = () => {
-  const { id: deviceId } = useParams();
+const UserDeviceView = () => {
+  const { bindingid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { list } = useSelector((state) => state.users);
@@ -49,9 +50,7 @@ const DeviceView = () => {
 
   const { loading, errorMessage } = useSelector((state) => state.devices);
 
-  const device = deviceSelectors.deviceById(deviceId);
-  const users = userSelectors.usersByDeviceId(deviceId);
-  const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
+  const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
 
   const [open, setOpen] = useState(false);
 
@@ -60,23 +59,24 @@ const DeviceView = () => {
   };
 
   const handleEdit = () => {
-    navigate(`${adminPath}/app/devices/${deviceId}/edit`);
+    navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/${bindingid}/edit`);
+    // <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}></NavLink>
   };
 
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(deviceActions.removeDevice(deviceId));
-    if (res.type === 'DEVICE/REMOVE_SUCCESS') {
+    const res = await dispatch(bindingActions.removeDeviceBinding(bindingid));
+    if (res.type === 'DEVICEBINDING/REMOVE_SUCCES') {
       navigate(-1);
     }
   };
 
   const refreshData = useCallback(() => {
-    dispatch(deviceActions.fetchDeviceById(deviceId));
+    //dispatch(deviceActions.fetchDeviceById(deviceId));
     dispatch(bindingActions.fetchDeviceBindings());
-    dispatch(userActions.fetchUsers());
-    dispatch(codeActions.fetchActivationCodes(deviceId));
-  }, [dispatch, deviceId]);
+    //dispatch(userActions.fetchUsers());
+    //dispatch(codeActions.fetchActivationCodes(deviceId));
+  }, [dispatch /*, deviceId*/]);
 
   useEffect(() => {
     refreshData();
@@ -96,7 +96,6 @@ const DeviceView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
   // useEffect(() => {
   //   fetchUsers();
   // }, [fetchUsers]);
@@ -134,10 +133,10 @@ const DeviceView = () => {
   ];
 
   const handleClearError = () => {
-    dispatch(deviceActions.deviceActions.clearError());
+    dispatch(bindingActions.deviceBindingActions.clearError());
   };
 
-  if (!device) {
+  if (!deviceBinding) {
     return (
       <Box
         sx={{
@@ -179,29 +178,19 @@ const DeviceView = () => {
     },
   ];
 
-  // const headCells: IHeadCells<IUser>[] = [
-  const headCells: IHeadCells<IUser>[] = [
-    { id: 'name', label: 'Пользователь', sortEnable: true },
-    { id: 'lastName', label: 'Фамилия', sortEnable: true },
-    { id: 'firstName', label: 'Имя', sortEnable: true },
-    { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
-  ];
-
   return (
     <>
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить устройство?</DialogContentText>
+            <DialogContentText color="black">Удалить устройство?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDelete} color="primary" variant="contained">
-              Удалить
+            <Button onClick={handleDelete} color="primary">
+              Да
             </Button>
-            <Button onClick={handleClose} color="secondary" variant="contained">
-              Отмена
+            <Button onClick={handleClose} color="primary" /*autoFocus*/>
+              Нет
             </Button>
           </DialogActions>
         </Dialog>
@@ -239,32 +228,12 @@ const DeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceDetailsView device={device} activationCode={code} />
+          <DeviceBindingDetailsView deviceBinding={deviceBinding} />
         </Box>
-      </Box>
-      <Box>
-        <CardHeader title={'Пользователи устройства'} sx={{ mx: 2 }} />
-        {/* <UserListTable users={users} /> */}
-
-        <Container maxWidth={false}>
-          {/* <ToolbarActions buttons={userButtons} /> */}
-          <ToolbarActionsWithSearch
-            buttons={userButtons}
-            searchTitle={'Найти устройство'}
-            valueRef={valueRef}
-            updateInput={handleUpdateInput}
-            searchOnClick={handleSearchClick}
-            keyPress={handleKeyPress}
-          />
-          <Box /*sx={{ pt: 2 }}*/>
-            {/* <UserListTable users={users} /> */}
-            <SortableTable<IUser> headCells={headCells} data={users} path={'/app/users/'} />
-          </Box>
-        </Container>
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
 };
 
-export default DeviceView;
+export default UserDeviceView;
