@@ -1,6 +1,6 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { IDevice, IDeviceBinding } from '@lib/types';
+import { IDeviceBinding } from '@lib/types';
 
 import { NavLink } from 'react-router-dom';
 

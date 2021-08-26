@@ -8,12 +8,9 @@ import { useEffect, useState } from 'react';
 
 import api from '@lib/client-api';
 
-import RefreshIcon from '@material-ui/icons/Refresh';
-
 import ComboBox from '../ComboBox';
 
 import { deviceStates } from '../../utils/constants';
-//import { activationCode2 } from '@lib/mock';
 
 interface IProps {
   loading: boolean;
@@ -172,7 +169,8 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
                     <RefreshIcon />
                   </Button>
                   )}
-                  {/*</Box>*//*}
+                  {/*</Box>*/
+                  /*}
                   </Box> */}
                 </Grid>
               </Grid>

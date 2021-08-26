@@ -1,16 +1,13 @@
 import { Box, Container } from '@material-ui/core';
-import { useCallback, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import { useCallback, useRef } from 'react';
+// import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { IUser } from '@lib/types';
 
 import SortableTable from '../../components/SortableTable';
-
-import UserListTable from '../../components/user/UserListTable';
+// import UserListTable from '../../components/user/UserListTable';
 import { IHeadCells, IToolBarButton } from '../../types';
-import ToolbarActions from '../ToolBarActions';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
-import { useSelector, useDispatch } from '../../store';
+import { useDispatch } from '../../store';
 import actions from '../../store/user';
 
 interface IProps {
@@ -18,7 +15,6 @@ interface IProps {
 }
 
 const CompanyUsers = ({ users }: IProps) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
@@ -82,7 +78,6 @@ const CompanyUsers = ({ users }: IProps) => {
       }}
     >
       <Container maxWidth={false}>
-        {/* <ToolbarActions buttons={userButtons} /> */}
         <ToolbarActionsWithSearch
           buttons={userButtons}
           searchTitle={'Найти устройство'}

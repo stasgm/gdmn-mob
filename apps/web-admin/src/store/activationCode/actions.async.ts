@@ -1,5 +1,4 @@
 import api from '@lib/client-api';
-import { IActivationCode } from '@lib/types';
 
 import { ThunkAction } from 'redux-thunk';
 

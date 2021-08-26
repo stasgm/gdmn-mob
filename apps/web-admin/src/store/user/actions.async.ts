@@ -2,8 +2,6 @@ import { ThunkAction } from 'redux-thunk';
 import api from '@lib/client-api';
 import { IUser, NewUser } from '@lib/types';
 
-import { X } from 'react-feather';
-
 import { AppState } from '../';
 
 import { userActions, UserActionType } from './actions';

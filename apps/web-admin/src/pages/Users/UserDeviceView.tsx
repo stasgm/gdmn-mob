@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -16,27 +16,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
-import { IUser } from '@lib/types';
-
-import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
-
 import { useSelector, useDispatch } from '../../store';
-import deviceActions from '../../store/device';
-import userActions from '../../store/user';
-import codeActions from '../../store/activationCode';
 import bindingActions from '../../store/deviceBinding';
-import { IToolBarButton, IHeadCells } from '../../types';
+import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
-// eslint-disable-next-line import/namespace
-import DeviceDetailsView from '../../components/device/DeviceDetailsView';
-//import UserListTable from '../../components/user/UserListTable';
-import userSelectors from '../../store/user/selectors';
-import deviceSelectors from '../../store/device/selectors';
-import deviceBindingSelectors from '../../store/deviceBinding/selectors';
-import activationCodeSelectors from '../../store/activationCode/selectors';
-import SnackBar from '../../components/SnackBar';
 
-import SortableTable from '../../components/SortableTable';
+import deviceBindingSelectors from '../../store/deviceBinding/selectors';
+import SnackBar from '../../components/SnackBar';
 
 import { adminPath } from '../../utils/constants';
 import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
@@ -45,8 +31,6 @@ const UserDeviceView = () => {
   const { bindingid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { list } = useSelector((state) => state.users);
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { loading, errorMessage } = useSelector((state) => state.devices);
 
@@ -82,12 +66,12 @@ const UserDeviceView = () => {
     refreshData();
   }, [refreshData]);
 
-  const fetchUsers = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(userActions.fetchUsers('', filterText, fromRecord, toRecord));
-    },
-    [dispatch],
-  );
+  // const fetchUsers = useCallback(
+  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
+  //     dispatch(userActions.fetchUsers('', filterText, fromRecord, toRecord));
+  //   },
+  //   [dispatch],
+  // );
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -99,38 +83,6 @@ const UserDeviceView = () => {
   // useEffect(() => {
   //   fetchUsers();
   // }, [fetchUsers]);
-
-  const handleUpdateInput = (value: string) => {
-    const inputValue: string = value;
-
-    if (inputValue) return;
-
-    fetchUsers('');
-  };
-
-  const handleSearchClick = () => {
-    const inputValue = valueRef?.current?.value;
-
-    fetchUsers(inputValue);
-  };
-
-  const handleKeyPress = (key: string) => {
-    if (key !== 'Enter') return;
-
-    const inputValue = valueRef?.current?.value;
-
-    fetchUsers(inputValue);
-  };
-
-  const userButtons: IToolBarButton[] = [
-    // {
-    //   name: 'Добавить',
-    //   color: 'primary',
-    //   variant: 'contained',
-    //   onClick: () => navigate('app/users/new'),
-    //   icon: <AddCircleOutlineIcon />,
-    // },
-  ];
 
   const handleClearError = () => {
     dispatch(bindingActions.deviceBindingActions.clearError());

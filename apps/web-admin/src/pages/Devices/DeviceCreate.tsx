@@ -1,6 +1,5 @@
 import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import { IDevice, NewDevice } from '@lib/types';
 
 import DeviceDetails from '../../components/device/DeviceDetails';
