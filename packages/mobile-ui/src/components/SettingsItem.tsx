@@ -1,25 +1,46 @@
 import React from 'react';
-import { View, StyleSheet, Text, TextInput } from 'react-native';
-import { Subheading, Switch } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Subheading, Switch, TextInput, useTheme } from 'react-native-paper';
 
 type Props = {
   label: string;
-  value: boolean | number;
-  onValueChange: () => void;
+  value: boolean | number | undefined;
+  onValueChange: (newValue: any) => void;
 };
 
 const SettingsItem = ({ label, value, onValueChange }: Props) => {
+  const { colors } = useTheme();
+
   return (
     <View style={localStyles.container}>
       <Subheading numberOfLines={5} style={localStyles.subHeading}>
         {label}
       </Subheading>
       {typeof value === 'boolean' ? (
-        <Switch value={value} onValueChange={onValueChange} />
+        <Switch value={value} onValueChange={(value) => onValueChange(value)} />
       ) : typeof value === 'number' ? (
-        <TextInput value={value.toString()} onChangeText={onValueChange} />
+        <TextInput
+          value={value === 0 ? '' : value.toString()}
+          onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
+          mode="outlined"
+          keyboardType={'numeric'}
+          style={localStyles.input}
+          theme={{
+            colors: {
+              primary: colors.primary,
+              text: colors.text,
+              placeholder: colors.primary,
+              background: colors.surface,
+            },
+          }}
+        />
       ) : (
-        <Text>{value}</Text>
+        <TextInput
+          value={value}
+          onChangeText={(text) => onValueChange(text)}
+          mode="outlined"
+          keyboardType={'default'}
+        />
       )}
     </View>
   );
@@ -30,12 +51,15 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 12,
     width: '100%',
+  },
+  input: {
+    height: 32,
   },
   subHeading: {
     width: '85%',
+    fontSize: 14,
   },
 });
 

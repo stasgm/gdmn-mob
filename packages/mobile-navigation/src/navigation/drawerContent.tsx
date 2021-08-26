@@ -20,7 +20,7 @@ type Props = DrawerContentComponentProps<DrawerContentOptions> & ICutsomProps;
 
 export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
-  const { loading, errorMessage } = useSelector((state) => state.app);
+  const { loading } = useSelector((state) => state.app);
   const { user, company } = useSelector((state) => state.auth);
 
   // const handleUpdate = async () => {
@@ -234,7 +234,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       {/* <Divider /> */}
       <View style={styles.systemInfo}>
         <TouchableOpacity disabled={loading} onPress={onSync}>
-          <Avatar.Icon size={50} icon="cloud-refresh" />
+          <Avatar.Icon size={50} style={loading && { opacity: 0.2 }} icon="cloud-refresh" />
         </TouchableOpacity>
         <View style={styles.updateSection}>
           <Caption style={styles.caption}>{loading ? 'Синхронизация данных...' : ''}</Caption>
