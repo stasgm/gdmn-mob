@@ -27,7 +27,6 @@ import { users as mockUsers } from './data/user';
  * */
 const addOne = async (newUser: NewUser): Promise<IUser> => {
   const { users } = getDb();
-  const { companies } = getDb();
 
   let creatorId;
   let company: string | null = null;
@@ -259,62 +258,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
 
   return Promise.all(pr);
 };
-
-// /**
-//  * Возвращает список устройств пользователя
-//  * @param {string} id - идентификатор пользователя
-//  * */
-// const findDevices = async (userId: string) => {
-//   const user = await users.find(userId);
-
-//   if (!user) {
-//     throw new DataNotFoundException('Пользователь не найден');
-//   }
-
-//   const deviceList = await devices.read();
-//   const pr = deviceList.filter((i) => i.userId === userId).map(async (i) => await makeDevice(i));
-
-//   return Promise.all(pr);
-// };
-
-/* const addCompanyToUser = async (userId: string, companyId: string) => {
-  const db = getDb();
-  const { users, companies } = db;
-
-  const user = await users.find(userId);
-
-  if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
-  }
-
-  const company = await companies.find(companyId);
-
-  if (!company) {
-    throw new DataNotFoundException('Компания не найдена');
-  }
-
-  return await users.update({ ...user, company: company.id });
-}; */
-
-/* const removeCompanyFromUser = async (userId: string, companyId: string) => {
-  const db = getDb();
-  const { users } = db;
-
-  const user = await users.find(userId);
-
-  if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
-  }
-
-  if (user.company === companyId) {
-    throw new DataNotFoundException('Компания не привязана к пользователю');
-  }
-
-  return users.update({
-    ...user,
-    companies: user.companies?.filter((i) => i === companyName),
-  });
-}; */
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
   const db = getDb();

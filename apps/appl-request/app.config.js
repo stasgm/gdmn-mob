@@ -11,6 +11,6 @@ export default ({ config }) => ({
   extra: {
     appVesion: config.version,
     buildVersion: config.android.versionCode,
-    backUserAlias: config.backUserAlias,
+    slug: config.slug,
   },
 });

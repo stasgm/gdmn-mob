@@ -27,27 +27,34 @@ class Message extends BaseRequest {
       } as types.ISendMessageResponse;
     }
 
-    const body: NewMessage = {
-      head: { company, consumer, appSystem: systemName },
-      status: 'READY',
-      body: message,
-    };
+    try {
+      const body: NewMessage = {
+        head: { company, consumer, appSystem: systemName },
+        status: 'READY',
+        body: message,
+      };
 
-    const res = await this.api.axios.post<IResponse<IMessageInfo>>('/messages', body);
-    const resData = res.data;
+      const res = await this.api.axios.post<IResponse<IMessageInfo>>('/messages', body);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'SEND_MESSAGE',
+          uid: resData.data?.uid,
+          date: resData.data?.date,
+        } as types.ISendMessageResponse;
+      }
+
       return {
-        type: 'SEND_MESSAGE',
-        uid: resData.data?.uid,
-        date: resData.data?.date,
-      } as types.ISendMessageResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка отправки сообщения',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   getMessages = async ({ systemName, companyId }: { systemName: string; companyId: string }) => {
@@ -60,20 +67,27 @@ class Message extends BaseRequest {
       } as types.IGetMessagesResponse;
     }
 
-    const res = await this.api.axios.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemName}`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.get<IResponse<IMessage[]>>(`/messages/${companyId}/${systemName}`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'GET_MESSAGES',
+          messageList: resData.data,
+        } as types.IGetMessagesResponse;
+      }
+
       return {
-        type: 'GET_MESSAGES',
-        messageList: resData.data,
-      } as types.IGetMessagesResponse;
+        type: 'ERROR',
+        message: resData.error || 'ошибка получения данных',
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка получения сообщения',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error || 'ошибка получения данных',
-    } as error.INetworkError;
   };
 
   removeMessage = async (messageId: string) => {
@@ -85,18 +99,25 @@ class Message extends BaseRequest {
       } as types.IRemoveMessageResponse;
     }
 
-    const res = await this.api.axios.delete<IResponse<void>>(`/messages/${messageId}`);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>(`/messages/${messageId}`);
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'REMOVE_MESSAGE',
+        } as types.IRemoveMessageResponse;
+      }
       return {
-        type: 'REMOVE_MESSAGE',
-      } as types.IRemoveMessageResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка удаления сообщения',
+      } as error.INetworkError;
     }
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   clear = async () => {
@@ -108,19 +129,26 @@ class Message extends BaseRequest {
       } as types.IClearMessagesResponse;
     }
 
-    const res = await this.api.axios.delete<IResponse<void>>('/messages');
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>('/messages');
+      const resData = res.data;
 
-    if (resData.result) {
+      if (resData.result) {
+        return {
+          type: 'CLEAR_MESSAGES',
+        } as types.IClearMessagesResponse;
+      }
+
       return {
-        type: 'CLEAR_MESSAGES',
-      } as types.IClearMessagesResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err?.response?.data?.error || 'ошибка удаления сообщений',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
   };
 
   /* subscribe = async (systemName: string, companyId: string) => {

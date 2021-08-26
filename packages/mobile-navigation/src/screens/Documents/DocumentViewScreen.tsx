@@ -8,10 +8,7 @@ import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 
-import { ItemSeparator } from '@lib/mobile-ui/src/components';
-
-import { useActionSheet } from '@lib/mobile-ui/src/hooks';
-import { BackButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
+import { BackButton, MenuButton, useActionSheet, ItemSeparator } from '@lib/mobile-ui';
 
 import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
 

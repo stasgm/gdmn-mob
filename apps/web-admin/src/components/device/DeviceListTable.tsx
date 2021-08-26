@@ -32,7 +32,7 @@ interface IProps {
   limitRows?: number;
   onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
-  onCreateUid?: (code?: string, deviceId?: string) => void;
+  onCreateUid?: (code: string, deviceId: string) => void;
 }
 
 const DeviceListTable = ({
@@ -147,7 +147,7 @@ const DeviceListTable = ({
                   <Tooltip title="Создать номер">
                     <Button
                       // component={RouterLink}
-                      onClick={() => onCreateUid && onCreateUid(code, device.id)} //formik.values.code
+                      onClick={() => onCreateUid && code && onCreateUid(code, device.id)} //formik.values.code
                     >
                       <RefreshIcon />
                     </Button>

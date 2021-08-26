@@ -99,64 +99,22 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   switch (version) {
     case '1.0.0':
       users = await userService.findAll(params);
+      /** example for versioning */
+      //users = await verUsers.v1.myFunction(params);
       break;
     case '2.0.0':
-      // call another service f.e. userService_v2
+      users = await userService.findAll(params);
+      /** example for versioning */
+      //users = await verUsers.v2.myFunction(params);
       break;
     default:
       users = await userService.findAll(params);
       break;
   }
-  //const users = await userService.findAll(params);
 
   ok(ctx as Context, users);
 
   log.info('getUsers: users are successfully received');
 };
-
-// const getFilteredUsers = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { filterText, fromRecord, toRecord } = ctx.query;
-
-//   const params: Record<string, string> = {};
-
-//   if (typeof filterText === 'string') {
-//     params.filterText = filterText;
-//   }
-
-//   if (typeof fromRecord === 'string') {
-//     params.fromRecord = fromRecord;
-//   }
-
-//   if (typeof toRecord === 'string') {
-//     params.toRecord = toRecord;
-//   }
-
-//   const users = await userService.findAll(params);
-
-//   ok(ctx as Context, users);
-
-//   log.info('getFilteredUsers: users are successfully received');
-// };
-
-// const getDevicesByUser = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { id: userId } = ctx.params;
-
-//   if (!userId) {
-//     ctx.throw(400, 'не указан идентификатор пользователя');
-//   }
-
-//   try {
-//     const deviceIfno = await userService.findDevices(userId);
-
-//     const result: IResponse<IDevice[]> = { result: true, data: deviceIfno };
-
-//     ctx.status = 200;
-//     ctx.body = result;
-
-//     log.info('getDevicesByUser: OK');
-//   } catch (err) {
-//     ctx.throw(400, err);
-//   }
-// };
 
 export { addUser, updateUser, removeUser, getUser, getUsers };
