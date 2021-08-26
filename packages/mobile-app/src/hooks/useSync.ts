@@ -53,6 +53,7 @@ const useSync = (onSync?: () => void): () => void => {
       if (readyDocs.length) {
         const sendingDocsMessage: IMessage['body'] = {
           type: 'DOCS',
+          version: 1,
           payload: readyDocs,
         };
 
@@ -94,6 +95,7 @@ const useSync = (onSync?: () => void): () => void => {
       //Формируем запрос на получение справочников для следующего раза
       const messageGetRef: IMessage['body'] = {
         type: 'CMD',
+        version: 1,
         payload: {
           name: 'GET_REF',
         },
@@ -102,6 +104,7 @@ const useSync = (onSync?: () => void): () => void => {
       //Формируем запрос на получение документов для следующего раза
       const messageGetDoc: IMessage['body'] = {
         type: 'CMD',
+        version: 1,
         payload: {
           name: 'GET_DOCUMENTS',
         },
@@ -157,6 +160,11 @@ const useSync = (onSync?: () => void): () => void => {
   const processMessage = async (msg: IMessage, errList: string[]) => {
     if (!msg) {
       return;
+    }
+
+    if (msg.body.version !== 1 ) {
+      errList.push(`Версия '${msg.body.version}' структуры загружаемых данных не поддерживается приложением`);
+        return;
     }
 
     switch (msg.body.type as BodyType) {
