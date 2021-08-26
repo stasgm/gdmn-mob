@@ -8,24 +8,19 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
-import { IDeviceBinding, IDevice } from '@lib/types';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
-import deviceSelectors from '../../store/device/selectors';
 import bindingSelectors from '../../store/deviceBinding/selectors';
 import bindingActions from '../../store/deviceBinding';
-import deviceActions from '../../store/device';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 import UserDetailsView from '../../components/user/UserDetailsView';
@@ -155,7 +150,7 @@ const UserView = () => {
   return (
     <>
       <Box>
-        <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title">
+        <Dialog open={open} onClose={handleClose}>
           <DialogContent>
             <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
           </DialogContent>

@@ -1,7 +1,5 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { adminPath } from '../../utils/constants';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 
 import { IUser, NewUser } from '@lib/types';
@@ -13,19 +11,10 @@ interface IProps {
   user: IUser | NewUser;
   onSubmit: (values: IUser | NewUser) => void;
   onCancel: () => void;
-  onChange: () => void;
 }
 
-const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) => {
-  const navigate = useNavigate();
-  //const [open, setOpen] = useState(false);
-  // let a = 'none';
-
+const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   const [open, setOpen] = useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
@@ -50,14 +39,14 @@ const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) =>
     },
   });
 
-  // const handleClickOpen = () => {
-  //   a = 'block';
-  //   return a;
-  // };
-  // const handleEdit = () => {
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
-  //   navigate(`${adminPath}/app/users/${user.id}/edit/password`);
-  // };
+  const handleClickClose = () => {
+    setOpen(false);
+    formik.values.password = '';
+  };
 
   return (
     <>
@@ -197,27 +186,40 @@ const UserDetails = ({ user, loading, onSubmit, onCancel, onChange }: IProps) =>
             </CardContent>
             <Divider />
             <>
-              {/* <Button
-                color="primary"
-                disabled={loading}
-                // onClick={() => onChange()}
-                onClick={onChange}
-                variant="contained"
-                sx={{ m: 1 }}
-              >
-                Сменить пароль
-              </Button> */}
-              {Object.keys(user).length != 0 && (
-                <Button color="primary" disabled={loading} onClick={handleClickOpen} variant="contained" sx={{ m: 1 }}>
-                  Сменить пароль
+              <Grid container>
+                <Grid display={open ? 'none' : 'block'}>
+                  {Object.keys(user).length != 0 && (
+                    <Button
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleClickOpen}
+                      variant="contained"
+                      sx={{ m: 1 }}
+                    >
+                      Сменить пароль
+                    </Button>
+                  )}
+                </Grid>
+                <Grid display={open ? 'block' : 'none'}>
+                  {Object.keys(user).length != 0 && (
+                    <Button
+                      color="primary"
+                      disabled={loading}
+                      onClick={handleClickClose}
+                      variant="contained"
+                      sx={{ m: 1 }}
+                    >
+                      Отменить смену пароля
+                    </Button>
+                  )}
+                </Grid>
+                <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
+                  Сохранить
                 </Button>
-              )}
-              <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
-                Сохранить
-              </Button>
-              <Button color="secondary" variant="contained" onClick={onCancel} disabled={loading}>
-                Отмена
-              </Button>
+                <Button color="secondary" variant="contained" sx={{ m: 1 }} onClick={onCancel} disabled={loading}>
+                  Отмена
+                </Button>
+              </Grid>
             </>
           </Card>
         </form>

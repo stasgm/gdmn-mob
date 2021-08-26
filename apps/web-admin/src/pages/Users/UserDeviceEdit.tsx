@@ -10,7 +10,6 @@ import actions from '../../store/deviceBinding';
 import selectors from '../../store/deviceBinding/selectors';
 
 const UserDeviceEdit = () => {
-  // { id: userId, deviceid } = useParams();
   const { bindingid } = useParams();
   const navigate = useNavigate();
 
@@ -18,7 +17,6 @@ const UserDeviceEdit = () => {
 
   const { loading, errorMessage } = useSelector((state) => state.deviceBindings);
   const binding = selectors.bindingById(bindingid);
-  //selectors.bindingsByDeviceIdAndUserId(deviceid, userId);
 
   useEffect(() => {
     dispatch(actions.fetchDeviceBindingById(bindingid));

@@ -151,7 +151,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
         const newState = deviceStates[item.state];
         const state = typeof newState === 'string' ? newState.toUpperCase() : '';
         const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-         const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
         filteredDevices =
           name.includes(filterText) ||

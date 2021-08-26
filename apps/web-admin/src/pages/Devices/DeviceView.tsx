@@ -44,7 +44,6 @@ const DeviceView = () => {
   const { id: deviceId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { list } = useSelector((state) => state.users);
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { loading, errorMessage } = useSelector((state) => state.devices);

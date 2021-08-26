@@ -9,8 +9,6 @@ import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
 import SnackBar from '../../components/SnackBar';
 
-import { adminPath } from '../../utils/constants';
-
 const UserEdit = () => {
   const { id: userId } = useParams();
 
@@ -38,10 +36,6 @@ const UserEdit = () => {
     if (res.type === 'USER/UPDATE_SUCCESS') {
       goBack();
     }
-  };
-
-  const handleEdit = () => {
-    navigate(`${adminPath}/app/users/${userId}/edit/password`);
   };
 
   if (!user) {
@@ -73,7 +67,7 @@ const UserEdit = () => {
         <CardHeader title={'Редактирование пользователя'} />
         {loading && <CircularProgress size={40} />}
       </Box>
-      <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={goBack} onChange={handleEdit} />
+      <UserDetails user={user} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </Box>
   );
