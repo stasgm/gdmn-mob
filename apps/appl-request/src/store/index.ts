@@ -4,7 +4,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 import { persistStore } from 'redux-persist';
 
-import appReducer from './app/reducer';
+// import appReducer from './app/reducer';
 
 import { AppActionType } from './app/actions';
 
