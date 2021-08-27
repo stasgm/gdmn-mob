@@ -54,7 +54,9 @@ export interface IProps {
 
 const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
   const { colors } = useTheme();
-  const { loading } = useSelector((state) => state.app);
+  const { loading, errorList } = useSelector((state) => state.app);
+
+  console.log('errorList', errorList);
 
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
 
