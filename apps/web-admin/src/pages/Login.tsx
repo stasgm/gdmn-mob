@@ -22,8 +22,8 @@ const Login = () => {
   const formik = useFormik<IUserCredentials>({
     enableReinitialize: true,
     initialValues: {
-      name: 'Stas',
-      password: '@123!',
+      name: '',
+      password: '',
     },
     validationSchema: yup.object().shape({
       name: yup.string().required('Заполните это поле'),

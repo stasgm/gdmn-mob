@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -23,7 +23,7 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
-import { useDispatch, useSelector } from '../../store';
+import { useDispatch } from '../../store';
 import { appActions } from '../../store/app/actions';
 import { orderType } from '../../store/docs/mock';
 import { IOrderFormParam } from '../../store/app/types';

@@ -28,7 +28,7 @@ const companies: ICompany[] = [
 
 type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences;
 
-export const newMessage: NewMessage<MessageType> = {
+export const newMessage: NewMessage = {
   head: {
     appSystem: 'Inventory',
     company: companies[0] as INamedEntity,
@@ -37,6 +37,7 @@ export const newMessage: NewMessage<MessageType> = {
   status: 'DRAFT',
   body: {
     type: 'CMD',
+    version: 1,
     payload: {
       name: 'GET_DOCUMENTS',
     },
@@ -57,6 +58,7 @@ export const messages: IMessage<MessageType>[] = [
     },
     body: {
       type: 'CMD',
+      version: 1,
       payload: {
         name: 'GET_DOCUMENTS',
         params: [

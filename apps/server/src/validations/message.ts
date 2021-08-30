@@ -16,10 +16,12 @@ const newMessage: Config = {
         appSystem: Joi.string().optional(),
         producer: Joi.object().optional(),
         consumer: Joi.object().optional(),
+        version: Joi.number().optional(),
         dateTime: Joi.string().optional(),
       }),
       body: Joi.object({
         type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+        version: Joi.number().optional(),
         payload: Joi.alternatives()
           .try(Joi.object(), Joi.array())
           .required()
