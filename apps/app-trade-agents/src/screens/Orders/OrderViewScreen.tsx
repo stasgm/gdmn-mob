@@ -52,7 +52,7 @@ const OrderViewScreen = () => {
       return;
     }
 
-    dispatch(documentActions.deleteDocument(id));
+    dispatch(documentActions.removeDocument(id));
     navigation.goBack();
   }, [dispatch, id, navigation]);
 

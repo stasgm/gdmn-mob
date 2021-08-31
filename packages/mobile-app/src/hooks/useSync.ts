@@ -20,6 +20,8 @@ const useSync = (onSync?: () => void): () => void => {
 
   const systemName = Constants.manifest?.extra?.slug;
   const consumer: INamedEntity = { id: '-1', name: systemName };
+  const refVersion = 1;
+  const docVersion = 1;
 
   const sync = () => {
     if (!company || !user) {
@@ -53,6 +55,7 @@ const useSync = (onSync?: () => void): () => void => {
       if (readyDocs.length) {
         const sendingDocsMessage: IMessage['body'] = {
           type: 'DOCS',
+          version: docVersion,
           payload: readyDocs,
         };
 
@@ -75,7 +78,6 @@ const useSync = (onSync?: () => void): () => void => {
           errList.push(sendMessageResponse.message);
         }
       }
-
       //2. Получаем все сообщения для мобильного
       const getMessagesResponse = await api.message.getMessages({
         systemName,
@@ -94,6 +96,7 @@ const useSync = (onSync?: () => void): () => void => {
       //Формируем запрос на получение справочников для следующего раза
       const messageGetRef: IMessage['body'] = {
         type: 'CMD',
+        version: refVersion,
         payload: {
           name: 'GET_REF',
         },
@@ -102,6 +105,7 @@ const useSync = (onSync?: () => void): () => void => {
       //Формируем запрос на получение документов для следующего раза
       const messageGetDoc: IMessage['body'] = {
         type: 'CMD',
+        version: docVersion,
         payload: {
           name: 'GET_DOCUMENTS',
         },
@@ -166,7 +170,11 @@ const useSync = (onSync?: () => void): () => void => {
 
       case 'REFS': {
         //TODO: проверка данных, приведение к типу
-
+        console.log('msg.body.version', msg.body.version);
+        if ((msg.body.version || 1) !== refVersion) {
+          errList.push(`Структура загружаемых данных для справочников с версией '${msg.body.version}' не поддерживается приложением`);
+          break;
+        }
 
         if (refLoadType) {
           //Записываем новые справочники из сообщения
@@ -201,6 +209,11 @@ const useSync = (onSync?: () => void): () => void => {
       }
 
       case 'DOCS': {
+        if ((msg.body.version || 1) !== docVersion) {
+          errList.push(`Структура загружаемых данных для документов с версией '${msg.body.version}' не поддерживается приложением`);
+          break;
+        }
+
         const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
 
         //Если удачно сохранились документы, удаляем сообщение в json
