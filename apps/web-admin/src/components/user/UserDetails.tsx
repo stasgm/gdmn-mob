@@ -1,10 +1,13 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
+import { Box, Card, CardContent, Grid, TextField, Divider, Button, IconButton } from '@material-ui/core';
 
 import { useState } from 'react';
 
 import { IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
+
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 
 interface IProps {
   loading: boolean;
@@ -187,38 +190,26 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
             <Divider />
             <>
               <Grid container>
-                <Grid display={open ? 'none' : 'block'}>
-                  {Object.keys(user).length != 0 && (
-                    <Button
-                      color="primary"
-                      disabled={loading}
-                      onClick={handleClickOpen}
-                      variant="contained"
-                      sx={{ m: 1 }}
-                    >
-                      Сменить пароль
-                    </Button>
-                  )}
-                </Grid>
-                <Grid display={open ? 'block' : 'none'}>
-                  {Object.keys(user).length != 0 && (
-                    <Button
-                      color="primary"
-                      disabled={loading}
-                      onClick={handleClickClose}
-                      variant="contained"
-                      sx={{ m: 1 }}
-                    >
-                      Отменить смену пароля
-                    </Button>
-                  )}
-                </Grid>
                 <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
                   Сохранить
                 </Button>
                 <Button color="secondary" variant="contained" sx={{ m: 1 }} onClick={onCancel} disabled={loading}>
                   Отмена
                 </Button>
+                <Grid display={open ? 'none' : 'block'}>
+                  {Object.keys(user).length != 0 && (
+                    <Button color="primary" disabled={loading} onClick={handleClickOpen} sx={{ m: 1 }}>
+                      <LockOutlinedIcon style={{ height: 18 }} /> Сменить пароль
+                    </Button>
+                  )}
+                </Grid>
+                <Grid display={open ? 'block' : 'none'}>
+                  {Object.keys(user).length != 0 && (
+                    <Button color="primary" disabled={loading} onClick={handleClickClose} sx={{ m: 1 }}>
+                      <NoEncryptionOutlinedIcon style={{ height: 18 }} /> Отменить смену пароля
+                    </Button>
+                  )}
+                </Grid>
               </Grid>
             </>
           </Card>
