@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
+import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';

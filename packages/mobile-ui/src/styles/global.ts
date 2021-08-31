@@ -114,6 +114,10 @@ const globalstyles = StyleSheet.create({
   flexDirectionRow: {
     flexDirection: 'row',
   },
+  directionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   flexGrow: {
     flexGrow: 10,
   },

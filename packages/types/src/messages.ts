@@ -46,21 +46,27 @@ const cmd2: ICmd<Pick<ICmdParams, 'data'>> = {
 export interface IMessage<T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences> {
   id: string;
   status: StatusType;
+  version?: number;
   head: IHeadMessage;
   body: {
     type: BodyType;
+    version: number;
     payload: T;
   };
 }
 
-export type NewMessage<T = any> = {
+export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-  status: StatusType;
-  body: {
-    type: BodyType;
-    payload: T;
-  };
 };
+
+// export type NewMessage<T = any> = {
+//   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+//   status: StatusType;
+//   body: {
+//     type: BodyType;
+//     payload: T;
+//   };
+// };
 
 export interface IDataMessage<T = any> {
   id: string;

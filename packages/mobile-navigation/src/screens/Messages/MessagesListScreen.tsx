@@ -3,6 +3,7 @@ import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/core';
+import Constants from 'expo-constants';
 
 import { IMessage } from '@lib/types';
 import { useSelector, messageActions, useDispatch } from '@lib/store';
@@ -84,7 +85,7 @@ const handleSend = async () => {
     dispatch(
       messageActions.fetchMessages({
         companyId: company!.id,
-        systemId: 'gdmn-appl-request',
+        systemId: Constants.manifest?.extra?.slug || 'gdmn',
       }),
     );
   }, [company, dispatch]);

@@ -36,6 +36,7 @@
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@lib/types": "*",
+    "@lib/mobile-app": "*",
     "@react-native-async-storage/async-storage": "^1.13.0",
     "@react-native-community/datetimepicker": "3.2.0",
     "@react-native-community/masked-view": "0.1.10",
