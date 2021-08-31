@@ -113,7 +113,10 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
 
   return (
     <>
-      <Box sx={{ background: 'transparent', border: 'none', display: { xl: 'none', xs: 'block' } }}>
+      <Box
+        sx={{ background: 'transparent', border: 'none', display: { xl: 'none', xs: 'block' } }}
+        onMouseLeave={onMobileClose}
+      >
         <Drawer
           anchor="left"
           onClose={onMobileClose}

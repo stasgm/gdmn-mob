@@ -134,7 +134,7 @@ const ToolBarActions = ({ buttons /*, onButtonsOpen */ }: props) => {
             display: { xl: 'none', md: 'none', sm: 'none', xs: 'block' },
           }}
         >
-          <StyledMenu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
+          <StyledMenu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose} onMouseLeave={handleClose}>
             {buttonsList}
           </StyledMenu>
         </Box>
