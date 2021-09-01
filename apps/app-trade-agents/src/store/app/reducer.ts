@@ -10,21 +10,6 @@ const initialState: Readonly<IAppState> = {
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
   switch (action.type) {
-    case getType(appActions.init):
-      return initialState;
-
-    case getType(appActions.setFormParams):
-      return {
-        ...state,
-        formParams: { ...state.formParams, ...action.payload },
-      };
-
-    case getType(appActions.clearFormParams):
-      return {
-        ...state,
-        formParams: {},
-      };
-
     default:
       return state;
   }

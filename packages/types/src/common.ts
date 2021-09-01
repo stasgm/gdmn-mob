@@ -20,4 +20,4 @@ export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
 
 export type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED' | 'PROCESSED_INCORRECT' | 'PROCESSED_DEADLOCK';
 
-export type BodyType = 'CMD' | 'REFS' | 'DOCS';
+export type BodyType = 'CMD' | 'REFS' | 'DOCS' | 'SETTINGS';

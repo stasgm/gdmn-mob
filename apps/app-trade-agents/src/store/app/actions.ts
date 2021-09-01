@@ -1,16 +1,14 @@
-import { ActionType, createAction } from 'typesafe-actions';
+import { IEntity, IDocument } from '@lib/types';
+import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { IFormParam } from './types';
-
-const init = createAction('APP/INIT')();
-
-const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
-const clearFormParams = createAction('APP/CLEAN_FORM_PARAMS')();
+const removeDocumentAsync = createAsyncAction(
+  'DOCUMENTS/REMOVE_DOCUMENT',
+  'DOCUMENTS/REMOVE_DOCUMENT_SUCCESS',
+  'DOCUMENTS/REMOVE_DOCUMENT_FAILURE',
+)<string | undefined, string, string>();
 
 export const appActions = {
-  init,
-  setFormParams,
-  clearFormParams,
+  removeDocumentAsync,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

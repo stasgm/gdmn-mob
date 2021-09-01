@@ -34,7 +34,7 @@ const RouteViewScreen = () => {
   useScrollToTop(ref);
 
   const handleDelete = useCallback(() => {
-    dispatch(documentActions.deleteDocument(id));
+    dispatch(documentActions.removeDocument(id));
     navigation.goBack();
   }, [dispatch, id, navigation]);
 

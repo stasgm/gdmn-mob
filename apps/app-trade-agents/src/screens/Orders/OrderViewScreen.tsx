@@ -107,7 +107,7 @@ const OrderViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(order?.status || 'DRAFT')}
-        title={order?.head.outlet.name}
+        title={order.head.outlet?.name}
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >

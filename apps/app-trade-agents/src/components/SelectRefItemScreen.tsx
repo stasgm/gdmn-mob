@@ -4,7 +4,7 @@ import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 
 import { INamedEntity, IReference } from '@lib/types';
-import { refSelectors, useSelector } from '@lib/store';
+import { appActions, refSelectors, useSelector } from '@lib/store';
 
 import {
   AppScreen,
@@ -17,7 +17,6 @@ import {
 } from '@lib/mobile-ui';
 
 import { useDispatch } from '../store';
-import { appActions } from '../store/app/actions';
 import { IOutlet } from '../store/docs/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
