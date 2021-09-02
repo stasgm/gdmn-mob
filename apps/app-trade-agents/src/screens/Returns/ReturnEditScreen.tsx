@@ -23,12 +23,10 @@ import {
   globalStyles as styles,
   SubTitle,
 } from '@lib/mobile-ui';
-
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument } from '../../store/types';
-
 import { IReturnFormParam } from '../../store/app/types';
 
 const ReturnEditScreen = () => {
@@ -37,11 +35,9 @@ const ReturnEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
+  const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
 
-  const returnType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
-    (t) => t.name === 'return',
-  );
+  const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -64,9 +60,7 @@ const ReturnEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
-    (e) => e.id === docOutlet?.id,
-  );
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
   useEffect(() => {
     if (!docContact && !!docOutlet) {

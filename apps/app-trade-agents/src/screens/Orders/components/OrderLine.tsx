@@ -32,9 +32,9 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   // const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
-  const packages = (refSelectors.selectByName('packageGood') as IReference<IPackageGood>)?.data?.filter(
-    (e) => e.good.id === item.good.id,
-  );
+  const packages = refSelectors
+    .selectByName<IPackageGood>('packageGood')
+    ?.data?.filter((e) => e.good.id === item.good.id);
 
   const qtyRef = useRef<TextInput>(null);
 

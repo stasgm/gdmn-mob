@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 import { v4 as uuid } from 'uuid';
 
@@ -20,7 +20,7 @@ const RouteDetailScreen = () => {
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   // const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId === id);
-  const visits = (docSelectors.selectByDocType('visit') as IVisitDocument[])?.filter((e) => e.head.routeLineId === id);
+  const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);
 
@@ -30,7 +30,8 @@ const RouteDetailScreen = () => {
     });
   }, [navigation]);
 
-  const point = (docSelectors.selectByDocType('route') as IRouteDocument[])
+  const point = docSelectors
+    .selectByDocType<IRouteDocument>('route')
     ?.find((e) => e.id === routeId)
     ?.lines.find((i) => i.id === id);
 
@@ -44,16 +45,14 @@ const RouteDetailScreen = () => {
 
   //TODO получить адрес item.outlet.id
   const outlet = point
-    ? (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find((e) => e.id === point.outlet.id)
+    ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
     : undefined;
   // const outlet = (outletRefMock as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
   // const contact = outlet
   //   ? (contactRefMock as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
   //   : undefined;
   const contact = outlet
-    ? (refSelectors.selectByName('contact') as IReference<IContact>).data?.find(
-        (item) => item.id === outlet?.company.id,
-      )
+    ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
     : undefined;
 
   const debt: IDebt = {

@@ -39,11 +39,11 @@ const OrderEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
 
-  const orderType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
-    (t) => t.name === 'order',
-  );
+  const orderType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documentType')
+    ?.data.find((t) => t.name === 'order');
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
@@ -67,9 +67,7 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
-    (e) => e.id === docOutlet?.id,
-  );
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
   useEffect(() => {
     if (!docContact && !!docOutlet) {

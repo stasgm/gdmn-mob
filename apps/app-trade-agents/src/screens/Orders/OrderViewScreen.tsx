@@ -33,7 +33,7 @@ const OrderViewScreen = () => {
   const routeBack = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeBack;
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
 
   const isBlocked = order?.status !== 'DRAFT';
 

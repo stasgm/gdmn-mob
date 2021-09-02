@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
@@ -50,7 +50,7 @@ const SelectGoodScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const goods = refSelectors.selectByName('good') as IReference<IGood>;
+  const goods = refSelectors.selectByName<IGood>('good');
 
   const list = goods.data?.filter((good) => good.goodgroup.id === groupId);
 

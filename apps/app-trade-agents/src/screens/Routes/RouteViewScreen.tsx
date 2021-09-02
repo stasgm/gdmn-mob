@@ -16,7 +16,7 @@ import {
 import { useDispatch, documentActions, docSelectors } from '@lib/store';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IRouteDocument, IRouteLine } from '../../store/types';
+import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 
@@ -28,12 +28,18 @@ const RouteViewScreen = () => {
   const dispatch = useDispatch();
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
-  const route = (docSelectors.selectByDocType('route') as IRouteDocument[])?.find((e) => e.id === id);
+  const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
 
   const handleDelete = useCallback(() => {
+    // const visitList = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
+
+    // const orderList = docSelectors.selectByDocType<IOrderDocument>('order')?.filter((e) => e.head.route?.id === id);
+
+    // visitList.forEach((v) => {});
+
     dispatch(documentActions.removeDocument(id));
     navigation.goBack();
   }, [dispatch, id, navigation]);
