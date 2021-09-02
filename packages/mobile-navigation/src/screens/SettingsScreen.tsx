@@ -73,19 +73,21 @@ const SettingsSceen = () => {
         <Text style={[styles.title]}>Настройки приложения</Text>
         <Divider />
         <View>
-          {Object.entries(data).filter(([key, item]) => item.visible).map(([key, item]) => {
-            return (
-              <View key={key}>
-                <SettingsItem
-                  key={key}
-                  label={item.description || key}
-                  value={item.data}
-                  onValueChange={(newValue) => handleUpdate(key, { ...item, data: newValue })}
-                />
-                <Divider />
-              </View>
-            );
-          })}
+          {Object.entries(data)
+            .filter(([key, item]) => item.visible)
+            .map(([key, item]) => {
+              return (
+                <View key={key}>
+                  <SettingsItem
+                    key={key}
+                    label={item.description || key}
+                    value={item.data}
+                    onValueChange={(newValue) => handleUpdate(key, { ...item, data: newValue })}
+                  />
+                  <Divider />
+                </View>
+              );
+            })}
         </View>
       </ScrollView>
     </AppScreen>

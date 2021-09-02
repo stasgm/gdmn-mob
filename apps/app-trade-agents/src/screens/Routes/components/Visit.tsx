@@ -1,11 +1,11 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions } from '@lib/store';
+import { docSelectors, documentActions, refSelectors } from '@lib/store';
 import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
-import { INamedEntity } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference } from '@lib/types';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -16,7 +16,6 @@ import { visitActions } from '../../../store/visits/actions';
 import { IOrderDocument, IReturnDocument } from '../../../store/docs/types';
 import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
-import { deprt1, orderType } from '../../../store/docs/mock';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
@@ -40,8 +39,18 @@ const Visit = ({
   const dateBegin = new Date(item.dateBegin);
   const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
 
+  console.log('outlet', outlet);
+
   const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find(
     (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
+  );
+
+  const orderType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
+    (t) => t.name === 'order',
+  );
+
+  const returnType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
+    (t) => t.name === 'return',
   );
 
   const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find(
@@ -95,6 +104,10 @@ const Visit = ({
   }, [navigation]);
 
   const handleNewOrder = () => {
+    if (!orderType) {
+      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
+    }
+
     const newOrder: IOrderDocument = {
       id: uuid(),
       number: 'б\\н',
@@ -117,19 +130,20 @@ const Visit = ({
   };
 
   const handleNewReturn = () => {
+    if (!returnType) {
+      return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
+    }
+
     const newReturn: IReturnDocument = {
-      documentDate: new Date().toISOString(),
-      documentType: {
-        id: '1',
-        name: 'return',
-      },
-      id: '111' + new Date().toISOString(),
+      id: uuid(),
       number: 'б\\н',
       status: 'DRAFT',
+      documentDate: new Date().toISOString(),
+      documentType: returnType,
       head: {
         contact,
         outlet,
-        depart: deprt1,
+        // depart: deprt1,
         route,
         reason: 'Брак',
       },

@@ -5,7 +5,15 @@ import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch } from '@lib/store';
+import {
+  appActions,
+  docSelectors,
+  documentActions,
+  refSelectors,
+  useDispatch as useDocDispatch,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -16,14 +24,11 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IReference } from '@lib/types';
+import { IDocumentType, IReference } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument } from '../../store/docs/types';
 
-import { useDispatch, useSelector } from '../../store';
-import { appActions } from '../../store/app/actions';
-import { returnType } from '../../store/docs/mock';
 import { IReturnFormParam } from '../../store/app/types';
 
 const ReturnEditScreen = () => {
@@ -33,6 +38,10 @@ const ReturnEditScreen = () => {
   const docDispatch = useDocDispatch();
 
   const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
+
+  const returnType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
+    (t) => t.name === 'return',
+  );
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -118,6 +127,10 @@ const ReturnEditScreen = () => {
     const docId = !id ? uuid() : id;
 
     if (!id) {
+      if (!returnType) {
+        return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
+      }
+
       const newReturn: IReturnDocument = {
         id: docId,
         documentType: returnType,
@@ -145,7 +158,6 @@ const ReturnEditScreen = () => {
       const updatedReturn: IReturnDocument = {
         ...returnDoc,
         id,
-        documentType: returnType,
         number: docNumber,
         documentDate: docDocumentDate,
         status: docStatus || 'DRAFT',
@@ -164,7 +176,19 @@ const ReturnEditScreen = () => {
 
       navigation.navigate('ReturnView', { id });
     }
-  }, [docNumber, docContact, docOutlet, docDocumentDate, id, navigation, docReason, docDispatch, returnDoc, docStatus]);
+  }, [
+    docNumber,
+    docContact,
+    docOutlet,
+    docReason,
+    docDocumentDate,
+    id,
+    returnType,
+    docDispatch,
+    navigation,
+    returnDoc,
+    docStatus,
+  ]);
 
   const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 

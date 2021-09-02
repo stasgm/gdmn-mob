@@ -5,7 +5,7 @@ import { IFormParam } from './types';
 const init = createAction('APP/INIT')();
 
 const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
-const clearFormParams = createAction('APP/CLEAN_FORM_PARAMS')();
+const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
 const setErrorList = createAction('APP/SET_ERROR_LIST')<string[]>();
 
