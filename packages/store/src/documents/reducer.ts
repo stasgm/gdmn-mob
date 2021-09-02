@@ -65,7 +65,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       return {
         ...state,
         loading: false,
-        list: state.list.map((l) => action.payload.find((d) => d.id === l.id) || l),
+        list: state.list.map((doc) => action.payload.find((d) => d.id === doc.id) || doc),
       };
 
     case getType(actions.updateDocumentsAsync.failure):

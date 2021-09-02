@@ -16,7 +16,7 @@ import {
   AppScreen,
 } from '@lib/mobile-ui';
 
-import { IReturnDocument } from '../../store/docs/types';
+import { IReturnDocument } from '../../store/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 

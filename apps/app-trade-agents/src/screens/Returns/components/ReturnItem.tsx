@@ -10,7 +10,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 
-import { IGood, IReturnLine } from '../../../store/docs/types';
+import { IGood, IReturnLine } from '../../../store/types';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {

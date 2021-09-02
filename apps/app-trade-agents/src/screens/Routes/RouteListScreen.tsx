@@ -5,7 +5,7 @@ import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { ItemSeparator, FilterButtons, Status, globalStyles as styles, DrawerButton, AppScreen } from '@lib/mobile-ui';
 import { useSelector, docSelectors } from '@lib/store';
 
-import { IRouteDocument } from '../../store/docs/types';
+import { IRouteDocument } from '../../store/types';
 
 import RouteListItem from './components/RouteListItem';
 
