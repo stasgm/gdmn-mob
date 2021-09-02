@@ -74,7 +74,7 @@ const DocumentViewScreen = () => {
   const Title = () => {
     return (
       <View>
-        <Text>{document?.documentType.name}</Text>
+        <Text>{document?.documentType.description}</Text>
         <Text style={[styles.textDescription, { color: colors.text }]}>{`№${document?.number} от ${toString({
           value: document?.documentDate,
           type: 'date',

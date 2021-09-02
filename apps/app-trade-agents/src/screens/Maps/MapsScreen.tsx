@@ -5,13 +5,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
 
 import { globalStyles as styles, Theme } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { docSelectors, refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
 import { ILocation } from '../../store/geo/types';
-import { IOutlet } from '../../store/docs/types';
-import { routeMock } from '../../store/docs/mock';
+import { IOutlet, IRouteDocument } from '../../store/docs/types';
 
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
@@ -41,11 +40,11 @@ const MapScreen = () => {
 
   const outlets = refSelectors.selectByName('outlet')?.data as IOutlet[];
 
-  /*const routeList = (docSelectors.selectByDocType('route') as IRouteDocument[]); ?.sort(
+  const routeList = (docSelectors.selectByDocType('route') as IRouteDocument[])?.sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
-  ); */
+  );
 
-  const routeList = routeMock?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+  // const routeList = routeMock?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const initLocations = useCallback(() => {
     const getLocations = async () => {

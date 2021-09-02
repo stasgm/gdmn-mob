@@ -78,7 +78,7 @@ const OrderListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.outlet.name,
+          title: i.head.outlet?.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,

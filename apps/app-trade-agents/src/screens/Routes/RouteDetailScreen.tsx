@@ -2,14 +2,13 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { docSelectors } from '@lib/store';
+import { docSelectors, refSelectors } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument } from '../../store/docs/types';
 
-import { contactRefMock, outletRefMock } from '../../store/docs/mock';
 import { useDispatch, useSelector } from '../../store';
 
 import { visitActions } from '../../store/visits/actions';
@@ -50,12 +49,17 @@ const RouteDetailScreen = () => {
   }
 
   //TODO получить адрес item.outlet.id
-  /*const outlet = point
+  const outlet = point
     ? (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find((e) => e.id === point.outlet.id)
-    : undefined;*/
-  const outlet = (outletRefMock as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
+    : undefined;
+  // const outlet = (outletRefMock as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
+  // const contact = outlet
+  //   ? (contactRefMock as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
+  //   : undefined;
   const contact = outlet
-    ? (contactRefMock as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
+    ? (refSelectors.selectByName('contact') as IReference<IContact>).data?.find(
+        (item) => item.id === outlet?.company.id,
+      )
     : undefined;
 
   const debt: IDebt = {

@@ -6,7 +6,15 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import { docSelectors, documentActions, refSelectors, useDispatch as useDocDispatch, useSelector } from '@lib/store';
+import {
+  docSelectors,
+  documentActions,
+  refSelectors,
+  useDispatch as useDocDispatch,
+  useSelector,
+  appActions,
+  useDispatch,
+} from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -17,15 +25,12 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IReference } from '@lib/types';
+import { IDocumentType, IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet } from '../../store/docs/types';
 
 import { getDateString } from '../../utils/helpers';
-import { useDispatch } from '../../store';
-import { appActions } from '../../store/app/actions';
-import { orderType } from '../../store/docs/mock';
 import { IOrderFormParam } from '../../store/app/types';
 
 const OrderEditScreen = () => {
@@ -35,6 +40,10 @@ const OrderEditScreen = () => {
   const docDispatch = useDocDispatch();
 
   const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+
+  const orderType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
+    (t) => t.name === 'order',
+  );
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
@@ -114,6 +123,10 @@ const OrderEditScreen = () => {
   }, [dispatch, order]);
 
   const handleSave = useCallback(() => {
+    if (!orderType) {
+      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
+    }
+
     if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
@@ -171,17 +184,18 @@ const OrderEditScreen = () => {
 
     // navigation.navigate('OrderView', { id: docId, routeBack: 'OrderList' });
   }, [
+    orderType,
     docNumber,
     docContact,
-    docDepart,
     docOutlet,
     docOnDate,
     docDocumentDate,
     id,
-    navigation,
     docDispatch,
+    navigation,
     order,
     docStatus,
+    docDepart,
   ]);
 
   useLayoutEffect(() => {

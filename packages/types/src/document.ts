@@ -11,20 +11,25 @@ type Meta<T> = {
   };
 };
 
-type IDocfMetadata<T, K> = {
+type DocfMetadata<T, K> = {
   head?: Meta<T>;
   lines?: Meta<K>;
 };
+
 export interface IHead {
   [fieldname: string]: unknown;
+}
+
+export interface IDocumentType extends INamedEntity {
+  description?: string;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {
   number: string;
   documentDate: string;
-  documentType: INamedEntity;
+  documentType: IDocumentType;
   status: StatusType;
-  metadata?: IDocfMetadata<T, K>;
+  metadata?: DocfMetadata<T, K>;
   errorMessage?: string;
   head?: T;
   lines?: K[];
@@ -78,4 +83,4 @@ const c: IDocument<IHead, ILine[]> = {
   lines: [{ id: '1', name: 'Товар1', quantity: 2 }],
 };
  */
-export { IDocument, IDocfMetadata, MandateProps };
+export { IDocument, DocfMetadata as IDocfMetadata, MandateProps };
