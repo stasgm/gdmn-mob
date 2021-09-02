@@ -6,13 +6,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { IReference } from '@lib/types';
-import { refSelectors } from '@lib/store';
+import { docSelectors, refSelectors } from '@lib/store';
 
-import { IOutlet, IRouteLine } from '../../../store/docs/types';
+import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
-import { useSelector } from '../../../store';
 import { getDateString } from '../../../utils/helpers';
-import { IVisit } from '../../../store/visits/types';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
 
@@ -34,15 +32,24 @@ const RouteItem = ({ item, routeId }: IItem) => {
   const address = outlet ? outlet.address : '';
 
   const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
-  const visits = (useSelector((state) => state.visits)?.list as IVisit[]).filter(
-    (visit) => visit.routeLineId.toString() === item.id,
+  // const visits = (useSelector((state) => state.visits)?.list as IVisitDocument[]).filter(
+  //   (visit) => visit.head.routeLineId === item.id,
+  // );
+  const visits = (docSelectors.selectByDocType('visit') as IVisitDocument[])?.filter(
+    (e) => e.head.routeLineId === item.id,
   );
 
   const lastVisit = visits
-    .filter((visit) => visit.dateEnd)
-    .sort((a, b) => (a.dateEnd === b.dateEnd || !a.dateEnd || !b.dateEnd ? 0 : a.dateEnd > b.dateEnd ? 1 : -1));
+    .filter((visit) => visit.head.dateEnd)
+    .sort((a, b) =>
+      a.head.dateEnd === b.head.dateEnd || !a.head.dateEnd || !b.head.dateEnd
+        ? 0
+        : a.head.dateEnd > b.head.dateEnd
+        ? 1
+        : -1,
+    );
 
-  const status = visits.length === 0 ? 0 : visits.find((visit) => visit.dateEnd) ? 2 : 1;
+  const status = visits.length === 0 ? 0 : visits.find((visit) => visit.head.dateEnd) ? 2 : 1;
 
   return (
     <TouchableHighlight
@@ -70,7 +77,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
         <View style={styles.bottomButtons}>
           {status ? <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" /> : null}
           <Text style={styles.field}>
-            {status === 2 && lastVisit[0].dateEnd && getDateString(lastVisit[0].dateEnd)}
+            {status === 2 && lastVisit[0].head.dateEnd && getDateString(lastVisit[0].head.dateEnd)}
           </Text>
         </View>
       </View>

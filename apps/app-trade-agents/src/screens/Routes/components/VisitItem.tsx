@@ -1,14 +1,13 @@
 import { AppScreen } from '@lib/mobile-ui';
 import React from 'react';
-//import { useNavigation } from '@react-navigation/native';
 import { View, Text, StyleSheet } from 'react-native';
 
-import { IVisit } from '../../../store/visits/types';
+import { IVisitDocument } from '../../../store/types';
 import { getDateString } from '../../../utils/helpers';
 
 //import { StackNavigationProp } from '@react-navigation/stack';
 
-// import { IVisit } from '../../../store/docs/types';
+// import { IVisitDocument } from '../../../store/docs/types';
 //import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 //type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
@@ -33,10 +32,10 @@ import { getDateString } from '../../../utils/helpers';
   );
 };*/
 
-const VisitItem = ({ item }: { item: IVisit }) => {
+const VisitItem = ({ item }: { item: IVisitDocument }) => {
   //const navigation = useNavigation<RouteLineProp>();
-  const dateBegin = new Date(item.dateBegin);
-  const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
+  const dateBegin = new Date(item.head.dateBegin);
+  const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
 
   return (
     <AppScreen>

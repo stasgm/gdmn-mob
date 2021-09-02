@@ -28,7 +28,7 @@ import {
 import { IDocumentType, IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOutlet } from '../../store/docs/types';
+import { IOrderDocument, IOutlet } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 import { IOrderFormParam } from '../../store/app/types';

@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIc
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IOrderDocument } from '../../../store/docs/types';
+import { IOrderDocument } from '../../../store/types';
 
 interface IProps {
   item: IOrderDocument;

@@ -7,20 +7,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistStore, persistReducer } from 'redux-persist';
 
 import geoReducer from './geo/reducer';
-import visitsReducer from './visits/reducer';
+// import visitsReducer from './visits/reducer';
 // import appReducer from './app/reducer';
 
 import { GeoActionType } from './geo/actions';
-import { VisitActionType } from './visits/actions';
+// import { VisitActionType } from './visits/actions';
 import { AppActionType } from './app/actions';
 
-type TActions = AppActionType | GeoActionType | VisitActionType;
+type TActions = AppActionType | GeoActionType;
 
-const persistVisitsConfig = {
-  key: 'visits',
-  storage: AsyncStorage,
-  whitelist: ['list'],
-};
+// const persistVisitsConfig = {
+//   key: 'visits',
+//   storage: AsyncStorage,
+//   whitelist: ['list'],
+// };
 
 const persistGeoConfig = {
   key: 'geo',
@@ -30,7 +30,7 @@ const persistGeoConfig = {
 
 export const combinedReducer = {
   // app: appReducer,
-  visits: persistReducer(persistVisitsConfig, visitsReducer),
+  //visits: persistReducer(persistVisitsConfig, visitsReducer),
   geo: persistReducer(persistGeoConfig, geoReducer),
 };
 

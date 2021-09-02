@@ -8,7 +8,7 @@ import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { ReturnsStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
-import { IReturnLine } from '../../store/docs/types';
+import { IReturnLine } from '../../store/types';
 
 import ReturnLine from './components/ReturnLine';
 

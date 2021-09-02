@@ -16,7 +16,7 @@ import {
 import { useDispatch, documentActions, docSelectors } from '@lib/store';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IRouteDocument, IRouteLine } from '../../store/docs/types';
+import { IRouteDocument, IRouteLine } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 

@@ -8,7 +8,7 @@ import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { OrdersStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
-import { IOrderLine } from '../../store/docs/types';
+import { IOrderLine } from '../../store/types';
 
 import OrderLine from './components/OrderLine';
 
