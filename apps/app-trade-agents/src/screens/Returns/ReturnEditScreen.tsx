@@ -27,7 +27,7 @@ import {
 import { IDocumentType, IReference } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IOutlet, IReturnDocument } from '../../store/docs/types';
+import { IOutlet, IReturnDocument } from '../../store/types';
 
 import { IReturnFormParam } from '../../store/app/types';
 

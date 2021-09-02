@@ -9,7 +9,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import { IGood, IOrderLine, IPackageGood } from '../../../store/docs/types';
+import { IGood, IOrderLine, IPackageGood } from '../../../store/types';
 
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 

@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIc
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IReturnDocument } from '../../../store/docs/types';
+import { IReturnDocument } from '../../../store/types';
 import { getDateString } from '../../../utils/helpers';
 
 interface IProps {

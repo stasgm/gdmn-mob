@@ -10,7 +10,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 
-import { IGood, IOrderLine } from '../../../store/docs/types';
+import { IGood, IOrderLine } from '../../../store/types';
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {

@@ -10,7 +10,7 @@ import { docSelectors, refSelectors } from '@lib/store';
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
 import { ILocation } from '../../store/geo/types';
-import { IOutlet, IRouteDocument } from '../../store/docs/types';
+import { IOutlet, IRouteDocument } from '../../store/types';
 
 import { getCurrentPosition } from '../../utils/expoFunctions';
 

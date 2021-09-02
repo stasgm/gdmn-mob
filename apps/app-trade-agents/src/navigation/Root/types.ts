@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-import { IOrderLine, IReturnLine } from '../../store/docs/types';
+import { IOrderLine, IReturnLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;

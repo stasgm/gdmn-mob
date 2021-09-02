@@ -11,7 +11,7 @@ import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup } from '../../store/docs/types';
+import { IGood, IGoodGroup } from '../../store/types';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -143,7 +143,7 @@ const SelectGroupScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{groups.name}</SubTitle>
+      <SubTitle style={styles.title}>{groups.description || groups.name}</SubTitle>
       <Divider />
       <FlatList
         ref={refListGroups}

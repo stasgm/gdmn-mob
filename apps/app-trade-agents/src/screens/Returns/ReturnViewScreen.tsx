@@ -17,7 +17,7 @@ import {
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { IReturnDocument, IReturnLine } from '../../store/docs/types';
+import { IReturnDocument, IReturnLine } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 
