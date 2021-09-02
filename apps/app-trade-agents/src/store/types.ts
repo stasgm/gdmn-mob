@@ -1,6 +1,6 @@
-import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData } from '@lib/types';
+import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData, IDocumentType } from '@lib/types';
 
-import { TakeOrderType } from '../visits/types';
+import { ICoords } from './geo/types';
 
 // export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
 
@@ -110,13 +110,36 @@ export interface IReturnLine extends IEntity {
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
+export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
+
+export type VisitResultType = 'ALL_COMPLETED' | 'NOT_COMPLETED' | 'PARTLY_COMPLETED';
+
+interface IVisitHead extends IHead {
+  routeLineId: string;
+  comment?: string;
+  dateBegin: string; //начало визита
+  dateEnd?: string; // конец визита
+  beginGeoPoint?: ICoords; //место начало визита
+  endGeoPoint?: ICoords; // место завершения визита
+  result?: VisitResultType;
+  takenType: TakeOrderType; //тип визита - это поле забрать из заявки
+}
+
+export type IVisitDocument = MandateProps<IDocument<IVisitHead>, 'head'>;
+
+export const visitDocumentType: IDocumentType = {
+  id: 'visit',
+  name: 'visit',
+  description: 'Визит',
+};
+
 /* export interface ICoords {
   latitude: number;
   longitude: number;
 }
  */
 /* export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
-export interface IVisit extends IEntity {
+export interface IVisitDocument extends IEntity {
   routeLineId: number;
   comment?: string;
   dateBegin: string; //начало визита

@@ -10,7 +10,7 @@ import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood } from '../../store/docs/types';
+import { IGood } from '../../store/types';
 
 const Good = ({ item }: { item: INamedEntity }) => {
   const navigation = useNavigation();
@@ -89,7 +89,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{goods.name}</SubTitle>
+      <SubTitle style={styles.title}>{goods.description || goods.name}</SubTitle>
       <Divider />
       {filterVisible && (
         <>

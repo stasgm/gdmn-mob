@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IReturnDocument } from '../../../store/docs/types';
+import { IReturnDocument } from '../../../store/types';
 import { getStatusColor } from '../../../utils/constants';
 import { getDateString } from '../../../utils/helpers';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';

@@ -11,9 +11,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from '../../../store';
 
-import { IVisit } from '../../../store/visits/types';
-import { visitActions } from '../../../store/visits/actions';
-import { IOrderDocument, IReturnDocument } from '../../../store/docs/types';
+// import { IVisitDocument } from '../../../store/visits/types';
+// import { visitActions } from '../../../store/visits/actions';
+import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
@@ -26,7 +26,7 @@ const Visit = ({
   contact,
   route,
 }: {
-  item: IVisit;
+  item: IVisitDocument;
   outlet: INamedEntity;
   contact: INamedEntity;
   route: INamedEntity;
@@ -36,8 +36,8 @@ const Visit = ({
 
   const [process, setProcess] = useState(false);
 
-  const dateBegin = new Date(item.dateBegin);
-  const dateEnd = item.dateEnd ? new Date(item.dateEnd) : undefined;
+  const dateBegin = new Date(item.head.dateBegin);
+  const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
 
   console.log('outlet', outlet);
 
@@ -60,7 +60,7 @@ const Visit = ({
   const timeProcess = () => {
     // TODO Вынести в helpers
     const diffMinutes = Math.floor(
-      ((item.dateEnd ? Date.parse(item.dateEnd) : Date.now()) - Date.parse(item.dateBegin)) / 60000,
+      ((item.head.dateEnd ? Date.parse(item.head.dateEnd) : Date.now()) - Date.parse(item.head.dateBegin)) / 60000,
     );
     const hour = Math.floor(diffMinutes / 60);
     return `${hour} часов ${diffMinutes - hour * 60} минут`;
@@ -86,11 +86,20 @@ const Visit = ({
 
     const date = new Date().toISOString();
 
-    dispatch(
-      visitActions.edit({
-        id: item.id,
+    const updatedVisit: IVisitDocument = {
+      ...item,
+      head: {
+        ...item.head,
         dateEnd: date,
         endGeoPoint: coords,
+      },
+      editionDate: new Date().toISOString(),
+    };
+
+    dispatch(
+      documentActions.updateDocument({
+        docId: item.id,
+        document: updatedVisit,
       }),
     );
 
@@ -119,7 +128,7 @@ const Visit = ({
         outlet,
         route,
         onDate: new Date().toISOString(),
-        takenOrder: item.takenType,
+        takenOrder: item.head.takenType,
       },
       lines: [],
     };

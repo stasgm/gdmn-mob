@@ -1,22 +1,15 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-
-import { docSelectors, refSelectors } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity, IReference } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
+import { v4 as uuid } from 'uuid';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IContact, IDebt, IOutlet, IRouteDocument } from '../../store/docs/types';
-
-import { useDispatch, useSelector } from '../../store';
-
-import { visitActions } from '../../store/visits/actions';
-
+import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
-
 import { getDateString } from '../../utils/helpers';
-
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';
@@ -26,7 +19,8 @@ const RouteDetailScreen = () => {
   const navigation = useNavigation();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
-  const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId.toString() === id);
+  // const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId === id);
+  const visits = (docSelectors.selectByDocType('visit') as IVisitDocument[])?.filter((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);
 
@@ -84,15 +78,35 @@ const RouteDetailScreen = () => {
 
     const date = new Date().toISOString();
 
-    dispatch(
-      visitActions.addOne({
-        id: `${id}${date}`,
-        routeLineId: Number(id),
+    const visitId = uuid();
+
+    const newVisit: IVisitDocument = {
+      id: visitId,
+      documentType: visitDocumentType,
+      number: visitId,
+      documentDate: date,
+      status: 'DRAFT',
+      head: {
+        routeLineId: id,
         dateBegin: date,
         beginGeoPoint: coords,
         takenType: 'ON_PLACE',
-      }),
-    );
+      },
+      creationDate: date,
+      editionDate: date,
+    };
+
+    dispatch(documentActions.addDocument(newVisit));
+
+    // dispatch(
+    //   documentActions.addDocument({
+    //     id: `${id}${date}`,
+    //     routeLineId: Number(id),
+    //     dateBegin: date,
+    //     beginGeoPoint: coords,
+    //     takenType: 'ON_PLACE',
+    //   }),
+    // );
 
     setProcess(false);
   };

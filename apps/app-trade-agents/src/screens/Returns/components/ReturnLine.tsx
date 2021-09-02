@@ -9,7 +9,7 @@ import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
 
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
-import { IGood, IReturnLine } from '../../../store/docs/types';
+import { IGood, IReturnLine } from '../../../store/types';
 
 interface IProps {
   item: IReturnLine;

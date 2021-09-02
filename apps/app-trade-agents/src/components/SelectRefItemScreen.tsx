@@ -17,7 +17,7 @@ import {
 } from '@lib/mobile-ui';
 
 import { useDispatch } from '../store';
-import { IOutlet } from '../store/docs/types';
+import { IOutlet } from '../store/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
 import { RefParamList } from '../navigation/Root/types';
@@ -64,7 +64,7 @@ const SelectRefItemScreen = () => {
     return refObj?.data;
   }, [clause, refObj?.data]);
 
-  const title = refObj?.name;
+  const title = refObj?.description || refObj?.name;
 
   const formParams = useSelector((state) => state.app.formParams);
 

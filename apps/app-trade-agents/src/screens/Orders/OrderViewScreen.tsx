@@ -16,7 +16,7 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IOrderDocument, IOrderLine } from '../../store/docs/types';
+import { IOrderDocument, IOrderLine } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 

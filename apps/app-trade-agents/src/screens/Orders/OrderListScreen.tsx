@@ -18,7 +18,7 @@ import {
 
 import { StatusType } from '@lib/types';
 
-import { IOrderDocument } from '../../store/docs/types';
+import { IOrderDocument } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 

@@ -1,15 +1,15 @@
-import { ActionType, createAction } from 'typesafe-actions';
+// import { ActionType, createAction } from 'typesafe-actions';
 
-import { IVisit } from './types';
+// import { IVisitDocument } from './types';
 
-const init = createAction('VISIT/INIT')();
-const addOne = createAction('VISIT/ADD_ONE')<IVisit>();
-const edit = createAction('VISIT/EDIT')<Omit<IVisit, 'dateBegin' | 'beginGeoPoint' | 'takenType' | 'routeLineId'>>();
+// const init = createAction('VISIT/INIT')();
+// const addOne = createAction('VISIT/ADD_ONE')<IVisitDocument>();
+// const edit = createAction('VISIT/EDIT')<Omit<IVisitDocument, 'dateBegin' | 'beginGeoPoint' | 'takenType' | 'routeLineId'>>();
 
-export const visitActions = {
-  init,
-  addOne,
-  edit,
-};
+// export const visitActions = {
+//   init,
+//   addOne,
+//   edit,
+// };
 
-export type VisitActionType = ActionType<typeof visitActions>;
+// export type VisitActionType = ActionType<typeof visitActions>;
