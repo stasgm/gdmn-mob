@@ -2,16 +2,13 @@ import { IEntity, IDocument } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('DOCUMENT/INIT')();
-//const setDocuments = createAction('DOCUMENT/SET_ALL')<IDocument[]>();
-// const deleteDocuments = createAction('DOCUMENT/DELETE_ALL')();
-
 const addDocument = createAction('DOCUMENT/ADD_ONE')<IDocument>();
 const updateDocument = createAction('DOCUMENT/UPDATE_ONE')<{ docId: string; document: IDocument }>();
-// const deleteDocument = createAction('DOCUMENT/DELETE_ONE')<string>();
+const removeDocument = createAction('DOCUMENT/REMOVE_ONE')<string>();
 
 const addDocumentLine = createAction('DOCUMENT/ADD_LINE_ONE')<{ docId: string; line: IEntity }>();
 const updateDocumentLine = createAction('DOCUMENT_LINE/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
-const deleteDocumentLine = createAction('DOCUMENT_LINE/DELETE_LINE_ONE')<{ docId: string; lineId: string }>();
+const deleteDocumentLine = createAction('DOCUMENT_LINE/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
 
 const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
 
@@ -33,11 +30,11 @@ const updateDocumentsAsync = createAsyncAction(
   'DOCUMENTS/UPDATE_MANY_FAILURE',
 )<string | undefined, IDocument[], string>();
 
-const removeDocumentAsync = createAsyncAction(
-  'DOCUMENTS/REMOVE_DOCUMENT',
-  'DOCUMENTS/REMOVE_DOCUMENT_SUCCESS',
-  'DOCUMENTS/REMOVE_DOCUMENT_FAILURE',
-)<string | undefined, string, string>();
+const removeDocumentsAsync = createAsyncAction(
+  'DOCUMENTS/REMOVE_MANY',
+  'DOCUMENTS/REMOVE_MANY_SUCCESS',
+  'DOCUMENTS/REMOVE_MANY_FAILURE',
+)<string | undefined, string[], string>();
 
 const clearDocumentsAsync = createAsyncAction(
   'DOCUMENTS/CLEAR_DOCUMENTS',
@@ -45,21 +42,16 @@ const clearDocumentsAsync = createAsyncAction(
   'DOCUMENTS/CLEAR_DOCUMENTS_FAILURE',
 )<string | undefined, undefined, string>();
 
-// const addDocumentAsync = createAsyncAction(
-//   'DOCUMENTS/ADD_ONE',
-//   'DOCUMENTS/ADD_ONE_SUCCESS',
-//   'DOCUMENTS/ADD_ONE_FAILURE',
-// )<string | undefined, IDocument, string>();
-
 export const actions = {
   init,
   addDocumentsAsync,
   clearDocumentsAsync,
   setDocumentsAsync,
   addDocument,
-  updateDocumentsAsync,
   updateDocument,
-  removeDocumentAsync,
+  updateDocumentsAsync,
+  removeDocument,
+  removeDocumentsAsync,
   addDocumentLine,
   updateDocumentLine,
   deleteDocumentLine,

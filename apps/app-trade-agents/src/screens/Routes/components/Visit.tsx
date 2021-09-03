@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors } from '@lib/store';
 import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
-import { IDocumentType, INamedEntity, IReference } from '@lib/types';
+import { IDocumentType, INamedEntity } from '@lib/types';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
@@ -84,7 +84,8 @@ const Visit = ({
         dateEnd: date,
         endGeoPoint: coords,
       },
-      editionDate: new Date().toISOString(),
+      creationDate: item.creationDate || date,
+      editionDate: date,
     };
 
     dispatch(
@@ -108,20 +109,24 @@ const Visit = ({
       return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
     }
 
+    const newOrderDate = new Date().toISOString();
+
     const newOrder: IOrderDocument = {
       id: uuid(),
       number: 'б\\н',
       status: 'DRAFT',
-      documentDate: new Date().toISOString(),
+      documentDate: newOrderDate,
       documentType: orderType,
       head: {
         contact,
         outlet,
         route,
-        onDate: new Date().toISOString(),
+        onDate: newOrderDate,
         takenOrder: item.head.takenType,
       },
       lines: [],
+      creationDate: newOrderDate,
+      editionDate: newOrderDate,
     };
 
     dispatch(documentActions.addDocument(newOrder));
@@ -134,11 +139,13 @@ const Visit = ({
       return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
     }
 
+    const newReturnDate = new Date().toISOString();
+
     const newReturn: IReturnDocument = {
       id: uuid(),
       number: 'б\\н',
       status: 'DRAFT',
-      documentDate: new Date().toISOString(),
+      documentDate: newReturnDate,
       documentType: returnType,
       head: {
         contact,
@@ -148,6 +155,8 @@ const Visit = ({
         reason: 'Брак',
       },
       lines: [],
+      creationDate: newReturnDate,
+      editionDate: newReturnDate,
     };
 
     dispatch(documentActions.addDocument(newReturn));

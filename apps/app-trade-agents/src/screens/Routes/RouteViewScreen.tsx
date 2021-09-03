@@ -13,19 +13,19 @@ import {
   BackButton,
   AppScreen,
 } from '@lib/mobile-ui';
-import { useDispatch, documentActions, docSelectors } from '@lib/store';
-
-import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+import { documentActions, docSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { getDateString } from '../../utils/helpers';
+
+import { RoutesStackParamList } from '../../navigation/Root/types';
+import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 
 import RouteItem from './components/RouteItem';
 
 const RouteViewScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
   const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
@@ -33,16 +33,36 @@ const RouteViewScreen = () => {
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
 
+  const routeLineList = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id)?.lines;
+
+  const visitList = docSelectors
+    .selectByDocType<IVisitDocument>('visit')
+    ?.filter((e) => routeLineList?.find((line) => line.id === e.head.routeLineId))
+    .map((doc) => doc.id);
+
+  const orderList = docSelectors
+    .selectByDocType<IOrderDocument>('order')
+    ?.filter((e) => e.head.route?.id === id)
+    .map((doc) => doc.id);
+
+  const returnList = docSelectors
+    .selectByDocType<IReturnDocument>('return')
+    ?.filter((e) => e.head.route?.id === id)
+    .map((doc) => doc.id);
+
   const handleDelete = useCallback(() => {
-    // const visitList = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
+    const deleteRoute = async () => {
+      const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
 
-    // const orderList = docSelectors.selectByDocType<IOrderDocument>('order')?.filter((e) => e.head.route?.id === id);
+      if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
+        console.log('mass', [...visitList, ...orderList, ...returnList, id]);
+        navigation.goBack();
+      }
+    };
 
-    // visitList.forEach((v) => {});
-
-    dispatch(documentActions.removeDocument(id));
-    navigation.goBack();
-  }, [dispatch, id, navigation]);
+    deleteRoute();
+    //dispatch(documentActions.removeDocument(id));
+  }, [docDispatch, id, navigation, orderList, returnList, visitList]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([

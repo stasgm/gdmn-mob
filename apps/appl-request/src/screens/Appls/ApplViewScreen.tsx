@@ -33,7 +33,7 @@ const ApplViewScreen = () => {
   const [visibleDialog, setVisibleDialog] = React.useState(false);
   const [refuseReason, setRefuseReason] = React.useState('');
 
-  const appl = docSelectors.selectByDocType<IApplDocument>('Заявки на закупку ТМЦ').find((e) => e.id === id);
+  const appl = docSelectors.selectByDocType<IApplDocument>('request').find((e) => e.id === id);
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
@@ -53,7 +53,9 @@ const ApplViewScreen = () => {
       return;
     }
 
-    const newDocument: IApplDocument = {
+    const date = new Date().toISOString();
+
+    const updatedDocument: IApplDocument = {
       ...appl,
       status: 'READY',
       errorMessage: undefined,
@@ -63,9 +65,11 @@ const ApplViewScreen = () => {
         cancelReason: refuseReason,
         specCancel: user && { id: user.id, name: user.name },
       },
+      creationDate: appl.creationDate || date,
+      editionDate: date,
     };
 
-    dispatch(documentActions.updateDocument({ docId: id, document: newDocument }));
+    dispatch(documentActions.updateDocument({ docId: id, document: updatedDocument }));
 
     navigation.goBack();
   }, [appl, dispatch, id, navigation, refuseReason, statusRefused, user]);
@@ -75,7 +79,9 @@ const ApplViewScreen = () => {
       return;
     }
 
-    const newDocument: IApplDocument = {
+    const date = new Date().toISOString();
+
+    const updatedDocument: IApplDocument = {
       ...appl,
       status: 'READY',
       errorMessage: undefined,
@@ -85,9 +91,11 @@ const ApplViewScreen = () => {
         cancelReason: '',
         specApprove: user && { id: user.id, name: user.name },
       },
+      creationDate: appl.creationDate || date,
+      editionDate: date,
     };
 
-    dispatch(documentActions.updateDocument({ docId: id, document: newDocument }));
+    dispatch(documentActions.updateDocument({ docId: id, document: updatedDocument }));
 
     navigation.goBack();
   }, [appl, dispatch, id, navigation, statusAccepted, user]);

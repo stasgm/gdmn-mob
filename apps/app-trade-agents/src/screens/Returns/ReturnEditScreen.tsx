@@ -125,11 +125,13 @@ const ReturnEditScreen = () => {
         return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
       }
 
+      const newReturnDate = new Date().toISOString();
+
       const newReturn: IReturnDocument = {
         id: docId,
         documentType: returnType,
         number: docNumber,
-        documentDate: new Date().toISOString(),
+        documentDate: newReturnDate,
         status: 'DRAFT',
         head: {
           contact: docContact,
@@ -137,8 +139,8 @@ const ReturnEditScreen = () => {
           reason: docReason,
         },
         lines: [],
-        creationDate: new Date().toISOString(),
-        editionDate: new Date().toISOString(),
+        creationDate: newReturnDate,
+        editionDate: newReturnDate,
       };
 
       docDispatch(documentActions.addDocument(newReturn));
@@ -148,6 +150,8 @@ const ReturnEditScreen = () => {
       if (!returnDoc) {
         return;
       }
+
+      const updatedReturnDate = new Date().toISOString();
 
       const updatedReturn: IReturnDocument = {
         ...returnDoc,
@@ -162,8 +166,8 @@ const ReturnEditScreen = () => {
           reason: docReason,
         },
         lines: returnDoc.lines,
-        creationDate: returnDoc.creationDate || new Date().toISOString(),
-        editionDate: new Date().toISOString(),
+        creationDate: returnDoc.creationDate || updatedReturnDate,
+        editionDate: updatedReturnDate,
       };
 
       docDispatch(documentActions.updateDocument({ docId: id, document: updatedReturn }));

@@ -96,9 +96,6 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         list: state.list.map((doc) => (doc.id === action.payload.docId ? { ...action.payload.document } : doc)),
       };
 
-    // case getType(actions.removeDocument):
-    //   return { ...state, list: state.list.filter((document) => document.id !== action.payload) };
-
     case getType(actions.clearDocumentsAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
@@ -108,13 +105,20 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
     case getType(actions.clearDocumentsAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
-    case getType(actions.removeDocumentAsync.request):
+    case getType(actions.removeDocument):
+      return { ...state, loading: false, list: state.list.filter((i) => i.id !== action.payload) };
+
+    case getType(actions.removeDocumentsAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
-    case getType(actions.removeDocumentAsync.success):
-      return { ...state, loading: false, list: [...state.list.filter((i) => i.id !== action.payload)] };
+    case getType(actions.removeDocumentsAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: state.list.filter((doc) => action.payload.indexOf(doc.id) === -1),
+      };
 
-    case getType(actions.removeDocumentAsync.failure):
+    case getType(actions.removeDocumentsAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
     case getType(actions.clearError):
