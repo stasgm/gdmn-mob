@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
@@ -14,7 +14,7 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { IToolBarButton, IHeadCells } from '../../types';
+import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
 import SnackBar from '../../components/SnackBar';
 
 const UserList = () => {
@@ -23,7 +23,20 @@ const UserList = () => {
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { list, loading, errorMessage } = useSelector((state) => state.users);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.users);
+
+  const [pageParam, setPageParams] = useState<IPageParam | undefined>(pageParams);
+
+  console.log('1', pageParam);
+
+  // useEffect(() => {
+  //   console.log('useEff', pageParams);
+  //   //setPageParams(pageParams || {});
+  //   return () => {
+  //     console.log('param', pageParam);
+  //     dispatch(actions.userActions.setPageParam(pageParam));
+  //   };
+  // }, []);
 
   const fetchUsers = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -55,13 +68,25 @@ const UserList = () => {
     if (key !== 'Enter') return;
 
     const inputValue = valueRef?.current?.value;
+    dispatch(actions.userActions.setPageParam(pageParam));
 
     fetchUsers(inputValue);
+    setPageParams({ filterText: inputValue });
+    console.log('Enter', pageParam, 'input', inputValue);
   };
 
   const handleClearError = () => {
     dispatch(actions.userActions.clearError());
   };
+
+  console.log('filterText', pageParam);
+
+  // const param = () => {
+  //   setPageParams(true);
+
+  //   const inputValue = valueRef?.current?.value;
+  //   dispatch(actions.userActions.setPageParam(inputValue));
+  // };
 
   const buttons: IToolBarButton[] = [
     {
@@ -123,6 +148,7 @@ const UserList = () => {
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
+            // value={(pageParam?.filterText  as undefined) || ''}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

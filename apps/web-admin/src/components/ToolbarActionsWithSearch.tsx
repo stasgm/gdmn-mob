@@ -13,9 +13,18 @@ interface IProps {
   updateInput: (value: string) => void;
   searchOnClick: () => void;
   keyPress: (key: string) => void;
+  value?: string;
 }
 
-const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnClick, keyPress, valueRef }: IProps) => {
+const ToolbarActionsWithSearch = ({
+  buttons,
+  searchTitle,
+  updateInput,
+  searchOnClick,
+  keyPress,
+  valueRef,
+  value,
+}: IProps) => {
   return (
     <Card>
       <Box
@@ -45,6 +54,7 @@ const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnC
             onKeyPress={(event) => keyPress(event.key)}
             type="search"
             inputRef={valueRef}
+            // value={value}
           />
         </Box>
         <Box
