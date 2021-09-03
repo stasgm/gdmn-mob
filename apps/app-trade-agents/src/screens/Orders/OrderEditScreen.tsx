@@ -292,7 +292,7 @@ const OrderEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
+        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>
