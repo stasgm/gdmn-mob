@@ -5,8 +5,9 @@ import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOpti
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
+import { Consumer } from '@expo/react-native-action-sheet/lib/typescript/context';
 
-const useSync = (onSync?: () => void): () => void => {
+const useSync = (onSync?: () => void): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const dispatch = useDispatch();
@@ -68,7 +69,9 @@ const useSync = (onSync?: () => void): () => void => {
 
         if (sendMessageResponse.type === 'SEND_MESSAGE') {
           const updateDocResponse = await docDispatch(
-            documentActions.updateDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
+            documentActions.updateDocuments(
+              documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d)),
+            ),
           );
 
           if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
@@ -88,7 +91,7 @@ const useSync = (onSync?: () => void): () => void => {
       //  справочники: очищаем старые и записываем в хранилище новые данные
       //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
       if (getMessagesResponse.type === 'GET_MESSAGES') {
-        await Promise.all(getMessagesResponse.messageList?.map(message => processMessage(message, errList)))
+        await Promise.all(getMessagesResponse.messageList?.map((message) => processMessage(message, errList)));
       } else {
         errList.push(getMessagesResponse.message);
       }
@@ -111,25 +114,24 @@ const useSync = (onSync?: () => void): () => void => {
         },
       };
 
+      //Формируем запрос на получение склада для юзера
+      const messageGetDepart: IMessage['body'] = {
+        type: 'CMD',
+        version: docVersion,
+        payload: {
+          name: 'GET_USER_SETTINGS',
+        },
+      };
+
       //3. Отправляем запрос на получение справочников
-      const sendMesRefResponse = await api.message.sendMessages(
-        systemName,
-        messageCompany,
-        consumer,
-        messageGetRef,
-      );
+      const sendMesRefResponse = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetRef);
 
       if (sendMesRefResponse.type === 'ERROR') {
         errList.push(sendMesRefResponse.message);
       }
 
       //4. Отправляем запрос на получение документов
-      const sendMesDocRespone = await api.message.sendMessages(
-        systemName,
-        messageCompany,
-        consumer,
-        messageGetDoc,
-      );
+      const sendMesDocRespone = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetDoc);
 
       if (sendMesDocRespone.type === 'ERROR') {
         errList.push(sendMesDocRespone.message);
@@ -140,11 +142,25 @@ const useSync = (onSync?: () => void): () => void => {
         const maxDocDate = new Date();
         maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
 
-        const delPromises = documents.filter((d) => d.status === 'PROCESSED' && new Date(d.documentDate) <= maxDocDate).map(async (d) => {
-          await docDispatch(documentActions.removeDocument(d.id));
-        });
+        const delPromises = documents
+          .filter((d) => d.status === 'PROCESSED' && new Date(d.documentDate) <= maxDocDate)
+          .map(async (d) => {
+            await docDispatch(documentActions.removeDocument(d.id));
+          });
 
         await Promise.all(delPromises);
+      }
+
+      //7. Отправляем запрос на получение склада для юзера
+      const sendMesDepartResponse = await api.message.sendMessages(
+        systemName,
+        messageCompany,
+        consumer,
+        messageGetDepart,
+      );
+
+      if (sendMesDepartResponse.type === 'ERROR') {
+        errList.push(sendMesDepartResponse.message);
       }
 
       dispatch(appActions.setLoading(false));
@@ -172,7 +188,9 @@ const useSync = (onSync?: () => void): () => void => {
         //TODO: проверка данных, приведение к типу
         console.log('msg.body.version', msg.body.version);
         if ((msg.body.version || 1) !== refVersion) {
-          errList.push(`Структура загружаемых данных для справочников с версией '${msg.body.version}' не поддерживается приложением`);
+          errList.push(
+            `Структура загружаемых данных для справочников с версией '${msg.body.version}' не поддерживается приложением`,
+          );
           break;
         }
 
@@ -210,7 +228,9 @@ const useSync = (onSync?: () => void): () => void => {
 
       case 'DOCS': {
         if ((msg.body.version || 1) !== docVersion) {
-          errList.push(`Структура загружаемых данных для документов с версией '${msg.body.version}' не поддерживается приложением`);
+          errList.push(
+            `Структура загружаемых данных для документов с версией '${msg.body.version}' не поддерживается приложением`,
+          );
           break;
         }
 
@@ -223,6 +243,11 @@ const useSync = (onSync?: () => void): () => void => {
           errList.push(setDocResponse.payload);
         }
 
+        break;
+      }
+
+      case 'SETTINGS': {
+        //TODO: обработка
         break;
       }
 

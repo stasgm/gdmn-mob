@@ -1,6 +1,10 @@
 import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } from './common';
 import { IHeadMessage, IMessage } from './messages';
 
+export interface IUserSettings {
+  [fieldName: string]: unknown;
+}
+
 // Типы для передачи и хранения данных на клиенте
 export interface IUser extends INamedEntity, IExternalSystemProps {
   alias?: string;
@@ -13,6 +17,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   creator?: INamedEntity;
   company?: INamedEntity;
   password?: string;
+  settings?: IUserSettings[];
 }
 
 export type NewUser = Omit<IUser, 'id'> & { password: string };
