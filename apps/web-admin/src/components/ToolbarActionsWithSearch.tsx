@@ -9,7 +9,7 @@ import ToolBarActions from './ToolBarActions';
 interface IProps {
   buttons: IToolBarButton[];
   searchTitle: string;
-  valueRef: any;
+  //valueRef: any;
   updateInput: (value: string) => void;
   searchOnClick: () => void;
   keyPress: (key: string) => void;
@@ -22,7 +22,7 @@ const ToolbarActionsWithSearch = ({
   updateInput,
   searchOnClick,
   keyPress,
-  valueRef,
+  //valueRef,
   value,
 }: IProps) => {
   return (
@@ -41,7 +41,7 @@ const ToolbarActionsWithSearch = ({
             sx={{ p: 2 }}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start" onClick={() => searchOnClick()}>
+                <InputAdornment position="start" onClick={searchOnClick}>
                   <IconButton>
                     <SearchIcon fontSize="small" />
                   </IconButton>
@@ -53,8 +53,8 @@ const ToolbarActionsWithSearch = ({
             onChange={(event) => updateInput(event.target.value)}
             onKeyPress={(event) => keyPress(event.key)}
             type="search"
-            inputRef={valueRef}
-            // value={value}
+            //inputRef={valueRef}
+            value={value || ''}
           />
         </Box>
         <Box
