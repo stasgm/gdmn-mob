@@ -1,7 +1,6 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { IReference } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -63,8 +62,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  const priceFSN =
-    (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
+  const priceFSN = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   const qtyRef = useRef<TextInput>(null);
 

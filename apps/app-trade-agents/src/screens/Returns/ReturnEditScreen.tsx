@@ -23,12 +23,10 @@ import {
   globalStyles as styles,
   SubTitle,
 } from '@lib/mobile-ui';
-
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument } from '../../store/types';
-
 import { IReturnFormParam } from '../../store/app/types';
 
 const ReturnEditScreen = () => {
@@ -37,11 +35,9 @@ const ReturnEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find((e) => e.id === id);
+  const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
 
-  const returnType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
-    (t) => t.name === 'return',
-  );
+  const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -64,9 +60,7 @@ const ReturnEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
-    (e) => e.id === docOutlet?.id,
-  );
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
   useEffect(() => {
     if (!docContact && !!docOutlet) {
@@ -131,11 +125,13 @@ const ReturnEditScreen = () => {
         return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
       }
 
+      const newReturnDate = new Date().toISOString();
+
       const newReturn: IReturnDocument = {
         id: docId,
         documentType: returnType,
         number: docNumber,
-        documentDate: new Date().toISOString(),
+        documentDate: newReturnDate,
         status: 'DRAFT',
         head: {
           contact: docContact,
@@ -143,8 +139,8 @@ const ReturnEditScreen = () => {
           reason: docReason,
         },
         lines: [],
-        creationDate: new Date().toISOString(),
-        editionDate: new Date().toISOString(),
+        creationDate: newReturnDate,
+        editionDate: newReturnDate,
       };
 
       docDispatch(documentActions.addDocument(newReturn));
@@ -154,6 +150,8 @@ const ReturnEditScreen = () => {
       if (!returnDoc) {
         return;
       }
+
+      const updatedReturnDate = new Date().toISOString();
 
       const updatedReturn: IReturnDocument = {
         ...returnDoc,
@@ -168,8 +166,8 @@ const ReturnEditScreen = () => {
           reason: docReason,
         },
         lines: returnDoc.lines,
-        creationDate: returnDoc.creationDate || new Date().toISOString(),
-        editionDate: new Date().toISOString(),
+        creationDate: returnDoc.creationDate || updatedReturnDate,
+        editionDate: updatedReturnDate,
       };
 
       docDispatch(documentActions.updateDocument({ docId: id, document: updatedReturn }));

@@ -29,9 +29,7 @@ const Group = ({
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
-  const goods = (refSelectors.selectByName('good') as IReference<IGood>).data.filter(
-    (good) => good.goodgroup.id === item.id,
-  );
+  const goods = refSelectors.selectByName<IGood>('good').data.filter((good) => good.goodgroup.id === item.id);
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
@@ -96,7 +94,7 @@ const SelectGroupScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
 
-  const groups = refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>;
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
   const firstLevelGroups = groups.data.filter((item) => !item.parent);
 

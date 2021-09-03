@@ -5,7 +5,7 @@ import { useScrollToTop, RouteProp, useRoute, useNavigation } from '@react-navig
 import { SubTitle, ItemSeparator, BackButton, SearchButton, AppScreen } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -20,7 +20,7 @@ const ReferenceViewScreen = () => {
 
   const refName = useRoute<RouteProp<ReferenceStackParamList, 'ReferenceView'>>().params?.name;
 
-  const list = refSelectors.selectByName(refName) as IReference<INamedEntity>;
+  const list = refSelectors.selectByName<INamedEntity>(refName);
 
   const filteredList = useMemo(() => {
     return (

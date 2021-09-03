@@ -25,9 +25,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
   const navigation = useNavigation<RouteLineProp>();
 
   //TODO получить адрес item.outlet.id
-  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
-    (e) => e.id === item.outlet.id,
-  );
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === item.outlet.id);
 
   const address = outlet ? outlet.address : '';
 
@@ -35,9 +33,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
   // const visits = (useSelector((state) => state.visits)?.list as IVisitDocument[]).filter(
   //   (visit) => visit.head.routeLineId === item.id,
   // );
-  const visits = (docSelectors.selectByDocType('visit') as IVisitDocument[])?.filter(
-    (e) => e.head.routeLineId === item.id,
-  );
+  const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === item.id);
 
   const lastVisit = visits
     .filter((visit) => visit.head.dateEnd)

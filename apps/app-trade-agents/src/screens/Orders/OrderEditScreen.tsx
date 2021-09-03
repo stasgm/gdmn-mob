@@ -39,11 +39,11 @@ const OrderEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find((e) => e.id === id);
+  const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
 
-  const orderType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
-    (t) => t.name === 'order',
-  );
+  const orderType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documentType')
+    ?.data.find((t) => t.name === 'order');
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
@@ -67,9 +67,7 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const outlet = (refSelectors.selectByName('outlet') as IReference<IOutlet>)?.data?.find(
-    (e) => e.id === docOutlet?.id,
-  );
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
 
   useEffect(() => {
     if (!docContact && !!docOutlet) {
@@ -133,12 +131,14 @@ const OrderEditScreen = () => {
 
     const docId = !id ? uuid() : id;
 
+    const newOrderDate = new Date().toISOString();
+
     if (!id) {
       const newOrder: IOrderDocument = {
         id: docId,
         documentType: orderType,
         number: docNumber,
-        documentDate: new Date().toISOString(),
+        documentDate: newOrderDate,
         status: 'DRAFT',
         head: {
           contact: docContact,
@@ -146,8 +146,8 @@ const OrderEditScreen = () => {
           outlet: docOutlet,
         },
         lines: [],
-        creationDate: new Date().toISOString(),
-        editionDate: new Date().toISOString(),
+        creationDate: newOrderDate,
+        editionDate: newOrderDate,
       };
 
       docDispatch(documentActions.addDocument(newOrder));
@@ -158,6 +158,8 @@ const OrderEditScreen = () => {
       if (!order) {
         return;
       }
+
+      const updatedOrderDate = new Date().toISOString();
 
       const updatedOrder: IOrderDocument = {
         ...order,
@@ -174,8 +176,8 @@ const OrderEditScreen = () => {
           depart: docDepart,
         },
         lines: order.lines,
-        creationDate: order.creationDate || new Date().toISOString(),
-        editionDate: new Date().toISOString(),
+        creationDate: order.creationDate || updatedOrderDate,
+        editionDate: updatedOrderDate,
       };
 
       docDispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
@@ -290,7 +292,7 @@ const OrderEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
+        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
               <Text>Черновик:</Text>

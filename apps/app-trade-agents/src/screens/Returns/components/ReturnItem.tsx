@@ -4,11 +4,8 @@ import { useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { globalStyles as styles } from '@lib/mobile-ui';
-
 import { refSelectors } from '@lib/store';
-import { IReference } from '@lib/types';
 
 import { IGood, IReturnLine } from '../../../store/types';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
@@ -23,7 +20,7 @@ const ReturnItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
 
-  const good = (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id);
+  const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 
   return (
     <TouchableOpacity

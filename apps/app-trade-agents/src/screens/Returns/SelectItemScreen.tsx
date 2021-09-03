@@ -8,7 +8,7 @@ import { Searchbar, Divider } from 'react-native-paper';
 
 import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 
@@ -20,7 +20,7 @@ const SelectItemScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = refSelectors.selectByName(name) as IReference<INamedEntity>;
+  const list = refSelectors.selectByName<INamedEntity>(name);
 
   const filteredList = useMemo(() => {
     return (

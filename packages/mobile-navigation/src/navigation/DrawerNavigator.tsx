@@ -3,14 +3,13 @@ import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
+import { useSelector } from '@lib/store';
+
 import SettingsNavigator from './Root/SettingsNavigator';
-import MessagesNavigator from './Root/MessagesNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
-// import DocumentsNavigator from './Root/DocumentsNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
 import { INavItem, RootDrawerParamList } from './types';
 import { DrawerContent } from './drawerContent';
-import { useSelector } from '@lib/store';
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
