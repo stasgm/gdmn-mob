@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors } from '@lib/store';
 import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
-import { IDocumentType, INamedEntity } from '@lib/types';
+import { IDocument, IDocumentType, INamedEntity } from '@lib/types';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
@@ -36,7 +36,7 @@ const Visit = ({
 
   console.log('outlet', outlet);
 
-  const order = docSelectors
+  const orderDoc = docSelectors
     .selectByDocType<IOrderDocument>('order')
     ?.find((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
 
@@ -88,12 +88,34 @@ const Visit = ({
       editionDate: date,
     };
 
-    dispatch(
-      documentActions.updateDocument({
-        docId: item.id,
-        document: updatedVisit,
-      }),
-    );
+    let updatedDocs: IDocument[] = [updatedVisit];
+
+    //Переводим черновики документов по визиту в статус Готово
+    if (orderDoc?.status === 'DRAFT') {
+      updatedDocs = [
+        ...updatedDocs,
+        {
+          ...orderDoc,
+          status: 'READY',
+          creationDate: orderDoc.creationDate || date,
+          editionDate: date,
+        },
+      ];
+    }
+
+    if (returnDoc?.status === 'DRAFT') {
+      updatedDocs = [
+        ...updatedDocs,
+        {
+          ...returnDoc,
+          status: 'READY',
+          creationDate: returnDoc.creationDate || date,
+          editionDate: date,
+        },
+      ];
+    }
+
+    dispatch(documentActions.updateDocuments(updatedDocs));
 
     setProcess(false);
   };
@@ -169,9 +191,9 @@ const Visit = ({
   } ${timeProcess()})`;
   const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
 
-  const orderText = `Заявка (${order ? `${order.lines.length}` : '0'})`;
+  const orderText = `Заявка (${orderDoc ? `${orderDoc.lines.length}` : '0'})`;
   const handleOrder = () => {
-    return order ? navigation.navigate('OrderView', { id: order.id }) : handleNewOrder();
+    return orderDoc ? navigation.navigate('OrderView', { id: orderDoc.id }) : handleNewOrder();
   };
 
   const returnText = `Возврат (${returnDoc ? `${returnDoc.lines.length}` : '0'})`;
