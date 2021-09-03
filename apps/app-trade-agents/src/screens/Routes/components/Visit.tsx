@@ -2,17 +2,12 @@ import React, { useLayoutEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
-
+import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors } from '@lib/store';
 import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
-import { IDocumentType, INamedEntity, IReference } from '@lib/types';
-
-import { StackNavigationProp } from '@react-navigation/stack';
+import { IDocumentType, INamedEntity } from '@lib/types';
 
 import { useDispatch } from '../../../store';
-
-// import { IVisitDocument } from '../../../store/visits/types';
-// import { visitActions } from '../../../store/visits/actions';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
@@ -41,21 +36,17 @@ const Visit = ({
 
   console.log('outlet', outlet);
 
-  const order = (docSelectors.selectByDocType('order') as IOrderDocument[])?.find(
-    (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
-  );
+  const order = docSelectors
+    .selectByDocType<IOrderDocument>('order')
+    ?.find((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
 
-  const orderType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
-    (t) => t.name === 'order',
-  );
+  const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
-  const returnType = (refSelectors.selectByName('documentType') as IReference<IDocumentType>)?.data.find(
-    (t) => t.name === 'return',
-  );
+  const returnDoc = docSelectors
+    .selectByDocType<IReturnDocument>('return')
+    ?.find((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
 
-  const returnDoc = (docSelectors.selectByDocType('return') as IReturnDocument[])?.find(
-    (e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id,
-  );
+  const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 
   const timeProcess = () => {
     // TODO Вынести в helpers
@@ -93,7 +84,8 @@ const Visit = ({
         dateEnd: date,
         endGeoPoint: coords,
       },
-      editionDate: new Date().toISOString(),
+      creationDate: item.creationDate || date,
+      editionDate: date,
     };
 
     dispatch(
@@ -117,20 +109,24 @@ const Visit = ({
       return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
     }
 
+    const newOrderDate = new Date().toISOString();
+
     const newOrder: IOrderDocument = {
       id: uuid(),
       number: 'б\\н',
       status: 'DRAFT',
-      documentDate: new Date().toISOString(),
+      documentDate: newOrderDate,
       documentType: orderType,
       head: {
         contact,
         outlet,
         route,
-        onDate: new Date().toISOString(),
+        onDate: newOrderDate,
         takenOrder: item.head.takenType,
       },
       lines: [],
+      creationDate: newOrderDate,
+      editionDate: newOrderDate,
     };
 
     dispatch(documentActions.addDocument(newOrder));
@@ -143,11 +139,13 @@ const Visit = ({
       return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
     }
 
+    const newReturnDate = new Date().toISOString();
+
     const newReturn: IReturnDocument = {
       id: uuid(),
       number: 'б\\н',
       status: 'DRAFT',
-      documentDate: new Date().toISOString(),
+      documentDate: newReturnDate,
       documentType: returnType,
       head: {
         contact,
@@ -157,6 +155,8 @@ const Visit = ({
         reason: 'Брак',
       },
       lines: [],
+      creationDate: newReturnDate,
+      editionDate: newReturnDate,
     };
 
     dispatch(documentActions.addDocument(newReturn));

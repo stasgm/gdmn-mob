@@ -1,5 +1,5 @@
 import { BodyType, INamedEntity, StatusType } from './common';
-import { IDocument } from './document';
+import { IDocument, IDocumentType } from './document';
 import { IReferences } from './references';
 
 export interface IHeadMessage {
@@ -13,7 +13,7 @@ export interface IHeadMessage {
 export interface ICmdParams<T = any> {
   dateBegin: string;
   dateEnd: string;
-  documentType?: INamedEntity;
+  documentType?: IDocumentType;
   data?: T;
 }
 

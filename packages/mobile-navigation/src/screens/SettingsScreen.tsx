@@ -74,7 +74,7 @@ const SettingsSceen = () => {
         <Divider />
         <View>
           {Object.entries(data)
-            .filter(([key, item]) => item.visible)
+            .filter(([_, item]) => item.visible)
             .map(([key, item]) => {
               return (
                 <View key={key}>

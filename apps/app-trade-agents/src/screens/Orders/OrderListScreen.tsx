@@ -58,9 +58,9 @@ const OrderListScreen = () => {
 
   const { loading } = useSelector((state) => state.documents);
 
-  const list = (docSelectors.selectByDocType('order') as IOrderDocument[]).sort(
-    (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
-  );
+  const list = docSelectors
+    .selectByDocType<IOrderDocument>('order')
+    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
 

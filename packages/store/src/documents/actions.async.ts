@@ -70,20 +70,20 @@ export const updateDocuments = (
   };
 };
 
-const removeDocument = (
-  documentId: string,
+const removeDocuments = (
+  documentIds: string[],
 ): AppThunk<
-  Promise<ActionType<typeof actions.removeDocumentAsync>>,
+  Promise<ActionType<typeof actions.removeDocumentsAsync>>,
   DocumentState,
-  ActionType<typeof actions.removeDocumentAsync>
+  ActionType<typeof actions.removeDocumentsAsync>
 > => {
   return async (dispatch) => {
-    dispatch(actions.removeDocumentAsync.request('Удаление документа'));
+    dispatch(actions.removeDocumentsAsync.request('Удаление документов'));
 
     try {
-      return dispatch(actions.removeDocumentAsync.success(documentId));
+      return dispatch(actions.removeDocumentsAsync.success(documentIds));
     } catch {
-      return dispatch(actions.removeDocumentAsync.failure('Ошибка удаления документа'));
+      return dispatch(actions.removeDocumentsAsync.failure('Ошибка удаления документов'));
     }
   };
 };
@@ -104,18 +104,4 @@ const clearDocuments = (): AppThunk<
   };
 };
 
-// export const addDocument = (document: IDocument): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(actions.addDocumentAsync.request(''));
-
-//     await sleep(1000);
-//     //TODO: проверка
-//     if (document) {
-//       return dispatch(actions.addDocumentAsync.success(document));
-//     }
-
-//     return dispatch(actions.addDocumentAsync.failure('something wrong'));
-//   };
-// };
-
-export default { setDocuments, addDocuments, updateDocuments, removeDocument, clearDocuments, useDocThunkDispatch };
+export default { setDocuments, addDocuments, updateDocuments, removeDocuments, clearDocuments, useDocThunkDispatch };

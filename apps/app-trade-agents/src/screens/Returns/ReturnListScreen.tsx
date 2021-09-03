@@ -27,7 +27,7 @@ const ReturnListScreen = () => {
   const showActionSheet = useActionSheet();
 
   const { loading } = useSelector((state) => state.documents);
-  const list = docSelectors.selectByDocType('return') as IReturnDocument[];
+  const list = docSelectors.selectByDocType<IReturnDocument>('return');
 
   const [status, setStatus] = useState<Status>('all');
 

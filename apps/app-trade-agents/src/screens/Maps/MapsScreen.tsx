@@ -38,11 +38,11 @@ const MapScreen = () => {
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
 
-  const outlets = refSelectors.selectByName('outlet')?.data as IOutlet[];
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const routeList = (docSelectors.selectByDocType('route') as IRouteDocument[])?.sort(
-    (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
-  );
+  const routeList = docSelectors
+    .selectByDocType<IRouteDocument>('route')
+    ?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   // const routeList = routeMock?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 

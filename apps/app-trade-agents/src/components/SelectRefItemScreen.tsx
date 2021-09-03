@@ -2,10 +2,8 @@ import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } fro
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
-
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 import { appActions, refSelectors, useSelector } from '@lib/store';
-
 import {
   AppScreen,
   BackButton,
@@ -27,7 +25,7 @@ const SelectRefItemScreen = () => {
   const dispatch = useDispatch();
   const { refName, isMulti, fieldName, value, clause } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
-  const refObj = refSelectors.selectByName(refName) as IReference<any>;
+  const refObj = refSelectors.selectByName<any>(refName);
 
   const list = useMemo(() => {
     if (clause && refObj?.data) {
