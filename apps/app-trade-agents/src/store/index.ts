@@ -7,20 +7,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistStore, persistReducer } from 'redux-persist';
 
 import geoReducer from './geo/reducer';
-// import visitsReducer from './visits/reducer';
-// import appReducer from './app/reducer';
-
 import { GeoActionType } from './geo/actions';
-// import { VisitActionType } from './visits/actions';
-import { AppActionType } from './app/actions';
 
-type TActions = AppActionType | GeoActionType;
+// export { default as geoActions } from './geo';
+// export { useGeoThunkDispatch } from './geo';
 
-// const persistVisitsConfig = {
-//   key: 'visits',
-//   storage: AsyncStorage,
-//   whitelist: ['list'],
-// };
+type TActions = GeoActionType;
 
 const persistGeoConfig = {
   key: 'geo',

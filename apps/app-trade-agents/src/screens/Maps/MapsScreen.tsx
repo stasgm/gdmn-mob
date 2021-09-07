@@ -44,10 +44,8 @@ const MapScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     ?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  // const routeList = routeMock?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-
   const initLocations = useCallback(() => {
-    const getLocations = async () => {
+    if (!!routeList && !!outlets) {
       const initialList: ILocation[] = routeList[0]?.lines.map((e) => {
         const outlet = outlets.find((i) => i.id === e.outlet.id);
         const res: ILocation = {
@@ -59,20 +57,19 @@ const MapScreen = () => {
         return res;
       });
 
-      return initialList;
-    };
-
-    if (routeList && outlets) {
-      getLocations()
-        .then((e) => dispatch(geoActions.addMany(e)))
-        .catch((err) => console.log(err));
+      dispatch(geoActions.addMany(initialList));
     }
   }, [dispatch, outlets, routeList]);
 
-  const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
-  const currentPoint = useSelector((state) => state.geo.currentPoint);
+  const list = (useSelector((state) => state.geo)?.list || [])?.sort((a, b) => a.number - b.number);
+  const currentPoint = useSelector((state) => state.geo?.currentPoint);
 
-  const setCurrentPoint = useCallback((point: ILocation) => dispatch(geoActions.setCurrentPoint(point)), [dispatch]);
+  const setCurrentPoint = useCallback(
+    (point: ILocation) => {
+      dispatch(geoActions.setCurrentPoint(point));
+    },
+    [dispatch],
+  );
 
   const refMap = useRef<MapView>(null);
 
@@ -85,7 +82,7 @@ const MapScreen = () => {
       latitudeDelta: 0.3,
       longitudeDelta: 0.3,
     });
-  }, [dispatch, initLocations]);
+  }, []);
 
   const handleGetLocation = async () => {
     setLoading(true);
@@ -138,13 +135,16 @@ const MapScreen = () => {
   };
 
   const handleFitToCoordinates = () => {
+    if (!list.length) {
+      return;
+    }
     moveToRegion(list.map((p) => p.coords));
   };
 
   const moveNextPoint = () => {
     const listLen = list.length;
 
-    if (listLen === 0) {
+    if (!listLen) {
       return;
     }
 
@@ -158,7 +158,7 @@ const MapScreen = () => {
   const movePrevPoint = () => {
     const listLen = list.length;
 
-    if (listLen === 0) {
+    if (!listLen) {
       return;
     }
 
