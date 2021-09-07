@@ -20,7 +20,7 @@ const RouteListScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  console.log('route', list);
+  // console.log('route', list);
 
   // useEffect(() => {
   //   docDispatch(documentActions.init());
