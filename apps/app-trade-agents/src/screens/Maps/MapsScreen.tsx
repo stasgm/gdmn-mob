@@ -82,6 +82,7 @@ const MapScreen = () => {
       latitudeDelta: 0.3,
       longitudeDelta: 0.3,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleGetLocation = async () => {
@@ -93,7 +94,11 @@ const MapScreen = () => {
       const coords = await getCurrentPosition();
       dispatch(geoActions.addCurrent({ coords }));
     } catch (e) {
-      setMessage(e.message);
+      if (e instanceof TypeError) {
+        setMessage(e.message);
+      } else {
+        setMessage('Неизвестная ошибка');
+      }
       setBarVisible(true);
     }
 

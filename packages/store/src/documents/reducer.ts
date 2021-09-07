@@ -26,7 +26,26 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       //Документы, которые есть только в мобильном
       const oldDocs = state.list.filter((oldDoc) => !docsFromBack.find((d) => d.id === oldDoc.id));
 
+      // Отфильтруем документы, которых по какой-то причине нет в мобильном, но пришел ответ от сервера
+      // и сформируем новый массив:
+      // - Если пришел новый документ (не ответ), то записываем его
+      // - Если пришел успешный ответ 'PROCESSED' от сервера,
+      //   то оставляем данные из хранилища и заменяем статус на 'PROCESSED' (документы отобразятся на закладке Архив)
+      // - Если пришли ответы с ошибками 'PROCESSED_DEADLOCK' или 'PROCESSED_INCORRECT',
+      //   то оставляем данные из хранилища, записываем ошибку из errorMessage
+      //   и заменяем статус на 'DRAFT' (чтобы пользователь заново смог отредактировать данный документ)
+      // - Если документ в хранилище в состоянии черновика,
+      //   то заменяем его на новые данные из сообщения,
+      //   иначе (состояние Готов или Отправлен) - оставляем данные из хранилища
+      // К сформированному массиву добавим документы из хранилища, которых не было в сообщении
       const newDocs = docsFromBack
+        .filter(
+          (d) =>
+            !state.list.find((l) => l.id === d.id) &&
+            d.status !== 'PROCESSED' &&
+            d.status !== 'PROCESSED_DEADLOCK' &&
+            d.status !== 'PROCESSED_INCORRECT',
+        )
         .map((newDoc) => {
           const oldDoc = state.list.find((d) => d.id === newDoc.id);
 
@@ -35,12 +54,17 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
             : newDoc.status === 'PROCESSED'
             ? {
                 ...oldDoc,
-                status: (newDoc.errorMessage ? 'DRAFT' : 'PROCESSED') as StatusType,
+                status: 'PROCESSED' as StatusType,
+              }
+            : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'
+            ? {
+                ...oldDoc,
+                status: 'DRAFT' as StatusType,
                 errorMessage: newDoc.errorMessage,
               }
-            : oldDoc.status !== 'DRAFT'
-            ? oldDoc
-            : { ...newDoc, errorMessage: oldDoc.errorMessage };
+            : oldDoc.status === 'DRAFT'
+            ? newDoc
+            : oldDoc;
         })
         .concat(oldDocs);
 
