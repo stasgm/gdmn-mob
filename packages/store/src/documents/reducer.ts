@@ -21,16 +21,20 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       return { ...state, loading: true, errorMessage: '' };
 
     case getType(actions.setDocumentsAsync.success): {
-      const docsFromBack = action.payload;
+      // Отфильтруем документы, которых по какой-то причине нет в мобильном, но пришел ответ от сервера
+      const docsFromBack = action.payload.filter(
+        (d) =>
+          state.list?.find((l) => l.id === d.id) ||
+          (d.status !== 'PROCESSED' && d.status !== 'PROCESSED_INCORRECT' && d.status !== 'PROCESSED_DEADLOCK'),
+      );
 
       //Документы, которые есть только в мобильном
       const oldDocs = state.list.filter((oldDoc) => !docsFromBack.find((d) => d.id === oldDoc.id));
 
-      // Отфильтруем документы, которых по какой-то причине нет в мобильном, но пришел ответ от сервера
-      // и сформируем новый массив:
+      // Сформируем новый массив:
       // - Если пришел новый документ (не ответ), то записываем его
       // - Если пришел успешный ответ 'PROCESSED' от сервера,
-      //   то оставляем данные из хранилища и заменяем статус на 'PROCESSED' (документы отобразятся на закладке Архив)
+      //   то оставляем данные из хранилища и заменяем статус на 'PROCESSED'
       // - Если пришли ответы с ошибками 'PROCESSED_DEADLOCK' или 'PROCESSED_INCORRECT',
       //   то оставляем данные из хранилища, записываем ошибку из errorMessage
       //   и заменяем статус на 'DRAFT' (чтобы пользователь заново смог отредактировать данный документ)
@@ -39,13 +43,6 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       //   иначе (состояние Готов или Отправлен) - оставляем данные из хранилища
       // К сформированному массиву добавим документы из хранилища, которых не было в сообщении
       const newDocs = docsFromBack
-        .filter(
-          (d) =>
-            !state.list.find((l) => l.id === d.id) &&
-            d.status !== 'PROCESSED' &&
-            d.status !== 'PROCESSED_DEADLOCK' &&
-            d.status !== 'PROCESSED_INCORRECT',
-        )
         .map((newDoc) => {
           const oldDoc = state.list.find((d) => d.id === newDoc.id);
 

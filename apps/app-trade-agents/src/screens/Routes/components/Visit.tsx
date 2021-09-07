@@ -210,12 +210,15 @@ const Visit = ({
             <Text>{visitTextEnd}</Text>
           ) : (
             <View>
-              <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
+              <PrimeButton onPress={handleOrder} outlined>
+                {'Добавить документ'}
+              </PrimeButton>
+              {/* <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
                 {orderText}
               </PrimeButton>
               <PrimeButton icon="clipboard-arrow-left-outline" onPress={handleReturn} outlined>
                 {returnText}
-              </PrimeButton>
+              </PrimeButton> */}
             </View>
           )}
         </>
