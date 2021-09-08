@@ -1,13 +1,11 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import React, { useLayoutEffect, useState } from 'react';
+import { View, Text, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors } from '@lib/store';
 import { BackButton, InfoBlock, PrimeButton } from '@lib/mobile-ui';
 import { IDocument, IDocumentType, INamedEntity } from '@lib/types';
-
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
@@ -31,37 +29,12 @@ const Visit = ({
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
 
-  // ref
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  // variables
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
-
-  // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
-
-  const handleDismiss = useCallback(() => {
-    // eslint-disable-next-line no-console
-    console.log('on dismiss');
-  }, []);
-
-  // const renderHeaderHandle = useCallback(
-  //   props => <HeaderHandle {...props} children="Modal Example" />,
-  //   []
-  // );
-
   const [process, setProcess] = useState(false);
 
   const dateBegin = new Date(item.head.dateBegin);
   const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
 
-  // console.log('outlet', outlet);
+  console.log('outlet', outlet);
 
   const orderDoc = docSelectors
     .selectByDocType<IOrderDocument>('order')
@@ -229,60 +202,40 @@ const Visit = ({
   };
 
   return (
-    <BottomSheetModalProvider>
-      <View style={styles.container}>
-        <InfoBlock colorLabel="#4E9600" title="Визит">
-          <>
-            <Text>{visitTextBegin}</Text>
-            {dateEnd ? (
-              <Text>{visitTextEnd}</Text>
-            ) : (
-              <View>
-                <PrimeButton onPress={handlePresentModalPress} outlined>
-                  {'Добавить документ'}
-                </PrimeButton>
-                {/* <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
+    <>
+      <InfoBlock colorLabel="#4E9600" title="Визит">
+        <>
+          <Text>{visitTextBegin}</Text>
+          {dateEnd ? (
+            <Text>{visitTextEnd}</Text>
+          ) : (
+            <View>
+              <PrimeButton onPress={handleOrder} outlined>
+                {'Добавить документ'}
+              </PrimeButton>
+              {/* <PrimeButton icon="clipboard-arrow-right-outline" onPress={handleOrder} outlined>
                 {orderText}
               </PrimeButton>
               <PrimeButton icon="clipboard-arrow-left-outline" onPress={handleReturn} outlined>
                 {returnText}
               </PrimeButton> */}
-              </View>
-            )}
-          </>
-        </InfoBlock>
-        {process ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
-          <>
-            {!dateEnd && (
-              <PrimeButton icon="stop-circle-outline" onPress={handleCloseVisit}>
-                Завершить визит
-              </PrimeButton>
-            )}
-          </>
-        )}
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          index={1}
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-          onDismiss={handleDismiss}
-        >
-          <View>
-            <Text>Awesome</Text>
-          </View>
-        </BottomSheetModal>
-      </View>
-    </BottomSheetModalProvider>
+            </View>
+          )}
+        </>
+      </InfoBlock>
+      {process ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <>
+          {!dateEnd && (
+            <PrimeButton icon="stop-circle-outline" onPress={handleCloseVisit}>
+              Завершить визит
+            </PrimeButton>
+          )}
+        </>
+      )}
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-});
 
 export default Visit;
