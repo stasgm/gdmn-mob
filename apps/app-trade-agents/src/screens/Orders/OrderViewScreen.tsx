@@ -30,7 +30,6 @@ const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const routeBack = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeBack;
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
 
   const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
@@ -80,7 +79,7 @@ const OrderViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
+      headerLeft: () => <BackButton />,
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
@@ -89,7 +88,7 @@ const OrderViewScreen = () => {
           </View>
         ),
     });
-  }, [navigation, handleAddOrderLine, actionsMenu, routeBack, isBlocked]);
+  }, [navigation, handleAddOrderLine, actionsMenu, isBlocked]);
 
   if (!order) {
     return (

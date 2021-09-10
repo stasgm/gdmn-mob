@@ -15,7 +15,7 @@ export type RefParamList = {
 };
 
 export type OrderParamList = RefParamList & {
-  OrderView: { id: string; routeBack?: string };
+  OrderView: { id: string };
   OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectGroupItem: { docId: string };
@@ -25,7 +25,7 @@ export type OrderParamList = RefParamList & {
 export type OrdersStackParamList = { OrderList: undefined } & OrderParamList;
 
 export type ReturnParamList = RefParamList & {
-  ReturnView: { id: string; routeBack?: string }; // | undefined
+  ReturnView: { id: string };
   ReturnEdit: { id: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItemReturn: { docId: string; name: string };

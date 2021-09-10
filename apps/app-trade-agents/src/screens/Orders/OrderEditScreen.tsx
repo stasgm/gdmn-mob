@@ -183,8 +183,6 @@ const OrderEditScreen = () => {
       docDispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
       navigation.navigate('OrderView', { id });
     }
-
-    // navigation.navigate('OrderView', { id: docId, routeBack: 'OrderList' });
   }, [
     orderType,
     docNumber,

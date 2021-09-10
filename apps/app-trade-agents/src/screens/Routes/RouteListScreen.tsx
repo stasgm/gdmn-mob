@@ -1,9 +1,9 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
 
 import { ItemSeparator, FilterButtons, Status, globalStyles as styles, DrawerButton, AppScreen } from '@lib/mobile-ui';
-import { useSelector, docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
+import { useSelector, docSelectors } from '@lib/store';
 
 import { IRouteDocument } from '../../store/types';
 
@@ -12,15 +12,12 @@ import RouteListItem from './components/RouteListItem';
 const RouteListScreen = () => {
   const navigation = useNavigation();
   const [status, setStatus] = useState<Status>('active');
-  const docDispatch = useDocThunkDispatch();
 
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
     .selectByDocType<IRouteDocument>('route')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-
-  console.log('route', list);
 
   // useEffect(() => {
   //   docDispatch(documentActions.init());

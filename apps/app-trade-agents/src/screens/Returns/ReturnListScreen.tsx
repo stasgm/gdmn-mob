@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, RefreshControl, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
@@ -15,12 +15,27 @@ import {
   Status,
   AppScreen,
 } from '@lib/mobile-ui';
+import { StatusType } from '@lib/types';
 
 import { IReturnDocument } from '../../store/types';
-
 import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { getDateString } from '../../utils/helpers';
+import { OrderListRenderItemProps } from '../Orders/OrderListScreen';
 
+// eslint-disable-next-line import/no-cycle
 import ReturnListItem from './components/ReturnListItem';
+
+export interface ReturnListItemProps {
+  title: string;
+  documentDate: string;
+  subtitle?: string;
+  status?: StatusType;
+  isFromRoute?: boolean;
+  lineCount?: number;
+}
+export interface ReturnListRenderItemProps extends ReturnListItemProps {
+  id: string;
+}
 
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
@@ -32,20 +47,32 @@ const ReturnListScreen = () => {
   const [status, setStatus] = useState<Status>('all');
 
   const filteredList = useMemo(() => {
-    if (status === 'all') {
-      return list;
-    } else if (status === 'active') {
-      return list.filter((e) => e.status !== 'PROCESSED');
-    } else if (status === 'archive') {
-      return list.filter((e) => e.status === 'PROCESSED');
-    }
-    return [];
+    const res =
+      status === 'all'
+        ? list
+        : status === 'active'
+        ? list.filter((e) => e.status !== 'PROCESSED')
+        : status === 'archive'
+        ? list.filter((e) => e.status === 'PROCESSED')
+        : [];
+
+    return res.map(
+      (i) =>
+        ({
+          id: i.id,
+          title: i.head.outlet?.name,
+          documentDate: getDateString(i.documentDate),
+          status: i.status,
+          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}}`,
+          isFromRoute: !!i.head.route,
+          lineCount: i.lines.length,
+        } as ReturnListRenderItemProps),
+    );
   }, [status, list]);
 
-  const renderItem = useCallback(
-    ({ item }: { item: IReturnDocument }) => <ReturnListItem key={item.id} item={item} />,
-    [],
-  );
+  const renderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
+    return <ReturnListItem {...item} />;
+  };
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ReturnEdit');

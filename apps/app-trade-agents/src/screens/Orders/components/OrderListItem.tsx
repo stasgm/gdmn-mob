@@ -37,9 +37,9 @@ const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: 
             <View style={styles.directionRow}>
               <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
-              {isFromRoute ? (
+              {isFromRoute && (
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
-              ) : null}
+              )}
             </View>
           </View>
         </View>
