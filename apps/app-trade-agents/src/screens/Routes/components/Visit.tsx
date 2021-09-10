@@ -1,10 +1,10 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, ActivityIndicator, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { docSelectors, documentActions, refSelectors } from '@lib/store';
-import { IDocument, IDocumentType, INamedEntity } from '@lib/types';
+import { docSelectors, documentActions, refSelectors, useSelector } from '@lib/store';
+import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
@@ -20,6 +20,7 @@ import OrderListItem from '../../Orders/components/OrderListItem';
 import { getDateString } from '../../../utils/helpers';
 import ReturnListItem from '../../Returns/components/ReturnListItem';
 import { ReturnListRenderItemProps } from '../../Returns/ReturnListScreen';
+import { useSendDocs } from '@lib/mobile-app';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -38,6 +39,8 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
 
   const dateBegin = new Date(item.head.dateBegin);
   const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
+
+  const { loading } = useSelector((state) => state.app);
 
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
@@ -98,35 +101,6 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     const updatedReturns: IReturnDocument[] = returnDocs
       .filter((doc) => doc.status === 'DRAFT')
       ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
-
-    //const updatedDocs: IDocument[] = [updatedVisit, ...updatedOrders, ...updatedReturns];
-
-    //Переводим черновики документов по визиту в статус Готово
-    //updatedDocs = [...updatedDocs, ...updatedOrders];
-
-    // if (orderDoc?.status === 'DRAFT') {
-    //   updatedDocs = [
-    //     ...updatedDocs,
-    //     {
-    //       ...orderDoc,
-    //       status: 'READY',
-    //       creationDate: orderDoc.creationDate || date,
-    //       editionDate: date,
-    //     },
-    //   ];
-    // }
-
-    // if (returnDoc?.status === 'DRAFT') {
-    //   updatedDocs = [
-    //     ...updatedDocs,
-    //     {
-    //       ...returnDoc,
-    //       status: 'READY',
-    //       creationDate: returnDoc.creationDate || date,
-    //       editionDate: date,
-    //     },
-    //   ];
-    // }
 
     dispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders, ...updatedReturns]));
 
@@ -270,6 +244,14 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     return <ReturnListItem {...item} />;
   };
 
+  const readyDocs = useMemo(() => {
+    return [
+    ...orderDocs.filter((doc) => doc.status === 'READY'),
+    ...returnDocs.filter((doc) => doc.status === 'READY'),
+  ]}, [orderDocs, returnDocs]);
+
+  const handleSendDocs = useSendDocs(readyDocs);
+
   return (
     <>
       <View style={localStyles.container}>
@@ -291,7 +273,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title={'Заявки'}>
+          <InfoBlock colorLabel="#4479D4" title='Заявки'>
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -302,7 +284,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title={'Возвраты'}>
+          <InfoBlock colorLabel="#4479D4" title='Возвраты'>
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}
@@ -313,7 +295,20 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
       </View>
-      {!dateEnd && <PrimeButton onPress={handlePresentDocType}>Добавить документ</PrimeButton>}
+      {!dateEnd ? (
+        <PrimeButton icon="plus-circle-outline" onPress={handlePresentDocType}>
+          Добавить документ
+        </PrimeButton>
+      ) : (
+        readyDocs?.length > 0 &&
+        (loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <PrimeButton icon="file-send" onPress={handleSendDocs}>
+            Отправить
+          </PrimeButton>
+        ))
+      )}
       <BottomSheet
         sheetRef={docTypeRef}
         title={'Тип документа'}
