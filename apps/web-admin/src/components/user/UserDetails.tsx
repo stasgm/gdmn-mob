@@ -203,13 +203,13 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     </Button>
                   )}
                 </Grid>
-                <Grid display={open ? 'block' : 'none'}>
+                {/* <Grid display={open ? 'block' : 'none'}>
                   {Object.keys(user).length != 0 && (
                     <Button color="primary" disabled={loading} onClick={handleClickClose} sx={{ m: 1 }}>
                       <NoEncryptionOutlinedIcon style={{ height: 18 }} /> Отменить смену пароля
                     </Button>
                   )}
-                </Grid>
+                </Grid> */}
               </Grid>
             </>
           </Card>

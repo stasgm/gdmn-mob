@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
@@ -14,16 +14,17 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/user';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
-import { IToolBarButton, IHeadCells } from '../../types';
+import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
 import SnackBar from '../../components/SnackBar';
 
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { list, loading, errorMessage } = useSelector((state) => state.users);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.users);
+
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchUsers = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -34,11 +35,13 @@ const UserList = () => {
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    fetchUsers();
-  }, [fetchUsers]);
+    fetchUsers(pageParams?.filterText as string);
+  }, [fetchUsers, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
+
+    setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
 
@@ -46,17 +49,15 @@ const UserList = () => {
   };
 
   const handleSearchClick = () => {
-    const inputValue = valueRef?.current?.value;
+    dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
-    fetchUsers(inputValue);
+    fetchUsers(pageParamLocal?.filterText as string);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
-    const inputValue = valueRef?.current?.value;
-
-    fetchUsers(inputValue);
+    handleSearchClick();
   };
 
   const handleClearError = () => {
@@ -119,10 +120,11 @@ const UserList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти пользователя'}
-            valueRef={valueRef}
+            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
+            value={(pageParamLocal?.filterText as undefined) || ''}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
