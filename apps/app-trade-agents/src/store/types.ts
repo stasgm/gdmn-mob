@@ -1,4 +1,6 @@
 import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData, IDocumentType } from '@lib/types';
+// import { AnyAction } from 'redux';
+// import { ThunkAction } from 'redux-thunk';
 
 import { ICoords } from './geo/types';
 
@@ -132,6 +134,13 @@ export const visitDocumentType: IDocumentType = {
   name: 'visit',
   description: 'Визит',
 };
+
+// export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
+//   ReturnType,
+//   S,
+//   unknown,
+//   A
+// >;
 
 /* export interface ICoords {
   latitude: number;

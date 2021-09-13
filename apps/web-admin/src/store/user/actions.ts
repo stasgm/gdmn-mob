@@ -36,7 +36,7 @@ const removeUserAsync = createAsyncAction('USER/REMOVE', 'USER/REMOVE_SUCCESS', 
   string
 >();
 
-const setPageParam = createAction('USER/SET_PARAM')<IPageParam>();
+const setPageParam = createAction('USER/SET_PARAM')<IPageParam | undefined>();
 const clearPageParams = createAction('USER/CLEAR_PARAMS')();
 
 export const userActions = {

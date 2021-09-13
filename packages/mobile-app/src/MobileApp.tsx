@@ -17,12 +17,12 @@ export interface IApp {
 }
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
-  const syncData = useSync(onSync);
+  const handleSyncData = useSync(onSync);
 
   return (
     <DrawerNavigator
       items={items}
-      onSyncClick={syncData}
+      onSyncClick={handleSyncData}
     />
   );
 };

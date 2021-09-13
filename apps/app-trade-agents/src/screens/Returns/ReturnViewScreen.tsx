@@ -31,7 +31,7 @@ const ReturnViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
-  const { id, routeBack } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
+  const { id } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
 
   const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
 
@@ -81,7 +81,7 @@ const ReturnViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton onPress={routeBack ? () => navigation.navigate(routeBack) : undefined} />,
+      headerLeft: () => <BackButton />,
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
@@ -90,7 +90,7 @@ const ReturnViewScreen = () => {
           </View>
         ),
     });
-  }, [navigation, handleAddReturnLine, routeBack, actionsMenu, isBlocked]);
+  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked]);
 
   if (!returnDoc) {
     return (
