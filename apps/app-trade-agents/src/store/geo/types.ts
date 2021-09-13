@@ -10,7 +10,7 @@ export interface ILocation extends INamedEntity {
   coords: ICoords;
 }
 
-export type IGeoState = {
+export type GeoState = {
   readonly list: ILocation[];
   readonly currentPoint?: ILocation;
   readonly loading: boolean;

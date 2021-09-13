@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { TouchableHighlight, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { IListItem } from '@lib/mobile-types';
+import { TouchableHighlight } from '@gorhom/bottom-sheet';
 
 // type IListItem = {
 //   id: string;

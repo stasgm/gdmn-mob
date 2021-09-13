@@ -19,6 +19,10 @@ const RouteListScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
+  // useEffect(() => {
+  //   docDispatch(documentActions.init());
+  // }, []);
+
   const ref = useRef<FlatList<IRouteDocument>>(null);
   useScrollToTop(ref);
 

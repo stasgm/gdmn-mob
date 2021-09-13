@@ -13,7 +13,7 @@ import {
   BackButton,
   AppScreen,
 } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
 import { getDateString } from '../../utils/helpers';
 
@@ -55,7 +55,6 @@ const RouteViewScreen = () => {
       const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
 
       if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
-        console.log('mass', [...visitList, ...orderList, ...returnList, id]);
         navigation.goBack();
       }
     };

@@ -282,15 +282,14 @@ const styles = StyleSheet.create({
   updateSection: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingRight: 10,
-    paddingBottom: 5,
+    paddingLeft: 6,
   },
   systemInfo: {
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
   },
   drawerSection: {
     marginTop: 0,

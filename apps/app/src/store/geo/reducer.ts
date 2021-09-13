@@ -1,16 +1,16 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IGeoState } from './types';
+import { GeoState } from './types';
 import { GeoActionType, geoActions } from './actions';
 
-const initialState: Readonly<IGeoState> = {
+const initialState: Readonly<GeoState> = {
   list: [],
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action): IGeoState => {
+const reducer: Reducer<GeoState, GeoActionType> = (state = initialState, action): GeoState => {
   switch (action.type) {
     case getType(geoActions.init):
       return initialState;

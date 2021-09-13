@@ -1,16 +1,16 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IGeoState } from './types';
+import { GeoState } from './types';
 import { GeoActionType, geoActions } from './actions';
 
-const initialState: Readonly<IGeoState> = {
+const initialState: Readonly<GeoState> = {
   list: [],
   loading: false,
   errorMessage: '',
 };
 
-const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action): IGeoState => {
+const reducer: Reducer<GeoState, GeoActionType> = (state = initialState, action): GeoState => {
   switch (action.type) {
     case getType(geoActions.init):
       return initialState;
@@ -25,7 +25,7 @@ const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action
     case getType(geoActions.addCurrent): {
       return {
         ...state,
-        list: [...state.list, { id: 'current', name: 'Моё местоположение', ...action.payload, number: 0 }],
+        list: [...(state.list || []), { id: 'current', name: 'Моё местоположение', ...action.payload, number: 0 }],
       };
     }
 
@@ -41,10 +41,10 @@ const reducer: Reducer<IGeoState, GeoActionType> = (state = initialState, action
     }
 
     case getType(geoActions.deleteOne):
-      return { ...state, list: state.list.filter((item) => item.id !== action.payload) };
+      return { ...state, list: state.list?.filter((item) => item.id !== action.payload) };
 
     case getType(geoActions.deleteCurrent):
-      return { ...state, list: state.list.filter((item) => item.id !== 'current') };
+      return { ...state, list: state.list?.filter((item) => item.id !== 'current') };
 
     case getType(geoActions.deleteAll):
       return { ...state, list: [] };

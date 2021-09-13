@@ -19,7 +19,6 @@ const RouteDetailScreen = () => {
   const navigation = useNavigation();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
-  // const visits = useSelector((state) => state.visits).list.filter((visit) => visit.routeLineId === id);
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);

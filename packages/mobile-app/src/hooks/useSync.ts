@@ -68,7 +68,7 @@ const useSync = (onSync?: () => void): () => void => {
 
         if (sendMessageResponse.type === 'SEND_MESSAGE') {
           const updateDocResponse = await docDispatch(
-            documentActions.updateDocuments(documents.map((d) => (d.status === 'READY' ? { ...d, status: 'SENT' } : d))),
+            documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT' }))),
           );
 
           if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
@@ -141,7 +141,7 @@ const useSync = (onSync?: () => void): () => void => {
         maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
 
         const delPromises = documents.filter((d) => d.status === 'PROCESSED' && new Date(d.documentDate) <= maxDocDate).map(async (d) => {
-          await docDispatch(documentActions.removeDocument(d.id));
+          docDispatch(documentActions.removeDocument(d.id));
         });
 
         await Promise.all(delPromises);
