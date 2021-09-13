@@ -9,13 +9,22 @@ import ToolBarActions from './ToolBarActions';
 interface IProps {
   buttons: IToolBarButton[];
   searchTitle: string;
-  valueRef: any;
+  //valueRef: any;
   updateInput: (value: string) => void;
   searchOnClick: () => void;
   keyPress: (key: string) => void;
+  value?: string;
 }
 
-const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnClick, keyPress, valueRef }: IProps) => {
+const ToolbarActionsWithSearch = ({
+  buttons,
+  searchTitle,
+  updateInput,
+  searchOnClick,
+  keyPress,
+  //valueRef,
+  value,
+}: IProps) => {
   return (
     <Card>
       <Box
@@ -32,7 +41,7 @@ const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnC
             sx={{ p: 2 }}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start" onClick={() => searchOnClick()}>
+                <InputAdornment position="start" onClick={searchOnClick}>
                   <IconButton>
                     <SearchIcon fontSize="small" />
                   </IconButton>
@@ -44,7 +53,8 @@ const ToolbarActionsWithSearch = ({ buttons, searchTitle, updateInput, searchOnC
             onChange={(event) => updateInput(event.target.value)}
             onKeyPress={(event) => keyPress(event.key)}
             type="search"
-            inputRef={valueRef}
+            //inputRef={valueRef}
+            value={value || ''}
           />
         </Box>
         <Box
