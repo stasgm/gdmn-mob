@@ -169,6 +169,16 @@ const globalstyles = StyleSheet.create({
     fontSize: 15,
     color: '#fff',
   },
+  textTotal: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  total: {
+    margin: 6,
+  },
+  colorRed: {
+    color: '#e91e63',
+  },
 });
 
 export default globalstyles;

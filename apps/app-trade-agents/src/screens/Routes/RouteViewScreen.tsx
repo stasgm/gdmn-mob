@@ -21,6 +21,7 @@ import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 
 import RouteItem from './components/RouteItem';
+import RouteTotal from './components/RouteTotal';
 
 const RouteViewScreen = () => {
   const navigation = useNavigation();
@@ -106,6 +107,7 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <RouteTotal routeId={id} />
     </AppScreen>
   );
 };
