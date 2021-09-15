@@ -1,7 +1,7 @@
-import { useDispatch, useDocThunkDispatch, useRefThunkDispatch } from '@lib/store';
+import { useDispatch, useDocThunkDispatch, useRefThunkDispatch, useAuthThunkDispatch } from '@lib/store';
 
-import { useSelector, documentActions, referenceActions, appActions } from '@lib/store';
-import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOption } from '@lib/types';
+import { useSelector, documentActions, referenceActions, appActions, authActions } from '@lib/store';
+import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
@@ -10,6 +10,7 @@ import { Consumer } from '@expo/react-native-action-sheet/lib/typescript/context
 const useSync = (onSync?: () => void): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
+  const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
   const { user, company } = useSelector((state) => state.auth);
@@ -23,6 +24,7 @@ const useSync = (onSync?: () => void): (() => void) => {
   const consumer: INamedEntity = { id: '-1', name: systemName };
   const refVersion = 1;
   const docVersion = 1;
+  const setVersion = 1;
 
   const sync = () => {
     if (!company || !user) {
@@ -246,6 +248,23 @@ const useSync = (onSync?: () => void): (() => void) => {
 
       case 'SETTINGS': {
         //TODO: обработка
+        if ((msg.body.version || 1) !== setVersion) {
+          errList.push(
+            `Структура загружаемых данных для  настроек пользователя с версией '${msg.body.version}' не поддерживается приложением`,
+          );
+          break;
+        }
+
+        const setUserSettingsResponse = await authDispatch(
+          authActions.setUserSettings(msg.body.payload as IUserSettings[]),
+        );
+
+        //Если удачно сохранились документы, удаляем сообщение в json
+        if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
+          await api.message.removeMessage(msg.id);
+        } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
+          errList.push('Неудачная загрузка дополнительных настроек пользователя');
+        }
         break;
       }
 
