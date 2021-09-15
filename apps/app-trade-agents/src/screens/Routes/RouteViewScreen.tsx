@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { RouteProp, useRoute, useScrollToTop } from '@react-navigation/native';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
@@ -19,6 +19,8 @@ import { getDateString } from '../../utils/helpers';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+
+import { useDispatch, useSelector } from '../../store';
 
 import RouteItem from './components/RouteItem';
 
@@ -50,6 +52,8 @@ const RouteViewScreen = () => {
     ?.filter((e) => e.head.route?.id === id)
     .map((doc) => doc.id);
 
+  const geoList = useSelector((state) => state.geo)?.list?.filter((g) => g.routeId === id);
+
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
       const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
@@ -58,8 +62,8 @@ const RouteViewScreen = () => {
         navigation.goBack();
       }
     };
-
     deleteRoute();
+    console.log('list', list);
     //dispatch(documentActions.removeDocument(id));
   }, [docDispatch, id, navigation, orderList, returnList, visitList]);
 
@@ -106,6 +110,7 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <Text> лалала </Text>
     </AppScreen>
   );
 };

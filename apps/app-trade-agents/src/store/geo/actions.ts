@@ -1,4 +1,4 @@
-import { ActionType, createAction } from 'typesafe-actions';
+import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 import { ILocation } from './types';
 
@@ -10,6 +10,11 @@ const addMany = createAction('GEOLOCATION/ADD_MANY')<ILocation[]>();
 const deleteOne = createAction('GEOLOCATION/DELETE_ONE')<string>();
 const deleteCurrent = createAction('GEOLOCATION/DELETE_CURRENT')();
 const deleteAll = createAction('GEOLOCATION/DELETE_ALL')();
+const removeManyAsync = createAsyncAction(
+  'GEOLOCATION/REMOVE_MANY',
+  'GEOLOCATION/REMOVE_MANY_SUCCESS',
+  'GEOLOCATION/REMOVE_MANY_FAILURE',
+)<string | undefined, string[], string>();
 
 export const geoActions = {
   init,
@@ -20,6 +25,7 @@ export const geoActions = {
   deleteCurrent,
   deleteAll,
   setCurrentPoint,
+  removeManyAsync,
 };
 
 export type GeoActionType = ActionType<typeof geoActions>;

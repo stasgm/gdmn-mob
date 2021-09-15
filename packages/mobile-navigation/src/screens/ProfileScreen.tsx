@@ -33,7 +33,9 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
-          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.lastName || ''}</Text>
+          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>
+            {!user?.firstName && !user?.lastName ? user?.name : user?.lastName || ''}
+          </Text>
           <Text style={[styles.profileInfoTextCompany, { color: colors.placeholder }]}>{company?.name || ''}</Text>
         </View>
       </View>

@@ -8,6 +8,7 @@ export interface ICoords {
 export interface ILocation extends INamedEntity {
   number: number;
   coords: ICoords;
+  routeId?: string;
 }
 
 export type GeoState = {

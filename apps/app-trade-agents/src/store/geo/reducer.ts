@@ -40,6 +40,19 @@ const reducer: Reducer<GeoState, GeoActionType> = (state = initialState, action)
       return { ...state, list: action.payload };
     }
 
+    case getType(geoActions.removeManyAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(geoActions.removeManyAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: state.list.filter((doc) => action.payload.indexOf(doc.id) === -1),
+      };
+
+    case getType(geoActions.removeManyAsync.failure):
+      return { ...state, loading: false, errorMessage: action.payload || 'error' };
+
     case getType(geoActions.deleteOne):
       return { ...state, list: state.list?.filter((item) => item.id !== action.payload) };
 
