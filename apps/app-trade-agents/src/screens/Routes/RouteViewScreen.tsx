@@ -19,6 +19,7 @@ import { getDateString } from '../../utils/helpers';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+import actions from '../../store/geo';
 
 import { useDispatch, useSelector } from '../../store';
 
@@ -28,6 +29,7 @@ const RouteViewScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
+  const dispatch = useDispatch();
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
   const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
@@ -57,7 +59,7 @@ const RouteViewScreen = () => {
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
       const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
-
+      const gg = dispatch(actions.geoActions.removeMany(geoList, id));
       if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
         navigation.goBack();
       }
