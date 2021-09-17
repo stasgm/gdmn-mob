@@ -2,6 +2,7 @@ import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } fr
 import { IHeadMessage, IMessage } from './messages';
 
 export interface IUserSettings {
+  visible: boolean;
   [fieldName: string]: unknown;
 }
 
