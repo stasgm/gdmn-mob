@@ -10,7 +10,7 @@ const addMany = createAction('GEOLOCATION/ADD_MANY')<ILocation[]>();
 const deleteOne = createAction('GEOLOCATION/DELETE_ONE')<string>();
 const deleteCurrent = createAction('GEOLOCATION/DELETE_CURRENT')();
 const deleteAll = createAction('GEOLOCATION/DELETE_ALL')();
-const removeMany = createAction('GEOLOCATION/REMOVE_MANY')<ILocation, 'id'>();
+const removeMany = createAction('GEOLOCATION/REMOVE_MANY')<ILocation[] /*, 'id'*/>();
 // const removeMany = createAsyncAction(
 //   'GEOLOCATION/REMOVE_MANY',
 //   'GEOLOCATION/REMOVE_MANY_SUCCESS',
