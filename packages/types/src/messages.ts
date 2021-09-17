@@ -1,6 +1,7 @@
 import { BodyType, INamedEntity, StatusType } from './common';
 import { IDocument, IDocumentType } from './document';
 import { IReferences } from './references';
+import { IUserSettings } from './models';
 
 export interface IHeadMessage {
   appSystem: string;
@@ -22,7 +23,7 @@ export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdPa
   params?: T;
 }
 
-export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences;
+export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings[];
 
 /* const cmd1: ICmd<ICmdParams[]> = {
   name: 'GET_DOCUMENTS',
@@ -43,7 +44,9 @@ const cmd2: ICmd<Pick<ICmdParams, 'data'>> = {
   params: { data: 'ddgdhfghf' },
 };
  */
-export interface IMessage<T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences> {
+export interface IMessage<
+  T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings[],
+> {
   id: string;
   status: StatusType;
   version?: number;
