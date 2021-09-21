@@ -17,7 +17,7 @@ const useSync = (onSync?: () => void): (() => void) => {
   const { list: documents } = useSelector((state) => state.documents);
   const { data: settings } = useSelector((state) => state.settings);
 
-  const cleanDocTime = (settings['cleanDocTime'] as ISettingsOption<number>).data;
+  const cleanDocTime = settings.cleanDocTime ? (settings['cleanDocTime'] as ISettingsOption<number>).data : 0;
   const refLoadType = (settings['refLoadType'] as ISettingsOption<boolean>).data;
 
   const systemName = Constants.manifest?.extra?.slug;

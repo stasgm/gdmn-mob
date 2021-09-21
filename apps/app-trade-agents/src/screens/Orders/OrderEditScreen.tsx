@@ -25,7 +25,7 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, IReference, IUserSettings } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet } from '../../store/types';
@@ -46,6 +46,8 @@ const OrderEditScreen = () => {
     ?.data.find((t) => t.name === 'order');
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
+
+  const userSettings = useSelector((state) => state.auth.user?.settings as IUserSettings[]);
 
   const {
     contact: docContact,
