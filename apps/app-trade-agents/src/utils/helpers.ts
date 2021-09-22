@@ -1,3 +1,7 @@
+import { IDefaultDepart } from '../store/types';
+
+import { INamedEntity } from '@lib/types';
+
 const getDateString = (_date: string | Date) => {
   if (!_date) {
     return '-';
@@ -26,4 +30,12 @@ const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   return matched === paramsEntries.length;
 };
 
-export { getDateString, extraPredicate };
+const isNamedEntity = (obj: any): obj is INamedEntity => {
+  return typeof obj === 'object' && 'name' in obj;
+};
+
+const isDefaultDepart = (obj: any): obj is IDefaultDepart => {
+  return typeof obj === 'object' && obj.depart !== undefined && isNamedEntity(obj.depart);
+};
+
+export { getDateString, extraPredicate, isNamedEntity, isDefaultDepart };

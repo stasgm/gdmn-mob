@@ -25,12 +25,12 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IDocumentType, IReference, IUserSettings } from '@lib/types';
+import { IDocumentType, IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet } from '../../store/types';
 
-import { getDateString } from '../../utils/helpers';
+import { getDateString, isDefaultDepart } from '../../utils/helpers';
 import { IOrderFormParam } from '../../store/app/types';
 
 const OrderEditScreen = () => {
@@ -47,7 +47,16 @@ const OrderEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
-  const userSettings = useSelector((state) => state.auth.user?.settings as IUserSettings[]);
+  const userSettings = useSelector((state) => state.auth.user?.settings);
+
+  // Подразделение по умолчанию
+
+  const defaultDepart = useMemo(() => {
+    if (!userSettings) {
+      return undefined;
+    }
+    return userSettings.find(isDefaultDepart)?.depart;
+  }, [userSettings]);
 
   const {
     contact: docContact,
@@ -117,10 +126,11 @@ const OrderEditScreen = () => {
           onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
+          depart: defaultDepart,
         }),
       );
     }
-  }, [dispatch, order]);
+  }, [dispatch, order, defaultDepart]);
 
   const handleSave = useCallback(() => {
     if (!orderType) {
@@ -276,9 +286,9 @@ const OrderEditScreen = () => {
   };
 
   const handlePresentDepart = () => {
-    if (isBlocked) {
+    /* if (isBlocked) {
       return;
-    }
+    } */
 
     navigation.navigate('SelectRefItem', {
       refName: 'department',
@@ -330,7 +340,7 @@ const OrderEditScreen = () => {
           label="Склад-магазин"
           value={docDepart?.name}
           onPress={handlePresentDepart}
-          disabled={isBlocked}
+          //disabled={isBlocked}
         />
       </ScrollView>
       {showOnDate && (
