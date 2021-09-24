@@ -4,7 +4,9 @@ import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
 
-import { globalStyles as styles, Theme } from '@lib/mobile-ui';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+
+import { globalStyles as styles, Theme, BottomSheet, RadioGroup, PrimeButton } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
@@ -15,6 +17,8 @@ import { IOutlet, IRouteDocument } from '../../store/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import localStyles from './styles';
+import { IListItem } from '@lib/mobile-types';
+import RouteListItem from '../Routes/components/RouteListItem';
 
 interface Region {
   latitude: number;
@@ -63,6 +67,10 @@ const MapScreen = () => {
 
   const list = (useSelector((state) => state.geo)?.list || [])?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo?.currentPoint);
+
+  const routesList = docSelectors
+    .selectByDocType<IRouteDocument>('route')
+    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const setCurrentPoint = useCallback(
     (point: ILocation) => {
@@ -179,6 +187,34 @@ const MapScreen = () => {
     setCurrentPoint(props);
   };
 
+  const docTypeRef = useRef<BottomSheetModal>(null);
+
+  const handleDismissDocType = () => docTypeRef.current?.dismiss();
+
+  const handleApplyDocType = () => {
+    docTypeRef.current?.dismiss();
+
+    // switch (selectedDocType.id) {
+    //   case 'order':
+    //     return handleNewOrder();
+    //   case 'return':
+    //     return handleNewReturn();
+    //   default:
+    //     return;
+    // }
+  };
+  const listDocumentType: IRouteDocument[] = [
+   // { id: 'id'},
+  //{ id: 'return', value: '2' },
+  ];
+  const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
+  const handlePresentDocType = () => {
+    setSelectedDocType(listDocumentType[0]);
+    docTypeRef.current?.present();
+  };
+
+  const renderItem = ({ item }: { item: IRouteDocument }) => <RouteListItem key={item.id} item={item} />;
+
   return (
     <View style={localStyles.containerMap}>
       {loading && (
@@ -243,6 +279,31 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
         </TouchableOpacity>
       </View>
+      <View style={[localStyles.buttonContainer]}>
+      {/* <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
+        <Text /* style={localStyles.bubble} />Проверка</Text>
+        </TouchableOpacity> */}
+
+      <PrimeButton icon="plus-circle-outline" onPress={handlePresentDocType}>
+          {/* <Text> {routesList} </Text> */}
+          {/* Маршруты */}
+        </PrimeButton>
+      </View>
+
+      <BottomSheet
+        sheetRef={docTypeRef}
+        title={'Тип документа'}
+        snapPoints={['20%', '90%']}
+        onDismiss={handleDismissDocType}
+        onApply={handleApplyDocType}
+      >
+        <RadioGroup
+          options={routesList}
+          onChange={(option) => setSelectedDocType(option)}
+          activeButtonId={selectedDocType?.id}
+        />
+      </BottomSheet>
+
       <Snackbar
         visible={barVisible}
         onDismiss={() => setBarVisible(false)}

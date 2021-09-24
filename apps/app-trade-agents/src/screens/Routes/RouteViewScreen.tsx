@@ -112,7 +112,6 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <Text> лалала </Text>
     </AppScreen>
   );
 };

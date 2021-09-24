@@ -246,9 +246,10 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
 
   const readyDocs = useMemo(() => {
     return [
-    ...orderDocs.filter((doc) => doc.status === 'READY'),
-    ...returnDocs.filter((doc) => doc.status === 'READY'),
-  ]}, [orderDocs, returnDocs]);
+      ...orderDocs.filter((doc) => doc.status === 'READY'),
+      ...returnDocs.filter((doc) => doc.status === 'READY'),
+    ];
+  }, [orderDocs, returnDocs]);
 
   const handleSendDocs = useSendDocs(readyDocs);
 
@@ -273,7 +274,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title='Заявки'>
+          <InfoBlock colorLabel="#4479D4" title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -284,7 +285,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title='Возвраты'>
+          <InfoBlock colorLabel="#4479D4" title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}

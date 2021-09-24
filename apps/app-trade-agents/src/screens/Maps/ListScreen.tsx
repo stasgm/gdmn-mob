@@ -71,8 +71,6 @@ const ListScreen = () => {
         scrollEventThrottle={400}
         ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
       />
-
-      <Text>Текст</Text>
     </AppScreen>
   );
 };

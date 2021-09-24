@@ -58,7 +58,6 @@ const RouteListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
-      <Text> лалала </Text>
     </AppScreen>
   );
 };
