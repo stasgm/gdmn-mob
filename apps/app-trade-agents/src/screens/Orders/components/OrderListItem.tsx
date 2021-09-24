@@ -12,7 +12,7 @@ import { OrdersStackParamList } from '../../../navigation/Root/types';
 // eslint-disable-next-line import/no-cycle
 import { OrderListRenderItemProps } from '../OrderListScreen';
 
-const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: OrderListRenderItemProps) => {
+const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute, errorMessage }: OrderListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
@@ -41,6 +41,9 @@ const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: 
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
               )}
             </View>
+          </View>
+          <View>
+            {errorMessage && <Text  style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>}
           </View>
         </View>
       </View>

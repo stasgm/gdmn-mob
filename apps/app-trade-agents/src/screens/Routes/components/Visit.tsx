@@ -10,6 +10,8 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 import { BackButton, BottomSheet, InfoBlock, ItemSeparator, PrimeButton, RadioGroup } from '@lib/mobile-ui';
 
+import { useSendDocs } from '@lib/mobile-app';
+
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { ICoords } from '../../../store/geo/types';
@@ -17,10 +19,9 @@ import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { OrderListRenderItemProps } from '../../Orders/OrderListScreen';
 import OrderListItem from '../../Orders/components/OrderListItem';
-import { getDateString } from '../../../utils/helpers';
+import { getDateString, isDefaultDepart } from '../../../utils/helpers';
 import ReturnListItem from '../../Returns/components/ReturnListItem';
 import { ReturnListRenderItemProps } from '../../Returns/ReturnListScreen';
-import { useSendDocs } from '@lib/mobile-app';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -41,6 +42,16 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
 
   const { loading } = useSelector((state) => state.app);
+
+  const userSettings = useSelector((state) => state.auth.user?.settings);
+
+  // Подразделение по умолчанию
+  const defaultDepart = useMemo(() => {
+    if (!userSettings) {
+      return undefined;
+    }
+    return (userSettings.find(isDefaultDepart)?.depart as INamedEntity) ?? undefined;
+  }, [userSettings]);
 
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
@@ -132,6 +143,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         route,
         onDate: newOrderDate,
         takenOrder: item.head.takenType,
+        depart: defaultDepart,
       },
       lines: [],
       creationDate: newOrderDate,
@@ -246,9 +258,10 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
 
   const readyDocs = useMemo(() => {
     return [
-    ...orderDocs.filter((doc) => doc.status === 'READY'),
-    ...returnDocs.filter((doc) => doc.status === 'READY'),
-  ]}, [orderDocs, returnDocs]);
+      ...orderDocs.filter((doc) => doc.status === 'READY'),
+      ...returnDocs.filter((doc) => doc.status === 'READY'),
+    ];
+  }, [orderDocs, returnDocs]);
 
   const handleSendDocs = useSendDocs(readyDocs);
 
@@ -273,7 +286,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title='Заявки'>
+          <InfoBlock colorLabel="#4479D4" title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -284,7 +297,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title='Возвраты'>
+          <InfoBlock colorLabel="#4479D4" title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}

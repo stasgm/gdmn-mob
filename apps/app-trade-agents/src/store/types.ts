@@ -135,6 +135,10 @@ export const visitDocumentType: IDocumentType = {
   description: 'Визит',
 };
 
+export type IDefaultDepart = {
+  depart: INamedEntity;
+};
+
 // export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
 //   ReturnType,
 //   S,
