@@ -1,6 +1,6 @@
-import { IDefaultDepart } from '../store/types';
-
 import { INamedEntity } from '@lib/types';
+
+import { IDefaultDepart } from '../store/types';
 
 const getDateString = (_date: string | Date) => {
   if (!_date) {

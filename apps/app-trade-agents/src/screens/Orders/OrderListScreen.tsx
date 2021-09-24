@@ -48,6 +48,7 @@ export interface OrderListItemProps {
   status?: StatusType;
   isFromRoute?: boolean;
   lineCount?: number;
+  errorMessage?: string;
 }
 export interface OrderListRenderItemProps extends OrderListItemProps {
   id: string;
@@ -98,6 +99,7 @@ const OrderListScreen = () => {
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
         } as OrderListRenderItemProps),
     );
   }, [status, list]);
