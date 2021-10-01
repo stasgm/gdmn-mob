@@ -1,13 +1,13 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { ISettings, IBaseSettings } from '@lib/types';
+import { Settings, IBaseSettings } from '@lib/types';
 
 import { actions, SettingsActionType } from './actions';
 
 import { SettingsState } from './types';
 
-const baseSettings: ISettings<IBaseSettings> = {
+const baseSettings: Settings<IBaseSettings> = {
   serverAutoCheck: {
     id: '1',
     sortOrder: 1,

@@ -1,4 +1,4 @@
-import { IUserCredentials } from '@lib/types';
+import { IUserCredentials, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
@@ -139,6 +139,24 @@ const signIn = (
   };
 };
 
+const setUserSettings = (
+  settings: IUserSettings,
+): AppThunk<
+  Promise<ActionType<typeof actions.setUserSettingsAsync>>,
+  AuthState,
+  ActionType<typeof actions.setUserSettingsAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setUserSettingsAsync.request(''));
+
+    try {
+      return dispatch(actions.setUserSettingsAsync.success(settings));
+    } catch {
+      return dispatch(actions.setUserSettingsAsync.failure('Ошибка записи настроек пользователя'));
+    }
+  };
+};
+
 // const signInWithDevice = (
 //   credentials: IUserCredentials,
 // ): AppThunk<
@@ -207,4 +225,12 @@ const getDeviceStatus = (
   };
 };
 
-export default { getDeviceByUid, activateDevice, signUp, signIn, getDeviceStatus, useAuthThunkDispatch };
+export default {
+  getDeviceByUid,
+  activateDevice,
+  signUp,
+  signIn,
+  getDeviceStatus,
+  useAuthThunkDispatch,
+  setUserSettings,
+};

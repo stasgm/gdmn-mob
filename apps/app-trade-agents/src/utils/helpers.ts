@@ -1,3 +1,5 @@
+import { INamedEntity } from '@lib/types';
+
 const getDateString = (_date: string | Date) => {
   if (!_date) {
     return '-';
@@ -26,4 +28,8 @@ const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   return matched === paramsEntries.length;
 };
 
-export { getDateString, extraPredicate };
+const isNamedEntity = (obj: any): obj is INamedEntity => {
+  return typeof obj === 'object' && 'name' in obj;
+};
+
+export { getDateString, extraPredicate, isNamedEntity };

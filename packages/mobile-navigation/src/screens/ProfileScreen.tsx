@@ -12,6 +12,7 @@ const ProfileScreen = () => {
   const { colors } = useTheme();
 
   const { user, company, device } = useSelector((state) => state.auth);
+  //console.log("user?.settings", user?.settings);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
