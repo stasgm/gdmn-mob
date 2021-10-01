@@ -176,6 +176,10 @@ const globalstyles = StyleSheet.create({
   total: {
     margin: 6,
   },
+  bottomTotal: {
+    alignItems: 'flex-end',
+    marginRight: 8,
+  },
   colorRed: {
     color: '#e91e63',
   },

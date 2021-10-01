@@ -34,9 +34,9 @@ const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }:
           </View>
           <View style={styles.directionRow}>
             <Text style={[styles.field, { color: colors.text }]}>{subtitle}</Text>
-            <View style={styles.directionRow}>
+            <View style={styles.rowCenter}>
               <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
               {isFromRoute && (
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
               )}

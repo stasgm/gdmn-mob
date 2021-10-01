@@ -19,7 +19,7 @@ import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { OrderListRenderItemProps } from '../../Orders/OrderListScreen';
 import OrderListItem from '../../Orders/components/OrderListItem';
-import { getDateString, isDefaultDepart } from '../../../utils/helpers';
+import { getDateString } from '../../../utils/helpers';
 import ReturnListItem from '../../Returns/components/ReturnListItem';
 import { ReturnListRenderItemProps } from '../../Returns/ReturnListScreen';
 
@@ -43,15 +43,8 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
 
   const { loading } = useSelector((state) => state.app);
 
-  const userSettings = useSelector((state) => state.auth.user?.settings);
-
   // Подразделение по умолчанию
-  const defaultDepart = useMemo(() => {
-    if (!userSettings) {
-      return undefined;
-    }
-    return (userSettings.find(isDefaultDepart)?.depart as INamedEntity) ?? undefined;
-  }, [userSettings]);
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
