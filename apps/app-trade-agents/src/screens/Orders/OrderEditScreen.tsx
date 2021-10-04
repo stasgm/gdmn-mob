@@ -30,7 +30,7 @@ import { IDocumentType, IReference } from '@lib/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet } from '../../store/types';
 
-import { getDateString, isDefaultDepart } from '../../utils/helpers';
+import { getDateString } from '../../utils/helpers';
 import { IOrderFormParam } from '../../store/app/types';
 
 const OrderEditScreen = () => {
@@ -47,16 +47,8 @@ const OrderEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
-  const userSettings = useSelector((state) => state.auth.user?.settings);
-
   // Подразделение по умолчанию
-
-  const defaultDepart = useMemo(() => {
-    if (!userSettings) {
-      return undefined;
-    }
-    return userSettings.find(isDefaultDepart)?.depart;
-  }, [userSettings]);
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
 
   const {
     contact: docContact,
@@ -156,6 +148,7 @@ const OrderEditScreen = () => {
           contact: docContact,
           onDate: docOnDate,
           outlet: docOutlet,
+          depart: docDepart,
         },
         lines: [],
         creationDate: newOrderDate,
@@ -286,9 +279,9 @@ const OrderEditScreen = () => {
   };
 
   const handlePresentDepart = () => {
-    /* if (isBlocked) {
+    if (isBlocked) {
       return;
-    } */
+    }
 
     navigation.navigate('SelectRefItem', {
       refName: 'department',
@@ -340,7 +333,7 @@ const OrderEditScreen = () => {
           label="Склад-магазин"
           value={docDepart?.name}
           onPress={handlePresentDepart}
-          //disabled={isBlocked}
+          disabled={isBlocked}
         />
       </ScrollView>
       {showOnDate && (

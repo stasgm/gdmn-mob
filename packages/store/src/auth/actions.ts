@@ -44,7 +44,7 @@ const setUserSettingsAsync = createAsyncAction(
   'AUTH/SET_USER_SETTINGS',
   'AUTH/SET_USER_SETTINGS_SUCCESS',
   'AUTH/SET_USER_SETTINGS_FAILURE',
-)<string, IUserSettings[] | undefined, string>();
+)<string, IUserSettings, string>();
 
 export const actions = {
   init,

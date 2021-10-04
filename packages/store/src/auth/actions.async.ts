@@ -140,7 +140,7 @@ const signIn = (
 };
 
 const setUserSettings = (
-  settings: IUserSettings[] | undefined,
+  settings: IUserSettings,
 ): AppThunk<
   Promise<ActionType<typeof actions.setUserSettingsAsync>>,
   AuthState,

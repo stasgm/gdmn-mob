@@ -7,16 +7,35 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
+import { StatusType } from '@lib/types';
+
 import { getStatusColor } from '../../../utils/constants';
 import { OrdersStackParamList } from '../../../navigation/Root/types';
-// eslint-disable-next-line import/no-cycle
-import { OrderListRenderItemProps } from '../OrderListScreen';
 
-const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute, errorMessage }: OrderListRenderItemProps) => {
+export interface OrderListItemProps {
+  title: string;
+  documentDate: string;
+  subtitle?: string;
+  status?: StatusType;
+  isFromRoute?: boolean;
+  lineCount?: number;
+  errorMessage?: string;
+}
+export interface OrderListRenderItemProps extends OrderListItemProps {
+  id: string;
+}
+
+const OrderListItem = ({
+  id,
+  title,
+  subtitle,
+  status,
+  lineCount,
+  isFromRoute,
+  errorMessage,
+}: OrderListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
-
-  // const info = `№ ${item.number} от ${getDateString(item.documentDate)} на ${getDateString(item.head?.onDate)}`;
 
   return (
     <TouchableOpacity
@@ -34,7 +53,7 @@ const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute, er
           </View>
           <View style={styles.directionRow}>
             <Text style={[styles.field, { color: colors.text }]}>{subtitle}</Text>
-            <View style={styles.directionRow}>
+            <View style={styles.rowCenter}>
               <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
               {isFromRoute && (
@@ -43,7 +62,9 @@ const OrderListItem = ({ id, title, subtitle, status, lineCount, isFromRoute, er
             </View>
           </View>
           <View>
-            {errorMessage && <Text  style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>}
+            {errorMessage && (
+              <Text style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>
+            )}
           </View>
         </View>
       </View>

@@ -4,13 +4,23 @@ import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-
 import { globalStyles as styles } from '@lib/mobile-ui';
+import { StatusType } from '@lib/types';
 
 import { getStatusColor } from '../../../utils/constants';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
-// eslint-disable-next-line import/no-cycle
-import { ReturnListRenderItemProps } from '../ReturnListScreen';
+
+export interface ReturnListItemProps {
+  title: string;
+  documentDate: string;
+  subtitle?: string;
+  status?: StatusType;
+  isFromRoute?: boolean;
+  lineCount?: number;
+}
+export interface ReturnListRenderItemProps extends ReturnListItemProps {
+  id: string;
+}
 
 const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: ReturnListRenderItemProps) => {
   const { colors } = useTheme();
@@ -34,9 +44,9 @@ const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }:
           </View>
           <View style={styles.directionRow}>
             <Text style={[styles.field, { color: colors.text }]}>{subtitle}</Text>
-            <View style={styles.directionRow}>
+            <View style={styles.rowCenter}>
               <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
               {isFromRoute && (
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
               )}

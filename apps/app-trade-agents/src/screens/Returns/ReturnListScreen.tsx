@@ -15,27 +15,13 @@ import {
   Status,
   AppScreen,
 } from '@lib/mobile-ui';
-import { StatusType } from '@lib/types';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getDateString } from '../../utils/helpers';
-import { OrderListRenderItemProps } from '../Orders/OrderListScreen';
 
-// eslint-disable-next-line import/no-cycle
-import ReturnListItem from './components/ReturnListItem';
-
-export interface ReturnListItemProps {
-  title: string;
-  documentDate: string;
-  subtitle?: string;
-  status?: StatusType;
-  isFromRoute?: boolean;
-  lineCount?: number;
-}
-export interface ReturnListRenderItemProps extends ReturnListItemProps {
-  id: string;
-}
+import { ReturnListRenderItemProps } from './components/ReturnListItem';
+import ReturnSwipeListItem from './components/ReturnSwipeListItem';
 
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
@@ -63,15 +49,16 @@ const ReturnListScreen = () => {
           title: i.head.outlet?.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}}`,
+          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
         } as ReturnListRenderItemProps),
     );
   }, [status, list]);
 
-  const renderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
-    return <ReturnListItem {...item} />;
+  const renderItem: ListRenderItem<ReturnListRenderItemProps> = ({ item }) => {
+    const doc = list.find((r) => r.id === item.id);
+    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
   };
 
   const handleAddDocument = useCallback(() => {

@@ -1,7 +1,7 @@
-import { IBaseSettings, ISettings } from '@lib/types';
+import { IBaseSettings, Settings } from '@lib/types';
 
 export type SettingsState = {
-  readonly data: ISettings<IBaseSettings>;
+  readonly data: Settings<IBaseSettings>;
   readonly loading: boolean;
   readonly errorMessage: string;
 };
