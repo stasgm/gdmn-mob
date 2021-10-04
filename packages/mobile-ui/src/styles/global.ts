@@ -121,7 +121,7 @@ const globalstyles = StyleSheet.create({
   flexGrow: {
     flexGrow: 10,
   },
-  // { backgroundColor: '#ddd', paddingVertical: 5 }
+  sectionTitle: { backgroundColor: '#ddd', paddingVertical: 5 },
   header: {
     flexDirection: 'row',
     backgroundColor: '#e1e1e1',
@@ -182,6 +182,9 @@ const globalstyles = StyleSheet.create({
   },
   colorRed: {
     color: '#e91e63',
+  },
+  marginBottom5: {
+    marginBottom: 5,
   },
 });
 

@@ -7,21 +7,18 @@ import { docSelectors, documentActions, refSelectors, useSelector } from '@lib/s
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-
 import { BackButton, BottomSheet, InfoBlock, ItemSeparator, PrimeButton, RadioGroup } from '@lib/mobile-ui';
-
 import { useSendDocs } from '@lib/mobile-app';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
-import { ICoords } from '../../../store/geo/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
-import { OrderListRenderItemProps } from '../../Orders/OrderListScreen';
-import OrderListItem from '../../Orders/components/OrderListItem';
 import { getDateString } from '../../../utils/helpers';
-import ReturnListItem from '../../Returns/components/ReturnListItem';
-import { ReturnListRenderItemProps } from '../../Returns/ReturnListScreen';
+import { ReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
+import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
+import OrderSwipeListItem from '../../Orders/components/OrderSwipeListItem';
+import { OrderListRenderItemProps } from '../../Orders/components/OrderListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -76,14 +73,14 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     // TODO Вынести в async actions
     setProcess(true);
 
-    let coords: ICoords | undefined;
+    // let coords: ICoords;
 
-    try {
-      coords = await getCurrentPosition();
-    } catch (e) {
-      // setMessage(e.message);
-      // setBarVisible(true);
-    }
+    // try {
+    const coords = await getCurrentPosition();
+    // } catch (e) {
+    //   // setMessage(e.message);
+    //   // setBarVisible(true);
+    // }
 
     const date = new Date().toISOString();
 
@@ -227,7 +224,8 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   }, [orderDocs]);
 
   const renderOrderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
-    return <OrderListItem {...item} />;
+    const doc = orderDocs.find((r) => r.id === item.id);
+    return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
   };
 
   const returns: ReturnListRenderItemProps[] = useMemo(() => {
@@ -246,7 +244,8 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   }, [returnDocs]);
 
   const renderReturnItem: ListRenderItem<ReturnListRenderItemProps> = ({ item }) => {
-    return <ReturnListItem {...item} />;
+    const doc = returnDocs.find((r) => r.id === item.id);
+    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
   };
 
   const readyDocs = useMemo(() => {
