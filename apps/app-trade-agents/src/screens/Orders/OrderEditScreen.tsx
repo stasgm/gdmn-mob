@@ -47,6 +47,9 @@ const OrderEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
 
+  // Подразделение по умолчанию
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+
   const {
     contact: docContact,
     outlet: docOutlet,
@@ -115,10 +118,11 @@ const OrderEditScreen = () => {
           onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
+          depart: defaultDepart,
         }),
       );
     }
-  }, [dispatch, order]);
+  }, [dispatch, order, defaultDepart]);
 
   const handleSave = useCallback(() => {
     if (!orderType) {
@@ -144,6 +148,7 @@ const OrderEditScreen = () => {
           contact: docContact,
           onDate: docOnDate,
           outlet: docOutlet,
+          depart: docDepart,
         },
         lines: [],
         creationDate: newOrderDate,

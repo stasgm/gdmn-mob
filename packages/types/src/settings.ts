@@ -8,7 +8,7 @@ interface ISettingsOption<T = string> extends IEntity {
   type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
 }
 
-type ISettings<T = Record<string, string>> = {
+type Settings<T = Record<string, string>> = {
   [P in keyof T]?: ISettingsOption<T[P]>;
 };
 
@@ -27,7 +27,7 @@ interface IInvSettings extends IBaseSettings {
   serverAutoCheck: boolean;
 }
 
-const InvSettings: ISettings<IInvSettings> =  {
+const InvSettings: Settings<IInvSettings> =  {
   ...baseSettings,
   useCamera: {
     id: '11',
@@ -45,4 +45,4 @@ const InvSettings: ISettings<IInvSettings> =  {
   },
 }; */
 
-export { ISettings, ISettingsOption, IBaseSettings };
+export { Settings, ISettingsOption, IBaseSettings };

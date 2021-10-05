@@ -1,7 +1,7 @@
 import { ThunkDispatch } from 'redux-thunk';
 import { useDispatch } from 'react-redux';
 
-import { ISettings } from '@lib/types';
+import { Settings } from '@lib/types';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -15,7 +15,7 @@ export type SettingDispatch = ThunkDispatch<SettingsState, any, SettingsActionTy
 export const useSettingThunkDispatch = () => useDispatch<SettingDispatch>();
 
 const addSettings = (
-  settings: ISettings,
+  settings: Settings,
 ): AppThunk<
   Promise<ActionType<typeof actions.addSettingsAsync>>,
   SettingsState,

@@ -17,8 +17,8 @@ const useSync = (onSync?: () => void): (() => void) => {
   const { list: documents } = useSelector((state) => state.documents);
   const { data: settings } = useSelector((state) => state.settings);
 
-  const cleanDocTime = (settings['cleanDocTime'] as ISettingsOption<number>).data;
-  const refLoadType = (settings['refLoadType'] as ISettingsOption<boolean>).data;
+  const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
+  const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
 
   const systemName = Constants.manifest?.extra?.slug;
   const consumer: INamedEntity = { id: '-1', name: systemName };
@@ -256,7 +256,7 @@ const useSync = (onSync?: () => void): (() => void) => {
         }
 
         const setUserSettingsResponse = await authDispatch(
-          authActions.setUserSettings(msg.body.payload as IUserSettings[]),
+          authActions.setUserSettings(msg.body.payload as IUserSettings),
         );
 
         //Если удачно сохранились документы, удаляем сообщение в json

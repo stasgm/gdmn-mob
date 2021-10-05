@@ -1,8 +1,14 @@
 import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } from './common';
+// eslint-disable-next-line import/no-cycle
 import { IHeadMessage, IMessage } from './messages';
 
 export interface IUserSettings {
-  [fieldName: string]: unknown;
+  [fieldName: string]: IUserSetting;
+}
+
+export interface IUserSetting {
+  visible?: boolean;
+  data: unknown;
 }
 
 // Типы для передачи и хранения данных на клиенте
@@ -17,7 +23,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   creator?: INamedEntity;
   company?: INamedEntity;
   password?: string;
-  settings?: IUserSettings[];
+  settings?: IUserSettings;
 }
 
 export type NewUser = Omit<IUser, 'id'> & { password: string };

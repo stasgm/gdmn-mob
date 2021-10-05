@@ -26,8 +26,11 @@ const useGeoLocation = () => {
             setIsLoading(false);
           }
         } catch (error) {
-          setErrorMsg(error);
-          console.log(error);
+          if (error instanceof TypeError) {
+            setErrorMsg(error.message);
+          } else {
+            throw new Error('Неизвестная ошибка');
+          }
         }
       })();
     }, 5000);

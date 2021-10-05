@@ -1,4 +1,4 @@
-import { IBaseSettings, ISettings, ISettingsOption } from '@lib/types';
+import { IBaseSettings, Settings, ISettingsOption } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
 const init = createAction('SETTINGS/INIT')();
@@ -10,7 +10,7 @@ const clearError = createAction('SETTINGS/CLEAR_ERROR')();
 
 const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS', 'SETTINGS/ADD_FAILURE')<
   string | undefined,
-  ISettings<IBaseSettings>,
+  Settings<IBaseSettings>,
   string
 >();
 

@@ -1,18 +1,8 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo, useRef } from 'react';
-import {
-  Animated,
-  ListRenderItem,
-  RefreshControl,
-  SectionList,
-  SectionListData,
-  Text,
-  View,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   useActionSheet,
@@ -26,33 +16,11 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { StatusType } from '@lib/types';
-
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-
-import { RectButton } from 'react-native-gesture-handler';
-
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { IOrderDocument } from '../../store/types';
-
 import { getDateString } from '../../utils/helpers';
 
-// eslint-disable-next-line import/no-cycle
-import OrderListItem from './components/OrderListItem';
-
-export interface OrderListItemProps {
-  title: string;
-  documentDate: string;
-  subtitle?: string;
-  status?: StatusType;
-  isFromRoute?: boolean;
-  lineCount?: number;
-}
-export interface OrderListRenderItemProps extends OrderListItemProps {
-  id: string;
-  // onPress: (id: string) => void;
-}
+import { OrderListRenderItemProps } from './components/OrderListItem';
+import OrderSwipeListItem from './components/OrderSwipeListItem';
 
 export interface OrderListProps {
   orders: OrderListRenderItemProps[];
@@ -67,8 +35,6 @@ export type SectionDataProps = SectionListData<OrderListRenderItemProps, OrderLi
 const OrderListScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
-
-  const dispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.documents);
 
@@ -98,6 +64,7 @@ const OrderListScreen = () => {
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
         } as OrderListRenderItemProps),
     );
   }, [status, list]);
@@ -153,94 +120,21 @@ const OrderListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
-
-  let ref = useRef(null);
-
-  const updateRef = (_ref: any) => {
-    ref = _ref;
-  };
-
-  const renderRightActions = (progress: unknown, id: string, isBlocked: boolean) => (
-    <View style={localStyles.swipeViewItem}>
-      {renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress, id)}
-      {renderRightAction('copy', 'content-copy', '#00aaff', 120, progress, id)}
-      {renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress, id, isBlocked)}
-    </View>
-  );
-
-  const renderRightAction = (
-    name: string,
-    icon: any,
-    color: any,
-    x: any,
-    progress: any,
-    id: string,
-    isBlocked?: boolean,
-  ) => {
-    const trans: Animated.AnimatedInterpolation = progress.interpolate({
-      inputRange: [0, 1, 2],
-      outputRange: [x, 0, 1],
-    });
-
-    const pressHandler = (id: string, isBlocked?: boolean) => {
-      if (name === 'edit') {
-        navigation.navigate('OrderView', { id });
-      } else if (name === 'delete') {
-        if (isBlocked) {
-          return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);
-        }
-
-        Alert.alert('Вы уверены, что хотите удалить документ?', '', [
-          {
-            text: 'Да',
-            onPress: async () => {
-              dispatch(documentActions.removeDocument(id));
-            },
-          },
-          {
-            text: 'Отмена',
-          },
-        ]);
-      }
-      (ref as unknown as Swipeable).close();
-    };
-
-    return (
-      // eslint-disable-next-line react-native/no-inline-styles
-      <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
-        <RectButton
-          style={[localStyles.rightAction, { backgroundColor: color }]}
-          onPress={() => pressHandler(id, isBlocked)}
-        >
-          <AnimatedIcon name={icon} size={30} color="#fff" style={localStyles.actionIcon} />
-        </RectButton>
-      </Animated.View>
-    );
-  };
-
   const renderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
-    return (
-      <Swipeable
-        friction={2}
-        renderRightActions={(progress) => renderRightActions(progress, item.id, item?.status !== 'DRAFT')}
-        ref={updateRef}
-      >
-        <OrderListItem {...item} />
-      </Swipeable>
-    );
+    const doc = list.find((r) => r.id === item.id);
+    return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
   };
 
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={{ marginBottom: 5 }} />
+      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
       <SectionList
         sections={sections}
         renderItem={renderItem}
         keyExtractor={({ id }) => id}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, { backgroundColor: '#ddd', paddingVertical: 5 }]}>{section.title}</SubTitle>
+          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
         )}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
@@ -248,21 +142,5 @@ const OrderListScreen = () => {
     </AppScreen>
   );
 };
-
-const localStyles = StyleSheet.create({
-  actionIcon: {
-    marginHorizontal: 10,
-    width: 30,
-  },
-  rightAction: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  swipeViewItem: {
-    flexDirection: 'row',
-    width: 120,
-  },
-});
 
 export default OrderListScreen;

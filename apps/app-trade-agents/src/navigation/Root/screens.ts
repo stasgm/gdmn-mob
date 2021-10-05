@@ -40,6 +40,7 @@ const returnScreens = {
   ReturnView: ReturnViewScreen,
   ReturnEdit: ReturnEditScreen,
   ReturnLine: ReturnLineScreen,
+  SelectRefItem: SelectRefItemScreen,
   SelectItemReturn: SelectItemScreen,
 };
 

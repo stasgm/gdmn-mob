@@ -22,8 +22,11 @@ export const getPermissionLocationStatus = async () => {
 
     // return new Error('Нет прав на получение геолокации');
   } catch (error) {
-    console.error(error);
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 
@@ -41,7 +44,11 @@ const getLocationAndroid = async (status: Location.PermissionStatus) => {
       ? LocationStatus.permissionsAllowed
       : LocationStatus.permissionsAllowedWithGPSOff;
   } catch (error) {
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 
@@ -58,11 +65,15 @@ const getLocationIos = async (status: Location.PermissionStatus) => {
 
     return LocationStatus.permissionsAllowed;
   } catch (error) {
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 
-export const getCurrentPosition = async (): Promise<ICoords> => {
+export const getCurrentPosition = async (): Promise<ICoords | undefined> => {
   try {
     await getPermissionLocationStatus();
 
@@ -71,14 +82,17 @@ export const getCurrentPosition = async (): Promise<ICoords> => {
 
     return { latitude: result.coords.latitude, longitude: result.coords.longitude };
   } catch (error) {
-    if (error.message.includes('Location services are disabled')) {
-      throw new Error('Служба геолокации отключена');
+    if (error instanceof TypeError) {
+      if (error.message.includes('Location services are disabled')) {
+        throw new Error('Служба геолокации отключена');
+      }
+      if (error.message.includes('permission is required')) {
+        throw new Error('Нет прав на получение геолокации');
+      }
+    } else {
+      throw new Error('Неизвестная ошибка');
     }
-    if (error.message.includes('permission is required')) {
-      throw new Error('Нет прав на получение геолокации');
-    }
-    console.log(error.message);
-    throw new Error(error);
+    return;
   }
 };
 
@@ -86,7 +100,11 @@ export const getAddressFromLatAndLong = async ({ latitude, longitude }: ICoords)
   try {
     return await Location.reverseGeocodeAsync({ latitude, longitude });
   } catch (error) {
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 
@@ -94,7 +112,11 @@ export const getLatitudeAndLongitudeFromString = async (string: string) => {
   try {
     return await Location.geocodeAsync(string);
   } catch (error) {
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 
@@ -108,7 +130,11 @@ export const openGPSAndroid = async () => {
 
     return LocationStatus.permissionsAllowedWithGPSOff;
   } catch (error) {
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 
@@ -121,7 +147,11 @@ const getPermissionLocation = async () => {
     return await Location.requestForegroundPermissionsAsync();
     // return await Permissions.getAsync(Permissions.LOCATION_FOREGROUND);
   } catch (error) {
-    throw new Error(error);
+    if (error instanceof TypeError) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('Неизвестная ошибка');
+    }
   }
 };
 

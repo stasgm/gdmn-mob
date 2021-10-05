@@ -95,6 +95,11 @@ export interface IRouteLine extends IEntity {
   /* result?: typeVisit; -это убрать в визиты */
 }
 
+export interface IRouteTotalLine {
+  group: INamedEntity;
+  quantity: number;
+}
+
 export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine>, 'head' | 'lines'>;
 
 interface IReturnHead extends IHead {

@@ -24,6 +24,7 @@ import actions from '../../store/geo';
 import { useDispatch, useSelector } from '../../store';
 
 import RouteItem from './components/RouteItem';
+import RouteTotal from './components/RouteTotal';
 
 const RouteViewScreen = () => {
   const navigation = useNavigation();
@@ -112,6 +113,7 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <RouteTotal routeId={id} />
     </AppScreen>
   );
 };

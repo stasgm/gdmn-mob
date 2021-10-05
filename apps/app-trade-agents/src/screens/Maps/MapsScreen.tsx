@@ -122,7 +122,7 @@ const MapScreen = () => {
 
     try {
       const coords = await getCurrentPosition();
-      dispatch(geoActions.addCurrent({ coords }));
+      coords && dispatch(geoActions.addCurrent({ coords }));
     } catch (e) {
       if (e instanceof TypeError) {
         setMessage(e.message);
