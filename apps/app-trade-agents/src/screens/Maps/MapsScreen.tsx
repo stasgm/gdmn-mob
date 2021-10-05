@@ -19,6 +19,7 @@ import { getCurrentPosition } from '../../utils/expoFunctions';
 import localStyles from './styles';
 import { IListItem } from '@lib/mobile-types';
 import RouteListItem from '../Routes/components/RouteListItem';
+import { color } from 'react-native-reanimated';
 
 interface Region {
   latitude: number;
@@ -53,13 +54,21 @@ const MapScreen = () => {
     value: item.documentDate,
   }));
 
-  const selectedList = routeList.find((item) => item.id === selectedDocType.id);
+  //const [selectedOption, setSelectedOption] = useState<{ id: string; value: string } | null>(null);
 
+  const [selectedDocType, setSelectedDocType] = useState(currentList[0]);
+  const handlePresentDocType = () => {
+    setSelectedDocType(currentList[0]);
+    docTypeRef.current?.present();
+  };
+
+  const selectedList = routeList.find((item) => item.id === selectedDocType.id);
+  console.log('listt', selectedList);
   const initLocations = useCallback(() => {
     if (!!routeList && !!outlets) {
       // const initial = routeList.find((item) => item.id === selectedDocType?.id);
       // console.log('initial', initial);
-      const initialList: ILocation[] = selectedList?.lines.map((e) => {
+      const initialList: ILocation[] = selectedList!.lines.map((e) => {
         const outlet = outlets.find((i) => i.id === e.outlet.id);
         const res: ILocation = {
           number: e.ordNumber,
@@ -199,7 +208,7 @@ const MapScreen = () => {
 
   const handleApplyDocType = () => {
     docTypeRef.current?.dismiss();
-    // return currentList;
+    return initLocations();
     // switch (selectedDocType.id) {
     //   case 'order':
     //     return handleNewOrder();
@@ -208,12 +217,6 @@ const MapScreen = () => {
     //   default:
     //     return;
     // }
-  };
-
-  const [selectedDocType, setSelectedDocType] = useState(currentList[0]);
-  const handlePresentDocType = () => {
-    setSelectedDocType(currentList[0]);
-    docTypeRef.current?.present();
   };
 
   return (
@@ -280,17 +283,15 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
         </TouchableOpacity>
       </View>
-      <View style={[localStyles.buttonContainer]}>
-        {/* <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
-        <Text /* style={localStyles.bubble} />Проверка</Text>
-        </TouchableOpacity> */}
-
-        <PrimeButton /*icon="plus-circle-outline"*/ onPress={handlePresentDocType}>Cменить маршрут</PrimeButton>
+      <View style={[localStyles.button]}>
+        <TouchableOpacity onPress={movePrevPoint} disabled={loading}>
+          <PrimeButton onPress={handlePresentDocType}>Cменить маршрут</PrimeButton>
+        </TouchableOpacity>
       </View>
 
       <BottomSheet
         sheetRef={docTypeRef}
-        title={'Тип документа'}
+        title={'Маршруты'}
         snapPoints={['20%', '90%']}
         onDismiss={handleDismissDocType}
         onApply={handleApplyDocType}
@@ -298,7 +299,7 @@ const MapScreen = () => {
         <RadioGroup
           options={currentList}
           onChange={(option) => setSelectedDocType(option)}
-          activeButtonId={selectedDocType?.id}
+          activeButtonId={currentList.find((item) => item.id === selectedDocType.id)?.id}
         />
       </BottomSheet>
 
