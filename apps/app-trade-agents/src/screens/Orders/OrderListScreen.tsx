@@ -169,7 +169,15 @@ const OrderListScreen = () => {
     </View>
   );
 
-  const renderRightAction = (name: string, icon: any, color: any, x: any, progress: any, id: string, isBlocked?: boolean) => {
+  const renderRightAction = (
+    name: string,
+    icon: any,
+    color: any,
+    x: any,
+    progress: any,
+    id: string,
+    isBlocked?: boolean,
+  ) => {
     const trans: Animated.AnimatedInterpolation = progress.interpolate({
       inputRange: [0, 1, 2],
       outputRange: [x, 0, 1],
@@ -201,7 +209,10 @@ const OrderListScreen = () => {
     return (
       // eslint-disable-next-line react-native/no-inline-styles
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
-        <RectButton style={[localStyles.rightAction, { backgroundColor: color }]} onPress={() => pressHandler(id, isBlocked)}>
+        <RectButton
+          style={[localStyles.rightAction, { backgroundColor: color }]}
+          onPress={() => pressHandler(id, isBlocked)}
+        >
           <AnimatedIcon name={icon} size={30} color="#fff" style={localStyles.actionIcon} />
         </RectButton>
       </Animated.View>
@@ -210,7 +221,11 @@ const OrderListScreen = () => {
 
   const renderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
     return (
-      <Swipeable friction={2} renderRightActions={(progress) => renderRightActions(progress, item.id, item?.status !== 'DRAFT')} ref={updateRef}>
+      <Swipeable
+        friction={2}
+        renderRightActions={(progress) => renderRightActions(progress, item.id, item?.status !== 'DRAFT')}
+        ref={updateRef}
+      >
         <OrderListItem {...item} />
       </Swipeable>
     );

@@ -1,12 +1,21 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { globalStyles as styles, Theme, BottomSheet, RadioGroup, PrimeButton } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  Theme,
+  BottomSheet,
+  RadioGroup,
+  PrimeButton,
+  DrawerButton,
+  AddButton,
+} from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
@@ -37,6 +46,7 @@ const DEFAULT_LONGITUDE = 27.56667;
 const MapScreen = () => {
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
+  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 
@@ -57,17 +67,15 @@ const MapScreen = () => {
   //const [selectedOption, setSelectedOption] = useState<{ id: string; value: string } | null>(null);
 
   const [selectedDocType, setSelectedDocType] = useState(currentList[0]);
+  const docTypeRef = useRef<BottomSheetModal>(null);
+
   const handlePresentDocType = () => {
-    setSelectedDocType(currentList[0]);
     docTypeRef.current?.present();
   };
 
   const selectedList = routeList.find((item) => item.id === selectedDocType.id);
-  console.log('listt', selectedList);
   const initLocations = useCallback(() => {
     if (!!routeList && !!outlets) {
-      // const initial = routeList.find((item) => item.id === selectedDocType?.id);
-      // console.log('initial', initial);
       const initialList: ILocation[] = selectedList!.lines.map((e) => {
         const outlet = outlets.find((i) => i.id === e.outlet.id);
         const res: ILocation = {
@@ -76,7 +84,6 @@ const MapScreen = () => {
           name: e.outlet.name,
           coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
         };
-        //console.log('1233', res);
         return res;
       });
 
@@ -202,22 +209,24 @@ const MapScreen = () => {
     setCurrentPoint(props);
   };
 
-  const docTypeRef = useRef<BottomSheetModal>(null);
-
   const handleDismissDocType = () => docTypeRef.current?.dismiss();
 
   const handleApplyDocType = () => {
     docTypeRef.current?.dismiss();
     return initLocations();
-    // switch (selectedDocType.id) {
-    //   case 'order':
-    //     return handleNewOrder();
-    //   case 'return':
-    //     return handleNewReturn();
-    //   default:
-    //     return;
-    // }
   };
+
+  // useLayoutEffect(() => {
+  navigation.setOptions({
+    headerLeft: () => <DrawerButton />,
+    headerRight: () => (
+      <View style={styles.buttons}>
+        {/* <MenuButton actionsMenu={actionsMenu} /> */}
+        <AddButton onPress={handlePresentDocType} />
+      </View>
+    ),
+  });
+  // }, [handlePresentDocType, navigation]);
 
   return (
     <View style={localStyles.containerMap}>
@@ -283,8 +292,8 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
         </TouchableOpacity>
       </View>
-      <View style={[localStyles.button]}>
-        <TouchableOpacity onPress={movePrevPoint} disabled={loading}>
+      <View /* style={[localStyles.button]}*/>
+        <TouchableOpacity disabled={loading}>
           <PrimeButton onPress={handlePresentDocType}>Cменить маршрут</PrimeButton>
         </TouchableOpacity>
       </View>
@@ -299,7 +308,7 @@ const MapScreen = () => {
         <RadioGroup
           options={currentList}
           onChange={(option) => setSelectedDocType(option)}
-          activeButtonId={currentList.find((item) => item.id === selectedDocType.id)?.id}
+          activeButtonId={selectedList?.id}
         />
       </BottomSheet>
 
