@@ -48,9 +48,18 @@ const MapScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     ?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
+  const currentList: IListItem[] = routeList.map((item) => ({
+    id: item.id,
+    value: item.documentDate,
+  }));
+
+  const selectedList = routeList.find((item) => item.id === selectedDocType.id);
+
   const initLocations = useCallback(() => {
     if (!!routeList && !!outlets) {
-      const initialList: ILocation[] = routeList[0]?.lines.map((e) => {
+      // const initial = routeList.find((item) => item.id === selectedDocType?.id);
+      // console.log('initial', initial);
+      const initialList: ILocation[] = selectedList?.lines.map((e) => {
         const outlet = outlets.find((i) => i.id === e.outlet.id);
         const res: ILocation = {
           number: e.ordNumber,
@@ -58,19 +67,16 @@ const MapScreen = () => {
           name: e.outlet.name,
           coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
         };
+        //console.log('1233', res);
         return res;
       });
 
       dispatch(geoActions.addMany(initialList));
     }
-  }, [dispatch, outlets, routeList]);
+  }, [dispatch, outlets, routeList, selectedList]);
 
   const list = (useSelector((state) => state.geo)?.list || [])?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo?.currentPoint);
-
-  const routesList = docSelectors
-    .selectByDocType<IRouteDocument>('route')
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const setCurrentPoint = useCallback(
     (point: ILocation) => {
@@ -193,7 +199,7 @@ const MapScreen = () => {
 
   const handleApplyDocType = () => {
     docTypeRef.current?.dismiss();
-
+    // return currentList;
     // switch (selectedDocType.id) {
     //   case 'order':
     //     return handleNewOrder();
@@ -203,17 +209,12 @@ const MapScreen = () => {
     //     return;
     // }
   };
-  const listDocumentType: IRouteDocument[] = [
-   // { id: 'id'},
-  //{ id: 'return', value: '2' },
-  ];
-  const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
+
+  const [selectedDocType, setSelectedDocType] = useState(currentList[0]);
   const handlePresentDocType = () => {
-    setSelectedDocType(listDocumentType[0]);
+    setSelectedDocType(currentList[0]);
     docTypeRef.current?.present();
   };
-
-  const renderItem = ({ item }: { item: IRouteDocument }) => <RouteListItem key={item.id} item={item} />;
 
   return (
     <View style={localStyles.containerMap}>
@@ -280,14 +281,11 @@ const MapScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={[localStyles.buttonContainer]}>
-      {/* <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
+        {/* <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
         <Text /* style={localStyles.bubble} />Проверка</Text>
         </TouchableOpacity> */}
 
-      <PrimeButton icon="plus-circle-outline" onPress={handlePresentDocType}>
-          {/* <Text> {routesList} </Text> */}
-          {/* Маршруты */}
-        </PrimeButton>
+        <PrimeButton /*icon="plus-circle-outline"*/ onPress={handlePresentDocType}>Cменить маршрут</PrimeButton>
       </View>
 
       <BottomSheet
@@ -298,7 +296,7 @@ const MapScreen = () => {
         onApply={handleApplyDocType}
       >
         <RadioGroup
-          options={routesList}
+          options={currentList}
           onChange={(option) => setSelectedDocType(option)}
           activeButtonId={selectedDocType?.id}
         />
