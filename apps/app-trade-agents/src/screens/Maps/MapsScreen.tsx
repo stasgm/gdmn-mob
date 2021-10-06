@@ -1,21 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import {
-  globalStyles as styles,
-  Theme,
-  BottomSheet,
-  RadioGroup,
-  PrimeButton,
-  DrawerButton,
-  AddButton,
-} from '@lib/mobile-ui';
+import { globalStyles as styles, Theme, BottomSheet, RadioGroup, PrimeButton } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
@@ -27,8 +18,6 @@ import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import localStyles from './styles';
 import { IListItem } from '@lib/mobile-types';
-import RouteListItem from '../Routes/components/RouteListItem';
-import { color } from 'react-native-reanimated';
 
 interface Region {
   latitude: number;
@@ -46,7 +35,6 @@ const DEFAULT_LONGITUDE = 27.56667;
 const MapScreen = () => {
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
-  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 
@@ -66,14 +54,14 @@ const MapScreen = () => {
 
   //const [selectedOption, setSelectedOption] = useState<{ id: string; value: string } | null>(null);
 
-  const [selectedDocType, setSelectedDocType] = useState(currentList[0]);
-  const docTypeRef = useRef<BottomSheetModal>(null);
+  const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
+  const routeRef = useRef<BottomSheetModal>(null);
 
-  const handlePresentDocType = () => {
-    docTypeRef.current?.present();
-  };
+  const handlePresentRoute = useCallback(() => {
+    routeRef.current?.present();
+  }, [routeRef]);
 
-  const selectedList = routeList.find((item) => item.id === selectedDocType.id);
+  const selectedList = routeList.find((item) => item.id === selectedRoute.id);
   const initLocations = useCallback(() => {
     if (!!routeList && !!outlets) {
       const initialList: ILocation[] = selectedList!.lines.map((e) => {
@@ -209,24 +197,12 @@ const MapScreen = () => {
     setCurrentPoint(props);
   };
 
-  const handleDismissDocType = () => docTypeRef.current?.dismiss();
+  const handleDismissRoute = () => routeRef.current?.dismiss();
 
-  const handleApplyDocType = () => {
-    docTypeRef.current?.dismiss();
+  const handleApplyRoute = () => {
+    routeRef.current?.dismiss();
     return initLocations();
   };
-
-  // useLayoutEffect(() => {
-  navigation.setOptions({
-    headerLeft: () => <DrawerButton />,
-    headerRight: () => (
-      <View style={styles.buttons}>
-        {/* <MenuButton actionsMenu={actionsMenu} /> */}
-        <AddButton onPress={handlePresentDocType} />
-      </View>
-    ),
-  });
-  // }, [handlePresentDocType, navigation]);
 
   return (
     <View style={localStyles.containerMap}>
@@ -294,20 +270,20 @@ const MapScreen = () => {
       </View>
       <View /* style={[localStyles.button]}*/>
         <TouchableOpacity disabled={loading}>
-          <PrimeButton onPress={handlePresentDocType}>Cменить маршрут</PrimeButton>
+          <PrimeButton onPress={handlePresentRoute}>Cменить маршрут </PrimeButton>
         </TouchableOpacity>
       </View>
 
       <BottomSheet
-        sheetRef={docTypeRef}
+        sheetRef={routeRef}
         title={'Маршруты'}
         snapPoints={['20%', '90%']}
-        onDismiss={handleDismissDocType}
-        onApply={handleApplyDocType}
+        onDismiss={handleDismissRoute}
+        onApply={handleApplyRoute}
       >
         <RadioGroup
           options={currentList}
-          onChange={(option) => setSelectedDocType(option)}
+          onChange={(option) => setSelectedRoute(option)}
           activeButtonId={selectedList?.id}
         />
       </BottomSheet>
