@@ -6,12 +6,17 @@ import { useNavigation } from '@react-navigation/core';
 import { authActions, useSelector, useDispatch } from '@lib/store';
 
 import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
-import { PrimeButton } from '@lib/mobile-ui/src/components';
+import { PrimeButton, SettingsItem } from '@lib/mobile-ui/src/components';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
+  const { data } = useSelector((state) => state.settings);
+
   const { user, company, device } = useSelector((state) => state.auth);
+
+  const settings = user?.settings;
+  // console.log('settings', user?.settings.depart.description);
   //console.log("user?.settings", user?.settings);
 
   const dispatch = useDispatch();
@@ -50,6 +55,28 @@ const ProfileScreen = () => {
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.state || ''}</Text>
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.uid || ''}</Text>
         </View>
+      </View>
+      <Divider />
+      <View style={[styles.profileContainer]}>
+        <View style={styles.profileInfo}>
+          {/* <Text style={[styles.profileInfoTextCompany]}>{user?.settings.depart.description}</Text> */}
+          {/* <Text style={[styles.profileInfoTextCompany]}>
+            {/* {settings?.}, {user?.settings.test.data} }
+          </Text> */}
+        </View>
+      </View>
+      <Divider />
+      <View style={[styles.profileContainer]}>
+        {settings &&
+          Object.entries(settings)
+            .filter(([_, item]) => item.visible)
+            .map(([key, item]) => {
+              return (
+                <View key={key}>
+                  <Text>{item.description || key}</Text>
+                </View>
+              );
+            })}
       </View>
       <Divider />
       <View>

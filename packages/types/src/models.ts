@@ -9,6 +9,7 @@ export interface IUserSettings {
 export interface IUserSetting {
   visible?: boolean;
   data: unknown;
+  description: string;
 }
 
 // Типы для передачи и хранения данных на клиенте
