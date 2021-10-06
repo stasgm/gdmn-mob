@@ -242,8 +242,8 @@ const MapScreen = () => {
       </MapView>
       <View style={localStyles.statusContainer}>
         <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-          <Text style={localStyles.pointName}>Маршрут №{selectedList?.number}</Text>
-          {currentPoint ? <Text style={localStyles.pointName}>{currentPoint?.name}</Text> : null}
+          <Text style={localStyles.routeName}>Маршрут №{selectedList?.number}</Text>
+          {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
         </TouchableOpacity>
       </View>
       <View style={[localStyles.buttonContainer]}>
