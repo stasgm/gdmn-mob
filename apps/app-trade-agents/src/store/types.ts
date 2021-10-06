@@ -56,6 +56,8 @@ export interface INetPrice extends IEntity {
   good: INamedEntity; // ID товара
   pricefso?: number; // цена ФСО
   pricefsn?: number; // цена ФСН
+  priceFsoSklad?: number; // цена ФСО склад
+  priceFsnSklad?: number; // цена ФСН склад
 }
 
 export type IPackage = INamedEntity;

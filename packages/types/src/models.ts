@@ -8,6 +8,7 @@ export interface IUserSettings {
 
 export interface IUserSetting {
   visible?: boolean;
+  description: string;
   data: unknown;
 }
 
