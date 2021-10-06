@@ -1,10 +1,10 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
 import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { DrawerButton, MenuButton, useActionSheet } from '@lib/mobile-ui';
+import { DrawerButton } from '@lib/mobile-ui';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -20,31 +20,12 @@ const MapTabsStack = createMaterialBottomTabNavigator<MapTabsStackParams>();
 
 const MapTabsNavigator = () => {
   const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
-
-  const handleChange = () => {
-    return 0;
-  };
-
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Сменить маршрут',
-        onPress: handleChange,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
-  }, [actionsMenu, navigation]);
+  }, [navigation]);
 
   return (
     <MapTabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Maps">

@@ -52,8 +52,6 @@ const MapScreen = () => {
     value: item.documentDate,
   }));
 
-  //const [selectedOption, setSelectedOption] = useState<{ id: string; value: string } | null>(null);
-
   const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
   const routeRef = useRef<BottomSheetModal>(null);
 
@@ -242,11 +240,12 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      {currentPoint ? (
-        <View style={localStyles.statusContainer}>
-          <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-        </View>
-      ) : null}
+      <View style={localStyles.statusContainer}>
+        <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
+          <Text style={localStyles.pointName}>Маршрут №{selectedList?.number}</Text>
+          {currentPoint ? <Text style={localStyles.pointName}>{currentPoint?.name}</Text> : null}
+        </TouchableOpacity>
+      </View>
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
@@ -268,12 +267,6 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
         </TouchableOpacity>
       </View>
-      <View /* style={[localStyles.button]}*/>
-        <TouchableOpacity disabled={loading}>
-          <PrimeButton onPress={handlePresentRoute}>Cменить маршрут </PrimeButton>
-        </TouchableOpacity>
-      </View>
-
       <BottomSheet
         sheetRef={routeRef}
         title={'Маршруты'}
