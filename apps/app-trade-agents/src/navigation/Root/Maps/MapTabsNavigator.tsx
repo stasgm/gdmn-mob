@@ -24,7 +24,6 @@ const MapTabsNavigator = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      // headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);
 

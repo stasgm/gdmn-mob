@@ -82,6 +82,9 @@ const styles = StyleSheet.create({
   selectedMark: {
     backgroundColor: 'red',
   },
+  routeName: {
+    textAlign: 'center',
+  },
 });
 
 export default styles;

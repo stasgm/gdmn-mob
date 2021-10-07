@@ -102,7 +102,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Количество</Text>
+              <Text style={styles.name}>Количество мест</Text>
               <TextInput
                 style={[styles.number, styles.field]}
                 editable={true}

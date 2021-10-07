@@ -8,8 +8,9 @@ export interface IUserSettings {
 
 export interface IUserSetting {
   visible?: boolean;
+  // data: unknown;
+  data: string | number | INamedEntity;
   description: string;
-  data: unknown;
 }
 
 // Типы для передачи и хранения данных на клиенте
