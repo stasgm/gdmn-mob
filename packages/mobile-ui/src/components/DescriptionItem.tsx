@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Divider, Text } from 'react-native-paper';
 import { INamedEntity } from '@lib/types';
 
 type Props = {
@@ -13,8 +13,10 @@ const DescriptionItem = ({ description, data }: Props) => {
   const value = typeof data === 'object' && 'name' in data ? data.name : data;
   return (
     <View style={localStyles.container}>
-      <View style={localStyles.change}>
+      <View>
         <Text style={localStyles.titleText}>{description}</Text>
+      </View>
+      <View>
         <Text style={localStyles.text}>{value}</Text>
       </View>
     </View>
@@ -23,20 +25,20 @@ const DescriptionItem = ({ description, data }: Props) => {
 
 const localStyles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flexDirection: 'column',
     justifyContent: 'space-between',
     padding: 10,
     width: '100%',
   },
-  change: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 2,
-    width: '100%',
-    height: 30,
-  },
+  // change: {
+  //   alignItems: 'center',
+  //   flexDirection: 'column',
+  //   justifyContent: 'space-between',
+  //   padding: 2,
+  //   width: '100%',
+  //   height: 30,
+  // },
   titleText: {
     color: '#333536',
     fontSize: 16,
