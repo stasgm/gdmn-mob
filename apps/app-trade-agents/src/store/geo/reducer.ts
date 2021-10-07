@@ -40,6 +40,16 @@ const reducer: Reducer<GeoState, GeoActionType> = (state = initialState, action)
       return { ...state, list: action.payload };
     }
 
+    // case getType(geoActions.removeMany):
+    //   return { ...state, loading: true, errorMessage: '' };
+
+    case getType(geoActions.removeMany):
+      return {
+        ...state,
+        // loading: false,
+        list: state.list.filter((item) => action.payload.indexOf(item.id) === -1),
+      };
+
     case getType(geoActions.deleteOne):
       return { ...state, list: state.list?.filter((item) => item.id !== action.payload) };
 

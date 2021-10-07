@@ -14,22 +14,22 @@
 
 // export const useGeoThunkDispatch = () => useDispatch<GeoDispatch>();
 
-// export const addMany = (
+// export const removeMany = (
 //   locations: ILocation[],
 // ): AppThunk<
-//   Promise<ActionType<typeof actions.addManyAsync>>,
+//   Promise<ActionType<typeof actions.removeManyAsync>>,
 //   GeoActionType,
-//   ActionType<typeof actions.addManyAsync>
+//   ActionType<typeof actions.removeManyAsync>
 // > => {
 //   return async (dispatch) => {
-//     dispatch(actions.addManyAsync.request(''));
+//     dispatch(actions.removeManyAsync.request(''));
 
 //     try {
-//       return dispatch(actions.addManyAsync.success(locations));
+//       return dispatch(actions.removeManyAsync.success(locations));
 //     } catch {
-//       return dispatch(actions.addManyAsync.failure('something wrong'));
+//       return dispatch(actions.removeManyAsync.failure('something wrong'));
 //     }
 //   };
 // };
 
-// export default { addMany, useGeoThunkDispatch };
+// export default { removeMany, useGeoThunkDispatch };

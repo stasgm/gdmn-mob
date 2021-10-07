@@ -6,13 +6,14 @@ import { useNavigation } from '@react-navigation/core';
 import { authActions, useSelector, useDispatch } from '@lib/store';
 
 import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
-import { PrimeButton } from '@lib/mobile-ui/src/components';
+import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
   const { user, company, device } = useSelector((state) => state.auth);
-  //console.log("user?.settings", user?.settings);
+
+  const settings = user?.settings;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -34,7 +35,9 @@ const ProfileScreen = () => {
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
-          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.lastName || ''}</Text>
+          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>
+            {!user?.firstName && !user?.lastName ? user?.name : user?.lastName || ''}
+          </Text>
           <Text style={[styles.profileInfoTextCompany, { color: colors.placeholder }]}>{company?.name || ''}</Text>
         </View>
       </View>
@@ -49,7 +52,21 @@ const ProfileScreen = () => {
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.uid || ''}</Text>
         </View>
       </View>
+      <Text style={[styles.title]}>Настройки пользователя</Text>
       <Divider />
+      <View style={[styles.descriptionContainer]}>
+        {settings &&
+          Object.entries(settings)
+            .filter(([_, item]) => item.visible)
+            .map(([key, item]) => {
+              return (
+                <View key={key}>
+                  <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
+                  <Divider />
+                </View>
+              );
+            })}
+      </View>
       <View>
         <PrimeButton outlined onPress={handleLogout}>
           Сменить пользователя
@@ -79,6 +96,11 @@ const styles = StyleSheet.create({
     height: 50,
     marginVertical: 10,
   },
+  descriptionContainer: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    marginVertical: 5,
+  },
   profileIcon: {
     justifyContent: 'space-around',
     marginRight: 5,
@@ -94,5 +116,10 @@ const styles = StyleSheet.create({
   profileInfoTextUser: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
   },
 });

@@ -4,7 +4,9 @@ import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
 
-import { globalStyles as styles, Theme } from '@lib/mobile-ui';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+
+import { globalStyles as styles, Theme, BottomSheet, RadioGroup, PrimeButton } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
 
 import { useDispatch, useSelector } from '../../store';
@@ -15,6 +17,7 @@ import { IOutlet, IRouteDocument } from '../../store/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import localStyles from './styles';
+import { IListItem } from '@lib/mobile-types';
 
 interface Region {
   latitude: number;
@@ -44,9 +47,22 @@ const MapScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     ?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
+  const currentList: IListItem[] = routeList.map((item) => ({
+    id: item.id,
+    value: item.documentDate,
+  }));
+
+  const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
+  const routeRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentRoute = useCallback(() => {
+    routeRef.current?.present();
+  }, [routeRef]);
+
+  const selectedList = routeList.find((item) => item.id === selectedRoute.id);
   const initLocations = useCallback(() => {
     if (!!routeList && !!outlets) {
-      const initialList: ILocation[] = routeList[0]?.lines.map((e) => {
+      const initialList: ILocation[] = selectedList!.lines.map((e) => {
         const outlet = outlets.find((i) => i.id === e.outlet.id);
         const res: ILocation = {
           number: e.ordNumber,
@@ -59,7 +75,7 @@ const MapScreen = () => {
 
       dispatch(geoActions.addMany(initialList));
     }
-  }, [dispatch, outlets, routeList]);
+  }, [dispatch, outlets, routeList, selectedList]);
 
   const list = (useSelector((state) => state.geo)?.list || [])?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo?.currentPoint);
@@ -179,6 +195,13 @@ const MapScreen = () => {
     setCurrentPoint(props);
   };
 
+  const handleDismissRoute = () => routeRef.current?.dismiss();
+
+  const handleApplyRoute = () => {
+    routeRef.current?.dismiss();
+    return initLocations();
+  };
+
   return (
     <View style={localStyles.containerMap}>
       {loading && (
@@ -217,11 +240,12 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      {currentPoint ? (
-        <View style={localStyles.statusContainer}>
-          <Text style={localStyles.pointName}>{currentPoint?.name}</Text>
-        </View>
-      ) : null}
+      <View style={localStyles.statusContainer}>
+        <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
+          <Text style={localStyles.routeName}>Маршрут №{selectedList?.number}</Text>
+          {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
+        </TouchableOpacity>
+      </View>
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
@@ -243,6 +267,20 @@ const MapScreen = () => {
           <MaterialCommunityIcons name="crosshairs-gps" size={35} color="#000" />
         </TouchableOpacity>
       </View>
+      <BottomSheet
+        sheetRef={routeRef}
+        title={'Маршруты'}
+        snapPoints={['20%', '90%']}
+        onDismiss={handleDismissRoute}
+        onApply={handleApplyRoute}
+      >
+        <RadioGroup
+          options={currentList}
+          onChange={(option) => setSelectedRoute(option)}
+          activeButtonId={selectedList?.id}
+        />
+      </BottomSheet>
+
       <Snackbar
         visible={barVisible}
         onDismiss={() => setBarVisible(false)}
