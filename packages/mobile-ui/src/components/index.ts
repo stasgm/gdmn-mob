@@ -11,3 +11,4 @@ export { default as PrimeButton } from './PrimeButton';
 export { default as RoundButton } from './RoundButton';
 export { default as InfoBlock } from './InfoBlock';
 export { default as SettingsItem } from './SettingsItem';
+export { default as DescriptionItem } from './DescriptionItem';
