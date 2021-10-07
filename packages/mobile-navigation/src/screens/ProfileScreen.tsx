@@ -27,6 +27,8 @@ const ProfileScreen = () => {
   const handleLogout = () => dispatch(authActions.logout());
   // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 
+  const visibleList = settings && Object.entries(settings).filter(([_, item]) => item.visible);
+
   return (
     <View style={styles.container}>
       <View style={[styles.profileContainer]}>
@@ -52,13 +54,12 @@ const ProfileScreen = () => {
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.uid || ''}</Text>
         </View>
       </View>
-      <Text style={[styles.title]}>Настройки пользователя</Text>
-      <Divider />
-      <View style={[styles.descriptionContainer]}>
-        {settings &&
-          Object.entries(settings)
-            .filter(([_, item]) => item.visible)
-            .map(([key, item]) => {
+      {visibleList && (
+        <View>
+          <Text style={[styles.title]}>Настройки пользователя</Text>
+          <Divider />
+          <View style={[styles.descriptionContainer]}>
+            {visibleList.map(([key, item]) => {
               return (
                 <View key={key}>
                   <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
@@ -66,7 +67,9 @@ const ProfileScreen = () => {
                 </View>
               );
             })}
-      </View>
+          </View>
+        </View>
+      )}
       <View>
         <PrimeButton outlined onPress={handleLogout}>
           Сменить пользователя
@@ -97,9 +100,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   descriptionContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'column',
+    justifyContent: 'space-between',
     marginVertical: 5,
+    width: '100%',
   },
   profileIcon: {
     justifyContent: 'space-around',
@@ -118,7 +123,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   title: {
-    fontSize: 20,
+    alignItems: 'center',
+    fontSize: 18,
     textAlign: 'center',
     margin: 10,
   },
