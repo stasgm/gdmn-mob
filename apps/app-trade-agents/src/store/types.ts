@@ -117,6 +117,20 @@ export interface IReturnLine extends IEntity {
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
+interface ISellHead extends IHead {
+  contact: INamedEntity;
+  outlet: INamedEntity;
+  depart?: INamedEntity;
+  route?: INamedEntity;
+}
+
+export interface ISellLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+}
+
+export type ISellBill = MandateProps<IDocument<ISellHead, ISellLine>, 'head' | 'lines'>;
+
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 
 export type VisitResultType = 'ALL_COMPLETED' | 'NOT_COMPLETED' | 'PARTLY_COMPLETED';

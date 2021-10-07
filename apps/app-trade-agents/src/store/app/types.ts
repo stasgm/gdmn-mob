@@ -29,3 +29,13 @@ export interface IReturnFormParam extends IFormParam {
   route?: INamedEntity;
   status?: StatusType;
 }
+
+export interface ISellFormParam extends IFormParam {
+  contact?: INamedEntity;
+  outlet?: INamedEntity;
+  number?: string;
+  documentBeginDate?: string;
+  documentEndDate?: string;
+  depart?: INamedEntity;
+  route?: INamedEntity;
+}

@@ -65,6 +65,10 @@ const ReturnListScreen = () => {
     navigation.navigate('ReturnEdit');
   }, [navigation]);
 
+  const handleAddSellBill = useCallback(() => {
+    navigation.navigate('ReturnSellBill');
+  }, [navigation]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -72,11 +76,15 @@ const ReturnListScreen = () => {
         onPress: handleAddDocument,
       },
       {
+        title: 'Базовая накладная',
+        onPress: handleAddSellBill,
+      },
+      {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocument]);
+  }, [showActionSheet, handleAddDocument, handleAddSellBill]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -85,10 +93,11 @@ const ReturnListScreen = () => {
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />
           <AddButton onPress={handleAddDocument} />
+          <AddButton onPress={handleAddSellBill} />
         </View>
       ),
     });
-  }, [actionsMenu, handleAddDocument, navigation]);
+  }, [actionsMenu, handleAddDocument, handleAddSellBill, navigation]);
 
   return (
     <AppScreen>
