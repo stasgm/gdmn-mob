@@ -57,13 +57,12 @@ const ProfileScreen = () => {
       {visibleList && (
         <View>
           <Text style={[styles.title]}>Настройки пользователя</Text>
-          <Divider />
           <View style={[styles.descriptionContainer]}>
             {visibleList.map(([key, item]) => {
               return (
                 <View key={key}>
-                  <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
                   <Divider />
+                  <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
                 </View>
               );
             })}
@@ -100,7 +99,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   descriptionContainer: {
-    alignItems: 'flex-start',
+    //alignItems: 'flex-start',
     flexDirection: 'column',
     justifyContent: 'space-between',
     marginVertical: 5,
