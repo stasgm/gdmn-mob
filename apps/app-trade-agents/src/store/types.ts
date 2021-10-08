@@ -46,6 +46,7 @@ export interface IGood extends INamedEntity {
   priceFsn: number; // цена ФСН
   priceFsoSklad: number; // цена ФСО склад
   priceFsnSklad: number; // цена ФСН склад
+  scale: number; //количество единиц в месте
 }
 
 //Подразделения-склады

@@ -41,11 +41,10 @@ const RouteTotal = ({ routeId }: IItem) => {
               groups.find((group) => group.parent?.id === firstGr.id && group.id === g.goodgroup.id)),
         ),
       )
-      .reduce(
-        (s: number, line) =>
-          round(s + round(line.quantity * (goods.find((g) => g.id === line.good.id)?.invWeight || 1))),
-        0,
-      ),
+      .reduce((s: number, line) => {
+        const good = goods.find((g) => g.id === line.good.id);
+        return round(s + round(line.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1)));
+      }, 0),
   }));
   // const totalList: IRouteTotalLine[] = firstLevelGroups.map((firstGr) => ({
   //   group: {

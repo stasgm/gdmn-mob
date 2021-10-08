@@ -173,6 +173,7 @@ const OrderEditScreen = () => {
         status: docStatus || 'DRAFT',
         documentDate: docDocumentDate,
         documentType: orderType,
+        errorMessage: undefined,
         head: {
           ...order.head,
           contact: docContact,
