@@ -29,6 +29,7 @@ export type ReturnParamList = RefParamList & {
   ReturnEdit: { id: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItemReturn: { docId: string; name: string };
+  ReturnSellBill: { id: string; name: string }; // | undefined;
 };
 
 export type ReturnsStackParamList = { ReturnList: undefined } & ReturnParamList;

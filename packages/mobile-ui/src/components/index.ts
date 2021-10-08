@@ -1,4 +1,4 @@
-export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButton } from './AppBar';
+export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButton, SendButton } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';
 export { RadioGroup } from './RadioGroup';

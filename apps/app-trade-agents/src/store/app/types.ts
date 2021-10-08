@@ -34,8 +34,8 @@ export interface ISellFormParam extends IFormParam {
   contact?: INamedEntity;
   outlet?: INamedEntity;
   number?: string;
-  documentBeginDate?: string;
-  documentEndDate?: string;
+  documentDateBegin?: string;
+  documentDateEnd?: string;
   depart?: INamedEntity;
   route?: INamedEntity;
 }

@@ -10,6 +10,7 @@ import {
   AddButton,
   DrawerButton,
   MenuButton,
+  SendButton,
   FilterButtons,
   ItemSeparator,
   Status,
@@ -93,7 +94,7 @@ const ReturnListScreen = () => {
         <View style={styles.buttons}>
           <MenuButton actionsMenu={actionsMenu} />
           <AddButton onPress={handleAddDocument} />
-          <AddButton onPress={handleAddSellBill} />
+          <SendButton onPress={handleAddSellBill} />
         </View>
       ),
     });
