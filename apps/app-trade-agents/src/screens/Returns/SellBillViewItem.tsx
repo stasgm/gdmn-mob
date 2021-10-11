@@ -8,7 +8,6 @@ import {
   AddButton,
   BackButton,
   MenuButton,
-  SendButton,
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
@@ -18,36 +17,25 @@ import {
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { IReturnDocument, IReturnLine } from '../../store/types';
+import { ISellBillDocument, ISellBillLine } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
 
-import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { SellBillsStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
 
-import ReturnItem from './components/ReturnItem';
+import SellBillItem from './SellBillItem';
 
-const ReturnViewScreen = () => {
+const SellBillViewItem = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
-  const { id } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
+  const navigation = useNavigation<StackNavigationProp<SellBillsStackParamList, 'SellBillViewItem'>>();
+  const { id } = useRoute<RouteProp<SellBillsStackParamList, 'SellBillViewItem'>>().params;
 
-  const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
+  const billDoc = docSelectors.selectByDocType<ISellBillDocument>('bill')?.find((e) => e.id === id);
 
-  const isBlocked = returnDoc?.status !== 'DRAFT';
-
-  const handleAddReturnLine = useCallback(() => {
-    navigation.navigate('SelectItemReturn', {
-      docId: id,
-      name: 'good',
-    });
-  }, [id, navigation]);
-
-  const handleAddSellBill = useCallback(() => {
-    navigation.navigate('SellBillEdit');
-  }, [navigation]);
+  const isBlocked = billDoc?.status !== 'DRAFT';
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -58,22 +46,16 @@ const ReturnViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation]);
 
-  const handleEditReturnHead = useCallback(() => {
-    navigation.navigate('ReturnEdit', { id });
-  }, [navigation, id]);
-
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Добавить товар',
-        onPress: handleAddReturnLine,
       },
       {
         title: 'Редактировать данные',
-        onPress: handleEditReturnHead,
       },
       {
-        title: 'Удалить возврат',
+        title: 'Удалить накладную',
         type: 'destructive',
         onPress: handleDelete,
       },
@@ -82,7 +64,7 @@ const ReturnViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);
+  }, [showActionSheet, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -91,14 +73,12 @@ const ReturnViewScreen = () => {
         !isBlocked && (
           <View style={styles.buttons}>
             <MenuButton actionsMenu={actionsMenu} />
-            <AddButton onPress={handleAddReturnLine} />
-            <SendButton onPress={handleAddSellBill} />
           </View>
         ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked, handleAddSellBill]);
+  }, [navigation, actionsMenu, isBlocked]);
 
-  if (!returnDoc) {
+  if (!billDoc) {
     return (
       <View style={styles.container}>
         <SubTitle style={styles.title}>Документ не найден</SubTitle>
@@ -106,25 +86,25 @@ const ReturnViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IReturnLine }) => (
-    <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+  const renderItem = ({ item }: { item: ISellBillLine }) => (
+    <SellBillItem docId={billDoc.id} item={item} readonly={isBlocked} />
   );
 
   return (
     <View style={[styles.container]}>
       <InfoBlock
-        colorLabel={getStatusColor(returnDoc?.status || 'DRAFT')}
-        title={returnDoc?.head.outlet.name}
-        onPress={handleEditReturnHead}
+        colorLabel={getStatusColor(billDoc?.status || 'DRAFT')}
+        title={billDoc?.head.outlet.name}
+        // onPress={}
         disabled={isBlocked}
       >
         <View style={styles.directionRow}>
-          <Text>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
+          <Text>{`№ ${billDoc.number} от ${getDateString(billDoc.documentDate)}`}</Text>
           {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
         </View>
       </InfoBlock>
       <FlatList
-        data={returnDoc.lines}
+        data={billDoc.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
@@ -134,4 +114,4 @@ const ReturnViewScreen = () => {
   );
 };
 
-export default ReturnViewScreen;
+export default SellBillViewItem;

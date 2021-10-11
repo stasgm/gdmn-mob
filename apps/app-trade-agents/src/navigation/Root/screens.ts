@@ -15,7 +15,10 @@ import {
   ReturnEditScreen,
   SelectItemScreen,
   ReturnListScreen,
-  ReturnSellBillScreen,
+  SellBillEditScreen,
+  SellBillListScreen,
+  SellBillViewItem,
+  SellBillViewScreen,
 } from '../../screens/Returns';
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
@@ -43,7 +46,9 @@ const returnScreens = {
   ReturnLine: ReturnLineScreen,
   SelectRefItem: SelectRefItemScreen,
   SelectItemReturn: SelectItemScreen,
-  ReturnSellBill: ReturnSellBillScreen,
+  SellBillEdit: SellBillEditScreen,
+  SellBillViewI: SellBillViewItem,
+  SellBillView: SellBillViewScreen,
 };
 
 const routerScreen = {

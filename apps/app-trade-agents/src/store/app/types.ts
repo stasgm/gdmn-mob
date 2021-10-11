@@ -38,4 +38,5 @@ export interface ISellFormParam extends IFormParam {
   documentDateEnd?: string;
   depart?: INamedEntity;
   route?: INamedEntity;
+  status?: StatusType;
 }

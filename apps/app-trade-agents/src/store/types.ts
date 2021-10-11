@@ -105,7 +105,7 @@ export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine>, 'he
 interface IReturnHead extends IHead {
   contact: INamedEntity;
   outlet: INamedEntity;
-  depart?: INamedEntity;
+  // depart?: INamedEntity;
   reason: string;
   route?: INamedEntity; // 	Маршрут
 }
@@ -113,23 +113,25 @@ interface IReturnHead extends IHead {
 export interface IReturnLine extends IEntity {
   good: INamedEntity;
   quantity: number;
+  sellBillKey?: string;
+  depart?: INamedEntity;
 }
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
-interface ISellHead extends IHead {
+interface ISellBillHead extends IHead {
   contact: INamedEntity;
   outlet: INamedEntity;
   depart?: INamedEntity;
   route?: INamedEntity;
 }
 
-export interface ISellLine extends IEntity {
+export interface ISellBillLine extends IEntity {
   good: INamedEntity;
   quantity: number;
 }
 
-export type ISellBill = MandateProps<IDocument<ISellHead, ISellLine>, 'head' | 'lines'>;
+export type ISellBillDocument = MandateProps<IDocument<ISellBillHead, ISellBillLine>, 'head' | 'lines'>;
 
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 

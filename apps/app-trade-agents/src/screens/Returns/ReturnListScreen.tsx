@@ -67,7 +67,7 @@ const ReturnListScreen = () => {
   }, [navigation]);
 
   const handleAddSellBill = useCallback(() => {
-    navigation.navigate('ReturnSellBill');
+    navigation.navigate('SellBillEdit');
   }, [navigation]);
 
   const actionsMenu = useCallback(() => {

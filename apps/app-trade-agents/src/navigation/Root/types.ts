@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-import { IOrderLine, IReturnLine } from '../../store/types';
+import { IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -29,8 +29,16 @@ export type ReturnParamList = RefParamList & {
   ReturnEdit: { id: string } | undefined;
   ReturnLine: { mode: number; docId: string; item: IReturnLine };
   SelectItemReturn: { docId: string; name: string };
-  ReturnSellBill: { id: string; name: string }; // | undefined;
 };
+
+export type SellBillParamList = RefParamList & {
+  SellBillLine: { mode: number; docId: string; item: ISellBillLine };
+  SellBillView: { id: string };
+  SellBillEdit: { id: string } | undefined;
+  SellBillViewItem: { id: string }; //{ docId: string; name: string };
+};
+
+export type SellBillsStackParamList = { SellBillList: undefined } & SellBillParamList;
 
 export type ReturnsStackParamList = { ReturnList: undefined } & ReturnParamList;
 
