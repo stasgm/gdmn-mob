@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Divider, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { INamedEntity } from '@lib/types';
 
 type Props = {
@@ -31,14 +31,6 @@ const localStyles = StyleSheet.create({
     padding: 10,
     width: '100%',
   },
-  // change: {
-  //   alignItems: 'center',
-  //   flexDirection: 'column',
-  //   justifyContent: 'space-between',
-  //   padding: 2,
-  //   width: '100%',
-  //   height: 30,
-  // },
   titleText: {
     color: '#333536',
     fontSize: 16,
