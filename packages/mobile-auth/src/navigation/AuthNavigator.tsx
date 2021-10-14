@@ -19,9 +19,15 @@ const AuthNavigator: React.FC = () => {
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...settings };
+    api.config = { ...settings };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // console.log('settings111', settings);
+
+  const disconnect = useCallback(() => {
+    dispatch(authActions.disconnect());
+  }, [dispatch]);
 
   const saveSettings = useCallback(
     (newSettings: IApiConfig) => {
@@ -29,9 +35,9 @@ const AuthNavigator: React.FC = () => {
         disconnect();
       }
       dispatch(authActions.setSettings(newSettings));
-      api.config = { ...api.config, ...newSettings };
-    },
-    [dispatch],
+      api.config = { ...newSettings };
+      },
+    [disconnect, dispatch],
   );
 
   const checkDevice = useCallback(() => {
@@ -56,10 +62,6 @@ const AuthNavigator: React.FC = () => {
     },
     [dispatch, settings],
   );
-
-  const disconnect = useCallback(() => {
-    dispatch(authActions.disconnect());
-  }, [dispatch]);
 
   const signIn = useCallback(
     async (credentials: IUserCredentials) => {
