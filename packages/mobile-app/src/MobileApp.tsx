@@ -8,6 +8,7 @@ import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
+
 import { useSync } from './hooks';
 
 export interface IApp {
@@ -19,12 +20,7 @@ export interface IApp {
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
 
-  return (
-    <DrawerNavigator
-      items={items}
-      onSyncClick={handleSyncData}
-    />
-  );
+  return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
