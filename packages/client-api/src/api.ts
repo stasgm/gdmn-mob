@@ -15,10 +15,9 @@ import Message from './requests/message';
 import User from './requests/user';
 
 class Api extends BaseApi {
-  protected _config: IApiConfig;
+  protected _config: IApiConfig = {} as IApiConfig;
   // protected _deviceId: string | undefined;
-
-  protected readonly _axios: AxiosInstance;
+  protected _axios: AxiosInstance = {} as AxiosInstance;
   // Классы запросов
   public auth: Auth;
   public company: Company;
@@ -30,15 +29,6 @@ class Api extends BaseApi {
 
   constructor(config: IApiConfig) {
     super();
-    this._config = config;
-
-    this._axios = axios.create({
-      // eslint-disable-next-line max-len
-      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}/${this._config.version}`,
-      url: this._config.apiPath,
-      timeout: config.timeout,
-      withCredentials: true,
-    });
 
     this.auth = new Auth(this);
     this.company = new Company(this);
@@ -48,9 +38,37 @@ class Api extends BaseApi {
     this.message = new Message(this);
     this.user = new User(this);
 
-    this._axios.defaults.params = {};
+    this.setAxios(config);
+  }
 
+  set config(config: IApiConfig) {
+    this.setAxios(config);
+  }
+
+  get config() {
+    return this._config;
+  }
+
+  get axios() {
+    return this._axios;
+  }
+
+  setAxios(config: IApiConfig) {
+    this._config = config;
+    this._axios = axios.create({
+      // eslint-disable-next-line max-len
+      baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}/${this._config.version}`,
+      url: this._config.apiPath,
+      timeout: config.timeout,
+      withCredentials: true,
+    });
+
+    this._axios.defaults.params = {};
     this._axios.defaults.withCredentials = true;
+
+    if (!this._config) {
+      throw new Error('Config is not valid');
+    }
 
     this._axios.interceptors.request.use(
       (request) => {
@@ -58,8 +76,7 @@ class Api extends BaseApi {
           // Добавляем device_ID
           request.params.deviceId = this._config.deviceId;
         }
-
-        console.info('✉️ request', request.url);
+        console.info('✉️ request', request.baseURL, request.url);
         return request;
       },
       (error) => {
@@ -82,19 +99,7 @@ class Api extends BaseApi {
         throw error;
       },
     );
-  }
-
-  set config(config: IApiConfig) {
-    this._config = config;
-  }
-
-  get config() {
-    this._axios.defaults = { ...this._axios.defaults, ...this._config };
-    return this._config;
-  }
-
-  get axios() {
-    return this._axios;
+    return;
   }
 }
 
