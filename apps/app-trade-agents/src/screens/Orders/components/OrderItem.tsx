@@ -36,10 +36,11 @@ const OrderItem = ({ docId, item, readonly = false }: IProps) => {
           <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
-              {item.quantity} x {(good?.priceFsn || 0).toString()} р.
+              {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()} x{' '}
+              {(good?.priceFsn || 0).toString()} р.
             </Text>
             <Text style={[styles.field, { color: colors.text }]}>
-              {Math.floor(item.quantity * (good?.invWeight ?? 1) * 1000) / 1000} кг
+              {Math.floor(item.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1) * 1000) / 1000} кг
             </Text>
           </View>
         </View>
