@@ -59,10 +59,10 @@ const MapScreen = () => {
     routeRef.current?.present();
   }, [routeRef]);
 
-  const selectedList = routeList.find((item) => item.id === selectedRoute.id);
+  const selectedItem = routeList.find((item) => item.id === selectedRoute.id);
   const initLocations = useCallback(() => {
-    if (!!routeList && !!outlets) {
-      const initialList: ILocation[] = selectedList!.lines.map((e) => {
+    if (selectedItem && !!outlets) {
+      const initialList: ILocation[] = selectedItem.lines.map((e) => {
         const outlet = outlets.find((i) => i.id === e.outlet.id);
         const res: ILocation = {
           number: e.ordNumber,
@@ -75,7 +75,7 @@ const MapScreen = () => {
 
       dispatch(geoActions.addMany(initialList));
     }
-  }, [dispatch, outlets, routeList, selectedList]);
+  }, [dispatch, outlets, selectedItem]);
 
   const list = (useSelector((state) => state.geo)?.list || [])?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo?.currentPoint);
@@ -240,12 +240,14 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      <View style={localStyles.statusContainer}>
-        <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-          <Text style={localStyles.routeName}>Маршрут №{selectedList?.number}</Text>
-          {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
-        </TouchableOpacity>
-      </View>
+      {selectedItem && (
+        <View style={localStyles.statusContainer}>
+          <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
+            <Text style={localStyles.routeName}>Маршрут №{selectedItem?.number}</Text>
+            {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
@@ -277,7 +279,7 @@ const MapScreen = () => {
         <RadioGroup
           options={currentList}
           onChange={(option) => setSelectedRoute(option)}
-          activeButtonId={selectedList?.id}
+          activeButtonId={selectedItem?.id}
         />
       </BottomSheet>
 
