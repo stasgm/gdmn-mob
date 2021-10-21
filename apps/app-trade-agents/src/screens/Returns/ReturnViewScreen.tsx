@@ -8,6 +8,7 @@ import {
   AddButton,
   BackButton,
   MenuButton,
+  SendButton,
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
@@ -57,6 +58,10 @@ const ReturnViewScreen = () => {
     navigation.navigate('ReturnEdit', { id });
   }, [navigation, id]);
 
+  const handleSellBillHead = useCallback(() => {
+    navigation.navigate('SellBill', { id });
+  }, [navigation, id]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -87,10 +92,11 @@ const ReturnViewScreen = () => {
           <View style={styles.buttons}>
             <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddReturnLine} />
+            <SendButton onPress={handleSellBillHead} />
           </View>
         ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked]);
+  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked, handleSellBillHead]);
 
   if (!returnDoc) {
     return (
