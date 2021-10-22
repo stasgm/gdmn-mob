@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { Divider, useTheme } from 'react-native-paper';
+import { Divider, Snackbar, useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -14,6 +14,7 @@ import {
   InfoBlock,
   ItemSeparator,
   AppScreen,
+  Theme,
 } from '@lib/mobile-ui';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
@@ -30,6 +31,9 @@ const SellBillScreen = () => {
 
   const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
   const outletId = returnDoc?.head.outlet.id;
+
+  const [barVisible, setBarVisible] = useState(false);
+  const [message, setMessage] = useState('');
 
   const { colors } = useTheme();
 
@@ -119,7 +123,7 @@ const SellBillScreen = () => {
   //   if (!(docDateBegin && docDateEnd && docGood)) {
   //     return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
   //   }
-  //   // setShowSellBill(true);
+  //   // setSellBills(true);
   // };
 
   const valueName = goods.find((item) => item.id === docGood?.id)?.valuename || '';
@@ -143,8 +147,20 @@ const SellBillScreen = () => {
       setSellBills(parsed);
       setLoading(false);
     } catch (e) {
-      console.error('Error', e);
+      if (e instanceof TypeError) {
+        setMessage(e.message);
+      } else {
+        setMessage('Неизвестная ошибка');
+        console.log('ghjdthrf', sellBills);
+      }
+      setBarVisible(true);
+      // console.error('Error', e);
     }
+  };
+  console.log('message', message);
+
+  const handleSearchStop = () => {
+    setLoading(false);
   };
 
   return (
@@ -161,7 +177,10 @@ const SellBillScreen = () => {
       />
       <SelectableInput label="Конечная дата" value={getDateString(docDateEnd || '')} onPress={handlePresentDateEnd} />
       <SelectableInput label="Товар" value={docGood?.name} onPress={handlePresentGood} />
-      <PrimeButton icon={!loading ? 'magnify' : 'block-helper'} onPress={handleSearchSellBills}>
+      <PrimeButton
+        icon={!loading ? 'magnify' : 'block-helper'}
+        onPress={!loading ? handleSearchSellBills : handleSearchStop}
+      >
         {!loading ? 'Найти' : 'Прервать'}
       </PrimeButton>
       {!!sellBills?.length && (
@@ -195,6 +214,20 @@ const SellBillScreen = () => {
           onChange={handleApplyDateEnd}
         />
       )}
+      <Snackbar
+        visible={barVisible}
+        onDismiss={() => setBarVisible(false)}
+        style={{ backgroundColor: Theme.colors.error }}
+        action={{
+          icon: 'close',
+          label: '',
+          onPress: () => {
+            setBarVisible(false);
+          },
+        }}
+      >
+        {message}
+      </Snackbar>
     </AppScreen>
   );
 };
