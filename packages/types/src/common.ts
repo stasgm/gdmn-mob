@@ -23,8 +23,8 @@ export type StatusType =
   | 'READY'
   | 'SENT'
   | 'PROCESSED'
+  | 'ARCHIVE'
   | 'PROCESSED_INCORRECT'
-  | 'PROCESSED_DEADLOCK'
-  | 'ARCHIVE';
+  | 'PROCESSED_DEADLOCK';
 
 export type BodyType = 'CMD' | 'REFS' | 'DOCS' | 'SETTINGS';
