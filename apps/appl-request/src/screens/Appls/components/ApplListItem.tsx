@@ -15,6 +15,7 @@ import { ApplListRenderItemProps } from '../ApplListScreen';
 const ApplListItem = ({
   id,
   title,
+  dept,
   subtitle,
   description,
   status,
@@ -38,6 +39,7 @@ const ApplListItem = ({
         </View> */}
         <View style={localStyles.info}>
           <Text style={styles.name}>{title}</Text>
+          <Text style={[styles.textBold, styles.textDescription]}>{dept}</Text>
           <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
           <View style={styles.rowBottom}>
             <Text style={[styles.number, styles.field]}>{subtitle}</Text>

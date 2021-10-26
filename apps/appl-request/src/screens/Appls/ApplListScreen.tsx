@@ -28,6 +28,7 @@ import ApplListItem from './components/ApplListItem';
 export interface ApplListItemProps {
   documentDate: string;
   title: string;
+  dept: string;
   subtitle?: string;
   description?: string;
   status?: StatusType;
@@ -84,7 +85,8 @@ const ApplListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.dept.name,
+          title: i.head.headCompany.name,
+          dept: i.head.dept.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
           applStatus: `${i.head.applStatus.name} ${
