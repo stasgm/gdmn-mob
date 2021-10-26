@@ -42,6 +42,7 @@ interface IEmployee extends INamedEntity {
 interface IApplHead extends IHead {
   applStatus: INamedEntity;
   purpose: INamedEntity;
+  headCompany: INamedEntity;
   dept: INamedEntity;
   purchaseType: INamedEntity;
   verificationDate?: string;

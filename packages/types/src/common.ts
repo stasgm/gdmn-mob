@@ -18,6 +18,13 @@ export type DeviceState = 'NON-REGISTERED' | 'NON-ACTIVATED' | 'ACTIVE' | 'BLOCK
 
 export type UserRole = 'SuperAdmin' | 'Admin' | 'User';
 
-export type StatusType = 'DRAFT' | 'READY' | 'SENT' | 'PROCESSED' | 'PROCESSED_INCORRECT' | 'PROCESSED_DEADLOCK';
+export type StatusType =
+  | 'DRAFT'
+  | 'READY'
+  | 'SENT'
+  | 'PROCESSED'
+  | 'PROCESSED_INCORRECT'
+  | 'PROCESSED_DEADLOCK'
+  | 'ARCHIVE';
 
 export type BodyType = 'CMD' | 'REFS' | 'DOCS' | 'SETTINGS';
