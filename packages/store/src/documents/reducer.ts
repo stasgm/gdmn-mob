@@ -38,7 +38,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       // - Если пришли ответы с ошибками 'PROCESSED_DEADLOCK' или 'PROCESSED_INCORRECT',
       //   то оставляем данные из хранилища, записываем ошибку из errorMessage
       //   и заменяем статус на 'DRAFT' (чтобы пользователь заново смог отредактировать данный документ)
-      // - Если документ в хранилище в состоянии черновика,
+      // - Если документ в хранилище в состоянии черновика или документ в хранилище 'PROCESSED', а в новом 'DRAFT',
       //   то заменяем его на новые данные из сообщения,
       //   иначе (состояние Готов или Отправлен) - оставляем данные из хранилища
       // К сформированному массиву добавим документы из хранилища, которых не было в сообщении
@@ -59,7 +59,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
                 status: 'DRAFT' as StatusType,
                 errorMessage: newDoc.errorMessage,
               }
-            : oldDoc.status === 'DRAFT'
+            : oldDoc.status === 'DRAFT' || (oldDoc.status === 'PROCESSED' && newDoc.status === 'DRAFT')
             ? newDoc
             : oldDoc;
         })
