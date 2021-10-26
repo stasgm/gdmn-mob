@@ -33,13 +33,18 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
 
       // Сформируем новый массив:
       // - Если пришел новый документ (не ответ), то записываем его
-      // - Если пришел успешный ответ 'PROCESSED' от сервера,
+      // - Если пришел успешный ответ 'PROCESSED' от сервера по отправленным документам,
       //   то оставляем данные из хранилища и заменяем статус на 'PROCESSED'
       // - Если пришли ответы с ошибками 'PROCESSED_DEADLOCK' или 'PROCESSED_INCORRECT',
       //   то оставляем данные из хранилища, записываем ошибку из errorMessage
       //   и заменяем статус на 'DRAFT' (чтобы пользователь заново смог отредактировать данный документ)
-      // - Если документ в хранилище в состоянии черновика или документ в хранилище 'PROCESSED', а в новом 'DRAFT',
-      //   то заменяем его на новые данные из сообщения,
+      // - Если в новом документе статус 'ARCHIVE' (документы, которые были обработанны ранее)
+      //   то заменяем его на новые данные из сообщения и заменяем статус на 'PROCESSED'
+      // - Если
+      //     - документ в хранилище в состоянии черновика или
+      //     - документ в хранилище 'PROCESSED', а в новом 'DRAFT'
+      //       (когда из гедымина отменили решение отправленного документа)
+      //   то заменяем его на новые данные из сообщения (для 'ARCHIVE' меняем статус на 'PROCESSED'),
       //   иначе (состояние Готов или Отправлен) - оставляем данные из хранилища
       // К сформированному массиву добавим документы из хранилища, которых не было в сообщении
       const newDocs = docsFromBack
@@ -59,6 +64,8 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
                 status: 'DRAFT' as StatusType,
                 errorMessage: newDoc.errorMessage,
               }
+            : newDoc.status === 'ARCHIVE'
+            ? { ...newDoc, status: 'PROCESSED' as StatusType }
             : oldDoc.status === 'DRAFT' || (oldDoc.status === 'PROCESSED' && newDoc.status === 'DRAFT')
             ? newDoc
             : oldDoc;
