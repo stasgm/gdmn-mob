@@ -52,7 +52,9 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
           const oldDoc = state.list.find((d) => d.id === newDoc.id);
 
           return !oldDoc
-            ? newDoc
+            ? newDoc.status === 'ARCHIVE'
+              ? { ...newDoc, status: 'PROCESSED' as StatusType }
+              : newDoc
             : newDoc.status === 'PROCESSED'
             ? {
                 ...oldDoc,
