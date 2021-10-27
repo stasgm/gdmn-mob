@@ -14,37 +14,12 @@ import {
   useActionSheet,
 } from '@lib/mobile-ui';
 
-import { StatusType } from '@lib/types';
-
 import { IApplDocument } from '../../store/types';
-
 import { getDateString } from '../../utils/helpers';
 
 import { shortenString } from '../../utils/stringOperations';
 
-// eslint-disable-next-line import/no-cycle
-import ApplListItem from './components/ApplListItem';
-
-export interface ApplListItemProps {
-  documentDate: string;
-  title: string;
-  dept: string;
-  subtitle?: string;
-  description?: string;
-  status?: StatusType;
-  applStatus: string;
-  isFromRoute?: boolean;
-  lineCount?: number;
-  errorMessage?: string;
-}
-export interface ApplListRenderItemProps extends ApplListItemProps {
-  id: string;
-  // onPress: (id: string) => void;
-}
-
-export interface ApplListProps {
-  Appl: ApplListRenderItemProps[];
-}
+import ApplListItem, { ApplListRenderItemProps } from './components/ApplListItem';
 
 export interface ApplListSectionProps {
   title: string;
@@ -53,7 +28,7 @@ export interface ApplListSectionProps {
 export type SectionDataProps = SectionListData<ApplListRenderItemProps, ApplListSectionProps>[];
 
 const renderItem: ListRenderItem<ApplListRenderItemProps> = ({ item }) => {
-  return <ApplListItem {...item} />;
+  return <ApplListItem key={item.id} {...item} />;
 };
 
 const ApplListScreen = () => {
@@ -69,7 +44,7 @@ const ApplListScreen = () => {
     .sort((a, b) => (a.number > b.number ? -1 : 1))
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  const [status, setStatus] = useState<Status>('all');
+  const [status, setStatus] = useState<Status>('active');
 
   const filteredList: ApplListRenderItemProps[] = useMemo(() => {
     const res =
@@ -123,16 +98,6 @@ const ApplListScreen = () => {
     [filteredList],
   );
 
-  // const handleAddDocument = useCallback(() => {
-  //   navigation.navigate('ApplView');
-  // }, [navigation]);
-
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     headerLeft: () => <DrawerButton />,
-  //   });
-  // }, [handleAddDocument, navigation]);
-
   const handleReset = useCallback(() => {
     dispatch(documentActions.init());
   }, [dispatch]);
@@ -169,10 +134,14 @@ const ApplListScreen = () => {
         sections={sections}
         renderItem={renderItem}
         keyExtractor={({ id }) => id}
-        // ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>}
-        // refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        // Performance settings
+        removeClippedSubviews={true} // Unmount components when outside of window
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
       />
     </AppScreen>
   );
