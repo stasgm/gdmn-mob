@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator } from 'react-native';
+import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Snackbar, useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -23,6 +23,7 @@ import { ISellBillFormParam } from '../../store/app/types';
 import { getDateString } from '../../utils/helpers';
 
 import SellBillItem from './components/SellBillItem';
+import { IResponse } from '@lib/types';
 
 const SellBillScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'SellBill'>>().params?.id;
@@ -118,6 +119,7 @@ const SellBillScreen = () => {
   };
 
   const [sellBills, setSellBills] = useState<ISellBill[]>();
+  const [error, setError] = useState<string | undefined>();
 
   // const handleShowSellBill = () => {
   //   if (!(docDateBegin && docDateEnd && docGood)) {
@@ -143,9 +145,17 @@ const SellBillScreen = () => {
       const path = `http://192.168.0.70:8000/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
       console.log('path', path);
       const fetched = await fetch(path, {});
-      const parsed: ISellBill[] = await fetched.json();
-      setSellBills(parsed);
+      const parsed: IResponse<ISellBill[]> = await fetched.json();
+      if (parsed.result) {
+        setSellBills(parsed.data);
+      } else {
+        setError(parsed.error);
+      }
+      // setSellBills(parsed);
       setLoading(false);
+      console.log('parsed', parsed);
+      console.log('sell', sellBills);
+      // const b = sellBills.find((item) => item.)
     } catch (e) {
       if (e instanceof TypeError) {
         setMessage(e.message);
@@ -162,6 +172,8 @@ const SellBillScreen = () => {
   const handleSearchStop = () => {
     setLoading(false);
   };
+
+  console.log('bill', sellBills);
 
   return (
     <AppScreen style={localStyles.appScreen}>
@@ -194,6 +206,11 @@ const SellBillScreen = () => {
               ItemSeparatorComponent={ItemSeparator}
             />
           </InfoBlock>
+        </View>
+      )}
+      {error && (
+        <View style={localStyles.error}>
+          <Text>{error}</Text>
         </View>
       )}
       {showDateBegin && (
@@ -239,4 +256,5 @@ const localStyles = StyleSheet.create({
   appScreen: { justifyContent: 'flex-start' },
   title: { flexDirection: 'row', justifyContent: 'center', padding: 5 },
   activity: { paddingLeft: 5 },
+  error: { display: 'flex', alignItems: 'center', padding: 5 },
 });

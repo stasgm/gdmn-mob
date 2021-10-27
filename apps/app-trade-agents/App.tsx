@@ -11,6 +11,7 @@ import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
 import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
+import { Settings, IBaseSettings } from '@lib/types';
 
 const Root = () => {
   const navItems: INavItem[] = [
@@ -46,9 +47,42 @@ const Root = () => {
     },
   ];
 
+  // const newSettings = {
+  //   serverName: 'http://192.168.0.70 ',
+  //   // http://192.168.0.70  //:8000/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`,
+  //   serverPort: '8000',
+  //   timeout: 10000,
+  // };
+
+  const newSettings: Settings<IBaseSettings> = {
+    serverName: {
+      id: '1',
+      sortOrder: 1,
+      description: 'Адрес сервера',
+      data: 'http://192.168.0.70',
+      type: 'string',
+    },
+    serverPort: {
+      id: '2',
+      description: 'Порт',
+      data: '8000',
+      type: 'string',
+      sortOrder: 2,
+      visible: true,
+    },
+    timeout: {
+      id: '3',
+      description: 'Время ожидания',
+      data: 10000,
+      type: 'number',
+      sortOrder: 3,
+      visible: true,
+    },
+  };
+
   return (
     // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне
-    <MobileApp items={navItems} />
+    <MobileApp items={navItems} appSettings={newSettings} />
   );
 };
 

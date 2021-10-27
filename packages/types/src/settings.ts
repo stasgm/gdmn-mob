@@ -16,7 +16,39 @@ interface IBaseSettings {
   serverAutoCheck: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
+  [name: string]: string | number | boolean;
 }
+
+interface IAppSettings extends IBaseSettings {
+  serverName: string;
+  serverPort: string;
+  timeout: number;
+}
+
+const IAppSettings: Settings<IAppSettings> =  {
+  // ...baseSettings,
+  serverName: {
+    id: '11',
+    description: 'Адрес сервера',
+    data: '', //?
+    type: 'string',
+    sortOrder: 1,
+  },
+  serverPort: {
+    id: '2',
+    sortOrder: 2,
+    description: 'Порт',
+    data: '',
+    type: 'string',
+  },
+  timeout: {
+    id: '3',
+    sortOrder: 3,
+    description: 'Время ожидания',
+    data: 1,
+    type: 'number',
+  },
+};
 
 // Example
 
