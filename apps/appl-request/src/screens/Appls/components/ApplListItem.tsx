@@ -6,11 +6,31 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
+import { StatusType } from '@lib/types';
 
 import { getStatusColor } from '../../../utils/constants';
 import { ApplsStackParamList } from '../../../navigation/Root/types';
-// eslint-disable-next-line import/no-cycle
-import { ApplListRenderItemProps } from '../ApplListScreen';
+
+export interface ApplListProps {
+  Appl: ApplListRenderItemProps[];
+}
+
+export interface ApplListRenderItemProps extends ApplListItemProps {
+  id: string;
+}
+
+export interface ApplListItemProps {
+  documentDate: string;
+  title: string;
+  dept: string;
+  subtitle?: string;
+  description?: string;
+  status?: StatusType;
+  applStatus: string;
+  isFromRoute?: boolean;
+  lineCount?: number;
+  errorMessage?: string;
+}
 
 const ApplListItem = ({
   id,
@@ -28,15 +48,13 @@ const ApplListItem = ({
 
   return (
     <TouchableOpacity
+      key={id}
       onPress={() => {
         navigation.navigate('ApplView', { id });
       }}
     >
       <View style={[styles.flexDirectionRow, localStyles.box]}>
         <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
-        {/* <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
-          <MaterialCommunityIcons name="file-outline" size={20} color={'#FFF'} />
-        </View> */}
         <View style={localStyles.info}>
           <Text style={styles.name}>{title}</Text>
           <Text style={[styles.textBold, styles.textDescription]}>{dept}</Text>
