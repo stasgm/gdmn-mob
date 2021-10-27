@@ -47,14 +47,16 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       //   то заменяем его на новые данные из сообщения (для 'ARCHIVE' меняем статус на 'PROCESSED'),
       //   иначе (состояние Готов или Отправлен) - оставляем данные из хранилища
       // К сформированному массиву добавим документы из хранилища, которых не было в сообщении
+      console.log(
+        'docs',
+        docsFromBack.map((d) => `${d.number} - ${d.status}`),
+      );
       const newDocs = docsFromBack
         .map((newDoc) => {
           const oldDoc = state.list.find((d) => d.id === newDoc.id);
 
           return !oldDoc
-            ? newDoc.status === 'ARCHIVE'
-              ? { ...newDoc, status: 'PROCESSED' as StatusType }
-              : newDoc
+            ? newDoc
             : newDoc.status === 'PROCESSED'
             ? {
                 ...oldDoc,
@@ -66,13 +68,17 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
                 status: 'DRAFT' as StatusType,
                 errorMessage: newDoc.errorMessage,
               }
-            : newDoc.status === 'ARCHIVE'
-            ? { ...newDoc, status: 'PROCESSED' as StatusType }
-            : oldDoc.status === 'DRAFT' || (oldDoc.status === 'PROCESSED' && newDoc.status === 'DRAFT')
+            : oldDoc.status === 'DRAFT' ||
+              ((oldDoc.status === 'PROCESSED' || oldDoc.status === 'ARCHIVE') && newDoc.status === 'DRAFT')
             ? newDoc
             : oldDoc;
         })
         .concat(oldDocs);
+
+      console.log(
+        'newDocs ',
+        newDocs.map((d) => `${d.number} - ${d.status}`),
+      );
 
       return {
         ...state,

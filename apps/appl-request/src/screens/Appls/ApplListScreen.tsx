@@ -76,9 +76,9 @@ const ApplListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
+        ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
         : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
         : [];
 
     return res.map(
