@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -52,23 +52,23 @@ const ApplListItem = ({
       onPress={() => {
         navigation.navigate('ApplView', { id });
       }}
+      style={[styles.flexDirectionRow, localStyles.box]}
     >
-      <View style={[styles.flexDirectionRow, localStyles.box]}>
-        <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
-        <View style={localStyles.info}>
-          <Text style={styles.name}>{title}</Text>
-          <Text style={[styles.textBold, styles.textDescription]}>{dept}</Text>
-          <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
-          <View style={styles.rowBottom}>
-            <Text style={[styles.number, styles.field]}>{subtitle}</Text>
-            <View style={[styles.rowCenter]}>
-              <Text style={[styles.number, styles.field]}>{lineCount}</Text>
-              <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
-            </View>
+      <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
+      <View style={localStyles.info}>
+        <Text style={[styles.textBold, styles.textDescription]}>{dept}</Text>
+        {/* <Divider /> */}
+        <Text style={[styles.name]}>{title}</Text>
+        <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
+        <View style={styles.rowBottom}>
+          <Text style={[styles.number, styles.field]}>{subtitle}</Text>
+          <View style={[styles.rowCenter]}>
+            <Text style={[styles.number, styles.field]}>{lineCount}</Text>
+            <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
           </View>
-          <Text style={[styles.number, styles.field]}>{description}</Text>
-          {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage || ''}</Text>}
         </View>
+        <Text style={[styles.number, styles.field]}>{description}</Text>
+        {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage || ''}</Text>}
       </View>
     </TouchableOpacity>
   );
