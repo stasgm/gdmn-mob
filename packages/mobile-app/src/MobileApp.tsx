@@ -42,28 +42,12 @@ const MobileApp = ({ store, appSettings, ...props }: IApp) => {
   // };
 
 
-  // const a = Object.entries(appStore.data).forEach((key) =>
-  // {if (settings && !Object.entries(settings).find((value) => key[0] === value[0])) {
-  //   handleAdd(settings[0], { data: value[1] }); }})}}
-  // /*console.log('key', key[0], key[1])*/
-  // );
-
-  // const a = Object.entries(appStore.data).forEach((key) =>
-  // {if (settings) {
-  //   const b = Object.entries(settings).find((value) =>
-  //   {
-  //     if
-  //    (key[0] === value[0])) {
-  //   handleAdd(settings[0], { data: value[1] }); }})}}
-  // /*console.log('key', key[0], key[1])*/
-  // );
-
   // console.log('store', storeSettings);
   useEffect(() => {
     if (appSettings) {
       Object.entries(appSettings).forEach(([optionName, value]) => {
         const storeSet = storeSettings.data[optionName];
-        console.log('optionName', optionName, value, storeSet === undefined && value !== undefined);
+        // console.log('optionName', optionName, value, storeSet === undefined && value !== undefined);
         if (storeSet === undefined && value !== undefined) {
           dispatch(settingsActions.addSettings({ optionName, value }));
           console.log('value', value);
@@ -71,12 +55,6 @@ const MobileApp = ({ store, appSettings, ...props }: IApp) => {
       })
     }
   }, []);
-  // const a = settings && Object.entries(settings).forEach((key) => {
-  //   const storeSet = appStore.data[key[0]];
-  //   if (!storeSet && key[1]) {
-  //     dispatch(settingsActions.addSettings({ optionName: key[0], value: key[1] }));
-  //   }
-  // });
 
   // console.log('example', a);
   // const handleAdd = (optionName: string, value: { settings }: IApp /*, 'settings'/*ISettingsOption<string | number | boolean>*/) => {

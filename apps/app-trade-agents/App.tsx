@@ -47,13 +47,6 @@ const Root = () => {
     },
   ];
 
-  // const newSettings = {
-  //   serverName: 'http://192.168.0.70 ',
-  //   // http://192.168.0.70  //:8000/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`,
-  //   serverPort: '8000',
-  //   timeout: 10000,
-  // };
-
   const newSettings: Settings<IBaseSettings> = {
     serverName: {
       id: '1',
@@ -61,6 +54,7 @@ const Root = () => {
       description: 'Адрес сервера',
       data: 'http://192.168.0.70',
       type: 'string',
+      visible: true,
     },
     serverPort: {
       id: '2',
