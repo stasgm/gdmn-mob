@@ -38,7 +38,7 @@ const TotalCompanies = (props: IProps) => {
             </Avatar>
           </Grid>
         </Grid>
-        <Box
+        {/* <Box
           sx={{
             alignItems: 'center',
             display: 'flex',
@@ -58,7 +58,7 @@ const TotalCompanies = (props: IProps) => {
           <Typography color="textSecondary" variant="caption">
             За последний месяц
           </Typography>
-        </Box>
+        </Box> */}
       </CardContent>
     </Card>
   );
