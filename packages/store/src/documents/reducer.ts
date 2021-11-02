@@ -63,7 +63,8 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
                 status: 'DRAFT' as StatusType,
                 errorMessage: newDoc.errorMessage,
               }
-            : oldDoc.status === 'DRAFT' || (oldDoc.status === 'PROCESSED' && newDoc.status === 'DRAFT')
+            : oldDoc.status === 'DRAFT' ||
+              ((oldDoc.status === 'PROCESSED' || oldDoc.status === 'ARCHIVE') && newDoc.status === 'DRAFT')
             ? newDoc
             : oldDoc;
         })
