@@ -19,7 +19,6 @@ export interface IApp {
   items?: INavItem[];
   store?: Store<any, any>;
   onSync?: () => void;
-  appSettings?: Settings<IBaseSettings>;
 }
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
@@ -28,40 +27,8 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
 };
 
-const MobileApp = ({ store, appSettings, ...props }: IApp) => {
-  const dispatch = useDispatch();
-
+const MobileApp = ({ store, ...props }: IApp) => {
   const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
-
-  const storeSettings = useSelector((state) => state.settings);
-
-  // const handleAdd = (optionName: string, value: ISettingsOption<string | number | boolean>) => {
-
-  //   console.log('{ optionName, value }', { optionName, value });
-  //   dispatch(settingsActions.addSettings({ optionName, value }));
-  // };
-
-
-  // console.log('store', storeSettings);
-  useEffect(() => {
-    if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings.data[optionName];
-        // console.log('optionName', optionName, value, storeSet === undefined && value !== undefined);
-        if (storeSet === undefined && value !== undefined) {
-          dispatch(settingsActions.addSettings({ optionName, value }));
-          console.log('value', value);
-        }
-      })
-    }
-  }, []);
-
-  // console.log('example', a);
-  // const handleAdd = (optionName: string, value: { settings }: IApp /*, 'settings'/*ISettingsOption<string | number | boolean>*/) => {
-
-  //   console.log('{ optionName, value }', { optionName, value });
-  //   dispatch(settingsActions.addSettings({ optionName, value }));
-  // };
 
   return store ? (
     <Provider store={store}>

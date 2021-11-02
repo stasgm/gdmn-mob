@@ -19,8 +19,6 @@ type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceVie
 const ReferenceListScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
 
-  console.log(list);
-
   const refData = useMemo(() => {
     return Object.entries(list)
       .map(([key, value]) => ({ ...value, refName: key } as RefListItem))

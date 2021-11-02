@@ -15,25 +15,33 @@ import { ReturnsStackParamList } from '../../../navigation/Root/types';
 import { getDateString } from '../../../utils/helpers';
 
 interface IProps {
+  item: ISellBillListRenderItemProps;
+}
+
+export interface ISellBillListRenderItemProps {
   docId: string;
-  item: ISellBill;
+  quantity: number;
+  price: number;
+  number: string;
+  documentdate: string;
+  contract?: string;
   valueName: string;
-  readonly?: boolean;
+  readonly: boolean;
   good: INamedEntity;
 }
 
-const SellBillItem = ({ docId, item, valueName, good, readonly = false }: IProps) => {
+const SellBillItem = ({ item }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SellBill'>>();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        !readonly &&
+        !item.readonly &&
           navigation.navigate('ReturnLine', {
             mode: 0,
-            docId,
-            item: { good, quantityFromSellBill: item.QUANTITY, priceFromSellBill: item.PRICE, quantity: 0, id: uuid() },
+            docId: item.docId,
+            item: { good: item.good, quantityFromSellBill: item.quantity, priceFromSellBill: item.price, quantity: 0, id: uuid() },
           });
       }}
     >
@@ -42,12 +50,12 @@ const SellBillItem = ({ docId, item, valueName, good, readonly = false }: IProps
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{`№ ${item.NUMBER} ${getDateString(
-            item.DOCUMENTDATE,
+          <Text style={[styles.name, { color: colors.text }]}>{`№ ${item.number} ${getDateString(
+            item.documentdate,
           )}`}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>{`Договор №${item.CONTRACT}`}</Text>
+          <Text style={[styles.field, { color: colors.text }]}>{`Договор №${item.contract}`}</Text>
           <Text style={[styles.name, { color: colors.text }]}>
-            {item.QUANTITY} {valueName} x {item.PRICE} р.
+            {item.quantity} {item.valueName} x {item.price} р.
           </Text>
         </View>
       </View>

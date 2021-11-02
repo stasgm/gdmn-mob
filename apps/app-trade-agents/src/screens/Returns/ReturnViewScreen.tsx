@@ -69,6 +69,10 @@ const ReturnViewScreen = () => {
         onPress: handleAddReturnLine,
       },
       {
+        title: 'Добавить товар из накладной',
+        onPress: handleSellBillHead,
+      },
+      {
         title: 'Редактировать данные',
         onPress: handleEditReturnHead,
       },
@@ -82,7 +86,7 @@ const ReturnViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);
+  }, [showActionSheet, handleAddReturnLine, handleSellBillHead, handleEditReturnHead, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -92,7 +96,6 @@ const ReturnViewScreen = () => {
           <View style={styles.buttons}>
             <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddReturnLine} />
-            <SendButton onPress={handleSellBillHead} />
           </View>
         ),
     });

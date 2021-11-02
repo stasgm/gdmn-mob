@@ -1,6 +1,8 @@
 import { IEntity } from './common';
 
-interface ISettingsOption<T = string> extends IEntity {
+export type SettingValue = string | number | boolean;
+
+interface ISettingsOption<T = SettingValue> extends IEntity {
   description?: string;
   data: T;
   visible?: boolean;
@@ -8,7 +10,7 @@ interface ISettingsOption<T = string> extends IEntity {
   type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
 }
 
-type Settings<T = Record<string, string>> = {
+type Settings<T = Record<string, SettingValue>> = {
   [P in keyof T]?: ISettingsOption<T[P]>;
 };
 
@@ -16,39 +18,8 @@ interface IBaseSettings {
   serverAutoCheck: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
-  [name: string]: string | number | boolean;
+  [name: string]: SettingValue;
 }
-
-interface IAppSettings extends IBaseSettings {
-  serverName: string;
-  serverPort: string;
-  timeout: number;
-}
-
-const IAppSettings: Settings<IAppSettings> =  {
-  // ...baseSettings,
-  serverName: {
-    id: '11',
-    description: 'Адрес сервера',
-    data: '', //?
-    type: 'string',
-    sortOrder: 1,
-  },
-  serverPort: {
-    id: '2',
-    sortOrder: 2,
-    description: 'Порт',
-    data: '',
-    type: 'string',
-  },
-  timeout: {
-    id: '3',
-    sortOrder: 3,
-    description: 'Время ожидания',
-    data: 1,
-    type: 'number',
-  },
-};
 
 // Example
 

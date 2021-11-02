@@ -1,57 +1,54 @@
-import React from 'react';
+import { SettingValue } from '@lib/types';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Subheading, Switch, TextInput, useTheme } from 'react-native-paper';
-import { Input } from '@lib/mobile-ui';
+import { Subheading, Switch, useTheme } from 'react-native-paper';
+
+import Input from './Input';
 
 type Props = {
   label: string;
-  value: string | boolean | number | undefined;
+  value: SettingValue;
   onValueChange: (newValue: any) => void;
 };
 
 const SettingsItem = ({ label, value, onValueChange }: Props) => {
-  const { colors } = useTheme();
+  const [currentValue, setCurrentValue] = useState(value);
 
   return (
     <View>
-      {/* <Subheading numberOfLines={5} style={localStyles.subHeading}>
-        {label}
-      </Subheading> */}
-      {typeof value === 'boolean' ? (
+      {typeof currentValue === 'boolean' ? (
         <View style={localStyles.container}>
           <Subheading numberOfLines={5} style={localStyles.subHeading}>
             {label}
           </Subheading>
-          <Switch value={value} onValueChange={(item) => onValueChange(item)} />
+          <Switch value={currentValue} onValueChange={(item) => onValueChange(item)} />
         </View>
       ) : (
         <View style={localStyles.settingsContainer}>
-          {typeof value === 'number' ? (
-            // <TextInput
-            //   value={value === 0 ? '' : value.toString()}
-            //   onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
-            //   mode="outlined"
-            //   keyboardType={'numeric'}
-            //   style={localStyles.input}
-            //   theme={{
-            //     colors: {
-            //       primary: colors.primary,
-            //       text: colors.text,
-            //       placeholder: colors.primary,
-            //       background: colors.surface,
-            //     },
-            //   }}
-            // />
+          {typeof currentValue === 'number' ? (
             <Input
               label={label}
-              value={value === 0 ? '' : value.toString()}
-              onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
+              value={currentValue === 0 ? '' : currentValue.toString()}
+              onChangeText={(text) => setCurrentValue(text !== '' ? Number(text) : 0)}
+              onEndEditing={() => onValueChange(currentValue)}
               keyboardType={'numeric'}
             />
-          ) : typeof value === 'string' ? (
-            <Input label={label} value={value} onChangeText={(text) => onValueChange(text)} keyboardType={'default'} />
+          // ) : typeof currentValue === 'string' ? (
+          //   <Input
+          //     label={label}
+          //     value={currentValue}
+          //     onChangeText={(text) => setCurrentValue(text)}
+          //     keyboardType={'default'}
+          //     onEndEditing={() => onValueChange(currentValue)}
+          //   />
           ) : (
-            <Input label={label} value={value} onChangeText={(text) => onValueChange(text)} keyboardType={'default'} />
+            <Input
+              label={label}
+              value={currentValue}
+              onChangeText={(text) => setCurrentValue(text)}
+              keyboardType={'default'}
+              onEndEditing={() => onValueChange(currentValue)}
+            />
           )}
         </View>
       )}

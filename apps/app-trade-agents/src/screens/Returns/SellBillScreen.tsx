@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text } from 'react-native';
+import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text, ListRenderItem } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Snackbar, useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -17,13 +17,14 @@ import {
   Theme,
 } from '@lib/mobile-ui';
 
+import { IResponse, ISettingsOption } from '@lib/types';
+
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IGood, IReturnDocument, ISellBill } from '../../store/types';
 import { ISellBillFormParam } from '../../store/app/types';
 import { getDateString } from '../../utils/helpers';
 
-import SellBillItem from './components/SellBillItem';
-import { IResponse } from '@lib/types';
+import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 
 const SellBillScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'SellBill'>>().params?.id;
@@ -35,11 +36,13 @@ const SellBillScreen = () => {
 
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
+  const [info, setInfo] = useState('');
 
   const { colors } = useTheme();
 
   const [loading, setLoading] = useState(false);
 
+  const { data: settings } = useSelector((state) => state.settings);
   const formParams = useSelector((state) => state.app.formParams);
 
   const {
@@ -50,6 +53,8 @@ const SellBillScreen = () => {
     return formParams as ISellBillFormParam;
   }, [formParams]);
 
+  console.log('good', docGood);
+
   // useEffect(() => {
   //   return () => {
   //     dispatch(appActions.clearFormParams());
@@ -58,16 +63,18 @@ const SellBillScreen = () => {
   // }, []);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
+  const serverName = (settings.serverName as ISettingsOption<string>).data || 0;
+  const serverPort = (settings.serverPort as ISettingsOption<string>).data || 0;
 
-  const time = 30;
   const maxDocDate = new Date();
-  maxDocDate.setDate(maxDocDate.getDate() - time);
+  maxDocDate.setDate(maxDocDate.getDate() - returnDocTime);
 
   useEffect(() => {
     // Инициализируем параметры
     dispatch(
       appActions.setFormParams({
-        dateBegin: time > 0 ? maxDocDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+        dateBegin: maxDocDate.toISOString().slice(0, 10),
         dateEnd: new Date().toISOString().slice(0, 10),
         good: undefined,
       }),
@@ -118,22 +125,27 @@ const SellBillScreen = () => {
     setShowDateEnd(true);
   };
 
-  const [sellBills, setSellBills] = useState<ISellBill[]>();
-  const [error, setError] = useState<string | undefined>();
+  const [sellBills, setSellBills] = useState<ISellBill[] | undefined>(undefined);
 
-  // const handleShowSellBill = () => {
-  //   if (!(docDateBegin && docDateEnd && docGood)) {
-  //     return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-  //   }
-  //   // setSellBills(true);
-  // };
+  const bills = useMemo(() => {
+    const valueName = goods.find((item) => item.id === docGood?.id)?.valuename || '';
+    return sellBills?.map((i) => {
+      return {
+        docId: returnDoc?.id,
+        quantity: i.QUANTITY,
+        price: i.PRICE,
+        number: i.NUMBER,
+        documentdate: i.DOCUMENTDATE,
+        contract: i.CONTRACT,
+        valueName: valueName,
+        readonly: false,
+        good: docGood,
+      } as ISellBillListRenderItemProps;
+    });
+  }, [sellBills, goods, returnDoc?.id]);
 
-  const valueName = goods.find((item) => item.id === docGood?.id)?.valuename || '';
-
-  const renderItem = ({ item }: { item: ISellBill }) =>
-    returnDoc?.id && docGood ? (
-      <SellBillItem docId={returnDoc?.id} item={item} valueName={valueName} good={docGood} />
-    ) : null;
+  const renderItem: ListRenderItem<ISellBillListRenderItemProps> = ({ item }) =>
+    (returnDoc?.id && docGood ? <SellBillItem item={item}/> : null);
 
   const handleSearchSellBills = async () => {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
@@ -142,77 +154,65 @@ const SellBillScreen = () => {
 
     try {
       setLoading(true);
-      const path = `http://192.168.0.70:8000/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
-      console.log('path', path);
+
+      const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
+
       const fetched = await fetch(path, {});
       const parsed: IResponse<ISellBill[]> = await fetched.json();
+
       if (parsed.result) {
         setSellBills(parsed.data);
       } else {
-        setError(parsed.error);
+        setMessage(parsed.error || 'Неизвестная ошибка');
       }
-      // setSellBills(parsed);
-      setLoading(false);
-      console.log('parsed', parsed);
-      console.log('sell', sellBills);
-      // const b = sellBills.find((item) => item.)
     } catch (e) {
       if (e instanceof TypeError) {
         setMessage(e.message);
       } else {
         setMessage('Неизвестная ошибка');
-        console.log('ghjdthrf', sellBills);
       }
       setBarVisible(true);
-      // console.error('Error', e);
     }
+    setLoading(false);
   };
-  console.log('message', message);
 
   const handleSearchStop = () => {
     setLoading(false);
   };
 
-  console.log('bill', sellBills);
-
   return (
     <AppScreen style={localStyles.appScreen}>
       <View style={localStyles.title}>
         <SubTitle>{statusName}</SubTitle>
-        {loading && <ActivityIndicator size="small" color="#70667D" style={localStyles.activity} />}
+        {loading ? <ActivityIndicator size="small" color="#70667D" /> : <View style={localStyles.blank} />}
       </View>
       <Divider />
-      <SelectableInput
-        label="Начальная дата"
-        value={getDateString(docDateBegin || '')}
-        onPress={handlePresentDateBegin}
-      />
-      <SelectableInput label="Конечная дата" value={getDateString(docDateEnd || '')} onPress={handlePresentDateEnd} />
-      <SelectableInput label="Товар" value={docGood?.name} onPress={handlePresentGood} />
+      <SelectableInput label="Дата начала" value={getDateString(docDateBegin || '')} onPress={handlePresentDateBegin} />
+      <SelectableInput label="Дата окончания" value={getDateString(docDateEnd || '')} onPress={handlePresentDateEnd} />
+      <SelectableInput label="Товар" value={docGood?.name || ''} onPress={handlePresentGood} />
       <PrimeButton
         icon={!loading ? 'magnify' : 'block-helper'}
         onPress={!loading ? handleSearchSellBills : handleSearchStop}
       >
         {!loading ? 'Найти' : 'Прервать'}
       </PrimeButton>
-      {!!sellBills?.length && (
-        <View style={localStyles.sellBill}>
-          <InfoBlock colorLabel={colors.primary} /*"#a91160" /*"#4479D4"*/ title="Накладные">
-            <FlatList
-              data={sellBills}
-              keyExtractor={(_, i) => String(i)}
-              renderItem={renderItem}
-              // scrollEventThrottle={1}
-              ItemSeparatorComponent={ItemSeparator}
-            />
-          </InfoBlock>
-        </View>
-      )}
-      {error && (
-        <View style={localStyles.error}>
-          <Text>{error}</Text>
-        </View>
-      )}
+      {sellBills &&
+        (sellBills?.length ? (
+          <View style={localStyles.sellBill}>
+            <InfoBlock colorLabel={colors.primary} title="Накладные">
+              <FlatList
+                data={bills}
+                keyExtractor={(_, i) => String(i)}
+                renderItem={renderItem}
+                ItemSeparatorComponent={ItemSeparator}
+              />
+            </InfoBlock>
+          </View>
+        ) : (
+          <View style={localStyles.title}>
+            <Text>Накладные не найдены</Text>
+          </View>
+        ))}
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"
@@ -255,6 +255,5 @@ const localStyles = StyleSheet.create({
   sellBill: { display: 'flex', flex: 1, padding: 10 },
   appScreen: { justifyContent: 'flex-start' },
   title: { flexDirection: 'row', justifyContent: 'center', padding: 5 },
-  activity: { paddingLeft: 5 },
-  error: { display: 'flex', alignItems: 'center', padding: 5 },
+  blank: { width: 20 },
 });
