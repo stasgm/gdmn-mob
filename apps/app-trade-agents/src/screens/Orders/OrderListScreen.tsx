@@ -19,18 +19,18 @@ import {
 import { IOrderDocument } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
 
-import { OrderListRenderItemProps } from './components/OrderListItem';
+import { IOrderListRenderItemProps } from './components/OrderListItem';
 import OrderSwipeListItem from './components/OrderSwipeListItem';
 
 export interface OrderListProps {
-  orders: OrderListRenderItemProps[];
+  orders: IOrderListRenderItemProps[];
 }
 
 export interface OrderListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<OrderListRenderItemProps, OrderListSectionProps>[];
+export type SectionDataProps = SectionListData<IOrderListRenderItemProps, OrderListSectionProps>[];
 
 const OrderListScreen = () => {
   const navigation = useNavigation();
@@ -44,7 +44,7 @@ const OrderListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: OrderListRenderItemProps[] = useMemo(() => {
+  const filteredList: IOrderListRenderItemProps[] = useMemo(() => {
     const res =
       status === 'all'
         ? list
@@ -65,7 +65,7 @@ const OrderListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as OrderListRenderItemProps),
+        } as IOrderListRenderItemProps),
     );
   }, [status, list]);
 
@@ -120,7 +120,7 @@ const OrderListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const renderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
+  const renderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
   };

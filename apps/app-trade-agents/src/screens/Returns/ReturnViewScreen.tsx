@@ -8,6 +8,7 @@ import {
   AddButton,
   BackButton,
   MenuButton,
+  SendButton,
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
@@ -57,11 +58,19 @@ const ReturnViewScreen = () => {
     navigation.navigate('ReturnEdit', { id });
   }, [navigation, id]);
 
+  const handleSellBillHead = useCallback(() => {
+    navigation.navigate('SellBill', { id });
+  }, [navigation, id]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Добавить товар',
         onPress: handleAddReturnLine,
+      },
+      {
+        title: 'Добавить товар из накладной',
+        onPress: handleSellBillHead,
       },
       {
         title: 'Редактировать данные',
@@ -77,7 +86,7 @@ const ReturnViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddReturnLine, handleEditReturnHead, handleDelete]);
+  }, [showActionSheet, handleAddReturnLine, handleSellBillHead, handleEditReturnHead, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -90,7 +99,7 @@ const ReturnViewScreen = () => {
           </View>
         ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked]);
+  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked, handleSellBillHead]);
 
   if (!returnDoc) {
     return (

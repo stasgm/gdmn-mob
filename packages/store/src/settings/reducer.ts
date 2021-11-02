@@ -44,7 +44,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.updateSettings):
+    case getType(actions.addSetting):
       return {
         ...state,
         data: {
@@ -53,10 +53,25 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
         },
       };
 
+    case getType(actions.updateOption):
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [action.payload.optionName]: action.payload.value,
+        },
+      };
+
+    case getType(actions.addSettings):
+      return {
+        ...state,
+        data: action.payload,
+      };
+
     case getType(actions.deleteAllSettings):
       return { ...state, data: {} };
 
-    case getType(actions.deleteSettingsOption): {
+    case getType(actions.deleteOption): {
       const removeProps = action.payload;
       // state.data[action.payload];
       const { [removeProps]: remove, ...rest } = state.data;

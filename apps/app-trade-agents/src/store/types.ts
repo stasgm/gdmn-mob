@@ -116,9 +116,40 @@ interface IReturnHead extends IHead {
 export interface IReturnLine extends IEntity {
   good: INamedEntity;
   quantity: number;
+  quantityFromSellBill?: number;
+  priceFromSellBill?: number;
 }
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
+
+export interface ISellBill extends IEntity {
+  ID: string;
+  NUMBER: string;
+  CONTRACT?: string;
+  DOCUMENTDATE: string;
+  QUANTITY: number;
+  PRICE: number;
+}
+
+export interface ISellBillItem extends ISellBill {
+  valueName: string;
+}
+
+export interface ISellBillHead extends IHead {
+  outlet?: INamedEntity;
+  contact: INamedEntity; //организация-плательщик
+  route?: INamedEntity; // 	Маршрут
+  depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
+  dateBegin?: string; //  Дата отгрузки
+  dateEnd?: string;
+}
+
+export interface ISellBillLine extends IEntity {
+  good?: INamedEntity;
+  quantity: number;
+}
+
+export type ISellBillDocument = MandateProps<IDocument<ISellBillHead, ISellBillLine>, 'head' | 'lines'>;
 
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 

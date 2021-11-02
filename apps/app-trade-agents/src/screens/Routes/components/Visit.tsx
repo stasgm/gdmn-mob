@@ -15,10 +15,10 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
-import { ReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
+import { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
 import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
 import OrderSwipeListItem from '../../Orders/components/OrderSwipeListItem';
-import { OrderListRenderItemProps } from '../../Orders/components/OrderListItem';
+import { IOrderListRenderItemProps } from '../../Orders/components/OrderListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -208,7 +208,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     docTypeRef.current?.present();
   };
 
-  const orders: OrderListRenderItemProps[] = useMemo(() => {
+  const orders: IOrderListRenderItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
       const creationDate = new Date(i.editionDate || i.creationDate || 0);
       return {
@@ -219,16 +219,16 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: false,
         lineCount: i.lines.length,
-      } as OrderListRenderItemProps;
+      } as IOrderListRenderItemProps;
     });
   }, [orderDocs]);
 
-  const renderOrderItem: ListRenderItem<OrderListRenderItemProps> = ({ item }) => {
+  const renderOrderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
     const doc = orderDocs.find((r) => r.id === item.id);
     return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
   };
 
-  const returns: ReturnListRenderItemProps[] = useMemo(() => {
+  const returns: IReturnListRenderItemProps[] = useMemo(() => {
     return returnDocs.map((i) => {
       const creationDate = new Date(i.editionDate || i.creationDate || 0);
       return {
@@ -239,11 +239,11 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: false,
         lineCount: i.lines.length,
-      } as ReturnListRenderItemProps;
+      } as IReturnListRenderItemProps;
     });
   }, [returnDocs]);
 
-  const renderReturnItem: ListRenderItem<ReturnListRenderItemProps> = ({ item }) => {
+  const renderReturnItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
     const doc = returnDocs.find((r) => r.id === item.id);
     return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
   };

@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -20,15 +20,27 @@ const ReturnLineScreen = () => {
   const [line, setLine] = useState<IReturnLine>(item);
 
   const handleSave = useCallback(() => {
-    dispatch(
-      mode === 0
-        ? documentActions.addDocumentLine({ docId, line })
-        : documentActions.updateDocumentLine({ docId, line }),
-    );
-
-    navigation.goBack();
+    if (line.quantityFromSellBill) {
+      if (line.quantity > line.quantityFromSellBill) {
+        Alert.alert('Введенное число превышает количество из накладной');
+      } else {
+        dispatch(
+          mode === 0
+            ? documentActions.addDocumentLine({ docId, line })
+            : documentActions.updateDocumentLine({ docId, line }),
+        );
+        navigation.navigate('ReturnView', { id: docId });
+      }
+    } else {
+      dispatch(
+        mode === 0
+          ? documentActions.addDocumentLine({ docId, line })
+          : documentActions.updateDocumentLine({ docId, line }),
+      );
+      navigation.goBack();
+    }
     // navigation.navigate('ReturnView', { id: docId });
-  }, [navigation, line, docId, dispatch, mode]);
+  }, [dispatch, mode, docId, line, navigation]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

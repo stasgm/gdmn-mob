@@ -1,46 +1,56 @@
-import React from 'react';
+import { SettingValue } from '@lib/types';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Subheading, Switch, TextInput, useTheme } from 'react-native-paper';
+import { Subheading, Switch, useTheme } from 'react-native-paper';
+
+import Input from './Input';
 
 type Props = {
   label: string;
-  value: boolean | number | undefined;
+  value: SettingValue;
   onValueChange: (newValue: any) => void;
 };
 
 const SettingsItem = ({ label, value, onValueChange }: Props) => {
-  const { colors } = useTheme();
+  const [currentValue, setCurrentValue] = useState(value);
 
   return (
-    <View style={localStyles.container}>
-      <Subheading numberOfLines={5} style={localStyles.subHeading}>
-        {label}
-      </Subheading>
-      {typeof value === 'boolean' ? (
-        <Switch value={value} onValueChange={(value) => onValueChange(value)} />
-      ) : typeof value === 'number' ? (
-        <TextInput
-          value={value === 0 ? '' : value.toString()}
-          onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
-          mode="outlined"
-          keyboardType={'numeric'}
-          style={localStyles.input}
-          theme={{
-            colors: {
-              primary: colors.primary,
-              text: colors.text,
-              placeholder: colors.primary,
-              background: colors.surface,
-            },
-          }}
-        />
+    <View>
+      {typeof currentValue === 'boolean' ? (
+        <View style={localStyles.container}>
+          <Subheading numberOfLines={5} style={localStyles.subHeading}>
+            {label}
+          </Subheading>
+          <Switch value={currentValue} onValueChange={(item) => onValueChange(item)} />
+        </View>
       ) : (
-        <TextInput
-          value={value}
-          onChangeText={(text) => onValueChange(text)}
-          mode="outlined"
-          keyboardType={'default'}
-        />
+        <View style={localStyles.settingsContainer}>
+          {typeof currentValue === 'number' ? (
+            <Input
+              label={label}
+              value={currentValue === 0 ? '' : currentValue.toString()}
+              onChangeText={(text) => setCurrentValue(text !== '' ? Number(text) : 0)}
+              onEndEditing={() => onValueChange(currentValue)}
+              keyboardType={'numeric'}
+            />
+          // ) : typeof currentValue === 'string' ? (
+          //   <Input
+          //     label={label}
+          //     value={currentValue}
+          //     onChangeText={(text) => setCurrentValue(text)}
+          //     keyboardType={'default'}
+          //     onEndEditing={() => onValueChange(currentValue)}
+          //   />
+          ) : (
+            <Input
+              label={label}
+              value={currentValue}
+              onChangeText={(text) => setCurrentValue(text)}
+              keyboardType={'default'}
+              onEndEditing={() => onValueChange(currentValue)}
+            />
+          )}
+        </View>
       )}
     </View>
   );
@@ -50,8 +60,15 @@ const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 12,
+    // justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    // width: '100%',
+  },
+  settingsContainer: {
+    // alignItems: 'center',
+    flexDirection: 'column',
+    // justifyContent: 'space-between',
+    paddingTop: 6,
     width: '100%',
   },
   input: {

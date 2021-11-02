@@ -12,7 +12,7 @@ import { StatusType } from '@lib/types';
 import { getStatusColor } from '../../../utils/constants';
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 
-export interface OrderListItemProps {
+export interface IOrderListItemProps {
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -21,7 +21,7 @@ export interface OrderListItemProps {
   lineCount?: number;
   errorMessage?: string;
 }
-export interface OrderListRenderItemProps extends OrderListItemProps {
+export interface IOrderListRenderItemProps extends IOrderListItemProps {
   id: string;
 }
 
@@ -33,7 +33,7 @@ const OrderListItem = ({
   lineCount,
   isFromRoute,
   errorMessage,
-}: OrderListRenderItemProps) => {
+}: IOrderListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 

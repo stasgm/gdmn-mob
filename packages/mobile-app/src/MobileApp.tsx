@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
@@ -9,7 +9,11 @@ import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
+import { settingsActions, useDispatch, useSelector } from '@lib/store';
+
 import { useSync } from './hooks';
+
+import { IBaseSettings, ISettingsOption, Settings } from '@lib/types';
 
 export interface IApp {
   items?: INavItem[];

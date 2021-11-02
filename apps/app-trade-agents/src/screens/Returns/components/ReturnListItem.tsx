@@ -10,7 +10,7 @@ import { StatusType } from '@lib/types';
 import { getStatusColor } from '../../../utils/constants';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
-export interface ReturnListItemProps {
+export interface IReturnListItemProps {
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -18,15 +18,13 @@ export interface ReturnListItemProps {
   isFromRoute?: boolean;
   lineCount?: number;
 }
-export interface ReturnListRenderItemProps extends ReturnListItemProps {
+export interface IReturnListRenderItemProps extends IReturnListItemProps {
   id: string;
 }
 
-const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: ReturnListRenderItemProps) => {
+const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: IReturnListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
-
-  // const info = `№ ${item.number} от ${getDateString(item.documentDate)}`;
 
   return (
     <TouchableOpacity

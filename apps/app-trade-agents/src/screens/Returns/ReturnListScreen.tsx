@@ -20,7 +20,7 @@ import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getDateString } from '../../utils/helpers';
 
-import { ReturnListRenderItemProps } from './components/ReturnListItem';
+import { IReturnListRenderItemProps } from './components/ReturnListItem';
 import ReturnSwipeListItem from './components/ReturnSwipeListItem';
 
 const ReturnListScreen = () => {
@@ -52,11 +52,11 @@ const ReturnListScreen = () => {
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
-        } as ReturnListRenderItemProps),
+        } as IReturnListRenderItemProps),
     );
   }, [status, list]);
 
-  const renderItem: ListRenderItem<ReturnListRenderItemProps> = ({ item }) => {
+  const renderItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
   };
