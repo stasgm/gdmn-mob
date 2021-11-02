@@ -10,10 +10,10 @@ import { IReturnDocument } from '../../../store/types';
 
 import SwipeItem from '../../../components/SwipeItem';
 
-import ReturnListItem, { ReturnListRenderItemProps } from './ReturnListItem';
+import ReturnListItem, { IReturnListRenderItemProps } from './ReturnListItem';
 
 interface IProps {
-  renderItem: ReturnListRenderItemProps;
+  renderItem: IReturnListRenderItemProps;
   item: IReturnDocument;
 }
 

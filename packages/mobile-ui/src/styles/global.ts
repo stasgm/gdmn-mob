@@ -160,7 +160,8 @@ const globalstyles = StyleSheet.create({
     fontSize: 12,
   },
   textDescription: {
-    fontSize: 11,
+    fontSize: 12,
+    textAlign: 'right',
   },
   field: {
     opacity: 0.5,

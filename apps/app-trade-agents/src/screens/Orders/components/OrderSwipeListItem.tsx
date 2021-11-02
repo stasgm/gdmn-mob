@@ -10,10 +10,10 @@ import { IOrderDocument } from '../../../store/types';
 
 import SwipeItem from '../../../components/SwipeItem';
 
-import OrderListItem, { OrderListRenderItemProps } from './OrderListItem';
+import OrderListItem, { IOrderListRenderItemProps } from './OrderListItem';
 
 interface IProps {
-  renderItem: OrderListRenderItemProps;
+  renderItem: IOrderListRenderItemProps;
   item: IOrderDocument;
 }
 

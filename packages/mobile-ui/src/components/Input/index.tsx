@@ -5,7 +5,8 @@ import { TextInput, useTheme } from 'react-native-paper';
 import styles from './styles';
 
 interface Props {
-  onChangeText?: ((text: string) => void) | undefined;
+  onChangeText?: (text: string) => void;
+  onEndEditing?: () => void;
   value?: string;
   label?: string;
   secureText?: boolean;
@@ -45,6 +46,7 @@ const Input: React.FC<Props> = ({
   returnKeyType,
   editable,
   disabled,
+  onEndEditing,
 }) => {
   const { colors } = useTheme();
 
@@ -55,6 +57,7 @@ const Input: React.FC<Props> = ({
           label={label}
           value={value}
           onChangeText={onChangeText}
+          onEndEditing={onEndEditing}
           theme={{
             colors: {
               primary: colors.primary,

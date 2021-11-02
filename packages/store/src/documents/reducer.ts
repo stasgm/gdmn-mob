@@ -32,21 +32,25 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
       const oldDocs = state.list.filter((oldDoc) => !docsFromBack.find((d) => d.id === oldDoc.id));
 
       // Сформируем новый массив:
-      // - Если пришел новый документ (не ответ), то записываем его
-      // - Если пришел успешный ответ 'PROCESSED' от сервера,
+      // - Если пришел новый документ (не ответ) или 'ARCHIVE' (подтвержденные ранее), то записываем его
+      // - Если пришел успешный ответ 'PROCESSED' от сервера по отправленным документам,
       //   то оставляем данные из хранилища и заменяем статус на 'PROCESSED'
       // - Если пришли ответы с ошибками 'PROCESSED_DEADLOCK' или 'PROCESSED_INCORRECT',
       //   то оставляем данные из хранилища, записываем ошибку из errorMessage
       //   и заменяем статус на 'DRAFT' (чтобы пользователь заново смог отредактировать данный документ)
-      // - Если документ в хранилище в состоянии черновика,
+      // - Если
+      //     - документ в хранилище в состоянии черновика или
+      //     - документ в хранилище 'PROCESSED', а в новом 'DRAFT'
+      //       (когда из гедымина отменили решение отправленного документа)
       //   то заменяем его на новые данные из сообщения,
       //   иначе (состояние Готов или Отправлен) - оставляем данные из хранилища
       // К сформированному массиву добавим документы из хранилища, которых не было в сообщении
+
       const newDocs = docsFromBack
         .map((newDoc) => {
           const oldDoc = state.list.find((d) => d.id === newDoc.id);
 
-          return !oldDoc
+          return !oldDoc || newDoc.status === 'ARCHIVE'
             ? newDoc
             : newDoc.status === 'PROCESSED'
             ? {
@@ -59,7 +63,8 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
                 status: 'DRAFT' as StatusType,
                 errorMessage: newDoc.errorMessage,
               }
-            : oldDoc.status === 'DRAFT'
+            : oldDoc.status === 'DRAFT' ||
+              ((oldDoc.status === 'PROCESSED' || oldDoc.status === 'ARCHIVE') && newDoc.status === 'DRAFT')
             ? newDoc
             : oldDoc;
         })

@@ -1,19 +1,12 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { ScrollView, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
-import {
-  AppScreen,
-  SettingsItem,
-  globalStyles as styles,
-  DrawerButton,
-  MenuButton,
-  useActionSheet,
-} from '@lib/mobile-ui';
-
+import { SettingsItem, globalStyles as styles, DrawerButton, MenuButton, useActionSheet } from '@lib/mobile-ui';
 import { ISettingsOption } from '@lib/types';
+export type SettingListItem = ISettingsOption & { setName: string };
 
 const SettingsSceen = () => {
   const navigation = useNavigation();
@@ -23,9 +16,14 @@ const SettingsSceen = () => {
   const { data } = useSelector((state) => state.settings);
   const { settings } = useSelector((state) => state.auth);
 
-  const handleUpdate = (optionName: string, value: ISettingsOption<string | number | boolean>) => {
-    console.log('{ optionName, value }', { optionName, value });
-    dispatch(settingsActions.updateSettings({ optionName, value }));
+  // const settingList = useMemo(() => {
+  //   return Object.entries(data)
+  //     .map(([key, value]) => ({ ...value, setName: key } as SettingListItem))
+  //     .filter((i) => i.visible);
+  // }, [data]);
+
+  const handleUpdate = (optionName: string, value: ISettingsOption) => {
+    dispatch(settingsActions.updateOption({ optionName, value }));
   };
 
   const handleReset = useCallback(() => {
@@ -55,9 +53,21 @@ const SettingsSceen = () => {
 
   const serverPath = `${settings?.protocol}${settings?.server}:${settings?.port}/${settings?.apiPath}`;
 
+  // const renderItem = ({ item }: { item: SettingListItem }) => (
+  //   <SettingsItem
+  //     key={item.id}
+  //     label={item.description || item.setName}
+  //     value={item.data}
+  //     onValueChange={(newValue) => {
+  //       const { setName, ...rest } = item;
+  //       handleUpdate(item.setName, { ...rest, data: newValue });
+  //     }}
+  //   />
+  // );
+
   return (
-    <AppScreen style={styles.contentTop}>
-      <ScrollView>
+    <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
+      <View>
         <Text style={[styles.title]}>Параметры связи с сервером</Text>
         <Divider />
         <View style={styles.details}>
@@ -69,14 +79,15 @@ const SettingsSceen = () => {
           <Text style={styles.name}>Время ожидания ответа сервера, мс.</Text>
           <Text style={[styles.number, styles.field]}>{settings?.timeout}</Text>
         </View>
-        {/* <Divider /> */}
+      </View>
+      <View>
         <Text style={[styles.title]}>Настройки приложения</Text>
         <Divider />
         <View>
           {Object.entries(data)
-            .filter(([_, item]) => item.visible)
+            .filter(([_, item]) => item?.visible)
             .map(([key, item]) => {
-              return (
+              return item ? (
                 <View key={key}>
                   <SettingsItem
                     key={key}
@@ -86,25 +97,18 @@ const SettingsSceen = () => {
                   />
                   <Divider />
                 </View>
-              );
+              ) : null;
             })}
         </View>
-      </ScrollView>
-    </AppScreen>
+        {/* <FlatList
+              data={settingList}
+              keyExtractor={(item, _) => item.id}
+              renderItem={renderItem}
+              ItemSeparatorComponent={Divider}
+            /> */}
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 export default SettingsSceen;
-
-/* const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-});
- */

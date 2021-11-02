@@ -1,20 +1,41 @@
 import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Divider, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
+import { StatusType } from '@lib/types';
 
 import { getStatusColor } from '../../../utils/constants';
 import { ApplsStackParamList } from '../../../navigation/Root/types';
-// eslint-disable-next-line import/no-cycle
-import { ApplListRenderItemProps } from '../ApplListScreen';
+
+export interface ApplListProps {
+  Appl: ApplListRenderItemProps[];
+}
+
+export interface ApplListRenderItemProps extends ApplListItemProps {
+  id: string;
+}
+
+export interface ApplListItemProps {
+  documentDate: string;
+  title: string;
+  dept: string;
+  subtitle?: string;
+  description?: string;
+  status?: StatusType;
+  applStatus: string;
+  isFromRoute?: boolean;
+  lineCount?: number;
+  errorMessage?: string;
+}
 
 const ApplListItem = ({
   id,
   title,
+  dept,
   subtitle,
   description,
   status,
@@ -27,28 +48,27 @@ const ApplListItem = ({
 
   return (
     <TouchableOpacity
+      key={id}
       onPress={() => {
         navigation.navigate('ApplView', { id });
       }}
+      style={[styles.flexDirectionRow, localStyles.box]}
     >
-      <View style={[styles.flexDirectionRow, localStyles.box]}>
-        <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
-        {/* <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
-          <MaterialCommunityIcons name="file-outline" size={20} color={'#FFF'} />
-        </View> */}
-        <View style={localStyles.info}>
-          <Text style={styles.name}>{title}</Text>
-          <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
-          <View style={styles.rowBottom}>
-            <Text style={[styles.number, styles.field]}>{subtitle}</Text>
-            <View style={[styles.rowCenter]}>
-              <Text style={[styles.number, styles.field]}>{lineCount}</Text>
-              <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
-            </View>
+      <View style={[localStyles.label, { backgroundColor: getStatusColor(status || 'DRAFT') }]} />
+      <View style={localStyles.info}>
+        <Text style={[styles.textBold, styles.textDescription]}>{dept}</Text>
+        {/* <Divider /> */}
+        <Text style={[styles.name]}>{title}</Text>
+        <Text style={[styles.textBold, styles.field]}>{applStatus}</Text>
+        <View style={styles.rowBottom}>
+          <Text style={[styles.number, styles.field]}>{subtitle}</Text>
+          <View style={[styles.rowCenter]}>
+            <Text style={[styles.number, styles.field]}>{lineCount}</Text>
+            <MaterialCommunityIcons name="information-outline" size={15} color={colors.text} style={styles.field} />
           </View>
-          <Text style={[styles.number, styles.field]}>{description}</Text>
-          {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage || ''}</Text>}
         </View>
+        <Text style={[styles.number, styles.field]}>{description}</Text>
+        {errorMessage && <Text style={[styles.number, localStyles.error]}>{errorMessage || ''}</Text>}
       </View>
     </TouchableOpacity>
   );
