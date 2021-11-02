@@ -118,8 +118,9 @@ const ApplViewScreen = () => {
 
   return (
     <AppScreen>
-      <InfoBlock colorLabel={colors.primary} title={appl.head.dept.name}>
+      <InfoBlock colorLabel={colors.primary} title={appl.head.headCompany.name}>
         <>
+          <Text style={[styles.textBold, styles.textDescription]}>{appl.head.dept.name}</Text>
           <Text>{`№ ${appl.number} от ${getDateString(appl.documentDate)}`} </Text>
           <Text>{`${appl.head.purpose.name}`} </Text>
           <Text style={[styles.field, styles.number]}>{`${appl.head.justification}`} </Text>

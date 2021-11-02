@@ -4,7 +4,6 @@ import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// import { peopleRefMock, depRefMock, companyRefMock, docTypeRefMock } from '@lib/mock';
 import { useSelector } from '@lib/store';
 import { DrawerButton, AppScreen } from '@lib/mobile-ui';
 
@@ -18,8 +17,6 @@ type ViewScreenProp = StackNavigationProp<ReferenceStackParamList, 'ReferenceVie
 
 const ReferenceListScreen = () => {
   const { list, loading } = useSelector((state) => state.references);
-
-  console.log(list);
 
   const refData = useMemo(() => {
     return Object.entries(list)
