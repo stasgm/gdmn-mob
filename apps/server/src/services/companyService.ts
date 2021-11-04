@@ -128,7 +128,7 @@ const deleteOne = async (id: string): Promise<string> => {
 
   delDevices(devicesByCompany);
 
-  await users.delete((user) => user.company === id && user.role !== 'Admin');
+  await users.delete((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin');
 
   await companies.delete(id);
 
