@@ -127,7 +127,7 @@ const CompanyView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить организацию?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить компанию?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDelete} color="primary" variant="contained">

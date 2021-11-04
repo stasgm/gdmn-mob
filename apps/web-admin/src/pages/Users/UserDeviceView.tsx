@@ -135,14 +135,14 @@ const UserDeviceView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Удалить устройство?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить привязанное устройство?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDelete} color="primary">
-              Да
+            <Button onClick={handleDelete} color="primary" variant="contained">
+              Удалить
             </Button>
-            <Button onClick={handleClose} color="primary" /*autoFocus*/>
-              Нет
+            <Button onClick={handleClose} color="secondary" variant="contained">
+              Отмена
             </Button>
           </DialogActions>
         </Dialog>

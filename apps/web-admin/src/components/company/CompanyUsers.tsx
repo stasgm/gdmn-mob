@@ -66,8 +66,8 @@ const CompanyUsers = ({ users }: IProps) => {
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
     { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
   ];
 
   return (
@@ -80,7 +80,7 @@ const CompanyUsers = ({ users }: IProps) => {
       <Container maxWidth={false}>
         <ToolbarActionsWithSearch
           buttons={userButtons}
-          searchTitle={'Найти устройство'}
+          searchTitle={'Найти пользователя'}
           valueRef={valueRef}
           updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}

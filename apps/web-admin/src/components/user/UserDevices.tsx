@@ -65,8 +65,8 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const headCells: IHeadCells<IDeviceBinding>[] = [
     { id: 'device', label: 'Наименование', sortEnable: true },
     { id: 'state', label: 'Состояние', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
   ];
 
   return (

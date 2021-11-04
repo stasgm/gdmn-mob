@@ -249,7 +249,7 @@ const DeviceView = () => {
           {/* <ToolbarActions buttons={userButtons} /> */}
           <ToolbarActionsWithSearch
             buttons={userButtons}
-            searchTitle={'Найти устройство'}
+            searchTitle={'Найти пользователя'}
             valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}

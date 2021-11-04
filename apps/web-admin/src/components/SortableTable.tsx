@@ -218,6 +218,7 @@ function SortableTable<T extends { id: string }>({ data = [], headCells = [], pa
       <TablePagination
         component="div"
         count={data.length}
+        labelRowsPerPage="Строк на странице"
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleLimitChange}
         page={page}
