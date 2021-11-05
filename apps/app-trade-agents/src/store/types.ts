@@ -118,6 +118,7 @@ export interface IReturnLine extends IEntity {
   quantity: number;
   quantityFromSellBill?: number;
   priceFromSellBill?: number;
+  sellBillId: string;
 }
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
@@ -126,6 +127,9 @@ export interface ISellBill extends IEntity {
   ID: string;
   NUMBER: string;
   CONTRACT?: string;
+  CONTRACTKEY?: string;
+  DEPARTNAME?: string;
+  DEPARTKEY?: string;
   DOCUMENTDATE: string;
   QUANTITY: number;
   PRICE: number;

@@ -25,9 +25,11 @@ export interface ISellBillListRenderItemProps {
   number: string;
   documentdate: string;
   contract?: string;
+  departName?: string;
   valueName: string;
   readonly: boolean;
   good: INamedEntity;
+  sellBillId: string;
 }
 
 const SellBillItem = ({ item }: IProps) => {
@@ -41,7 +43,14 @@ const SellBillItem = ({ item }: IProps) => {
           navigation.navigate('ReturnLine', {
             mode: 0,
             docId: item.docId,
-            item: { good: item.good, quantityFromSellBill: item.quantity, priceFromSellBill: item.price, quantity: 0, id: uuid() },
+            item: {
+              good: item.good,
+              quantityFromSellBill: item.quantity,
+              priceFromSellBill: item.price,
+              quantity: 0,
+              id: uuid(),
+              sellBillId: item.sellBillId,
+            },
           });
       }}
     >
@@ -54,6 +63,7 @@ const SellBillItem = ({ item }: IProps) => {
             item.documentdate,
           )}`}</Text>
           <Text style={[styles.field, { color: colors.text }]}>{`Договор №${item.contract}`}</Text>
+          <Text style={[styles.field, { color: colors.text }]}>{item.departName}</Text>
           <Text style={[styles.name, { color: colors.text }]}>
             {item.quantity} {item.valueName} x {item.price} р.
           </Text>
