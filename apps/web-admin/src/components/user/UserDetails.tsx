@@ -1,9 +1,10 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button, IconButton } from '@material-ui/core';
+import MaskedInput from 'react-text-mask';
 
 import { useState } from 'react';
 
 import { IUser, NewUser } from '@lib/types';
-import { FormikTouched, useFormik } from 'formik';
+import { Field, FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -51,6 +52,10 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     formik.values.password = '';
   };
 
+  const phoneNumberMask = ['(', /[1-9]/, /[1-9]/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
+  //  \+375 \((17|29|33|44)\) [0-9]{3}-[0-9]{2}-[0-9]{2}$;
+  // ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
+  // ['(', /[1-9]/, /[1-9]/')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
   return (
     <>
       <Box
@@ -127,18 +132,42 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  <TextField
+                  {/* <TextField */}
+                  {/* <TextField
                     error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                     fullWidth
                     label="Телефон"
                     name="phoneNumber"
                     variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="phoneNumber"
+                    // onBlur={formik.handleBlur}
+                    // onChange={formik.handleChange}
+                    // type="phoneNumber"
                     disabled={loading}
+                    // value={formik.values.phoneNumber}
+
+                    render={({ field }: any) => ( */}
+                  <MaskedInput
+                    // {...field}э
+                    mask={phoneNumberMask}
+                    // id="phone"
+                    // placeholder="Enter your phone number"
+                    type="phoneNumber"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={'text-input'}
                     value={formik.values.phoneNumber}
                   />
+                  {/* // {() => <TextField {...props} />} */}
+                  {/* )} */}
+                  {/* > */}
+                  {/* <InputMask
+                    mask="+375(99)999-99-99"
+                    value={formik.values.phoneNumber}
+                    // onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    maskChar=" "
+                  ></InputMask>*/}
+                  {/* </TextField> */}
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
