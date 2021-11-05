@@ -147,7 +147,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
 
 const verifyCode = async (code: string) => {
   const db = getDb();
-  const { devices, codes } = db;
+  const { devices, codes, deviceBindings } = db;
 
   const rec = await codes.find((i) => i.code === code);
 
@@ -172,6 +172,7 @@ const verifyCode = async (code: string) => {
   // обновляем uid у устройства
   const uid = uuidv1();
   const device = await devices.find(rec.deviceId);
+  const deviceBinding = await deviceBindings.find(rec.deviceId);
 
   if (!device) {
     throw new DataNotFoundException('По данному коду устройство не найдено');

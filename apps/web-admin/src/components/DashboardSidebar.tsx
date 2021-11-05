@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
@@ -9,16 +9,18 @@ import {
   Users as UsersIcon,
 } from 'react-feather';
 
-import { useSelector } from '@lib/store';
+import { useSelector, useDispatch } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
+
+import actions from '../store/user';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
 
 const userInfo = {
   avatar: '/assets/images/avatar1.svg',
-  jobTitle: 'Senior Developer',
+  jobTitle: 'User',
   name: 'Katarina Smith',
 };
 
@@ -31,7 +33,7 @@ const items = [
   {
     href: `${adminPath}/app/companies`,
     icon: UsersIcon,
-    title: 'Организации',
+    title: 'Компании',
   },
   {
     href: `${adminPath}/app/users`,
@@ -59,6 +61,22 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
   const [isCompact, setCompact] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+
+  // const fetchUsers = useCallback(
+  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
+  //     dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
+  //   },
+  //   [dispatch],
+  // );
+
+  // useEffect(() => {
+  //   /* Загружаем данные при загрузке компонента */
+  //   dispatch(actions.fetchUsers(''));
+  //   //   },
+  //   //   [dispatch],
+  // }, [dispatch]);
 
   const content = (
     <Box
