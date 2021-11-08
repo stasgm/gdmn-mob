@@ -46,7 +46,6 @@ const ReturnEditScreen = () => {
     outlet: docOutlet,
     number: docNumber,
     documentDate: docDocumentDate,
-    reason: docReason,
     status: docStatus,
     route: docRoute,
   } = useMemo(() => {
@@ -94,8 +93,6 @@ const ReturnEditScreen = () => {
           number: returnDoc.number,
           contact: returnDoc.head.contact,
           outlet: returnDoc.head.outlet,
-          depart: returnDoc.head.depart,
-          reason: returnDoc.head.reason,
           route: returnDoc.head.route,
           documentDate: returnDoc.documentDate,
           status: returnDoc.status,
@@ -114,7 +111,7 @@ const ReturnEditScreen = () => {
   }, [dispatch, returnDoc]);
 
   const handleSave = useCallback(() => {
-    if (!(docNumber && docContact && docOutlet && docReason && docDocumentDate)) {
+    if (!(docNumber && docContact && docOutlet && docDocumentDate)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -136,7 +133,6 @@ const ReturnEditScreen = () => {
         head: {
           contact: docContact,
           outlet: docOutlet,
-          reason: docReason,
         },
         lines: [],
         creationDate: newReturnDate,
@@ -163,7 +159,6 @@ const ReturnEditScreen = () => {
           ...returnDoc.head,
           contact: docContact,
           outlet: docOutlet,
-          reason: docReason,
         },
         lines: returnDoc.lines,
         creationDate: returnDoc.creationDate || updatedReturnDate,
@@ -178,7 +173,6 @@ const ReturnEditScreen = () => {
     docNumber,
     docContact,
     docOutlet,
-    docReason,
     docDocumentDate,
     id,
     returnType,
@@ -263,12 +257,6 @@ const ReturnEditScreen = () => {
           disabled={isBlocked}
         />
         <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
-        <Input
-          label="Причина возврата"
-          value={docReason}
-          onChangeText={(text) => dispatch(appActions.setFormParams({ reason: text }))}
-          disabled={!['DRAFT', 'READY'].includes(docStatus || 'DRAFT')}
-        />
       </ScrollView>
     </AppInputScreen>
   );
