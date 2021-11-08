@@ -1,5 +1,7 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button, IconButton } from '@material-ui/core';
+import { Box, Card, CardContent, Grid, TextField, Divider, Button, IconButton, Input } from '@material-ui/core';
 import MaskedInput from 'react-text-mask';
+
+import InputMask from 'react-input-mask';
 
 import { useState } from 'react';
 
@@ -52,7 +54,11 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     formik.values.password = '';
   };
 
-  const phoneNumberMask = ['(', /[1-9]/, /[1-9]/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
+  const MaskedTextInput = (values: any) => {
+    return <Input {...values} component={MaskedInput} />;
+  };
+
+  const phoneNumberMask = ['(', /[1-9]/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
   //  \+375 \((17|29|33|44)\) [0-9]{3}-[0-9]{2}-[0-9]{2}$;
   // ['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
   // ['(', /[1-9]/, /[1-9]/')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
@@ -144,22 +150,70 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     // type="phoneNumber"
                     disabled={loading}
                     // value={formik.values.phoneNumber}
+                  */}
 
-                    render={({ field }: any) => ( */}
-                  <MaskedInput
-                    // {...field}э
-                    mask={phoneNumberMask}
-                    // id="phone"
-                    // placeholder="Enter your phone number"
-                    type="phoneNumber"
+                  <InputMask
+                    mask="+ 999 (99) 999-99-99"
+                    value={formik.values.phoneNumber}
+                    disabled={loading}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={'text-input'}
+                    maskChar=" "
+                  >
+                  {/* <MuiPhoneNumber
+                    // name={name}
                     value={formik.values.phoneNumber}
-                  />
-                  {/* // {() => <TextField {...props} />} */}
-                  {/* )} */}
-                  {/* > */}
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    id="contactPhoneNumber"
+                    defaultCountry={'by'}
+                    style={{ width: '100%' }}
+                    label="Contacto telefónico"
+                    variant="outlined"
+                    // margin="normal"
+                    // error={Boolean(errors.phone)}
+                  >*/}
+                    {() => (
+                      <TextField
+                        error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                        fullWidth
+                        label="Телефон"
+                        name="phoneNumber"
+                        variant="outlined"
+                        type="phoneNumber"
+                        // placeholder="+375 (29) 999-99-99"
+                        // value={formik.values.phoneNumber}
+                      />
+                    )}
+                  </InputMask>
+                  {/* <MaskedTextInput
+                    mask={phoneNumberMask}
+                    id="phone"
+                    type="phone"
+                    label="Телефон"
+                    placeholder="Enter your phone number"
+                    error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                    fullWidth
+                    value={formik.values.phoneNumber}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  /> */}
+                  {/* <Field
+                    render={({ field }: any) => (
+                      <MaskedInput
+                        {...field}
+                        mask={phoneNumberMask}
+                        // id="phone"
+                        // placeholder="Enter your phone number"
+                        type="phoneNumber"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className={'text-input'}
+                        value={formik.values.phoneNumber}
+                      />
+                      // {/* // {() => <TextField {...props} />} */}
+                  {/* )}
+                  /> */}
                   {/* <InputMask
                     mask="+375(99)999-99-99"
                     value={formik.values.phoneNumber}
@@ -175,6 +229,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     fullWidth
                     label="Email"
                     name="email"
+                    placeholder="email@example.com"
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}

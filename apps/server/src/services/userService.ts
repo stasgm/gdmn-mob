@@ -121,7 +121,7 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     externalId: userData.externalId || oldUser.externalId,
     firstName: userData.firstName === undefined ? oldUser.firstName : userData.firstName,
     lastName: userData.lastName === undefined ? oldUser.lastName : userData.lastName,
-    phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
+    phoneNumber: userData.phoneNumber === undefined ? oldUser.phoneNumber : userData.phoneNumber,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
     email: userData.email || oldUser.email,
