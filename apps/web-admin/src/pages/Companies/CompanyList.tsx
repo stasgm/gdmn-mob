@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -17,7 +17,7 @@ import actions from '../../store/company';
 
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
-import { IHeadCells, IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 
 import SnackBar from '../../components/SnackBar';
 import SortableTable from '../../components/SortableTable';
@@ -28,7 +28,9 @@ const CompanyList = () => {
   const dispatch: AppDispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
-  const { list, loading, errorMessage } = useSelector((state) => state.companies);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
+
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchCompanies = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -39,11 +41,13 @@ const CompanyList = () => {
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchCompanies();
-  }, [fetchCompanies]);
+    fetchCompanies(pageParams?.filterText as string);
+  }, [fetchCompanies, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
+
+    setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
 
@@ -51,17 +55,17 @@ const CompanyList = () => {
   };
 
   const handleSearchClick = () => {
-    const inputValue = valueRef?.current?.value;
+    dispatch(actions.companyActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
-    fetchCompanies(inputValue);
+    fetchCompanies(pageParamLocal?.filterText as string);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
-    const inputValue = valueRef?.current?.value;
-
-    fetchCompanies(inputValue);
+    handleSearchClick();
+    // const inputValue = valueRef?.current?.value;
+    // fetchCompanies(inputValue);
   };
 
   const handleClearError = () => {
@@ -129,10 +133,11 @@ const CompanyList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти компанию'}
-            valueRef={valueRef}
+            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
+            value={(pageParamLocal?.filterText as undefined) || ''}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

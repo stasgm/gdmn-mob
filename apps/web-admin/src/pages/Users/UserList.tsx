@@ -28,13 +28,16 @@ const UserList = () => {
 
   const fetchUsers = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      console.log('fetch', filterText);
       dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
+      console.log('fetch filter', filterText);
     },
     [dispatch],
   );
 
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
+    console.log('use', pageParams?.filterText);
     fetchUsers(pageParams?.filterText as string);
   }, [fetchUsers, pageParams?.filterText]);
 
@@ -42,6 +45,8 @@ const UserList = () => {
     const inputValue: string = value;
 
     setPageParamLocal({ filterText: value });
+    console.log('update filter', value);
+
 
     if (inputValue) return;
 
@@ -50,8 +55,10 @@ const UserList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-
+    console.log('pageParamLocal', pageParamLocal?.filterText);
     fetchUsers(pageParamLocal?.filterText as string);
+    console.log('pageParamLocal filter', pageParamLocal?.filterText);
+
   };
 
   const handleKeyPress = (key: string) => {

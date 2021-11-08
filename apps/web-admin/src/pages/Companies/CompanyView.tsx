@@ -71,6 +71,13 @@ const CompanyView = () => {
     setOpen(false);
   };
 
+  // const fetchUsers = useCallback(
+  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
+  //     dispatch(userActions.fetchUsers(companyId, filterText, fromRecord, toRecord));
+  //   },
+  //   [companyId, dispatch],
+  // );
+
   const refreshData = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
     dispatch(userActions.fetchUsers(companyId));
