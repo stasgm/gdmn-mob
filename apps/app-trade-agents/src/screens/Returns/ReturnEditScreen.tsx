@@ -26,8 +26,7 @@ import {
 import { IDocumentType } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IOutlet, IReturnDocument } from '../../store/types';
-import { IReturnFormParam } from '../../store/app/types';
+import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;

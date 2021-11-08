@@ -20,8 +20,8 @@ import {
 import { IResponse, ISettingsOption } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IGood, IReturnDocument, ISellBill } from '../../store/types';
-import { ISellBillFormParam } from '../../store/app/types';
+import { IGood, IReturnDocument, ISellBill, ISellBillFormParam } from '../../store/types';
+
 import { getDateString } from '../../utils/helpers';
 
 import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
@@ -36,7 +36,6 @@ const SellBillScreen = () => {
 
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
-  const [info, setInfo] = useState('');
 
   const { colors } = useTheme();
 
@@ -142,10 +141,11 @@ const SellBillScreen = () => {
         good: docGood,
       } as ISellBillListRenderItemProps;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sellBills, goods, returnDoc?.id]);
 
   const renderItem: ListRenderItem<ISellBillListRenderItemProps> = ({ item }) =>
-    (returnDoc?.id && docGood ? <SellBillItem item={item}/> : null);
+    returnDoc?.id && docGood ? <SellBillItem item={item} /> : null;
 
   const handleSearchSellBills = async () => {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {

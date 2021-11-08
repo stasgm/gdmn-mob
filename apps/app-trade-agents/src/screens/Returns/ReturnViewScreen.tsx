@@ -8,7 +8,6 @@ import {
   AddButton,
   BackButton,
   MenuButton,
-  SendButton,
   useActionSheet,
   globalStyles as styles,
   InfoBlock,

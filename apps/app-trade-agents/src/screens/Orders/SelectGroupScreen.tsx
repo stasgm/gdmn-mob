@@ -1,21 +1,19 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect, useMemo } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup } from '../../store/types';
+import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
+import { useSelector as useAppTradeSelector } from '../../store/';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
-
-const keyStore = 'Order/GoodGroup';
 
 const Group = ({
   item,
@@ -92,11 +90,30 @@ const Group = ({
 
 const SelectGroupScreen = () => {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  // const { colors } = useTheme();
+  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
+  const dispatch = useDispatch();
+  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id;
+
+  const formParams = useSelector((state) => state.app.formParams);
+
+  const { model } = useAppTradeSelector((state) => state.appTrade);
+
+  const contactModel = contactId ? model[contactId] : undefined;
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const firstLevelGroups = groups.data.filter((item) => !item.parent);
+  const groupModel = useMemo(
+    () =>
+      contactModel?.reduce((prev: IGoodGroup[], cur: IGood) => {
+        const group = groups.data?.find((gr) => gr.id !== cur.goodgroup.id);
+        // const parent = groups.data?.find((gr) => gr.id !== cur.goodgroup.id);
+        return [...prev.filter((gr) => gr.id !== cur.goodgroup.id && gr.id !== group?.parent?.id), cur.goodgroup];
+      }, []) || [],
+    [contactModel, groups.data],
+  );
+
+  const firstLevelGroups = groupModel.filter((item) => !item.parent);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
@@ -105,32 +122,44 @@ const SelectGroupScreen = () => {
       headerLeft: () => <BackButton />,
     });
 
-    const getData = async () => {
-      try {
-        const value = await AsyncStorage.getItem(keyStore);
-        if (value !== null) {
-          const expandGroup = groups.data.find((group) => group.id === value);
-          setExpend(expandGroup);
-        }
-      } catch (e) {
-        // error reading value
-      }
-    };
+    if (formParams?.groupId) {
+      const expandGroup = groupModel.find((group) => group.id === formParams.groupId);
+      setExpend(expandGroup);
+    }
 
-    getData();
-  }, [navigation, colors.card, groups.data]);
+    // const getData = async () => {
+    //   try {
+    //     const value = await AsyncStorage.getItem(keyStore);
+    //     if (value !== null) {
+    //       const expandGroup = groupModel.find((group) => group.id === value);
+    //       setExpend(expandGroup);
+    //     }
+    //   } catch (e) {
+    //     // error reading value
+    //   }
+    // };
+
+    // getData();
+  }, [navigation, groupModel, formParams?.groupId]);
 
   useEffect(() => {
-    const storeData = async () => {
-      try {
-        expend ? await AsyncStorage.setItem(keyStore, expend.id) : await AsyncStorage.removeItem(keyStore);
-      } catch (e) {
-        // saving error
-      }
-    };
+    // const storeData = async () => {
+    //   try {
+    //     expend ? await AsyncStorage.setItem(keyStore, expend.id) : await AsyncStorage.removeItem(keyStore);
+    //   } catch (e) {
+    //     // saving error
+    //   }
+    // };
 
-    storeData();
-  }, [expend]);
+    // storeData();
+    dispatch(
+      appActions.setFormParams({
+        ...formParams,
+        ['groupId']: expend?.id,
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, expend?.id]);
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);

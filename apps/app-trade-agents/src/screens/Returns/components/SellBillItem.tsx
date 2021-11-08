@@ -1,16 +1,13 @@
 import React from 'react';
+import { v4 as uuid } from 'uuid';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
-
 import { INamedEntity } from '@lib/types';
 
-import { v4 as uuid } from 'uuid';
-
-import { ISellBill } from '../../../store/types';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 import { getDateString } from '../../../utils/helpers';
 
@@ -41,7 +38,13 @@ const SellBillItem = ({ item }: IProps) => {
           navigation.navigate('ReturnLine', {
             mode: 0,
             docId: item.docId,
-            item: { good: item.good, quantityFromSellBill: item.quantity, priceFromSellBill: item.price, quantity: 0, id: uuid() },
+            item: {
+              good: item.good,
+              quantityFromSellBill: item.quantity,
+              priceFromSellBill: item.price,
+              quantity: 0,
+              id: uuid(),
+            },
           });
       }}
     >
