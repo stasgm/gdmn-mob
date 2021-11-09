@@ -90,6 +90,19 @@ const reducer: Reducer<IDeviceBindingState, DeviceBindingActionType> = (
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
+    case getType(deviceBindingActions.setPageParam):
+      return {
+        ...state,
+        pageParams: { ...state.pageParams, ...action.payload },
+      };
+
+    case getType(deviceBindingActions.clearPageParams):
+      return {
+        ...state,
+        pageParams: undefined,
+      };
+
     default:
       return state;
   }

@@ -2,15 +2,15 @@ import { Box, Container } from '@material-ui/core';
 import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
 import { IDeviceBinding } from '@lib/types';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { deviceBinding } from '@lib/mock';
 
 import SortableTable from '../../components/SortableTable';
 
-import { IHeadCells, IToolBarButton } from '../../types';
+import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
-import { useDispatch } from '../../store';
+import { useDispatch, useSelector } from '../../store';
 import actionsBinding from '../../store/deviceBinding';
 
 interface IProps {
@@ -23,6 +23,10 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
+  const { pageParams } = useSelector((state) => state.deviceBindings);
+
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
+
   const fetchDeviceBindings = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actionsBinding.fetchDeviceBindings(userId, filterText, fromRecord, toRecord));
@@ -30,8 +34,16 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     [dispatch, userId],
   );
 
+  useEffect(() => {
+    /* Загружаем данные при загрузке компонента */
+    // console.log('use', pageParams?.filterText);
+    fetchDeviceBindings(pageParams?.filterText as string);
+  }, [fetchDeviceBindings, pageParams?.filterText]);
+
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
+
+    setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
 
@@ -39,17 +51,22 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   };
 
   const handleSearchClick = () => {
-    const inputValue = valueRef?.current?.value;
+    dispatch(actionsBinding.deviceBindingActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
-    fetchDeviceBindings(inputValue);
+    fetchDeviceBindings(pageParamLocal?.filterText as string);
+
+    // const inputValue = valueRef?.current?.value;
+
+    // fetchDeviceBindings(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
-    const inputValue = valueRef?.current?.value;
+    handleSearchClick();
+    // const inputValue = valueRef?.current?.value;
 
-    fetchDeviceBindings(inputValue);
+    // fetchDeviceBindings(inputValue);
   };
 
   const deviceButtons: IToolBarButton[] = [
@@ -80,10 +97,11 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
         <ToolbarActionsWithSearch
           buttons={deviceButtons}
           searchTitle={'Найти устройство'}
-          valueRef={valueRef}
+          // valueRef={valueRef}
           updateInput={handleUpdateInput}
           searchOnClick={handleSearchClick}
           keyPress={handleKeyPress}
+          value={(pageParamLocal?.filterText as undefined) || ''}
         />
         <Box sx={{ pt: 2 }}>
           {/* <DeviceBindingListTable deviceBindings={userBindingDevices} limitRows={5} /> */}

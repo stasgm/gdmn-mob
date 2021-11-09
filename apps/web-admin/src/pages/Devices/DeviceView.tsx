@@ -26,7 +26,7 @@ import deviceActions from '../../store/device';
 import userActions from '../../store/user';
 import codeActions from '../../store/activationCode';
 import bindingActions from '../../store/deviceBinding';
-import { IToolBarButton, IHeadCells } from '../../types';
+import { IToolBarButton, IHeadCells, IPageParam } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 // eslint-disable-next-line import/namespace
 import DeviceDetailsView from '../../components/device/DeviceDetailsView';
@@ -53,6 +53,10 @@ const DeviceView = () => {
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
 
   const [open, setOpen] = useState(false);
+
+  const { pageParams } = useSelector((state) => state.users);
+
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const handleCancel = () => {
     navigate(-1);
@@ -103,23 +107,28 @@ const DeviceView = () => {
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
 
+    setPageParamLocal({ filterText: value });
+
     if (inputValue) return;
 
     fetchUsers('');
   };
 
   const handleSearchClick = () => {
-    const inputValue = valueRef?.current?.value;
+    // const inputValue = valueRef?.current?.value;
+    dispatch(userActions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    fetchUsers(pageParamLocal?.filterText as string);
 
-    fetchUsers(inputValue);
+    // fetchUsers(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
-    const inputValue = valueRef?.current?.value;
+    handleSearchClick();
+    // const inputValue = valueRef?.current?.value;
 
-    fetchUsers(inputValue);
+    // fetchUsers(inputValue);
   };
 
   const userButtons: IToolBarButton[] = [
@@ -250,10 +259,11 @@ const DeviceView = () => {
           <ToolbarActionsWithSearch
             buttons={userButtons}
             searchTitle={'Найти пользователя'}
-            valueRef={valueRef}
+            // valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
+            value={(pageParamLocal?.filterText as undefined) || ''}
           />
           <Box /*sx={{ pt: 2 }}*/>
             {/* <UserListTable users={users} /> */}

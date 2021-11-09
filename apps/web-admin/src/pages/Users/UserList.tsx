@@ -47,7 +47,6 @@ const UserList = () => {
     setPageParamLocal({ filterText: value });
     console.log('update filter', value);
 
-
     if (inputValue) return;
 
     fetchUsers('');
@@ -58,7 +57,6 @@ const UserList = () => {
     console.log('pageParamLocal', pageParamLocal?.filterText);
     fetchUsers(pageParamLocal?.filterText as string);
     console.log('pageParamLocal filter', pageParamLocal?.filterText);
-
   };
 
   const handleKeyPress = (key: string) => {
