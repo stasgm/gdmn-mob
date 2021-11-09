@@ -242,7 +242,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   <TextField
                     error={formik.touched.alias && Boolean(formik.errors.alias)}
                     fullWidth
-                    label="ERP системы"
+                    label="Пользователь ERP"
                     name="alias"
                     variant="outlined"
                     onBlur={formik.handleBlur}

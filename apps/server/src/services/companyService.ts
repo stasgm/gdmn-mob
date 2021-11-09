@@ -129,7 +129,8 @@ const deleteOne = async (id: string): Promise<string> => {
   delDevices(devicesByCompany);
 
   await users.delete((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin');
-
+  const company = await companies.find((adminCompany) => adminCompany.id === id);
+  await updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
   await companies.delete(id);
 
   return 'Компания удалена';

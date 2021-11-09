@@ -83,7 +83,7 @@ const UserDetailsView = ({ user }: IProps) => {
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  ERP системы
+                  Пользователь ERP
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
