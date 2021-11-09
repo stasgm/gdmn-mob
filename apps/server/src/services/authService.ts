@@ -172,13 +172,14 @@ const verifyCode = async (code: string) => {
   // обновляем uid у устройства
   const uid = uuidv1();
   const device = await devices.find(rec.deviceId);
-  const deviceBinding = await deviceBindings.find(rec.deviceId);
+  const deviceBinding = await deviceBindings.find((deviceBinding) => deviceBinding.deviceId === rec.deviceId);
 
   if (!device) {
     throw new DataNotFoundException('По данному коду устройство не найдено');
   }
 
   await devices.update({ ...device, uid: uid, state: 'ACTIVE' });
+  await deviceBindings.update({ ...deviceBinding, state: 'ACTIVE' });
 
   await codes.delete((i) => i.code === code);
 

@@ -28,9 +28,11 @@ const findAll = async (params?: Record<string, string>): Promise<IActivationCode
 };
 
 const genActivationCode = async (deviceId: string) => {
-  const { devices, codes } = getDb();
+  const { devices, codes, deviceBindings } = getDb();
 
   const device = await devices.find(deviceId);
+
+  const deviceBinding = await deviceBindings.find((deviceBinding) => deviceBinding.deviceId === deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -54,6 +56,7 @@ const genActivationCode = async (deviceId: string) => {
   const createdCode = await codes.find(newCode);
 
   await devices.update({ ...device, state: 'NON-ACTIVATED' });
+  await deviceBindings.update({ ...deviceBinding, state: 'NON-ACTIVATED' });
 
   const retCode = await makeCode(createdCode);
 
