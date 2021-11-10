@@ -15,6 +15,7 @@ import {
 import { ICoords } from './geo/types';
 import { AppTradeActionType } from './app-trade/actions';
 
+// eslint-disable-next-line import/no-cycle
 import { IModel, IGood } from './app-trade/types';
 
 export { IModel, IGood };

@@ -7,7 +7,15 @@ export type AppTradeState = {
 };
 
 export interface IModel {
-  [outletId: string]: IGood[];
+  [contactId: string]: IParentGroupModel;
+}
+
+export interface IParentGroupModel {
+  [parentGroupId: string]: IGroupModel;
+}
+
+export interface IGroupModel {
+  [groupId: string]: IGood[];
 }
 
 // Товары

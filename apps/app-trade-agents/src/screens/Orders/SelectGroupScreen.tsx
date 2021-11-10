@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useEffect, useMemo } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -12,6 +12,7 @@ import { IReference } from '@lib/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
 import { useSelector as useAppTradeSelector } from '../../store/';
+import { IGroupModel } from '../../store/app-trade/types';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -27,13 +28,22 @@ const Group = ({
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
-  const goods = refSelectors.selectByName<IGood>('good').data.filter((good) => good.goodgroup.id === item.id);
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
   const groups = refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>;
 
-  const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id);
+  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+
+  const { model } = useAppTradeSelector((state) => state.appTrade);
+
+  const groupsModel = model[contact?.id || ''][item.parent?.id || item.id] || {};
+
+  const goods = groupsModel[item.id];
+
+  const nextLevelGroups = groups.data.filter(
+    (group) => group.parent?.id === item.id && groupsModel[group.id]?.length > 0,
+  );
 
   const isExpand = expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
 
@@ -64,7 +74,7 @@ const Group = ({
           {nextLevelGroups.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
-              <Text style={styles.field}>{goods.length}</Text>
+              <Text style={styles.field}>{goods?.length}</Text>
             </View>
           )}
         </View>
@@ -93,27 +103,49 @@ const SelectGroupScreen = () => {
   // const { colors } = useTheme();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
-  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id;
+  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
 
   const formParams = useSelector((state) => state.app.formParams);
 
   const { model } = useAppTradeSelector((state) => state.appTrade);
 
-  const contactModel = contactId ? model[contactId] : undefined;
+  // console.log('model', model);
+
+  const contactModel = model[contact?.id || ''];
+
+  // console.log(
+  //   'contactModel',
+  //   contact?.name,
+  //   contactModel?.map((i) => i.goodgroup.),
+  // );
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const groupModel = useMemo(
-    () =>
-      contactModel?.reduce((prev: IGoodGroup[], cur: IGood) => {
-        const group = groups.data?.find((gr) => gr.id !== cur.goodgroup.id);
-        // const parent = groups.data?.find((gr) => gr.id !== cur.goodgroup.id);
-        return [...prev.filter((gr) => gr.id !== cur.goodgroup.id && gr.id !== group?.parent?.id), cur.goodgroup];
-      }, []) || [],
-    [contactModel, groups.data],
-  );
+  // const groupModel: IGoodGroup[] = [];
+  // const groupModel = useMemo(
+  //   () =>
+  //     contactModel?.reduce((prev: IGoodGroup[], cur: IGood) => {
+  //       let newPrev = prev;
+  //       console.log('useMemo groupModel');
+  //       const group = groups.data?.find((gr) => gr.id === cur.goodgroup.id);
+  //       if (group) {
+  //         newPrev = [...newPrev.filter((gr) => gr.id !== group.id), group];
+  //       }
+  //       const parent = groups.data?.find((gr) => gr.id === group?.parent?.id);
+  //       if (parent) {
+  //         newPrev = [...newPrev.filter((gr) => gr.id !== parent.id), parent];
+  //       }
+  //       return newPrev;
+  //     }, []) || [],
+  //   [contactModel, groups.data],
+  // );
 
-  const firstLevelGroups = groupModel.filter((item) => !item.parent);
+  const firstLevelGroups = groups.data?.filter(
+    (item) => !item.parent && Object.keys(contactModel[item.id] || []).length > 0,
+  );
+  // const firstLevelGroups = Object.entries(contactModel).map((i) => i[1]).;
+
+  console.log('firstLevelGroups', firstLevelGroups);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
@@ -121,51 +153,45 @@ const SelectGroupScreen = () => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
     });
+    console.log('useLayoutEffect');
 
     if (formParams?.groupId) {
-      const expandGroup = groupModel.find((group) => group.id === formParams.groupId);
+      const expandGroup = groups.data.find((group) => group.id === formParams.groupId);
       setExpend(expandGroup);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation, formParams?.groupId]);
 
-    // const getData = async () => {
-    //   try {
-    //     const value = await AsyncStorage.getItem(keyStore);
-    //     if (value !== null) {
-    //       const expandGroup = groupModel.find((group) => group.id === value);
-    //       setExpend(expandGroup);
-    //     }
-    //   } catch (e) {
-    //     // error reading value
-    //   }
-    // };
-
-    // getData();
-  }, [navigation, groupModel, formParams?.groupId]);
-
-  useEffect(() => {
-    // const storeData = async () => {
-    //   try {
-    //     expend ? await AsyncStorage.setItem(keyStore, expend.id) : await AsyncStorage.removeItem(keyStore);
-    //   } catch (e) {
-    //     // saving error
-    //   }
-    // };
-
-    // storeData();
+  const handleSetExpand = (group: IGoodGroup | undefined) => {
+    setExpend(group);
     dispatch(
       appActions.setFormParams({
         ...formParams,
-        ['groupId']: expend?.id,
+        ['groupId']: group?.id,
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, expend?.id]);
+  };
+
+  // useEffect(() => {
+  //   if (formParams?.groupId !== expend?.id) {
+  //     console.log('useEffect setFormParams');
+  //     dispatch(
+  //       appActions.setFormParams({
+  //         ...formParams,
+  //         ['groupId']: expend?.id,
+  //       }),
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dispatch, expend]);
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
+  // console.log('expend', expend);
+
   const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group item={item} expendGroup={expend?.id} setExpend={setExpend} />
+    <Group item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
   );
 
   return (
