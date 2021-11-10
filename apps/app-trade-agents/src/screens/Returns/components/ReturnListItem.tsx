@@ -17,12 +17,21 @@ export interface IReturnListItemProps {
   status?: StatusType;
   isFromRoute?: boolean;
   lineCount?: number;
+  errorMessage?: string;
 }
 export interface IReturnListRenderItemProps extends IReturnListItemProps {
   id: string;
 }
 
-const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }: IReturnListRenderItemProps) => {
+const ReturnListItem = ({
+  id,
+  title,
+  subtitle,
+  status,
+  lineCount,
+  isFromRoute,
+  errorMessage,
+}: IReturnListRenderItemProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
 
@@ -49,6 +58,11 @@ const ReturnListItem = ({ id, title, subtitle, status, lineCount, isFromRoute }:
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
               )}
             </View>
+          </View>
+          <View>
+            {errorMessage && (
+              <Text style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>
+            )}
           </View>
         </View>
       </View>
