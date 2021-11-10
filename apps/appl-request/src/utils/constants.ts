@@ -11,6 +11,7 @@ const getStatusColor = (status: StatusType) => {
       break;
 
     case 'PROCESSED':
+    case 'ARCHIVE':
       statusColor = statusColors[1];
       break;
 

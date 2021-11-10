@@ -54,7 +54,7 @@ const ProfileScreen = () => {
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.uid || ''}</Text>
         </View>
       </View>
-      {visibleList && (
+      {!!visibleList?.length && (
         <View>
           <Text style={[styles.title]}>Настройки пользователя</Text>
           <View style={[styles.descriptionContainer]}>

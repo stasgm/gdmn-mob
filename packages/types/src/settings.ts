@@ -1,6 +1,8 @@
 import { IEntity } from './common';
 
-interface ISettingsOption<T = string> extends IEntity {
+export type SettingValue = string | number | boolean;
+
+interface ISettingsOption<T = SettingValue> extends IEntity {
   description?: string;
   data: T;
   visible?: boolean;
@@ -8,7 +10,7 @@ interface ISettingsOption<T = string> extends IEntity {
   type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
 }
 
-type Settings<T = Record<string, string>> = {
+type Settings<T = Record<string, SettingValue>> = {
   [P in keyof T]?: ISettingsOption<T[P]>;
 };
 
@@ -16,6 +18,7 @@ interface IBaseSettings {
   serverAutoCheck: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
+  [name: string]: SettingValue;
 }
 
 // Example

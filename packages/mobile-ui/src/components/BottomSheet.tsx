@@ -8,7 +8,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import React, { useMemo, ReactNode } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, LogBox } from 'react-native';
 
 import { ItemSeparator } from './ItemSeparator';
 
@@ -20,6 +20,8 @@ interface IProps {
   onDismiss: () => void;
   onApply: () => void;
 }
+
+LogBox.ignoreAllLogs();
 
 const BottomSheet = ({ sheetRef, children, title, snapPoints = ['40%', '90%'], onDismiss, onApply }: IProps) => {
   return (

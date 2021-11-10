@@ -59,7 +59,7 @@ const SelectRefItemScreen = () => {
         return companyFound && extraPredicate(item, newParams);
       });
     }
-    return refObj?.data;
+    return refObj?.data?.sort((a, b) => (a.name < b.name ? -1 : 1));
   }, [clause, refObj?.data]);
 
   const title = refObj?.description || refObj?.name;

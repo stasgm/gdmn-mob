@@ -86,6 +86,19 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <ItemSeparator />
+          {item.quantityFromSellBill && (
+            <>
+              <View style={[styles.item, { backgroundColor: colors.background }]}>
+                <View style={styles.details}>
+                  <Text style={[styles.name, { color: colors.text }]}>Количество из накладной</Text>
+                  <Text style={[styles.number, styles.field, { color: colors.text }]}>
+                    {item.quantityFromSellBill.toString()}
+                  </Text>
+                </View>
+              </View>
+              <ItemSeparator />
+            </>
+          )}
           <View style={[styles.item, { backgroundColor: colors.background }]}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Количество</Text>
