@@ -137,15 +137,17 @@ const SellBillScreen = () => {
         number: i.NUMBER,
         documentdate: i.DOCUMENTDATE,
         contract: i.CONTRACT,
+        departName: i.DEPARTNAME,
+        sellBillId: i.ID,
         valueName: valueName,
         readonly: false,
         good: docGood,
       } as ISellBillListRenderItemProps;
     });
-  }, [sellBills, goods, returnDoc?.id]);
+  }, [goods, sellBills, docGood, returnDoc?.id]);
 
   const renderItem: ListRenderItem<ISellBillListRenderItemProps> = ({ item }) =>
-    (returnDoc?.id && docGood ? <SellBillItem item={item}/> : null);
+    returnDoc?.id && docGood ? <SellBillItem item={item} /> : null;
 
   const handleSearchSellBills = async () => {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
@@ -159,6 +161,7 @@ const SellBillScreen = () => {
 
       const fetched = await fetch(path, {});
       const parsed: IResponse<ISellBill[]> = await fetched.json();
+      console.log('pars', parsed);
 
       if (parsed.result) {
         setSellBills(parsed.data);

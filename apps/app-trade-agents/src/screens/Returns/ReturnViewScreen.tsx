@@ -8,7 +8,6 @@ import {
   AddButton,
   BackButton,
   MenuButton,
-  SendButton,
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
@@ -38,13 +37,6 @@ const ReturnViewScreen = () => {
 
   const isBlocked = returnDoc?.status !== 'DRAFT';
 
-  const handleAddReturnLine = useCallback(() => {
-    navigation.navigate('SelectItemReturn', {
-      docId: id,
-      name: 'good',
-    });
-  }, [id, navigation]);
-
   const handleDelete = useCallback(() => {
     if (!id) {
       return;
@@ -58,19 +50,15 @@ const ReturnViewScreen = () => {
     navigation.navigate('ReturnEdit', { id });
   }, [navigation, id]);
 
-  const handleSellBillHead = useCallback(() => {
+  const handleAddSellBill = useCallback(() => {
     navigation.navigate('SellBill', { id });
   }, [navigation, id]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить товар',
-        onPress: handleAddReturnLine,
-      },
-      {
         title: 'Добавить товар из накладной',
-        onPress: handleSellBillHead,
+        onPress: handleAddSellBill,
       },
       {
         title: 'Редактировать данные',
@@ -86,7 +74,7 @@ const ReturnViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddReturnLine, handleSellBillHead, handleEditReturnHead, handleDelete]);
+  }, [showActionSheet, handleAddSellBill, handleEditReturnHead, handleDelete]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -95,11 +83,11 @@ const ReturnViewScreen = () => {
         !isBlocked && (
           <View style={styles.buttons}>
             <MenuButton actionsMenu={actionsMenu} />
-            <AddButton onPress={handleAddReturnLine} />
+            <AddButton onPress={handleAddSellBill} />
           </View>
         ),
     });
-  }, [navigation, handleAddReturnLine, actionsMenu, isBlocked, handleSellBillHead]);
+  }, [navigation, actionsMenu, isBlocked, handleAddSellBill]);
 
   if (!returnDoc) {
     return (
