@@ -193,7 +193,9 @@ const Register = () => {
             {Boolean(formik.touched.policy && formik.errors.policy) && (
               <FormHelperText error>{formik.errors.policy}</FormHelperText>
             )} */}
-            {formik.values.password !== formik.values.verifyPassword && <>Пароли не совпадают</>}
+            {formik.values.password !== formik.values.verifyPassword && (
+              <Box style={{ color: 'red' }}>Пароли не совпадают</Box>
+            )}
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"

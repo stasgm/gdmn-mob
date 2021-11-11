@@ -23,7 +23,7 @@ const signup: Config = {
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не заполнено имя пользователя')),
       password: Joi.string().required().error(new InvalidParameterException('Не заполнен пароль')),
-      email: Joi.string(),
+      email: Joi.optional(),
     }),
   },
 };
