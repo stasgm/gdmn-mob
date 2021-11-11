@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { Response } from 'express';
 
 import { IResponse } from './type';
@@ -18,4 +20,8 @@ const ok = <T>(res: Response, dto?: T) => {
 
 const errorMessage = (status: number, name: string): string => status + ': ' + name;
 
-export { ok, errorMessage };
+const generateAuthToken = () => {
+  return crypto.randomBytes(30).toString('hex');
+};
+
+export { ok, errorMessage, generateAuthToken };

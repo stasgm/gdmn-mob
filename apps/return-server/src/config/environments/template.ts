@@ -52,4 +52,14 @@ export default {
    * Application version
    */
   VERSION: '0.0.1',
+
+  /**
+   * user name
+   */
+  USER_NAME: 'online_user_name',
+
+  /**
+   * user password
+   */
+  USER_PASSWORD: 'online_user_password',
 };
