@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button, IconButton } from '@material-ui/core';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik } from 'formik';
@@ -26,8 +26,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       name: user.name || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      // password: (user as NewUser).password || '',
-      password: user.password || '',
+      verifyPassword: '',
+      password: (user as NewUser).password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
       alias: user.alias || '',
@@ -36,20 +36,28 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       name: yup.string().required('Заполните это поле'),
       password:
         Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
+      verifyPassword:
+        Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
       onSubmit(values);
     },
   });
 
+  useEffect(() => {
+    if (Object.keys(user).length == 0) {
+      setOpen(true);
+    }
+  }, [user]);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
 
-  const handleClickClose = () => {
-    setOpen(false);
-    formik.values.password = '';
-  };
+  // const handleClickClose = () => {
+  //   setOpen(false);
+  //   formik.values.password = '';
+  // };
 
   return (
     <>
@@ -78,26 +86,20 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
-                {Object.keys(user).length == 0 && (
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      error={
-                        (formik.touched as FormikTouched<NewUser>).password &&
-                        Boolean((formik.errors as NewUser).password)
-                      }
-                      fullWidth
-                      required
-                      label="Пароль"
-                      name="password"
-                      variant="outlined"
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      type="password"
-                      disabled={loading}
-                      value={(formik.values as NewUser).password}
-                    />
-                  </Grid>
-                )}
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.alias && Boolean(formik.errors.alias)}
+                    fullWidth
+                    label="Alias"
+                    name="alias"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="alias"
+                    disabled={loading}
+                    value={formik.values.alias}
+                  />
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -154,35 +156,45 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.email}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
+                <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
                   <TextField
-                    error={formik.touched.alias && Boolean(formik.errors.alias)}
+                    error={
+                      (formik.touched as FormikTouched<NewUser>).password &&
+                      Boolean((formik.errors as NewUser).password)
+                    }
                     fullWidth
-                    label="Alias"
-                    name="alias"
+                    required={'true' && Boolean(open)}
+                    label="Пароль"
+                    name="password"
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="alias"
+                    type="password"
                     disabled={loading}
-                    value={formik.values.alias}
+                    value={(formik.values as NewUser).password}
                   />
                 </Grid>
-                {Object.keys(user).length != 0 && (
+                <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
+                  <TextField
+                    error={
+                      (formik.touched as FormikTouched<NewUser>).verifyPassword &&
+                      Boolean((formik.errors as NewUser).verifyPassword)
+                    }
+                    fullWidth
+                    required={'true' && Boolean(open)}
+                    label="Повторите пароль"
+                    name="verifyPassword"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="password"
+                    disabled={loading}
+                    value={(formik.values as NewUser).verifyPassword}
+                  />
+                </Grid>
+                {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword && (
                   <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
-                    <TextField
-                      error={formik.touched.password && Boolean(formik.errors.password)}
-                      fullWidth
-                      required={'true' && Boolean(open)}
-                      label="Пароль"
-                      name="password"
-                      variant="outlined"
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      type="password"
-                      disabled={loading}
-                      value={formik.values.password}
-                    />
+                    Пароли не совпадают
                   </Grid>
                 )}
               </Grid>
@@ -190,7 +202,15 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
             <Divider />
             <>
               <Grid container>
-                <Button color="primary" disabled={loading} type="submit" variant="contained" sx={{ m: 1 }}>
+                <Button
+                  color="primary"
+                  disabled={
+                    loading || (formik.values as NewUser).verifyPassword !== (formik.values as NewUser).password
+                  }
+                  type="submit"
+                  variant="contained"
+                  sx={{ m: 1 }}
+                >
                   Сохранить
                 </Button>
                 <Button color="secondary" variant="contained" sx={{ m: 1 }} onClick={onCancel} disabled={loading}>
