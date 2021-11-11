@@ -101,7 +101,7 @@ const UserList = () => {
     { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
     { id: 'creationDate', label: 'Дата создания', sortEnable: false },
     { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
-    { id: 'alias', label: 'Alias', sortEnable: true },
+    { id: 'alias', label: 'Пользователь ERP', sortEnable: true },
   ];
 
   return (

@@ -10,11 +10,11 @@ import { created, ok } from '../utils/apiHelpers';
  * Регистрация нового пользователя (Администратора компании)
  * */
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, password } = ctx.request.body as IUserCredentials;
-  console.log('signUp', name);
+  const { name, password, email } = ctx.request.body as IUserCredentials;
   await authService.signUp({
     password,
     name,
+    email,
   });
 
   created(ctx as Context);

@@ -23,7 +23,8 @@ class Auth extends BaseRequest {
 
     const body = {
       name: userCredentials.name,
-      password: userCredentials.name,
+      password: userCredentials.password,
+      email: userCredentials.email,
       // companies: companyId ? [companyId] : undefined,
       // creatorId: creatorId ?? name,
     };
