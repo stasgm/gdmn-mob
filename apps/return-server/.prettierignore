@@ -1,0 +1,9 @@
+*.json
+*.md
+dist
+build
+/coverage
+.github
+**/.vscode
+**/.vs
+packages/eslint-plugin/src/configs/*.json
