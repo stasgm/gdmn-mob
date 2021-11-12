@@ -37,7 +37,6 @@ class Api extends BaseApi {
     this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
-
     this.setAxios(config);
   }
 
@@ -55,7 +54,6 @@ class Api extends BaseApi {
 
   setAxios(config: IApiConfig) {
     this._config = config;
-    console.log('api version', this._config.version, config.version);
     this._axios = axios.create({
       // eslint-disable-next-line max-len
       baseURL: `${this._config.protocol}${this._config.server}:${this._config.port}/${this._config.apiPath}/${this._config.version}`,
