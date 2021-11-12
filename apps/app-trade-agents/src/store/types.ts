@@ -176,6 +176,10 @@ export const visitDocumentType: IDocumentType = {
   description: 'Визит',
 };
 
+export interface IToken {
+  access_token: string;
+}
+
 // export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
 //   ReturnType,
 //   S,

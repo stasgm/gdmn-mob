@@ -20,7 +20,7 @@ import {
 import { IResponse, ISettingsOption } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IGood, IReturnDocument, ISellBill } from '../../store/types';
+import { IGood, IReturnDocument, ISellBill, IToken } from '../../store/types';
 import { ISellBillFormParam } from '../../store/app/types';
 import { getDateString } from '../../utils/helpers';
 
@@ -156,10 +156,41 @@ const SellBillScreen = () => {
 
     try {
       setLoading(true);
+      /* const pathLogin = `${serverName}:${serverPort}/v1/login`;
+      const userData = {
+        username: 'online_user',
+        password: 'online_user_password',
+      };
+      try {
+        const tokenFetched = await fetch(pathLogin, {
+          method: 'POST',
+          body: JSON.stringify(userData),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const parsedToken: IResponse<IToken> = await tokenFetched.json();
+
+        if (parsedToken.result) {
+          const token = parsedToken.data;
+          //console.log('token', token?.access_token);
+        }
+      } catch (e) {
+        if (e instanceof TypeError) {
+          setMessage(e.message);
+        } else {
+          setMessage('Неизвестная ошибка');
+        }
+        setBarVisible(true);
+      }*/
 
       const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
 
-      const fetched = await fetch(path, {});
+      const fetched = await fetch(path, {
+        headers: {
+          authorization: '07a569f943d00a273bf5bad419a616dfef0e4efbd81b3115bc49d924e735',
+        },
+      });
       const parsed: IResponse<ISellBill[]> = await fetched.json();
       console.log('pars', parsed);
 
@@ -167,6 +198,7 @@ const SellBillScreen = () => {
         setSellBills(parsed.data);
       } else {
         setMessage(parsed.error || 'Неизвестная ошибка');
+        setBarVisible(true);
       }
     } catch (e) {
       if (e instanceof TypeError) {
