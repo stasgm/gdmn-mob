@@ -1,7 +1,7 @@
 import express from 'express';
 
 import environment from './config/environment';
-import router from './router/sellRouter';
+import router from './routers';
 import errorMiddleware from './middlewares/errorMiddleware';
 import authMiddleware from './middlewares/authMiddleware';
 

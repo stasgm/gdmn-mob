@@ -7,6 +7,6 @@ export const requireAuth = async (req: any, res: Response, next: NextFunction) =
   if (req.user) {
     next();
   } else {
-    next(ApiErrorRet.UnauthorizedError());
+    next(ApiErrorRet.UnauthorizedError('Не пройдена аутенцификация', 'Не пройдена аутенцификация'));
   }
 };

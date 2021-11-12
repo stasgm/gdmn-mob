@@ -11,8 +11,8 @@ export default class ApiErrorRet extends Error {
     return `${this.name} (${this.status}): ${this.message}\n${this.stack || ''}`;
   }
 
-  static UnauthorizedError(): ApiErrorRet {
-    return new ApiErrorRet(401, 'Пользователь не авторизован', 'UnauthorizedError');
+  static UnauthorizedError(message: string, name = 'UnauthorizedError'): ApiErrorRet {
+    return new ApiErrorRet(401, name, message);
   }
 
   static BadRequest(message: string, name = 'BadRequest'): ApiErrorRet {

@@ -57,10 +57,10 @@ export default {
   /**
    * user name
    */
-  USER_NAME: 'online_user_name',
+  USER_NAME: 'online_user',
 
   /**
-   * user password
+   * user password (online_user_password)
    */
-  USER_PASSWORD: 'online_user_password',
+  USER_PASSWORD: '$2b$10$raahaTqWzCIsovOXeK6JgOD6tPrvdoWimfltL.So0w0Uu6nW.29Ii',
 };

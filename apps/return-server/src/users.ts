@@ -3,6 +3,8 @@ import Datastore from 'nedb';
 import { IUser } from './type';
 
 import environment from './config/environment';
+
+//const db = new Datastore({ filename: 'datastore', autoload: true });
 const db = new Datastore();
 db.loadDatabase();
 
@@ -13,4 +15,4 @@ const user: IUser = {
 
 const users = [user];
 
-export { db, users };
+export { users, db };

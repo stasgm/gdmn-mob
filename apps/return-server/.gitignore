@@ -40,5 +40,7 @@ yarn-error.log*
 # databases
 /databases
 
+datastore
+
 admin/**/bundle*.*
 admin/**/react

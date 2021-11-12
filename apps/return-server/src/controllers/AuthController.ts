@@ -1,34 +1,46 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import bcrypt from 'bcrypt';
 
-import { db, users } from '../neDBInit';
+import { db, users } from '../users';
 import { insert, remove } from '../service/neDB';
-import { generateAuthToken } from '../util';
+import { generateAuthToken, ok } from '../util';
+import ApiErrorRet from '../exceptions/apiError';
+
+db.loadDatabase();
 
 const checkRequireAuth = async (req: Request, res: Response) => {
-  res.send({ success: true });
+  return ok(res);
 };
 
-const loginController = async (req: Request, res: Response) => {
+const loginController = async (req: Request, res: Response, next: NextFunction) => {
   const { username, password } = req.body;
   const user = users.find((u) => {
     return username === u.name;
   });
   if (!user) {
-    res.status(404).send({ success: false, error: { code: 404, message: 'Неверное имя пользователя' } });
+    next(ApiErrorRet.DataNotFound('Неверное имя пользователя', 'Неверное имя пользователя'));
     return;
   }
-  const hashedPassword = user.password;
+
+  //const salt = bcrypt.genSaltSync(10);
+  // шифруем пароль
+  //const passwordToSave = bcrypt.hashSync(user.password, salt);
+  // выводим результат
+  //console.log('passwordToSave=', passwordToSave);
+
   //Сравним пришедший пароль с тем, который хранится у нас
+
+  const hashedPassword = user.password;
+
   if (await bcrypt.compare(password, hashedPassword)) {
     //Сгенерируем новый токен
     const authToken = generateAuthToken();
     //Сохраним новый токен в bd для вошедшего пользователя
     await insert(db, { authToken, user });
-    res.status(200).send({ success: true, data: { access_token: authToken } });
+    return ok(res, { access_token: authToken });
   } else {
-    res.status(401).send({ success: false, error: { code: 401, message: 'Неверный пароль' } });
+    next(ApiErrorRet.UnauthorizedError('Неверный пароль', 'Неверный пароль'));
   }
 };
 
@@ -38,7 +50,7 @@ const logoutController = async (req: Request, res: Response) => {
   await remove(db, { authToken });
   // //Удаляем токен из Header
   // delete req.headers['Authorization'];
-  res.status(200).send({ success: true });
+  return ok(res);
 };
 
 export { loginController, checkRequireAuth, logoutController };

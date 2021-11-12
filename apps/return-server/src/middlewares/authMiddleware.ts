@@ -1,7 +1,8 @@
 import { Response, NextFunction } from 'express';
 
-import { findOne } from '../neDB/crud';
-import { db } from '../neDB/init';
+import { findOne } from '../service/neDB';
+import { db } from '../users';
+db.loadDatabase();
 
 export default async (req: any, res: Response, next: NextFunction) => {
   // Получение значения из header
