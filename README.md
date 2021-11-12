@@ -54,3 +54,7 @@
    ```bash
    yarn expo:app
    ```
+
+## Инструкции к приложениям:
+
+1. [Инструкция по web-admin](https://github.com/stasgm/gdmn-mob/blob/dev/apps/web-admin/docs/README.md)

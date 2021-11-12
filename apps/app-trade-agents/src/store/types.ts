@@ -142,8 +142,6 @@ export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine>, 'he
 interface IReturnHead extends IHead {
   contact: INamedEntity;
   outlet: INamedEntity;
-  depart?: INamedEntity;
-  reason: string;
   route?: INamedEntity; // 	Маршрут
 }
 
@@ -152,6 +150,7 @@ export interface IReturnLine extends IEntity {
   quantity: number;
   quantityFromSellBill?: number;
   priceFromSellBill?: number;
+  sellBillId: string;
 }
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
@@ -160,6 +159,9 @@ export interface ISellBill extends IEntity {
   ID: string;
   NUMBER: string;
   CONTRACT?: string;
+  CONTRACTKEY?: string;
+  DEPARTNAME?: string;
+  DEPARTKEY?: string;
   DOCUMENTDATE: string;
   QUANTITY: number;
   PRICE: number;
@@ -171,10 +173,10 @@ export interface ISellBillItem extends ISellBill {
 
 export interface ISellBillHead extends IHead {
   outlet?: INamedEntity;
-  contact: INamedEntity; //организация-плательщик
-  route?: INamedEntity; // 	Маршрут
-  depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
-  dateBegin?: string; //  Дата отгрузки
+  contact?: INamedEntity;
+  route?: INamedEntity;
+  depart?: INamedEntity;
+  dateBegin?: string;
   dateEnd?: string;
 }
 

@@ -52,6 +52,7 @@ const ReturnListScreen = () => {
           subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
         } as IReturnListRenderItemProps),
     );
   }, [status, list]);
