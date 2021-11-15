@@ -118,18 +118,20 @@ const Root = () => {
     setLoading(true);
     const setModel = async () => {
       if (goods.length > 0 && contacts.length > 0) {
-        const refGoods = groups.reduce((prev: IParentGroupModel, cur: IGoodGroup) => {
-          if (!cur.parent) {
-            return prev;
-          }
+        const refGoods = groups
+          .filter((gr) => gr.parent !== undefined)
+          ?.reduce((prev: IParentGroupModel, cur: IGoodGroup) => {
+            if (!cur.parent) {
+              return prev;
+            }
 
-          const goodList = goods.filter((g) => g.goodgroup.id === cur.id);
-          const groupsModel = prev[cur.parent.id];
+            const goodList = goods.filter((g) => g.goodgroup.id === cur.id);
+            const groupsModel = prev[cur.parent.id];
 
-          const newGroupsModel: IGroupModel = { ...groupsModel, [cur.id]: goodList };
+            const newGroupsModel: IGroupModel = { ...groupsModel, [cur.id]: goodList };
 
-          return { ...prev, [cur.parent.id]: newGroupsModel };
-        }, {});
+            return { ...prev, [cur.parent.id]: newGroupsModel };
+          }, {});
 
         const model: IModel = contacts.reduce((oPrev: IModel, oCur: IContact) => {
           const netContact = netPrice.filter((n) => n.contact.id === oCur.id);
