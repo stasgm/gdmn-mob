@@ -9,6 +9,7 @@ const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const disconnect = createAction('AUTH/DISCONNECT')();
 const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
+const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -53,6 +54,7 @@ export const actions = {
   disconnect,
   logout,
   setCompany,
+  setUserToken,
   getDeviceByUidAsync,
   loginUserAsync,
   signUpAsync,
