@@ -4,9 +4,7 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { IReference, Settings } from '@lib/types';
-import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
-
-import { View, StyleSheet } from 'react-native';
+import { refSelectors, settingsActions, useDispatch, useSelector, referenceActions } from '@lib/store';
 
 import { Caption } from 'react-native-paper';
 
@@ -111,13 +109,17 @@ const Root = () => {
   const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
   const netPrice = (refSelectors.selectByName('netPrice') as IReference<INetPrice>)?.data;
 
+  // const { list } = useSelector((state) => state.references);
+
+  useEffect(() => dispatch(referenceActions.init()), []);
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     console.log('useEffect');
     setLoading(true);
     const setModel = async () => {
-      if (goods.length > 0 && contacts.length > 0) {
+      if (!!goods?.length && !!contacts?.length) {
         const refGoods = groups
           .filter((gr) => gr.parent !== undefined)
           ?.reduce((prev: IParentGroupModel, cur: IGoodGroup) => {
