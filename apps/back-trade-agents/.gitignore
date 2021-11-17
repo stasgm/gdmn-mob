@@ -6,8 +6,8 @@
 .pnp.js
 
 #config
-src/config/environments/dev.ts
-src/config/environments/prod.ts
+/src/config/environments/dev.ts
+/src/config/environments/prod.ts
 
 # testing
 /coverage
