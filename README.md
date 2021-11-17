@@ -12,7 +12,7 @@
    1. сделать две копии файла конфигурации (`apps/server/config/dev.sample`) в эту же папку
    2. переименовать одну копию в `prod.ts`, а вторую -- в `dev.ts`
    3. в созданных файлах конфигурации (`prod.ts`, `dev.ts`) указать cвои данные
-   4. сделать копию файла конфигурации (`/apps/server/config/databases/templates.config.json.sample`) в эту же папку
+   4. сделать копию файла конфигурации (`apps/server/config/databases/templates.config.json.sample`) в эту же папку
    5. переименовать копию в `templates.config.json`
    6. при использовании одной базы данных в созданном файле конфигурации оставить только `[]`
 8. Настроить конфигурацию модуля `app-trade-agents`:
