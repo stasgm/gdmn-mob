@@ -54,6 +54,7 @@ const logOut = async (ctx: Context): Promise<void> => {
   await authService.logout(user.id);
 
   ctx.logout();
+  ctx.session = null;
 
   ok(ctx as Context);
 

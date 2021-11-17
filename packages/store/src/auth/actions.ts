@@ -8,7 +8,7 @@ const clearError = createAction('AUTH/CLEAR_ERROR')();
 const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const disconnect = createAction('AUTH/DISCONNECT')();
-const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
+// const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -34,6 +34,12 @@ const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUT
   string
 >();
 
+const logoutUserAsync = createAsyncAction('AUTH/LOGOUT', 'AUTH/LOGOUT_SUCCESS', 'AUTH/LOGOUT_FAILURE')<
+  undefined,
+  undefined,
+  string
+>();
+
 const getDeviceStatusAsync = createAsyncAction(
   'AUTH/GET_DEVICE_STATUS',
   'AUTH/GET_DEVICE_STATUS_SUCCESS',
@@ -51,7 +57,7 @@ export const actions = {
   clearError,
   setSettings,
   disconnect,
-  logout,
+  logoutUserAsync,
   setCompany,
   getDeviceByUidAsync,
   loginUserAsync,

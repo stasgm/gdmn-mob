@@ -16,7 +16,6 @@ import routes from './routes';
 
 const Router = () => {
   const isLogged = authSelectors.isLogged();
-  // const isLogged = true;
 
   return useRoutes(routes(isLogged));
 };
