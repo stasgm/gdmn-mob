@@ -6,10 +6,8 @@
 .pnp.js
 
 #config
-/config/dev.ts
-/config/prod.ts
-/config/test.ts
-/config/databases/templates.config.json
+src/config/environments/dev.ts
+src/config/environments/prod.ts
 
 # testing
 /coverage
