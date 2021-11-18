@@ -19,7 +19,7 @@ const AuthNavigator: React.FC = () => {
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
-    api.config = { ...settings };
+    api.config = { ...api.config, ...settings };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -36,7 +36,7 @@ const AuthNavigator: React.FC = () => {
       }
       dispatch(authActions.setSettings(newSettings));
       api.config = { ...newSettings };
-      },
+    },
     [disconnect, dispatch],
   );
 

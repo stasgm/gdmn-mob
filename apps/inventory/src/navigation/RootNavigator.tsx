@@ -2,21 +2,15 @@ import React from 'react';
 
 import { INavItem, DrawerNavigator } from '@lib/mobile-navigation';
 
-import DashboardNavigator from './Root/DashboardNavigator';
-import MapNavigator from './Root/MapNavigator';
+import DocumentsNavigator from './Root/DocumentsNavigator';
+
 
 const navItems: INavItem[] = [
   {
-    name: 'Dashboard',
-    title: 'Дашборд',
-    icon: 'view-dashboard-outline',
-    component: DashboardNavigator,
-  },
-  {
-    name: 'Map',
-    title: 'Карта',
-    icon: 'map-outline',
-    component: MapNavigator,
+    name: 'Documents',
+    title: 'Документы',
+    icon: 'file-document-outline',
+    component: DocumentsNavigator,
   },
 ];
 

@@ -11,7 +11,7 @@ import TaskListScreen from '../../screens/TaskListScreen';
 
 export type TabsStackParams = {
   Main: undefined;
-  Tasks: undefined;
+  Documents: undefined;
 };
 
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
@@ -20,15 +20,15 @@ const TabsNavigator = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
 
-  const handleAddTask = () => {
+  const handleAddDocument = () => {
     console.log('new Task');
   };
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить задачу',
-        onPress: handleAddTask,
+        title: 'Добавить документ',
+        onPress: handleAddDocument,
       },
       {
         title: 'Отмена',
@@ -50,18 +50,18 @@ const TabsNavigator = () => {
         name="Main"
         component={Home}
         options={{
-          title: 'Дела',
-          tabBarLabel: 'Дела',
+          title: 'Меню',
+          tabBarLabel: 'Меню',
           tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="copy" color={color} />,
         }}
       />
       <TabsStack.Screen
-        name="Tasks"
+        name="Documents"
         component={TaskListScreen}
         options={{
-          title: 'Задачи',
-          tabBarLabel: 'Задачи',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="tasks" color={color} />,
+          title: 'Документы',
+          tabBarLabel: 'Документы',
+          tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="documents" color={color} />,
         }}
       />
     </TabsStack.Navigator>

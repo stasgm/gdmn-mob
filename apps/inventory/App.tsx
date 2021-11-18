@@ -1,31 +1,92 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { NavigationContainer } from '@react-navigation/native';
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { MobileApp } from '@lib/mobile-app';
+import { INavItem } from '@lib/mobile-navigation';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Settings } from '@lib/types';
+import { settingsActions, useDispatch, useSelector } from '@lib/store';
 
-import { authSelectors } from '@lib/store';
+//import { NavigationContainer } from '@react-navigation/native';
+//import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+
+import { persistor, store } from './src/store';
+import DocumentsNavigator from './src/navigation/DocumentsNavigator';
+
+/* import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
+ */
+//////////////////////////////////////
 
-import { store } from './src/store';
+const Root = () => {
+  const navItems: INavItem[] = [
+    {
+      name: 'Documents',
+      title: 'Документы',
+      icon: 'file-document-outline',
+      component: DocumentsNavigator,
+          },
+  ];
 
-const App = () => {
-  const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
-  // const Router = () => <RootNavigator />;
+  const appSettings: Settings = {
+    serverName: {
+      id: '4',
+      sortOrder: 4,
+      description: 'Бэк-офис. Адрес сервера',
+      data: 'http://192.168.0.70',
+      type: 'string',
+      visible: true,
+    },
+    serverPort: {
+      id: '5',
+      description: 'Бэк-офис. Порт сервера',
+      data: '8000',
+      type: 'string',
+      sortOrder: 5,
+      visible: true,
+    },
+    returnDocTime: {
+      id: '6',
+      description: 'Время поиска накладных возврата, дн',
+      data: 30,
+      type: 'number',
+      sortOrder: 7,
+      visible: true,
+    },
+  };
+
+  /* const storeSettings = useSelector((state) => state.settings);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (appSettings) {
+      Object.entries(appSettings).forEach(([optionName, value]) => {
+        const storeSet = storeSettings.data[optionName];
+        if (!storeSet && value) {
+          dispatch(settingsActions.addSetting({ optionName, value }));
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeSettings]); */
 
   return (
-    <Provider store={store}>
-      <UIProvider theme={defaultTheme}>
-        <ActionSheetProvider>
-          <NavigationContainer>
-            <Router />
-          </NavigationContainer>
-        </ActionSheetProvider>
-      </UIProvider>
-    </Provider>
+    // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне
+    <MobileApp items={navItems} />
   );
 };
 
+
+const App = () => (
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <Root />
+    </PersistGate>
+  </Provider>
+);
+
 export default App;
+
+
