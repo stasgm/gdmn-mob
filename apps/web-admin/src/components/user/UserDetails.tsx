@@ -192,11 +192,12 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={(formik.values as NewUser).verifyPassword}
                   />
                 </Grid>
-                {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword && (
-                  <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
-                    Пароли не совпадают
-                  </Grid>
-                )}
+                {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword &&
+                  (formik.values as NewUser).verifyPassword && (
+                    <Grid item md={6} xs={12} display={open ? 'block' : 'none'} style={{ color: 'red' }}>
+                      Пароли не совпадают
+                    </Grid>
+                  )}
               </Grid>
             </CardContent>
             <Divider />
