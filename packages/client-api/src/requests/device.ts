@@ -44,7 +44,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка добавления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка добавления устройства',
+        //err?.response?.data?.error || 'ошибка добавления устройства',
       } as error.INetworkError;
     }
   };
@@ -76,7 +77,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка обновления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка обновления устройства',
+        //err?.response?.data?.error || 'ошибка обновления устройства',
       } as error.INetworkError;
     }
   };
@@ -106,7 +108,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления устройства',
+        //err?.response?.data?.error || 'ошибка удаления устройства',
       } as error.INetworkError;
     }
   };
@@ -151,7 +154,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
+        message: err instanceof TypeError ? err.message : 'ошибка подключения',
+        //err?.response?.data?.error || 'ошибка подключения',
       } as error.INetworkError;
     }
   };
@@ -198,7 +202,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
+        //err?.response?.data?.error || 'ошибка получения данных об устройствах',
       } as error.INetworkError;
     }
   };
@@ -221,7 +226,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения пользователей по устройству',
+        message: err instanceof TypeError ? err.message : 'ошибка получения пользователей по устройству',
+        //err?.response?.data?.error || 'ошибка получения пользователей по устройству',
       } as error.INetworkError;
     }
   };

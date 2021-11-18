@@ -6,6 +6,10 @@
   "description": "web-admin",
   "license": "MIT",
   "scripts": {
+    "start": "cross-env MOCK=false yarn run start-dev",
+    "start:mock": "cross-env MOCK=true yarn start-dev",
+    "start-dev": "webpack serve --config=configs/webpack/dev.js",
+    "start-prod": "yarn run build",
     "build": "set \"INLINE_RUNTIME_CHUNK=false\" && yarn run clean-dist && webpack --config=configs/webpack/prod.js && yarn run copy-dist-admin",
     "clean-dist": "rimraf dist/*",
     "copy-dist-admin": "xcopy dist\\*.* ..\\server\\admin /s /y",
@@ -13,10 +17,6 @@
     "prettier:fix": "prettier --write \"**/*.ts*\"",
     "lint": "eslint \"**/*.ts*\"",
     "lint:fix": "eslint --fix \"**/*.ts*\"",
-    "start": "cross-env MOCK=false yarn run start-dev",
-    "start:mock": "cross-env MOCK=true yarn start-dev",
-    "start-dev": "webpack serve --config=configs/webpack/dev.js",
-    "start-prod": "yarn run build",
     "precommit": "lint-staged",
     "test": "jest --coverage --watchAll --config=configs/jest.json"
   },
