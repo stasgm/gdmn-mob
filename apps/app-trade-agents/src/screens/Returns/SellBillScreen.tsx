@@ -156,7 +156,7 @@ function SellBillScreen() {
 
   const setUserToken = useCallback((token: string) => dispatch(authActions.setUserToken(token)), [dispatch]);
 
-  const handleLogin = async () => {
+  const fetchLogin = async () => {
     const pathLogin = `${serverName}:${serverPort}/v1/login`;
     const userData = {
       username: onlineUser,
@@ -193,14 +193,13 @@ function SellBillScreen() {
     }
   };
 
-  const handleSearchSellBills = async () => {
+  const fetchSellBill = async (isFirst = true, parToken: string | undefined = userToken) => {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
-
     try {
       setLoading(true);
-      const newToken = userToken ?? (await handleLogin()) ?? '';
+      const newToken = parToken ?? (await fetchLogin()) ?? '';
 
       const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
 
@@ -216,7 +215,14 @@ function SellBillScreen() {
         setSellBills(parsed.data);
       } else {
         setMessage(parsed.error || 'Неизвестная ошибка');
-        setBarVisible(true);
+        if (parsed.error?.slice(0, 3) === '401') {
+          const token = await fetchLogin();
+          if (isFirst && token) {
+            await fetchSellBill(false, token);
+          }
+        } else {
+          setBarVisible(true);
+        }
       }
     } catch (e) {
       if (e instanceof TypeError) {
@@ -227,6 +233,10 @@ function SellBillScreen() {
       setBarVisible(true);
     }
     setLoading(false);
+  };
+
+  const handleSearchSellBills = async () => {
+    await fetchSellBill();
   };
 
   const handleSearchStop = () => {
