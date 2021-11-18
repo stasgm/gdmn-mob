@@ -1,16 +1,13 @@
 import { useState } from 'react';
-// import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { AppBar, Badge, Box, IconButton, Toolbar } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import LogoutIcon from '@material-ui/icons/ExitToAppOutlined';
 
-import { authActions, useDispatch, useAuthThunkDispatch } from '@lib/store';
+import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
-
-// import { AppDispatch, useDispatch } from '../store';
 
 import Logo from './Logo';
 
@@ -20,8 +17,6 @@ interface IProps {
 
 const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
   const [notifications] = useState([]);
-
-  // const dispatch = useDispatch();
 
   const authDispatch = useAuthThunkDispatch();
 
@@ -33,11 +28,9 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
         </RouterLink>
         <Box sx={{ flexGrow: 1 }} />
         <Box
-          // component="button"
           sx={{
             background: 'transparent',
             border: 'none',
-            //display: { xs: 'none', md: 'block', lg: 'block' },
             color: 'white',
           }}
         >
@@ -46,20 +39,11 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton
-            color="inherit"
-            onClick={async () => {
-              const res = await authDispatch(authActions.logOut());
-              // if (res.type === 'AUTH/LOGOUT_SUCCESS') {
-
-              // }
-            }}
-          >
+          <IconButton color="inherit" onClick={() => authDispatch(authActions.logOut())}>
             <LogoutIcon />
           </IconButton>
         </Box>
         <Box
-          // component="button"
           sx={{
             background: 'transparent',
             border: 'none',
