@@ -171,7 +171,7 @@ class Device extends BaseRequest {
 
       return {
         type: 'GET_DEVICES',
-        devices: mockDevices,
+        devices: [mockDevice],
       };
     }
 

@@ -19,7 +19,7 @@ const AuthNavigator: React.FC = () => {
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
-    api.config = { ...settings };
+    api.config = { ...api.config, ...settings };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -36,7 +36,7 @@ const AuthNavigator: React.FC = () => {
       }
       dispatch(authActions.setSettings(newSettings));
       api.config = { ...newSettings };
-      },
+    },
     [disconnect, dispatch],
   );
 
@@ -52,6 +52,10 @@ const AuthNavigator: React.FC = () => {
 
   const activateDevice = useCallback(
     async (code: string) => {
+      if (code === '1111') {
+        dispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: true } }));
+        api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
+      } // если код активации равен 1111, то переходим в mock режим
       const res = await dispatch(authActions.activateDevice(code));
       if (res.type === 'AUTH/ACTIVATE_DEVICE_SUCCESS') {
         //Если устройство прошло активацию по коду,

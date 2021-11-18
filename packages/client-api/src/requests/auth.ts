@@ -182,10 +182,8 @@ class Auth extends BaseRequest {
   // };
 
   verifyCode = async (code: string) => {
-    console.log('verifyCode api');
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
-
       if (code === '1111') {
         console.log('verifyCode code', code, mockDevice);
         return {
@@ -230,6 +228,15 @@ class Auth extends BaseRequest {
   };
 
   getDeviceStatus = async (uid: string) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'GET_DEVICE_STATUS',
+        status: 'ACTIVE',
+      } as types.IDeviceStatusResponse;  // активация устройства в mock
+    }
+
     try {
       const res = await this.api.axios.get<IResponse<DeviceState>>(`/auth/deviceStatus/${uid}`);
       const resData = res.data;
