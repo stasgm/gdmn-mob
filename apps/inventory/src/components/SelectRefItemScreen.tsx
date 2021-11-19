@@ -34,12 +34,24 @@ const SelectRefItemScreen = () => {
 
         let companyFound = true;
 
+        // clause = { type: 'shop', name: 'Раница', company: { id: 1} }
+        // if ('companyId' in newParams && refName === 'outlet') {
+        /*         const params: Record<string, string> = {};
+                Object.keys(clause).forEach((i) => {
+                  if (i in item) {
+                    if (typeof clause[i] !== 'object') {
+                      params[i] = clause[i];
+                    }
+                  }
+                });
+                 */
         Object.keys(clause).forEach((i) => {
           if (i in item) {
             if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
             }
           }
         });
+        // params = { name: 'Раница' }
         companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
         delete newParams.companyId;
         // }

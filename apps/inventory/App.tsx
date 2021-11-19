@@ -4,7 +4,6 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Settings } from '@lib/types';
-import { settingsActions, useDispatch, useSelector } from '@lib/store';
 
 //import { NavigationContainer } from '@react-navigation/native';
 //import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -18,7 +17,6 @@ import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import RootNavigator from './src/navigation/RootNavigator';
  */
-//////////////////////////////////////
 
 const Root = () => {
   const navItems: INavItem[] = [
@@ -56,21 +54,6 @@ const Root = () => {
       visible: true,
     },
   };
-
-  /* const storeSettings = useSelector((state) => state.settings);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings.data[optionName];
-        if (!storeSet && value) {
-          dispatch(settingsActions.addSetting({ optionName, value }));
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeSettings]); */
 
   return (
     // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне

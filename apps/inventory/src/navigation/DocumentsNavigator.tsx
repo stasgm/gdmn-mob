@@ -1,31 +1,24 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import TabsNavigator from './Root/TabsNavigator';
-
-export type DocumentsStackParamList = {
-  Documents: undefined;
-};
+//import TabsNavigator from './Root/TabsNavigator';
+import { DocumentsStackParamList } from './Root/types';
+import { documentListScreens, documentScreens } from './Root/screens';
 
 const DocumentsStack = createStackNavigator<DocumentsStackParamList>();
 
 const DocumentsNavigator = () => {
   return (
-    <DocumentsStack.Navigator initialRouteName="Documents" screenOptions={{ headerShown: true, title: 'Документы' }}>
-      <DocumentsStack.Screen name="Documents" component={TabsNavigator} options={{ title: 'Документы' }} />
+    <DocumentsStack.Navigator initialRouteName="OrderList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
+      {Object.entries({ ...documentListScreens, ...documentScreens }).map(([name, component]) => (
+        <DocumentsStack.Screen name={name as keyof DocumentsStackParamList} component={component} key={name} />
+      ))}
     </DocumentsStack.Navigator>
   );
+
+
 };
+
 export default DocumentsNavigator;
 
 
-/* const OrdersNavigator = () => {
-  return (
-    <Stack.Navigator initialRouteName="OrderList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
-      {Object.entries({ ...orderListScreens, ...orderScreens }).map(([name, component]) => (
-        <Stack.Screen name={name as keyof OrdersStackParamList} component={component} key={name} />
-      ))}
-    </Stack.Navigator>
-  );
-};
- */

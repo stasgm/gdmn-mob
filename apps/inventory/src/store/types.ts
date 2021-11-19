@@ -1,12 +1,5 @@
 import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData, IDocumentType } from '@lib/types';
-// import { AnyAction } from 'redux';
-// import { ThunkAction } from 'redux-thunk';
 
-//import { ICoords } from './geo/types';
-
-// export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
-
-// export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
 //Организации
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
@@ -14,6 +7,7 @@ export interface IContact extends INamedEntity, IReferenceData {
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
 }
+
 //Магазины
 export interface IOutlet extends INamedEntity, IReferenceData {
   company: INamedEntity; //организация-плательщик
@@ -22,6 +16,7 @@ export interface IOutlet extends INamedEntity, IReferenceData {
   lat: number; // широта
   lon: number; // долгота
 }
+
 //Задолженности
 export interface IDebt extends IEntity {
   id: string;
@@ -30,10 +25,12 @@ export interface IDebt extends IEntity {
   saldo: number; //Задолженность
   saldoDebt: number; //Просроченная задолженность
 }
+
 //Группы товаров
 export interface IGoodGroup extends INamedEntity {
   parent?: INamedEntity;
 }
+
 // Товары
 export interface IGood extends INamedEntity {
   alias: string;
@@ -51,6 +48,7 @@ export interface IGood extends INamedEntity {
 
 //Подразделения-склады
 export type IDepartment = INamedEntity;
+
 // Интерфейс для матрицы номенклатур для организаций
 export interface INetPrice extends IEntity {
   contact: INamedEntity; // организация
@@ -95,7 +93,6 @@ export interface IRouteLine extends IEntity {
   ordNumber: number; // порядковый номер
   comment?: string;
   visited: boolean;
-  /* result?: typeVisit; -это убрать в визиты */
 }
 
 export interface IRouteTotalLine {
@@ -162,8 +159,8 @@ interface IVisitHead extends IHead {
   comment?: string;
   dateBegin: string; //начало визита
   dateEnd?: string; // конец визита
-  beginGeoPoint?: ICoords; //место начало визита
-  endGeoPoint?: ICoords; // место завершения визита
+  //beginGeoPoint?: ICoords; //место начало визита
+  //endGeoPoint?: ICoords; // место завершения визита
   result?: VisitResultType;
   takenType: TakeOrderType; //тип визита - это поле забрать из заявки
 }
