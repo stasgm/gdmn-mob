@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
-import { OrdersStackParamList } from '../../../navigation/Root/types';
+import { DocumentsStackParamList } from '../../../navigation/Root/types';
 import { IOrderDocument } from '../../../store/types';
 
 import SwipeItem from '../../../components/SwipeItem';
@@ -18,12 +18,12 @@ interface IProps {
 }
 
 const OrderSwipeListItem = ({ item, renderItem }: IProps) => {
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
 
   const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate('OrderView', { id });
+      navigation.navigate('DocumentView', { id });
     } else if (name === 'copy') {
       const newReturnDate = new Date().toISOString();
 
@@ -39,7 +39,7 @@ const OrderSwipeListItem = ({ item, renderItem }: IProps) => {
 
       dispatch(documentActions.addDocument(newOrder));
 
-      navigation.navigate('OrderView', { id: newOrder.id });
+      navigation.navigate('DocumentView', { id: newOrder.id });
     } else if (name === 'delete') {
       if (isBlocked) {
         return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);

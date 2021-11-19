@@ -13,7 +13,7 @@ import { useSendDocs } from '@lib/mobile-app';
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
-import { getCurrentPosition } from '../../../utils/expoFunctions';
+//import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
 //import { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
 //import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
@@ -33,7 +33,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
 
-  const [process, setProcess] = useState(false);
+  //const [process, setProcess] = useState(false);
 
   const dateBegin = new Date(item.head.dateBegin);
   const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
@@ -69,7 +69,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     return value >= 10 ? value : `0${value}`;
   };
 
-  const handleCloseVisit = async () => {
+  /* const handleCloseVisit = async () => {
     // TODO Вынести в async actions
     setProcess(true);
 
@@ -99,7 +99,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     dispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders, ...updatedReturns]));
 
     setProcess(false);
-  };
+  }; */
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -135,7 +135,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
 
     dispatch(documentActions.addDocument(newOrder));
 
-    navigation.navigate('OrderView', { id: newOrder.id });
+    navigation.navigate('DocumentsView', { id: newOrder.id });
   };
 
   const handleNewReturn = () => {

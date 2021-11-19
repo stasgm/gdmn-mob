@@ -8,7 +8,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { IGood, IOrderLine } from '../../../store/types';
-import { OrdersStackParamList } from '../../../navigation/Root/types';
+import { DocumentsStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {
   docId: string;
@@ -18,7 +18,7 @@ interface IProps {
 
 const OrderItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentView'>>();
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 

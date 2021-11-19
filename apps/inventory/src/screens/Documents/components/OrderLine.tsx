@@ -11,7 +11,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IGood, IOrderLine, IPackageGood } from '../../../store/types';
 
-import { OrdersStackParamList } from '../../../navigation/Root/types';
+import { DocumentsStackParamList } from '../../../navigation/Root/types';
 
 import Checkbox from './Checkbox';
 
@@ -26,7 +26,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { docId, mode } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
+  const { docId, mode } = useRoute<RouteProp<DocumentsStackParamList, 'OrderLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   // const isFocused = useIsFocused();

@@ -2,8 +2,7 @@ import React from 'react';
 
 import { INavItem, DrawerNavigator } from '@lib/mobile-navigation';
 
-import DocumentsNavigator from './Root/DocumentsNavigator';
-
+import DocumentsNavigator from './DocumentsNavigator';
 
 const navItems: INavItem[] = [
   {

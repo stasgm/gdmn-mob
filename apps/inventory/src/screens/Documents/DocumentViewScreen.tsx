@@ -29,8 +29,8 @@ import OrderItem from './components/OrderItem';
 const DocumentViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'OrderView'>>();
-  const id = useRoute<RouteProp<DocumentsStackParamList, 'OrderView'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentView'>>();
+  const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
 
   const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
 

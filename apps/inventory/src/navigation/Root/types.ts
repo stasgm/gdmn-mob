@@ -15,9 +15,9 @@ export type RefParamList = {
 };
 
 export type DocumentParamList = RefParamList & {
-  OrderView: { id: string };
+  DocunentView: { id: string };
   DocumentEdit: { id: string } | undefined;
-  OrderLine: { mode: number; docId: string; item: IOrderLine };
+  DocunentLine: { mode: number; docId: string; item: IOrderLine };
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string; groupId: string };
 };

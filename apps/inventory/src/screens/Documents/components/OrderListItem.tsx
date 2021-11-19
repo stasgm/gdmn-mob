@@ -10,7 +10,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { StatusType } from '@lib/types';
 
 import { getStatusColor } from '../../../utils/constants';
-import { OrdersStackParamList } from '../../../navigation/Root/types';
+import { DocumentsStackParamList } from '../../../navigation/Root/types';
 
 export interface IOrderListItemProps {
   title: string;
@@ -35,12 +35,12 @@ const OrderListItem = ({
   errorMessage,
 }: IOrderListRenderItemProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'OrderList'>>();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('OrderView', { id });
+        navigation.navigate('DocumentView', { id });
       }}
     >
       <View style={styles.item}>

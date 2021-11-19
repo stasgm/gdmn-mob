@@ -157,8 +157,7 @@ export const DocumentEditScreen = () => {
 
       docDispatch(documentActions.addDocument(newOrder));
 
-      navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
-      // navigation.navigate('OrderView', { id: newOrder.id });
+      navigation.dispatch(StackActions.replace('DocumentView', { id: newOrder.id }));
     } else {
       if (!order) {
         return;
@@ -187,7 +186,7 @@ export const DocumentEditScreen = () => {
       };
 
       docDispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
-      navigation.navigate('OrderView', { id });
+      navigation.navigate('DocumentView', { id });
     }
   }, [
     orderType,
