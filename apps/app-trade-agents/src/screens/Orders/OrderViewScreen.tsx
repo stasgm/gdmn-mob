@@ -43,7 +43,7 @@ const OrderViewScreen = () => {
   }, [navigation, id]);
 
   const handleEditOrderHead = useCallback(() => {
-    navigation.navigate('OrderEdit', { id });
+    navigation.navigate('OrdertEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {

@@ -34,8 +34,8 @@ import { getDateString } from '../../utils/helpers';
 import { IOrderFormParam } from '../../store/app/types';
 
 export const DocumentEditScreen = () => {
-  const id = useRoute<RouteProp<DocumentsStackParamList, 'OrderEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'OrderEdit'>>();
+  const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentEdit'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 

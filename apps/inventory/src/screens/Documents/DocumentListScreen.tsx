@@ -92,7 +92,7 @@ const DocumentListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('OrderEdit');
+    navigation.navigate('DocumentEdit');
   }, [navigation]);
 
   const actionsMenu = useCallback(() => {

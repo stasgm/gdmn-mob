@@ -2,7 +2,7 @@ import { Platform, Linking } from 'react-native';
 import * as Location from 'expo-location';
 import * as IntentLauncher from 'expo-intent-launcher';
 
-import { ICoords } from '../store/geo/types';
+//import { ICoords } from '../store/geo/types';
 
 const LocationStatus = {
   permissionsAllowed: 'permissionsAllowed',
@@ -73,7 +73,7 @@ const getLocationIos = async (status: Location.PermissionStatus) => {
   }
 };
 
-export const getCurrentPosition = async (): Promise<ICoords | undefined> => {
+/* export const getCurrentPosition = async (): Promise<ICoords | undefined> => {
   try {
     await getPermissionLocationStatus();
 
@@ -94,9 +94,9 @@ export const getCurrentPosition = async (): Promise<ICoords | undefined> => {
     }
     return;
   }
-};
+}; */
 
-export const getAddressFromLatAndLong = async ({ latitude, longitude }: ICoords) => {
+/* export const getAddressFromLatAndLong = async ({ latitude, longitude }: ICoords) => {
   try {
     return await Location.reverseGeocodeAsync({ latitude, longitude });
   } catch (error) {
@@ -106,7 +106,7 @@ export const getAddressFromLatAndLong = async ({ latitude, longitude }: ICoords)
       throw new Error('Неизвестная ошибка');
     }
   }
-};
+}; */
 
 export const getLatitudeAndLongitudeFromString = async (string: string) => {
   try {

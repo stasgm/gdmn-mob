@@ -15,10 +15,10 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
-import { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
-import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
-import OrderSwipeListItem from '../../Orders/components/OrderSwipeListItem';
-import { IOrderListRenderItemProps } from '../../Orders/components/OrderListItem';
+//import { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
+//import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
+import OrderSwipeListItem from '../../Documents/components/OrderSwipeListItem';
+import { IOrderListRenderItemProps } from '../../Documents/components/OrderListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -73,14 +73,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     // TODO Вынести в async actions
     setProcess(true);
 
-    // let coords: ICoords;
-
-    // try {
     const coords = await getCurrentPosition();
-    // } catch (e) {
-    //   // setMessage(e.message);
-    //   // setBarVisible(true);
-    // }
 
     const date = new Date().toISOString();
 
@@ -161,7 +154,6 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
       head: {
         contact,
         outlet,
-        // depart: deprt1,
         route,
         reason: 'Брак',
       },
@@ -197,8 +189,8 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   };
 
   const listDocumentType: IListItem[] = [
-    { id: 'order', value: 'Заявка' },
-    { id: 'return', value: 'Возврат' },
+    { id: 'order', value: 'Заявка-новая' },
+    { id: 'return', value: 'Возврат-новый' },
   ];
 
   const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
@@ -226,26 +218,6 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   const renderOrderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
     const doc = orderDocs.find((r) => r.id === item.id);
     return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
-  };
-
-  const returns: IReturnListRenderItemProps[] = useMemo(() => {
-    return returnDocs.map((i) => {
-      const creationDate = new Date(i.editionDate || i.creationDate || 0);
-      return {
-        id: i.id,
-        title: `№ ${i.number} от ${getDateString(i.documentDate)}`,
-        documentDate: getDateString(i.documentDate),
-        status: i.status,
-        subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
-        isFromRoute: false,
-        lineCount: i.lines.length,
-      } as IReturnListRenderItemProps;
-    });
-  }, [returnDocs]);
-
-  const renderReturnItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
-    const doc = returnDocs.find((r) => r.id === item.id);
-    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
   };
 
   const readyDocs = useMemo(() => {
@@ -278,7 +250,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title="Заявки">
+          <InfoBlock colorLabel="#4479D4" title="Документы">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -288,7 +260,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
             />
           </InfoBlock>
         )}
-        {returnDocs.length !== 0 && (
+        {/* {returnDocs.length !== 0 && (
           <InfoBlock colorLabel="#4479D4" title="Возвраты">
             <FlatList
               data={returns}
@@ -298,7 +270,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
               ItemSeparatorComponent={ItemSeparator}
             />
           </InfoBlock>
-        )}
+        )} */}
       </View>
       {!dateEnd ? (
         <PrimeButton icon="plus-circle-outline" onPress={handlePresentDocType}>
@@ -334,7 +306,6 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 24,
   },
 });
 
