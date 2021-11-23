@@ -308,18 +308,6 @@ export const DocumentEditScreen = () => {
     });
   };
 
-  /* const handlePresentDocComment = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'comment',
-      fieldName: 'docComment',
-      value: docComment && [docComment],
-    });
-  }; */
-
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
@@ -358,13 +346,6 @@ export const DocumentEditScreen = () => {
           onPress={handlePresentDocType}
           disabled={isBlocked}
         />
-        {/* <SelectableInput
-          label="Организация"
-          placeholder="Выберите покупателя..."
-          value={docContact?.name}
-          onPress={handlePresentContact}
-          disabled={isBlocked}
-        /> */}
         <SelectableInput
           label="Подразделение"
           value={docDepartment?.name}
