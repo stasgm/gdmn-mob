@@ -25,13 +25,11 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IDocumentType, IReference } from '@lib/types';
-
 import { DocumentsStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOutlet } from '../../store/types';
+import { IDepartment, IInventoryDocument } from '../../store/types';
 
 import { getDateString } from '../../utils/helpers';
-import { IOrderFormParam } from '../../store/app/types';
+import { IInventoryFormParam} from '../../store/app/types';
 
 export const DocumentEditScreen = () => {
   const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentEdit'>>().params?.id;
@@ -39,26 +37,19 @@ export const DocumentEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
+  const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
 
-  const orderType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'order');
-
-  const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
-
-  // Подразделение по умолчанию
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
   const {
     contact: docContact,
-    outlet: docOutlet,
+    documentType: docType,
+    department: docDepartment,
     depart: docDepart,
     number: docNumber,
-    documentDate: docDocumentDate,
     onDate: docOnDate,
+    comment: docComment,
     status: docStatus,
-    route: docRoute,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
@@ -70,66 +61,90 @@ export const DocumentEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docOutlet?.id);
+  const department = refSelectors
+    .selectByName<IDepartment>('department')
+    ?.data?.find((e) => e.id === docDepartment?.id);
 
   useEffect(() => {
-    if (!docContact && !!docOutlet) {
+    if (!docContact && !!docDepartment) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['contact']: outlet?.company,
+          ['department']: department?.name,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docOutlet, outlet?.company]);
+  }, [dispatch, docDepartment, department?.name]);
 
   useEffect(() => {
-    if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
+    if (!!docContact && !!docDepart) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['outlet']: undefined,
+          ['depart']: undefined,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docContact?.id, outlet?.company.id]);
+  }, [dispatch, docContact?.id, docDepart?.name]);
+
+  useEffect(() => {
+    if (!docType) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['documentType']: docType,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docType]);
+
+
+  useEffect(() => {
+    if (!docComment) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['comment']: docComment,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docComment]);
+
 
   useEffect(() => {
     // Инициализируем параметры
-    if (order) {
+    if (inventory) {
       dispatch(
         appActions.setFormParams({
-          number: order.number,
-          contact: order.head.contact,
-          outlet: order.head.outlet,
-          onDate: order.head.onDate,
-          documentDate: order.documentDate,
-          status: order.status,
-          route: order.head.route,
-          depart: order.head.depart,
+          number: inventory.number,
+          contact: inventory.head.contact,
+          documentType: inventory.documentType,
+          comment: inventory.head.comment,
+          onDate: inventory.head.onDate,
+          department: inventory.head.department,
+          documentDate: inventory.documentDate,
+          status: inventory.status,
+          depart: inventory.head.depart,
         }),
       );
     } else {
       dispatch(
         appActions.setFormParams({
           number: '1',
-          onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
+          onDate: new Date().toISOString(),
           status: 'DRAFT',
-          depart: defaultDepart,
         }),
       );
     }
-  }, [dispatch, order, defaultDepart]);
+  }, [dispatch, inventory]);
 
   const handleSave = useCallback(() => {
-    if (!orderType) {
-      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
-    }
-
-    if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
+    if (!(docNumber && docType && docContact && docDepartment && docOnDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -138,16 +153,17 @@ export const DocumentEditScreen = () => {
     const newOrderDate = new Date().toISOString();
 
     if (!id) {
-      const newOrder: IOrderDocument = {
+      const newInventory: IInventoryDocument = {
         id: docId,
-        documentType: orderType,
         number: docNumber,
         documentDate: newOrderDate,
         status: 'DRAFT',
+        documentType: docType,
         head: {
           contact: docContact,
+          comment: docComment,
           onDate: docOnDate,
-          outlet: docOutlet,
+          department: docDepartment,
           depart: docDepart,
         },
         lines: [],
@@ -155,50 +171,52 @@ export const DocumentEditScreen = () => {
         editionDate: newOrderDate,
       };
 
-      docDispatch(documentActions.addDocument(newOrder));
+      docDispatch(documentActions.addDocument(newInventory));
 
-      navigation.dispatch(StackActions.replace('DocumentView', { id: newOrder.id }));
+      navigation.dispatch(StackActions.replace('DocumentView', { id: newInventory.id }));
     } else {
-      if (!order) {
+      if (!inventory) {
         return;
       }
 
       const updatedOrderDate = new Date().toISOString();
 
-      const updatedOrder: IOrderDocument = {
-        ...order,
+      const updatedInventory: IInventoryDocument = {
+        ...inventory,
         id,
         number: docNumber,
         status: docStatus || 'DRAFT',
-        documentDate: docDocumentDate,
-        documentType: orderType,
+        //documentDate: docDocumentDate,
         errorMessage: undefined,
+        documentType: docType,
+        comment: docComment,
         head: {
-          ...order.head,
+          ...inventory.head,
           contact: docContact,
-          outlet: docOutlet,
           onDate: docOnDate,
+          comment: docComment,
+          department: docDepartment,
           depart: docDepart,
         },
-        lines: order.lines,
-        creationDate: order.creationDate || updatedOrderDate,
+        lines: inventory.lines,
+        creationDate: inventory.creationDate || updatedOrderDate,
         editionDate: updatedOrderDate,
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
+      docDispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
       navigation.navigate('DocumentView', { id });
     }
   }, [
-    orderType,
+    docType,
     docNumber,
     docContact,
-    docOutlet,
+    docDepartment,
     docOnDate,
-    docDocumentDate,
+    docComment,
     id,
     docDispatch,
     navigation,
-    order,
+    inventory,
     docStatus,
     docDepart,
   ]);
@@ -210,7 +228,7 @@ export const DocumentEditScreen = () => {
     });
   }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
+  const isBlocked = docStatus !== 'DRAFT';
 
   const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
@@ -239,12 +257,6 @@ export const DocumentEditScreen = () => {
       return;
     }
 
-    if (docRoute) {
-      return Alert.alert('Внимание!', 'Нельзя менять организацию! Документ возврата привязан к маршруту.', [
-        { text: 'OK' },
-      ]);
-    }
-
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
@@ -252,29 +264,23 @@ export const DocumentEditScreen = () => {
     });
   };
 
-  const handlePresentOutlet = () => {
+  const handlePresentDepartment = () => {
     if (isBlocked) {
       return;
-    }
-
-    if (docRoute) {
-      return Alert.alert('Внимание!', 'Нельзя менять магазин! Документ возврата привязан к маршруту.', [
-        { text: 'OK' },
-      ]);
     }
 
     //TODO: если изменился контакт, то и магазин должен обнулиться
     const params: Record<string, string> = {};
 
-    if (docContact?.id) {
+    /* if (docContact?.id) {
       params.companyId = docContact?.id;
-    }
+    } */
 
     navigation.navigate('SelectRefItem', {
-      refName: 'outlet',
-      fieldName: 'outlet',
+      refName: 'department',
+      fieldName: 'department',
       clause: params,
-      value: docOutlet && [docOutlet],
+      value: docDepartment && [docDepartment],
     });
   };
 
@@ -284,11 +290,35 @@ export const DocumentEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: 'department',
-      fieldName: 'depart',
+      refName: 'depart',
+      fieldName: 'docDepart',
       value: docDepart && [docDepart],
     });
   };
+
+  const handlePresentDocType = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'documentType',
+      fieldName: 'docType',
+      value: docType && [docType],
+    });
+  };
+
+  /* const handlePresentDocComment = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'comment',
+      fieldName: 'docComment',
+      value: docComment && [docComment],
+    });
+  }; */
 
   return (
     <AppInputScreen>
@@ -316,27 +346,45 @@ export const DocumentEditScreen = () => {
           disabled={isBlocked}
         />
         <SelectableInput
-          label="Дата отгрузки"
+          label="Дата"
           value={getDateString(docOnDate || '')}
           onPress={handlePresentOnDate}
           disabled={docStatus !== 'DRAFT'}
         />
         <SelectableInput
+          label="Тип документа"
+          placeholder="Выберите тип документа..."
+          value={docType?.name}
+          onPress={handlePresentDocType}
+          disabled={isBlocked}
+        />
+        {/* <SelectableInput
           label="Организация"
           placeholder="Выберите покупателя..."
           value={docContact?.name}
           onPress={handlePresentContact}
           disabled={isBlocked}
-        />
-        <SelectableInput label="Магазин" value={docOutlet?.name} onPress={handlePresentOutlet} disabled={isBlocked} />
+        /> */}
         <SelectableInput
-          label="Склад-магазин"
+          label="Подразделение"
+          value={docDepartment?.name}
+          onPress={handlePresentDepartment}
+          disabled={isBlocked}
+        />
+        <SelectableInput
+          label="Контрагенты"
           value={docDepart?.name}
           onPress={handlePresentDepart}
           disabled={isBlocked}
         />
+        <Input
+          label="Комментарий"
+          value={docComment}
+          onChangeText={(text) => dispatch(appActions.setFormParams({ string: text.trim() }))}
+          disabled={isBlocked}
+        />
       </ScrollView>
-      {showOnDate && (
+       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
           value={new Date(docOnDate || '')}

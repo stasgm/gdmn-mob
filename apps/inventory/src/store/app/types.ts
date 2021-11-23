@@ -1,4 +1,6 @@
-import { INamedEntity, StatusType } from '@lib/types';
+import { IDocumentType, INamedEntity, StatusType } from '@lib/types';
+
+import { IDepartment } from '../types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -34,4 +36,17 @@ export interface ISellBillFormParam extends IFormParam {
   dateBegin?: string;
   dateEnd?: string;
   good?: INamedEntity;
+}
+
+export interface IInventoryFormParam extends IFormParam {
+  contact?: INamedEntity;
+  //outlet?: INamedEntity;
+  depart?: INamedEntity;
+  number?: string;
+  documentDate?: string;
+  onDate?: string;
+  status?: StatusType;
+  documentType?: IDocumentType;
+  department?: IDepartment;
+  comment?: string;
 }

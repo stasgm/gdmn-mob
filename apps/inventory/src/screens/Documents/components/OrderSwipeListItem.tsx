@@ -18,7 +18,7 @@ interface IProps {
 }
 
 const OrderSwipeListItem = ({ item, renderItem }: IProps) => {
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'OrderList'>>();
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentList'>>();
   const dispatch = useDispatch();
 
   const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {

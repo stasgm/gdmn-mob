@@ -35,7 +35,7 @@ const OrderListItem = ({
   errorMessage,
 }: IOrderListRenderItemProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'OrderList'>>();
+  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentList'>>();
 
   return (
     <TouchableOpacity

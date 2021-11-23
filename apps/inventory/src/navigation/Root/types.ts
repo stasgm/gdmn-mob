@@ -15,14 +15,14 @@ export type RefParamList = {
 };
 
 export type DocumentParamList = RefParamList & {
-  DocunentView: { id: string };
+  DocumentView: { id: string };
   DocumentEdit: { id: string } | undefined;
   DocunentLine: { mode: number; docId: string; item: IOrderLine };
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string; groupId: string };
 };
 
-export type DocumentsStackParamList = { OrderList: undefined } & DocumentParamList;
+export type DocumentsStackParamList = { DocumentList: undefined } & DocumentParamList;
 
 export type ReturnParamList = RefParamList & {
   ReturnView: { id: string };

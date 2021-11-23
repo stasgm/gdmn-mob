@@ -177,3 +177,18 @@ export interface IToken {
   access_token: string;
 }
 
+export interface IInventoryHead extends IHead {
+  contact: INamedEntity; //организация-плательщик
+  outlet: INamedEntity; // магазин –подразделение организации плательщика
+  depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
+  onDate: string; //  Дата
+  department?: IDepartment; //Подразделение
+  comment: string; // Комvентарий
+}
+
+export interface IInventoryLine extends IEntity {
+  good: INamedEntity;
+  quantity: number;
+}
+
+export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
