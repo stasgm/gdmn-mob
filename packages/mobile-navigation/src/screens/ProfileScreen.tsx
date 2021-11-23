@@ -7,13 +7,14 @@ import { authActions, useSelector, useDispatch } from '@lib/store';
 
 import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
+import api from '@lib/client-api';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
-  const { user, company, device } = useSelector((state) => state.auth);
+  const { user, company, device, settings: authSettings } = useSelector((state) => state.auth);
 
-  const settings = user?.settings;
+   const settings = user?.settings;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -24,7 +25,19 @@ const ProfileScreen = () => {
     });
   }, [navigation]);
 
-  const handleLogout = () => dispatch(authActions.logout());
+  const handleLogout = () => {
+    // if (connectionStatus === 'demo') {
+    //   dispatch(authActions.setConnectionStatus('init'));
+    // }
+    console.log('logout isMock', api.config.debug?.isMock);
+    dispatch(authActions.logout());
+    api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
+    dispatch(authActions.setSettings({ ...authSettings, debug: { ...authSettings.debug, isMock: false } }));
+    // if (connectionStatus === 'demo') {
+    //   api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
+    //   dispatch(authActions.setSettings({ ...authSettings, deviceId: undefined, debug: { ...authSettings.debug, isMock: false } }));
+    // }
+  };
   // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 
   const visibleList = settings && Object.entries(settings).filter(([_, item]) => item.visible);
@@ -71,7 +84,7 @@ const ProfileScreen = () => {
       )}
       <View>
         <PrimeButton outlined onPress={handleLogout}>
-          Сменить пользователя
+          {authSettings.debug?.isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
         {/*         <PrimeButton outlined onPress={handleChangeCompany}>
           Сменить организацию

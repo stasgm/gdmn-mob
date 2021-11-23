@@ -130,10 +130,10 @@ const signIn = (
   };
 };
 
-const logOut = (): AppThunk<
+const logout = (): AppThunk<
   Promise<ActionType<typeof actions.logoutUserAsync>>,
   AuthState,
-  ActionType<typeof actions.logoutUserAsync>
+  ActionType<typeof actions.logoutUserAsync> | ActionType<typeof actions.setConnectionStatus>
 > => {
   return async (dispatch) => {
     dispatch(actions.logoutUserAsync.request());
@@ -141,6 +141,9 @@ const logOut = (): AppThunk<
     const response = await api.auth.logout();
 
     if (response.type === 'LOGOUT') {
+      // if (api.config.debug?.isMock) {
+      //   dispatch(actions.setConnectionStatus('init'));
+      // }
       return dispatch(actions.logoutUserAsync.success());
     }
 
@@ -238,13 +241,38 @@ const getDeviceStatus = (
   };
 };
 
+const getCompany = (
+  companyId: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.getCompanyAsync>>,
+  AuthState,
+  ActionType<typeof actions.getCompanyAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.getCompanyAsync.request('Получение компании'));
+
+    const response = await api.company.getCompany(companyId);
+
+    if (response.type === 'GET_COMPANY') {
+      return dispatch(actions.getCompanyAsync.success(response.company));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(actions.getCompanyAsync.failure(response.message));
+    }
+
+    return dispatch(actions.getCompanyAsync.failure('Ошибка получения компании'));
+  };
+};
+
 export default {
   getDeviceByUid,
   activateDevice,
   signUp,
   signIn,
-  logOut,
+  logout,
   getDeviceStatus,
   useAuthThunkDispatch,
   setUserSettings,
+  getCompany,
 };

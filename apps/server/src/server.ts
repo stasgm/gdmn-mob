@@ -47,12 +47,14 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
   passport.serializeUser((user: unknown, done) => {
+    console.log('serializeUser', user);
     done(null, (user as IUser).id);
   });
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
   passport.deserializeUser(async (id: string, done) => {
     try {
+      console.log('deserializeUser', id);
       const user = await userService.findOne(id);
       done(null, user);
     } catch (err) {

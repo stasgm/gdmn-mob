@@ -5,7 +5,7 @@ import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
 import api from '@lib/client-api';
-// import { config } from '@lib/client-config';
+import { user as mockUser } from '@lib/mock';
 
 /*
   Порядок работы:
@@ -35,8 +35,8 @@ const SignInScreen = (props: Props) => {
   if (api.config.debug?.isMock) {
     // config.debug?.useMockup
     initialCredentials = {
-      name: 'ГОЦЕЛЮК',
-      password: '@123!',
+      name: mockUser.name,
+      password: mockUser.password || '',
     };
   }
 

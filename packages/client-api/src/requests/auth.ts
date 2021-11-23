@@ -58,10 +58,7 @@ class Auth extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (
-        (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') ||
-        (userCredentials.name === 'Stas' && userCredentials.password === '@123!')
-      ) {
+      if (userCredentials.name === mockUser.name && userCredentials.password === mockUser.password) {
         return {
           type: 'LOGIN',
           user: mockUser,
@@ -103,6 +100,7 @@ class Auth extends BaseRequest {
   };
 
   logout = async () => {
+    console.log('logout api isMock', this.api.config.debug?.isMock);
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -239,7 +237,7 @@ class Auth extends BaseRequest {
       return {
         type: 'GET_DEVICE_STATUS',
         status: 'ACTIVE',
-      } as types.IDeviceStatusResponse;  // активация устройства в mock
+      } as types.IDeviceStatusResponse; // активация устройства в mock
     }
 
     try {

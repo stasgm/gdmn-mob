@@ -4,13 +4,14 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Settings } from '@lib/types';
-import { settingsActions, useDispatch, useSelector } from '@lib/store';
+import { authActions, settingsActions, useDispatch, useSelector } from '@lib/store';
 
 import { persistor, store } from './src/store';
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
 import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
+import config from './src/config';
 
 const Root = () => {
   const navItems: INavItem[] = [
@@ -51,15 +52,15 @@ const Root = () => {
       id: '4',
       sortOrder: 4,
       description: 'Бэк-офис. Адрес сервера',
-      data: 'http://192.168.0.70',
+      data: config.BACK_URL,
       type: 'string',
       visible: true,
     },
     serverPort: {
       id: '5',
       description: 'Бэк-офис. Порт сервера',
-      data: '8000',
-      type: 'string',
+      data: config.BACK_PORT,
+      type: 'number',
       sortOrder: 5,
       visible: true,
     },
@@ -82,6 +83,7 @@ const Root = () => {
   };
 
   const storeSettings = useSelector((state) => state.settings);
+  // const { settings, connectionStatus } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -95,6 +97,17 @@ const Root = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeSettings]);
+
+  // useEffect(() => {
+  //   // dispatch(authActions.init());
+  //   if (settings.debug?.isMock) {
+  //     console.log('useEffect first demo');
+  //     dispatch(authActions.setConnectionStatus('init'));
+  //   } else if (connectionStatus !== 'init' && connectionStatus !== 'not-connected') {
+  //     console.log('useEffect first demo 2');
+  //     dispatch(authActions.setConnectionStatus('not-connected'));
+  //   }
+  // }, []);
 
   return (
     // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне

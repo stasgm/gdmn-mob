@@ -1,6 +1,5 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 import { globalStyles as styles, PrimeButton, RoundButton, AppScreen, ScreenTitle } from '@lib/mobile-ui';

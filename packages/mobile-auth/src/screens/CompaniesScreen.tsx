@@ -72,7 +72,7 @@ const CompaniesScreen = (props: Props) => {
       onLogout();
       // const res = await apiService.auth.logout();
       // if (res.result) {
-      //   actions.logOut();
+      //   actions.logout();
       //   return;
       // }
       // throw new Error();

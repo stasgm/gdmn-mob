@@ -14,12 +14,13 @@ import localStyles from './styles';
 export type Props = {
   settings: IApiConfig | undefined;
   onSetSettings: (settings: IApiConfig) => void;
+  onSetDemoMode: () => void;
 };
 
 const ConfigScreen = (props: Props) => {
   const navigation = useNavigation<StackNavigationProp<AuthStackParamList, 'Config'>>();
 
-  const { settings, onSetSettings } = props;
+  const { settings, onSetSettings, onSetDemoMode } = props;
   const [serverName, setServerName] = useState(`${settings?.protocol}${settings?.server}` || '');
   const [serverPort, setServerPort] = useState(settings?.port?.toString() || '');
   const [timeout, setTimeout] = useState(settings?.timeout?.toString() || '');
@@ -29,6 +30,8 @@ const ConfigScreen = (props: Props) => {
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
     const protocol: string = match?.[1] || '';
     const server: string = match?.[2] || '';
+
+    console.log('server', server);
 
     const newSettings: IApiConfig = {
       apiPath: settings?.apiPath || '',
@@ -60,8 +63,13 @@ const ConfigScreen = (props: Props) => {
         >
           Принять
         </PrimeButton>
-        <PrimeButton icon="cancel" onPress={navigation.goBack} style={localStyles.button}>
+        <PrimeButton icon="cancel" onPress={() => navigation.navigate('Splash')} style={localStyles.button}>
           Отмена
+        </PrimeButton>
+      </View>
+      <View style={localStyles.buttonsView}>
+        <PrimeButton outlined icon="presentation-play" onPress={onSetDemoMode} style={localStyles.button}>
+          Подключиться в демо режиме
         </PrimeButton>
       </View>
     </AppInputScreen>

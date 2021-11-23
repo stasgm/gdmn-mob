@@ -4,7 +4,7 @@ import { Store } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import { authSelectors } from '@lib/store';
+import { authActions, authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
@@ -12,8 +12,6 @@ import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
 
 import { useSync } from './hooks';
-
-import { IBaseSettings, ISettingsOption, Settings } from '@lib/types';
 
 export interface IApp {
   items?: INavItem[];
@@ -28,6 +26,25 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
+  const { settings, connectionStatus } = useSelector((state) => state.auth);
+
+  const authDispatch = useDispatch();
+
+  useEffect(() => {
+    // authDispatch(authActions.init());
+    console.log('init connectionStatus', connectionStatus);
+    if (connectionStatus === 'init') {
+      return;
+    }
+    if (settings.debug?.isMock) {
+      console.log('useEffect first demo');
+      authDispatch(authActions.setConnectionStatus('init'));
+    } else if (connectionStatus !== 'not-connected') {
+      console.log('useEffect first demo 2');
+      authDispatch(authActions.setConnectionStatus('not-connected'));
+    }
+  }, []);
+
   const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
   return store ? (
