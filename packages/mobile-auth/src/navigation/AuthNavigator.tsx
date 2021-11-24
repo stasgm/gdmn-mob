@@ -7,7 +7,7 @@ import { IApiConfig } from '@lib/client-types';
 
 import api from '@lib/client-api';
 
-import { device, user as mockUser } from '@lib/mock';
+import { device as mockDevice, user as mockUser } from '@lib/mock';
 
 import { SplashScreen, SignInScreen, ConfigScreen, ActivationScreen, AppLoadScreen, ModeSelectionScreen } from '../screens';
 
@@ -121,11 +121,13 @@ const AuthNavigator: React.FC = () => {
 
   const onSetDemoMode = useCallback(async () => {
     console.log('demo mode');
+    authDispatch(authActions.setConnectionStatus('demo'));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
     dispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: true } }));
     await signIn({ name: mockUser.name, password: mockUser.password || '' });
     setCompany(mockUser.company as ICompany);
-    authDispatch(authActions.setConnectionStatus('demo'));
+    await dispatch(authActions.getDeviceByUid(mockDevice.uid));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authDispatch, dispatch, setCompany, signIn]);
 

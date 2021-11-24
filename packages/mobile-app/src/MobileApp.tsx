@@ -45,6 +45,8 @@ const MobileApp = ({ store, ...props }: IApp) => {
     }
   }, []);
 
+  console.log('MobileApp', connectionStatus);
+
   const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
   return store ? (
