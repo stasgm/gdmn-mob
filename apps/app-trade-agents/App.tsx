@@ -1,18 +1,28 @@
 import React, { useEffect } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch as useDocDispatch } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Settings } from '@lib/types';
-import { settingsActions, useDispatch, useSelector } from '@lib/store';
+import { settingsActions, useDispatch, useSelector, documentActions, referenceActions } from '@lib/store';
+
+// import { geoActions } from '/src/store/geo/actions';
 
 import { persistor, store } from './src/store';
+
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
 import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
+import { geoActions } from './src/store/geo/actions';
 
 const Root = () => {
+  const newDispatch = useDocDispatch();
+  useEffect(() => {
+    newDispatch(documentActions.init());
+    newDispatch(referenceActions.init());
+    newDispatch(geoActions.init());
+  }, [newDispatch]);
   const navItems: INavItem[] = [
     /*   {
       name: 'Dashboard',
