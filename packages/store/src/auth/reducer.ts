@@ -6,6 +6,8 @@ import { config } from '@lib/client-config';
 
 import { AuthState } from './types';
 import { AuthActionType, actions } from './actions';
+import { device as mockDevice, user as mockUser } from '@lib/mock';
+import { ICompany } from '@lib/types';
 
 const {
   server: { name, port, protocol },
@@ -99,7 +101,8 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         status: '',
         loading: false,
         company: undefined,
-        connectionStatus: 'not-connected',
+        connectionStatus: state.settings.deviceId ? 'connected' : 'not-connected',
+        settings: { ...state.settings, debug: { ...state.settings.debug, isMock: false } },
       };
 
     case getType(actions.logoutUserAsync.failure):
@@ -158,6 +161,16 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setConnectionStatus):
       return { ...state, error: false, connectionStatus: action.payload };
+
+    case getType(actions.setDemoMode):
+      return {
+        ...state,
+        connectionStatus: 'demo',
+        user: mockUser,
+        device: mockDevice,
+        company: mockUser.company as ICompany,
+        settings: { ...state.settings, debug: { ...state.settings.debug, isMock: true } },
+      };
 
     default:
       return state;

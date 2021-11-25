@@ -19,6 +19,14 @@ const rootReducer = combineReducers(combinedReducer);
 export const { store } = configureStore(combinedReducer);
 export const persistor = persistStore(store);
 
+// export const persistor = persistStore(store, undefined, () => {
+//   let userId = store.getState().auth.user?.id;
+//   if (userId) {
+//     rootReducer.replacePersistConfig({ key: `user:${userId}`, storage })
+//     persistor.persist(PERSIST_USER)
+//   }
+// });
+
 export type AppState = ReturnType<typeof rootReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
 export type AppDispatch = ThunkDispatch<AppState, any, TActions>;

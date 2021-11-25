@@ -31,7 +31,7 @@ const MobileApp = ({ store, ...props }: IApp) => {
   const authDispatch = useDispatch();
 
   useEffect(() => {
-    // authDispatch(authActions.init());
+    //authDispatch(authActions.init());
     console.log('init connectionStatus', connectionStatus);
     if (connectionStatus === 'init') {
       return;

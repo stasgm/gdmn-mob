@@ -9,6 +9,7 @@ const clearError = createAction('AUTH/CLEAR_ERROR')();
 const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const disconnect = createAction('AUTH/DISCONNECT')();
+const setDemoMode = createAction('AUTH/SET_DEMO')();
 //const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
 const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
@@ -61,6 +62,7 @@ const setUserSettingsAsync = createAsyncAction(
   'AUTH/SET_USER_SETTINGS_FAILURE',
 )<string, IUserSettings, string>();
 
+
 export const actions = {
   init,
   clearError,
@@ -77,6 +79,7 @@ export const actions = {
   setUserSettingsAsync,
   setConnectionStatus,
   getCompanyAsync,
+  setDemoMode,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

@@ -32,7 +32,7 @@ const ProfileScreen = () => {
     console.log('logout isMock', api.config.debug?.isMock);
     dispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-    dispatch(authActions.setSettings({ ...authSettings, debug: { ...authSettings.debug, isMock: false } }));
+    // dispatch(authActions.setSettings({ ...authSettings, debug: { ...authSettings.debug, isMock: false } }));
     // if (connectionStatus === 'demo') {
     //   api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     //   dispatch(authActions.setSettings({ ...authSettings, deviceId: undefined, debug: { ...authSettings.debug, isMock: false } }));

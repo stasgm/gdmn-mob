@@ -141,9 +141,6 @@ const logout = (): AppThunk<
     const response = await api.auth.logout();
 
     if (response.type === 'LOGOUT') {
-      // if (api.config.debug?.isMock) {
-      //   dispatch(actions.setConnectionStatus('init'));
-      // }
       return dispatch(actions.logoutUserAsync.success());
     }
 
