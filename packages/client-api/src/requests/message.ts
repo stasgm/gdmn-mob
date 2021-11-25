@@ -1,5 +1,7 @@
 import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
-import { messages as mockMessages } from '@lib/mock';
+import { messageRequest, messageAgent } from '@lib/mock';
+
+import Constants from 'expo-constants';
 
 import { error, message as types } from '../types';
 import { sleep } from '../utils';
@@ -63,7 +65,7 @@ class Message extends BaseRequest {
 
       return {
         type: 'GET_MESSAGES',
-        messageList: mockMessages,
+        messageList: Constants.manifest?.extra?.slug === 'gdmn-appl-request' ? messageRequest : messageAgent,
       } as types.IGetMessagesResponse;
     }
 
