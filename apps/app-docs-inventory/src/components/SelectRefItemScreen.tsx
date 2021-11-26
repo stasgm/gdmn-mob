@@ -176,4 +176,3 @@ const LineItem = React.memo(
     );
   },
 );
-
