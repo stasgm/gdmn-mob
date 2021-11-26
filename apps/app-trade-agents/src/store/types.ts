@@ -53,8 +53,8 @@ export interface IGood extends INamedEntity {
 export type IDepartment = INamedEntity;
 // Интерфейс для матрицы номенклатур для организаций
 export interface INetPrice extends IEntity {
-  contact: INamedEntity; // организация
-  good: INamedEntity; // ID товара
+  contactId: INamedEntity; // организация
+  goodId: INamedEntity; // ID товара
   pricefso?: number; // цена ФСО
   pricefsn?: number; // цена ФСН
   priceFsoSklad?: number; // цена ФСО склад
