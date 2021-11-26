@@ -9,6 +9,7 @@ export interface IFormParam {
 export interface IInventoryFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
+  onDate?: string;
   status?: StatusType;
   documentType?: IDocumentType;
   depart?: IContact;

@@ -45,6 +45,7 @@ export const DocumentEditScreen = () => {
     documentType: docType,
     department: docDepartment,
     depart: docDepart,
+    onDate: docOnDate,
     documentDate: docDocumentDate,
     number: docNumber,
     comment: docComment,
@@ -119,6 +120,7 @@ export const DocumentEditScreen = () => {
         appActions.setFormParams({
           number: inventory.number,
           documentType: inventory.documentType,
+          onDate: inventory.head.onDate,
           documentDate: inventory.documentDate,
           comment: inventory.head.comment,
           department: inventory.head.department,
@@ -130,6 +132,7 @@ export const DocumentEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: '1',
+          onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
         }),
@@ -138,12 +141,11 @@ export const DocumentEditScreen = () => {
   }, [dispatch, inventory]);
 
   const handleSave = useCallback(() => {
-    if (!(docNumber && docType && docDepart && docDepartment && docDocumentDate && docDocumentDate)) {
+    if (!(docNumber && docType && docDepart && docOnDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
-
     const newOntDate = new Date().toISOString();
 
     if (!id) {
@@ -155,6 +157,7 @@ export const DocumentEditScreen = () => {
         documentType: docType,
         head: {
           comment: docComment,
+          onDate: docOnDate,
           department: docDepartment,
           depart: docDepart,
         },
@@ -183,6 +186,7 @@ export const DocumentEditScreen = () => {
         head: {
           ...inventory.head,
           comment: docComment,
+          onDate: docOnDate,
           department: docDepartment,
           depart: docDepart,
         },
@@ -198,8 +202,8 @@ export const DocumentEditScreen = () => {
     docType,
     docNumber,
     docDepartment,
-    docDocumentDate,
     docComment,
+    docOnDate,
     id,
     docDispatch,
     navigation,
@@ -301,7 +305,7 @@ export const DocumentEditScreen = () => {
         />
         <SelectableInput
           label="Дата"
-          value={getDateString(docDocumentDate || '')}
+          value={getDateString(docOnDate || '')}
           onPress={handlePresentOnDate}
           disabled={docStatus !== 'DRAFT'}
         />
@@ -334,7 +338,7 @@ export const DocumentEditScreen = () => {
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docDocumentDate || '')}
+          value={new Date(docOnDate || '')}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}
