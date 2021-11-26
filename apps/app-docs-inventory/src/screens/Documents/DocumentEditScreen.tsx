@@ -1,12 +1,13 @@
-/* eslint-disable import/no-duplicates */
-/* eslint-disable no-undef */
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import {
   useDispatch as useDocDispatch,
   docSelectors,
@@ -19,8 +20,8 @@ import {
 import {
   BackButton,
   AppInputScreen,
-  Input,
   SelectableInput,
+  Input,
   SaveButton,
   globalStyles as styles,
   SubTitle,
@@ -44,6 +45,7 @@ export const DocumentEditScreen = () => {
     documentType: docType,
     department: docDepartment,
     depart: docDepart,
+    documentDate: docDocumentDate,
     number: docNumber,
     onDate: docOnDate,
     comment: docComment,
@@ -118,6 +120,7 @@ export const DocumentEditScreen = () => {
         appActions.setFormParams({
           number: inventory.number,
           documentType: inventory.documentType,
+          documentDate: inventory.documentDate,
           comment: inventory.head.comment,
           onDate: inventory.head.onDate,
           department: inventory.head.department,
@@ -130,6 +133,7 @@ export const DocumentEditScreen = () => {
         appActions.setFormParams({
           number: '1',
           onDate: new Date().toISOString(),
+          documentDate: new Date().toISOString(),
           status: 'DRAFT',
         }),
       );
@@ -137,29 +141,30 @@ export const DocumentEditScreen = () => {
   }, [dispatch, inventory]);
 
   const handleSave = useCallback(() => {
-    if (!(docNumber && docType && docDepart && docDepartment && docOnDate)) {
+    if (!(docNumber && docType && docDepart && docDepartment && docOnDate && docDocumentDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
 
-    const newDocumentDate = new Date().toISOString();
+    const newOntDate = new Date().toISOString();
 
     if (!id) {
       const newInventory: IInventoryDocument = {
         id: docId,
         number: docNumber,
+        documentDate: newOntDate,
         status: 'DRAFT',
         documentType: docType,
         head: {
           comment: docComment,
-          onDate: newDocumentDate,
+          onDate: newOntDate,
           department: docDepartment,
           depart: docDepart,
         },
         lines: [],
-        creationDate: newDocumentDate,
-        editionDate: newDocumentDate,
+        creationDate: newOntDate,
+        editionDate: newOntDate,
       };
 
       docDispatch(documentActions.addDocument(newInventory));
@@ -199,6 +204,7 @@ export const DocumentEditScreen = () => {
     docType,
     docNumber,
     docDepartment,
+    docDocumentDate,
     docOnDate,
     docComment,
     id,
@@ -240,13 +246,6 @@ export const DocumentEditScreen = () => {
     setShowOnDate(true);
   };
 
-    navigation.navigate('SelectRefItem', {
-      refName: 'contact',
-      fieldName: 'contact',
-      value: docContact && [docContact],
-    });
-  };
-
   const handlePresentDepartment = () => {
     if (isBlocked) {
       return;
@@ -255,7 +254,6 @@ export const DocumentEditScreen = () => {
     navigation.navigate('SelectRefItem', {
       refName: 'department',
       fieldName: 'department',
-      clause: params,
       value: docDepartment && [docDepartment],
     });
   };
