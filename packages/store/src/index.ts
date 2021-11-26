@@ -18,7 +18,6 @@ import { TActions } from './types';
 const persistAuthConfig = {
   key: 'auth',
   storage: AsyncStorage,
-  persistKey: PERSIST_USER,
   whitelist: ['user', 'settings', 'company', 'device', 'connectionStatus'],
 };
 
