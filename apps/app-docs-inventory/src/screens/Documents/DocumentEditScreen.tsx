@@ -82,7 +82,7 @@ export const DocumentEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['depart']: depart?.name,
+          ['depart']: docDepart,
         }),
       );
     }
@@ -184,7 +184,6 @@ export const DocumentEditScreen = () => {
         status: docStatus || 'DRAFT',
         errorMessage: undefined,
         documentType: docType,
-        comment: docComment,
         head: {
           ...inventory.head,
           onDate: docOnDate,
@@ -277,7 +276,7 @@ export const DocumentEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'documentType',
-      fieldName: 'docType',
+      fieldName: 'documentType',
       value: docType && [docType],
     });
   };
