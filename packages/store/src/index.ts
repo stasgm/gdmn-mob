@@ -15,9 +15,73 @@ import { reducer as msgReducer } from './messages';
 import { reducer as appReducer } from './app';
 import { TActions } from './types';
 
+/**
+ * Одно из решений, как привязать AsyncStorage к пользователю,
+ * это создать свой объект, поддерживающий все методы интерфейса
+ * AsyncStorageStatic, который будет вызывать методы исходного
+ * AsyncStorage, подставляя в имя ключа ид пользователя.
+ *
+ * Тут могут возникнуть две проблемы:
+ * 1) до того, как у нас будет пользователь, данные будут сохраняться
+ *    в одни ключи (с пустым ИД пользователя), как только пользователь
+ *    возникнет -- в другие.
+ * 2) как удалять уже ненужные нам ключи? когда пользователь,
+ *    дерегистрируется в программе.
+ *
+ */
+
+class UserAsyncStorageClass {
+  private _userIdPrefix: string = '';
+  private _storage: typeof AsyncStorage;
+
+  constructor(storage: typeof AsyncStorage) {
+    this._storage = storage;
+  }
+
+  setUserId(userId: string) {
+    this._userIdPrefix = `${userId}\\`;
+  }
+
+  private _getUserPrefix(key: string) {
+    return `${this._userIdPrefix}${key}`;
+  }
+
+  getItem = (key: string, callback?: (error?: Error, result?: string) => void): Promise<string | null> =>
+    this._storage.getItem(this._getUserPrefix(key), callback);
+
+  setItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> =>
+    this._storage.setItem(this._getUserPrefix(key), value, callback);
+
+  removeItem = (key: string, callback?: (error?: Error) => void): Promise<void> =>
+    this._storage.removeItem(this._getUserPrefix(key), callback);
+
+  mergeItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> =>
+    this._storage.mergeItem(this._getUserPrefix(key), value, callback);
+
+  clear = (callback?: (error?: Error) => void): Promise<void> =>
+    this._storage.clear(callback);
+
+  getAllKeys = (callback?: (error?: Error, keys?: string[]) => void): Promise<string[]> =>
+    this._storage.getAllKeys(callback);
+
+  multiGet = (
+      keys: string[],
+      callback?: (errors?: Error[], result?: [string, string | null][]) => void
+    ): Promise<[string, string | null][]> =>
+    this._storage.multiGet(keys, callback);
+
+  multiSet = (keyValuePairs: string[][], callback?: (errors?: Error[]) => void): Promise<void> =>
+    this._storage.multiSet(keyValuePairs, callback);
+
+  multiRemove = (keys: string[], callback?: (errors?: Error[]) => void): Promise<void> =>
+    this._storage.multiRemove(keys, callback);
+};
+
+const UserAsyncStorage = new UserAsyncStorageClass(AsyncStorage);
+
 const persistAuthConfig = {
   key: 'auth',
-  storage: AsyncStorage,
+  storage: UserAsyncStorage,
   whitelist: ['user', 'settings', 'company', 'device'],
 };
 
