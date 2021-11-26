@@ -1,7 +1,8 @@
 import { combineReducers, Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import { configureStore } from '@lib/store';
+import { AppDispatch, configureStore } from '@lib/store';
 import { persistStore } from 'redux-persist';
+import { TypedUseSelectorHook, useDispatch as useReduxDispatch, useSelector as useReduxSelector } from 'react-redux';
 
 export const combinedReducer = {};
 
@@ -12,3 +13,7 @@ export const persistor = persistStore(store);
 
 export type AppState = ReturnType<typeof rootReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
+
+export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
+export const useDispatch = useReduxDispatch;
+export const useThunkDispatch = () => useReduxDispatch<AppDispatch>();

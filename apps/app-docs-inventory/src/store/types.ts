@@ -13,8 +13,6 @@ export interface IContact extends INamedEntity, IReferenceData {
 
 export interface IInventoryHead extends IHead {
   depart?: IContact; // Поле склад
- /*  documentType?: IDocumentType;
-  onDate: string; //  Дата */
   department?: IDepartment; //Подразделение
   comment?: string; // Комvентарий
 }

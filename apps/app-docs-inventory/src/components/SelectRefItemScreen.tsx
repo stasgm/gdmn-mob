@@ -15,12 +15,11 @@ import {
 } from '@lib/mobile-ui';
 
 import { useDispatch } from '../store';
-import { IOutlet } from '../store/types';
 import { extraPredicate } from '../utils/helpers';
 import { IFormParam } from '../store/app/types';
 import { RefParamList } from '../navigation/Root/types';
 
-const SelectRefItemScreen = () => {
+export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { refName, isMulti, fieldName, value, clause } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
@@ -32,19 +31,17 @@ const SelectRefItemScreen = () => {
       return refObj?.data.filter((item) => {
         const newParams = Object.assign({}, clause);
 
-        let companyFound = true;
-
         Object.keys(clause).forEach((i) => {
           if (i in item) {
             if (typeof clause[i] !== 'object' && typeof item[i] !== 'object' && item[i] === clause[i]) {
             }
           }
         });
-        companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
-        delete newParams.companyId;
+        // params = { name: 'Раница' }
+
         // }
 
-        return companyFound && extraPredicate(item, newParams);
+        return extraPredicate(item, newParams);
       });
     }
     return refObj?.data?.sort((a, b) => (a.name < b.name ? -1 : 1));
@@ -180,4 +177,3 @@ const LineItem = React.memo(
   },
 );
 
-export default SelectRefItemScreen;
