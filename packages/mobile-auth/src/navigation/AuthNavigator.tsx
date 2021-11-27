@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
+import { user as mockUser } from '@lib/mock';
 
 import api from '@lib/client-api';
 
@@ -25,6 +26,28 @@ const AuthNavigator: React.FC = () => {
   const { settings, user, connectionStatus } = useSelector((state) => state.auth);
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
+
+  // const { settings, connectionStatus } = useSelector((state) => state.auth);
+
+  // const authDispatch = useDispatch();
+
+  useEffect(() => {
+    //authDispatch(authActions.init());
+    console.log('init connectionStatus', connectionStatus);
+    if (connectionStatus === 'init') {
+      return;
+    }
+    if (settings.debug?.isMock) {
+      console.log('useEffect first demo');
+      authDispatch(authActions.setConnectionStatus('init'));
+    }
+    // else if (connectionStatus !== 'not-connected') {
+    //   console.log('useEffect first demo 2');
+    //   authDispatch(authActions.setConnectionStatus('not-connected'));
+    // }
+  }, []);
+
+  console.log('AuthNav', connectionStatus);
 
   useEffect(() => {
     //authDispatch(authActions.init());
@@ -121,6 +144,7 @@ const AuthNavigator: React.FC = () => {
 
   const onSetDemoMode = useCallback(async () => {
     console.log('demo mode');
+    // await signIn({ name: mockUser.name, password: mockUser.password || '' })
     dispatch(authActions.setDemoMode());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
     // eslint-disable-next-line react-hooks/exhaustive-deps

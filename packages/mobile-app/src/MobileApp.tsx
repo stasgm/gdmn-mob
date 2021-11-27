@@ -26,23 +26,23 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
-  //const { settings, connectionStatus } = useSelector((state) => state.auth);
+  // const { settings, connectionStatus } = useSelector((state) => state.auth);
 
   // const authDispatch = useDispatch();
 
   // useEffect(() => {
   //   authDispatch(authActions.init());
-  //   console.log('init connectionStatus', connectionStatus);
-  //   if (connectionStatus === 'init') {
-  //     return;
-  //   }
-  //   if (settings.debug?.isMock) {
-  //     console.log('useEffect first demo');
-  //     authDispatch(authActions.setConnectionStatus('init'));
-  //   } else if (connectionStatus !== 'not-connected') {
-  //     console.log('useEffect first demo 2');
-  //     authDispatch(authActions.setConnectionStatus('not-connected'));
-  //   }
+  //   // console.log('init connectionStatus', connectionStatus);
+  //   // if (connectionStatus === 'init') {
+  //   //   return;
+  //   // }
+  //   // if (settings.debug?.isMock) {
+  //   //   console.log('useEffect first demo');
+  //   //   authDispatch(authActions.setConnectionStatus('init'));
+  //   // } else if (connectionStatus !== 'not-connected') {
+  //   //   console.log('useEffect first demo 2');
+  //   //   authDispatch(authActions.setConnectionStatus('not-connected'));
+  //   // }
   // }, []);
 
   // console.log('MobileApp', connectionStatus);
