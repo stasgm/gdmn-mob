@@ -14,7 +14,7 @@ const ProfileScreen = () => {
 
   const { user, company, device, settings: authSettings } = useSelector((state) => state.auth);
 
-   const settings = user?.settings;
+  const settings = user?.settings;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -26,17 +26,9 @@ const ProfileScreen = () => {
   }, [navigation]);
 
   const handleLogout = () => {
-    // if (connectionStatus === 'demo') {
-    //   dispatch(authActions.setConnectionStatus('init'));
-    // }
     console.log('logout isMock', api.config.debug?.isMock);
     dispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-    // dispatch(authActions.setSettings({ ...authSettings, debug: { ...authSettings.debug, isMock: false } }));
-    // if (connectionStatus === 'demo') {
-    //   api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-    //   dispatch(authActions.setSettings({ ...authSettings, deviceId: undefined, debug: { ...authSettings.debug, isMock: false } }));
-    // }
   };
   // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 

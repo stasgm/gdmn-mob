@@ -1,15 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useAuthThunkDispatch, useDispatch, documentActions } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
 import api from '@lib/client-api';
-
-import { device as mockDevice, user as mockUser } from '@lib/mock';
-
-import { Settings } from 'react-native';
 
 import {
   SplashScreen,
@@ -34,38 +30,9 @@ const AuthNavigator: React.FC = () => {
     //authDispatch(authActions.init());
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...settings };
-    console.log('11111settings', settings);
-    // // authDispatch(authActions.init());
-    // console.log('init connectionStatus', connectionStatus);
-    // if (connectionStatus === 'init') {
-    //   return;
-    // }
-    // if (settings.debug?.isMock) {
-    //   console.log('useEffect first demo');
-    //   authDispatch(authActions.setConnectionStatus('init'));
-    // } else if (connectionStatus !== 'not-connected') {
-    //   console.log('useEffect first demo 2');
-    //   authDispatch(authActions.setConnectionStatus('not-connected'));
-    // }
+    console.log('useEffect', settings);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // useEffect(() => {
-  //   // authDispatch(authActions.init());
-  //   console.log('init connectionStatus', connectionStatus);
-  //   if (connectionStatus === 'init') {
-  //     return;
-  //   }
-  //   if (settings.debug?.isMock) {
-  //     console.log('useEffect first demo');
-  //     authDispatch(authActions.setConnectionStatus('init'));
-  //   } else if (connectionStatus !== 'not-connected') {
-  //     console.log('useEffect first demo 2');
-  //     authDispatch(authActions.setConnectionStatus('not-connected'));
-  //   }
-  // }, []);
-
-  // console.log('settings111', settings);
 
   const disconnect = useCallback(() => {
     authDispatch(authActions.disconnect());
@@ -86,7 +53,6 @@ const AuthNavigator: React.FC = () => {
   const checkDevice = useCallback(() => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
-    // setConnectionMode(false);
     authDispatch(authActions.getDeviceStatus(settings?.deviceId));
     //Получим устройство по uid
     if (settings?.deviceId && user) {
@@ -121,8 +87,7 @@ const AuthNavigator: React.FC = () => {
     console.log('logout', connectionStatus);
     authDispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-    // authDispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: false } }));
-  }, [connectionStatus, authDispatch, settings]);
+  }, [connectionStatus, authDispatch]);
 
   const setCompany = useCallback((company: ICompany) => authDispatch(authActions.setCompany(company)), [authDispatch]);
 
@@ -151,22 +116,13 @@ const AuthNavigator: React.FC = () => {
   const onSetServerMode = useCallback(() => {
     disconnect();
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-    authDispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: false } }));
-    dispatch(authActions.setConnectionStatus('not-connected'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disconnect, authDispatch]);
 
   const onSetDemoMode = useCallback(async () => {
     console.log('demo mode');
     dispatch(authActions.setDemoMode());
-    // dispatch(authActions.setConnectionStatus('demo'));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
-    // authDispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: true } }));
-    // await signIn({ name: mockUser.name, password: mockUser.password || '' });
-    // setCompany(mockUser.company as ICompany);
-    // await authDispatch(authActions.getDeviceByUid(mockDevice.uid));
-    // dispatch(documentActions.init());
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, authDispatch, setCompany, signIn]);
 

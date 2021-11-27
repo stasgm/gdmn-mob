@@ -4,10 +4,12 @@ import { getType } from 'typesafe-actions';
 
 import { config } from '@lib/client-config';
 
+import { device as mockDevice, user as mockUser } from '@lib/mock';
+
+import { ICompany } from '@lib/types';
+
 import { AuthState } from './types';
 import { AuthActionType, actions } from './actions';
-import { device as mockDevice, user as mockUser } from '@lib/mock';
-import { ICompany } from '@lib/types';
 
 const {
   server: { name, port, protocol },
@@ -126,6 +128,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         error: false,
         status: '',
         loading: false,
+        settings: { ...state.settings, debug: { ...state.settings.debug, isMock: true } },
       };
 
     case getType(actions.getDeviceStatusAsync.request):

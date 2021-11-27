@@ -4,8 +4,8 @@ import { View, Keyboard } from 'react-native';
 import { IUserCredentials } from '@lib/types';
 import { useSelector } from '@lib/store';
 import { AppInputScreen, globalStyles as styles, Input, PrimeButton, RoundButton, ScreenTitle } from '@lib/mobile-ui';
-import api from '@lib/client-api';
-import { user as mockUser } from '@lib/mock';
+// import api from '@lib/client-api';
+// import { user as mockUser } from '@lib/mock';
 
 /*
   Порядок работы:
@@ -27,18 +27,18 @@ const SignInScreen = (props: Props) => {
 
   const { error, loading, status } = useSelector((state) => state.auth);
 
-  let initialCredentials: IUserCredentials = {
+  const initialCredentials: IUserCredentials = {
     name: '',
     password: '',
   };
 
-  if (api.config.debug?.isMock) {
-    // config.debug?.useMockup
-    initialCredentials = {
-      name: mockUser.name,
-      password: mockUser.password || '',
-    };
-  }
+  // if (api.config.debug?.isMock) {
+  //   // config.debug?.useMockup
+  //   initialCredentials = {
+  //     name: mockUser.name,
+  //     password: mockUser.password || '',
+  //   };
+  // }
 
   const [credential, setCredentials] = useState<IUserCredentials>(initialCredentials);
 
