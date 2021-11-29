@@ -6,11 +6,24 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { StatusType } from '@lib/types';
 import { globalStyles as styles } from '@lib/mobile-ui';
-import { IDocumentListRenderItemProps } from '@lib/types';
 
-import { getStatusColor } from '@lib/mobile-ui/src/styles/global';
+import { getStatusColor } from '../../../utils/constants';
 import { DocumentsStackParamList } from '../../../navigation/Root/types';
+
+export interface IDocumentListItemProps {
+  title: string;
+  documentDate: string;
+  subtitle?: string;
+  status?: StatusType;
+  isFromRoute?: boolean;
+  lineCount?: number;
+  errorMessage?: string;
+}
+export interface IDocumentListRenderItemProps extends IDocumentListItemProps {
+  id: string;
+}
 
 export const DocumentListItem = ({
   id,
