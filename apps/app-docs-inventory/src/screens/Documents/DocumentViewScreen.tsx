@@ -28,9 +28,11 @@ export const DocumentViewScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentView'>>();
   const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
+  console.log('id', id);
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
+  const dd = docSelectors.selectByDocType<IInventoryDocument>('order');
 
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
-
+  console.log('inventory', dd);
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
