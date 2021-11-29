@@ -141,7 +141,8 @@ export const DocumentEditScreen = () => {
   }, [dispatch, inventory]);
 
   const handleSave = useCallback(() => {
-    if (!(docNumber && docType && docDepart && docOnDate)) {
+    if (!(docNumber && docType)) {
+      //&& docDepart  && docOnDate
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 

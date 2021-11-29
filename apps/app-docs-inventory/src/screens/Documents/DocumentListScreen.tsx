@@ -10,16 +10,18 @@ import {
   DrawerButton,
   SubTitle,
   AddButton,
-  FilterButtons
+  FilterButtons,
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
-import { IDocumentListRenderItemProps } from '@lib/types';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index'
+
+import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { IInventoryDocument } from '../../store/types';
-import { DocumentSwipeListItem } from './components/DocumentSwipeListItem';
 
+import { IDocumentListRenderItemProps } from './components/DocumentListItem';
+
+import { DocumentSwipeListItem } from './components/DocumentSwipeListItem';
 
 export interface DocumentListProps {
   orders: IDocumentListRenderItemProps[];
@@ -31,7 +33,6 @@ export interface DocumentListSectionProps {
 export type SectionDataProps = SectionListData<IDocumentListRenderItemProps, DocumentListSectionProps>[];
 
 export const DocumentListScreen = () => {
-
   const navigation = useNavigation();
 
   const { loading } = useSelector((state) => state.documents);
@@ -57,9 +58,9 @@ export const DocumentListScreen = () => {
         ({
           id: i.id,
           title: i.head.department?.name,
-          documentDate: getDateString(i.head?.onDate),
+          documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} на ${getDateString(i.head?.onDate)}`,
+          subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
@@ -120,10 +121,9 @@ export const DocumentListScreen = () => {
         renderSectionHeader={({ section }) => (
           <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
         )}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>
   );
-
 };
