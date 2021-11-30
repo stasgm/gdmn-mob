@@ -24,7 +24,7 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb } from './services/dao/db';
+import { createDb, dbtype } from './services/dao/db';
 
 interface IServer {
   name: string;
@@ -40,12 +40,17 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();
   app.keys = ['super-secret-key-web1215'];
 
-  app.context.db = createDb(server.dbPath, server.dbName);
+  app.context.db = await createDb(server.dbPath, server.dbName);
   app.context.port = server.port;
   app.context.name = server.name;
 
+  const dbArr = await (app.context.db as dbtype).dbid.read();
+  const dbid = dbArr.length === 1 ? dbArr[0].id : '';
+  const Config = { ...koaConfig, key: koaConfig.key + dbid };
+
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
+
   passport.serializeUser((user: unknown, done) => {
     done(null, (user as IUser).id);
   });
@@ -90,7 +95,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
       }),
     )
     .use(morganlogger('combined', { stream: accessLogStream }))
-    .use(session(koaConfig, app))
+    .use(session(Config, app))
     .use(passport.initialize())
     .use(passport.session())
     .use(

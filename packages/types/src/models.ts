@@ -98,3 +98,5 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
 export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
 }
+
+export type IDBid = IEntity;
