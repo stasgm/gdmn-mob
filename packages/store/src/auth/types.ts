@@ -1,7 +1,7 @@
 import { IDevice, IUser, ICompany } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
-export type ConnectionStatus = 'init' | 'demo' | 'not-connected' | 'connected' | 'not-activated';
+export type ConnectionStatus = 'not-connected' | 'connected' | 'not-activated';
 
 export type AuthState = {
   readonly user: IUser | undefined;

@@ -22,7 +22,7 @@ const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
-  connectionStatus: 'init',
+  connectionStatus: 'not-connected',
   userToken: undefined,
   settings: {
     apiPath,
@@ -128,7 +128,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         error: false,
         status: '',
         loading: false,
-        settings: { ...state.settings, debug: { ...state.settings.debug, isMock: true } },
+        settings: { ...state.settings, debug: { ...state.settings.debug, isMock: false } },
       };
 
     case getType(actions.getDeviceStatusAsync.request):
@@ -168,7 +168,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setDemoMode):
       return {
         ...state,
-        connectionStatus: 'demo',
+        connectionStatus: 'connected',
         user: mockUser,
         device: mockDevice,
         company: mockUser.company as ICompany,

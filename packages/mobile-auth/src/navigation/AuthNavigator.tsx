@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
-import { user as mockUser } from '@lib/mock';
 
 import api from '@lib/client-api';
 
@@ -18,7 +17,6 @@ import {
 } from '../screens';
 
 import { AuthStackParamList } from './types';
-// import { useNavigation } from '@react-navigation/native';
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
@@ -27,35 +25,30 @@ const AuthNavigator: React.FC = () => {
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
-  // const { settings, connectionStatus } = useSelector((state) => state.auth);
-
-  // const authDispatch = useDispatch();
+  const [isInit, setInit] = useState(false);
 
   useEffect(() => {
     //authDispatch(authActions.init());
-    console.log('init connectionStatus', connectionStatus);
-    if (connectionStatus === 'init') {
-      return;
-    }
-    if (settings.debug?.isMock) {
-      console.log('useEffect first demo');
-      authDispatch(authActions.setConnectionStatus('init'));
-    }
-    // else if (connectionStatus !== 'not-connected') {
-    //   console.log('useEffect first demo 2');
-    //   authDispatch(authActions.setConnectionStatus('not-connected'));
-    // }
-  }, []);
-
-  console.log('AuthNav', connectionStatus);
-
-  useEffect(() => {
-    //authDispatch(authActions.init());
+    let isMock = settings.debug?.isMock;
     //При запуске приложения записываем настройки в апи
+    if (connectionStatus === 'not-connected' && (!settings.deviceId || settings.debug?.isMock)) {
+      if (settings.debug?.isMock) {
+        disconnect();
+        isMock = false;
+      };
+      setInit(true);
+    }
+
     api.config = { ...api.config, ...settings };
-    console.log('useEffect', settings);
+
+    console.log('settings', settings);
+    console.log('api.config', api.config);
+    console.log('connectionStatus', connectionStatus);
+    console.log('settings.debug?.isMock', settings.debug?.isMock);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  console.log('isInit', isInit, settings.deviceId);
 
   const disconnect = useCallback(() => {
     authDispatch(authActions.disconnect());
@@ -67,8 +60,7 @@ const AuthNavigator: React.FC = () => {
         disconnect();
       }
       authDispatch(authActions.setSettings(newSettings));
-      api.config = { ...newSettings };
-      console.log('api.config', api.config);
+      api.config = { ...api.config, ...newSettings };
     },
     [disconnect, authDispatch],
   );
@@ -107,10 +99,9 @@ const AuthNavigator: React.FC = () => {
   );
 
   const logout = useCallback(async () => {
-    console.log('logout', connectionStatus);
     authDispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-  }, [connectionStatus, authDispatch]);
+  }, [authDispatch]);
 
   const setCompany = useCallback((company: ICompany) => authDispatch(authActions.setCompany(company)), [authDispatch]);
 
@@ -138,13 +129,12 @@ const AuthNavigator: React.FC = () => {
 
   const onSetServerMode = useCallback(() => {
     disconnect();
+    setInit(false);
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disconnect, authDispatch]);
 
   const onSetDemoMode = useCallback(async () => {
-    console.log('demo mode');
-    // await signIn({ name: mockUser.name, password: mockUser.password || '' })
     dispatch(authActions.setDemoMode());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -169,7 +159,7 @@ const AuthNavigator: React.FC = () => {
 
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      {connectionStatus === 'init' ? (
+      {isInit ? (
         <AuthStack.Screen
           name="Mode"
           component={ModeSelection}

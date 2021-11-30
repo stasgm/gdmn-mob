@@ -52,7 +52,7 @@ const ConfigScreen = (props: Props) => {
       <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
       <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
       <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
-      <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
+      {/* <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} /> */}
       <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} />
       <View style={localStyles.buttonsView}>
         <PrimeButton
@@ -61,7 +61,7 @@ const ConfigScreen = (props: Props) => {
           style={localStyles.button}
           disabled={!serverName || !serverPort || !timeout}
         >
-          Принять
+          Сохранить
         </PrimeButton>
         <PrimeButton icon="cancel" onPress={() => navigation.navigate('Splash')} style={localStyles.button}>
           Отмена
