@@ -23,8 +23,6 @@ const AuthNavigator: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // console.log('settings111', settings);
-
   const disconnect = useCallback(() => {
     dispatch(authActions.disconnect());
   }, [dispatch]);

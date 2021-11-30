@@ -41,7 +41,6 @@ function SellBillScreen() {
 
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
-  const [info, setInfo] = useState('');
 
   const { colors } = useTheme();
 

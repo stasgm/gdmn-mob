@@ -22,6 +22,8 @@ const getConfig = () => {
   console.log('process.env.DEV_ENV', process.env.NODE_ENV);
   console.log('process.env.MOCK', process.env.MOCK);
 
+  console.log('config', process.env.NODE_ENV, dev);
+
   switch (process.env.NODE_ENV) {
     case 'production':
       config = prod;

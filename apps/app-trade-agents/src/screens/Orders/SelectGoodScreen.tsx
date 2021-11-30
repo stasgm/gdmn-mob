@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { docSelectors, refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
@@ -10,7 +10,8 @@ import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood } from '../../store/types';
+import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
+import { useSelector as useAppTradeSelector } from '../../store/';
 
 const Good = ({ item }: { item: INamedEntity }) => {
   const navigation = useNavigation();
@@ -45,14 +46,22 @@ const Good = ({ item }: { item: INamedEntity }) => {
 const SelectGoodScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
-  const { groupId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
+  const { groupId, docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
+
+  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+
+  const { model } = useAppTradeSelector((state) => state.appTrade);
+
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
+
+  const groupsModel = model[contact?.id || ''][groups.find((gr) => gr.id === groupId)?.parent?.id || ''] || {};
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
   const goods = refSelectors.selectByName<IGood>('good');
 
-  const list = goods.data?.filter((good) => good.goodgroup.id === groupId);
+  const list = groupsModel[groupId];
 
   const filteredList = useMemo(() => {
     return (

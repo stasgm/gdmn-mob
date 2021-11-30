@@ -37,7 +37,6 @@ class Api extends BaseApi {
     this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
-
     this.setAxios(config);
   }
 
@@ -110,6 +109,8 @@ const {
   apiPath,
   version,
 } = config;
+
+console.log('config 111', config, version);
 
 export default new Api({
   apiPath,

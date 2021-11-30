@@ -3,7 +3,7 @@ import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { INamedEntity } from '@lib/types';
-import { appActions, refSelectors, useSelector } from '@lib/store';
+import { appActions, refSelectors, useSelector, IFormParam } from '@lib/store';
 import {
   AppScreen,
   BackButton,
@@ -15,10 +15,10 @@ import {
 } from '@lib/mobile-ui';
 
 import { useDispatch } from '../store';
-import { IOutlet } from '../store/types';
 import { extraPredicate } from '../utils/helpers';
-import { IFormParam } from '../store/app/types';
+
 import { RefParamList } from '../navigation/Root/types';
+import { IOutlet } from '../store/types';
 
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
