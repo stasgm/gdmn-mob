@@ -7,6 +7,7 @@ import { Settings } from '@lib/types';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
 
 import { persistor, store } from './src/store';
+
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
@@ -48,19 +49,19 @@ const Root = () => {
 
   const appSettings: Settings = {
     serverName: {
-      id: '4',
-      sortOrder: 4,
+      id: '5',
+      sortOrder: 5,
       description: 'Бэк-офис. Адрес сервера',
       data: 'http://192.168.0.70',
       type: 'string',
       visible: true,
     },
     serverPort: {
-      id: '5',
+      id: '6',
       description: 'Бэк-офис. Порт сервера',
       data: '8000',
       type: 'string',
-      sortOrder: 5,
+      sortOrder: 6,
       visible: true,
     },
     // timeout: {
@@ -72,7 +73,7 @@ const Root = () => {
     //   visible: true,
     // },
     returnDocTime: {
-      id: '6',
+      id: '7',
       description: 'Время поиска накладных возврата, дн',
       data: 30,
       type: 'number',
