@@ -145,15 +145,12 @@ const SelectGroupScreen = () => {
   );
   // const firstLevelGroups = Object.entries(contactModel).map((i) => i[1]).;
 
-  console.log('firstLevelGroups', firstLevelGroups);
-
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
     });
-    console.log('useLayoutEffect');
 
     if (formParams?.groupId) {
       const expandGroup = groups.data.find((group) => group.id === formParams.groupId);

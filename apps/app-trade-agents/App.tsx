@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
-import { IReference, Settings } from '@lib/types';
+import { IReference, ISettingsOption, Settings } from '@lib/types';
 import { refSelectors, settingsActions, useDispatch, useSelector, referenceActions } from '@lib/store';
 
 import { Caption } from 'react-native-paper';
@@ -90,8 +90,12 @@ const Root = () => {
   };
 
   const storeSettings = useSelector((state) => state.settings);
+
   const dispatch = useDispatch();
   const appTradeDispatch = useAppTradeThunkDispatch();
+
+  const { data: settings } = useSelector((state) => state.settings);
+  const isUseNetPrice = (settings.netPriceType as ISettingsOption<boolean>).data;
 
   useEffect(() => {
     if (appSettings) {
@@ -112,9 +116,9 @@ const Root = () => {
 
   // const { list } = useSelector((state) => state.references);
 
-  useEffect(() => dispatch(referenceActions.init()), []);
 
   const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     console.log('useEffect');
@@ -137,11 +141,11 @@ const Root = () => {
           }, {});
 
         const model: IModel = contacts.reduce((oPrev: IModel, oCur: IContact) => {
-          const netContact = netPrice.filter((n) => n.contact.id === oCur.id);
+          const netContact = netPrice.filter((n) => n.contactId === oCur.id);
           const parentGroupList: IParentGroupModel =
-            netContact.length > 0
+            netContact.length > 0 && isUseNetPrice
               ? netContact.reduce((prev: IParentGroupModel, cur: INetPrice) => {
-                  const good = goods.find((g) => g.id === cur.good.id);
+                  const good = goods.find((g) => g.id === cur.goodId);
                   if (!good) {
                     return prev;
                   }
@@ -178,13 +182,13 @@ const Root = () => {
               : refGoods;
           return { ...oPrev, [oCur.id]: parentGroupList };
         }, {});
-
+        console.log('model', model);
         await appTradeDispatch(actions.setModel(model));
       }
     };
     setModel();
     setLoading(false);
-  }, [appTradeDispatch, contacts, goods, groups, netPrice]);
+  }, [appTradeDispatch, contacts, goods, groups, netPrice, isUseNetPrice]);
 
   return loading ? (
     <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
