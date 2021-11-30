@@ -27,19 +27,17 @@ export const DocumentViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentView'>>();
-  const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
-  console.log('id', id);
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
-  const dd = docSelectors.selectByDocType<IInventoryDocument>('order');
 
-  console.log('inventory', dd);
+  const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
+
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
-    navigation.navigate('SelectGroupItem', {
+    navigation.navigate('SelectGoodItem', {
       docId: id,
     });
-  }, [navigation, id]);
+  }, [navigation, id]); //
 
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('DocumentEdit', { id });
@@ -65,7 +63,7 @@ export const DocumentViewScreen = () => {
         onPress: handleEditInventoryHead,
       },
       {
-        title: 'Удалить заявку',
+        title: 'Удалить документ',
         type: 'destructive',
         onPress: handleDelete,
       },

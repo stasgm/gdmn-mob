@@ -1,7 +1,10 @@
-import { DocumentEditScreen } from '../../screens/Documents/DocumentEditScreen';
-import { DocumentListScreen } from '../../screens/Documents/DocumentListScreen';
-import { DocumentViewScreen } from '../../screens/Documents/DocumentViewScreen';
-import { DocumentLineScreen } from '../../screens/Documents/DocumentLineScreen';
+import {
+  DocumentEditScreen,
+  SelectGoodScreen,
+  DocumentListScreen,
+  DocumentViewScreen,
+  DocumentLineScreen,
+} from '../../screens/Documents';
 
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
 
@@ -10,6 +13,7 @@ export const documentScreens = {
   DocumentView: DocumentViewScreen,
   DocumentLine: DocumentLineScreen,
   SelectRefItem: SelectRefItemScreen,
+  SelectGoodItem: SelectGoodScreen,
 };
 
 export const documentListScreens = {

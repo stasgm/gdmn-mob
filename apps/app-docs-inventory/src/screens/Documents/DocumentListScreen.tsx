@@ -40,7 +40,6 @@ export const DocumentListScreen = () => {
   const list = docSelectors
     .selectByDocType<IInventoryDocument>('order')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-  console.log('list', list);
 
   const [status, setStatus] = useState<Status>('all');
 

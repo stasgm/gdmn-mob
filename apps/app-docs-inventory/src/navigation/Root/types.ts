@@ -19,7 +19,7 @@ export type DocumentParamList = RefParamList & {
   DocumentEdit: { id: string } | undefined;
   DocumentLine: { mode: number; docId: string; item: IInventoryLine };
   SelectGroupItem: { docId: string };
-  SelectGoodItem: { docId: string; groupId: string };
+  SelectGoodItem: { docId: string }; //group Id
 };
 
 export type DocumentsStackParamList = { DocumentList: undefined } & DocumentParamList;

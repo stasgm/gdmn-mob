@@ -17,11 +17,6 @@ export interface IGood extends INamedEntity {
   scale: number; //количество единиц в месте
 }
 
-export interface IPackageGood extends IEntity {
-  good: INamedEntity;
-  package: INamedEntity;
-}
-
 //Подразделения-склады
 export type IDepartment = INamedEntity;
 
@@ -47,3 +42,8 @@ export interface IInventoryLine extends IEntity {
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
+
+/* export interface IPackageGood extends IEntity {
+  good: INamedEntity;
+  package: INamedEntity;
+} */

@@ -1,25 +1,21 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View, Text, Alert } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { IReference } from '@lib/types';
 
-import { IGood, IInventoryLine, IPackageGood } from '../../../store/types';
+import { IGood, IInventoryLine } from '../../../store/types';
 import { DocumentsStackParamList } from '../../../navigation/Root/types';
-
-import { Checkbox } from './Checkbox';
 
 interface IProps {
   item: IInventoryLine;
   onSetLine: (value: IInventoryLine) => void;
 }
 
-type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
+//type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 export const DocumentLine = ({ item, onSetLine }: IProps) => {
   const navigation = useNavigation();
@@ -29,16 +25,9 @@ export const DocumentLine = ({ item, onSetLine }: IProps) => {
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
 
-  const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
-  const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
-  const packages = refSelectors
-    .selectByName<IPackageGood>('packageGood')
-    ?.data?.filter((e) => e.good.id === item.good.id);
-
   const currRef = useRef<TextInput>(null);
 
   useEffect(() => {
-    //TODO временное решение
     currRef?.current && setTimeout(() => currRef.current?.focus(), 500);
   }, []);
 
@@ -73,11 +62,6 @@ export const DocumentLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  useEffect(() => {
-    onSetLine({ ...item, packagekey: pack });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pack]);
-
   const priceFSN =
     (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
@@ -101,7 +85,7 @@ export const DocumentLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Количество мест</Text>
+              <Text style={styles.name}>Количество</Text>
               <TextInput
                 style={[styles.number, styles.field]}
                 editable={true}
@@ -113,37 +97,6 @@ export const DocumentLine = ({ item, onSetLine }: IProps) => {
               />
             </View>
           </View>
-          <ItemSeparator />
-          <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-            </View>
-            <MaterialCommunityIcons
-              name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
-          {isVisiblePackages && (
-            <View>
-              {packages.length > 0 ? (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === pack?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              ) : (
-                <Text style={localStyles.text}>Для данного товара нет</Text>
-              )}
-            </View>
-          )}
-          <ItemSeparator />
         </View>
       </ScrollView>
       {mode ? (
@@ -155,12 +108,8 @@ export const DocumentLine = ({ item, onSetLine }: IProps) => {
   );
 };
 
-const localStyles = StyleSheet.create({
-  packages: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
+/* const localStyles = StyleSheet.create({
   text: {
     padding: 10,
   },
-});
+}); */
