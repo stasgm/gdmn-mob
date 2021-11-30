@@ -111,7 +111,7 @@ const signIn = (
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
-  ActionType<typeof actions.loginUserAsync /* | typeof actions.setCompany */>
+  ActionType<typeof actions.loginUserAsync>
 > => {
   return async (dispatch) => {
     dispatch(actions.loginUserAsync.request(''));
@@ -119,15 +119,6 @@ const signIn = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
-      /*       // Если к пользователю привязана компания то сразу выполняем вход
-            if (response.user.company?.id) {
-              const companyResponse = await api.company.getCompany(response.user.company?.id);
-
-              if (companyResponse.type === 'GET_COMPANY') {
-                dispatch(actions.setCompany(companyResponse.company));
-              }
-            } */
-
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
@@ -136,6 +127,28 @@ const signIn = (
     }
 
     return dispatch(actions.loginUserAsync.failure('something wrong'));
+  };
+};
+
+const logOut = (): AppThunk<
+  Promise<ActionType<typeof actions.logoutUserAsync>>,
+  AuthState,
+  ActionType<typeof actions.logoutUserAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.logoutUserAsync.request());
+
+    const response = await api.auth.logout();
+
+    if (response.type === 'LOGOUT') {
+      return dispatch(actions.logoutUserAsync.success());
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(actions.logoutUserAsync.failure(response.message));
+    }
+
+    return dispatch(actions.logoutUserAsync.failure('Ошибка выхода из учетной записи'));
   };
 };
 
@@ -230,6 +243,7 @@ export default {
   activateDevice,
   signUp,
   signIn,
+  logOut,
   getDeviceStatus,
   useAuthThunkDispatch,
   setUserSettings,

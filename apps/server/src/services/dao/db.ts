@@ -24,7 +24,7 @@ let database: dbtype | null = null;
 export const createDb = (dir: string, name: string) => {
   const db = new Database(dir, name);
 
-  const users = db.collection<IDBUser>('user');
+  const users = db.collection<IDBUser>('users');
   const devices = db.collection<IDBDevice>('devices');
   const companies = db.collection<IDBCompany>('companies');
   const codes = db.collection<IDBActivationCode>('activation-codes');

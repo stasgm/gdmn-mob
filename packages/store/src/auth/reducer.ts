@@ -19,6 +19,7 @@ const initialState: Readonly<AuthState> = {
   device: undefined,
   company: undefined,
   connectionStatus: 'not-connected',
+  userToken: undefined,
   settings: {
     apiPath,
     port,
@@ -87,11 +88,23 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.signUpAsync.failure):
       return { ...state, error: true, status: action.payload, loading: false, user: undefined };
 
-    case getType(actions.logout):
-      return { ...state, user: undefined };
+    case getType(actions.logoutUserAsync.request):
+      return { ...state, error: false, status: '', loading: true, user: undefined };
+
+    case getType(actions.logoutUserAsync.success):
+      return { ...state, user: undefined, error: false, status: '', loading: false, company: undefined };
+
+    case getType(actions.logoutUserAsync.failure):
+      return { ...state, error: true, status: action.payload, loading: false, user: undefined };
+
+    // case getType(actions.logout):
+    //   return { ...state, user: undefined, error: false, status: '', loading: false };
     // Misc
     case getType(actions.setCompany):
       return { ...state, company: action.payload };
+
+    case getType(actions.setUserToken):
+      return { ...state, userToken: action.payload };
 
     case getType(actions.disconnect):
       return {

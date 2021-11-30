@@ -44,13 +44,16 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.port = server.port;
   app.context.name = server.name;
 
-  passport.serializeUser((user: unknown, done) => done(null, (user as IUser).id));
+  //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
+  //passport сохраняет пользовательские данные
+  passport.serializeUser((user: unknown, done) => {
+    done(null, (user as IUser).id);
+  });
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  //passport достаёт пользовательские данные из сессии
   passport.deserializeUser(async (id: string, done) => {
     try {
-      //console.log('id', id);
       const user = await userService.findOne(id);
-      //console.log('user', user);
       done(null, user);
     } catch (err) {
       done(err);

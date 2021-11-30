@@ -28,7 +28,7 @@ const companies: ICompany[] = [
     editionDate: '2021.01.01',
   },
   {
-    id: '11',
+    id: '777',
     name: 'Компания 1',
     admin: user1,
     city: 'Город',

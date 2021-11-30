@@ -1,11 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text, ListRenderItem } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Snackbar, useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, authActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   SelectableInput,
@@ -20,13 +20,18 @@ import {
 import { IResponse, ISettingsOption } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IGood, IReturnDocument, ISellBill, ISellBillFormParam } from '../../store/types';
-
+import { IGood, IReturnDocument, ISellBill, IToken } from '../../store/types';
+import { ISellBillFormParam } from '../../store/app/types';
 import { getDateString } from '../../utils/helpers';
+
+import config from '../../config';
 
 import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 
-const SellBillScreen = () => {
+const onlineUser = config.USER_NAME;
+const onlineUserPass = config.USER_PASSWORD;
+
+function SellBillScreen() {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'SellBill'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SellBill'>>();
   const dispatch = useDispatch();
@@ -43,6 +48,7 @@ const SellBillScreen = () => {
 
   const { data: settings } = useSelector((state) => state.settings);
   const formParams = useSelector((state) => state.app.formParams);
+  const { userToken } = useSelector((state) => state.auth);
 
   const {
     dateBegin: docDateBegin,
@@ -60,7 +66,6 @@ const SellBillScreen = () => {
   //   };
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
-
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
   const serverName = (settings.serverName as ISettingsOption<string>).data || 0;
@@ -148,17 +153,60 @@ const SellBillScreen = () => {
   const renderItem: ListRenderItem<ISellBillListRenderItemProps> = ({ item }) =>
     returnDoc?.id && docGood ? <SellBillItem item={item} /> : null;
 
-  const handleSearchSellBills = async () => {
+  const setUserToken = useCallback((token: string) => dispatch(authActions.setUserToken(token)), [dispatch]);
+
+  const fetchLogin = async () => {
+    const pathLogin = `${serverName}:${serverPort}/v1/login`;
+    const userData = {
+      username: onlineUser,
+      password: onlineUserPass,
+    };
+
+    try {
+      const tokenFetched = await fetch(pathLogin, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const parsedToken: IResponse<IToken> = await tokenFetched.json();
+
+      if (parsedToken.result) {
+        const token: IToken | undefined = parsedToken.data;
+        if (token?.access_token) {
+          setUserToken(token?.access_token);
+          return token.access_token;
+        }
+      }
+      return undefined;
+    } catch (e) {
+      if (e instanceof TypeError) {
+        setMessage(e.message);
+      } else {
+        setMessage('Неизвестная ошибка');
+      }
+      setBarVisible(true);
+      return undefined;
+    }
+  };
+
+  const fetchSellBill = async (isFirst = true, parToken: string | undefined = userToken) => {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
-
     try {
       setLoading(true);
+      const newToken = parToken ?? (await fetchLogin()) ?? '';
 
       const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
 
-      const fetched = await fetch(path, {});
+      const fetched = await fetch(path, {
+        headers: {
+          authorization: newToken,
+        },
+      });
       const parsed: IResponse<ISellBill[]> = await fetched.json();
       console.log('pars', parsed);
 
@@ -166,6 +214,14 @@ const SellBillScreen = () => {
         setSellBills(parsed.data);
       } else {
         setMessage(parsed.error || 'Неизвестная ошибка');
+        if (parsed.error?.slice(0, 3) === '401') {
+          const token = await fetchLogin();
+          if (isFirst && token) {
+            await fetchSellBill(false, token);
+          }
+        } else {
+          setBarVisible(true);
+        }
       }
     } catch (e) {
       if (e instanceof TypeError) {
@@ -176,6 +232,10 @@ const SellBillScreen = () => {
       setBarVisible(true);
     }
     setLoading(false);
+  };
+
+  const handleSearchSellBills = async () => {
+    await fetchSellBill();
   };
 
   const handleSearchStop = () => {
@@ -249,7 +309,7 @@ const SellBillScreen = () => {
       </Snackbar>
     </AppScreen>
   );
-};
+}
 
 export default SellBillScreen;
 
