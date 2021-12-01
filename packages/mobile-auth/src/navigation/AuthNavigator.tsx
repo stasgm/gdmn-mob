@@ -7,6 +7,8 @@ import { IApiConfig } from '@lib/client-types';
 
 import api from '@lib/client-api';
 
+import { ActivityIndicator } from 'react-native';
+
 import {
   SplashScreen,
   SignInScreen,
@@ -25,30 +27,37 @@ const AuthNavigator: React.FC = () => {
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
-  const [isInit, setInit] = useState(false);
+  /*
+    При запуске приложения
+    - устанавливаем isInit, чтобы открылось окно выбора режима (демо или подключение к серверу).
+      если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
+    - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
+  */
+  const [isInit, setInit] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     //authDispatch(authActions.init());
-    let isMock = settings.debug?.isMock;
-    //При запуске приложения записываем настройки в апи
+    setLoading(true);
+    let debug = { ...api.config.debug, ...settings.debug };
+
     if (connectionStatus === 'not-connected' && (!settings.deviceId || settings.debug?.isMock)) {
-      if (settings.debug?.isMock) {
+      //Если загружается приложение в демо режиме, а перед этим не вышли из аккаунта
+      //то выполняем disconnect, меняем признак демо режима в false
+      if (settings.debug?.isMock && user) {
         disconnect();
-        isMock = false;
-      };
+        debug = { ...debug, isMock: false };
+      }
       setInit(true);
+    } else {
+      setInit(false);
     }
+    //При запуске приложения записываем настройки в апи
+    api.config = { ...api.config, ...settings, debug };
 
-    api.config = { ...api.config, ...settings };
-
-    console.log('settings', settings);
-    console.log('api.config', api.config);
-    console.log('connectionStatus', connectionStatus);
-    console.log('settings.debug?.isMock', settings.debug?.isMock);
+    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  console.log('isInit', isInit, settings.deviceId);
 
   const disconnect = useCallback(() => {
     authDispatch(authActions.disconnect());
@@ -125,8 +134,6 @@ const AuthNavigator: React.FC = () => {
     [logout, setCompany, user?.company],
   );
 
-  // const navigation = useNavigation();
-
   const onSetServerMode = useCallback(() => {
     disconnect();
     setInit(false);
@@ -151,20 +158,17 @@ const AuthNavigator: React.FC = () => {
   );
 
   /*
+    Если isInit, то переходим на окно выбора режима (демо или подключение к серверу)
     Если connectionStatus = 'not-connected', то переходим на окно с подключеним
     Если connectionStatus = 'connected' и user undefined то переходим на окно входа пользователя
     Если connectionStatus = 'connected' и есть user, то переходим на окно с компаниями
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
 
-  return (
+  return !loading ? (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
-        <AuthStack.Screen
-          name="Mode"
-          component={ModeSelection}
-          // options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
-        />
+        <AuthStack.Screen name="Mode" component={ModeSelection} />
       ) : connectionStatus === 'connected' ? (
         !user ? (
           <AuthStack.Screen
@@ -198,6 +202,8 @@ const AuthNavigator: React.FC = () => {
         <AuthStack.Screen name="Activation" component={ActivateWithParams} />
       )}
     </AuthStack.Navigator>
+  ) : (
+    <ActivityIndicator size="large" color="#0000ff" />
   );
 };
 

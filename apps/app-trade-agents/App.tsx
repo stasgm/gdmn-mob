@@ -4,7 +4,7 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Settings } from '@lib/types';
-import { authActions, settingsActions, useDispatch, useSelector } from '@lib/store';
+import { settingsActions, useDispatch, useSelector } from '@lib/store';
 
 import { persistor, store } from './src/store';
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
@@ -64,14 +64,7 @@ const Root = () => {
       sortOrder: 5,
       visible: true,
     },
-    // timeout: {
-    //   id: '6',
-    //   description: 'Бэк-офис. Время ожидания, мс',
-    //   data: 10000,
-    //   type: 'number',
-    //   sortOrder: 6,
-    //   visible: true,
-    // },
+
     returnDocTime: {
       id: '6',
       description: 'Время поиска накладных возврата, дн',
@@ -83,7 +76,6 @@ const Root = () => {
   };
 
   const storeSettings = useSelector((state) => state.settings);
-  // const { settings, connectionStatus } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -97,17 +89,6 @@ const Root = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeSettings]);
-
-  // useEffect(() => {
-  //   // dispatch(authActions.init());
-  //   if (settings.debug?.isMock) {
-  //     console.log('useEffect first demo');
-  //     dispatch(authActions.setConnectionStatus('init'));
-  //   } else if (connectionStatus !== 'init' && connectionStatus !== 'not-connected') {
-  //     console.log('useEffect first demo 2');
-  //     dispatch(authActions.setConnectionStatus('not-connected'));
-  //   }
-  // }, []);
 
   return (
     // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне

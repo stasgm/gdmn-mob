@@ -30,7 +30,6 @@ const ProfileScreen = () => {
     dispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   };
-  // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
 
   const visibleList = settings && Object.entries(settings).filter(([_, item]) => item.visible);
 
@@ -78,9 +77,6 @@ const ProfileScreen = () => {
         <PrimeButton outlined onPress={handleLogout}>
           {authSettings.debug?.isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
-        {/*         <PrimeButton outlined onPress={handleChangeCompany}>
-          Сменить организацию
-        </PrimeButton> */}
       </View>
     </View>
   );
