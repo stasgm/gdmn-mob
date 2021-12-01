@@ -114,11 +114,7 @@ const Root = () => {
   const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
   const netPrice = (refSelectors.selectByName('netPrice') as IReference<INetPrice>)?.data;
 
-  // const { list } = useSelector((state) => state.references);
-
-
   const [loading, setLoading] = useState(false);
-
 
   useEffect(() => {
     console.log('useEffect');
