@@ -17,7 +17,6 @@ type Settings<T = Record<string, SettingValue>> = {
 interface IBaseSettings {
   serverAutoCheck: boolean;
   refLoadType: boolean;
-  netPriceType: boolean;
   cleanDocTime: number;
   [name: string]: SettingValue;
 }

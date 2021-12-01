@@ -86,6 +86,7 @@ const SettingsSceen = () => {
         <View>
           {Object.entries(data)
             .filter(([_, item]) => item?.visible)
+            .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
             .map(([key, item]) => {
               return item ? (
                 <View key={key}>

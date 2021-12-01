@@ -56,8 +56,16 @@ const Root = () => {
   ];
 
   const appSettings: Settings = {
-    serverName: {
+    isUseNetPrice: {
       id: '5',
+      description: 'Использовать матрицы',
+      data: true,
+      type: 'boolean',
+      sortOrder: 3,
+      visible: true,
+    },
+    serverName: {
+      id: '6',
       sortOrder: 5,
       description: 'Бэк-офис. Адрес сервера',
       data: config.BACK_URL,
@@ -65,16 +73,15 @@ const Root = () => {
       visible: true,
     },
     serverPort: {
-      id: '6',
+      id: '7',
       description: 'Бэк-офис. Порт сервера',
       data: config.BACK_PORT,
       type: 'number',
-      sortOrder: 5,
+      sortOrder: 6,
       visible: true,
     },
-
     returnDocTime: {
-      id: '7',
+      id: '8',
       description: 'Время поиска накладных возврата, дн',
       data: 30,
       type: 'number',
@@ -89,7 +96,7 @@ const Root = () => {
   const appTradeDispatch = useAppTradeThunkDispatch();
 
   const { data: settings } = useSelector((state) => state.settings);
-  const isUseNetPrice = (settings.netPriceType as ISettingsOption<boolean>).data;
+  const isUseNetPrice = (settings?.isUseNetPrice as ISettingsOption<boolean>)?.data;
 
   useEffect(() => {
     if (appSettings) {
