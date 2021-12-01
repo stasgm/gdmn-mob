@@ -127,7 +127,7 @@ const DeviceList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти устройство'}
-            valueRef={valueRef}
+            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}

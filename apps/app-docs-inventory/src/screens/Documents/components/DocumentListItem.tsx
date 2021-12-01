@@ -10,6 +10,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { IDocumentListRenderItemProps } from '@lib/types';
 
 import { getStatusColor } from '@lib/mobile-ui/src/styles/global';
+
 import { DocumentsStackParamList } from '../../../navigation/Root/types';
 
 export const DocumentListItem = ({

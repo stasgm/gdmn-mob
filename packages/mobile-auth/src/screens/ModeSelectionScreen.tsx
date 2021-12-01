@@ -4,10 +4,12 @@ import { View, TouchableOpacity, Text } from 'react-native';
 import { PrimeButton, AppScreen, ScreenTitle } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
-import localStyles from './styles';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+
 import { AuthStackParamList } from '../navigation/types';
+
+import localStyles from './styles';
 
 type Props = {
   onSetDemoMode: () => void;

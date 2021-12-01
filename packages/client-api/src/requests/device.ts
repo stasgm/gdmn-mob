@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
-import { device as mockDevice, devices as mockDevices } from '@lib/mock';
+import { device as mockDevice } from '@lib/mock';
 
 import { error, device as types } from '../types';
 import { getParams, sleep } from '../utils';

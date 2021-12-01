@@ -56,8 +56,9 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
  * @param {IDBDevice} deviceBindingId - устройство
  * @return обновленную связь
  * */
-const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>, params?: Record<string, string>) => {
-  const { deviceBindings, companies, devices } = getDb();
+const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>) => {
+  //, params?: Record<string, string>
+  const { deviceBindings } = getDb();
 
   const oldDeviceBinding = await deviceBindings.find(id);
 

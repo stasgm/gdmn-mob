@@ -1,8 +1,4 @@
-import { ICompany, IDocument, IMessage, INamedEntity, IReferences, NewMessage, ICmd, ICmdParams } from '@lib/types';
-
-import { company3 } from '..';
-
-// import { companyRefMock, depRefMock, docTypeRefMock, peopleRefMock, goodsRefMock } from './references';
+import { ICompany, IDocument, IMessage, INamedEntity, IReferences, ICmd, ICmdParams } from '@lib/types';
 
 const user1: INamedEntity = {
   id: '123',
@@ -12,11 +8,6 @@ const user1: INamedEntity = {
 const user2: INamedEntity = {
   id: '15',
   name: 'ГОЦЕЛЮК Н. А.',
-};
-
-const user3: INamedEntity = {
-  id: '654',
-  name: 'Gedemin',
 };
 
 const companies: ICompany[] = [

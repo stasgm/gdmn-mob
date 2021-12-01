@@ -1,5 +1,5 @@
-import  { DocumentEditScreen } from '../../screens/Documents/DocumentEditScreen';
-import  { DocumentListScreen } from '../../screens/Documents/DocumentListScreen';
+import { DocumentEditScreen } from '../../screens/Documents/DocumentEditScreen';
+import { DocumentListScreen } from '../../screens/Documents/DocumentListScreen';
 
 export const documentScreens = {
   DocumentEdit: DocumentEditScreen,

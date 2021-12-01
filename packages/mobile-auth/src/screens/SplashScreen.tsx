@@ -17,7 +17,7 @@ type Props = {
 const SplashScreen = (props: Props) => {
   const navigation = useNavigation();
 
-  const { onCheckDevice, onBreakConnection, settings } = props;
+  const { onCheckDevice, onBreakConnection } = props;
   const { error, loading, status } = useSelector((state) => state.auth);
 
   return (

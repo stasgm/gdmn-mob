@@ -10,16 +10,16 @@ import {
   DrawerButton,
   SubTitle,
   AddButton,
-  FilterButtons
+  FilterButtons,
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
 import { IDocumentListRenderItemProps } from '@lib/types';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index'
+import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { IInventoryDocument } from '../../store/types';
-import { DocumentSwipeListItem } from './components/DocumentSwipeListItem';
 
+import { DocumentSwipeListItem } from './components/DocumentSwipeListItem';
 
 export interface DocumentListProps {
   orders: IDocumentListRenderItemProps[];
@@ -31,7 +31,6 @@ export interface DocumentListSectionProps {
 export type SectionDataProps = SectionListData<IDocumentListRenderItemProps, DocumentListSectionProps>[];
 
 export const DocumentListScreen = () => {
-
   const navigation = useNavigation();
 
   const { loading } = useSelector((state) => state.documents);
@@ -125,5 +124,4 @@ export const DocumentListScreen = () => {
       />
     </AppScreen>
   );
-
 };

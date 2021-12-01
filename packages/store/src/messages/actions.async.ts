@@ -1,5 +1,5 @@
 import api from '@lib/client-api';
-import { IMessage } from '@lib/types';
+
 import { ThunkDispatch } from 'redux-thunk';
 import { useDispatch } from 'react-redux';
 

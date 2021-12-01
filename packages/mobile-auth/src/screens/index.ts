@@ -6,4 +6,12 @@ import { default as CompaniesScreen } from './CompaniesScreen';
 import { default as AppLoadScreen } from './AppLoadScreen';
 import { default as ModeSelectionScreen } from './ModeSelectionScreen';
 
-export { ActivationScreen, SplashScreen, CompaniesScreen, ConfigScreen, SignInScreen, AppLoadScreen, ModeSelectionScreen };
+export {
+  ActivationScreen,
+  SplashScreen,
+  CompaniesScreen,
+  ConfigScreen,
+  SignInScreen,
+  AppLoadScreen,
+  ModeSelectionScreen,
+};

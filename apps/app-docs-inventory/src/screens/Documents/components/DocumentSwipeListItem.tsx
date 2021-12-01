@@ -5,13 +5,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
+import { IDocumentListRenderItemProps } from '@lib/types';
+
 import { DocumentsStackParamList } from '../../../navigation/Root/types';
 import { IInventoryDocument } from '../../../store/types';
 
 import { SwipeItem } from '../../../components/SwipeItem';
-import { DocumentListItem } from './DocumentListItem';
 
-import { IDocumentListRenderItemProps } from '@lib/types';
+import { DocumentListItem } from './DocumentListItem';
 
 interface IProps {
   renderItem: IDocumentListRenderItemProps;

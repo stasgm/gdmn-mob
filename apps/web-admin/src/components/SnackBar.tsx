@@ -9,7 +9,8 @@ interface props {
 const SnackBar = ({ errorMessage, onClearError }: props) => {
   const [openAlert, setOpenAlert] = useState(false);
 
-  const handleClose = (_event?: React.SyntheticEvent, reason?: string) => {
+  const handleClose = (_event?: React.SyntheticEvent) => {
+    // , reason?: string
     // if (reason === 'clickaway') {
     //   return;
     // }

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Platform, ReturnKeyTypeOptions, View, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { ReturnKeyTypeOptions, View, TouchableOpacity } from 'react-native';
 import { TextInput, useTheme, IconButton } from 'react-native-paper';
 
 import styles from './styles';

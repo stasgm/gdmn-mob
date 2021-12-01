@@ -1,7 +1,7 @@
 import { SettingValue } from '@lib/types';
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Subheading, Switch, useTheme } from 'react-native-paper';
+import { Subheading, Switch } from 'react-native-paper';
 
 import Input from './Input';
 
