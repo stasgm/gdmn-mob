@@ -45,7 +45,7 @@ class DeviceBinding extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка добавления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка добавления устройства',
       } as error.INetworkError;
     }
   };
@@ -77,7 +77,7 @@ class DeviceBinding extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка обновления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка обновления устройства',
       } as error.INetworkError;
     }
   };
@@ -107,7 +107,7 @@ class DeviceBinding extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления устройства',
       } as error.INetworkError;
     }
   };
@@ -152,7 +152,7 @@ class DeviceBinding extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
+        message: err instanceof TypeError ? err.message : 'ошибка подключения',
       } as error.INetworkError;
     }
   };
@@ -199,7 +199,7 @@ class DeviceBinding extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
       };
     }
   };
