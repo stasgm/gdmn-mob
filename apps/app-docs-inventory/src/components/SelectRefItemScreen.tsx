@@ -37,10 +37,6 @@ export const SelectRefItemScreen = () => {
             }
           }
         });
-        // params = { name: 'Раница' }
-
-        // }
-
         return extraPredicate(item, newParams);
       });
     }

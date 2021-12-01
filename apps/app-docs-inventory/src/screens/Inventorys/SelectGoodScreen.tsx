@@ -10,18 +10,18 @@ import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
-import { DocumentsStackParamList } from '../../navigation/Root/types';
+import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/types';
 
 const Good = ({ item }: { item: INamedEntity }) => {
   const navigation = useNavigation();
 
-  const { docId } = useRoute<RouteProp<DocumentsStackParamList, 'SelectGoodItem'>>().params;
+  const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectGoodItem'>>().params;
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('DocumentLine', {
+        navigation.navigate('InventoryLine', {
           mode: 0,
           docId,
           item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
@@ -45,15 +45,12 @@ const Good = ({ item }: { item: INamedEntity }) => {
 export const SelectGoodScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
-  //const { docId } = useRoute<RouteProp<DocumentsStackParamList, 'SelectGoodItem'>>().params;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
   const goods = refSelectors.selectByName<IGood>('good');
   const list = goods.data;
-  //console.log('Goods', goods);
-  //console.log('List', list);
 
   const filteredList = useMemo(() => {
     return (

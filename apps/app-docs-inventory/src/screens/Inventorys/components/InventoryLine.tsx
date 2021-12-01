@@ -8,7 +8,7 @@ import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { IReference } from '@lib/types';
 
 import { IGood, IInventoryLine } from '../../../store/types';
-import { DocumentsStackParamList } from '../../../navigation/Root/types';
+import { InventorysStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {
   item: IInventoryLine;
@@ -17,11 +17,11 @@ interface IProps {
 
 //type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
-export const DocumentLine = ({ item, onSetLine }: IProps) => {
+export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const { docId, mode } = useRoute<RouteProp<DocumentsStackParamList, 'DocumentLine'>>().params;
+  const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
 

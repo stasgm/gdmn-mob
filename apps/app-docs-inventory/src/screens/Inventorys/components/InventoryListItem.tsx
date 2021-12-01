@@ -10,9 +10,9 @@ import { StatusType } from '@lib/types';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { getStatusColor } from '../../../utils/constants';
-import { DocumentsStackParamList } from '../../../navigation/Root/types';
+import { InventorysStackParamList } from '../../../navigation/Root/types';
 
-export interface IDocumentListItemProps {
+export interface IInventoryListItemProps {
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -21,11 +21,11 @@ export interface IDocumentListItemProps {
   lineCount?: number;
   errorMessage?: string;
 }
-export interface IDocumentListRenderItemProps extends IDocumentListItemProps {
+export interface IInventoryListRenderItemProps extends IInventoryListItemProps {
   id: string;
 }
 
-export const DocumentListItem = ({
+export const InventoryListItem = ({
   id,
   title,
   subtitle,
@@ -33,14 +33,14 @@ export const DocumentListItem = ({
   lineCount,
   isFromRoute,
   errorMessage,
-}: IDocumentListRenderItemProps) => {
+}: IInventoryListRenderItemProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentList'>>();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('DocumentView', { id });
+        navigation.navigate('InventoryView', { id });
       }}
     >
       <View style={styles.item}>

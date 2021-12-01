@@ -27,26 +27,25 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { DocumentsStackParamList } from '../../navigation/Root/types';
+import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryFormParam } from '../../store/app/types';
 import { IInventoryDocument, IDepartment } from '../../store/types';
 
-export const DocumentEditScreen = () => {
-  const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentEdit'>>();
+export const InventoryEditScreen = () => {
+  const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryEdit'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
-
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
 
   const {
     documentType: docType,
     department: docDepartment,
     depart: docDepart,
     onDate: docOnDate,
-    documentDate: docDocumentDate,
+    documentDate: docInventoryDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
@@ -169,7 +168,7 @@ export const DocumentEditScreen = () => {
 
       docDispatch(documentActions.addDocument(newInventory));
 
-      navigation.dispatch(StackActions.replace('DocumentView', { id: newInventory.id }));
+      navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
     } else {
       if (!inventory) {
         return;
@@ -197,7 +196,7 @@ export const DocumentEditScreen = () => {
       };
 
       docDispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
-      navigation.navigate('DocumentView', { id });
+      navigation.navigate('InventoryView', { id });
     }
   }, [
     docType,
@@ -263,7 +262,7 @@ export const DocumentEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
-      fieldName: 'docDepart',
+      fieldName: 'depart',
       value: docDepart && [docDepart],
     });
   };

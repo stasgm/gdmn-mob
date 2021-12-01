@@ -42,8 +42,3 @@ export interface IInventoryLine extends IEntity {
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
-
-/* export interface IPackageGood extends IEntity {
-  good: INamedEntity;
-  package: INamedEntity;
-} */

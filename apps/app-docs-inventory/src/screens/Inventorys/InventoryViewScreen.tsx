@@ -18,17 +18,17 @@ import {
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
-import { DocumentsStackParamList } from '../../navigation/Root/types';
+import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
-import { DocumentItem } from './components/DocumentItem';
+import { InventoryItem } from './components/InventoryItem';
 
-export const DocumentViewScreen = () => {
+export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentView'>>();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
 
-  const id = useRoute<RouteProp<DocumentsStackParamList, 'DocumentView'>>().params?.id;
+  const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryView'>>().params?.id;
   const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
 
   const isBlocked = inventory?.status !== 'DRAFT';
@@ -40,7 +40,7 @@ export const DocumentViewScreen = () => {
   }, [navigation, id]); //
 
   const handleEditInventoryHead = useCallback(() => {
-    navigation.navigate('DocumentEdit', { id });
+    navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
@@ -96,7 +96,7 @@ export const DocumentViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <DocumentItem docId={inventory.id} item={item} readonly={isBlocked} />
+    <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
   );
 
   return (

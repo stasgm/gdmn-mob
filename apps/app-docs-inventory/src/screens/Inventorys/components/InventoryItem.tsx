@@ -9,7 +9,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { IGood, IInventoryLine } from '../../../store/types';
-import { DocumentsStackParamList } from '../../../navigation/Root/types';
+import { InventorysStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {
   docId: string;
@@ -17,16 +17,16 @@ interface IProps {
   readonly?: boolean;
 }
 
-export const DocumentItem = ({ docId, item, readonly = false }: IProps) => {
+export const InventoryItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentView'>>();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventorytView'>>();
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 
   return (
     <TouchableOpacity
       onPress={() => {
-        !readonly && navigation.navigate('DocumentLine', { mode: 1, docId, item });
+        !readonly && navigation.navigate('InventoryLine', { mode: 1, docId, item });
       }}
     >
       <View style={[styles.item]}>

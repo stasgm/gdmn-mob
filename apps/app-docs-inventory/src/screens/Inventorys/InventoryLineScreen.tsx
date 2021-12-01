@@ -6,16 +6,16 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { DocumentsStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
+import { InventorysStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine } from '../../store/types';
 
-import { DocumentLine } from './components/DocumentLine';
+import { InventoryLine } from './components/InventoryLine';
 
-export const DocumentLineScreen = () => {
+export const InventoryLineScreen = () => {
   const navigation =
-    useNavigation<StackNavigationProp<DocumentsStackParamList | RoutesStackParamList, 'DocumentLine'>>();
+    useNavigation<StackNavigationProp<InventorysStackParamList | RoutesStackParamList, 'InventoryLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, item } = useRoute<RouteProp<DocumentsStackParamList, 'DocumentLine'>>().params;
+  const { mode, docId, item } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
   const [line, setLine] = useState<IInventoryLine>(item);
 
@@ -42,7 +42,7 @@ export const DocumentLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <DocumentLine item={line} onSetLine={setLine} />
+      <InventoryLine item={line} onSetLine={setLine} />
     </View>
   );
 };

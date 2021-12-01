@@ -5,30 +5,28 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
-import { DocumentsStackParamList } from '../../../navigation/Root/types';
+import { InventorysStackParamList } from '../../../navigation/Root/types';
 import { IInventoryDocument } from '../../../store/types';
-
 import { SwipeItem } from '../../../components/SwipeItem';
-import { DocumentListItem } from './DocumentListItem';
 
-import { IDocumentListRenderItemProps } from '@lib/types';
+import { IInventoryListRenderItemProps, InventoryListItem } from './InventoryListItem';
 
 interface IProps {
-  renderItem: IDocumentListRenderItemProps;
+  renderItem: IInventoryListRenderItemProps;
   item: IInventoryDocument;
 }
 
-export const DocumentSwipeListItem = ({ item, renderItem }: IProps) => {
-  const navigation = useNavigation<StackNavigationProp<DocumentsStackParamList, 'DocumentList'>>();
+export const InventorySwipeListItem = ({ item, renderItem }: IProps) => {
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
   const dispatch = useDispatch();
 
   const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate('DocumentView', { id });
+      navigation.navigate('InventoryView', { id });
     } else if (name === 'copy') {
       const newReturnDate = new Date().toISOString();
 
-      const newDocument: IInventoryDocument = {
+      const newInventory: IInventoryDocument = {
         ...item,
         id: uuid(),
         number: 'б\\н',
@@ -38,9 +36,9 @@ export const DocumentSwipeListItem = ({ item, renderItem }: IProps) => {
         editionDate: newReturnDate,
       };
 
-      dispatch(documentActions.addDocument(newDocument));
+      dispatch(documentActions.addDocument(newInventory));
 
-      navigation.navigate('DocumentView', { id: newDocument.id });
+      navigation.navigate('InventoryView', { id: newInventory.id });
     } else if (name === 'delete') {
       if (isBlocked) {
         return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);
@@ -62,7 +60,7 @@ export const DocumentSwipeListItem = ({ item, renderItem }: IProps) => {
 
   return (
     <SwipeItem onPress={(name) => handlePressSwipeOrder(name, item.id, item?.status !== 'DRAFT')}>
-      <DocumentListItem {...renderItem} />
+      <InventoryListItem {...renderItem} />
     </SwipeItem>
   );
 };

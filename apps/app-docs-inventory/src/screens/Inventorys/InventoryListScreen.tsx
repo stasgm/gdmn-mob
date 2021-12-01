@@ -19,20 +19,20 @@ import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { IInventoryDocument } from '../../store/types';
 
-import { IDocumentListRenderItemProps } from './components/DocumentListItem';
+import { IInventoryListRenderItemProps } from './components/InventoryListItem';
 
-import { DocumentSwipeListItem } from './components/DocumentSwipeListItem';
+import { InventorySwipeListItem } from './components/InventorySwipeListItem';
 
-export interface DocumentListProps {
-  orders: IDocumentListRenderItemProps[];
+export interface InventoryListProps {
+  orders: IInventoryListRenderItemProps[];
 }
 
-export interface DocumentListSectionProps {
+export interface InventoryListSectionProps {
   title: string;
 }
-export type SectionDataProps = SectionListData<IDocumentListRenderItemProps, DocumentListSectionProps>[];
+export type SectionDataProps = SectionListData<IInventoryListRenderItemProps, InventoryListSectionProps>[];
 
-export const DocumentListScreen = () => {
+export const InventoryListScreen = () => {
   const navigation = useNavigation();
 
   const { loading } = useSelector((state) => state.documents);
@@ -43,7 +43,7 @@ export const DocumentListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: IDocumentListRenderItemProps[] = useMemo(() => {
+  const filteredList: IInventoryListRenderItemProps[] = useMemo(() => {
     const res =
       status === 'all'
         ? list
@@ -64,7 +64,7 @@ export const DocumentListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IDocumentListRenderItemProps),
+        } as IInventoryListRenderItemProps),
     );
   }, [status, list]);
 
@@ -91,7 +91,7 @@ export const DocumentListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('DocumentEdit');
+    navigation.navigate('InventoryEdit');
   }, [navigation]);
 
   useLayoutEffect(() => {
@@ -105,9 +105,9 @@ export const DocumentListScreen = () => {
     });
   }, [handleAddDocument, navigation]);
 
-  const renderItem: ListRenderItem<IDocumentListRenderItemProps> = ({ item }) => {
+  const renderItem: ListRenderItem<IInventoryListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <DocumentSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? <InventorySwipeListItem renderItem={item} item={doc} /> : null;
   };
 
   return (

@@ -5,16 +5,16 @@ import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { persistor, store } from './src/store';
-import { DocumentsNavigator } from './src/navigation/DocumentsNavigator';
+import { InventorysNavigator } from './src/navigation/InventorysNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
     () => [
       {
-        name: 'Documents',
-        title: 'Документы',
+        name: 'Inventorys',
+        title: 'Инвентаризации',
         icon: 'file-document-outline',
-        component: DocumentsNavigator,
+        component: InventorysNavigator,
       },
     ],
     [],

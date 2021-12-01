@@ -14,17 +14,17 @@ export type RefParamList = {
   SelectRefItem: IRefSelectParams;
 };
 
-export type DocumentParamList = RefParamList & {
-  DocumentView: { id: string };
-  DocumentEdit: { id: string } | undefined;
-  DocumentLine: { mode: number; docId: string; item: IInventoryLine };
+export type InventoryParamList = RefParamList & {
+  InventoryView: { id: string };
+  InventoryEdit: { id: string } | undefined;
+  InventoryLine: { mode: number; docId: string; item: IInventoryLine };
   SelectGroupItem: { docId: string };
   SelectGoodItem: { docId: string }; //group Id
 };
 
-export type DocumentsStackParamList = { DocumentList: undefined } & DocumentParamList;
+export type InventorysStackParamList = { InventoryList: undefined } & InventoryParamList;
 
-export type RoutesStackParamList = DocumentParamList & {
+export type RoutesStackParamList = InventoryParamList & {
   RouteList: undefined;
   RouteView: { id: string };
   RouteDetails: { routeId: string; id: string };

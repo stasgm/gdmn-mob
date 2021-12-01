@@ -1,21 +1,21 @@
 import {
-  DocumentEditScreen,
+  InventoryEditScreen,
   SelectGoodScreen,
-  DocumentListScreen,
-  DocumentViewScreen,
-  DocumentLineScreen,
-} from '../../screens/Documents';
+  InventoryListScreen,
+  InventoryViewScreen,
+  InventoryLineScreen,
+} from '../../screens/Inventorys';
 
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
 
-export const documentScreens = {
-  DocumentEdit: DocumentEditScreen,
-  DocumentView: DocumentViewScreen,
-  DocumentLine: DocumentLineScreen,
+export const inventoryScreens = {
+  InventoryEdit: InventoryEditScreen,
+  InventoryView: InventoryViewScreen,
+  InventoryLine: InventoryLineScreen,
   SelectRefItem: SelectRefItemScreen,
   SelectGoodItem: SelectGoodScreen,
 };
 
-export const documentListScreens = {
-  DocumentList: DocumentListScreen,
+export const inventoryListScreens = {
+  InventoryList: InventoryListScreen,
 };
