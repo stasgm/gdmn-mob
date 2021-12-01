@@ -29,14 +29,14 @@ interface IVisitProps {
   route: INamedEntity;
 }
 
-const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
+const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
 
   const [process, setProcess] = useState(false);
 
-  const dateBegin = new Date(item.head.dateBegin);
-  const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
+  const dateBegin = new Date(visit.head.dateBegin);
+  const dateEnd = visit.head.dateEnd ? new Date(visit.head.dateEnd) : undefined;
 
   const { loading } = useSelector((state) => state.app);
 
@@ -58,7 +58,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   const timeProcess = () => {
     // TODO Вынести в helpers
     const diffMinutes = Math.floor(
-      ((item.head.dateEnd ? Date.parse(item.head.dateEnd) : Date.now()) - Date.parse(item.head.dateBegin)) / 60000,
+      ((visit.head.dateEnd ? Date.parse(visit.head.dateEnd) : Date.now()) - Date.parse(visit.head.dateBegin)) / 60000,
     );
     const hour = Math.floor(diffMinutes / 60);
     return `${hour} часов ${diffMinutes - hour * 60} минут`;
@@ -85,13 +85,13 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     const date = new Date().toISOString();
 
     const updatedVisit: IVisitDocument = {
-      ...item,
+      ...visit,
       head: {
-        ...item.head,
+        ...visit.head,
         dateEnd: date,
         endGeoPoint: coords,
       },
-      creationDate: item.creationDate || date,
+      creationDate: visit.creationDate || date,
       editionDate: date,
     };
 
@@ -132,7 +132,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         outlet,
         route,
         onDate: newOrderDate,
-        takenOrder: item.head.takenType,
+        takenOrder: visit.head.takenType,
         depart: defaultDepart,
       },
       lines: [],

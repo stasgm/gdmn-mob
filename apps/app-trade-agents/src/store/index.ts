@@ -8,6 +8,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 
 import geoReducer from './geo/reducer';
 import { GeoActionType } from './geo/actions';
+import appTradeReducer from './app-trade/reducer';
 
 // export { default as geoActions } from './geo';
 // export { useGeoThunkDispatch } from './geo';
@@ -21,7 +22,7 @@ const persistGeoConfig = {
 };
 
 export const combinedReducer = {
-  // app: appReducer,
+  appTrade: appTradeReducer,
   //visits: persistReducer(persistVisitsConfig, visitsReducer),
   geo: persistReducer(persistGeoConfig, geoReducer),
 };

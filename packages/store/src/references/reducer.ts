@@ -1,8 +1,6 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { IReference, IReferenceData, IReferences } from '@lib/types';
-
 import { ReferenceState } from './types';
 import { ReferenceActionType, actions } from './actions';
 

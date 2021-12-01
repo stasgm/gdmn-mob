@@ -1,4 +1,4 @@
-import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
+import { ActionType, createAction } from 'typesafe-actions';
 
 import { ILocation } from './types';
 

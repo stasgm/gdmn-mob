@@ -1,21 +1,19 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup } from '../../store/types';
+import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
+import { useSelector as useAppTradeSelector } from '../../store/';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
-
-const keyStore = 'Order/GoodGroup';
 
 const Group = ({
   item,
@@ -29,13 +27,22 @@ const Group = ({
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
-  const goods = refSelectors.selectByName<IGood>('good').data.filter((good) => good.goodgroup.id === item.id);
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
   const groups = refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>;
 
-  const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id);
+  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+
+  const { model } = useAppTradeSelector((state) => state.appTrade);
+
+  const groupsModel = model[contact?.id || ''][item.parent?.id || item.id] || {};
+
+  const goods = groupsModel[item.id];
+
+  const nextLevelGroups = groups.data.filter(
+    (group) => group.parent?.id === item.id && groupsModel[group.id]?.length > 0,
+  );
 
   const isExpand = expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
 
@@ -66,7 +73,7 @@ const Group = ({
           {nextLevelGroups.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
-              <Text style={styles.field}>{goods.length}</Text>
+              <Text style={styles.field}>{goods?.length}</Text>
             </View>
           )}
         </View>
@@ -92,11 +99,21 @@ const Group = ({
 
 const SelectGroupScreen = () => {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
+  const dispatch = useDispatch();
+  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+
+  const formParams = useSelector((state) => state.app.formParams);
+
+  const { model } = useAppTradeSelector((state) => state.appTrade);
+
+  const contactModel = model[contact?.id || ''];
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const firstLevelGroups = groups.data.filter((item) => !item.parent);
+  const firstLevelGroups = groups.data?.filter(
+    (item) => !item.parent && Object.keys(contactModel[item.id] || []).length > 0,
+  );
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
@@ -105,38 +122,41 @@ const SelectGroupScreen = () => {
       headerLeft: () => <BackButton />,
     });
 
-    const getData = async () => {
-      try {
-        const value = await AsyncStorage.getItem(keyStore);
-        if (value !== null) {
-          const expandGroup = groups.data.find((group) => group.id === value);
-          setExpend(expandGroup);
-        }
-      } catch (e) {
-        // error reading value
-      }
-    };
+    if (formParams?.groupId) {
+      const expandGroup = groups.data.find((group) => group.id === formParams.groupId);
+      setExpend(expandGroup);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation, formParams?.groupId]);
 
-    getData();
-  }, [navigation, colors.card, groups.data]);
+  const handleSetExpand = (group: IGoodGroup | undefined) => {
+    setExpend(group);
+    dispatch(
+      appActions.setFormParams({
+        ...formParams,
+        ['groupId']: group?.id,
+      }),
+    );
+  };
 
-  useEffect(() => {
-    const storeData = async () => {
-      try {
-        expend ? await AsyncStorage.setItem(keyStore, expend.id) : await AsyncStorage.removeItem(keyStore);
-      } catch (e) {
-        // saving error
-      }
-    };
-
-    storeData();
-  }, [expend]);
+  // useEffect(() => {
+  //   if (formParams?.groupId !== expend?.id) {
+  //     console.log('useEffect setFormParams');
+  //     dispatch(
+  //       appActions.setFormParams({
+  //         ...formParams,
+  //         ['groupId']: expend?.id,
+  //       }),
+  //     );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [dispatch, expend]);
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
   const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group item={item} expendGroup={expend?.id} setExpend={setExpend} />
+    <Group item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
   );
 
   return (

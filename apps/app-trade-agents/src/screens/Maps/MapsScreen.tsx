@@ -6,8 +6,10 @@ import { Snackbar } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { globalStyles as styles, Theme, BottomSheet, RadioGroup, PrimeButton } from '@lib/mobile-ui';
+import { globalStyles as styles, Theme, BottomSheet, RadioGroup } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
+
+import { IListItem } from '@lib/mobile-types';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
@@ -17,7 +19,6 @@ import { IOutlet, IRouteDocument } from '../../store/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import localStyles from './styles';
-import { IListItem } from '@lib/mobile-types';
 
 interface Region {
   latitude: number;

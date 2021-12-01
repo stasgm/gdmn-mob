@@ -33,15 +33,15 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               onEndEditing={() => onValueChange(currentValue)}
               keyboardType={'numeric'}
             />
-          // ) : typeof currentValue === 'string' ? (
-          //   <Input
-          //     label={label}
-          //     value={currentValue}
-          //     onChangeText={(text) => setCurrentValue(text)}
-          //     keyboardType={'default'}
-          //     onEndEditing={() => onValueChange(currentValue)}
-          //   />
           ) : (
+            // ) : typeof currentValue === 'string' ? (
+            //   <Input
+            //     label={label}
+            //     value={currentValue}
+            //     onChangeText={(text) => setCurrentValue(text)}
+            //     keyboardType={'default'}
+            //     onEndEditing={() => onValueChange(currentValue)}
+            //   />
             <Input
               label={label}
               value={currentValue}

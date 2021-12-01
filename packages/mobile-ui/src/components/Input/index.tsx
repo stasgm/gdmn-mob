@@ -1,6 +1,6 @@
-import React from 'react';
-import { ReturnKeyTypeOptions, View } from 'react-native';
-import { TextInput, useTheme } from 'react-native-paper';
+import React, { useState } from 'react';
+import { Platform, ReturnKeyTypeOptions, View, TouchableOpacity } from 'react-native';
+import { TextInput, useTheme, IconButton } from 'react-native-paper';
 
 import styles from './styles';
 
@@ -32,6 +32,7 @@ interface Props {
     | undefined;
   editable?: boolean;
   disabled?: boolean;
+  clearInput?: boolean;
 }
 
 const Input: React.FC<Props> = ({
@@ -47,6 +48,7 @@ const Input: React.FC<Props> = ({
   editable,
   disabled,
   onEndEditing,
+  clearInput,
 }) => {
   const { colors } = useTheme();
 
@@ -78,6 +80,13 @@ const Input: React.FC<Props> = ({
           disabled={disabled}
           editable={editable}
         />
+        {!!value && !!clearInput && (
+          <View style={styles.button}>
+            <TouchableOpacity>
+              <IconButton icon="close" size={20} onPress={() => onChangeText && onChangeText('')} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

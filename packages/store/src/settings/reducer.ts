@@ -23,12 +23,20 @@ const baseSettings: Settings<IBaseSettings> = {
     sortOrder: 2,
     visible: true,
   },
-  cleanDocTime: {
+  netPriceType: {
     id: '3',
+    description: 'Использовать матрицы',
+    data: true,
+    type: 'boolean',
+    sortOrder: 3,
+    visible: true,
+  },
+  cleanDocTime: {
+    id: '4',
     description: 'Время хранения документов в архиве, дн.',
     data: 30,
     type: 'number',
-    sortOrder: 3,
+    sortOrder: 4,
     visible: true,
   },
 };
