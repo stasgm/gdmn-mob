@@ -130,7 +130,7 @@ const signIn = (
   };
 };
 
-const logOut = (): AppThunk<
+const logout = (): AppThunk<
   Promise<ActionType<typeof actions.logoutUserAsync>>,
   AuthState,
   ActionType<typeof actions.logoutUserAsync>
@@ -243,7 +243,7 @@ export default {
   activateDevice,
   signUp,
   signIn,
-  logOut,
+  logout,
   getDeviceStatus,
   useAuthThunkDispatch,
   setUserSettings,

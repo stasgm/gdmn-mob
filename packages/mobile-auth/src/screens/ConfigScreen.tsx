@@ -50,7 +50,7 @@ const ConfigScreen = (props: Props) => {
       <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
       <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
       <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} />
-      <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} />
+      <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true}/>
       <View style={localStyles.buttonsView}>
         <PrimeButton
           icon="check"
