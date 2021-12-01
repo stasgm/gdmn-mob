@@ -43,11 +43,7 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
     editionDate: new Date().toISOString(),
   };
 
-  console.log('newDeviceBinding', newDeviceBinding);
-
   const createdDeviceBinding = await deviceBindings.find(await deviceBindings.insert(newDeviceBinding));
-  console.log('createdDeviceBinding', createdDeviceBinding);
-
   return makeDeviceBinding(createdDeviceBinding);
 };
 

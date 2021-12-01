@@ -54,7 +54,6 @@ class Auth extends BaseRequest {
   };
 
   login = async (userCredentials: IUserCredentials) => {
-    // console.log('login', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -100,7 +99,6 @@ class Auth extends BaseRequest {
   };
 
   logout = async () => {
-    console.log('logout api isMock', this.api.config.debug?.isMock);
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -188,20 +186,20 @@ class Auth extends BaseRequest {
   // };
 
   verifyCode = async (code: string) => {
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
-      if (code === '1111') {
-        console.log('verifyCode code', code, mockDevice);
-        return {
-          type: 'VERIFY_CODE',
-          uid: mockDevice.uid,
-        } as types.IVerifyCodeResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: 'Неверный код',
-      } as error.INetworkError;
-    }
+    // if (this.api.config.debug?.isMock) {
+    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    //   if (code === '1111') {
+    //     console.log('verifyCode code', code, mockDevice);
+    //     return {
+    //       type: 'VERIFY_CODE',
+    //       uid: mockDevice.uid,
+    //     } as types.IVerifyCodeResponse;
+    //   }
+    //   return {
+    //     type: 'ERROR',
+    //     message: 'Неверный код',
+    //   } as error.INetworkError;
+    // }
 
     try {
       const body = { code };

@@ -123,7 +123,6 @@ class Device extends BaseRequest {
     * @returns IDevice
     */
   getDevice = async (deviceId?: string) => {
-    // console.log('getDevice', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 

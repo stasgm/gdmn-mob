@@ -23,12 +23,6 @@ import DocumentItem from './components/DocumentItem';
 
 const DocumentListScreen = () => {
   const { list, loading } = useSelector((state) => state.documents);
-  // const { colors } = useTheme();
-  // const docType = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().params?.type;
-  // const route = useRoute<RouteProp<DocumentsTabsStackParamsList, 'DocumentList'>>().name;
-
-  // console.log('docType', docType);
-  // console.log('route', route);
 
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();

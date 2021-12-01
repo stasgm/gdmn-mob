@@ -64,8 +64,6 @@ const FindMany = async ({
     (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === consumerId,
   );
 
-  console.log('messageList', messageList);
-
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);

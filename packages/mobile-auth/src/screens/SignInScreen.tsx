@@ -75,7 +75,6 @@ const SignInScreen = (props: Props) => {
         <RoundButton
           icon="server"
           onPress={() => {
-            console.log('press');
             onDisconnect();
           }}
           disabled={loading}

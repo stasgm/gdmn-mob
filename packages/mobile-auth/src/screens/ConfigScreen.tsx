@@ -23,15 +23,13 @@ const ConfigScreen = (props: Props) => {
   const { settings, onSetSettings, onSetDemoMode } = props;
   const [serverName, setServerName] = useState(`${settings?.protocol}${settings?.server}` || '');
   const [serverPort, setServerPort] = useState(settings?.port?.toString() || '');
-  const [timeout, setTimeout] = useState(settings?.timeout?.toString() || '');
+  const [timeout] = useState(settings?.timeout?.toString() || '');
   const [deviceId, setDeviceId] = useState(settings?.deviceId || '');
 
   const handleSaveSettings = () => {
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
     const protocol: string = match?.[1] || '';
     const server: string = match?.[2] || '';
-
-    console.log('server', server);
 
     const newSettings: IApiConfig = {
       apiPath: settings?.apiPath || '',

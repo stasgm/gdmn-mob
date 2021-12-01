@@ -26,7 +26,6 @@ const ProfileScreen = () => {
   }, [navigation]);
 
   const handleLogout = () => {
-    console.log('logout isMock', api.config.debug?.isMock);
     dispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   };

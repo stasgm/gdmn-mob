@@ -110,8 +110,6 @@ const {
   version,
 } = config;
 
-console.log('config 111', config, version);
-
 export default new Api({
   apiPath,
   timeout,

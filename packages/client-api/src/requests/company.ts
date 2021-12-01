@@ -29,10 +29,7 @@ class Company extends BaseRequest {
       } as types.IAddCompanyResponse;
     }
 
-    //  try {
-    // console.log('company', company);
     const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-    // console.log('res', res);
     const resData = res.data;
 
     if (resData?.result) {

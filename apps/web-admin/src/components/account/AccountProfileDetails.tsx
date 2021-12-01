@@ -18,7 +18,6 @@ const AccountProfileDetails = ({ user, loading, onSubmit }: IProps) => {
       name: yup.string().required('Required'),
     }),
     onSubmit: (values) => {
-      console.log('onSubmit', values);
       onSubmit(values);
     },
   });
