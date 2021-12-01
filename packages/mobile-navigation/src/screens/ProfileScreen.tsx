@@ -1,13 +1,17 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { authActions, useSelector, useDispatch } from '@lib/store';
+import { authActions, useSelector, useDispatch, documentActions, referenceActions } from '@lib/store';
 
-import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
 import api from '@lib/client-api';
+
+import { useActionSheet } from '@lib/mobile-ui';
+
+import { geoActions } from '../../../../apps/app-trade-agents/src/store/geo/actions';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
@@ -18,10 +22,32 @@ const ProfileScreen = () => {
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+
+  const handleClearData = () => {
+    dispatch(documentActions.init());
+    dispatch(referenceActions.init());
+    dispatch(geoActions.init());
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Очистить данные',
+        type: 'destructive',
+        onPress: handleClearData,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleClearData, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);
 
