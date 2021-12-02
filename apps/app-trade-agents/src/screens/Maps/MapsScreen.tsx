@@ -73,7 +73,7 @@ const MapScreen = () => {
         };
         return res;
       });
-
+      
       dispatch(geoActions.addMany(initialList));
     }
   }, [dispatch, outlets, selectedItem]);
@@ -200,7 +200,7 @@ const MapScreen = () => {
 
   const handleApplyRoute = () => {
     routeRef.current?.dismiss();
-    return initLocations();
+    initLocations();
   };
 
   return (
