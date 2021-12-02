@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     top: 5,
     right: 5,
     zIndex: 5,
-    width: '100%',
+    // width: '100%',
   },
 });
 
