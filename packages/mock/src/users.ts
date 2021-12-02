@@ -19,7 +19,7 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
     company: company3,
-    role: 'Admin',
+    role: 'User',
     creationDate: '2021.01.01',
     editionDate: '2021.01.01',
     password: '@123!',

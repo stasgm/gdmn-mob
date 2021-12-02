@@ -11,8 +11,6 @@ import api from '@lib/client-api';
 
 import { useActionSheet } from '@lib/mobile-ui';
 
-import { geoActions } from '../../../../apps/app-trade-agents/src/store/geo/actions';
-
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
@@ -27,7 +25,6 @@ const ProfileScreen = () => {
   const handleClearData = () => {
     dispatch(documentActions.init());
     dispatch(referenceActions.init());
-    dispatch(geoActions.init());
   };
 
   const actionsMenu = useCallback(() => {

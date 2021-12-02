@@ -122,7 +122,7 @@ const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[]> => {
-  const { deviceBindings, devices, users } = getDb();
+  const { deviceBindings, devices } = getDb();
 
   let deviceBindingList = await deviceBindings.read((item) => {
     const newParams = { ...params };
