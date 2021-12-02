@@ -18,14 +18,7 @@ export type InventoryParamList = RefParamList & {
   InventoryView: { id: string };
   InventoryEdit: { id: string } | undefined;
   InventoryLine: { mode: number; docId: string; item: IInventoryLine };
-  SelectGroupItem: { docId: string };
-  SelectGoodItem: { docId: string }; //group Id
+  SelectGoodItem: { docId: string };
 };
 
 export type InventorysStackParamList = { InventoryList: undefined } & InventoryParamList;
-
-export type RoutesStackParamList = InventoryParamList & {
-  RouteList: undefined;
-  RouteView: { id: string };
-  RouteDetails: { routeId: string; id: string };
-};

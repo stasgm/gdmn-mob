@@ -15,6 +15,7 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  ScanButton,
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
@@ -37,7 +38,10 @@ export const InventoryViewScreen = () => {
     navigation.navigate('SelectGoodItem', {
       docId: id,
     });
-  }, [navigation, id]); //
+  }, [navigation, id]);
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const handleScannerGood = useCallback(() => {}, []); //Scan
 
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
@@ -80,12 +84,13 @@ export const InventoryViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
+            <ScanButton onPress={handleScannerGood} />
             <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddInventoryLine} />
           </View>
         ),
     });
-  }, [navigation, handleAddInventoryLine, actionsMenu, isBlocked]);
+  }, [navigation, handleAddInventoryLine, handleScannerGood, actionsMenu, isBlocked]);
 
   if (!inventory) {
     return (
