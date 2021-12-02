@@ -1822,6 +1822,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '3121846445',
                 name: 'Магазин "Рога и копыта" № 1',
+                address: 'г. Минск ул. Лесная , 27',
               },
             },
             {
@@ -1831,6 +1832,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '1367139123',
                 name: 'Магазин "Рога и копыта" № 3',
+                address: 'г. Минск ул. Центральная, 102',
               },
             },
             {
@@ -1840,6 +1842,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '819293369',
                 name: 'Магазин "ЕдаЭксперт" № 1',
+                address: 'г. Минск ул. Полевая, 20/2',
               },
             },
             {
@@ -1849,6 +1852,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '1854869537',
                 name: 'Магазин "ЕдаЭксперт" № 3',
+                address: 'г. Минск ул. Полевая, 20/2',
               },
             },
             {
@@ -1858,6 +1862,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '1822992103',
                 name: 'Магазин "ЕдаЭксперт" № 5',
+                address: 'г. Минск ул. Речная, 74',
               },
             },
           ],
@@ -1886,6 +1891,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '1121464445',
                 name: 'Магазин "Рога и копыта" № 2',
+                address: 'г. Минск ул. Садовая , 15',
               },
             },
             {
@@ -1895,6 +1901,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '498076351',
                 name: 'Магазин "ЕдаЭксперт" № 2',
+                address: 'г. Минск ул. Луговая, 41 Б',
               },
             },
             {
@@ -1904,6 +1911,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '1673741713',
                 name: 'Магазин "ЕдаЭксперт" № 4',
+                address: 'г. Минск ул. Солнечная, 7 Б',
               },
             },
             {
@@ -1913,6 +1921,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               outlet: {
                 id: '1475086884',
                 name: 'ООО "МатериалПродукт" Магазин " 1"',
+                address: 'г. Минск ул. Озерная, 18',
               },
             },
           ],
