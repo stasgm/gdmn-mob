@@ -15,8 +15,8 @@ const SettingsSceen = () => {
 
   const { data } = useSelector((state) => state.settings);
   const { settings } = useSelector((state) => state.auth);
-
-  // const settingList = useMemo(() => {
+  /////
+// const settingList = useMemo(() => {
   //   return Object.entries(data)
   //     .map(([key, value]) => ({ ...value, setName: key } as SettingListItem))
   //     .filter((i) => i.visible);
