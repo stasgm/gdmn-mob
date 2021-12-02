@@ -10,9 +10,6 @@ import { persistor, store } from './src/store';
 import { InventorysNavigator } from './src/navigation/InventorysNavigator';
 
 const Root = () => {
-  //const newDispatch = useDocDispatch();
-  // newDispatch(settingsActions.init());
-
   const navItems: INavItem[] = useMemo(
     () => [
       {
@@ -27,8 +24,8 @@ const Root = () => {
 
   const appSettings: Settings = {
     scannerUse: {
-      id: '5',
-      sortOrder: 5,
+      id: '3',
+      sortOrder: 3,
       description: 'Использовать сканер',
       data: true,
       type: 'boolean',
