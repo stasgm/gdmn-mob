@@ -11,10 +11,10 @@ export interface IGood extends INamedEntity {
   vat: string; //НДС
   goodgroup: INamedEntity; // группа товаров
   valuename: string; // Наименование ед. изм.
+  weightCode?: string;
   invWeight: number; // Вес единицы товара
   priceFso: number; // цена ФСО
   priceFsn: number; // цена ФСН
-  scale: number; //количество единиц в месте
 }
 
 //Подразделения-склады
@@ -42,3 +42,36 @@ export interface IInventoryLine extends IEntity {
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
+
+//* Model *//
+export interface IModelRem {
+  price: number;
+  q: number;
+}
+
+export interface IRem extends IGood {
+  remains?: number;
+  price?: number;
+}
+
+export interface IWeightCodeSettings {
+  weightCode: string;
+  code: number;
+  weight: number;
+}
+export interface IMGoodRemain extends IGood {
+  remains?: IModelRem[];
+}
+
+export interface IMDGoodRemain {
+  contactName: string;
+  goods: IMGoodData<IMGoodRemain>;
+}
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IModelData<T = unknown> {
+  [id: string]: T;
+}

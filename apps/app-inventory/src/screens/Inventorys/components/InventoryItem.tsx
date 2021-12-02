@@ -19,7 +19,7 @@ interface IProps {
 
 export const InventoryItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventorytView'>>();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 
