@@ -12,8 +12,6 @@ const TotalCompanies = (props: IProps) => {
 
   const { palette } = useTheme();
 
-  console.log('дашборд');
-
   return (
     <Card {...props}>
       <CardContent>

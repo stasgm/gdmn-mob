@@ -1,6 +1,7 @@
 import { BodyType, INamedEntity, StatusType } from './common';
 import { IDocument, IDocumentType } from './document';
 import { IReferences } from './references';
+
 import { IUserSettings } from './models';
 
 export interface IHeadMessage {
@@ -46,7 +47,7 @@ const cmd2: ICmd<Pick<ICmdParams, 'data'>> = {
  */
 export interface IMessage<
   T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings,
-  > {
+> {
   id: string;
   status: StatusType;
   version?: number;
@@ -81,4 +82,17 @@ export interface IDataMessage<T = any> {
 export interface IMessageInfo {
   uid: string;
   date: Date;
+}
+
+// Messages
+export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer'> {
+  // appSystem: string;
+  companyId: string;
+  producerId: string;
+  consumerId: string;
+  // dateTime: string;
+}
+
+export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
+  head: IDBHeadMessage;
 }

@@ -5,7 +5,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
-import { IReference } from '@lib/types';
 import { docSelectors, refSelectors } from '@lib/store';
 
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';

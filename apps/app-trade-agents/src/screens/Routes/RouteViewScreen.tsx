@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { RouteProp, useRoute, useScrollToTop } from '@react-navigation/native';
-import { View, FlatList, Text } from 'react-native';
+import { View, FlatList } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 

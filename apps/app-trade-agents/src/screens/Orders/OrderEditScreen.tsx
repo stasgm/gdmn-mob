@@ -24,14 +24,11 @@ import {
   globalStyles as styles,
   SubTitle,
 } from '@lib/mobile-ui';
-
 import { IDocumentType, IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOutlet } from '../../store/types';
-
+import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
-import { IOrderFormParam } from '../../store/app/types';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;

@@ -1,5 +1,5 @@
 export { default as configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
-export { TActions } from './src/types';
+export { TActions, IFormParam } from './src/types';
 export { default as authActions } from './src/auth';
 export { useAuthThunkDispatch } from './src/auth';
 export { default as authSelectors } from './src/auth/selectors';

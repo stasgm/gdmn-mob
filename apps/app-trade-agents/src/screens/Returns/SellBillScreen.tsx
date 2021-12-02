@@ -20,8 +20,7 @@ import {
 import { IResponse, ISettingsOption } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IGood, IReturnDocument, ISellBill, IToken } from '../../store/types';
-import { ISellBillFormParam } from '../../store/app/types';
+import { IGood, IReturnDocument, ISellBill, IToken, ISellBillFormParam } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
 
 import config from '../../config';
@@ -41,7 +40,6 @@ function SellBillScreen() {
 
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
-  const [info, setInfo] = useState('');
 
   const { colors } = useTheme();
 
@@ -50,6 +48,8 @@ function SellBillScreen() {
   const { data: settings } = useSelector((state) => state.settings);
   const formParams = useSelector((state) => state.app.formParams);
   const { userToken } = useSelector((state) => state.auth);
+
+  const sellBilSettings = useSelector((state) => state.auth);
 
   const {
     dateBegin: docDateBegin,
@@ -197,6 +197,7 @@ function SellBillScreen() {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
+
     try {
       setLoading(true);
       const newToken = parToken ?? (await fetchLogin()) ?? '';
@@ -232,6 +233,61 @@ function SellBillScreen() {
       }
       setBarVisible(true);
     }
+
+    if (sellBilSettings.settings.debug?.isMock) {
+      //   await sleep(this.api.config.debug?.mockDelay || 0);
+
+      //   return {
+      const mockSellBills: ISellBill[] = [
+        {
+          ID: '1246759230',
+          NUMBER: '1448516',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTNAME: 'Магазин-склад',
+          DEPARTKEY: '323658854',
+          DOCUMENTDATE: '2021-04-27T21:00:00.000Z',
+          QUANTITY: 4.95,
+          PRICE: 5.35,
+        },
+        {
+          ID: '1215293118',
+          NUMBER: '5376518',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTKEY: '323658854',
+          DEPARTNAME: 'Магазин-склад',
+          DOCUMENTDATE: '2021-04-16T21:00:00.000Z',
+          QUANTITY: 5.25,
+          PRICE: 6.12,
+        },
+        {
+          ID: '1308039951',
+          NUMBER: '1453027',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTNAME: 'Магазин-склад',
+          DEPARTKEY: '323658854',
+          DOCUMENTDATE: '2021-05-13T21:00:00.000Z',
+          QUANTITY: 6.4,
+          PRICE: 6.12,
+        },
+        {
+          ID: '1334757495',
+          NUMBER: '5947875',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTNAME: 'Магазин-склад',
+          DEPARTKEY: '323658854',
+          DOCUMENTDATE: '2021-05-20T21:00:00.000Z',
+          QUANTITY: 5.6,
+          PRICE: 6.12,
+        },
+      ] as any;
+      setSellBills(mockSellBills);
+      //   } //as types.IGetMessagesResponse;
+    }
+
     setLoading(false);
   };
 
@@ -242,6 +298,9 @@ function SellBillScreen() {
   const handleSearchStop = () => {
     setLoading(false);
   };
+
+  console.log('возвраты', sellBills);
+  console.log('не ', bills);
 
   return (
     <AppScreen style={localStyles.appScreen}>

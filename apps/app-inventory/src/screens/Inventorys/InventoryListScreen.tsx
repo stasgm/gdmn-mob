@@ -14,7 +14,6 @@ import {
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
-
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { IInventoryDocument } from '../../store/types';

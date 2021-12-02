@@ -7,21 +7,22 @@ export const superAdmin: INamedEntity = {
 
 const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
 const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
-const company3: INamedEntity = { id: '777', name: 'Компания 1' };
+const company3: INamedEntity = { id: '777', name: 'Моя компания' };
 
-const users: IUser[] = [
+const users: (IUser & { password?: string; verifyPassword?: string })[] = [
   {
     id: '15',
     externalId: '147012274',
-    name: 'ГОЦЕЛЮК Н. А.',
-    firstName: 'НАТАЛЬЯ',
-    lastName: 'ГОЦЕЛЮК',
+    name: 'Иванов И.И.',
+    firstName: 'Иван',
+    lastName: 'Иванов',
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
     company: company3,
-    role: 'Admin',
+    role: 'User',
     creationDate: '2021.01.01',
     editionDate: '2021.01.01',
+    password: '@123!',
   },
   {
     id: '123',
@@ -41,7 +42,7 @@ const users: IUser[] = [
     externalId: '150449124',
     name: 'Ina',
     firstName: 'Ina',
-    lastName: 'Dzadzevich',
+    lastName: 'Korban',
     phoneNumber: '+37529-33-333-33',
     creator: superAdmin,
     company: company1,

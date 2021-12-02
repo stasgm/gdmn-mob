@@ -35,8 +35,6 @@ class User extends BaseRequest {
       const res = await this.api.axios.post<IResponse<IUser>>('/users', user);
       const resData = res.data;
 
-      // console.log('resData', resData);
-
       if (resData.result) {
         return {
           type: 'ADD_USER',
@@ -51,7 +49,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка добавления пользователя',
+        message: err instanceof TypeError ? err.message : 'ошибка добавления пользователя',
       };
     }
   };
@@ -91,7 +89,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка обновления пользователя',
+        message: err instanceof TypeError ? err.message : 'ошибка обновления пользователя',
       } as error.INetworkError;
     }
   };
@@ -122,7 +120,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления пользователя',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления пользователя',
       } as error.INetworkError;
     }
   };
@@ -163,7 +161,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data || 'ошибка получения данных о пользователе',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
       } as error.INetworkError;
     }
   };
@@ -209,7 +207,7 @@ class User extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных о пользователях',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователях',
       } as error.INetworkError;
     }
   };

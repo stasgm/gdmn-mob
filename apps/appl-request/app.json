@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "GDMN Заявки на закупку",
+    "name": "GDMN Отдел снабжения",
     "slug": "gdmn-appl-request",
     "version": "0.0.1",
     "orientation": "portrait",
@@ -12,16 +12,12 @@
     },
     "packagerOpts": {
       "config": "metro.config.js",
-      "sourceExts": [
-        "svg"
-      ]
+      "sourceExts": ["svg"]
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

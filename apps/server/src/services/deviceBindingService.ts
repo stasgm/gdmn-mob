@@ -43,11 +43,7 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
     editionDate: new Date().toISOString(),
   };
 
-  console.log('newDeviceBinding', newDeviceBinding);
-
   const createdDeviceBinding = await deviceBindings.find(await deviceBindings.insert(newDeviceBinding));
-  console.log('createdDeviceBinding', createdDeviceBinding);
-
   return makeDeviceBinding(createdDeviceBinding);
 };
 
@@ -56,8 +52,9 @@ const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> 
  * @param {IDBDevice} deviceBindingId - устройство
  * @return обновленную связь
  * */
-const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>, params?: Record<string, string>) => {
-  const { deviceBindings, companies, devices } = getDb();
+const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>) => {
+  //, params?: Record<string, string>
+  const { deviceBindings } = getDb();
 
   const oldDeviceBinding = await deviceBindings.find(id);
 
@@ -125,7 +122,7 @@ const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
 };
 
 const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[]> => {
-  const { deviceBindings, devices, users } = getDb();
+  const { deviceBindings, devices } = getDb();
 
   let deviceBindingList = await deviceBindings.read((item) => {
     const newParams = { ...params };
