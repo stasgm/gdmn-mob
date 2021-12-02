@@ -1,5 +1,5 @@
 import { DeviceState, IResponse, IUser, IUserCredentials } from '@lib/types';
-import { device as mockDevice, user as mockUser } from '@lib/mock';
+import { user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
 import { sleep } from '../utils';
@@ -54,14 +54,10 @@ class Auth extends BaseRequest {
   };
 
   login = async (userCredentials: IUserCredentials) => {
-    // console.log('login', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (
-        (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') ||
-        (userCredentials.name === 'Stas' && userCredentials.password === '@123!')
-      ) {
+      if (userCredentials.name === mockUser.name && userCredentials.password === mockUser.password) {
         return {
           type: 'LOGIN',
           user: mockUser,
@@ -190,20 +186,20 @@ class Auth extends BaseRequest {
   // };
 
   verifyCode = async (code: string) => {
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
-      if (code === '1111') {
-        console.log('verifyCode code', code, mockDevice);
-        return {
-          type: 'VERIFY_CODE',
-          uid: mockDevice.uid,
-        } as types.IVerifyCodeResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: 'Неверный код',
-      } as error.INetworkError;
-    }
+    // if (this.api.config.debug?.isMock) {
+    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    //   if (code === '1111') {
+    //     console.log('verifyCode code', code, mockDevice);
+    //     return {
+    //       type: 'VERIFY_CODE',
+    //       uid: mockDevice.uid,
+    //     } as types.IVerifyCodeResponse;
+    //   }
+    //   return {
+    //     type: 'ERROR',
+    //     message: 'Неверный код',
+    //   } as error.INetworkError;
+    // }
 
     try {
       const body = { code };
@@ -239,7 +235,7 @@ class Auth extends BaseRequest {
       return {
         type: 'GET_DEVICE_STATUS',
         status: 'ACTIVE',
-      } as types.IDeviceStatusResponse;  // активация устройства в mock
+      } as types.IDeviceStatusResponse; // активация устройства в mock
     }
 
     try {

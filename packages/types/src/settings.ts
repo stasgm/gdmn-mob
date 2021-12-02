@@ -18,6 +18,7 @@ interface IBaseSettings {
   serverAutoCheck: boolean;
   refLoadType: boolean;
   cleanDocTime: number;
+  scannerUse: boolean;
   [name: string]: SettingValue;
 }
 

@@ -39,7 +39,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }: IProps) => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <IconButton color="inherit" onClick={() => authDispatch(authActions.logOut())}>
+          <IconButton color="inherit" onClick={() => authDispatch(authActions.logout())}>
             <LogoutIcon />
           </IconButton>
         </Box>

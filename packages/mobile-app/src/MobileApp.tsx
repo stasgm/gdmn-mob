@@ -4,16 +4,15 @@ import { Store } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import { authSelectors } from '@lib/store';
+import { authActions, authSelectors, useAuthThunkDispatch } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
-import { settingsActions, useDispatch, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { useSync } from './hooks';
-
-import { IBaseSettings, ISettingsOption, Settings } from '@lib/types';
+import api from '@lib/client-api';
 
 export interface IApp {
   items?: INavItem[];
@@ -23,6 +22,17 @@ export interface IApp {
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
+
+  const { settings } = useSelector((state) => state.auth);
+  const authDispatch = useAuthThunkDispatch();
+
+  useEffect(() => {
+    // authDispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: false } }));
+    // authDispatch(authActions.init());
+    // //При запуске приложения записываем настройки в апи
+    api.config = { ...api.config, ...settings };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
 };

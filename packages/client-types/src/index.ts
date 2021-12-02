@@ -1,6 +1,6 @@
 export interface IApiConfig {
   protocol: string;
-  server: string;
+  server?: string;
   port: number;
   timeout: number;
   version?: string;

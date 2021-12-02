@@ -5,8 +5,6 @@ import DashboardNavigator from './Root/DashboardNavigator';
 import DocumentsNavigator from './Root/DocumentsNavigator';
 import LocationNavigator from './Root/Maps/MapNavigator';
 
-console.log('RootNavigator');
-
 const navItems: INavItem[] = [
   {
     name: 'MyDashboard',

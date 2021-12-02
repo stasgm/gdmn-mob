@@ -47,7 +47,7 @@ const reducer: Reducer<GeoState, GeoActionType> = (state = initialState, action)
       return {
         ...state,
         // loading: false,
-        list: state.list.filter((item) => action.payload.indexOf(item.id) === -1),
+        list: state.list.filter((item) => action.payload.indexOf(item) === -1),
       };
 
     case getType(geoActions.deleteOne):

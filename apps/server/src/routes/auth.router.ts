@@ -2,7 +2,7 @@
 // import compose from 'koa-compose';
 import Router from 'koa-joi-router';
 
-import { signUp, logIn, logOut, getCurrentUser, verifyCode, getDeviceStatus } from '../controllers/auth';
+import { signUp, logIn, logout, getCurrentUser, verifyCode, getDeviceStatus } from '../controllers/auth';
 
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
@@ -14,7 +14,7 @@ const router = Router();
 router.prefix('/auth');
 router.post('/signup', authValidation.signup, signUp);
 router.post('/login', authValidation.login, logIn); // Проверка устройства проводится в методе службе
-router.post('/logout', authMiddleware, deviceMiddleware, logOut);
+router.post('/logout', authMiddleware, deviceMiddleware, logout);
 router.get('/user', authMiddleware, deviceMiddleware, getCurrentUser);
 router.post('/device/code', authValidation.verifyCode, verifyCode);
 router.get('/deviceStatus/:id', authValidation.getDeviceStatus, getDeviceStatus);

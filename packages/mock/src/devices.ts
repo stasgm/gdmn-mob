@@ -1,6 +1,6 @@
 import { IDevice } from '@lib/types';
 
-import { company, company2, company3 } from './companies';
+import { company2, company3 } from './companies';
 
 const devices: IDevice[] = [
   {

@@ -4,7 +4,7 @@ import session from 'koa-session';
 const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
 
 const config: Partial<session.opts> = {
-  key: 'koa:sess3' /** (string) cookie key (default is koa:sess) */,
+  key: 'koa:sess' /** (string) cookie key (default is koa:sess) */,
   maxAge: SESSION_COOKIE_LIFETIME /** (number) maxAge in ms (default is 1 days) */,
   overwrite: true /** (boolean) can overwrite or not (default true) */,
   httpOnly: true /** (boolean) httpOnly or not (default true) */,

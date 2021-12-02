@@ -37,6 +37,7 @@ const DeviceList = () => {
   );
 
   const fetchActivationCodes = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
     (deviceId?: string) => {
       dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },
@@ -127,7 +128,7 @@ const DeviceList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти устройство'}
-            valueRef={valueRef}
+            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
