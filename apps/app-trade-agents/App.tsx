@@ -95,9 +95,6 @@ const Root = () => {
   const dispatch = useDispatch();
   const appTradeDispatch = useAppTradeThunkDispatch();
 
-  const { data: settings } = useSelector((state) => state.settings);
-  const isUseNetPrice = (settings?.isUseNetPrice as ISettingsOption<boolean>)?.data;
-
   useEffect(() => {
     if (appSettings) {
       Object.entries(appSettings).forEach(([optionName, value]) => {
@@ -109,6 +106,9 @@ const Root = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeSettings]);
+
+  const { data: settings } = useSelector((state) => state.settings);
+  const isUseNetPrice = (settings?.isUseNetPrice as ISettingsOption<boolean>)?.data;
 
   const groups = (refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>)?.data;
   const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
