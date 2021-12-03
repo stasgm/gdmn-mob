@@ -9,9 +9,9 @@ const users: IDBUser[] = [
   {
     id: '15',
     externalId: '147012274',
-    name: 'Иванов И.И.',
-    firstName: 'Иван',
-    lastName: 'Иванович',
+    name: 'Короткевич З.',
+    firstName: 'Змицер',
+    lastName: 'Короткевич',
     phoneNumber: '8-044-788-86-44',
     creatorId: superAdmin.id,
     company: '777',

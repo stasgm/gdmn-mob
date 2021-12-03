@@ -13,9 +13,9 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
   {
     id: '15',
     externalId: '147012274',
-    name: 'Иванов И.И.',
-    firstName: 'Иван',
-    lastName: 'Иванов',
+    name: 'Короткевич З.',
+    firstName: 'Змицер',
+    lastName: 'Короткевич',
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
     company: company3,

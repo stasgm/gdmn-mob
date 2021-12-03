@@ -60,3 +60,5 @@
 ## Инструкции к приложениям:
 
 1. [Инструкция по web-admin](https://github.com/stasgm/gdmn-mob/blob/dev/apps/web-admin/docs/README.md)
+2. [Инструкция по Gdmn Отдел снабжения](https://github.com/stasgm/gdmn-mob/blob/dev/apps/appl-request/docs/README.md)
+3. [Инструкция по Gdmn Торговые агенты](https://github.com/stasgm/gdmn-mob/blob/dev/apps/app-trade-agents/docs/README.md)
