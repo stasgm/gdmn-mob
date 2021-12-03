@@ -4,7 +4,11 @@ import { AppDispatch, configureStore } from '@lib/store';
 import { persistStore } from 'redux-persist';
 import { TypedUseSelectorHook, useDispatch as useReduxDispatch, useSelector as useReduxSelector } from 'react-redux';
 
-export const combinedReducer = {};
+import appInventoryReducer from './app-inv/reducer';
+
+export const combinedReducer = {
+  appInventory: appInventoryReducer,
+};
 
 const rootReducer = combineReducers(combinedReducer);
 

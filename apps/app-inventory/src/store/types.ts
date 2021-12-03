@@ -1,20 +1,38 @@
-import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData } from '@lib/types';
+import {
+  INamedEntity,
+  IEntity,
+  IDocument,
+  MandateProps,
+  IHead,
+  IReferenceData,
+  IDocumentType,
+  StatusType,
+} from '@lib/types';
+import { AnyAction } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+
+// eslint-disable-next-line import/no-cycle
+import { IModel, IGood } from './app-inv/types';
+
+export { IModel, IGood };
+export interface IFormParam {
+  [fieldName: string]: unknown;
+}
+
+export interface IInventoryFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  onDate?: string;
+  status?: StatusType;
+  documentType?: IDocumentType;
+  depart?: IContact;
+  department?: IDepartment;
+  comment?: string;
+}
 
 //Группы товаров
 export interface IGoodGroup extends INamedEntity {
   parent?: INamedEntity;
-}
-// Товары
-export interface IGood extends INamedEntity {
-  alias: string;
-  barcode: string;
-  vat: string; //НДС
-  goodgroup: INamedEntity; // группа товаров
-  valuename: string; // Наименование ед. изм.
-  weightCode?: string;
-  invWeight: number; // Вес единицы товара
-  priceFso: number; // цена ФСО
-  priceFsn: number; // цена ФСН
 }
 
 //Подразделения-склады
@@ -45,12 +63,24 @@ export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInvento
 
 //* Model *//
 export interface IModelRem {
-  price: number;
-  q: number;
+  price?: number;
+  q?: number;
 }
 
 export interface IRem extends IGood {
   remains?: number;
+  price?: number;
+}
+
+export interface IRemains {
+  contactId: string;
+  date: Date;
+  data: IRemainsData[];
+}
+
+export interface IRemainsData {
+  goodId: string;
+  q?: number;
   price?: number;
 }
 
@@ -75,3 +105,10 @@ export interface IMGoodData<T = unknown> {
 export interface IModelData<T = unknown> {
   [id: string]: T;
 }
+
+export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
+  ReturnType,
+  S,
+  unknown,
+  A
+>;

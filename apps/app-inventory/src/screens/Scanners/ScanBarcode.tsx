@@ -13,7 +13,7 @@ import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { useAppStore } from '../../store/app/store';
+import { useAppStore } from '../../store/app-inv/store';
 //import { IMDGoodRemain, IModelData, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
 import { IRem } from '../../store/types';
 const oneSecund = 1000;
