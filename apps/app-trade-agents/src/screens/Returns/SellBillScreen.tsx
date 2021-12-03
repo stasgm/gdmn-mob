@@ -197,47 +197,7 @@ function SellBillScreen() {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
-
-    try {
-      setLoading(true);
-      const newToken = parToken ?? (await fetchLogin()) ?? '';
-
-      const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
-
-      const fetched = await fetch(path, {
-        headers: {
-          authorization: newToken,
-        },
-      });
-      const parsed: IResponse<ISellBill[]> = await fetched.json();
-      console.log('pars', parsed);
-
-      if (parsed.result) {
-        setSellBills(parsed.data);
-      } else {
-        setMessage(parsed.error || 'Неизвестная ошибка');
-        if (parsed.error?.slice(0, 3) === '401') {
-          const token = await fetchLogin();
-          if (isFirst && token) {
-            await fetchSellBill(false, token);
-          }
-        } else {
-          setBarVisible(true);
-        }
-      }
-    } catch (e) {
-      if (e instanceof TypeError) {
-        setMessage(e.message);
-      } else {
-        setMessage('Неизвестная ошибка');
-      }
-      setBarVisible(true);
-    }
-
     if (sellBilSettings.settings.debug?.isMock) {
-      //   await sleep(this.api.config.debug?.mockDelay || 0);
-
-      //   return {
       const mockSellBills: ISellBill[] = [
         {
           ID: '1246759230',
@@ -285,7 +245,41 @@ function SellBillScreen() {
         },
       ] as any;
       setSellBills(mockSellBills);
-      //   } //as types.IGetMessagesResponse;
+    } else {
+      try {
+        setLoading(true);
+        const newToken = parToken ?? (await fetchLogin()) ?? '';
+
+        const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
+
+        const fetched = await fetch(path, {
+          headers: {
+            authorization: newToken,
+          },
+        });
+        const parsed: IResponse<ISellBill[]> = await fetched.json();
+
+        if (parsed.result) {
+          setSellBills(parsed.data);
+        } else {
+          setMessage(parsed.error || 'Неизвестная ошибка');
+          if (parsed.error?.slice(0, 3) === '401') {
+            const token = await fetchLogin();
+            if (isFirst && token) {
+              await fetchSellBill(false, token);
+            }
+          } else {
+            setBarVisible(true);
+          }
+        }
+      } catch (e) {
+        if (e instanceof TypeError) {
+          setMessage(e.message);
+        } else {
+          setMessage('Неизвестная ошибка');
+        }
+        setBarVisible(true);
+      }
     }
 
     setLoading(false);
@@ -298,9 +292,6 @@ function SellBillScreen() {
   const handleSearchStop = () => {
     setLoading(false);
   };
-
-  console.log('возвраты', sellBills);
-  console.log('не ', bills);
 
   return (
     <AppScreen style={localStyles.appScreen}>
