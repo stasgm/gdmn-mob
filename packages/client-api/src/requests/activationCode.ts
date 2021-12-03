@@ -54,7 +54,8 @@ class ActivationCode extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных об активационных кодах',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных об активационных кодах',
+        //err?.response?.data?.error || 'ошибка получения данных об активационных кодах',
       } as error.INetworkError;
     }
   };
@@ -96,7 +97,8 @@ class ActivationCode extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка создания кода',
+        message: err instanceof TypeError ? err.message : 'ошибка создания кода',
+        //err?.response?.data?.error || 'ошибка создания кода',
       } as error.INetworkError;
     }
   };

@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button, IconButton } from '@material-ui/core';
+import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
 import { useEffect, useState } from 'react';
 
@@ -7,7 +7,6 @@ import { FormikTouched, useFormik } from 'formik';
 import * as yup from 'yup';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import NoEncryptionOutlinedIcon from '@material-ui/icons/NoEncryptionOutlined';
 
 interface IProps {
   loading: boolean;
@@ -192,11 +191,12 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={(formik.values as NewUser).verifyPassword}
                   />
                 </Grid>
-                {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword && (
-                  <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
-                    Пароли не совпадают
-                  </Grid>
-                )}
+                {(formik.values as NewUser).password !== (formik.values as NewUser).verifyPassword &&
+                  (formik.values as NewUser).verifyPassword && (
+                    <Grid item md={6} xs={12} display={open ? 'block' : 'none'} style={{ color: 'red' }}>
+                      Пароли не совпадают
+                    </Grid>
+                  )}
               </Grid>
             </CardContent>
             <Divider />

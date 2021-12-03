@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
-import { device as mockDevice, devices as mockDevices } from '@lib/mock';
+import { device as mockDevice } from '@lib/mock';
 
 import { error, device as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -44,7 +44,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка добавления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка добавления устройства',
+        //err?.response?.data?.error || 'ошибка добавления устройства',
       } as error.INetworkError;
     }
   };
@@ -76,7 +77,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка обновления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка обновления устройства',
+        //err?.response?.data?.error || 'ошибка обновления устройства',
       } as error.INetworkError;
     }
   };
@@ -106,7 +108,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления устройства',
+        //err?.response?.data?.error || 'ошибка удаления устройства',
       } as error.INetworkError;
     }
   };
@@ -120,7 +123,6 @@ class Device extends BaseRequest {
     * @returns IDevice
     */
   getDevice = async (deviceId?: string) => {
-    // console.log('getDevice', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -151,7 +153,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
+        message: err instanceof TypeError ? err.message : 'ошибка подключения',
+        //err?.response?.data?.error || 'ошибка подключения',
       } as error.INetworkError;
     }
   };
@@ -171,7 +174,7 @@ class Device extends BaseRequest {
 
       return {
         type: 'GET_DEVICES',
-        devices: mockDevices,
+        devices: [mockDevice],
       };
     }
 
@@ -198,7 +201,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных об устройствах',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
+        //err?.response?.data?.error || 'ошибка получения данных об устройствах',
       } as error.INetworkError;
     }
   };
@@ -221,7 +225,8 @@ class Device extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения пользователей по устройству',
+        message: err instanceof TypeError ? err.message : 'ошибка получения пользователей по устройству',
+        //err?.response?.data?.error || 'ошибка получения пользователей по устройству',
       } as error.INetworkError;
     }
   };

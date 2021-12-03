@@ -1,6 +1,4 @@
 import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } from './common';
-// eslint-disable-next-line import/no-cycle
-import { IHeadMessage, IMessage } from './messages';
 
 export interface IUserSettings {
   [fieldName: string]: IUserSetting;
@@ -86,15 +84,4 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
   deviceId: string;
 }
 
-// Messages
-export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer'> {
-  // appSystem: string;
-  companyId: string;
-  producerId: string;
-  consumerId: string;
-  // dateTime: string;
-}
-
-export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
-  head: IDBHeadMessage;
-}
+export type IDBid = IEntity;

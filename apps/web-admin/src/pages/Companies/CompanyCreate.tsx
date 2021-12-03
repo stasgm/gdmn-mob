@@ -24,7 +24,6 @@ const CompanyCreate = () => {
   };
 
   const handleSubmit = async (values: ICompany | NewCompany) => {
-    console.log('values', values);
     const res = await dispatch(actions.addCompany(values as NewCompany));
     if (res.type === 'COMPANY/ADD_SUCCESS') {
       handleGoBack();

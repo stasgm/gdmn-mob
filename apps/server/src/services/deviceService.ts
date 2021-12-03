@@ -46,7 +46,6 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
  * */
 const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>) => {
   const { devices, companies } = getDb();
-  console.log('update', id);
   const oldDevice = await devices.find(id);
 
   if (!oldDevice) {

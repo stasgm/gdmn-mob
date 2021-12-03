@@ -21,6 +21,14 @@ const localStyles = StyleSheet.create({
     marginVertical: 10,
     maxHeight: 200,
   },
+  serverMode: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+  serverModeText: {
+    fontSize: 16,
+  },
 });
 
 export default localStyles;

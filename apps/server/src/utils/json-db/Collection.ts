@@ -10,7 +10,7 @@ import { CollectionItem } from './CollectionItem';
  * @template T
  */
 class Collection<T extends CollectionItem> {
-  filter(arg0: (device: any) => boolean) {
+  filter() {
     throw new Error('Method not implemented.');
   }
   private collectionPath: string;

@@ -1,7 +1,4 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
-import { Context } from 'koa';
-
-//import { DB } from '@lib/mock';
 
 import {
   DataNotFoundException,

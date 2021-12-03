@@ -34,6 +34,7 @@ export const SwipeItem = ({ children, onPress }: DocumentListItemProps) => {
     });
 
     return (
+      // eslint-disable-next-line react-native/no-inline-styles
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
         <RectButton
           style={[localStyles.rightAction, { backgroundColor: color }]}

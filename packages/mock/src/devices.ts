@@ -1,14 +1,14 @@
 import { IDevice } from '@lib/types';
 
-import { company, company2, company3 } from './companies';
+import { company2, company3 } from './companies';
 
 const devices: IDevice[] = [
   {
     id: '1',
-    name: 'iPhone',
+    name: 'MyPhone',
     state: 'ACTIVE',
     uid: 'ecc6ff20-899c-11eb-b406-85744eedb503',
-    company: company,
+    company: company3,
     creationDate: '2021.01.01',
     editionDate: '2021.01.01',
   },
