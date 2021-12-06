@@ -1,3 +1,4 @@
+import { ScanBarcodeScreen } from '../Scanners/ScanBarcode';
 export { InventoryListScreen } from './InventoryListScreen';
 export { InventoryEditScreen } from './InventoryEditScreen';
 export { SelectRefItemScreen } from '../../components/SelectRefItemScreen';

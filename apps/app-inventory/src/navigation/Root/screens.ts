@@ -7,6 +7,7 @@ import {
 } from '../../screens/Inventorys';
 
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
+import { ScanBarcodeScreen } from '../../screens/Scanners/ScanBarcode';
 
 export const inventoryScreens = {
   InventoryEdit: InventoryEditScreen,
@@ -14,8 +15,13 @@ export const inventoryScreens = {
   InventoryLine: InventoryLineScreen,
   SelectRefItem: SelectRefItemScreen,
   SelectGoodItem: SelectGoodScreen,
+  ScanBarcode: ScanBarcodeScreen,
 };
 
 export const inventoryListScreens = {
   InventoryList: InventoryListScreen,
 };
+
+/* export const ScanScreens = {
+  ScanBarcode: ScanBarcodeScreen,
+}; */

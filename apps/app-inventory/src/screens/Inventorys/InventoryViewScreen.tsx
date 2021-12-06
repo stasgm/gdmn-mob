@@ -48,6 +48,10 @@ export const InventoryViewScreen = () => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
 
+  const handleScanner = useCallback(() => {
+    navigation.navigate('ScanBarcode', { docId: id });
+  }, [navigation, id]);
+
   const handleDelete = useCallback(() => {
     if (!id) {
       return;
@@ -85,12 +89,13 @@ export const InventoryViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
+            <ScanButton onPress={handleScanner} />
             <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddInventoryLine} />
           </View>
         ),
     });
-  }, [navigation, handleAddInventoryLine, handleScannerGood, actionsMenu, isBlocked]);
+  }, [navigation, handleAddInventoryLine, handleScannerGood, actionsMenu, handleScanner, isBlocked]);
 
   if (!inventory) {
     return (
@@ -108,7 +113,7 @@ export const InventoryViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(inventory?.status || 'DRAFT')}
-        title={inventory.head.department?.name || ''}
+        title={inventory.head.contact?.name || ''}
         onPress={handleEditInventoryHead}
         disabled={!['DRAFT', 'READY'].includes(inventory.status)}
       >
