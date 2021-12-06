@@ -26,7 +26,7 @@ export interface IInventoryFormParam extends IFormParam {
   status?: StatusType;
   documentType?: IDocumentType;
   depart?: IContact;
-  department?: IDepartment;
+  contact?: IDepartment;
   comment?: string;
 }
 
