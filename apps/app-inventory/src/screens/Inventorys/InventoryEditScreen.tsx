@@ -41,7 +41,7 @@ export const InventoryEditScreen = () => {
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
   const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
   const docType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documenttypes')
+    .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'inventory');
   //console.log(docType);
 
