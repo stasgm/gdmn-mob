@@ -30,14 +30,39 @@ const Root = () => {
 
   const appSettings: Settings = {
     scannerUse: {
-      id: '3',
-      sortOrder: 3,
+      id: '4',
+      sortOrder: 4,
       description: 'Использовать сканер',
       data: true,
       type: 'boolean',
       visible: true,
     },
+    idWeightCode: {
+      id: '5',
+      sortOrder: 5,
+      description: 'Идентификатор весового товара',
+      data: '22',
+      type: 'string',
+      visible: true,
+    },
+    countBarcode: {
+      id: '6',
+      sortOrder: 6,
+      description: 'Количество символов для кода товара',
+      data: 5,
+      type: 'number',
+      visible: true,
+    },
+    countWeight: {
+      id: '7',
+      sortOrder: 7,
+      description: 'Количество символов для веса (в гр.)',
+      data: 5,
+      type: 'number',
+      visible: true,
+    },
   };
+
   ////
   const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
