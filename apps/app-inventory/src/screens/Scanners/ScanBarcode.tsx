@@ -1,42 +1,41 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, TouchableOpacity, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
-// eslint-disable-next-line import/no-unresolved
 import { BarCodeScanner } from 'expo-barcode-scanner';
-// eslint-disable-next-line import/no-unresolved
 import { Camera } from 'expo-camera';
 
-import { useTheme } from '@react-navigation/native';
-import { StackScreenProps } from '@react-navigation/stack';
+import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/native';
 
 import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
+import { ScanButton } from '@lib/mobile-ui';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { useAppStore } from '../../store/app-inv/store';
-//import { IMDGoodRemain, IModelData, IRem, IRemains, IWeightCodeSettings } from '../../../../../../common/base';
-import { IRem } from '../../store/types';
+//import { useAppStore } from '../../store/app/store';
+import { IMDGoodRemain, IModelData, IRem, IWeightCodeSettings } from '../../store/types';
+
 const oneSecund = 1000;
 
-type Props = StackScreenProps<InventorysStackParamList, 'ScanBarcode'>;
 type ScannedObject = IRem & { quantity: number };
 
-export const ScanBarcodeScreen = ({ route, navigation }: Props) => {
-  const { colors } = useTheme();
+export const ScanBarcodeScreen = () => {
+  const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
+  const navigation = useNavigation();
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const { state } = useAppStore();
+  //const { state } = useAppStore();
+  const { colors } = useTheme();
 
   const [barcode, setBarcode] = useState('');
   const [goodItem, setGoodItem] = useState<ScannedObject>();
-  const docId = route.params?.docId;
 
-  const document = useMemo(
+  /* const document = useMemo(
     () => state.documents?.find((item: { id: number }) => item.id === docId),
     [docId, state.documents],
-  );
+  ); */
 
   //const remainsData = state.models?.remains?.data as unknown as IModelData<IMDGoodRemain>;
   //const goods = remainsData?.[document?.head?.fromcontactId]?.goods;
@@ -58,12 +57,16 @@ export const ScanBarcodeScreen = ({ route, navigation }: Props) => {
     setScanned(true);
     setBarcode(data);
   };
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const handleScannerGood = useCallback(() => {
+    navigation.navigate('InventoryEdit');
+  }, [navigation]);
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(oneSecund);
   }, [vibroMode]);
 
-/*   useEffect(() => {
+  /*   useEffect(() => {
     if (!scanned) {
       return;
     }
@@ -214,7 +217,7 @@ export const ScanBarcodeScreen = ({ route, navigation }: Props) => {
                 style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
-                <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
+                <ScanButton onPress={handleScannerGood} />
                 <Text style={scanStyle.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
@@ -261,7 +264,7 @@ export const ScanBarcodeScreen = ({ route, navigation }: Props) => {
         {!scanned && (
           <View style={scanStyle.footer}>
             <>
-              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+              <ScanButton onPress={handleScannerGood} />
               <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>

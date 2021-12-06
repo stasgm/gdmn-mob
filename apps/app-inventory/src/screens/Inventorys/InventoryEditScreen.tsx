@@ -7,6 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { IDocumentType, IReference } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import {
   useDispatch as useDocDispatch,
@@ -38,11 +39,14 @@ export const InventoryEditScreen = () => {
   const docDispatch = useDocDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  const docType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documenttypes')
+    ?.data.find((t) => t.name === 'inventory');
+  //console.log(docType);
 
   const {
-    documentType: docType,
-    department: docDepartment,
+    contact: docDepartment,
     depart: docDepart,
     onDate: docOnDate,
     documentDate: docInventoryDate,
@@ -60,16 +64,14 @@ export const InventoryEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const department = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docDepartment?.id);
+  const contact = refSelectors.selectByName<IDepartment>('contact')?.data?.find((e) => e.id === docDepartment?.id);
 
   useEffect(() => {
     if (!docDepartment) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['department']: department?.name,
+          ['contact']: contact?.name,
         }),
       );
     }
@@ -87,18 +89,6 @@ export const InventoryEditScreen = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, docDepart]);
-
-  useEffect(() => {
-    if (!docType) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['documentType']: docType,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docType]);
 
   useEffect(() => {
     if (!docComment) {
@@ -122,7 +112,7 @@ export const InventoryEditScreen = () => {
           onDate: inventory.head.onDate,
           documentDate: inventory.documentDate,
           comment: inventory.head.comment,
-          department: inventory.head.department,
+          contact: inventory.head.department,
           status: inventory.status,
           depart: inventory.head.depart,
         }),
@@ -140,7 +130,12 @@ export const InventoryEditScreen = () => {
   }, [dispatch, inventory]);
 
   const handleSave = useCallback(() => {
-    if (!(docNumber && docType)) {
+    if (!docType) {
+      return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
+    }
+    console.log(docType);
+
+    if (!docNumber) {
       //&& docDepart  && docOnDate
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
@@ -151,14 +146,14 @@ export const InventoryEditScreen = () => {
     if (!id) {
       const newInventory: IInventoryDocument = {
         id: docId,
+        documentType: docType,
         number: docNumber,
         documentDate: newOntDate,
         status: 'DRAFT',
-        documentType: docType,
         head: {
           comment: docComment,
           onDate: docOnDate,
-          department: docDepartment,
+          contact: docDepartment,
           depart: docDepart,
         },
         lines: [],
@@ -167,7 +162,7 @@ export const InventoryEditScreen = () => {
       };
 
       docDispatch(documentActions.addDocument(newInventory));
-
+      //console.log(newInventory.documentType);
       navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
     } else {
       if (!inventory) {
@@ -181,13 +176,13 @@ export const InventoryEditScreen = () => {
         id,
         number: docNumber,
         status: docStatus || 'DRAFT',
-        errorMessage: undefined,
         documentType: docType,
+        errorMessage: undefined,
         head: {
           ...inventory.head,
           comment: docComment,
           onDate: docOnDate,
-          department: docDepartment,
+          contact: docDepartment,
           depart: docDepart,
         },
         lines: inventory.lines,
@@ -199,8 +194,8 @@ export const InventoryEditScreen = () => {
       navigation.navigate('InventoryView', { id });
     }
   }, [
-    docType,
     docNumber,
+    docType,
     docDepartment,
     docComment,
     docOnDate,
@@ -249,8 +244,8 @@ export const InventoryEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: 'department',
-      fieldName: 'department',
+      refName: 'contact',
+      fieldName: 'contact',
       value: docDepartment && [docDepartment],
     });
   };
@@ -264,18 +259,6 @@ export const InventoryEditScreen = () => {
       refName: 'depart',
       fieldName: 'depart',
       value: docDepart && [docDepart],
-    });
-  };
-
-  const handlePresentDocType = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'documentType',
-      fieldName: 'documentType',
-      value: docType && [docType],
     });
   };
 
@@ -308,13 +291,6 @@ export const InventoryEditScreen = () => {
           value={getDateString(docOnDate || '')}
           onPress={handlePresentOnDate}
           disabled={docStatus !== 'DRAFT'}
-        />
-        <SelectableInput
-          label="Тип документа"
-          placeholder="Выберите тип документа..."
-          value={docType?.name}
-          onPress={handlePresentDocType}
-          disabled={isBlocked}
         />
         <SelectableInput
           label="Подразделение"

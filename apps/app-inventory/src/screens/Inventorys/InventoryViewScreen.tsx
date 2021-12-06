@@ -30,7 +30,8 @@ export const InventoryViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
 
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryView'>>().params?.id;
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('order')?.find((e) => e.id === id);
+  //console.log();
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
   const isBlocked = inventory?.status !== 'DRAFT';
 
@@ -84,7 +85,6 @@ export const InventoryViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
-            <ScanButton onPress={handleScannerGood} />
             <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddInventoryLine} />
           </View>
