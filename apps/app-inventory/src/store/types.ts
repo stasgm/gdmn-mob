@@ -12,7 +12,7 @@ import { AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
 // eslint-disable-next-line import/no-cycle
-import { IModel, IGood } from './app-inv/types';
+import { IModel, IGood } from './app/types';
 
 export { IModel, IGood };
 export interface IFormParam {

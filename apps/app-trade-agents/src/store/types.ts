@@ -213,3 +213,10 @@ export const visitDocumentType: IDocumentType = {
 export interface IToken {
   access_token: string;
 }
+
+export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
+  ReturnType,
+  S,
+  unknown,
+  A
+>;
