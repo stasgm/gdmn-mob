@@ -6,14 +6,14 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { InventorysStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
+import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine } from '../../store/types';
 
 import { InventoryLine } from './components/InventoryLine';
 
 export const InventoryLineScreen = () => {
   const navigation =
-    useNavigation<StackNavigationProp<InventorysStackParamList | RoutesStackParamList, 'InventoryLine'>>();
+    useNavigation<StackNavigationProp<InventorysStackParamList | InventorysStackParamList, 'InventoryLine'>>();
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
