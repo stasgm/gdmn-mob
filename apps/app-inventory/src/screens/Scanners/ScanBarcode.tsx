@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, TouchableOpacity, Vibration } from 'react-native';
+import { v4 as uuid } from 'uuid';
 import { Text, IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
@@ -12,13 +13,12 @@ import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
 import { ScanButton } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
+import { INamedEntity } from '@lib/types';
+
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IRem, IGood, IInventoryLine } from '../../store/types';
 
-//IMDGoodRemain  IModelData  IWeightCodeSettings
 const oneSecund = 1000;
-
-type ScannedObject = IRem & { quantity: number } & { good: IGood };
 
 export const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
@@ -31,7 +31,6 @@ export const ScanBarcodeScreen = () => {
   const { colors } = useTheme();
 
   const [barcode, setBarcode] = useState('');
-  const [goodItem, setGoodItem] = useState<ScannedObject>();
   const [itemLine, setItemLine] = useState<IInventoryLine>();
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
@@ -63,48 +62,31 @@ export const ScanBarcodeScreen = () => {
     }
 
     if (!barcode && scanned) {
-      setGoodItem(undefined);
       setItemLine(undefined);
       return;
     }
 
-    const IInventoryLineObject = (goodItemLine: ScannedObject | undefined): IInventoryLine | undefined => {
-      if (!goodItemLine) {
-        return;
-      } else {
-        return {
-          good: goodItemLine.good,
-          id: goodItemLine.id,
-          quantity: goodItemLine.quantity,
-          price: goodItemLine.price,
-          remains: goodItemLine.remains,
-        };
-      }
-    };
-
-    const getScannedObject = (brc: string): ScannedObject | undefined => {
+    const getScannedObject = (brc: string): IInventoryLine | undefined => {
       const good = goods?.find((e) => e.barcode === brc);
       if (!good) {
         return;
       } else {
         return {
-          ...good,
-          good: good,
+          good: { id: good.id, name: good.name } as INamedEntity,
+          id: uuid(),
           quantity: 1,
-          price: 0,
+          price: 10,
           remains: 0,
+          barcode: good.barcode,
         };
       }
     };
 
     vibroMode && Vibration.vibrate(oneSecund);
 
-    const scannedObj: ScannedObject | undefined = getScannedObject(barcode);
-    setGoodItem(scannedObj);
-
+    const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
-      const IInventoryLineObj = IInventoryLineObject(scannedObj);
-      setItemLine(IInventoryLineObj);
+      setItemLine(scannedObj);
     }
   }, [barcode, goods, scanned, vibroMode]);
 
@@ -152,7 +134,7 @@ export const ScanBarcodeScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanStyle.transparent}
-            onPress={() => setFlashMode(!flashMode)}
+            onPress={() => setFlashMode(!flashMode)} //navigation.navigate('RemainsList', { docId: document?.id })
           />
         </View>
         {!scanned ? (
@@ -186,7 +168,7 @@ export const ScanBarcodeScreen = () => {
                 <Text style={scanStyle.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {scanned && !goodItem && (
+            {scanned && !itemLine && (
               <View style={scanStyle.infoContainer}>
                 <View style={[scanStyle.buttons, { backgroundColor: '#CC3C4D' }]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
@@ -197,14 +179,13 @@ export const ScanBarcodeScreen = () => {
                 </View>
               </View>
             )}
-            {scanned && goodItem && (
-              //const item: numder = 10;
-
+            {scanned && itemLine && (
               <View style={scanStyle.buttonsContainer}>
                 <TouchableOpacity
                   style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
-                    navigation.navigate('InventoryLineEdit', {
+                    console.log('#itemLine', itemLine);
+                    navigation.navigate('InventoryLine', {
                       mode: 0,
                       docId,
                       item: itemLine,
@@ -214,12 +195,12 @@ export const ScanBarcodeScreen = () => {
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={scanStyle.goodInfo}>
                     <Text style={scanStyle.goodName} numberOfLines={3}>
-                      {goodItem?.name}
+                      {itemLine?.good.name}
                     </Text>
                     <Text style={scanStyle.barcode}>
-                      цена: {goodItem?.price || 0}, остаток: {goodItem?.remains}, кол-во: {goodItem?.quantity}
+                      цена: {itemLine?.price || 0}, остаток: {itemLine?.remains}, кол-во: {itemLine?.quantity}
                     </Text>
-                    <Text style={scanStyle.barcode}>{goodItem?.barcode}</Text>
+                    <Text style={scanStyle.barcode}>{itemLine?.barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>

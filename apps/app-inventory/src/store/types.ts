@@ -41,6 +41,7 @@ export interface IInventoryLine extends IEntity {
   packagekey?: INamedEntity; // Вид упаковки
   price?: number;
   remains?: number;
+  barcode?: string;
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
