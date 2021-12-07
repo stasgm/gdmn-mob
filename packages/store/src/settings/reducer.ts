@@ -24,11 +24,11 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: true,
   },
   cleanDocTime: {
-    id: '4',
+    id: '3',
     description: 'Время хранения документов в архиве, дн.',
     data: 30,
     type: 'number',
-    sortOrder: 4,
+    sortOrder: 3,
     visible: true,
   },
 };
