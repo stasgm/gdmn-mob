@@ -5,17 +5,18 @@ export const superAdmin: INamedEntity = {
   name: 'gdmn',
 };
 
-const company1: INamedEntity = { id: '654', name: 'ОДО Амперсант' };
-const company2: INamedEntity = { id: '789', name: 'ОДО Золотые Программы' };
+const company1: INamedEntity = { id: '789', name: 'Моя компания 1' };
+const company2: INamedEntity = { id: '654', name: 'Моя компания 2' };
 const company3: INamedEntity = { id: '777', name: 'Моя компания' };
 
 const users: (IUser & { password?: string; verifyPassword?: string })[] = [
   {
     id: '15',
     externalId: '147012274',
-    name: 'Короткевич З.',
+    name: 'Короткевич З.С.',
+    surName: 'Короткевич',
     firstName: 'Змицер',
-    lastName: 'Короткевич',
+    lastName: 'Семенович',
     phoneNumber: '8-044-788-86-44',
     creator: superAdmin,
     company: company3,
@@ -27,7 +28,7 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
   {
     id: '123',
     externalId: '150449124',
-    name: 'Шляхтичич C.',
+    name: 'Шляхтичич C.С.',
     firstName: 'Станислав',
     surName: 'Шляхтичич',
     lastName: 'Сергеевич',
@@ -62,20 +63,6 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
     phoneNumber: '+37529-22-222-22',
     creator: superAdmin,
     company: company1,
-    role: 'User',
-    creationDate: '2021-11-24T14:02:55.886Z',
-    editionDate: '2021-11-24T14:02:55.886Z',
-  },
-  {
-    id: '13',
-    externalId: '150449124',
-    name: 'Короткевич З.С.',
-    firstName: 'Змицер',
-    surName: 'Короткевич',
-    lastName: 'Семенович',
-    phoneNumber: '+37529-22-222-22',
-    creator: superAdmin,
-    company: company2,
     role: 'User',
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',

@@ -25,7 +25,7 @@ const depRefMock: IReference = {
 const peopleMock = [
   {
     id: '3',
-    name: 'Короткевич З.',
+    name: 'Короткевич З.С.',
     company: company2,
   },
   {
