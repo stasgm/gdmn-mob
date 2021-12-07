@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, TouchableOpacity, Vibration, Alert } from 'react-native';
+/* eslint-disable react-native/no-inline-styles */
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, TouchableOpacity, Vibration } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
@@ -12,11 +13,12 @@ import { ScanButton } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IMDGoodRemain, IModelData, IRem, IWeightCodeSettings, IGood } from '../../store/types';
+import { IRem, IGood, IInventoryLine } from '../../store/types';
 
+//IMDGoodRemain  IModelData  IWeightCodeSettings
 const oneSecund = 1000;
 
-type ScannedObject = IRem & { quantity: number };
+type ScannedObject = IRem & { quantity: number } & { good: IGood };
 
 export const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
@@ -30,6 +32,7 @@ export const ScanBarcodeScreen = () => {
 
   const [barcode, setBarcode] = useState('');
   const [goodItem, setGoodItem] = useState<ScannedObject>();
+  const [itemLine, setItemLine] = useState<IInventoryLine>();
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
@@ -61,19 +64,32 @@ export const ScanBarcodeScreen = () => {
 
     if (!barcode && scanned) {
       setGoodItem(undefined);
+      setItemLine(undefined);
       return;
     }
 
+    const IInventoryLineObject = (goodItemLine: ScannedObject | undefined): IInventoryLine | undefined => {
+      if (!goodItemLine) {
+        return;
+      } else {
+        return {
+          good: goodItemLine.good,
+          id: goodItemLine.id,
+          quantity: goodItemLine.quantity,
+          price: goodItemLine.price,
+          remains: goodItemLine.remains,
+        };
+      }
+    };
+
     const getScannedObject = (brc: string): ScannedObject | undefined => {
       const good = goods?.find((e) => e.barcode === brc);
-
       if (!good) {
         return;
       } else {
-        //const { remains, ...good } = remItem;
-        console.log(good);
         return {
           ...good,
+          good: good,
           quantity: 1,
           price: 0,
           remains: 0,
@@ -84,8 +100,12 @@ export const ScanBarcodeScreen = () => {
     vibroMode && Vibration.vibrate(oneSecund);
 
     const scannedObj: ScannedObject | undefined = getScannedObject(barcode);
-
     setGoodItem(scannedObj);
+
+    if (scannedObj !== undefined) {
+      const IInventoryLineObj = IInventoryLineObject(scannedObj);
+      setItemLine(IInventoryLineObj);
+    }
   }, [barcode, goods, scanned, vibroMode]);
 
   if (hasPermission === null) {
@@ -132,14 +152,12 @@ export const ScanBarcodeScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanStyle.transparent}
-            onPress={() => setFlashMode(!flashMode)} //navigation.navigate('InventoryList', { docId: document?.id })
+            onPress={() => setFlashMode(!flashMode)}
           />
         </View>
         {!scanned ? (
-          // eslint-disable-next-line react-native/no-inline-styles
           <View style={[scanStyle.scannerContainer, { alignItems: 'center' }]}>
             <View
-              // eslint-disable-next-line react-native/no-inline-styles
               style={{
                 width: '70%',
                 height: '50%',
@@ -180,16 +198,16 @@ export const ScanBarcodeScreen = () => {
               </View>
             )}
             {scanned && goodItem && (
+              //const item: numder = 10;
+
               <View style={scanStyle.buttonsContainer}>
                 <TouchableOpacity
                   style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
                     navigation.navigate('InventoryLineEdit', {
-                      prodId: goodItem.id,
+                      mode: 0,
                       docId,
-                      price: goodItem.price,
-                      remains: goodItem.remains,
-                      quantity: goodItem.quantity,
+                      item: itemLine,
                     });
                   }}
                 >
