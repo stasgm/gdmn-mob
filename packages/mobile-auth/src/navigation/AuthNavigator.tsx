@@ -23,7 +23,9 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const { settings, user, connectionStatus } = useSelector((state) => state.auth);
+  const settings = useSelector((state) => state.auth.settings);
+  const user = useSelector((state) => state.auth.user);
+  const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
@@ -37,7 +39,7 @@ const AuthNavigator: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //authDispatch(authActions.init());
+    // authDispatch(authActions.init());
     setLoading(true);
     let debug = { ...api.config.debug, ...settings.debug };
 
@@ -178,7 +180,7 @@ const AuthNavigator: React.FC = () => {
           />
         ) : (
           <AuthStack.Screen
-            name="Login"
+            name="LoginCompany"
             component={AppLoadWithParams}
             options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
           />

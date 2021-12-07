@@ -14,7 +14,10 @@ import { useActionSheet } from '@lib/mobile-ui';
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
-  const { user, company, device, settings: authSettings } = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.auth.user);
+  const company = useSelector((state) => state.auth.company);
+  const device = useSelector((state) => state.auth.device);
+  const isMock = useSelector((state) => state.auth.settings.debug?.isMock);
 
   const settings = user?.settings;
 
@@ -97,7 +100,7 @@ const ProfileScreen = () => {
       )}
       <View>
         <PrimeButton outlined onPress={handleLogout}>
-          {authSettings.debug?.isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
+          {isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
       </View>
     </View>
