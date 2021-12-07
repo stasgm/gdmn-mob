@@ -201,12 +201,4 @@ const App = () => (
   </Provider>
 );
 
-// const styles = StyleSheet.create({
-//   caption: {
-//     textAlign: 'center',
-//     fontSize: 14,
-//     lineHeight: 14,
-//   },
-// });
-
 export default App;

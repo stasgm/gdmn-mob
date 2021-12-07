@@ -93,7 +93,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, error: true, status: action.payload, loading: false, user: undefined };
 
     case getType(actions.logoutUserAsync.request):
-      return { ...state, error: false, status: '', loading: true, user: undefined };
+      return { ...state, error: false, status: '', loading: true };
 
     case getType(actions.logoutUserAsync.success):
       return {

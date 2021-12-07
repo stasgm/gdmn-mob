@@ -8,12 +8,14 @@ const isLogged = (): boolean => {
 };
 
 const isLoggedWithCompany = (): boolean => {
-  const auth = useSelector((state: RootState) => state.auth);
+  const connectionStatus = useSelector((state: RootState) => state.auth.connectionStatus);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const company = useSelector((state: RootState) => state.auth.company);
+  const isMock = useSelector((state: RootState) => state.auth.settings.debug?.isMock);
   return (
-    auth &&
     Boolean(
-      (auth.connectionStatus === 'connected' && auth.user && auth.company) ||
-        (auth.settings.debug?.isMock && auth.connectionStatus === 'connected'),
+      (connectionStatus === 'connected' && user && company)
+      || (isMock && connectionStatus === 'connected'),
     )
   );
 };

@@ -4,7 +4,7 @@ import { Store } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import { authActions, authSelectors, useAuthThunkDispatch } from '@lib/store';
+import { authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
@@ -23,11 +23,9 @@ export interface IApp {
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
 
-  const { settings } = useSelector((state) => state.auth);
-  const authDispatch = useAuthThunkDispatch();
+  const settings = useSelector( state => state.auth.settings );
 
   useEffect(() => {
-    // authDispatch(authActions.setSettings({ ...settings, debug: { ...settings.debug, isMock: false } }));
     // authDispatch(authActions.init());
     // //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...settings };

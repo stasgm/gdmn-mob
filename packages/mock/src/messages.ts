@@ -152,8 +152,8 @@ export const messageRequest: IMessage<MessageType>[] = [
               name: 'Согласован инженерной службой',
             },
             purchaseType: { id: '168355982', name: 'Стройматериалы' },
-            headCompany: { id: '147347293', name: 'ОАО "МатериалПродукт"' },
-            dept: { id: '170271488', name: 'МТП МатериалПродукт' },
+            headCompany: { id: '147347293', name: 'ОАО "ПродуктМаг"' },
+            dept: { id: '170271488', name: 'МТП ПродуктМаг' },
             purpose: { id: '168355982', name: 'Стройматериалы' },
             justification:
               'Данные тип Ремень 1250 и 1800(Б) требуются на установки, ремень 1180 (А) требуется на редуктор.',
@@ -216,13 +216,13 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
             },
-            headCompany: { id: '147347293', name: 'ОАО "МатериалПродукт"' },
+            headCompany: { id: '147347293', name: 'ОАО "ПродуктМаг"' },
             dept: { id: '151229051', name: 'Административный комплекс' },
             purpose: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
             },
-            justification: 'для общехозяйственных нужд управляющей компании Холдинга "МатериалПродукт"',
+            justification: 'для общехозяйственных нужд управляющей компании Холдинга "ПродуктМаг"',
             sysApplicant: {
               id: '147257056',
               name: 'Антонов Алексей Витальевич',
@@ -291,9 +291,9 @@ export const messageRequest: IMessage<MessageType>[] = [
             purchaseType: { id: '168354197', name: 'Отдел эксплуатации' },
             headCompany: {
               id: '147093196',
-              name: 'ОАО "МатериалПродукт"-упр.ком.холдинга МатериалПродукт',
+              name: 'ОАО "ПродуктМаг"-упр.ком.холдинга ПродуктМаг',
             },
-            dept: { id: '147095763', name: 'СХЦ "МатериалПродукт""' },
+            dept: { id: '147095763', name: 'СХЦ "ПродуктМаг""' },
             purpose: { id: '168354197', name: 'Отдел эксплуатации' },
             sysApplicant: {
               id: '147257056',
@@ -361,8 +361,8 @@ export const messageRequest: IMessage<MessageType>[] = [
               name: 'Согласован инженерной службой',
             },
             purchaseType: { id: '168353581', name: 'Механизация' },
-            headCompany: { id: '147347293', name: 'ОАО "МатериалПродукт"' },
-            dept: { id: '147095763', name: 'СХЦ "МатериалПродукт"' },
+            headCompany: { id: '147347293', name: 'ОАО "ПродуктМаг"' },
+            dept: { id: '147095763', name: 'СХЦ "ПродуктМаг"' },
             purpose: { id: '168353581', name: 'Механизация' },
             justification: 'Просим Вас закупить данные зап.части для ремонта автомобиля задействованного на КЗС.',
             sysApplicant: {
@@ -417,9 +417,9 @@ export const messageRequest: IMessage<MessageType>[] = [
             },
             headCompany: {
               id: '147093196',
-              name: 'ОАО "МатериалПродукт"-упр.ком.холдинга ОАО "МатериалПродукт"',
+              name: 'ОАО "ПродуктМаг"-упр.ком.холдинга ОАО "ПродуктМаг"',
             },
-            dept: { id: '147095763', name: 'ОАО "МатериалПродукт"' },
+            dept: { id: '147095763', name: 'ОАО "ПродуктМаг"' },
             purpose: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
@@ -536,9 +536,9 @@ export const messageRequest: IMessage<MessageType>[] = [
             },
             headCompany: {
               id: '147093196',
-              name: 'ОАО "МатериалПродукт"-упр.ком.холдинга ОАО "МатериалПродукт"',
+              name: 'ОАО "ПродуктМаг"-упр.ком.холдинга ОАО "ПродуктМаг"',
             },
-            dept: { id: '147095763', name: 'ОАО "МатериалПродукт"' },
+            dept: { id: '147095763', name: 'ОАО "ПродуктМаг"' },
             purpose: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
@@ -648,7 +648,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           data: [
             {
               id: '147042924',
-              name: 'ОАО "Рога и копыта"',
+              name: 'ОАО "МаркетКомпани"',
               contractNumber: '53',
               contractDate: '2013-12-10',
               paycond: 'отсрочка 20 б/д_поручение',
@@ -664,7 +664,7 @@ export const messageAgent: IMessage<MessageType>[] = [
             },
             {
               id: '1908473665',
-              name: 'ООО "МатериалПродукт"',
+              name: 'ООО "ПродуктМаг"',
               contractNumber: '309-СР',
               contractDate: '2020-01-24',
               paycond: 'отсрочка 45 к/д_ поручение',
@@ -953,8 +953,8 @@ export const messageAgent: IMessage<MessageType>[] = [
           data: [
             {
               id: '3121846445',
-              name: 'Магазин "Рога и копыта" № 1',
-              company: { id: '147042924', name: 'ОАО "Рога и копыта"' },
+              name: 'Магазин "МаркетКомпани" № 1',
+              company: { id: '147042924', name: 'ОАО "МаркетКомпани"' },
               phoneNumber: '',
               address: 'г. Минск ул. Лесная , 27',
               lon: 27.53348781,
@@ -962,8 +962,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             },
             {
               id: '1121464445',
-              name: 'Магазин "Рога и копыта" № 2',
-              company: { id: '147042924', name: 'ОАО "Рога и копыта"' },
+              name: 'Магазин "МаркетКомпани" № 2',
+              company: { id: '147042924', name: 'ОАО "МаркетКомпани"' },
               phoneNumber: '',
               address: 'г. Минск ул. Садовая , 15',
               lon: 27.6189887,
@@ -971,8 +971,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             },
             {
               id: '1367139123',
-              name: 'Магазин "Рога и копыта" № 3',
-              company: { id: '147042924', name: 'ОАО "Рога и копыта"' },
+              name: 'Магазин "МаркетКомпани" № 3',
+              company: { id: '147042924', name: 'ОАО "МаркетКомпани"' },
               phoneNumber: '',
               address: 'г. Минск ул. Центральная, 102',
               lon: 27.49557362,
@@ -1025,8 +1025,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             },
             {
               id: '1475086884',
-              name: 'ООО "МатериалПродукт" Магазин " 1"',
-              company: { id: '1908473665', name: 'ООО "МатериалПродукт"' },
+              name: 'ООО "ПродуктМаг" Магазин " 1"',
+              company: { id: '1908473665', name: 'ООО "ПродуктМаг"' },
               phoneNumber: '',
               address: 'г. Минск ул. Озерная, 18',
               lon: 27.65653043,
@@ -1077,8 +1077,8 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: 'Сосиски докторские',
               },
               package: {
-                id: '1607786772',
-                name: '500 гр.-700  гр.(10)',
+                id: '1607786790',
+                name: '500 гр.-700  гр.(5)',
               },
             },
             {
@@ -1132,8 +1132,8 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: 'Сосиски сливочные',
               },
               package: {
-                id: '1607786773',
-                name: '2 кг. - 3 кг.(5)',
+                id: '1607786772',
+                name: '500 гр.-700  гр.(10)',
               },
             },
             {
@@ -1457,7 +1457,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               id: '1003948567',
               contact: {
                 id: '147042924',
-                name: 'ОАО "Рога и копыта"',
+                name: 'ОАО "МаркетКомпани"',
               },
               ondate: '2021-11-24T10:31:35.138Z',
               saldo: 2345600,
@@ -1477,7 +1477,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               id: '1001948567',
               contact: {
                 id: '1788296478',
-                name: 'ООО "МатериалПродукт"',
+                name: 'ООО "ПродуктМаг"',
               },
               ondate: '2021-11-24T10:31:35.138Z',
               saldo: 689571,
@@ -1811,7 +1811,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           head: {
             agent: {
               id: '875701130',
-              name: 'ЛАЗАРЕВА МАРИНА АЛЕКСАНДРОВНА',
+              name: 'Короткевич З.С.',
             },
           },
           lines: [
@@ -1821,7 +1821,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               visited: false,
               outlet: {
                 id: '3121846445',
-                name: 'Магазин "Рога и копыта" № 1',
+                name: 'Магазин "МаркетКомпани" № 1',
                 address: 'г. Минск ул. Лесная , 27',
               },
             },
@@ -1831,7 +1831,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               visited: false,
               outlet: {
                 id: '1367139123',
-                name: 'Магазин "Рога и копыта" № 3',
+                name: 'Магазин "МаркетКомпани" № 3',
                 address: 'г. Минск ул. Центральная, 102',
               },
             },
@@ -1880,7 +1880,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           head: {
             agent: {
               id: '875701130',
-              name: 'ЛАЗАРЕВА МАРИНА АЛЕКСАНДРОВНА',
+              name: 'Короткевич З.С.',
             },
           },
           lines: [
@@ -1890,7 +1890,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               visited: false,
               outlet: {
                 id: '1121464445',
-                name: 'Магазин "Рога и копыта" № 2',
+                name: 'Магазин "МаркетКомпани" № 2',
                 address: 'г. Минск ул. Садовая , 15',
               },
             },
@@ -1920,7 +1920,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               visited: false,
               outlet: {
                 id: '1475086884',
-                name: 'ООО "МатериалПродукт" Магазин " 1"',
+                name: 'ООО "ПродуктМаг" Магазин " 1"',
                 address: 'г. Минск ул. Озерная, 18',
               },
             },
@@ -2047,12 +2047,12 @@ export const messageAgent: IMessage<MessageType>[] = [
           head: {
             contact: {
               id: '147042924',
-              name: 'ОАО "Рога и копыта"',
+              name: 'ОАО "МаркетКомпани"',
             },
             onDate: '2021-11-24T10:31:26.332Z',
             outlet: {
               id: '1121464445',
-              name: 'Магазин "Рога и копыта" № 2',
+              name: 'Магазин "МаркетКомпани" № 2',
             },
             depart: {
               id: '357852117',
@@ -2150,11 +2150,11 @@ export const messageAgent: IMessage<MessageType>[] = [
           head: {
             contact: {
               id: '147042924',
-              name: 'ОАО "Рога и копыта"',
+              name: 'ОАО "МаркетКомпани"',
             },
             outlet: {
               id: '1367139123',
-              name: 'Магазин "Рога и копыта" № 3',
+              name: 'Магазин "МаркетКомпани" № 3',
             },
           },
           lines: [
@@ -2199,11 +2199,11 @@ export const messageAgent: IMessage<MessageType>[] = [
           head: {
             contact: {
               id: '1908473665',
-              name: 'ООО "МатериалПродукт"',
+              name: 'ООО "ПродуктМаг"',
             },
             outlet: {
               id: '1475086884',
-              name: 'ООО "МатериалПродукт" Магазин № 1',
+              name: 'ООО "ПродуктМаг" Магазин № 1',
             },
           },
           lines: [
