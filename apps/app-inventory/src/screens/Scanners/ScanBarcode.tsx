@@ -13,15 +13,12 @@ import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
 import { ScanButton } from '@lib/mobile-ui';
 import { refSelectors, useSelector, docSelectors } from '@lib/store';
 
-import { INamedEntity } from '@lib/types';
+import { INamedEntity, Settings, ISettingsOption } from '@lib/types';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IRem, IGood, IInventoryLine, IInventoryDocument, IModelData, IMDGoodRemain } from '../../store/types';
-
-//const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
-//const { model } = useAppTradeSelector((state) => state.appTrade);
+import { IRem, IGood, IInventoryLine, IInventoryDocument, IModelData, IMDGoodRemain, IGoodGroup } from '../../store/types';
 
 const oneSecund = 1000;
 
@@ -30,21 +27,24 @@ export const ScanBarcodeScreen = () => {
   const navigation = useNavigation();
 
   const document = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === docId);
-
   const { model } = useAppInventorySelector((state) => state.appInventory);
-  const remainsData = model?.remains?.data as unknown as IModelData<IMDGoodRemain>;
-  //const groupsModel = model[remainsData? || ''][item.parent?.id || item.id] || {};
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
+  const groupsModel = model[document?.head?.contact?.id || ''] || {};
+  // const goods = groupsModel[];
 
-  const goods = groupsModel[item.id];
+  const goods1 = refSelectors.selectByName<IGood>('good');
+  // const good = groupsModel[goods.id];
 
-
-  //const remainsData = state.models?.remains?.data as unknown as IModelData<IMDGoodRemain>;
+  //const remainsData = model[document?.];// as IModelData<IMDGoodRemain>;
   //const goods = remainsData?.[document?.head?.fromcontactId]?.goods;
 
-  //const weightCodeSettings = useMemo(
-  //  () => state.companySettings?.weightSettings as unknown as IWeightCodeSettings,
-  //  [state.companySettings?.weightSettings],
-  //);
+  console.log('groupsModel', groupsModel);
+
+  const { data: settings } = useSelector((state) => state.settings);
+
+  const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
+  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
+  const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
@@ -54,8 +54,6 @@ export const ScanBarcodeScreen = () => {
 
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IInventoryLine>();
-
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   useEffect(() => {
     const permission = async () => {
@@ -78,7 +76,7 @@ export const ScanBarcodeScreen = () => {
     vibroMode && Vibration.vibrate(oneSecund);
   }, [vibroMode]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!scanned) {
       return;
     }
@@ -86,10 +84,25 @@ export const ScanBarcodeScreen = () => {
     if (!barcode && scanned) {
       setItemLine(undefined);
       return;
-    }
+    } */
 
-    const getScannedObject = (brc: string): IInventoryLine | undefined => {
-      const good = goods?.find((e) => e.barcode === brc);
+    //const getScannedObject = (brc: string): IInventoryLine | undefined => {
+
+     /*  let charFrom = 0;
+      let charTo = weightSettingsWeightCode.data.length;
+
+      if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
+        const remItem = goods?.find((item: number) => goods[item].barcode === brc);
+
+        if (!remItem) {
+          return;
+        }
+
+        const { remains, ...good } = remItem; */
+
+
+
+      /* const good = goods1?.find((e) => e.barcode === brc);
       if (!good) {
         return;
       } else {
@@ -103,23 +116,75 @@ export const ScanBarcodeScreen = () => {
         };
       }
     };
+    */
+//////////////
+/* const getScannedObject = (brc: string): ScannedObject => {
+  let charFrom = 0;
 
+  let charTo = weightCodeSettings?.weightCode.length;
+
+  if (brc.substring(charFrom, charTo) !== weightCodeSettings?.weightCode) {
+    const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc)];
+
+    if (!remItem) {
+      return;
+    }
+
+    const { remains, ...good } = remItem;
+
+    return {
+      goodkey: good.id,
+      ...good,
+      quantity: 1,
+      price: remains.length ? remains[0].price : 0,
+      remains: remains.length ? remains?.[0].q : 0,
+    };
+
+    // return goodObj ? { ...goodObj, quantity: 1 } : undefined;
+  }
+
+  charFrom = charTo;
+  charTo = charFrom + weightCodeSettings?.code;
+  const code = Number(barcode.substring(charFrom, charTo)).toString();
+
+  charFrom = charTo;
+  charTo = charFrom + weightCodeSettings?.weight;
+
+  const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
+
+  const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code)];
+
+  if (!remItem) {
+    return;
+  }
+
+  const { remains, ...good } = remItem;
+
+  return {
+    goodkey: good.id,
+    ...good,
+    quantity: qty,
+    price: remains.length ? remains[0].price : 0,
+    remains: remains.length ? remains?.[0].q : 0,
+  };
+}; */
+ //////////////
     vibroMode && Vibration.vibrate(oneSecund);
 
-    const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
+    /* const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
-    }
-  }, [barcode, goods, scanned, vibroMode]);
+    } */
+} //, [barcode, scanned, vibroMode]);
 
-  if (hasPermission === null) {
+  /* if (hasPermission === null) {
     return <View />;
   }
 
   if (hasPermission === false) {
     return <Text style={styles.title}>Нет доступа к камере</Text>;
   }
-
+ */
   return (
     <View style={[scanStyle.content, { backgroundColor: colors.card }]}>
       <Camera

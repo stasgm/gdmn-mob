@@ -1,3 +1,6 @@
+import { AnyAction } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+
 import {
   INamedEntity,
   IEntity,
@@ -8,12 +11,10 @@ import {
   IDocumentType,
   StatusType,
 } from '@lib/types';
-import { AnyAction } from 'redux';
-import { ThunkAction } from 'redux-thunk';
 
-import { IModelData, IGood } from './app/types';
+import { IModel, IGood } from './app/types';
 
-export { IModelData, IGood };
+export { IModel, IGood };
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -87,11 +88,12 @@ export interface IRemainsData {
   price?: number;
 }
 
-export interface IWeightCodeSettings {
+/* export interface IWeightCodeSettings {
   weightCode: string;
   code: number;
   weight: number;
-}
+} */
+
 export interface IMGoodRemain extends IGood {
   remains?: IModelRem[];
 }
@@ -105,9 +107,9 @@ export interface IMGoodData<T = unknown> {
   [id: string]: T;
 }
 
-/* export interface IModelData<T = unknown> {
+export interface IModelData<T = unknown> {
   [id: string]: T;
-} */
+}
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
   ReturnType,

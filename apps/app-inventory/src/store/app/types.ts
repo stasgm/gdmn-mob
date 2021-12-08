@@ -1,12 +1,12 @@
 import { INamedEntity } from '@lib/types';
 
 export type AppInventoryState = {
-  readonly model: IModelData;
+  readonly model: IModel;
   readonly loading: boolean;
   readonly errorMessage: string;
 };
 
-export interface IModelData {
+export interface IModel {
   [contactId: string]: IParentGroupModel;
 }
 
@@ -23,7 +23,7 @@ export interface IGood extends INamedEntity {
   alias: string;
   barcode: string;
   vat: string; //НДС
-  goodgroup: INamedEntity; // группа товаров
+  goodGroup: INamedEntity; // группа товаров
   valuename: string; // Наименование ед. изм.
   invWeight: number; // Вес единицы товара
   priceFso: number; // цена ФСО

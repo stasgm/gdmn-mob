@@ -37,7 +37,7 @@ const Root = () => {
       type: 'boolean',
       visible: true,
     },
-    idWeightCode: {
+    weightCode: {
       id: '5',
       sortOrder: 5,
       description: 'Идентификатор весового товара',
@@ -45,7 +45,7 @@ const Root = () => {
       type: 'string',
       visible: true,
     },
-    countBarcode: {
+    countCode: {
       id: '6',
       sortOrder: 6,
       description: 'Количество символов для кода товара',
