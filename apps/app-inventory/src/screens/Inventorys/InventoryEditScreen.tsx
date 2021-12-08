@@ -29,8 +29,7 @@ import {
 } from '@lib/mobile-ui';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryFormParam } from '../../store/app/types';
-import { IInventoryDocument, IDepartment } from '../../store/types';
+import { IInventoryDocument, IDepartment, IInventoryFormParam } from '../../store/types';
 
 export const InventoryEditScreen = () => {
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;

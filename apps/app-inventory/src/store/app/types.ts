@@ -1,12 +1,12 @@
 import { INamedEntity } from '@lib/types';
 
 export type AppInventoryState = {
-  readonly model: IModel;
+  readonly model: IModelData;
   readonly loading: boolean;
   readonly errorMessage: string;
 };
 
-export interface IModel {
+export interface IModelData {
   [contactId: string]: IParentGroupModel;
 }
 

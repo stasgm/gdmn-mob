@@ -11,10 +11,10 @@ import {
 import { AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 
-// eslint-disable-next-line import/no-cycle
-import { IModel, IGood } from './app/types';
+import { IModelData, IGood } from './app/types';
 
-export { IModel, IGood };
+export { IModelData, IGood };
+
 export interface IFormParam {
   [fieldName: string]: unknown;
 }
@@ -105,9 +105,9 @@ export interface IMGoodData<T = unknown> {
   [id: string]: T;
 }
 
-export interface IModelData<T = unknown> {
+/* export interface IModelData<T = unknown> {
   [id: string]: T;
-}
+} */
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
   ReturnType,

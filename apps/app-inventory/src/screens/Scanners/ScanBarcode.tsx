@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, TouchableOpacity, Vibration } from 'react-native';
 import { v4 as uuid } from 'uuid';
 import { Text, IconButton } from 'react-native-paper';
@@ -11,18 +11,40 @@ import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/
 import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
 import { ScanButton } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity } from '@lib/types';
 
+import { useSelector as useAppInventorySelector } from '../../store/index';
+
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IRem, IGood, IInventoryLine } from '../../store/types';
+import { IRem, IGood, IInventoryLine, IInventoryDocument, IModelData, IMDGoodRemain } from '../../store/types';
+
+//const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
+//const { model } = useAppTradeSelector((state) => state.appTrade);
 
 const oneSecund = 1000;
 
 export const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation();
+
+  const document = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === docId);
+
+  const { model } = useAppInventorySelector((state) => state.appInventory);
+  const remainsData = model?.remains?.data as unknown as IModelData<IMDGoodRemain>;
+  //const groupsModel = model[remainsData? || ''][item.parent?.id || item.id] || {};
+
+  const goods = groupsModel[item.id];
+
+
+  //const remainsData = state.models?.remains?.data as unknown as IModelData<IMDGoodRemain>;
+  //const goods = remainsData?.[document?.head?.fromcontactId]?.goods;
+
+  //const weightCodeSettings = useMemo(
+  //  () => state.companySettings?.weightSettings as unknown as IWeightCodeSettings,
+  //  [state.companySettings?.weightSettings],
+  //);
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
