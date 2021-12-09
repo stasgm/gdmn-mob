@@ -2,20 +2,20 @@ import { useDispatch } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { ActionType } from 'typesafe-actions';
 
-import { AppThunk } from '../types';
+import { AppThunk, IMDGoodRemain, IModelData } from '../types';
 
 import { actions, AppInventoryActionType } from './actions';
-import { AppInventoryState, IModel } from './types';
+import { AppInventoryState } from './types';
 
 export type appInventoryDispatch = ThunkDispatch<AppInventoryState, any, AppInventoryActionType>;
 
 export const useAppInventoryThunkDispatch = () => useDispatch<appInventoryDispatch>();
 
 export const setModel = (
-  model: IModel,
+  model: IModelData<IMDGoodRemain>,
 ): AppThunk<
   Promise<ActionType<typeof actions.setModelAsync>>,
-  AppInventoryActionType,
+  AppInventoryState,
   ActionType<typeof actions.setModelAsync>
 > => {
   return async (dispatch) => {

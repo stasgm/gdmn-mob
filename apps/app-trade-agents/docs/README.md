@@ -76,7 +76,7 @@
 
 По нажатию на товар можно перейти в окно просмотра позиций.
 
-<img src="img/2.References/2.GoodPosition.jpg" alt="drawing"height="600"/>
+<img src="img/2.References/2.GoodPosition.jpg" alt="drawing" height="600"/>
 
 Рассмотрим еще один справочник.
 
