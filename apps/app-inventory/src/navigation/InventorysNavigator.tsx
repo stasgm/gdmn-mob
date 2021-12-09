@@ -1,8 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-//import { ScanBarcodeScreen } from '../screens/Scanners/ScanBarcode';
-
 import { InventorysStackParamList } from './Root/types';
 import { inventoryListScreens, inventoryScreens } from './Root/screens';
 

@@ -15,10 +15,9 @@ import { useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
-import { useSelector as useAppInventorySelector } from '../../store/index';
-
-import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument } from '../../store/types';
+import { useSelector as useAppInventorySelector } from '../../../../store/index';
+import { InventorysStackParamList } from '../../../../navigation/Root/types';
+import { IInventoryLine, IInventoryDocument } from '../../../../store/types';
 
 const oneSecund = 1000;
 
