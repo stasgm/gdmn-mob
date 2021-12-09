@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch as useDocDispatch } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { IReference, Settings } from '@lib/types';
@@ -16,6 +16,10 @@ import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IMo
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
 
 const Root = () => {
+  // const newDispatch = useDocDispatch();
+  // useEffect(() => {
+  //   newDispatch(settingsActions.init());
+  // }, [newDispatch]);
   const navItems: INavItem[] = useMemo(
     () => [
       {

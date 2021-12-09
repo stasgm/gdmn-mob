@@ -21,6 +21,12 @@ const SettingsSceen = () => {
   //     .filter((i) => i.visible);
   // }, [data]);
 
+  Object.entries(data).forEach((item) => {
+    if (!item[1]?.group) {
+      item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
+    }
+  });
+
   const parents = Object.entries(data).reduce(
     (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
       const obj = cur[1];
@@ -33,12 +39,6 @@ const SettingsSceen = () => {
     },
     [],
   );
-
-  Object.entries(data).forEach((item) => {
-    if (!item[1]?.group) {
-      item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
-    }
-  });
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     dispatch(settingsActions.updateOption({ optionName, value }));
@@ -128,7 +128,7 @@ const SettingsSceen = () => {
                   key={key}
                   group={item}
                   data={data}
-                  // onValueChange={(newValue) => handleUpdate(item.id, { ...item, data: newValue })}
+                  onValueChange={(optionName, value) => handleUpdate(optionName, value)}
                 />
                 <Divider />
               </View>

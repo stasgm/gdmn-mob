@@ -32,7 +32,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 2 },
+    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
   },
 };
 
