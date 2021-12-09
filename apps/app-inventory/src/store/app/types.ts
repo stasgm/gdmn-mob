@@ -31,6 +31,6 @@ export interface IGood extends INamedEntity {
   valuename?: string; // Наименование ед. изм.
   invWeight?: number; // Вес единицы товара
   priceFso: number; // цена ФСО
-  priceFsn?: number; // цена ФСН
+  price?: number; //Цена
   scale?: number; //количество единиц в месте
 }

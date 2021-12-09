@@ -83,6 +83,7 @@ export const ScanBarcodeScreen = () => {
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
+      //console.log('Символ', weightSettingsWeightCode.data);
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc) || ''];
 
@@ -91,6 +92,7 @@ export const ScanBarcodeScreen = () => {
         }
 
         const { remains, ...good } = remItem;
+        //console.log('Остаток1', remains);
 
         return {
           good: { id: good.id, name: good.name } as INamedEntity,
@@ -105,11 +107,13 @@ export const ScanBarcodeScreen = () => {
       charFrom = charTo;
       charTo = charFrom + weightSettingsCountCode;
       const code = Number(barcode.substring(charFrom, charTo)).toString();
+      //console.log('Код', code);
 
       charFrom = charTo;
       charTo = charFrom + weightSettingsCountWeight;
 
       const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
+      //console.log('Колич', qty);
 
       const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code) || ''];
 
@@ -118,7 +122,7 @@ export const ScanBarcodeScreen = () => {
       }
 
       const { remains, ...good } = remItem;
-
+      //console.log('Остаток2', remains);
       return {
         good: { id: good.id, name: good.name } as INamedEntity,
         id: uuid(),
@@ -242,7 +246,6 @@ export const ScanBarcodeScreen = () => {
                 <TouchableOpacity
                   style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
-                    console.log('#itemLine', itemLine);
                     navigation.navigate('InventoryLine', {
                       mode: 0,
                       docId,

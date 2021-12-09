@@ -4,10 +4,9 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
-import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { IReference } from '@lib/types';
+import { documentActions, useDispatch } from '@lib/store';
 
-import { IGood, IInventoryLine } from '../../../store/types';
+import { IInventoryLine } from '../../../store/types';
 import { InventorysStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {
@@ -60,9 +59,8 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  const priceFSN =
-    (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
-
+  const price = item?.price || 0;
+  //console.log('Item', item);
   return (
     <>
       <ScrollView>
@@ -77,7 +75,7 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
+              <Text style={[styles.number, styles.field]}>{price.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
