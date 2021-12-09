@@ -36,6 +36,7 @@ const Root = () => {
       data: true,
       type: 'boolean',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     idWeightCode: {
       id: '5',
@@ -44,6 +45,7 @@ const Root = () => {
       data: '22',
       type: 'string',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     countBarcode: {
       id: '6',
@@ -52,6 +54,7 @@ const Root = () => {
       data: 5,
       type: 'number',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     countWeight: {
       id: '7',
@@ -60,6 +63,7 @@ const Root = () => {
       data: 5,
       type: 'number',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
   };
 
@@ -110,6 +114,7 @@ const Root = () => {
     getRemainsModel();
     setLoading(false);
   }, [appInventoryDispatch, contacts, goods, remains]);
+
   return loading ? (
     <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
   ) : (

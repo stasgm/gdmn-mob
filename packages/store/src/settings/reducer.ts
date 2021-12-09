@@ -14,6 +14,7 @@ const baseSettings: Settings<IBaseSettings> = {
     description: 'Опрашивать сервер автоматически',
     data: true,
     type: 'boolean',
+    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
   },
   refLoadType: {
     id: '2',
@@ -22,6 +23,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 2,
     visible: true,
+    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
   },
   cleanDocTime: {
     id: '3',
@@ -30,6 +32,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
+    group: { id: '1', name: 'Настройки приложения', sortOrder: 2 },
   },
 };
 

@@ -16,7 +16,7 @@ import {
 
 import { useDispatch } from '../store';
 import { extraPredicate } from '../utils/helpers';
-import { IFormParam } from '../store/app/types';
+import { IFormParam } from '../store/types';
 import { RefParamList } from '../navigation/Root/types';
 
 export const SelectRefItemScreen = () => {

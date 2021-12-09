@@ -4,9 +4,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
-import { SettingsItem, globalStyles as styles, DrawerButton, MenuButton, useActionSheet } from '@lib/mobile-ui';
-import { ISettingsOption } from '@lib/types';
-export type SettingListItem = ISettingsOption & { setName: string };
+import { globalStyles as styles, DrawerButton, MenuButton, useActionSheet, SettingsGroup } from '@lib/mobile-ui';
+import { INamedEntity, ISettingsOption, SettingValue } from '@lib/types';
 
 const SettingsSceen = () => {
   const navigation = useNavigation();
@@ -16,11 +15,30 @@ const SettingsSceen = () => {
   const { data } = useSelector((state) => state.settings);
   const { settings } = useSelector((state) => state.auth);
   /////
-// const settingList = useMemo(() => {
+  // const settingList = useMemo(() => {
   //   return Object.entries(data)
   //     .map(([key, value]) => ({ ...value, setName: key } as SettingListItem))
   //     .filter((i) => i.visible);
   // }, [data]);
+
+  const parents = Object.entries(data).reduce(
+    (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+      const obj = cur[1];
+
+      if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+        return prev;
+      }
+
+      return [...prev, obj.group];
+    },
+    [],
+  );
+
+  Object.entries(data).forEach((item) => {
+    if (!item[1]?.group) {
+      item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
+    }
+  });
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     dispatch(settingsActions.updateOption({ optionName, value }));
@@ -81,9 +99,10 @@ const SettingsSceen = () => {
         </View>
       </View>
       <View>
-        <Text style={[styles.title]}>Настройки приложения</Text>
+        {/* <Text style={[styles.title]}>Настройки приложения</Text> */}
         <Divider />
-        <View>
+        {/* <View>
+          {/* <View style={[localStyles.border, { borderColor: colors.primary }]}> *
           {Object.entries(data)
             .filter(([_, item]) => item?.visible)
             .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
@@ -100,6 +119,21 @@ const SettingsSceen = () => {
                 </View>
               ) : null;
             })}
+        </View> */}
+        <View>
+          {parents.map((item, key) => {
+            return item ? (
+              <View key={key}>
+                <SettingsGroup
+                  key={key}
+                  group={item}
+                  data={data}
+                  // onValueChange={(newValue) => handleUpdate(item.id, { ...item, data: newValue })}
+                />
+                <Divider />
+              </View>
+            ) : null;
+          })}
         </View>
         {/* <FlatList
               data={settingList}
