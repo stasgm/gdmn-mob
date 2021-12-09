@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
-  AddButton,
   BackButton,
   MenuButton,
   useActionSheet,
@@ -91,7 +90,6 @@ export const InventoryViewScreen = () => {
           <View style={styles.buttons}>
             <ScanButton onPress={handleScanner} />
             <MenuButton actionsMenu={actionsMenu} />
-            <AddButton onPress={handleAddInventoryLine} />
           </View>
         ),
     });

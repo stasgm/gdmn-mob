@@ -80,7 +80,7 @@ const Root = () => {
   }, [storeSettings]);
 
   const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const departments = (refSelectors.selectByName('department') as IReference<IContact>)?.data;
+  const departments = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
   const remains = (refSelectors.selectByName('remain') as IReference<IRemains>)?.data;
 
   const [loading, setLoading] = useState(false);
