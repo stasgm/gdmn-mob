@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
-  AddButton,
   BackButton,
   MenuButton,
   useActionSheet,
@@ -48,6 +47,10 @@ export const InventoryViewScreen = () => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
 
+  const handleScanner = useCallback(() => {
+    navigation.navigate('ScanBarcode', { docId: id });
+  }, [navigation, id]);
+
   const handleDelete = useCallback(() => {
     if (!id) {
       return;
@@ -85,12 +88,12 @@ export const InventoryViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
+            <ScanButton onPress={handleScanner} />
             <MenuButton actionsMenu={actionsMenu} />
-            <AddButton onPress={handleAddInventoryLine} />
           </View>
         ),
     });
-  }, [navigation, handleAddInventoryLine, handleScannerGood, actionsMenu, isBlocked]);
+  }, [navigation, handleAddInventoryLine, handleScannerGood, actionsMenu, handleScanner, isBlocked]);
 
   if (!inventory) {
     return (

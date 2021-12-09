@@ -1,0 +1,1 @@
+export { ScanBarcodeScreen } from './ScanBarcode';

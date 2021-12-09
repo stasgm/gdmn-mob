@@ -37,7 +37,7 @@ const Root = () => {
       type: 'boolean',
       visible: true,
     },
-    idWeightCode: {
+    weightCode: {
       id: '5',
       sortOrder: 5,
       description: 'Идентификатор весового товара',
@@ -45,7 +45,7 @@ const Root = () => {
       type: 'string',
       visible: true,
     },
-    countBarcode: {
+    countCode: {
       id: '6',
       sortOrder: 6,
       description: 'Количество символов для кода товара',
@@ -63,7 +63,6 @@ const Root = () => {
     },
   };
 
-  ////
   const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
@@ -81,7 +80,7 @@ const Root = () => {
   }, [storeSettings]);
 
   const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
+  const departments = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
   const remains = (refSelectors.selectByName('remain') as IReference<IRemains>)?.data;
 
   const [loading, setLoading] = useState(false);
@@ -90,26 +89,29 @@ const Root = () => {
     console.log('useEffect setModel');
     setLoading(true);
     const getRemainsModel = async () => {
-      const model: IModelData<IMDGoodRemain> = contacts?.reduce((contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
-        const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-          goodsprev[g.id] = {
-            ...g,
-            remains:
-              remains
-                ?.find((r) => r.contactId === c.id)
-                ?.data?.filter((i) => i.goodId === g.id)
-                ?.map((r) => ({ price: r.price, q: r.q })) || [],
-          };
-          return goodsprev;
-        }, {});
-        contsprev[c.id] = { contactName: c.name, goods: remGoods };
-        return contsprev;
-      }, {});
+      const model: IModelData<IMDGoodRemain> = departments?.reduce(
+        (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
+          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+            goodsprev[g.id] = {
+              ...g,
+              remains:
+                remains
+                  ?.find((r) => r.contactId === c.id)
+                  ?.data?.filter((i) => i.goodId === g.id)
+                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
+            };
+            return goodsprev;
+          }, {});
+          contsprev[c.id] = { contactName: c.name, goods: remGoods };
+          return contsprev;
+        },
+        {},
+      );
       await appInventoryDispatch(actions.setModel(model));
     };
     getRemainsModel();
     setLoading(false);
-  }, [appInventoryDispatch, contacts, goods, remains]);
+  }, [appInventoryDispatch, departments, goods, remains]);
   return loading ? (
     <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
   ) : (
