@@ -63,7 +63,6 @@ const Root = () => {
     },
   };
 
-  ////
   const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();

@@ -1,7 +1,10 @@
 import { INamedEntity } from '@lib/types';
 
+// eslint-disable-next-line import/no-cycle
+import { IMDGoodRemain, IModelData } from '../types';
+
 export type AppInventoryState = {
-  readonly model: IModel;
+  readonly model: IModelData<IMDGoodRemain>;
   readonly loading: boolean;
   readonly errorMessage: string;
 };
@@ -21,14 +24,13 @@ export interface IGroupModel {
 // Товары
 export interface IGood extends INamedEntity {
   alias: string;
-  barcode: string;
-  vat: string; //НДС
+  barcode?: string;
+  vat?: string; //НДС
+  weightCode?: string;
   goodGroup: INamedEntity; // группа товаров
-  valuename: string; // Наименование ед. изм.
-  invWeight: number; // Вес единицы товара
+  valuename?: string; // Наименование ед. изм.
+  invWeight?: number; // Вес единицы товара
   priceFso: number; // цена ФСО
-  priceFsn: number; // цена ФСН
-  priceFsoSklad: number; // цена ФСО склад
-  priceFsnSklad: number; // цена ФСН склад
-  scale: number; //количество единиц в месте
+  priceFsn?: number; // цена ФСН
+  scale?: number; //количество единиц в месте
 }

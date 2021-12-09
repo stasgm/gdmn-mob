@@ -12,9 +12,10 @@ import {
   StatusType,
 } from '@lib/types';
 
-import { IModel, IGood } from './app/types';
+// eslint-disable-next-line import/no-cycle
+import { IGood } from './app/types';
 
-export { IModel, IGood };
+export { IGood };
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -87,12 +88,6 @@ export interface IRemainsData {
   q?: number;
   price?: number;
 }
-
-/* export interface IWeightCodeSettings {
-  weightCode: string;
-  code: number;
-  weight: number;
-} */
 
 export interface IMGoodRemain extends IGood {
   remains?: IModelRem[];
