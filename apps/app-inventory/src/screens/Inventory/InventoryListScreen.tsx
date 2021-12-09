@@ -56,7 +56,7 @@ export const InventoryListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.contact?.name,
+          title: i.head.department?.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
           subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,

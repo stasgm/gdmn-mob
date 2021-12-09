@@ -42,11 +42,9 @@ export const InventoryEditScreen = () => {
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'inventory');
-  //console.log(docType);
 
   const {
-    contact: docDepartment,
-    depart: docDepart,
+    department: docDepartment,
     onDate: docOnDate,
     documentDate: docInventoryDate,
     number: docNumber,
@@ -63,31 +61,19 @@ export const InventoryEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const contact = refSelectors.selectByName<IDepartment>('contact')?.data?.find((e) => e.id === docDepartment?.id);
+  const department = refSelectors.selectByName<IDepartment>('contact')?.data?.find((e) => e.id === docDepartment?.id);
 
   useEffect(() => {
     if (!docDepartment) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['contact']: contact?.name,
+          ['department']: department?.name,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, docDepartment]);
-
-  useEffect(() => {
-    if (!docDepart) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['depart']: docDepart,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docDepart]);
 
   useEffect(() => {
     if (!docComment) {
@@ -111,7 +97,7 @@ export const InventoryEditScreen = () => {
           onDate: inventory.head.onDate,
           documentDate: inventory.documentDate,
           comment: inventory.head.comment,
-          contact: inventory.head.department,
+          department: inventory.head.department,
           status: inventory.status,
           depart: inventory.head.depart,
         }),
@@ -132,10 +118,8 @@ export const InventoryEditScreen = () => {
     if (!docType) {
       return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     }
-    console.log(docType);
 
-    if (!docNumber) {
-      //&& docDepart  && docOnDate
+    if (!(docNumber && docDepartment && docOnDate && docInventoryDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -146,14 +130,13 @@ export const InventoryEditScreen = () => {
       const newInventory: IInventoryDocument = {
         id: docId,
         documentType: docType,
-        number: docNumber,
+        number: '1',
         documentDate: newOntDate,
         status: 'DRAFT',
         head: {
           comment: docComment,
           onDate: docOnDate,
-          contact: docDepartment,
-          depart: docDepart,
+          department: docDepartment,
         },
         lines: [],
         creationDate: newOntDate,
@@ -161,7 +144,7 @@ export const InventoryEditScreen = () => {
       };
 
       docDispatch(documentActions.addDocument(newInventory));
-      //console.log(newInventory.documentType);
+
       navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
     } else {
       if (!inventory) {
@@ -173,7 +156,7 @@ export const InventoryEditScreen = () => {
       const updatedInventory: IInventoryDocument = {
         ...inventory,
         id,
-        number: docNumber,
+        number: docNumber as string,
         status: docStatus || 'DRAFT',
         documentType: docType,
         errorMessage: undefined,
@@ -181,8 +164,7 @@ export const InventoryEditScreen = () => {
           ...inventory.head,
           comment: docComment,
           onDate: docOnDate,
-          contact: docDepartment,
-          depart: docDepart,
+          department: docDepartment,
         },
         lines: inventory.lines,
         creationDate: inventory.creationDate || updatedOrderDate,
@@ -202,8 +184,8 @@ export const InventoryEditScreen = () => {
     docDispatch,
     navigation,
     inventory,
+    docInventoryDate,
     docStatus,
-    docDepart,
   ]);
 
   useLayoutEffect(() => {
@@ -217,11 +199,11 @@ export const InventoryEditScreen = () => {
 
   const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
-  // Окно календаря для выбора даты
+  // Окно календаря для выбора даты.
   const [showOnDate, setShowOnDate] = useState(false);
 
   const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату
+    //Закрываем календарь и записываем выбранную дату.
     setShowOnDate(false);
 
     if (selectedOnDate) {
@@ -244,20 +226,8 @@ export const InventoryEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
-      fieldName: 'contact',
+      fieldName: 'department',
       value: docDepartment && [docDepartment],
-    });
-  };
-
-  const handlePresentDepart = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'depart',
-      fieldName: 'depart',
-      value: docDepart && [docDepart],
     });
   };
 
@@ -295,12 +265,6 @@ export const InventoryEditScreen = () => {
           label="Подразделение"
           value={docDepartment?.name}
           onPress={handlePresentDepartment}
-          disabled={isBlocked}
-        />
-        <SelectableInput
-          label="Организации"
-          value={docDepart?.name}
-          onPress={handlePresentDepart}
           disabled={isBlocked}
         />
         <Input

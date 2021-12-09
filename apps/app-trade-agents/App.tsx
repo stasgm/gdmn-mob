@@ -112,7 +112,7 @@ const Root = () => {
 
   const groups = (refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>)?.data;
   const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
+  const departments = (refSelectors.selectByName('department') as IReference<IContact>)?.data;
   const netPrice = (refSelectors.selectByName('netPrice') as IReference<INetPrice>)?.data;
 
   const [loading, setLoading] = useState(false);
@@ -121,7 +121,7 @@ const Root = () => {
     console.log('useEffect setModel');
     setLoading(true);
     const setModel = async () => {
-      if (!!goods?.length && !!contacts?.length) {
+      if (!!goods?.length && !!departments?.length) {
         const refGoods = groups
           .filter((gr) => gr.parent !== undefined)
           ?.reduce((prev: IParentGroupModel, cur: IGoodGroup) => {
@@ -137,7 +137,7 @@ const Root = () => {
             return { ...prev, [cur.parent.id]: newGroupsModel };
           }, {});
 
-        const model: IModel = contacts.reduce((oPrev: IModel, oCur: IContact) => {
+        const model: IModel = departments.reduce((oPrev: IModel, oCur: IContact) => {
           const netContact = netPrice.filter((n) => n.contactId === oCur.id);
           const parentGroupList: IParentGroupModel =
             netContact.length > 0 && isUseNetPrice

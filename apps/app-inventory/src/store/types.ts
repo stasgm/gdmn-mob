@@ -28,7 +28,7 @@ export interface IInventoryFormParam extends IFormParam {
   status?: StatusType;
   documentType?: IDocumentType;
   depart?: IContact;
-  contact?: IDepartment;
+  department?: IDepartment;
   comment?: string;
 }
 
@@ -51,7 +51,7 @@ export interface IContact extends INamedEntity, IReferenceData {
 export interface IInventoryHead extends IHead {
   onDate?: string; //Дата
   depart?: IContact; // Поле склад
-  contact?: IDepartment; //Подразделение
+  department?: IDepartment; //Подразделение
   comment?: string; // Комvентарий
 }
 

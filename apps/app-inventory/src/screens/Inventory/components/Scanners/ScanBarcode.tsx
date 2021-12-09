@@ -44,7 +44,7 @@ export const ScanBarcodeScreen = () => {
     .selectByDocType<IInventoryDocument>('inventory')
     ?.find((e) => e.id === docId) as IInventoryDocument;
 
-  const goods = model[document?.head?.contact?.id || ''].goods;
+  const goods = model[document?.head?.department?.id || ''].goods;
 
   useEffect(() => {
     const permission = async () => {

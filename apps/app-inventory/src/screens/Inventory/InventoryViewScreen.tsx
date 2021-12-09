@@ -113,7 +113,7 @@ export const InventoryViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(inventory?.status || 'DRAFT')}
-        title={inventory.head.contact?.name || ''}
+        title={inventory.head.department?.name || ''}
         onPress={handleEditInventoryHead}
         disabled={!['DRAFT', 'READY'].includes(inventory.status)}
       >
