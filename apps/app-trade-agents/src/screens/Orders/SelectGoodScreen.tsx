@@ -25,7 +25,7 @@ const Good = ({ item }: { item: INamedEntity }) => {
         navigation.navigate('OrderLine', {
           mode: 0,
           docId,
-          item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
+          item: { id: uuid(), good: item, quantity: 0 },
         });
       }}
     >
@@ -47,29 +47,8 @@ const SelectGoodScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const { groupId, docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
-
-  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
-
-  const { model } = useAppTradeSelector((state) => state.appTrade);
-
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
-
-  const groupsModel = model[contact?.id || ''][groups.find((gr) => gr.id === groupId)?.parent?.id || ''] || {};
-
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-
-  const goods = refSelectors.selectByName<IGood>('good');
-
-  const list = groupsModel[groupId];
-
-  const filteredList = useMemo(() => {
-    return (
-      list
-        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
-        ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
-    );
-  }, [list, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -95,6 +74,31 @@ const SelectGoodScreen = () => {
   useScrollToTop(refList);
 
   const renderItem = ({ item }: { item: INamedEntity }) => <Good item={item} />;
+
+  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+
+  // if (!contact) {
+  //   return <Text style={styles.title}>Организация не определена</Text>;
+  // }
+
+  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
+
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
+
+  const groupsModel =
+    goodModel[contact?.id || ''].goods[groups.find((gr) => gr.id === groupId)?.parent?.id || ''] || {};
+
+  const goods = refSelectors.selectByName<IGood>('good');
+
+  const list = Object.entries(groupsModel[groupId]).map(([id, good]) => good);
+
+  const filteredList = useMemo(() => {
+    return (
+      list
+        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
+    );
+  }, [list, searchQuery]);
 
   return (
     <AppScreen>

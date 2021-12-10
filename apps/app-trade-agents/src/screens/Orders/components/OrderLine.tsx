@@ -79,8 +79,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const priceFSN =
-    (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
+  // const priceFSN =
+  //   (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   return (
     <>
@@ -96,7 +96,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field]}>{priceFSN.toString()}</Text>
+              <Text style={[styles.number, styles.field]}>{item.good.priceFsn.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />

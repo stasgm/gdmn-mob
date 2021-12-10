@@ -73,7 +73,7 @@ const MapScreen = () => {
         };
         return res;
       });
-      
+
       dispatch(geoActions.addMany(initialList));
     }
   }, [dispatch, outlets, selectedItem]);
