@@ -7,6 +7,7 @@ export interface IEntity {
 
 export interface INamedEntity extends IEntity {
   name: string;
+  [fieldName: string]: unknown;
 }
 
 export interface IExternalSystemProps {

@@ -94,8 +94,8 @@ export const ScanBarcodeScreen = () => {
           good: { id: good.id, name: good.name } as INamedEntity,
           id: uuid(),
           quantity: 1,
-          price: remains?.length ? remains[0].price : 0,
-          remains: remains?.length ? remains?.[0].q : 0,
+          price: remains!.length ? remains![0].price : 0,
+          remains: remains!.length ? remains![0].q : 0,
           barcode: good.barcode,
         };
       }
