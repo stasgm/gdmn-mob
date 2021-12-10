@@ -90,7 +90,7 @@ const Root = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log('useEffect setModel');
+    //console.log('useEffect setModel');
     setLoading(true);
     const getRemainsModel = async () => {
       const model: IModelData<IMDGoodRemain> = departments?.reduce(

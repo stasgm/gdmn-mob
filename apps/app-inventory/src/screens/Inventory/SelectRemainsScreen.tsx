@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+/* import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
@@ -138,3 +138,4 @@ export const SelectRemainsScreen = () => {
     </AppScreen>
   );
 };
+ */
