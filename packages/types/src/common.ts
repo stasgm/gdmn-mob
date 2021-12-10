@@ -9,6 +9,9 @@ export interface INamedEntity extends IEntity {
   name: string;
   [fieldName: string]: unknown;
 }
+export interface ISortEntity extends INamedEntity {
+  sortOrder: number;
+}
 
 export interface IExternalSystemProps {
   externalId?: string;

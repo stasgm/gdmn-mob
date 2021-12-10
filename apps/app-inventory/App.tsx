@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch as useDocDispatch } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { IReference, Settings } from '@lib/types';
@@ -36,6 +36,7 @@ const Root = () => {
       data: true,
       type: 'boolean',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     weightCode: {
       id: '5',
@@ -44,6 +45,7 @@ const Root = () => {
       data: '22',
       type: 'string',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     countCode: {
       id: '6',
@@ -52,6 +54,7 @@ const Root = () => {
       data: 5,
       type: 'number',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     countWeight: {
       id: '7',
@@ -60,6 +63,7 @@ const Root = () => {
       data: 5,
       type: 'number',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
   };
 
