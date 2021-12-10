@@ -28,10 +28,9 @@ const oneSecund = 1000;
 export const ScanBarcodeReaderScreen = () => {
   const ref = useRef<TextInput>(null);
 
-  const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
+  const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
   const navigation = useNavigation();
   const { data: settings } = useSelector((state) => state.settings);
-
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
@@ -54,14 +53,12 @@ export const ScanBarcodeReaderScreen = () => {
     setScanned(true);
     setBarcode(data);
   };
-
   useEffect(() => {
     if (!scanned && ref?.current) {
       ref.current.focus();
       ref.current.clear();
     }
   }, [scanned, ref]);
-
   useEffect(() => {
     if (!scanned) {
       return;
@@ -73,6 +70,7 @@ export const ScanBarcodeReaderScreen = () => {
     }
 
     const getScannedObject = (brc: string): IInventoryLine | undefined => {
+      console.log('Объект', brc);
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
@@ -162,7 +160,7 @@ export const ScanBarcodeReaderScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanReader.transparent}
-            onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
+            onPress={() => navigation.navigate('InventoryList', { docId: document?.id })}
           />
         </View>
         {!scanned ? (

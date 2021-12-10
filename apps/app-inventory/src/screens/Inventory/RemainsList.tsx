@@ -1,4 +1,4 @@
-import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+/* import { useScrollToTop, useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
@@ -43,8 +43,8 @@ interface IField extends IGood {
         <Text style={[localStyles.name, { color: colors.text }]}>{item.name}</Text>
         <Text style={localStyles.itemInfo}>
           {item.remains} {item.value} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб. */
-          {/* цена: {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}, остаток: {item.remains} */}
-         </Text>
+
+/* </Text>
         {barcode && (
           <View style={localStyles.barcode}>
             <Text style={[localStyles.number, localStyles.fieldDesciption, { color: colors.text }]}>
@@ -86,7 +86,6 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
         const { remains, ...goodInfo } = goods[e];
         const goodPos: IRem = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
 
-        // eslint-disable-next-line @babel/no-unused-expressions
         remains.length > 0
           ? remains.forEach((re) => {
               r.push({ ...goodPos, price: re.price, remains: re.q });
@@ -151,3 +150,4 @@ const RemainsListScreen = ({ route, navigation }: Props) => {
 
 export { RemainsListScreen };
 
+ */

@@ -60,7 +60,6 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   }, [goodQty]);
 
   const price = item?.price || 0;
-  //console.log('Item', item);
   return (
     <>
       <ScrollView>

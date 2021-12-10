@@ -4,8 +4,9 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { ISettingsOption } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   MenuButton,
@@ -29,7 +30,10 @@ export const InventoryViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
 
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryView'>>().params?.id;
-  //console.log();
+
+  const { data: settings } = useSelector((state) => state.settings);
+  const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
+
   const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
   const isBlocked = inventory?.status !== 'DRAFT';
@@ -46,10 +50,9 @@ export const InventoryViewScreen = () => {
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
-
   const handleScanner = useCallback(() => {
-    navigation.navigate('ScanBarcode', { docId: id });
-  }, [navigation, id]);
+    navigation.navigate(scanUsetSetting.data ? 'ScanBarcode' : 'ScanBarcodeReader', { docId: id });
+  }, [navigation, id, scanUsetSetting]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
