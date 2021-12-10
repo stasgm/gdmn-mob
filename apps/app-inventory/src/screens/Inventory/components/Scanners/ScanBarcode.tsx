@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TouchableOpacity, Vibration } from 'react-native';
+import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { v4 as uuid } from 'uuid';
-import { Text, IconButton } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 
