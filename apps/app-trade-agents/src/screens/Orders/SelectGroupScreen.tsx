@@ -34,15 +34,17 @@ const Group = ({
 
   const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
 
-  const { model } = useAppTradeSelector((state) => state.appTrade);
+  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const groupsModel = model[contact?.id || ''][item.parent?.id || item.id] || {};
+  const groupsModel = goodModel[contact?.id || ''].goods[item.parent?.id || item.id] || {};
 
-  const goods = groupsModel[item.id];
+  const goodsObj = groupsModel[item.id];
 
-  const nextLevelGroups = groups.data.filter(
-    (group) => group.parent?.id === item.id && groupsModel[group.id]?.length > 0,
-  );
+  // console.log('goodsObj', goodsObj);
+
+  const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
+
+  const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id && groupsModel[group.id]);
 
   const isExpand = expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
 
@@ -73,7 +75,7 @@ const Group = ({
           {nextLevelGroups.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
-              <Text style={styles.field}>{goods?.length}</Text>
+              <Text style={styles.field}>{goodCount}</Text>
             </View>
           )}
         </View>
@@ -105,14 +107,14 @@ const SelectGroupScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  const { model } = useAppTradeSelector((state) => state.appTrade);
+  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const contactModel = model[contact?.id || ''];
+  const groupsModel = goodModel[contact?.id || ''].goods;
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
   const firstLevelGroups = groups.data?.filter(
-    (item) => !item.parent && Object.keys(contactModel[item.id] || []).length > 0,
+    (item) => !item.parent && Object.keys(groupsModel[item.id] || []).length > 0,
   );
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
