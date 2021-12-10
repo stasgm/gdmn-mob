@@ -16,8 +16,8 @@ export const InventoryLineScreen = () => {
     useNavigation<StackNavigationProp<InventorysStackParamList | InventorysStackParamList, 'InventoryLine'>>();
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
-
   const [line, setLine] = useState<IInventoryLine>(item);
+  console.log('Лине', line);
 
   const handleSave = useCallback(() => {
     dispatch(

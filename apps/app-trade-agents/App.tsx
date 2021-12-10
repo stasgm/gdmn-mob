@@ -194,18 +194,14 @@ const Root = () => {
         .filter((gr) => gr.parent !== undefined)
         ?.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IGoodGroup) => {
           if (!cur.parent) {
-            console.log('!cur.parent', cur.name);
             return prev;
           }
-          console.log('goodList111');
           const goodList = goods
             .filter((g) => g.goodgroup.id === cur.id)
             .reduce((gPrev: IMGoodData<IGood>, gCur: IGood) => {
               gPrev[gCur.id] = gCur;
               return gPrev;
             }, {});
-
-          console.log('goodList', cur.parent.id, cur.id);
 
           const gr = prev[cur.parent.id] || {};
           gr[cur.id] = goodList;
@@ -216,11 +212,9 @@ const Root = () => {
       const goodModel: IModelData<IGoodModel> = contacts.reduce((oPrev: IModelData<IGoodModel>, oCur: IContact) => {
         const matrixContact = goodMatrix?.find((n) => n.contactId === oCur.id);
         const onDate = matrixContact?.onDate ? new Date(matrixContact?.onDate) : new Date();
-        console.log('contactName 1', oCur.name);
         const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
           matrixContact?.data && matrixContact.data.length && isUseNetPrice
             ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
-                console.log('contactName 2', oCur.name);
                 const good = goods.find((g) => g.id === cur.goodId);
                 if (!good) {
                   return prev;
@@ -247,7 +241,6 @@ const Root = () => {
                 const newParentGroup = prev[group.parent.id] || {};
                 const newGroup = newParentGroup[group.id] || {};
                 newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
-                console.log('contactName 3', oCur.name);
                 return { ...prev, [group.parent.id]: newParentGroup };
               }, {})
             : refGoods;

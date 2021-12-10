@@ -1,3 +1,6 @@
+import { AnyAction } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+
 import {
   INamedEntity,
   IEntity,
@@ -8,13 +11,12 @@ import {
   IDocumentType,
   StatusType,
 } from '@lib/types';
-import { AnyAction } from 'redux';
-import { ThunkAction } from 'redux-thunk';
 
 // eslint-disable-next-line import/no-cycle
-import { IModel, IGood } from './app/types';
+import { IGood } from './app/types';
 
-export { IModel, IGood };
+export { IGood };
+
 export interface IFormParam {
   [fieldName: string]: unknown;
 }
@@ -26,7 +28,7 @@ export interface IInventoryFormParam extends IFormParam {
   status?: StatusType;
   documentType?: IDocumentType;
   depart?: IContact;
-  contact?: IDepartment;
+  department?: IDepartment;
   comment?: string;
 }
 
@@ -49,7 +51,7 @@ export interface IContact extends INamedEntity, IReferenceData {
 export interface IInventoryHead extends IHead {
   onDate?: string; //Дата
   depart?: IContact; // Поле склад
-  contact?: IDepartment; //Подразделение
+  department?: IDepartment; //Подразделение
   comment?: string; // Комvентарий
 }
 
@@ -57,6 +59,9 @@ export interface IInventoryLine extends IEntity {
   good: INamedEntity;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
+  price?: number;
+  remains?: number;
+  barcode?: string;
 }
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
@@ -84,11 +89,6 @@ export interface IRemainsData {
   price?: number;
 }
 
-export interface IWeightCodeSettings {
-  weightCode: string;
-  code: number;
-  weight: number;
-}
 export interface IMGoodRemain extends IGood {
   remains?: IModelRem[];
 }

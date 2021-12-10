@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch as useDocDispatch } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { IReference, Settings } from '@lib/types';
@@ -36,22 +36,25 @@ const Root = () => {
       data: true,
       type: 'boolean',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
-    idWeightCode: {
+    weightCode: {
       id: '5',
       sortOrder: 5,
       description: 'Идентификатор весового товара',
       data: '22',
       type: 'string',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
-    countBarcode: {
+    countCode: {
       id: '6',
       sortOrder: 6,
       description: 'Количество символов для кода товара',
       data: 5,
       type: 'number',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
     countWeight: {
       id: '7',
@@ -60,10 +63,10 @@ const Root = () => {
       data: 5,
       type: 'number',
       visible: true,
+      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
   };
 
-  ////
   const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
@@ -81,7 +84,7 @@ const Root = () => {
   }, [storeSettings]);
 
   const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
+  const departments = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
   const remains = (refSelectors.selectByName('remain') as IReference<IRemains>)?.data;
 
   const [loading, setLoading] = useState(false);
@@ -90,26 +93,29 @@ const Root = () => {
     console.log('useEffect setModel');
     setLoading(true);
     const getRemainsModel = async () => {
-      const model: IModelData<IMDGoodRemain> = contacts?.reduce((contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
-        const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-          goodsprev[g.id] = {
-            ...g,
-            remains:
-              remains
-                ?.find((r) => r.contactId === c.id)
-                ?.data?.filter((i) => i.goodId === g.id)
-                ?.map((r) => ({ price: r.price, q: r.q })) || [],
-          };
-          return goodsprev;
-        }, {});
-        contsprev[c.id] = { contactName: c.name, goods: remGoods };
-        return contsprev;
-      }, {});
+      const model: IModelData<IMDGoodRemain> = departments?.reduce(
+        (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
+          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+            goodsprev[g.id] = {
+              ...g,
+              remains:
+                remains
+                  ?.find((r) => r.contactId === c.id)
+                  ?.data?.filter((i) => i.goodId === g.id)
+                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
+            };
+            return goodsprev;
+          }, {});
+          contsprev[c.id] = { contactName: c.name, goods: remGoods };
+          return contsprev;
+        },
+        {},
+      );
       await appInventoryDispatch(actions.setModel(model));
     };
     getRemainsModel();
     setLoading(false);
-  }, [appInventoryDispatch, contacts, goods, remains]);
+  }, [appInventoryDispatch, departments, goods, remains]);
   return loading ? (
     <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
   ) : (
