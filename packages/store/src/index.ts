@@ -1,3 +1,4 @@
+import * as FileSystem from 'expo-file-system';
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
@@ -30,8 +31,30 @@ import { TActions } from './types';
  *
  */
 
+const dbDir = `${FileSystem.documentDirectory}db/`;
+
+const getDirectory = (path: string): string => {
+  const regex = /^(.+)\/([^/]+)$/;
+  const res = regex.exec(path);
+
+  return res ? res[1] : path;
+};
+
+const ensureDirExists = async (dir: string) => {
+  const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
+
+  if (!dirInfo.exists) {
+    await FileSystem.makeDirectoryAsync(`${dbDir}${dir}`, { intermediates: true });
+  }
+};
+
+const ensureFileExists = async (dir: string) => {
+  const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
+  return dirInfo.exists;
+};
+
 class UserAsyncStorageClass {
-  private _userIdPrefix: string = '';
+  private _userIdPrefix = '';
   private _storage: typeof AsyncStorage;
 
   constructor(storage: typeof AsyncStorage) {
@@ -46,36 +69,94 @@ class UserAsyncStorageClass {
     return `${this._userIdPrefix}${key}`;
   }
 
-  getItem = (key: string, callback?: (error?: Error, result?: string) => void): Promise<string | null> =>
-    this._storage.getItem(this._getUserPrefix(key), callback);
+  getItem = (key: string, callback?: (error?: Error, result?: string) => void): Promise<string | null> => {
+    console.log('getItem', key);
+    const getData = async () => {
+      const userKey = this._getUserPrefix(key);
+      try {
+        if (!(await ensureFileExists(`${userKey}.json`))) {
+          return;
+        }
+        await ensureDirExists(getDirectory(userKey));
+        const result = await FileSystem.readAsStringAsync(`${dbDir}${userKey}.json`);
+        return result ? JSON.parse(result) : null;
+      } catch (e) {
+        console.log('error', e);
+      }
+    };
+    return getData();
+  };
 
-  setItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> =>
-    this._storage.setItem(this._getUserPrefix(key), value, callback);
+  // this._storage.getItem(this._getUserPrefix(key), callback);
 
-  removeItem = (key: string, callback?: (error?: Error) => void): Promise<void> =>
-    this._storage.removeItem(this._getUserPrefix(key), callback);
+  setItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> => {
+    console.log('setItem', key, value);
+    const userKey = this._getUserPrefix(key);
+    const saveData = async () => {
+      try {
+        await ensureDirExists(getDirectory(userKey));
+        await FileSystem.writeAsStringAsync(`${dbDir}${userKey}.json`, value);
+      } catch (e) {
+        console.log('error', e);
+      }
+    };
+    return saveData();
+  };
+  //this._storage.setItem(this._getUserPrefix(key), value, callback);
+
+  removeItem = (key: string, callback?: (error?: Error) => void): Promise<void> => {
+    console.log('removeItem', key);
+    const userKey = this._getUserPrefix(key);
+    const removeData = async () => {
+      try {
+        await ensureDirExists('');
+        await FileSystem.deleteAsync(`${dbDir}${userKey}.json`);
+      } catch (e) {
+        console.log('error', e);
+      }
+    };
+    return removeData();
+  };
+
+  //this._storage.removeItem(this._getUserPrefix(key), callback);
 
   mergeItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> =>
     this._storage.mergeItem(this._getUserPrefix(key), value, callback);
 
-  clear = (callback?: (error?: Error) => void): Promise<void> =>
-    this._storage.clear(callback);
+  clear = (callback?: (error?: Error) => void): Promise<void> => this._storage.clear(callback);
 
   getAllKeys = (callback?: (error?: Error, keys?: string[]) => void): Promise<string[]> =>
     this._storage.getAllKeys(callback);
 
   multiGet = (
-      keys: string[],
-      callback?: (errors?: Error[], result?: [string, string | null][]) => void
-    ): Promise<[string, string | null][]> =>
-    this._storage.multiGet(keys, callback);
+    keys: string[],
+    callback?: (errors?: Error[], result?: [string, string | null][]) => void,
+  ): Promise<[string, string | null][]> => this._storage.multiGet(keys, callback);
 
   multiSet = (keyValuePairs: string[][], callback?: (errors?: Error[]) => void): Promise<void> =>
     this._storage.multiSet(keyValuePairs, callback);
 
   multiRemove = (keys: string[], callback?: (errors?: Error[]) => void): Promise<void> =>
-    this._storage.multiRemove(keys, callback);
-};
+    this._storage.multiRemove(
+      keys.map((key) => this._getUserPrefix(key)),
+      callback,
+    );
+
+  multiMerge = (keyValuePairs: string[][], callback?: (errors?: Error[]) => void): Promise<void> =>
+    this._storage.multiMerge(
+      keyValuePairs.map((keys) => keys.map((key) => this._getUserPrefix(key))),
+      callback,
+    );
+}
+
+// const save = (data: Array<T>) => {
+//   return new Promise((resolve, reject) => {
+//     fs.writeFile(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' }, (err: unknown) => {
+//       if (err) return reject(err);
+//       return resolve();
+//     });
+//   });
+// };
 
 const UserAsyncStorage = new UserAsyncStorageClass(AsyncStorage);
 
