@@ -1,4 +1,4 @@
-export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButton } from './AppBar';
+export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButton, ScanButton } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';
 export { RadioGroup } from './RadioGroup';
@@ -10,5 +10,6 @@ export { default as FilterButtons, Status } from './FilterButtons';
 export { default as PrimeButton } from './PrimeButton';
 export { default as RoundButton } from './RoundButton';
 export { default as InfoBlock } from './InfoBlock';
+export { default as SettingsGroup } from './SettingsGroup';
 export { default as SettingsItem } from './SettingsItem';
 export { default as DescriptionItem } from './DescriptionItem';

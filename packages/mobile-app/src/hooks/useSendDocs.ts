@@ -6,7 +6,7 @@ import api from '@lib/client-api';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 
-const useSendDocs = (readyDocs: IDocument[]): () => void => {
+const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
 

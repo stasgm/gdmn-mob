@@ -186,7 +186,6 @@ const useSync = (onSync?: () => void): (() => void) => {
 
       case 'REFS': {
         //TODO: проверка данных, приведение к типу
-        console.log('msg.body.version', msg.body.version);
         if ((msg.body.version || 1) !== refVersion) {
           errList.push(
             `Структура загружаемых данных для справочников с версией '${msg.body.version}' не поддерживается приложением`,

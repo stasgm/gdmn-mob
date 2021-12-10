@@ -9,16 +9,16 @@ const deviceBindings: IDeviceBinding[] = [
     user,
     device,
     state: 'ACTIVE',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
+    creationDate: '2021-11-24T14:02:55.886Z',
+    editionDate: '2021-11-24T14:02:55.886Z',
   },
   {
     id: '2',
     user: user2,
     device: device2,
     state: 'ACTIVE',
-    creationDate: '2021.01.01',
-    editionDate: '2021.01.01',
+    creationDate: '2021-11-24T14:02:55.886Z',
+    editionDate: '2021-11-24T14:02:55.886Z',
   },
 ];
 

@@ -30,7 +30,6 @@ const Account = () => {
         const res = await dispatch(actions.fetchUserById(id));
 
         if (res.type === 'USER/FETCH_USER_SUCCESS') {
-          console.log('res.payload', res.payload);
           setUser(res.payload);
         }
       }

@@ -9,7 +9,6 @@ import { userActions, UserActionType } from './actions';
 export type AppThunk = ThunkAction<Promise<UserActionType>, AppState, null, UserActionType>;
 
 const fetchUserById = (id: string): AppThunk => {
-  console.log('fetchUserById');
   return async (dispatch) => {
     dispatch(userActions.fetchUserAsync.request(''));
 

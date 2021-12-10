@@ -1,31 +1,60 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { authActions, useSelector, useDispatch } from '@lib/store';
+import { authActions, useSelector, useDispatch, documentActions, referenceActions } from '@lib/store';
 
-import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
+import api from '@lib/client-api';
+
+import { useActionSheet } from '@lib/mobile-ui';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
-  const { user, company, device } = useSelector((state) => state.auth);
+  const user = useSelector((state) => state.auth.user);
+  const company = useSelector((state) => state.auth.company);
+  const device = useSelector((state) => state.auth.device);
+  const isMock = useSelector((state) => state.auth.settings.debug?.isMock);
 
   const settings = user?.settings;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const showActionSheet = useActionSheet();
+
+  const handleClearData = () => {
+    dispatch(documentActions.init());
+    dispatch(referenceActions.init());
+  };
+
+  const actionsMenu = useCallback(() => {
+    showActionSheet([
+      {
+        title: 'Очистить данные',
+        type: 'destructive',
+        onPress: handleClearData,
+      },
+      {
+        title: 'Отмена',
+        type: 'cancel',
+      },
+    ]);
+  }, [handleClearData, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
+      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);
 
-  const handleLogout = () => dispatch(authActions.logout());
-  // const handleChangeCompany = () => dispatch(authActions.setCompany(undefined));
+  const handleLogout = () => {
+    dispatch(authActions.logout());
+    api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
+  };
 
   const visibleList = settings && Object.entries(settings).filter(([_, item]) => item.visible);
 
@@ -71,11 +100,8 @@ const ProfileScreen = () => {
       )}
       <View>
         <PrimeButton outlined onPress={handleLogout}>
-          Сменить пользователя
+          {isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
-        {/*         <PrimeButton outlined onPress={handleChangeCompany}>
-          Сменить организацию
-        </PrimeButton> */}
       </View>
     </View>
   );
