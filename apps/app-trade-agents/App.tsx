@@ -62,6 +62,7 @@ const Root = () => {
       type: 'boolean',
       sortOrder: 3,
       visible: true,
+      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
     },
     serverName: {
       id: '6',
@@ -70,6 +71,7 @@ const Root = () => {
       data: config.BACK_URL,
       type: 'string',
       visible: true,
+      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
     },
     serverPort: {
       id: '7',
@@ -78,6 +80,7 @@ const Root = () => {
       type: 'number',
       sortOrder: 6,
       visible: true,
+      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
     },
     returnDocTime: {
       id: '8',
@@ -86,6 +89,7 @@ const Root = () => {
       type: 'number',
       sortOrder: 7,
       visible: true,
+      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
     },
   };
 
