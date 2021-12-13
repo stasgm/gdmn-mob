@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
+import { ScrollView, TextInput, View, Text, Alert, Button, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
@@ -8,6 +8,8 @@ import { documentActions, useDispatch } from '@lib/store';
 
 import { IInventoryLine } from '../../../store/types';
 import { InventorysStackParamList } from '../../../navigation/Root/types';
+import { ScanDataMatrix } from './Scanners/ScanDataMatrix';
+import { IconButton } from 'react-native-paper';
 
 interface IProps {
   item: IInventoryLine;
@@ -21,6 +23,8 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
+  const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
+  const [doScanned, setDoScanned] = useState(false);
 
   const currRef = useRef<TextInput>(null);
 
@@ -54,15 +58,32 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
       ]);
   }, [dispatch, docId, item.id, mode, navigation]);
 
+  const handleScanner = useCallback(() => {
+    navigation.navigate('ScanDataMatrix', { docId: docId });
+  }, [docId, navigation]);
+
+  const handleEIDScanned = (data: string) => {
+    setDoScanned(false);
+    setGoodEID(data);
+  };
+
+  const handelEIDChange = useCallback((value: string) => {
+    setGoodEID(value);
+  }, []);
+
   useEffect(() => {
-    onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    onSetLine({ ...item, quantity: parseFloat(goodQty), EID: goodEID });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goodQty]);
+  }, [goodQty, goodEID]);
 
   const price = item?.price || 0;
+  const remains = item?.remains || 0;
   //console.log('Item', item);
   return (
     <>
+      <Modal animationType="slide" visible={doScanned}>
+        <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+      </Modal>
       <ScrollView>
         <View style={[styles.content]}>
           <View style={[styles.item]}>
@@ -81,6 +102,30 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
+              <Text style={styles.name}>Остаток</Text>
+              <Text style={[styles.number, styles.field]}>{remains.toString()}</Text>
+            </View>
+          </View>
+          <ItemSeparator />
+
+          <View style={styles.item}>
+            <View style={localStyles.details}>
+              <View style={localStyles.new}>
+                <Text style={styles.name}>EID</Text>
+                <Text style={[styles.number, styles.field]}>{item?.EID || 'Не указан'}</Text>
+              </View>
+              <View style={localStyles.button}>
+                {item?.EID && (
+                  <TouchableOpacity>
+                    <IconButton icon="close" size={20} onPress={() => setGoodEID(undefined)} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          </View>
+          <ItemSeparator />
+          <View style={styles.item}>
+            <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
               <TextInput
                 style={[styles.number, styles.field]}
@@ -93,6 +138,11 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
               />
             </View>
           </View>
+          <View>
+            <PrimeButton icon="barcode-scan" onPress={() => setDoScanned(true)}>
+              Сканировать EID
+            </PrimeButton>
+          </View>
         </View>
       </ScrollView>
       {mode ? (
@@ -104,8 +154,23 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   );
 };
 
-/* const localStyles = StyleSheet.create({
-  text: {
-    padding: 10,
+const localStyles = StyleSheet.create({
+  button: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    position: 'absolute',
+    // top: 5,
+    right: -10,
+    zIndex: 5,
+    // width: '100%',
   },
-}); */
+  new: {
+    width: '90%',
+  },
+  details: {
+    flex: 1,
+    margin: 5,
+    // alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
