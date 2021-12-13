@@ -18,10 +18,13 @@ class User extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
+     // const uu = user.
+
       return {
         type: 'ADD_USER',
         user: {
           ...user,
+          //name: user
           id: uuid(),
           creator: mockUser,
           role: 'User',

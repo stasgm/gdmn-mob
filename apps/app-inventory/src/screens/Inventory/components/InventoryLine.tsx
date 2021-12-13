@@ -77,8 +77,6 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   }, [goodQty, goodEID]);
 
   const price = item?.price || 0;
-  const remains = item?.remains || 0;
-  //console.log('Item', item);
   return (
     <>
       <Modal animationType="slide" visible={doScanned}>
