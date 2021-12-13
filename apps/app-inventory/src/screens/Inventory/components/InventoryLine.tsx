@@ -1,15 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert, Button, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, TextInput, View, Text, Alert, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
-import { documentActions, useDispatch } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
+
+import { IconButton } from 'react-native-paper';
+
+import { ISettingsOption } from '@lib/types';
 
 import { IInventoryLine } from '../../../store/types';
 import { InventorysStackParamList } from '../../../navigation/Root/types';
+
 import { ScanDataMatrix } from './Scanners/ScanDataMatrix';
-import { IconButton } from 'react-native-paper';
+import { ScanDataMatrixReader } from './Scanners/ScanDataMatrixReader';
 
 interface IProps {
   item: IInventoryLine;
@@ -27,6 +32,10 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const [doScanned, setDoScanned] = useState(false);
 
   const currRef = useRef<TextInput>(null);
+
+  const { data: settings } = useSelector((state) => state.settings);
+  const scanUsetSetting = settings.scannerUse as ISettingsOption<string>;
+  console.log('scann', scanUsetSetting);
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), 500);
@@ -58,18 +67,10 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
       ]);
   }, [dispatch, docId, item.id, mode, navigation]);
 
-  const handleScanner = useCallback(() => {
-    navigation.navigate('ScanDataMatrix', { docId: docId });
-  }, [docId, navigation]);
-
   const handleEIDScanned = (data: string) => {
     setDoScanned(false);
     setGoodEID(data);
   };
-
-  const handelEIDChange = useCallback((value: string) => {
-    setGoodEID(value);
-  }, []);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty), EID: goodEID });
@@ -77,10 +78,16 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   }, [goodQty, goodEID]);
 
   const price = item?.price || 0;
+  const remains = item?.remains || 0;
+
   return (
     <>
       <Modal animationType="slide" visible={doScanned}>
-        <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        {scanUsetSetting.data ? (
+          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        ) : (
+          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        )}
       </Modal>
       <ScrollView>
         <View style={[styles.content]}>
