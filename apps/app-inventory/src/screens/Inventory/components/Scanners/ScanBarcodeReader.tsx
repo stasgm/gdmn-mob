@@ -55,8 +55,11 @@ export const ScanBarcodeReaderScreen = () => {
   };
   useEffect(() => {
     if (!scanned && ref?.current) {
-      ref.current.focus();
-      ref.current.clear();
+      ref?.current &&
+        setTimeout(() => {
+          // eslint-disable-next-line no-sequences
+          ref.current?.focus(), ref.current?.clear();
+        }, 500);
     }
   }, [scanned, ref]);
   useEffect(() => {
@@ -70,7 +73,6 @@ export const ScanBarcodeReaderScreen = () => {
     }
 
     const getScannedObject = (brc: string): IInventoryLine | undefined => {
-      console.log('Объект', brc);
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
@@ -171,7 +173,9 @@ export const ScanBarcodeReaderScreen = () => {
                 autoFocus={true}
                 ref={ref}
                 showSoftInputOnFocus={false}
-                onChangeText={(text) => handleBarCodeScanned(text)}
+                onChangeText={(text) => {
+                  handleBarCodeScanned(text);
+                }}
               />
             </TouchableWithoutFeedback>
           </View>
