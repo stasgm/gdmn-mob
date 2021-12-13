@@ -70,9 +70,10 @@ class UserAsyncStorageClass {
   }
 
   getItem = (key: string, callback?: (error?: Error, result?: string) => void): Promise<string | null> => {
-    console.log('getItem', key);
+    console.log('getItem 1', key);
     const getData = async () => {
       const userKey = this._getUserPrefix(key);
+      console.log('getItem 2', userKey);
       try {
         if (!(await ensureFileExists(`${userKey}.json`))) {
           return;
@@ -90,9 +91,10 @@ class UserAsyncStorageClass {
   // this._storage.getItem(this._getUserPrefix(key), callback);
 
   setItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> => {
-    console.log('setItem', key, value);
-    const userKey = this._getUserPrefix(key);
+    console.log('setItem 1', key);
     const saveData = async () => {
+      const userKey = this._getUserPrefix(key);
+      console.log('setItem 2', userKey, value);
       try {
         await ensureDirExists(getDirectory(userKey));
         await FileSystem.writeAsStringAsync(`${dbDir}${userKey}.json`, value);
@@ -105,9 +107,10 @@ class UserAsyncStorageClass {
   //this._storage.setItem(this._getUserPrefix(key), value, callback);
 
   removeItem = (key: string, callback?: (error?: Error) => void): Promise<void> => {
-    console.log('removeItem', key);
-    const userKey = this._getUserPrefix(key);
+    console.log('removeItem 1', key);
     const removeData = async () => {
+      const userKey = this._getUserPrefix(key);
+      console.log('removeItem 2', userKey);
       try {
         await ensureDirExists('');
         await FileSystem.deleteAsync(`${dbDir}${userKey}.json`);
@@ -149,16 +152,7 @@ class UserAsyncStorageClass {
     );
 }
 
-// const save = (data: Array<T>) => {
-//   return new Promise((resolve, reject) => {
-//     fs.writeFile(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' }, (err: unknown) => {
-//       if (err) return reject(err);
-//       return resolve();
-//     });
-//   });
-// };
-
-const UserAsyncStorage = new UserAsyncStorageClass(AsyncStorage);
+export const UserAsyncStorage = new UserAsyncStorageClass(AsyncStorage);
 
 const persistAuthConfig = {
   key: 'auth',

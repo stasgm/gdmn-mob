@@ -119,6 +119,7 @@ const signIn = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
+      // UserAsyncStorage.setUserId('5ae8c930-0584-11ec-991a-779431d580c9');
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 

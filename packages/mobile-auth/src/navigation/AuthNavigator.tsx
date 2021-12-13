@@ -76,10 +76,10 @@ const AuthNavigator: React.FC = () => {
     [disconnect, authDispatch],
   );
 
-  const checkDevice = useCallback(() => {
+  const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
-    authDispatch(authActions.getDeviceStatus(settings?.deviceId));
+    await authDispatch(authActions.getDeviceStatus(settings?.deviceId));
     //Получим устройство по uid
     if (settings?.deviceId && user) {
       authDispatch(authActions.getDeviceByUid(settings.deviceId));

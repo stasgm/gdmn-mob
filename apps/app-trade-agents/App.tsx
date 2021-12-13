@@ -4,7 +4,7 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { IReference, ISettingsOption, Settings } from '@lib/types';
-import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import { refSelectors, settingsActions, useDispatch, UserAsyncStorage, useSelector } from '@lib/store';
 
 import { Caption } from 'react-native-paper';
 
@@ -88,6 +88,11 @@ const Root = () => {
       visible: true,
     },
   };
+
+  // useEffect(() => {
+  //   UserAsyncStorage.setUserId('');
+  //   const deviceUId = UserAsyncStorage.getItem('deviceUId');
+  // }, []);
 
   const storeSettings = useSelector((state) => state.settings);
 
