@@ -1,4 +1,4 @@
-/* import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
@@ -84,7 +84,7 @@ export const SelectRemainsScreen = () => {
     return Object.keys(goods)
       ?.reduce((r: IRem[], e) => {
         const { remains, ...goodInfo } = goods[e];
-        const goodPos: IRem = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
+        const goodPos: IRem = { ...goodInfo, price: 0, remains: 0 }; //goodGroup: e
 
         remains!.length > 0
           ? remains!.forEach((re) => {
@@ -123,6 +123,9 @@ export const SelectRemainsScreen = () => {
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
+              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />
@@ -138,4 +141,3 @@ export const SelectRemainsScreen = () => {
     </AppScreen>
   );
 };
- */

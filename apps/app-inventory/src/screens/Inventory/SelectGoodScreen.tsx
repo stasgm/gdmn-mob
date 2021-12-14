@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, IconButton, Divider } from 'react-native-paper';
+import { IconButton, Divider, Searchbar } from 'react-native-paper';
+//import { SearchBar } from 'react-native-elements';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
@@ -97,6 +98,9 @@ export const SelectGoodScreen = () => {
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
+              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />
