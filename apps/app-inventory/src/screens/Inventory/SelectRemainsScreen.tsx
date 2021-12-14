@@ -1,24 +1,25 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+/* eslint-disable react/no-children-prop */
+import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, IconButton, Divider } from 'react-native-paper';
+import { Searchbar, Divider, Avatar, IconButton } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 
-import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, ScanButton, ItemSeparator, BackButton } from '@lib/mobile-ui';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
 
-import { docSelectors, refSelectors } from '@lib/store';
-import { INamedEntity } from '@lib/types';
+import { docSelectors, useSelector } from '@lib/store';
+import { INamedEntity, ISettingsOption } from '@lib/types';
 
+import { formatValue } from '../../utils/helpers';
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IGood, IInventoryDocument, IRem } from '../../store/types';
+import { IGood, IInventoryDocument, IMGoodRemain, IRem } from '../../store/types';
 
-const Good = ({ item }: { item: IRem }) => {
+const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -41,62 +42,72 @@ const Good = ({ item }: { item: IRem }) => {
         });
       }}
     >
-      <View style={styles.item}>
-        <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-        </View>
-        <View style={styles.details}>
-          <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name || item.id}</Text>
-            {barcode && (
-              <View style={scanStyle.barcode}>
-                <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.barcode}</Text>
-              </View>
-            )}
+      <View style={{ backgroundColor: colors.card }}>
+        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} children={undefined} />
+      </View>
+      <View style={styles.details}>
+        <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+        <Text style={styles.itemInfo}>
+          {item.remains} {item.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+        </Text>
+        {barcode && (
+          <View style={styles.barcode}>
+            <Text style={[styles.number, styles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
           </View>
-        </View>
+        )}
       </View>
     </TouchableOpacity>
   );
 };
+//////////
 
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
-  const [filterVisible, setFilterVisible] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(true);
   const [list, setList] = useState<IRem[]>([]);
 
+  const { data: settings } = useSelector((state) => state.settings);
+  const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
   const model = useAppInventorySelector((state) => state.appInventory.model);
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
-    ?.find((e) => e.id === docId) as IInventoryDocument;
-  //////
-  const goodRemains: IRem[] = useMemo(() => {
-    const goods = model[document?.head?.department?.id || ''].goods;
+    ?.find((item) => item.id === docId) as IInventoryDocument;
 
+  const handleScanner = useCallback(() => {
+    navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
+  }, [navigation, docId, scanUsetSetting]);
+
+  //////
+  const goodRemains: IMGoodRemain[] = useMemo(() => {
+    const goods = model[document?.head?.department?.id || ''].goods;
+    //console.log('Остатки', goods);
     if (!goods) {
       return [];
     }
+    const Arrr: IRem[]
+    Object.keys(goods)?.forEach((e) => {
+      const { remains, ...good } = goods[e];
 
-    return Object.keys(goods)
-      ?.reduce((r: IRem[], e) => {
-        const { remains, ...goodInfo } = goods[e];
-        const goodPos: IRem = { ...goodInfo, price: 0, remains: 0 }; //goodGroup: e
-
-        remains!.length > 0
-          ? remains!.forEach((re) => {
-              r.push({ ...goodPos, price: re.price, remains: re.q });
-            })
-          : r.push(goodPos);
-        return r;
-      }, [])
-      .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
+      return {
+        good: { id: good.id, name: good.name } as INamedEntity,
+        price: remains!.length ? remains![0].price : 0,
+        remains: remains!.length ? remains![0].q : 0,
+        barcode: good.barcode,
+      };
+    }, []);
   }, [document?.head?.department?.id, model]);
 
-  const filteredList = useEffect(() => {
+  useEffect(() => {
+    if (!filterVisible && searchText) {
+      setSearchText('');
+    }
+  }, [filterVisible, searchText]);
+
+  useEffect(() => {
     setList(
       goodRemains?.filter(
         (item) =>
@@ -106,12 +117,30 @@ export const SelectRemainsScreen = () => {
     );
   }, [goodRemains, searchText]);
 
-  const refList = React.useRef<FlatList<IRem>>(null);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+      headerRight: () => (
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+        />
+      ),
+    });
+  }, [navigation, filterVisible, colors.card]);
+
+  const refList = useRef<FlatList<IRem>>(null);
   useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: IRem }) => <Good item={item} />;
+  const renderItem = ({ item }: { item: IRem }) => <GoodRemains item={item} />;
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <ScanButton onPress={handleScanner} />,
+    });
+  }, [navigation, handleScanner]);
 
-  ////////////
   return (
     <AppScreen>
       <Divider />
@@ -119,11 +148,10 @@ export const SelectRemainsScreen = () => {
         <>
           <View style={styles.flexDirectionRow}>
             <Searchbar
-              placeholder="Поиск по штрихкоду или наименованию..."
+              placeholder="Поиск (штрихкод, наименование)"
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
-              // eslint-disable-next-line react/no-children-prop
               children={undefined}
               autoComplete={undefined}
             />

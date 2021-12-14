@@ -24,7 +24,6 @@ interface IProps {
 export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  console.log('InventoryLine', item);
   const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
@@ -35,7 +34,6 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
 
   const { data: settings } = useSelector((state) => state.settings);
   const scanUsetSetting = settings.scannerUse as ISettingsOption<string>;
-  console.log('scann', scanUsetSetting);
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), 500);
