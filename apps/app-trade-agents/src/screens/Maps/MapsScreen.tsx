@@ -19,6 +19,7 @@ import { IOutlet, IRouteDocument } from '../../store/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import localStyles from './styles';
+import { getDateString } from '../../utils/helpers';
 
 interface Region {
   latitude: number;
@@ -46,11 +47,11 @@ const MapScreen = () => {
 
   const routeList = docSelectors
     .selectByDocType<IRouteDocument>('route')
-    ?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+    ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
   const currentList: IListItem[] = routeList.map((item) => ({
     id: item.id,
-    value: item.documentDate,
+    value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
   }));
 
   const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
@@ -231,8 +232,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                  ? localStyles.selectedMark
-                  : localStyles.mark,
+                    ? localStyles.selectedMark
+                    : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>
@@ -243,10 +244,15 @@ const MapScreen = () => {
       </MapView>
       {selectedItem && (
         <View style={localStyles.statusContainer}>
-          <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-            <Text style={localStyles.routeName}>Маршрут №{selectedItem?.number}</Text>
+          <View style={{ width: '80%' }}>
+            <Text style={localStyles.routeName}>Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}</Text>
             {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
-          </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
+              <MaterialCommunityIcons style={localStyles.routeIcon} name="arrow-decision" size={30} color="#000" />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
       <View style={[localStyles.buttonContainer]}>
