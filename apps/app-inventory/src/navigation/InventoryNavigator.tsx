@@ -6,7 +6,7 @@ import { inventoryListScreens, inventoryScreens } from './Root/screens';
 
 const Stack = createStackNavigator<InventorysStackParamList>();
 
-export const InventorysNavigator = () => {
+export const InventoryNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="InventoryList" screenOptions={{ headerShown: true, title: 'Инвентаризации' }}>
       {Object.entries({ ...inventoryListScreens, ...inventoryScreens }).map(([name, component]) => (

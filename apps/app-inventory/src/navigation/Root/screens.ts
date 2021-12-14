@@ -4,7 +4,7 @@ import {
   InventoryListScreen,
   InventoryViewScreen,
   InventoryLineScreen,
-  // SelectRemainsScreen,
+  SelectRemainsScreen,
 } from '../../screens/Inventory';
 
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
@@ -17,7 +17,7 @@ export const inventoryScreens = {
   InventoryLine: InventoryLineScreen,
   SelectRefItem: SelectRefItemScreen,
   SelectGoodItem: SelectGoodScreen,
-  //SelectRemainsItem: SelectRemainsScreen,
+  SelectRemainsItem: SelectRemainsScreen,
   ScanBarcode: ScanBarcodeScreen,
   ScanBarcodeReader: ScanBarcodeReaderScreen,
 };

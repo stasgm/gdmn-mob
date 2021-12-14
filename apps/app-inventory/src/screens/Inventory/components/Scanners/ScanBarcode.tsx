@@ -188,7 +188,7 @@ export const ScanBarcodeScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanStyle.transparent}
-            onPress={() => setFlashMode(!flashMode)} //navigation.navigate('RemainsList', { docId: document?.id })
+            onPress={() => navigation.navigate('SelectRemainsItem', { docId: document?.id })}
           />
         </View>
         {!scanned ? (

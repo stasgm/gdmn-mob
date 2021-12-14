@@ -39,13 +39,13 @@ export const InventoryViewScreen = () => {
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
-    navigation.navigate('SelectGoodItem', {
+    navigation.navigate('SelectRemainsItem', {
       docId: id,
     });
   }, [navigation, id]);
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const handleScannerGood = useCallback(() => {}, []); //Scan
+  const handleScannerGood = useCallback(() => {}, []);
 
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
