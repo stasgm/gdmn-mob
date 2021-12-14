@@ -79,6 +79,8 @@ export const ScanBarcodeScreen = () => {
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
           goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown') || ''];
+        // Находим товар из модели остатков по баркоду, если баркод не найден, ищем товар с id равным unknown и добавляем в позицию документа
+        // Если таких товаров нет, то товар не найден
 
         if (!remItem) {
           return;
