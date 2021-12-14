@@ -109,6 +109,7 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
                 <Text style={scanStyle.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
+
             {scanned && barcode && (
               <View style={scanStyle.buttonsContainer}>
                 <TouchableOpacity
