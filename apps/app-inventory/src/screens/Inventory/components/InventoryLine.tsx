@@ -35,7 +35,6 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
 
   const { data: settings } = useSelector((state) => state.settings);
   const scanUsetSetting = settings.scannerUse as ISettingsOption<string>;
-  console.log('scann', scanUsetSetting);
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), 500);
