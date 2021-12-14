@@ -12,17 +12,17 @@ import { AppScreen, ScanButton, ItemSeparator, BackButton } from '@lib/mobile-ui
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
 
 import { docSelectors, useSelector } from '@lib/store';
-import { INamedEntity, ISettingsOption } from '@lib/types';
+import { ISettingsOption } from '@lib/types';
 
 import { formatValue } from '../../utils/helpers';
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IGood, IInventoryDocument, IMGoodRemain, IRem } from '../../store/types';
+import { IInventoryDocument, IRem } from '../../store/types';
 
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-
+  console.log('III', item);
   const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
@@ -82,25 +82,26 @@ export const SelectRemainsScreen = () => {
   }, [navigation, docId, scanUsetSetting]);
 
   //////
-  const goodRemains: IMGoodRemain[] = useMemo(() => {
+  const goodRemains: IRem[] = useMemo(() => {
     const goods = model[document?.head?.department?.id || ''].goods;
-    //console.log('Остатки', goods);
     if (!goods) {
       return [];
     }
-    const Arrr: IRem[]
-    Object.keys(goods)?.forEach((e) => {
-      const { remains, ...good } = goods[e];
 
-      return {
-        good: { id: good.id, name: good.name } as INamedEntity,
-        price: remains!.length ? remains![0].price : 0,
-        remains: remains!.length ? remains![0].q : 0,
-        barcode: good.barcode,
-      };
-    }, []);
-  }, [document?.head?.department?.id, model]);
+    return Object.keys(goods)
+      ?.reduce((r: IRem[], e) => {
+        const { remains, ...goodInfo } = goods[e];
+        const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
 
+        remains && remains.length > 0
+          ? remains.forEach((re) => {
+              r.push({ ...goodPos, price: re.price, remains: re.q });
+            })
+          : r.push(goodPos);
+        return r;
+      }, [])
+      .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
+  }, [model, document?.head?.department?.id]);
   useEffect(() => {
     if (!filterVisible && searchText) {
       setSearchText('');
