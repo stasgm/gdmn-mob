@@ -68,7 +68,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
  * @param user NewUser
  * @returns IUser
  */
-const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefined> => {
+const signup = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefined> => {
   const { users } = getDb();
 
   // Кол-во пользователей
@@ -204,4 +204,4 @@ const getDeviceStatus = async (uid: string): Promise<DeviceState> => {
   return device.state;
 };
 
-export { authenticate, validateAuthCreds, signUp, verifyCode, logout, getDeviceStatus };
+export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus };

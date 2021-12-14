@@ -17,7 +17,7 @@ const ProfileScreen = () => {
   const user = useSelector((state) => state.auth.user);
   const company = useSelector((state) => state.auth.company);
   const device = useSelector((state) => state.auth.device);
-  const isMock = useSelector((state) => state.auth.settings.debug?.isMock);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   const settings = user?.settings;
 
@@ -100,7 +100,7 @@ const ProfileScreen = () => {
       )}
       <View>
         <PrimeButton outlined onPress={handleLogout}>
-          {isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
+          {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
       </View>
     </View>

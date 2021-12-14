@@ -23,7 +23,7 @@ const Register = () => {
   const dispatch = useAuthThunkDispatch();
 
   const handleSubmit = async (values: IUserCredentials) => {
-    const res = await dispatch(authActions.signUp(values));
+    const res = await dispatch(authActions.signup(values));
 
     if (res.type === 'AUTH/SIGNUP_SUCCESS') {
       navigate(`${adminPath}/login`);

@@ -11,32 +11,12 @@ import { AppThunk } from '../types';
 
 import { AuthState } from './types';
 import { actions, AuthActionType } from './actions';
+import { UserAsyncStorage } from '../utils/userAsyncStore';
+import { user as mockUser } from '@lib/mock';
 
 export type AuthDispatch = ThunkDispatch<AuthState, any, AuthActionType>;
 
 export const useAuthThunkDispatch = () => useDispatch<AuthDispatch>();
-
-// const checkDevice = (): AppThunk<
-//   Promise<ActionType<typeof actions.checkDeviceAsync>>,
-//   AuthState,
-//   ActionType<typeof actions.checkDeviceAsync>
-// > => {
-//   return async (dispatch) => {
-//     dispatch(actions.checkDeviceAsync.request(''));
-
-//     const response = await api.device.getDevice();
-
-//     if (response.type === 'GET_DEVICE') {
-//       return dispatch(actions.checkDeviceAsync.success(response.device));
-//     }
-
-//     if (response.type === 'ERROR') {
-//       return dispatch(actions.checkDeviceAsync.failure(response.message));
-//     }
-
-//     return dispatch(actions.checkDeviceAsync.failure('something wrong'));
-//   };
-// };
 
 const getDeviceByUid = (
   uid: string,
@@ -86,27 +66,27 @@ const activateDevice = (
   };
 };
 
-const signUp = (
+const signup = (
   userCredentials: IUserCredentials,
-): AppThunk<Promise<ActionType<typeof actions.signUpAsync>>, AuthState, ActionType<typeof actions.signUpAsync>> => {
+): AppThunk<Promise<ActionType<typeof actions.signupAsync>>, AuthState, ActionType<typeof actions.signupAsync>> => {
   return async (dispatch) => {
-    dispatch(actions.signUpAsync.request(''));
+    dispatch(actions.signupAsync.request(''));
 
     const response = await api.auth.signup(userCredentials);
 
     if (response.type === 'SIGNUP') {
-      return dispatch(actions.signUpAsync.success());
+      return dispatch(actions.signupAsync.success());
     }
 
     if (response.type === 'ERROR') {
-      return dispatch(actions.signUpAsync.failure(response.message));
+      return dispatch(actions.signupAsync.failure(response.message));
     }
 
-    return dispatch(actions.signUpAsync.failure('something wrong'));
+    return dispatch(actions.signupAsync.failure('something wrong'));
   };
 };
 
-const signIn = (
+const login = (
   credentials: IUserCredentials,
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
@@ -119,7 +99,8 @@ const signIn = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
-      // UserAsyncStorage.setUserId('5ae8c930-0584-11ec-991a-779431d580c9');
+      UserAsyncStorage.setUserId(response.user.id);
+      //UserAsyncStorage.setUserId('5ae8c930-0584-11ec-991a-779431d580c9');
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
@@ -128,6 +109,24 @@ const signIn = (
     }
 
     return dispatch(actions.loginUserAsync.failure('something wrong'));
+  };
+};
+
+const disconnect = (): AppThunk<
+  Promise<ActionType<typeof actions.disconnectAsync>>,
+  AuthState,
+  ActionType<typeof actions.disconnectAsync> | ActionType<typeof actions.setConnectionStatus>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.disconnectAsync.request());
+
+    try {
+      // dispatch(actions.setConnectionStatus('not-connected'));
+      UserAsyncStorage.setUserId('');
+      return dispatch(actions.disconnectAsync.success());
+    } catch {
+      return dispatch(actions.disconnectAsync.failure('Ошибка выхода'));
+    }
   };
 };
 
@@ -142,6 +141,8 @@ const logout = (): AppThunk<
     const response = await api.auth.logout();
 
     if (response.type === 'LOGOUT') {
+      UserAsyncStorage.setUserId('');
+      dispatch(actions.setConnectionStatus(api.config.deviceId ? 'connected' : 'not-connected'));
       return dispatch(actions.logoutUserAsync.success());
     }
 
@@ -171,45 +172,22 @@ const setUserSettings = (
   };
 };
 
-// const signInWithDevice = (
-//   credentials: IUserCredentials,
-// ): AppThunk<
-//   Promise<ActionType<typeof actions.loginUserAsync | typeof actions.checkDeviceAsync>>,
-//   AuthState,
-//   ActionType<typeof actions.loginUserAsync | typeof actions.checkDeviceAsync>
-// > => {
-//   return async (dispatch) => {
-//     //Если устройство найдено, то проверяем пользователя, иначе возвращаем ошибку устройства
-//     //Если пользователь найден, записываем в хранилище объект пользователя, иначе возвращаем ошибку идентификации
-//     dispatch(actions.checkDeviceAsync.request(''));
+const setDemoMode = (): AppThunk<
+  Promise<ActionType<typeof actions.setDemoModeAsync>>,
+  AuthState,
+  ActionType<typeof actions.setDemoModeAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setDemoModeAsync.request(''));
 
-//     const responseDevice = await api.device.getDevice();
-
-//     if (responseDevice.type === 'GET_DEVICE') {
-//       dispatch(actions.checkDeviceAsync.success(responseDevice.device));
-
-//       dispatch(actions.loginUserAsync.request(''));
-
-//       const responseLogin = await api.auth.login(credentials);
-
-//       if (responseLogin.type === 'LOGIN') {
-//         return dispatch(actions.loginUserAsync.success(responseLogin.user));
-//       }
-
-//       if (responseLogin.type === 'ERROR') {
-//         return dispatch(actions.loginUserAsync.failure(responseLogin.message));
-//       }
-
-//       return dispatch(actions.loginUserAsync.failure('something wrong'));
-//     }
-
-//     if (responseDevice.type === 'ERROR') {
-//       return dispatch(actions.checkDeviceAsync.failure(responseDevice.message));
-//     }
-
-//     return dispatch(actions.checkDeviceAsync.failure('something wrong'));
-//   };
-// };
+    try {
+      UserAsyncStorage.setUserId(mockUser.id);
+      return dispatch(actions.setDemoModeAsync.success());
+    } catch {
+      return dispatch(actions.setDemoModeAsync.failure('Ошибка установки демо режима'));
+    }
+  };
+};
 
 const getDeviceStatus = (
   uid?: string,
@@ -266,11 +244,13 @@ const getCompany = (
 export default {
   getDeviceByUid,
   activateDevice,
-  signUp,
-  signIn,
+  signup,
+  login,
   logout,
+  disconnect,
   getDeviceStatus,
   useAuthThunkDispatch,
   setUserSettings,
   getCompany,
+  setDemoMode,
 };

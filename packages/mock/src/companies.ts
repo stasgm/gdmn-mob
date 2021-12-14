@@ -35,9 +35,27 @@ const companies: ICompany[] = [
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',
   },
-  { id: '12', name: 'Company 2', admin: admin2, creationDate: '2021-11-24T14:02:55.886Z', editionDate: '2021-11-24T14:02:55.886Z' },
-  { id: '13', name: 'Company 3', admin: admin1, creationDate: '2021-11-24T14:02:55.886Z', editionDate: '2021-11-24T14:02:55.886Z' },
-  { id: '44', name: 'Company 4', admin: admin2, creationDate: '2021-11-24T14:02:55.886Z', editionDate: '2021-11-24T14:02:55.886Z' },
+  {
+    id: '12',
+    name: 'Company 2',
+    admin: admin2,
+    creationDate: '2021-11-24T14:02:55.886Z',
+    editionDate: '2021-11-24T14:02:55.886Z',
+  },
+  {
+    id: '13',
+    name: 'Company 3',
+    admin: admin1,
+    creationDate: '2021-11-24T14:02:55.886Z',
+    editionDate: '2021-11-24T14:02:55.886Z',
+  },
+  {
+    id: '44',
+    name: 'Company 4',
+    admin: admin2,
+    creationDate: '2021-11-24T14:02:55.886Z',
+    editionDate: '2021-11-24T14:02:55.886Z',
+  },
 ];
 
 const company = companies[0];

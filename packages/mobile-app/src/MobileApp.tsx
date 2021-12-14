@@ -23,12 +23,12 @@ export interface IApp {
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
 
-  const settings = useSelector( state => state.auth.settings );
+  const config = useSelector( state => state.auth.config );
 
   useEffect(() => {
     // authDispatch(authActions.init());
     // //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...settings };
+    api.config = { ...api.config, ...config };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

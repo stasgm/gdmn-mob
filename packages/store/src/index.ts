@@ -1,4 +1,3 @@
-import * as FileSystem from 'expo-file-system';
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
@@ -8,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { persistReducer } from 'redux-persist';
 
+// import { reducer as configReducer } from './config';
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
 import { reducer as referenceReducer } from './references';
@@ -15,184 +15,62 @@ import { reducer as settingsReducer } from './settings';
 import { reducer as msgReducer } from './messages';
 import { reducer as appReducer } from './app';
 import { TActions } from './types';
+import { UserAsyncStorage } from './utils/userAsyncStore';
 
-/**
- * Одно из решений, как привязать AsyncStorage к пользователю,
- * это создать свой объект, поддерживающий все методы интерфейса
- * AsyncStorageStatic, который будет вызывать методы исходного
- * AsyncStorage, подставляя в имя ключа ид пользователя.
- *
- * Тут могут возникнуть две проблемы:
- * 1) до того, как у нас будет пользователь, данные будут сохраняться
- *    в одни ключи (с пустым ИД пользователя), как только пользователь
- *    возникнет -- в другие.
- * 2) как удалять уже ненужные нам ключи? когда пользователь,
- *    дерегистрируется в программе.
- *
- */
-
-const dbDir = `${FileSystem.documentDirectory}db/`;
-
-const getDirectory = (path: string): string => {
-  const regex = /^(.+)\/([^/]+)$/;
-  const res = regex.exec(path);
-
-  return res ? res[1] : path;
-};
-
-const ensureDirExists = async (dir: string) => {
-  const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
-
-  if (!dirInfo.exists) {
-    await FileSystem.makeDirectoryAsync(`${dbDir}${dir}`, { intermediates: true });
-  }
-};
-
-const ensureFileExists = async (dir: string) => {
-  const dirInfo = await FileSystem.getInfoAsync(`${dbDir}${dir}`);
-  return dirInfo.exists;
-};
-
-class UserAsyncStorageClass {
-  private _userIdPrefix = '';
-  private _storage: typeof AsyncStorage;
-
-  constructor(storage: typeof AsyncStorage) {
-    this._storage = storage;
-  }
-
-  setUserId(userId: string) {
-    this._userIdPrefix = `${userId}\\`;
-  }
-
-  private _getUserPrefix(key: string) {
-    return `${this._userIdPrefix}${key}`;
-  }
-
-  getItem = (key: string, callback?: (error?: Error, result?: string) => void): Promise<string | null> => {
-    console.log('getItem 1', key);
-    const getData = async () => {
-      const userKey = this._getUserPrefix(key);
-      console.log('getItem 2', userKey);
-      try {
-        if (!(await ensureFileExists(`${userKey}.json`))) {
-          return;
-        }
-        await ensureDirExists(getDirectory(userKey));
-        const result = await FileSystem.readAsStringAsync(`${dbDir}${userKey}.json`);
-        return result ? JSON.parse(result) : null;
-      } catch (e) {
-        console.log('error', e);
-      }
-    };
-    return getData();
-  };
-
-  // this._storage.getItem(this._getUserPrefix(key), callback);
-
-  setItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> => {
-    console.log('setItem 1', key);
-    const saveData = async () => {
-      const userKey = this._getUserPrefix(key);
-      console.log('setItem 2', userKey, value);
-      try {
-        await ensureDirExists(getDirectory(userKey));
-        await FileSystem.writeAsStringAsync(`${dbDir}${userKey}.json`, value);
-      } catch (e) {
-        console.log('error', e);
-      }
-    };
-    return saveData();
-  };
-  //this._storage.setItem(this._getUserPrefix(key), value, callback);
-
-  removeItem = (key: string, callback?: (error?: Error) => void): Promise<void> => {
-    console.log('removeItem 1', key);
-    const removeData = async () => {
-      const userKey = this._getUserPrefix(key);
-      console.log('removeItem 2', userKey);
-      try {
-        await ensureDirExists('');
-        await FileSystem.deleteAsync(`${dbDir}${userKey}.json`);
-      } catch (e) {
-        console.log('error', e);
-      }
-    };
-    return removeData();
-  };
-
-  //this._storage.removeItem(this._getUserPrefix(key), callback);
-
-  mergeItem = (key: string, value: string, callback?: (error?: Error) => void): Promise<void> =>
-    this._storage.mergeItem(this._getUserPrefix(key), value, callback);
-
-  clear = (callback?: (error?: Error) => void): Promise<void> => this._storage.clear(callback);
-
-  getAllKeys = (callback?: (error?: Error, keys?: string[]) => void): Promise<string[]> =>
-    this._storage.getAllKeys(callback);
-
-  multiGet = (
-    keys: string[],
-    callback?: (errors?: Error[], result?: [string, string | null][]) => void,
-  ): Promise<[string, string | null][]> => this._storage.multiGet(keys, callback);
-
-  multiSet = (keyValuePairs: string[][], callback?: (errors?: Error[]) => void): Promise<void> =>
-    this._storage.multiSet(keyValuePairs, callback);
-
-  multiRemove = (keys: string[], callback?: (errors?: Error[]) => void): Promise<void> =>
-    this._storage.multiRemove(
-      keys.map((key) => this._getUserPrefix(key)),
-      callback,
-    );
-
-  multiMerge = (keyValuePairs: string[][], callback?: (errors?: Error[]) => void): Promise<void> =>
-    this._storage.multiMerge(
-      keyValuePairs.map((keys) => keys.map((key) => this._getUserPrefix(key))),
-      callback,
-    );
-}
-
-export const UserAsyncStorage = new UserAsyncStorageClass(AsyncStorage);
+// const persistConfig = {
+//   key: 'config',
+//   storage: UserAsyncStorage,
+// };
 
 const persistAuthConfig = {
   key: 'auth',
   storage: UserAsyncStorage,
-  whitelist: ['user', 'settings', 'company', 'device'],
+  whitelist: ['user', 'settings', 'company', 'device', 'isDemo'],
 };
 
 const persistDocsConfig = {
   key: 'documents',
-  storage: AsyncStorage,
+  storage: UserAsyncStorage,
   whitelist: ['list'],
 };
 
 const persistRefsConfig = {
   key: 'references',
-  storage: AsyncStorage,
+  storage: UserAsyncStorage,
   whitelist: ['list'],
 };
 
 const persistSettingsConfig = {
   key: 'settings',
-  storage: AsyncStorage,
+  storage: UserAsyncStorage,
   whitelist: ['data'],
 };
 
 const persistAppConfig = {
   key: 'app',
-  storage: AsyncStorage,
+  storage: UserAsyncStorage,
   whitelist: ['formParams', 'errorList'],
 };
 
 export const rootReducer = {
+  // config: persistReducer(persistConfig, configReducer),
   auth: persistReducer(persistAuthConfig, authReducer),
-  // auth: authReducer,
   messages: msgReducer,
   references: persistReducer(persistRefsConfig, referenceReducer),
   documents: persistReducer(persistDocsConfig, documentReducer),
   settings: persistReducer(persistSettingsConfig, settingsReducer),
   app: persistReducer(persistAppConfig, appReducer),
 };
+
+// export const rootReducer = {
+//   // config: persistReducer(persistConfig, configReducer),
+//   auth: authReducer,
+//   messages: msgReducer,
+//   references: referenceReducer,
+//   documents: documentReducer,
+//   settings: settingsReducer,
+//   app: appReducer,
+// };
 
 type AppReducers<S, A extends AnyAction> = { [key: string]: Reducer<S, A> };
 
