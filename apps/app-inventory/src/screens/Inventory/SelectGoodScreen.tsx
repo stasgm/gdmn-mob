@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { IconButton, Divider, Searchbar } from 'react-native-paper';
-//import { SearchBar } from 'react-native-elements';
+import { Divider, Searchbar } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
