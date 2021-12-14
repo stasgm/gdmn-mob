@@ -114,7 +114,7 @@ export const ScanBarcodeScreen = () => {
       }
 
       const { remains, ...good } = remItem;
-      console.log('good.barcode', good.barcode);
+
       return {
         good: { id: good.id, name: good.name } as INamedEntity,
         id: uuid(),
@@ -151,8 +151,6 @@ export const ScanBarcodeScreen = () => {
   if (hasPermission === false) {
     return <Text style={styles.title}>Нет доступа к камере</Text>;
   }
-
-  console.log('123', itemLine?.barcode);
 
   return (
     <View style={[scanStyle.content, { backgroundColor: colors.card }]}>
