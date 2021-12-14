@@ -78,9 +78,7 @@ export const ScanBarcodeScreen = () => {
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
         const remItem =
-          goods?.[
-            Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown1') || ''
-          ];
+          goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown') || ''];
 
         if (!remItem) {
           return;
