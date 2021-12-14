@@ -13,12 +13,11 @@ import {
 } from '@lib/types';
 
 import { ICoords } from './geo/types';
-import { AppTradeActionType } from './app-trade/actions';
 
 // eslint-disable-next-line import/no-cycle
-import { IModel, IGood } from './app-trade/types';
+import { IGood } from './app/types';
 
-export { IModel, IGood };
+export { IGood };
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -86,11 +85,25 @@ export interface IGoodGroup extends INamedEntity {
 //Подразделения-склады
 export type IDepartment = INamedEntity;
 // Интерфейс для матрицы номенклатур для организаций
-export interface INetPrice extends IEntity {
-  contactId: string; // организация
-  goodId: string; // ID товара
-  pricefso?: number; // цена ФСО
-  pricefsn?: number; // цена ФСН
+// export interface INetPrice extends IEntity {
+//   contactId: string; // организация
+//   goodId: string; // ID товара
+//   pricefso?: number; // цена ФСО
+//   pricefsn?: number; // цена ФСН
+//   priceFsoSklad?: number; // цена ФСО склад
+//   priceFsnSklad?: number; // цена ФСН склад
+// }
+
+export interface IGoodMatrix extends IEntity {
+  contactId: string;
+  onDate: string;
+  data: IMatrixData[];
+}
+
+export interface IMatrixData {
+  goodId: string;
+  priceFso?: number; // цена ФСО
+  priceFsn?: number; // цена ФСН
   priceFsoSklad?: number; // цена ФСО склад
   priceFsnSklad?: number; // цена ФСН склад
 }
@@ -112,7 +125,7 @@ export interface IOrderHead extends IHead {
 }
 
 export interface IOrderLine extends IEntity {
-  good: INamedEntity;
+  good: IGood;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
 }

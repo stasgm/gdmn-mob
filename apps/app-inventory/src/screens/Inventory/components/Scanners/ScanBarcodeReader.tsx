@@ -53,15 +53,17 @@ export const ScanBarcodeReaderScreen = () => {
     setScanned(true);
     setBarcode(data);
   };
+
   useEffect(() => {
     if (!scanned && ref?.current) {
       ref?.current &&
         setTimeout(() => {
-          // eslint-disable-next-line no-sequences
-          ref.current?.focus(), ref.current?.clear();
+          ref.current?.focus();
+          ref.current?.clear();
         }, 500);
     }
   }, [scanned, ref]);
+
   useEffect(() => {
     if (!scanned) {
       return;
@@ -173,9 +175,7 @@ export const ScanBarcodeReaderScreen = () => {
                 autoFocus={true}
                 ref={ref}
                 showSoftInputOnFocus={false}
-                onChangeText={(text) => {
-                  handleBarCodeScanned(text);
-                }}
+                onChangeText={(text) => handleBarCodeScanned(text)}
               />
             </TouchableWithoutFeedback>
           </View>
