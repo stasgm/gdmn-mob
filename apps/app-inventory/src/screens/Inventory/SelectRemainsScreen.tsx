@@ -5,7 +5,7 @@ import { Searchbar, Divider, IconButton } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
-import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles } from '@lib/mobile-ui';
+import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
 import { docSelectors, useSelector } from '@lib/store';
 import { ISettingsOption } from '@lib/types';
 
@@ -123,12 +123,7 @@ export const SelectRemainsScreen = () => {
       headerLeft: () => <BackButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <IconButton
-            icon="card-search-outline"
-            style={filterVisible && { backgroundColor: colors.card }}
-            size={26}
-            onPress={() => setFilterVisible((prev) => !prev)}
-          />
+          <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />
           <ScanButton onPress={handleScanner} />
         </View>
       ),
