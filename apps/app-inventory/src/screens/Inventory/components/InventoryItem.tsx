@@ -38,7 +38,7 @@ export const InventoryItem = ({ docId, item, readonly = false }: IProps) => {
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
               {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()} x{' '}
-              {(good?.price || 0).toString()} р.
+              {(item.price || 0).toString()} р.
             </Text>
             <Text style={[styles.field, { color: colors.text }]}>
               {Math.floor(item.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1) * 1000) / 1000} кг
