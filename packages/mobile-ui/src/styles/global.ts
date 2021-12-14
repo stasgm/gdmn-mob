@@ -187,6 +187,9 @@ const globalstyles = StyleSheet.create({
   marginBottom5: {
     marginBottom: 5,
   },
+  barcode: {
+    alignItems: 'flex-end',
+  },
 });
 
 export default globalstyles;

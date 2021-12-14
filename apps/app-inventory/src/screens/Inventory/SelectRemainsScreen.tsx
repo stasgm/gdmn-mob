@@ -1,18 +1,15 @@
 /* eslint-disable react/no-children-prop */
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, Avatar, IconButton } from 'react-native-paper';
+import { Searchbar, Divider, IconButton } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
-import { styles } from '@lib/mobile-navigation';
-
-import { AppScreen, ScanButton, ItemSeparator, BackButton } from '@lib/mobile-ui';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
-import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
-
+import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 import { docSelectors, useSelector } from '@lib/store';
 import { ISettingsOption } from '@lib/types';
+
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { formatValue } from '../../utils/helpers';
 import { useSelector as useAppInventorySelector } from '../../store/index';
@@ -42,30 +39,33 @@ const GoodRemains = ({ item }: { item: IRem }) => {
         });
       }}
     >
-      <View style={{ backgroundColor: colors.card }}>
-        <Avatar.Icon size={38} icon="cube-outline" style={{ backgroundColor: colors.primary }} children={undefined} />
-      </View>
-      <View style={styles.details}>
-        <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
-        <Text style={styles.itemInfo}>
-          {item.remains} {item.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
-        </Text>
-        {barcode && (
-          <View style={styles.barcode}>
-            <Text style={[styles.number, styles.fieldDesciption, { color: colors.text }]}>{item.barcode}</Text>
+      <View style={[styles.item]}>
+        <View style={[styles.icon]}>
+          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+        </View>
+        <View style={styles.details}>
+          <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+          <View style={[styles.directionRow]}>
+            <Text style={[styles.field, { color: colors.text }]}>
+              {item.remains} {item.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+            </Text>
+            {barcode && (
+              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.barcode}</Text>
+            )}
           </View>
-        )}
+        </View>
       </View>
     </TouchableOpacity>
   );
 };
+
 //////////
 
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
-  const [filterVisible, setFilterVisible] = useState(true);
+  const [filterVisible, setFilterVisible] = useState(false);
   const [list, setList] = useState<IRem[]>([]);
 
   const { data: settings } = useSelector((state) => state.settings);
@@ -122,25 +122,23 @@ export const SelectRemainsScreen = () => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
       headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
+        <View style={styles.buttons}>
+          <IconButton
+            icon="card-search-outline"
+            style={filterVisible && { backgroundColor: colors.card }}
+            size={26}
+            onPress={() => setFilterVisible((prev) => !prev)}
+          />
+          <ScanButton onPress={handleScanner} />
+        </View>
       ),
     });
-  }, [navigation, filterVisible, colors.card]);
+  }, [navigation, filterVisible, colors.card, handleScanner]);
 
   const refList = useRef<FlatList<IRem>>(null);
   useScrollToTop(refList);
 
   const renderItem = ({ item }: { item: IRem }) => <GoodRemains item={item} />;
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => <ScanButton onPress={handleScanner} />,
-    });
-  }, [navigation, handleScanner]);
 
   return (
     <AppScreen>

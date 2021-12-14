@@ -40,13 +40,12 @@ export const InventoryViewScreen = () => {
 
   const handleAddInventoryLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
-      //SelectGoodItem
       docId: id,
     });
   }, [navigation, id]);
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const handleScannerGood = useCallback(() => {}, []); //Scan
+  const handleScannerGood = useCallback(() => {}, []);
 
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
