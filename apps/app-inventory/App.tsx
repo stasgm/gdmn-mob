@@ -10,7 +10,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { Caption } from 'react-native-paper';
 
 import { persistor, store } from './src/store';
-import { InventorysNavigator } from './src/navigation/InventorysNavigator';
+import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
 import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/types';
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
@@ -22,7 +22,7 @@ const Root = () => {
         name: 'Inventorys',
         title: 'Инвентаризации',
         icon: 'file-document-outline',
-        component: InventorysNavigator,
+        component: InventoryNavigator,
       },
     ],
     [],
