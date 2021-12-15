@@ -162,10 +162,8 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
     position: 'absolute',
-    // top: 5,
     right: -10,
     zIndex: 5,
-    // width: '100%',
   },
   new: {
     width: '90%',
@@ -173,7 +171,6 @@ const localStyles = StyleSheet.create({
   details: {
     flex: 1,
     margin: 5,
-    // alignItems: 'center',
     justifyContent: 'center',
   },
 });

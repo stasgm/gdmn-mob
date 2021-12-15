@@ -186,7 +186,7 @@ export const ScanBarcodeReaderScreen = () => {
                 style={[scanReader.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
-                <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
+                <IconButton icon="barcode-scan" size={30} />
                 <Text style={scanReader.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>

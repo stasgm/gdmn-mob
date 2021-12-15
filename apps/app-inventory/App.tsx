@@ -16,6 +16,8 @@ import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IMo
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
 
 const Root = () => {
+  //const newDispatch = useDocDispatch();
+  //newDispatch(settingsActions.init());
   const navItems: INavItem[] = useMemo(
     () => [
       {

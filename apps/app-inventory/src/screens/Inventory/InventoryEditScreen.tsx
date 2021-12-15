@@ -236,24 +236,29 @@ export const InventoryEditScreen = () => {
             </View>
           </>
         )}
+
         <Input
           label="Номер документа"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
           disabled={isBlocked}
+          clearInput={true}
         />
+
         <SelectableInput
           label="Дата"
           value={getDateString(docOnDate || '')}
           onPress={handlePresentOnDate}
           disabled={docStatus !== 'DRAFT'}
         />
+
         <SelectableInput
           label="Подразделение"
           value={docDepartment?.name}
           onPress={handlePresentDepartment}
           disabled={isBlocked}
         />
+
         <Input
           label="Комментарий"
           value={docComment}
@@ -261,6 +266,7 @@ export const InventoryEditScreen = () => {
             dispatch(appActions.setFormParams({ comment: text.trim() || '' }));
           }}
           disabled={isBlocked}
+          clearInput={true}
         />
       </ScrollView>
       {showOnDate && (
