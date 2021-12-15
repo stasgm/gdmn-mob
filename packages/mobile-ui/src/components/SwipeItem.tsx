@@ -7,9 +7,12 @@ import { RectButton } from 'react-native-gesture-handler';
 export interface OrderListItemProps {
   children?: ReactNode;
   onPress: (name: 'edit' | 'copy' | 'delete') => void;
+  edit?: boolean;
+  copy?: boolean;
+  del?: boolean;
 }
 
-const SwipeItem = ({ children, onPress }: OrderListItemProps) => {
+const SwipeItem = ({ children, onPress, edit, copy, del }: OrderListItemProps) => {
   const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
 
   let ref = useRef(null);
@@ -20,9 +23,9 @@ const SwipeItem = ({ children, onPress }: OrderListItemProps) => {
 
   const renderRightActions = (progress: unknown) => (
     <View style={localStyles.swipeViewItem}>
-      {renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress)}
-      {renderRightAction('copy', 'content-copy', '#00aaff', 120, progress)}
-      {renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress)}
+      {edit ? renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress) : null}
+      {copy ? renderRightAction('copy', 'content-copy', '#00aaff', 120, progress) : null}
+      {del ? renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress) : null}
     </View>
   );
 
@@ -33,7 +36,6 @@ const SwipeItem = ({ children, onPress }: OrderListItemProps) => {
     });
 
     return (
-      // eslint-disable-next-line react-native/no-inline-styles
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
         <RectButton
           style={[localStyles.rightAction, { backgroundColor: color }]}

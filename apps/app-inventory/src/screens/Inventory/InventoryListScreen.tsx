@@ -106,7 +106,7 @@ export const InventoryListScreen = () => {
 
   const renderItem: ListRenderItem<IInventoryListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <InventorySwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? <InventorySwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} /> : null;
   };
 
   return (

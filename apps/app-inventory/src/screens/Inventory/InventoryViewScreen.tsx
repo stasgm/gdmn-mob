@@ -107,7 +107,7 @@ export const InventoryViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <InventorySwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} />
+    <InventorySwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} edit={true} del={true} />
   );
 
   return (

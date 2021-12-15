@@ -6,13 +6,13 @@ import { documentActions, useDispatch } from '@lib/store';
 
 import { SwipeItem } from '@lib/mobile-ui';
 
-import { InventorysStackParamList } from '../../../navigation/Root/types';
-import { IInventoryLine } from '../../../store/types';
+import { ReturnsStackParamList } from '../../../navigation/Root/types';
+import { IReturnLine } from '../../../store/types';
 
-import { InventoryItem } from './InventoryItem';
+import ReturnItem from './ReturnItem';
 
 interface IProps {
-  item: IInventoryLine;
+  item: IReturnLine;
   docId: string;
   readonly?: boolean;
   edit?: boolean;
@@ -20,13 +20,13 @@ interface IProps {
   del?: boolean;
 }
 
-const InventorySwipeLineItem = ({ docId, item, readonly, edit, copy, del }: IProps) => {
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
+const ReturnSwipeLineItem = ({ docId, item, readonly, edit, copy, del }: IProps) => {
+  const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
   const dispatch = useDispatch();
 
   const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string) => {
     if (name === 'edit') {
-      navigation.navigate('InventoryLine', { mode: 0, docId, item });
+      navigation.navigate('ReturnLine', { mode: 0, docId, item });
     } else if (name === 'delete') {
       if (readonly) {
         return Alert.alert('Внимание!', 'Позиция не может быть удалена', [{ text: 'OK' }]);
@@ -46,11 +46,13 @@ const InventorySwipeLineItem = ({ docId, item, readonly, edit, copy, del }: IPro
     }
   };
 
-  return (
+  return !readonly ? (
     <SwipeItem onPress={(name) => handlePressSwipeOrder(name, item.id)} edit={edit} copy={copy} del={del}>
-      <InventoryItem docId={docId} item={item} readonly={readonly} />
+      <ReturnItem docId={docId} item={item} readonly={readonly} />
     </SwipeItem>
+  ) : (
+    <ReturnItem docId={docId} item={item} readonly={readonly} />
   );
 };
 
-export default InventorySwipeLineItem;
+export default ReturnSwipeLineItem;

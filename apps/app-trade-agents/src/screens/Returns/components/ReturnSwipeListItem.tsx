@@ -8,16 +8,19 @@ import { documentActions, useDispatch } from '@lib/store';
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 import { IReturnDocument } from '../../../store/types';
 
-import SwipeItem from '../../../components/SwipeItem';
+import { SwipeItem } from '@lib/mobile-ui';
 
 import ReturnListItem, { IReturnListRenderItemProps } from './ReturnListItem';
 
 interface IProps {
   renderItem: IReturnListRenderItemProps;
   item: IReturnDocument;
+  edit?: boolean;
+  copy?: boolean;
+  del?: boolean;
 }
 
-const ReturnSwipeListItem = ({ item, renderItem }: IProps) => {
+const ReturnSwipeListItem = ({ item, renderItem, edit, copy, del }: IProps) => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
   const dispatch = useDispatch();
 
@@ -60,7 +63,12 @@ const ReturnSwipeListItem = ({ item, renderItem }: IProps) => {
   };
 
   return (
-    <SwipeItem onPress={(name) => handlePressSwipeReturn(name, item.id, item?.status !== 'DRAFT')}>
+    <SwipeItem
+      onPress={(name) => handlePressSwipeReturn(name, item.id, item?.status !== 'DRAFT')}
+      edit={edit}
+      copy={copy}
+      del={del}
+    >
       <ReturnListItem {...renderItem} />
     </SwipeItem>
   );

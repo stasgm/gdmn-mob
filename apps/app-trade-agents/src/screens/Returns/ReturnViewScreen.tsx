@@ -26,6 +26,7 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import ReturnItem from './components/ReturnItem';
+import ReturnSwipeLineItem from './components/ReturnSwipeLineItem';
 
 const ReturnViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -98,7 +99,7 @@ const ReturnViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IReturnLine }) => (
-    <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+    <ReturnSwipeLineItem docId={returnDoc.id} item={item} readonly={isBlocked} edit={true}del={true} />
   );
 
   return (

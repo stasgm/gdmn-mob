@@ -122,7 +122,7 @@ const OrderListScreen = () => {
 
   const renderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? <OrderSwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} /> : null;
   };
 
   return (

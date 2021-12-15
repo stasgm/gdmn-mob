@@ -59,7 +59,7 @@ const ReturnListScreen = () => {
 
   const renderItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} /> : null;
   };
 
   const handleAddDocument = useCallback(() => {

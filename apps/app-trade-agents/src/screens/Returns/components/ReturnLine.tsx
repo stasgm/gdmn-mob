@@ -117,11 +117,11 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
         </View>
         <ItemSeparator />
       </ScrollView>
-      {mode ? (
+      {/* {mode ? (
         <PrimeButton icon="delete" onPress={handleDelete} outlined>
           Удалить позицию
         </PrimeButton>
-      ) : null}
+      ) : null} */}
     </>
   );
 };

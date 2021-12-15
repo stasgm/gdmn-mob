@@ -5,19 +5,24 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
+import { SwipeItem } from '@lib/mobile-ui';
+
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 import { IOrderDocument } from '../../../store/types';
 
-import SwipeItem from '../../../components/SwipeItem';
+// import SwipeItem from '../../../components/SwipeItem';
 
 import OrderListItem, { IOrderListRenderItemProps } from './OrderListItem';
 
 interface IProps {
   renderItem: IOrderListRenderItemProps;
   item: IOrderDocument;
+  edit?: boolean;
+  copy?: boolean;
+  del?: boolean;
 }
 
-const OrderSwipeListItem = ({ item, renderItem }: IProps) => {
+const OrderSwipeListItem = ({ item, renderItem, edit, del, copy }: IProps) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
 
@@ -60,7 +65,12 @@ const OrderSwipeListItem = ({ item, renderItem }: IProps) => {
   };
 
   return (
-    <SwipeItem onPress={(name) => handlePressSwipeOrder(name, item.id, item?.status !== 'DRAFT')}>
+    <SwipeItem
+      onPress={(name) => handlePressSwipeOrder(name, item.id, item?.status !== 'DRAFT')}
+      edit={edit}
+      copy={copy}
+      del={del}
+    >
       <OrderListItem {...renderItem} />
     </SwipeItem>
   );

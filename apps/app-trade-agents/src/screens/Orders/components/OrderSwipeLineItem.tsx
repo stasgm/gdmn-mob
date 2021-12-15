@@ -4,10 +4,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
+import { SwipeItem } from '@lib/mobile-ui';
+
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 import { IOrderLine } from '../../../store/types';
-
-import SwipeLineItem from '../../../components/SwipeLineItem';
 
 import OrderItem from './OrderItem';
 
@@ -15,17 +15,20 @@ interface IProps {
   item: IOrderLine;
   docId: string;
   readonly?: boolean;
+  edit?: boolean;
+  copy?: boolean;
+  del?: boolean;
 }
 
-const OrderSwipeLineItem = ({ docId, item, readonly }: IProps) => {
+const OrderSwipeLineItem = ({ docId, item, readonly, edit, copy, del }: IProps) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const dispatch = useDispatch();
 
-  const handlePressSwipeOrder = (name: 'edit' | 'delete', id: string, isBlocked?: boolean) => {
+  const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string) => {
     if (name === 'edit') {
       navigation.navigate('OrderLine', { mode: 0, docId, item });
     } else if (name === 'delete') {
-      if (isBlocked) {
+      if (readonly) {
         return Alert.alert('Внимание!', 'Позиция не может быть удалена', [{ text: 'OK' }]);
       }
 
@@ -44,9 +47,9 @@ const OrderSwipeLineItem = ({ docId, item, readonly }: IProps) => {
   };
 
   return (
-    <SwipeLineItem onPress={(name) => handlePressSwipeOrder(name, item.id)}>
+    <SwipeItem onPress={(name) => handlePressSwipeOrder(name, item.id)} edit={edit} copy={copy} del={del}>
       <OrderItem docId={docId} item={item} readonly={readonly} />
-    </SwipeLineItem>
+    </SwipeItem>
   );
 };
 

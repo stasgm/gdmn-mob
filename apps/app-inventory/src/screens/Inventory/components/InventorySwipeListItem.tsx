@@ -5,18 +5,22 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
+import { SwipeItem } from '@lib/mobile-ui';
+
 import { InventorysStackParamList } from '../../../navigation/Root/types';
 import { IInventoryDocument } from '../../../store/types';
-import { SwipeItem } from '../../../components/SwipeItem';
 
 import { IInventoryListRenderItemProps, InventoryListItem } from './InventoryListItem';
 
 interface IProps {
   renderItem: IInventoryListRenderItemProps;
   item: IInventoryDocument;
+  edit?: boolean;
+  copy?: boolean;
+  del?: boolean;
 }
 
-export const InventorySwipeListItem = ({ item, renderItem }: IProps) => {
+export const InventorySwipeListItem = ({ item, renderItem, edit, del, copy }: IProps) => {
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
   const dispatch = useDispatch();
 
@@ -59,7 +63,12 @@ export const InventorySwipeListItem = ({ item, renderItem }: IProps) => {
   };
 
   return (
-    <SwipeItem onPress={(name) => handlePressSwipeOrder(name, item.id, item?.status !== 'DRAFT')}>
+    <SwipeItem
+      onPress={(name) => handlePressSwipeOrder(name, item.id, item?.status !== 'DRAFT')}
+      edit={edit}
+      copy={copy}
+      del={del}
+    >
       <InventoryListItem {...renderItem} />
     </SwipeItem>
   );
