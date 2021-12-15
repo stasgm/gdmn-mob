@@ -25,6 +25,7 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import OrderItem from './components/OrderItem';
+import OrderSwipeLineItem from './components/OrderSwipeLineItem';
 
 const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -98,8 +99,12 @@ const OrderViewScreen = () => {
     );
   }
 
+  // const renderItem = ({ item }: { item: IOrderLine }) => (
+  //   <OrderItem docId={order.id} item={item} readonly={isBlocked} />
+  // );
+
   const renderItem = ({ item }: { item: IOrderLine }) => (
-    <OrderItem docId={order.id} item={item} readonly={isBlocked} />
+    <OrderSwipeLineItem docId={order.id} item={item} readonly={isBlocked} />
   );
 
   return (
