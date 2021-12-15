@@ -269,7 +269,7 @@ export const ScanBarcodeScreen = () => {
         {!scanned && (
           <View style={scanStyle.footer}>
             <>
-              <IconButton icon="barcode-scan" size={30} />
+              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
               <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>

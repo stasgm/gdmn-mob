@@ -19,7 +19,6 @@ import { IInventoryDocument, IRem } from '../../store/types';
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  console.log('III', item);
   const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
@@ -59,8 +58,6 @@ const GoodRemains = ({ item }: { item: IRem }) => {
   );
 };
 
-//////////
-
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
@@ -81,7 +78,6 @@ export const SelectRemainsScreen = () => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
   }, [navigation, docId, scanUsetSetting]);
 
-  //////
   const goodRemains: IRem[] = useMemo(() => {
     const goods = model[document?.head?.department?.id || ''].goods;
     if (!goods) {

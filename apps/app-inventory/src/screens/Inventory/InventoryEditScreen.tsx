@@ -76,18 +76,6 @@ export const InventoryEditScreen = () => {
   }, [dispatch, docDepartment]);
 
   useEffect(() => {
-    if (!docComment) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['comment']: docComment,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docComment]);
-
-  useEffect(() => {
     // Инициализируем параметры
     if (inventory) {
       dispatch(
@@ -118,7 +106,6 @@ export const InventoryEditScreen = () => {
     if (!docType) {
       return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     }
-
     if (!(docNumber && docDepartment && docOnDate && docInventoryDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
@@ -162,7 +149,7 @@ export const InventoryEditScreen = () => {
         errorMessage: undefined,
         head: {
           ...inventory.head,
-          comment: docComment,
+          comment: docComment as string,
           onDate: docOnDate,
           department: docDepartment,
         },
@@ -270,7 +257,9 @@ export const InventoryEditScreen = () => {
         <Input
           label="Комментарий"
           value={docComment}
-          onChangeText={(text) => dispatch(appActions.setFormParams({ string: text.trim() }))}
+          onChangeText={(text) => {
+            dispatch(appActions.setFormParams({ comment: text.trim() || '' }));
+          }}
           disabled={isBlocked}
         />
       </ScrollView>
