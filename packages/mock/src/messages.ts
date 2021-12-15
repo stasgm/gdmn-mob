@@ -63,9 +63,9 @@ export const messageRequest: IMessage<MessageType>[] = [
           metadata: {
             id: { sortOrder: 0, visible: false },
             name: { sortOrder: 1, name: 'ФИО' },
-            firstName: { sortOrder: 2, name: 'Имя' },
-            lastName: { sortOrder: 3, name: 'Отчество' },
-            middleName: { sortOrder: 4, name: 'Фамилия' },
+            lastName: { sortOrder: 2, name: 'Фамилия' },
+            firstName: { sortOrder: 3, name: 'Имя' },
+            middleName: { sortOrder: 4, name: 'Отчество' },
             position: { sortOrder: 5, name: 'Должность' },
           },
           data: [
@@ -73,16 +73,16 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '147093200',
               name: 'Иванова Дарья Викторовна',
               firstName: 'Дарья',
-              lastName: 'Викторовна',
-              middleName: 'Иванова',
+              middleName: 'Викторовна',
+              lastName: 'Иванова',
               position: { id: '147527836', name: 'Главный бухгалтер' },
             },
             {
               id: '147093201',
               name: 'Антонов Алексей Витальевич',
               firstName: 'Алексей',
-              lastName: 'Витальевич',
-              middleName: 'Антонов',
+              middleName: 'Витальевич',
+              lastName: 'Антонов',
               position: {
                 id: '151231946',
                 name: 'Ведущий инженер',
@@ -92,16 +92,16 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '147257062',
               name: 'Зайцев Николай Романович',
               firstName: 'Николай',
-              lastName: 'Романович',
-              middleName: 'Зайцев',
+              middleName: 'Романович',
+              lastName: 'Зайцев',
               position: { id: '148477406', name: 'Главный инженер' },
             },
             {
               id: '147527919',
               name: 'Маркова Вероника Николаевна',
               firstName: 'Вероника',
-              lastName: 'Николаевна',
-              middleName: 'Маркова',
+              middleName: 'Николаевна',
+              lastName: 'Маркова',
               position: { id: '147527678', name: 'Заведующий складом' },
             },
           ],
@@ -1957,6 +1957,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '857817085',
                 name: 'Колбаса вареная докторская',
+                priceFsn: 4.82,
               },
               quantity: 2,
               packagekey: {
@@ -1969,6 +1970,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '857817085',
                 name: 'Колбаса вареная докторская',
+                priceFsn: 4.82,
               },
               quantity: 2,
               packagekey: {
@@ -2011,6 +2013,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                priceFsn: 4.37,
               },
               quantity: 2,
               packagekey: {
@@ -2023,6 +2026,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                priceFsn: 4.37,
               },
               quantity: 2,
               packagekey: {
@@ -2065,6 +2069,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '147035338',
                 name: 'Колбаски баварские',
+                priceFsn: 20.42,
               },
               quantity: 2,
               packagekey: {
@@ -2077,6 +2082,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '147035339',
                 name: 'Колбаски балканские',
+                priceFsn: 20.27,
               },
               quantity: 2,
               packagekey: {
