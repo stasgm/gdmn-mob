@@ -52,19 +52,19 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
     });
   }, []);
 
-  const handleDelete = useCallback(() => {
-    !!mode &&
-      Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-        {
-          text: 'Удалить',
-          onPress: () => {
-            dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
-            navigation.goBack();
-          },
-        },
-        { text: 'Отмена' },
-      ]);
-  }, [dispatch, docId, item.id, mode, navigation]);
+  // const handleDelete = useCallback(() => {
+  //   !!mode &&
+  //     Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
+  //       {
+  //         text: 'Удалить',
+  //         onPress: () => {
+  //           dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
+  //           navigation.goBack();
+  //         },
+  //       },
+  //       { text: 'Отмена' },
+  //     ]);
+  // }, [dispatch, docId, item.id, mode, navigation]);
 
   const handleEIDScanned = (data: string) => {
     setDoScanned(false);
@@ -149,11 +149,11 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
           </View>
         </View>
       </ScrollView>
-      {mode ? (
+      {/* {mode ? (
         <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
           Удалить позицию
         </PrimeButton>
-      ) : null}
+      ) : null} */}
     </>
   );
 };

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { v4 as uuid } from 'uuid';
 import { IconButton } from 'react-native-paper';

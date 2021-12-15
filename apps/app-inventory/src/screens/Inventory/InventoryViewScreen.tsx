@@ -22,7 +22,7 @@ import { IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
-import { InventoryItem } from './components/InventoryItem';
+import InventorySwipeLineItem from './components/InventorySwipeLineItem';
 
 export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -107,7 +107,7 @@ export const InventoryViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+    <InventorySwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} />
   );
 
   return (
