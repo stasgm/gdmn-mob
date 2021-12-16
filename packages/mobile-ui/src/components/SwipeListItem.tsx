@@ -1,36 +1,34 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Alert } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
-import { SwipeItem } from '@lib/mobile-ui';
+import { IDocument } from '@lib/types';
 
-import { InventorysStackParamList } from '../../../navigation/Root/types';
-import { IInventoryDocument } from '../../../store/types';
-
-import { IInventoryListRenderItemProps, InventoryListItem } from './InventoryListItem';
+import SwipeItem from './SwipeItem';
 
 interface IProps {
-  renderItem: IInventoryListRenderItemProps;
-  item: IInventoryDocument;
+  children?: ReactNode;
+  renderItem: any;
+  item: any;
   edit?: boolean;
   copy?: boolean;
   del?: boolean;
+  routeName: string;
 }
 
-export const InventorySwipeListItem = ({ item, renderItem, edit, del, copy }: IProps) => {
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
+const SwipeListItem = ({ children, item, renderItem, edit, del, copy, routeName }: IProps) => {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate('InventoryView', { id });
+      navigation.navigate(routeName, { id });
     } else if (name === 'copy') {
       const newReturnDate = new Date().toISOString();
 
-      const newInventory: IInventoryDocument = {
+      const newInventory: IDocument = {
         ...item,
         id: uuid(),
         number: 'б\\н',
@@ -42,7 +40,7 @@ export const InventorySwipeListItem = ({ item, renderItem, edit, del, copy }: IP
 
       dispatch(documentActions.addDocument(newInventory));
 
-      navigation.navigate('InventoryView', { id: newInventory.id });
+      navigation.navigate(routeName, { id: newInventory.id });
     } else if (name === 'delete') {
       if (isBlocked) {
         return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);
@@ -69,7 +67,10 @@ export const InventorySwipeListItem = ({ item, renderItem, edit, del, copy }: IP
       copy={copy}
       del={del}
     >
-      <InventoryListItem {...renderItem} />
+      <View>{children}</View>
+      {/* <InventoryListItem {...renderItem} /> */}
     </SwipeItem>
   );
 };
+
+export default SwipeListItem;

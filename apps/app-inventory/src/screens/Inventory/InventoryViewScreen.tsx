@@ -114,7 +114,7 @@ export const InventoryViewScreen = () => {
       readonly={isBlocked}
       edit={true}
       del={true}
-      navigate="InventoryLine"
+      routeName="InventoryLine"
     >
       <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>

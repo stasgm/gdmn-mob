@@ -104,7 +104,7 @@ const OrderViewScreen = () => {
   // );
 
   const renderItem = ({ item }: { item: IOrderLine }) => (
-    <SwipeLineItem docId={order.id} item={item} readonly={isBlocked} edit={true} del={true} navigate="OrderLine">
+    <SwipeLineItem docId={order.id} item={item} readonly={isBlocked} edit={true} del={true} routeName="OrderLine">
       <OrderItem docId={order.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );

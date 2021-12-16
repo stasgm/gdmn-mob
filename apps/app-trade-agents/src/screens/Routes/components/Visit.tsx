@@ -7,7 +7,15 @@ import { docSelectors, documentActions, refSelectors, useSelector } from '@lib/s
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { BackButton, BottomSheet, InfoBlock, ItemSeparator, PrimeButton, RadioGroup } from '@lib/mobile-ui';
+import {
+  BackButton,
+  BottomSheet,
+  InfoBlock,
+  ItemSeparator,
+  PrimeButton,
+  RadioGroup,
+  SwipeListItem,
+} from '@lib/mobile-ui';
 import { useSendDocs } from '@lib/mobile-app';
 
 import { useDispatch } from '../../../store';
@@ -15,10 +23,8 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
-import { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
-import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
-import OrderSwipeListItem from '../../Orders/components/OrderSwipeListItem';
-import { IOrderListRenderItemProps } from '../../Orders/components/OrderListItem';
+import ReturnListItem, { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
+import OrderListItem, { IOrderListRenderItemProps } from '../../Orders/components/OrderListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -225,7 +231,11 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const renderOrderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
     const doc = orderDocs.find((r) => r.id === item.id);
-    return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} navigate="OrderView">
+        <OrderListItem {...item} />
+      </SwipeListItem>
+    ) : null;
   };
 
   const returns: IReturnListRenderItemProps[] = useMemo(() => {
@@ -245,7 +255,11 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const renderReturnItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
     const doc = returnDocs.find((r) => r.id === item.id);
-    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} navigate="ReturnView">
+        <ReturnListItem {...item} />
+      </SwipeListItem>
+    ) : null;
   };
 
   const readyDocs = useMemo(() => {
@@ -278,7 +292,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title="Заявки">
+          <InfoBlock colorLabel="#E3C920" title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -289,7 +303,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title="Возвраты">
+          <InfoBlock colorLabel="#E3C920" title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}

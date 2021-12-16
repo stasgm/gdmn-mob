@@ -14,14 +14,14 @@ import {
   ItemSeparator,
   Status,
   AppScreen,
+  SwipeListItem,
 } from '@lib/mobile-ui';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getDateString } from '../../utils/helpers';
 
-import { IReturnListRenderItemProps } from './components/ReturnListItem';
-import ReturnSwipeListItem from './components/ReturnSwipeListItem';
+import ReturnListItem, { IReturnListRenderItemProps } from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
@@ -59,7 +59,11 @@ const ReturnListScreen = () => {
 
   const renderItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
+        <ReturnListItem {...item} />
+      </SwipeListItem>
+    ) : null;
   };
 
   const handleAddDocument = useCallback(() => {

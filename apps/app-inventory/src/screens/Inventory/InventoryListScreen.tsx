@@ -11,6 +11,7 @@ import {
   SubTitle,
   AddButton,
   FilterButtons,
+  SwipeListItem,
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
@@ -18,9 +19,7 @@ import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { IInventoryDocument } from '../../store/types';
 
-import { IInventoryListRenderItemProps } from './components/InventoryListItem';
-
-import { InventorySwipeListItem } from './components/InventorySwipeListItem';
+import { IInventoryListRenderItemProps, InventoryListItem } from './components/InventoryListItem';
 
 export interface InventoryListProps {
   orders: IInventoryListRenderItemProps[];
@@ -106,7 +105,11 @@ export const InventoryListScreen = () => {
 
   const renderItem: ListRenderItem<IInventoryListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <InventorySwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="InventoryView">
+        <InventoryListItem {...item} />
+      </SwipeListItem>
+    ) : null;
   };
 
   return (

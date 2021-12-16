@@ -13,16 +13,16 @@ interface IProps {
   edit?: boolean;
   copy?: boolean;
   del?: boolean;
-  navigate: 'OrderLine' | 'ReturnLine' | 'InventoryLine';
+  routeName: string;
 }
 
-const OrderSwipeLineItem = ({ children, docId, item, readonly, edit, copy, del, navigate }: IProps) => {
+const SwipeLineItem = ({ children, docId, item, readonly, edit, copy, del, routeName }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string) => {
     if (name === 'edit') {
-      navigation.navigate(navigate, { mode: 0, docId, item });
+      navigation.navigate(routeName, { mode: 0, docId, item });
     } else if (name === 'delete') {
       Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
         {
@@ -47,4 +47,4 @@ const OrderSwipeLineItem = ({ children, docId, item, readonly, edit, copy, del, 
   );
 };
 
-export default OrderSwipeLineItem;
+export default SwipeLineItem;

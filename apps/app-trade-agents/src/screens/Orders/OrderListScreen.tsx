@@ -14,13 +14,13 @@ import {
   Status,
   AppScreen,
   SubTitle,
+  SwipeListItem,
 } from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
 
-import { IOrderListRenderItemProps } from './components/OrderListItem';
-import OrderSwipeListItem from './components/OrderSwipeListItem';
+import OrderListItem, { IOrderListRenderItemProps } from './components/OrderListItem';
 
 export interface OrderListProps {
   orders: IOrderListRenderItemProps[];
@@ -122,7 +122,11 @@ const OrderListScreen = () => {
 
   const renderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <OrderSwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
+        <OrderListItem {...item} />
+      </SwipeListItem>
+    ) : null;
   };
 
   return (

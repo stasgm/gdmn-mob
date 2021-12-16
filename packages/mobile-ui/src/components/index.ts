@@ -15,3 +15,4 @@ export { default as SettingsItem } from './SettingsItem';
 export { default as DescriptionItem } from './DescriptionItem';
 export { default as SwipeItem } from './SwipeItem';
 export { default as SwipeLineItem } from './SwipeLineItem';
+export { default as SwipeListItem } from './SwipeListItem';
