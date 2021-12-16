@@ -19,7 +19,7 @@ const {
   debug: { useMockup },
 } = config;
 
-const initialState: Readonly<AuthState> = {
+export const initialState: Readonly<AuthState> = {
   user: undefined,
   device: undefined,
   company: undefined,
@@ -50,6 +50,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setConfig):
       return { ...state, config: action.payload };
+
+    case getType(actions.loadDataAsync.request):
+      return { ...state, loading: true, status: '', error: false };
+
+    case getType(actions.loadDataAsync.success):
+      return { ...state, ...action.payload, loading: false, status: '', error: false };
+
+    case getType(actions.loadDataAsync.failure):
+      return { ...state, loading: false, status: action.payload, error: true };
 
     case getType(actions.getDeviceByUidAsync.request):
       return { ...state, loading: true, status: '', error: false, device: undefined };
@@ -207,7 +216,8 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       };
 
     case getType(actions.setDemoModeAsync.success):
-      return { ...state,
+      return {
+        ...state,
         connectionStatus: 'connected',
         user: mockUser,
         device: mockDevice,
@@ -215,7 +225,6 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         // settings: { ...state.settings, debug: { ...state.settings.debug, isMock: true } },
         isDemo: true,
       };
-
 
     case getType(actions.setDemoModeAsync.failure):
       return { ...state, loading: false, status: '', error: true };

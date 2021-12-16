@@ -2,7 +2,7 @@ import { IApiConfig } from '@lib/client-types';
 import { IDevice, IUser, ICompany, DeviceState, IUserSettings } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { ConnectionStatus } from './types';
+import { AuthState, ConnectionStatus } from './types';
 
 const init = createAction('AUTH/INIT')();
 const clearError = createAction('AUTH/CLEAR_ERROR')();
@@ -14,6 +14,12 @@ const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 //const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
 const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
+
+const loadDataAsync = createAsyncAction('AUTH/LOAD_DATA', 'AUTH/LOAD_DATA_SUCCESS', 'AUTH/LOAD_DATA_FAILURE')<
+  undefined,
+  AuthState,
+  string
+>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -77,6 +83,7 @@ const setDemoModeAsync = createAsyncAction(
 
 export const actions = {
   init,
+  loadDataAsync,
   clearError,
   setConfig,
   disconnectAsync,

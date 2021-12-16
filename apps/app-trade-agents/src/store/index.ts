@@ -31,14 +31,14 @@ const persistAppTradeConfig = {
 };
 
 export const combinedReducer = {
-  appTrade: persistReducer(persistAppTradeConfig, appTradeReducer),
-  geo: persistReducer(persistGeoConfig, geoReducer),
+  appTrade: appTradeReducer,
+  geo: geoReducer,
 };
 
 const rootReducer = combineReducers(combinedReducer);
 
 export const { store } = configureStore(combinedReducer);
-export const persistor = persistStore(store);
+// export const persistor = persistStore(store);
 
 export type AppState = ReturnType<typeof rootReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

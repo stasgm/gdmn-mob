@@ -1,5 +1,5 @@
-import { UserAsyncStorage } from './src/utils/userAsyncStore';
-export { default as configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
+import { appStorage, saveState, loadState } from './src/utils/appStorage';
+export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
 export { TActions, IFormParam } from './src/types';
 // export { default as configActions } from './src/config';
 // export { useConfigThunkDispatch } from './src/config';
@@ -18,4 +18,4 @@ export { default as refSelectors } from './src/references/selectors';
 export { default as settingsActions } from './src/settings';
 export { useSettingThunkDispatch } from './src/settings';
 export { default as appActions } from './src/app';
-export { UserAsyncStorage };
+export { appStorage, saveState, loadState };

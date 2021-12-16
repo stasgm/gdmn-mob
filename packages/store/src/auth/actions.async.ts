@@ -13,10 +13,29 @@ import { AuthState } from './types';
 import { actions, AuthActionType } from './actions';
 import { UserAsyncStorage } from '../utils/userAsyncStore';
 import { user as mockUser } from '@lib/mock';
+import { appStorage, loadState } from '../utils/appStorage';
 
 export type AuthDispatch = ThunkDispatch<AuthState, any, AuthActionType>;
 
 export const useAuthThunkDispatch = () => useDispatch<AuthDispatch>();
+
+const loadData = (): AppThunk<
+  Promise<ActionType<typeof actions.loadDataAsync>>,
+  AuthState,
+  ActionType<typeof actions.loadDataAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.loadDataAsync.request());
+    try {
+      // const auth: AuthState = await appStorage.getItem('auth');
+      console.log('loadData');
+      const newState = await loadState();
+      return dispatch(actions.loadDataAsync.success(newState));
+    } catch {
+      return dispatch(actions.loadDataAsync.failure('Ошибка загрузки данных из json'));
+    }
+  };
+};
 
 const getDeviceByUid = (
   uid: string,
@@ -242,6 +261,7 @@ const getCompany = (
 };
 
 export default {
+  loadData,
   getDeviceByUid,
   activateDevice,
   signup,

@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { PersistGate } from 'redux-persist/integration/react';
 import { IReference, ISettingsOption, Settings } from '@lib/types';
-import { refSelectors, settingsActions, useDispatch, UserAsyncStorage, useSelector } from '@lib/store';
+import { authActions, refSelectors, settingsActions, useDispatch, useSelector, saveState, loadState } from '@lib/store';
 
 import { Caption } from 'react-native-paper';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { persistor, store, useAppTradeThunkDispatch, appTradeActions } from './src/store';
+import { Store } from 'redux';
+
+import { store, useAppTradeThunkDispatch, appTradeActions } from './src/store';
 
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
@@ -89,15 +91,16 @@ const Root = () => {
     },
   };
 
-  // useEffect(() => {
-  //   UserAsyncStorage.setUserId('');
-  //   const deviceUId = UserAsyncStorage.getItem('deviceUId');
-  // }, []);
-
   const storeSettings = useSelector((state) => state.settings);
 
   const dispatch = useDispatch();
   const appDispatch = useAppTradeThunkDispatch();
+
+  // useEffect(() => {
+  //   console.log('useEffect loadData');
+  //   dispatch(authActions.loadData());
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   useEffect(() => {
     if (appSettings) {
@@ -260,6 +263,8 @@ const Root = () => {
     setLoading(false);
   }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
 
+  // const persistedState = loadState();
+
   // useEffect(() => {
   //   console.log('useEffect setModel');
   //   setLoading(true);
@@ -336,11 +341,27 @@ const Root = () => {
   );
 };
 
+// const StoreProvider = ({ children }: { children?: ReactNode }) => {
+//   const [myStore, setStore] = useState<Store | null>(null);
+//   // const userId = useSelector((state) => state.auth.user?.id);
+//   console.log('store', myStore);
+
+//   useEffect(() => {
+//     store.then((str: any) => setStore(str)).catch(() => console.log('err'));
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, []);
+
+//   if (!myStore) {
+//     return <></>;
+//   } // or whatever
+//   return <Provider store={myStore}>{children}</Provider>;
+// };
+
 const App = () => (
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <Root />
-    </PersistGate>
+    {/* <PersistGate loading={null} persistor={persistor}> */}
+    <Root />
+    {/* </PersistGate> */}
   </Provider>
 );
 
