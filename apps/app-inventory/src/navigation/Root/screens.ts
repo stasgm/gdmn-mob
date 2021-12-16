@@ -1,5 +1,5 @@
 import {
-  InventoryEditScreen,
+  InventoryEditScreen1,
   SelectGoodScreen,
   InventoryListScreen,
   InventoryViewScreen,
@@ -12,7 +12,7 @@ import { ScanBarcodeScreen } from '../../screens/Inventory/components/Scanners/S
 import { ScanBarcodeReaderScreen } from '../../screens/Inventory/components/Scanners/ScanBarcodeReader';
 
 export const inventoryScreens = {
-  InventoryEdit: InventoryEditScreen,
+  InventoryEdit: InventoryEditScreen1,
   InventoryView: InventoryViewScreen,
   InventoryLine: InventoryLineScreen,
   SelectRefItem: SelectRefItemScreen,

@@ -12,8 +12,12 @@ type Props = {
 };
 
 const SettingsItem = ({ label, value, onValueChange }: Props) => {
-  const [currentValue, setCurrentValue] = useState(value);
+  //console.log('Svalue', value);
+  //console.log('Slabel', label);
+  //console.log('Sfuction', onValueChange);
 
+  const [currentValue, setCurrentValue] = useState(value);
+  //console.log('valueS', value);
   return (
     <View>
       {typeof currentValue === 'boolean' ? (
@@ -21,7 +25,7 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
           <Subheading numberOfLines={5} style={localStyles.subHeading}>
             {label}
           </Subheading>
-          <Switch value={currentValue} onValueChange={(item) => onValueChange(item)} />
+          <Switch value={currentValue} onValueChange={(item) => onValueChange(item)} children={undefined} />
         </View>
       ) : (
         <View style={localStyles.settingsContainer}>
@@ -34,14 +38,6 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               keyboardType={'numeric'}
             />
           ) : (
-            // ) : typeof currentValue === 'string' ? (
-            //   <Input
-            //     label={label}
-            //     value={currentValue}
-            //     onChangeText={(text) => setCurrentValue(text)}
-            //     keyboardType={'default'}
-            //     onEndEditing={() => onValueChange(currentValue)}
-            //   />
             <Input
               label={label}
               value={currentValue}

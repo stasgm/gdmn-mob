@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { IReference, Settings } from '@lib/types';
+import { IReference, Settings, SettingsDoc } from '@lib/types';
 import { PersistGate } from 'redux-persist/integration/react';
 import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles } from '@lib/mobile-ui';
@@ -69,6 +70,29 @@ const Root = () => {
     },
   };
 
+  /* const listRequisites: SettingsDoc = {
+    docNumber: {
+      id: '1',
+      name: 'number',
+      typeInput: 'string',
+      sortOrder: 1,
+      description: 'Номер документа',
+      clearInput: true,
+      disabled: true,
+      onChangeText: 'onChangeText',
+    },
+    docComment: {
+      id: '2',
+      name: 'comment',
+      typeInput: 'string',
+      sortOrder: 2,
+      description: 'Комментарий',
+      clearInput: true,
+      disabled: true,
+      onChangeText: 'onChangeText',
+    },
+  }; */
+
   const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
@@ -82,7 +106,6 @@ const Root = () => {
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeSettings]);
 
   const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;

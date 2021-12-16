@@ -14,13 +14,6 @@ const SettingsSceen = () => {
 
   const { data } = useSelector((state) => state.settings);
   const { settings } = useSelector((state) => state.auth);
-  /////
-  // const settingList = useMemo(() => {
-  //   return Object.entries(data)
-  //     .map(([key, value]) => ({ ...value, setName: key } as SettingListItem))
-  //     .filter((i) => i.visible);
-  // }, [data]);
-
   Object.entries(data).forEach((item) => {
     if (!item[1]?.group) {
       item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
@@ -39,6 +32,8 @@ const SettingsSceen = () => {
     },
     [],
   );
+  //console.log('SettS1', parents);
+  //console.log('SettS2', data);
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     dispatch(settingsActions.updateOption({ optionName, value }));
@@ -71,18 +66,6 @@ const SettingsSceen = () => {
 
   const serverPath = `${settings?.protocol}${settings?.server}:${settings?.port}/${settings?.apiPath}`;
 
-  // const renderItem = ({ item }: { item: SettingListItem }) => (
-  //   <SettingsItem
-  //     key={item.id}
-  //     label={item.description || item.setName}
-  //     value={item.data}
-  //     onValueChange={(newValue) => {
-  //       const { setName, ...rest } = item;
-  //       handleUpdate(item.setName, { ...rest, data: newValue });
-  //     }}
-  //   />
-  // );
-
   return (
     <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
       <View>
@@ -99,27 +82,6 @@ const SettingsSceen = () => {
         </View>
       </View>
       <View>
-        {/* <Text style={[styles.title]}>Настройки приложения</Text> */}
-        <Divider />
-        {/* <View>
-          {/* <View style={[localStyles.border, { borderColor: colors.primary }]}> *
-          {Object.entries(data)
-            .filter(([_, item]) => item?.visible)
-            .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
-            .map(([key, item]) => {
-              return item ? (
-                <View key={key}>
-                  <SettingsItem
-                    key={key}
-                    label={item.description || key}
-                    value={item.data}
-                    onValueChange={(newValue) => handleUpdate(key, { ...item, data: newValue })}
-                  />
-                  <Divider />
-                </View>
-              ) : null;
-            })}
-        </View> */}
         <View>
           {parents.map((item, key) => {
             return item ? (
