@@ -16,13 +16,14 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
-import InventorySwipeLineItem from './components/InventorySwipeLineItem';
+import { InventoryItem } from './components/InventoryItem';
 
 export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -107,7 +108,16 @@ export const InventoryViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <InventorySwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} edit={true} del={true} />
+    <SwipeLineItem
+      docId={inventory.id}
+      item={item}
+      readonly={isBlocked}
+      edit={true}
+      del={true}
+      navigate="InventoryLine"
+    >
+      <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+    </SwipeLineItem>
   );
 
   return (

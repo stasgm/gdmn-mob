@@ -13,6 +13,7 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -26,7 +27,6 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import ReturnItem from './components/ReturnItem';
-import ReturnSwipeLineItem from './components/ReturnSwipeLineItem';
 
 const ReturnViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -99,7 +99,9 @@ const ReturnViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IReturnLine }) => (
-    <ReturnSwipeLineItem docId={returnDoc.id} item={item} readonly={isBlocked} edit={true}del={true} />
+    <SwipeLineItem docId={returnDoc.id} item={item} readonly={isBlocked} edit={true} del={true} navigate="ReturnLine">
+      <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+    </SwipeLineItem>
   );
 
   return (

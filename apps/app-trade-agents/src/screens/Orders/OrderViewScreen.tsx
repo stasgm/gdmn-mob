@@ -14,6 +14,7 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { IOrderDocument, IOrderLine } from '../../store/types';
@@ -25,7 +26,6 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import OrderItem from './components/OrderItem';
-import OrderSwipeLineItem from './components/OrderSwipeLineItem';
 
 const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -104,7 +104,9 @@ const OrderViewScreen = () => {
   // );
 
   const renderItem = ({ item }: { item: IOrderLine }) => (
-    <OrderSwipeLineItem docId={order.id} item={item} readonly={isBlocked} edit={true} del={true} />
+    <SwipeLineItem docId={order.id} item={item} readonly={isBlocked} edit={true} del={true} navigate="OrderLine">
+      <OrderItem docId={order.id} item={item} readonly={isBlocked} />
+    </SwipeLineItem>
   );
 
   return (
