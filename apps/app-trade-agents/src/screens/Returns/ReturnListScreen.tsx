@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { FlatList, ListRenderItem, RefreshControl, Text, View } from 'react-native';
+import { FlatList, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
@@ -17,18 +17,27 @@ import {
   SwipeListItem,
   ScreenListItem,
   IListItemProps,
+  SubTitle,
 } from '@lib/mobile-ui';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getDateString } from '../../utils/helpers';
 
+export interface OrderListSectionProps {
+  title: string;
+}
+
+export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
+
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
   const showActionSheet = useActionSheet();
 
   const { loading } = useSelector((state) => state.documents);
-  const list = docSelectors.selectByDocType<IReturnDocument>('return');
+  const list = docSelectors
+    .selectByDocType<IReturnDocument>('return')
+    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -57,14 +66,27 @@ const ReturnListScreen = () => {
     );
   }, [status, list]);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
-        <ScreenListItem {...item} routeName="ReturnView" />
-      </SwipeListItem>
-    ) : null;
-  };
+  const sections = useMemo(
+    () =>
+      filteredList.reduce<SectionDataProps>((prev, item) => {
+        const sectionTitle = item.documentDate;
+        const sectionExists = prev.some(({ title }) => title === sectionTitle);
+        if (sectionExists) {
+          return prev.map((section) =>
+            section.title === sectionTitle ? { ...section, data: [...section.data, item] } : section,
+          );
+        }
+
+        return [
+          ...prev,
+          {
+            title: sectionTitle,
+            data: [item],
+          },
+        ];
+      }, []),
+    [filteredList],
+  );
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ReturnEdit');
@@ -95,14 +117,26 @@ const ReturnListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
+    const doc = list.find((r) => r.id === item.id);
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
+        <ScreenListItem {...item} routeName="ReturnView" />
+      </SwipeListItem>
+    ) : null;
+  };
+
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
-      <FlatList
-        data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+      <SectionList
+        sections={sections}
+        keyExtractor={({ id }) => id}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        renderSectionHeader={({ section }) => (
+          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+        )}
         scrollEventThrottle={400}
         onEndReached={() => ({})}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
