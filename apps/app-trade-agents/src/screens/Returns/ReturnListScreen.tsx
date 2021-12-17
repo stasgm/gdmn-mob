@@ -15,13 +15,13 @@ import {
   Status,
   AppScreen,
   SwipeListItem,
+  ScreenListItem,
+  IListItemProps,
 } from '@lib/mobile-ui';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getDateString } from '../../utils/helpers';
-
-import ReturnListItem, { IReturnListRenderItemProps } from './components/ReturnListItem';
 
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
@@ -53,15 +53,15 @@ const ReturnListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IReturnListRenderItemProps),
+        } as IListItemProps),
     );
   }, [status, list]);
 
-  const renderItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
-        <ReturnListItem {...item} />
+      <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
+        <ScreenListItem {...item} routeName="ReturnView" />
       </SwipeListItem>
     ) : null;
   };

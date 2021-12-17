@@ -99,7 +99,7 @@ const ReturnViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IReturnLine }) => (
-    <SwipeLineItem docId={returnDoc.id} item={item} readonly={isBlocked} edit={true} del={true} routeName="ReturnLine">
+    <SwipeLineItem docId={returnDoc.id} item={item} readonly={isBlocked} copy={false} routeName="ReturnLine">
       <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );

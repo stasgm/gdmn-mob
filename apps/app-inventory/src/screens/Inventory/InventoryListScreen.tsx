@@ -12,6 +12,8 @@ import {
   AddButton,
   FilterButtons,
   SwipeListItem,
+  ScreenListItem,
+  IListItemProps,
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
@@ -19,16 +21,14 @@ import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { IInventoryDocument } from '../../store/types';
 
-import { IInventoryListRenderItemProps, InventoryListItem } from './components/InventoryListItem';
-
 export interface InventoryListProps {
-  orders: IInventoryListRenderItemProps[];
+  orders: IListItemProps[];
 }
 
 export interface InventoryListSectionProps {
   title: string;
 }
-export type SectionDataProps = SectionListData<IInventoryListRenderItemProps, InventoryListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, InventoryListSectionProps>[];
 
 export const InventoryListScreen = () => {
   const navigation = useNavigation();
@@ -41,7 +41,7 @@ export const InventoryListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: IInventoryListRenderItemProps[] = useMemo(() => {
+  const filteredList: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
         ? list
@@ -62,7 +62,7 @@ export const InventoryListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IInventoryListRenderItemProps),
+        } as IListItemProps),
     );
   }, [status, list]);
 
@@ -103,11 +103,11 @@ export const InventoryListScreen = () => {
     });
   }, [handleAddDocument, navigation]);
 
-  const renderItem: ListRenderItem<IInventoryListRenderItemProps> = ({ item }) => {
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="InventoryView">
-        <InventoryListItem {...item} />
+      <SwipeListItem renderItem={item} item={doc} routeName="InventoryView">
+        <ScreenListItem {...item} routeName="InventoryView" />
       </SwipeListItem>
     ) : null;
   };

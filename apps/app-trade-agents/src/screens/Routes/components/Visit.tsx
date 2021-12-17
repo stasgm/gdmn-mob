@@ -14,6 +14,8 @@ import {
   ItemSeparator,
   PrimeButton,
   RadioGroup,
+  ScreenListItem,
+  IListItemProps,
   SwipeListItem,
 } from '@lib/mobile-ui';
 import { useSendDocs } from '@lib/mobile-app';
@@ -23,8 +25,6 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
-import ReturnListItem, { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
-import OrderListItem, { IOrderListRenderItemProps } from '../../Orders/components/OrderListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -214,7 +214,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     docTypeRef.current?.present();
   };
 
-  const orders: IOrderListRenderItemProps[] = useMemo(() => {
+  const orders: IListItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
       const creationDate = new Date(i.editionDate || i.creationDate || 0);
       return {
@@ -225,20 +225,20 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: false,
         lineCount: i.lines.length,
-      } as IOrderListRenderItemProps;
+      } as IListItemProps;
     });
   }, [orderDocs]);
 
-  const renderOrderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
+  const renderOrderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = orderDocs.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} navigate="OrderView">
-        <OrderListItem {...item} />
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
+        <ScreenListItem {...item} routeName="ReturnView" />
       </SwipeListItem>
     ) : null;
   };
 
-  const returns: IReturnListRenderItemProps[] = useMemo(() => {
+  const returns: IListItemProps[] = useMemo(() => {
     return returnDocs.map((i) => {
       const creationDate = new Date(i.editionDate || i.creationDate || 0);
       return {
@@ -249,15 +249,15 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: false,
         lineCount: i.lines.length,
-      } as IReturnListRenderItemProps;
+      } as IListItemProps;
     });
   }, [returnDocs]);
 
-  const renderReturnItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
+  const renderReturnItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = returnDocs.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} navigate="ReturnView">
-        <ReturnListItem {...item} />
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
+        <ScreenListItem {...item} routeName="ReturnView" />
       </SwipeListItem>
     ) : null;
   };

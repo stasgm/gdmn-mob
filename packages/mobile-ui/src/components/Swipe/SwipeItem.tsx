@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton } from 'react-native-gesture-handler';
 
-export interface OrderListItemProps {
+export interface ListItemProps {
   children?: ReactNode;
   onPress: (name: 'edit' | 'copy' | 'delete') => void;
   edit?: boolean;
@@ -12,7 +12,7 @@ export interface OrderListItemProps {
   del?: boolean;
 }
 
-const SwipeItem = ({ children, onPress, edit = true, copy = true, del = true }: OrderListItemProps) => {
+const SwipeItem = ({ children, onPress, edit = true, copy = true, del = true }: ListItemProps) => {
   const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
 
   let ref = useRef(null);

@@ -13,6 +13,5 @@ export { default as InfoBlock } from './InfoBlock';
 export { default as SettingsGroup } from './SettingsGroup';
 export { default as SettingsItem } from './SettingsItem';
 export { default as DescriptionItem } from './DescriptionItem';
-export { default as SwipeItem } from './SwipeItem';
-export { default as SwipeLineItem } from './SwipeLineItem';
-export { default as SwipeListItem } from './SwipeListItem';
+export { SwipeItem, SwipeLineItem, SwipeListItem } from './Swipe';
+export { default as ScreenListItem, IListItemProps } from './ScreenListItem';
