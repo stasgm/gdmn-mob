@@ -1,15 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ItemSeparator } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import { IGood, IOrderLine, IPackageGood } from '../../../store/types';
+import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 
@@ -148,11 +148,11 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
         </View>
       </ScrollView>
-      {mode ? (
+      {/* {mode ? (
         <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
           Удалить позицию
         </PrimeButton>
-      ) : null}
+      ) : null} */}
     </>
   );
 };

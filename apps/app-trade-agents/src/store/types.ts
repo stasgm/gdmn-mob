@@ -14,7 +14,6 @@ import {
 
 import { ICoords } from './geo/types';
 
-// eslint-disable-next-line import/no-cycle
 import { IGood } from './app/types';
 
 export { IGood };

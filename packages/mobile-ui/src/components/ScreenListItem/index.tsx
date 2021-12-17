@@ -3,16 +3,12 @@ import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-
-import { globalStyles as styles } from '@lib/mobile-ui';
-
 import { StatusType } from '@lib/types';
 
-import { getStatusColor } from '../../../utils/constants';
-import { OrdersStackParamList } from '../../../navigation/Root/types';
+import styles from '../../styles/global';
 
-export interface IOrderListItemProps {
+import { getStatusColor } from './constants';
+export interface IListItemProps {
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -20,12 +16,11 @@ export interface IOrderListItemProps {
   isFromRoute?: boolean;
   lineCount?: number;
   errorMessage?: string;
-}
-export interface IOrderListRenderItemProps extends IOrderListItemProps {
   id: string;
+  routeName: string;
 }
 
-const OrderListItem = ({
+const ScreenListItem = ({
   id,
   title,
   subtitle,
@@ -33,14 +28,15 @@ const OrderListItem = ({
   lineCount,
   isFromRoute,
   errorMessage,
-}: IOrderListRenderItemProps) => {
+  routeName,
+}: IListItemProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
+  const navigation = useNavigation();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('OrderView', { id });
+        navigation.navigate(routeName, { id });
       }}
     >
       <View style={styles.item}>
@@ -72,4 +68,4 @@ const OrderListItem = ({
   );
 };
 
-export default OrderListItem;
+export default ScreenListItem;

@@ -18,8 +18,9 @@ import { IOutlet, IRouteDocument } from '../../store/types';
 
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
-import localStyles from './styles';
 import { getDateString } from '../../utils/helpers';
+
+import localStyles from './styles';
 
 interface Region {
   latitude: number;
@@ -232,8 +233,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                    ? localStyles.selectedMark
-                    : localStyles.mark,
+                  ? localStyles.selectedMark
+                  : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>
@@ -245,7 +246,9 @@ const MapScreen = () => {
       {selectedItem && (
         <View style={localStyles.statusContainer}>
           <View style={{ width: '80%' }}>
-            <Text style={localStyles.routeName}>Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}</Text>
+            <Text style={localStyles.routeName}>
+              Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}
+            </Text>
             {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
           </View>
           <View>
