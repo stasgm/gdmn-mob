@@ -12,7 +12,7 @@ export interface OrderListItemProps {
   del?: boolean;
 }
 
-const SwipeItem = ({ children, onPress, edit, copy, del }: OrderListItemProps) => {
+const SwipeItem = ({ children, onPress, edit = true, copy = true, del = true }: OrderListItemProps) => {
   const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
 
   let ref = useRef(null);
@@ -23,9 +23,9 @@ const SwipeItem = ({ children, onPress, edit, copy, del }: OrderListItemProps) =
 
   const renderRightActions = (progress: unknown) => (
     <View style={localStyles.swipeViewItem}>
-      {edit ? renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress) : null}
-      {copy ? renderRightAction('copy', 'content-copy', '#00aaff', 120, progress) : null}
-      {del ? renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress) : null}
+      {edit && renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress)}
+      {copy && renderRightAction('copy', 'content-copy', '#00aaff', 120, progress)}
+      {del && renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress)}
     </View>
   );
 

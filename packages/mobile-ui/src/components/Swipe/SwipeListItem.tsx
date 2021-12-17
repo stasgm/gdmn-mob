@@ -18,7 +18,7 @@ interface IProps {
   routeName: string;
 }
 
-const SwipeListItem = ({ children, item, renderItem, edit, del, copy, routeName }: IProps) => {
+const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
@@ -68,7 +68,6 @@ const SwipeListItem = ({ children, item, renderItem, edit, del, copy, routeName 
       del={del}
     >
       <View>{children}</View>
-      {/* <InventoryListItem {...renderItem} /> */}
     </SwipeItem>
   );
 };

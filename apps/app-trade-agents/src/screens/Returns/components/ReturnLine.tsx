@@ -1,5 +1,5 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ItemSeparator } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 

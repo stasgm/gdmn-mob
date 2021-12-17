@@ -1,15 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
-import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ItemSeparator } from '@lib/mobile-ui';
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { INamedEntity, IReference } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import { IGood, IOrderLine, IPackageGood } from '../../../store/types';
+import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import { OrdersStackParamList } from '../../../navigation/Root/types';
 
@@ -55,19 +55,19 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     });
   }, []);
 
-  // const handleDelete = useCallback(() => {
-  //   !!mode &&
-  //     Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-  //       {
-  //         text: 'Удалить',
-  //         onPress: () => {
-  //           dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
-  //           navigation.goBack();
-  //         },
-  //       },
-  //       { text: 'Отмена' },
-  //     ]);
-  // }, [dispatch, docId, item.id, mode, navigation]);
+  const handleDelete = useCallback(() => {
+    !!mode &&
+      Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
+        {
+          text: 'Удалить',
+          onPress: () => {
+            dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
+            navigation.goBack();
+          },
+        },
+        { text: 'Отмена' },
+      ]);
+  }, [dispatch, docId, item.id, mode, navigation]);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
