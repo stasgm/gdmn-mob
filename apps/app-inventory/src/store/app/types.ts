@@ -30,7 +30,11 @@ export interface IGood extends INamedEntity {
   goodGroup: INamedEntity; // группа товаров
   valuename?: string; // Наименование ед. изм.
   invWeight?: number; // Вес единицы товара
-  priceFso: number; // цена ФСО
   price?: number; //Цена
   scale?: number; //количество единиц в месте
+}
+
+export interface IRem extends IGood {
+  remains?: number;
+  price?: number;
 }

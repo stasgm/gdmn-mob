@@ -43,13 +43,10 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
 
   useEffect(() => {
     if (!scanned && ref?.current) {
-      console.log('ref?.current11');
       ref.current.focus();
       ref.current.clear();
     }
   }, [scanned, ref]);
-
-  console.log('current', ref.current?.context);
 
   return (
     <KeyboardAvoidingView

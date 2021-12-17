@@ -5,6 +5,16 @@ export const styles = StyleSheet.create({
     flex: 1,
     margin: 5,
   },
+  barcode: {
+    alignItems: 'flex-end',
+  },
+  fieldDesciption: {
+    opacity: 0.5,
+  },
+  itemInfo: {
+    fontSize: 12,
+    opacity: 0.4,
+  },
   content: {
     height: '100%',
     padding: 3,
@@ -25,7 +35,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   flexGrow: {
-    flexGrow: 10,
+    flexGrow: 8,
   },
   header: {
     flexDirection: 'row',
@@ -56,6 +66,7 @@ export const styles = StyleSheet.create({
   searchBar: {
     elevation: 0,
     shadowOpacity: 0,
+    fontSize: 6,
   },
   textDescription: {
     fontSize: 11,
@@ -71,6 +82,5 @@ export const styles = StyleSheet.create({
   input: {
     height: 40,
     marginLeft: 12,
-    // borderWidth: 1,
   },
 });

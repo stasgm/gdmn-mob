@@ -24,7 +24,6 @@ interface IProps {
 export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  console.log('InventoryLine', item);
   const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
