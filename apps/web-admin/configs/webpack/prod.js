@@ -12,6 +12,7 @@ module.exports = merge(commonConfig, {
     path: getRootRelativePath(config.webpack.buildPath),
     filename: 'js/bundle.[contenthash].min.js',
     publicPath: '/admin/',
+    assetModuleFilename: 'assets/images/[name][ext]'
   },
   devtool: 'source-map',
   plugins: [

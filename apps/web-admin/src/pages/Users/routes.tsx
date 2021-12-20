@@ -1,5 +1,5 @@
 import { Navigate, useRoutes } from 'react-router-dom';
-import { PartialRouteObject } from 'react-router';
+import { RouteObject } from 'react-router';
 
 import UserDeviceView from './UserDeviceView';
 
@@ -11,7 +11,7 @@ import UserCreate from './UserCreate';
 import UserList from './UserList';
 import UserDeviceCreate from './UserDeviceCreate';
 
-const routes: PartialRouteObject[] = [
+const routes: RouteObject[] = [
   { path: '/', element: <UserList /> },
   { path: '/new', element: <UserCreate /> },
   { path: '/:id', element: <UserView /> },
