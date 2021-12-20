@@ -1,5 +1,5 @@
 {
-  "name": "@apps/docs-inventory",
+  "name": "@apps/inventory",
   "version": "1.0.0",
   "private": true,
   "main": "__generated__/AppEntry.js",

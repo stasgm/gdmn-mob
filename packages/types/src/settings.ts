@@ -1,4 +1,4 @@
-import { IDepartment } from '../src/document';
+//import { IDepartment } from '../src/document';
 
 import { IEntity, ISortEntity } from './common';
 
@@ -53,16 +53,18 @@ const InvSettings: Settings<IInvSettings> =  {
 }; */
 
 export type SettingValueDoc = string | number | boolean | undefined;
+export type RefTypeChoose = 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
 
 interface ISettingsOptionDoc<T = SettingValueDoc> extends IEntity {
   description: string;
-  type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
+  type: RefTypeChoose;
   refName?: string;
   sortOrder?: number;
   clearInput?: boolean;
   disabled?: boolean;
   onChangeText?: string;
   value?: any;
+  requeried?: boolean;
 }
 
 type SettingsDoc<T = Record<string, SettingValueDoc>> = {
