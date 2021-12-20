@@ -1,18 +1,41 @@
-// import { Reducer } from 'redux';
-// import { getType } from 'typesafe-actions';
+import { Reducer } from 'redux';
+import { getType } from 'typesafe-actions';
 
-// import { appActions, AppActionType } from './actions';
-// import { IAppState } from './types';
+import { actions, AppTradeActionType } from './actions';
 
-// const initialState: Readonly<IAppState> = {
-//   formParams: {},
-// };
+import { AppTradeState } from './types';
 
-// const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
-//   switch (action.type) {
-//     default:
-//       return state;
-//   }
-// };
+const initialState: Readonly<AppTradeState> = {
+  goodModel: {},
+  loading: false,
+  errorMessage: '',
+};
 
-// export default reducer;
+const reducer: Reducer<AppTradeState, AppTradeActionType> = (state = initialState, action): AppTradeState => {
+  switch (action.type) {
+    case getType(actions.init):
+      return initialState;
+
+    case getType(actions.setGoodModelAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(actions.setGoodModelAsync.success):
+      return {
+        ...state,
+        loading: false,
+        goodModel: action.payload,
+      };
+
+    case getType(actions.setGoodModelAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    default:
+      return state;
+  }
+};
+
+export default reducer;

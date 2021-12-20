@@ -8,11 +8,15 @@ import { persistStore, persistReducer } from 'redux-persist';
 
 import geoReducer from './geo/reducer';
 import { GeoActionType } from './geo/actions';
+import appTradeReducer from './app/reducer';
+import { AppTradeActionType } from './app/actions';
 
-// export { default as geoActions } from './geo';
-// export { useGeoThunkDispatch } from './geo';
+export { default as geoActions } from './geo';
 
-type TActions = GeoActionType;
+export { default as appTradeActions } from './app/actions.async';
+export { useAppTradeThunkDispatch } from './app/actions.async';
+
+type TActions = GeoActionType | AppTradeActionType;
 
 const persistGeoConfig = {
   key: 'geo',
@@ -20,9 +24,14 @@ const persistGeoConfig = {
   whitelist: ['list'],
 };
 
+const persistAppTradeConfig = {
+  key: 'appTrade',
+  storage: AsyncStorage,
+  whitelist: ['goodModel'],
+};
+
 export const combinedReducer = {
-  // app: appReducer,
-  //visits: persistReducer(persistVisitsConfig, visitsReducer),
+  appTrade: persistReducer(persistAppTradeConfig, appTradeReducer),
   geo: persistReducer(persistGeoConfig, geoReducer),
 };
 

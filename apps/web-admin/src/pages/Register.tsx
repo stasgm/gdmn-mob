@@ -38,11 +38,14 @@ const Register = () => {
     enableReinitialize: true,
     initialValues: {
       name: '',
+      email: '',
       password: '',
+      verifyPassword: '',
     },
     validationSchema: yup.object({
       name: yup.string().required('Заполните это поле'),
       password: yup.string().required('Заполните это поле'),
+      verifyPassword: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values) => handleSubmit(values),
   });
@@ -129,20 +132,21 @@ const Register = () => {
               onChange={formik.handleChange}
               value={formik.values.lastName}
               variant="outlined"
-            />
+            />*/}
             <TextField
               error={Boolean(formik.touched.email && formik.errors.email)}
               fullWidth
-              helperText={formik.touched.email && formik.errors.email}
+              // helperText={formik.touched.email && formik.errors.email}
               label="Email"
               margin="normal"
               name="email"
+              placeholder="example@example.com"
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               type="email"
               value={formik.values.email}
               variant="outlined"
-            /> */}
+            />
             <TextField
               error={Boolean(formik.touched.password && formik.errors.password)}
               required
@@ -155,6 +159,20 @@ const Register = () => {
               onChange={formik.handleChange}
               type="password"
               value={formik.values.password}
+              variant="outlined"
+            />
+            <TextField
+              error={Boolean(formik.touched.verifyPassword && formik.errors.verifyPassword)}
+              required
+              label="Повторите пароль"
+              fullWidth
+              helperText={formik.touched.verifyPassword && formik.errors.verifyPassword}
+              margin="normal"
+              name="verifyPassword"
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              type="password"
+              value={formik.values.verifyPassword}
               variant="outlined"
             />
             {/* <Box
@@ -175,10 +193,19 @@ const Register = () => {
             {Boolean(formik.touched.policy && formik.errors.policy) && (
               <FormHelperText error>{formik.errors.policy}</FormHelperText>
             )} */}
+            {formik.values.password !== formik.values.verifyPassword && formik.values.verifyPassword && (
+              <Box style={{ color: 'red' }}>Пароли не совпадают</Box>
+            )}
             <Box sx={{ py: 2 }}>
               <Button
                 color="primary"
-                disabled={loading || !!formik.errors.password || !!formik.errors.name}
+                disabled={
+                  loading ||
+                  !!formik.errors.password ||
+                  !!formik.errors.name ||
+                  !!formik.errors.verifyPassword ||
+                  formik.values.password !== formik.values.verifyPassword
+                }
                 fullWidth
                 size="large"
                 type="submit"

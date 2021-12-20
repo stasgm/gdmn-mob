@@ -111,7 +111,7 @@ const signIn = (
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
-  ActionType<typeof actions.loginUserAsync /* | typeof actions.setCompany */>
+  ActionType<typeof actions.loginUserAsync>
 > => {
   return async (dispatch) => {
     dispatch(actions.loginUserAsync.request(''));
@@ -119,15 +119,6 @@ const signIn = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
-      /*       // Если к пользователю привязана компания то сразу выполняем вход
-            if (response.user.company?.id) {
-              const companyResponse = await api.company.getCompany(response.user.company?.id);
-
-              if (companyResponse.type === 'GET_COMPANY') {
-                dispatch(actions.setCompany(companyResponse.company));
-              }
-            } */
-
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
@@ -136,6 +127,28 @@ const signIn = (
     }
 
     return dispatch(actions.loginUserAsync.failure('something wrong'));
+  };
+};
+
+const logout = (): AppThunk<
+  Promise<ActionType<typeof actions.logoutUserAsync>>,
+  AuthState,
+  ActionType<typeof actions.logoutUserAsync> | ActionType<typeof actions.setConnectionStatus>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.logoutUserAsync.request());
+
+    const response = await api.auth.logout();
+
+    if (response.type === 'LOGOUT') {
+      return dispatch(actions.logoutUserAsync.success());
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(actions.logoutUserAsync.failure(response.message));
+    }
+
+    return dispatch(actions.logoutUserAsync.failure('Ошибка выхода из учетной записи'));
   };
 };
 
@@ -225,12 +238,38 @@ const getDeviceStatus = (
   };
 };
 
+const getCompany = (
+  companyId: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.getCompanyAsync>>,
+  AuthState,
+  ActionType<typeof actions.getCompanyAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.getCompanyAsync.request('Получение компании'));
+
+    const response = await api.company.getCompany(companyId);
+
+    if (response.type === 'GET_COMPANY') {
+      return dispatch(actions.getCompanyAsync.success(response.company));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(actions.getCompanyAsync.failure(response.message));
+    }
+
+    return dispatch(actions.getCompanyAsync.failure('Ошибка получения компании'));
+  };
+};
+
 export default {
   getDeviceByUid,
   activateDevice,
   signUp,
   signIn,
+  logout,
   getDeviceStatus,
   useAuthThunkDispatch,
   setUserSettings,
+  getCompany,
 };

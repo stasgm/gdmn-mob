@@ -1,6 +1,4 @@
 import { DeviceState, IEntity, IExternalSystemProps, INamedEntity, UserRole } from './common';
-// eslint-disable-next-line import/no-cycle
-import { IHeadMessage, IMessage } from './messages';
 
 export interface IUserSettings {
   [fieldName: string]: IUserSetting;
@@ -19,18 +17,19 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   role: UserRole;
   firstName?: string;
   lastName?: string;
-  surName?: string;
+  middleName?: string;
   email?: string;
   phoneNumber?: string;
   creator?: INamedEntity;
   company?: INamedEntity;
-  password?: string;
   settings?: IUserSettings;
 }
 
-export type NewUser = Omit<IUser, 'id'> & { password: string };
+export type n = Omit<IUser, 'id' | 'name'>;
 
-export type IUserCredentials = Pick<IUser, 'name'> & { password: string };
+export type NewUser = Omit<IUser, 'id'> & { password: string; verifyPassword?: string };
+
+export type IUserCredentials = Pick<IUser, 'name' | 'email'> & { password: string; verifyPassword?: string };
 
 export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;
@@ -87,15 +86,4 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
   deviceId: string;
 }
 
-// Messages
-export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer'> {
-  // appSystem: string;
-  companyId: string;
-  producerId: string;
-  consumerId: string;
-  // dateTime: string;
-}
-
-export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
-  head: IDBHeadMessage;
-}
+export type IDBid = IEntity;

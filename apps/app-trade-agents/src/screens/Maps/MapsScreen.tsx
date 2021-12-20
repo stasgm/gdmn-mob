@@ -6,8 +6,10 @@ import { Snackbar } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { globalStyles as styles, Theme, BottomSheet, RadioGroup, PrimeButton } from '@lib/mobile-ui';
+import { globalStyles as styles, Theme, BottomSheet, RadioGroup } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
+
+import { IListItem } from '@lib/mobile-types';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
@@ -16,8 +18,9 @@ import { IOutlet, IRouteDocument } from '../../store/types';
 
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
+import { getDateString } from '../../utils/helpers';
+
 import localStyles from './styles';
-import { IListItem } from '@lib/mobile-types';
 
 interface Region {
   latitude: number;
@@ -45,11 +48,11 @@ const MapScreen = () => {
 
   const routeList = docSelectors
     .selectByDocType<IRouteDocument>('route')
-    ?.sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+    ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
   const currentList: IListItem[] = routeList.map((item) => ({
     id: item.id,
-    value: item.documentDate,
+    value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
   }));
 
   const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
@@ -199,7 +202,7 @@ const MapScreen = () => {
 
   const handleApplyRoute = () => {
     routeRef.current?.dismiss();
-    return initLocations();
+    initLocations();
   };
 
   return (
@@ -242,10 +245,17 @@ const MapScreen = () => {
       </MapView>
       {selectedItem && (
         <View style={localStyles.statusContainer}>
-          <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-            <Text style={localStyles.routeName}>Маршрут №{selectedItem?.number}</Text>
+          <View style={{ width: '80%' }}>
+            <Text style={localStyles.routeName}>
+              Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}
+            </Text>
             {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
-          </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
+              <MaterialCommunityIcons style={localStyles.routeIcon} name="arrow-decision" size={30} color="#000" />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
       <View style={[localStyles.buttonContainer]}>

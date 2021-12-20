@@ -22,8 +22,6 @@ const DeviceEdit = () => {
   const device = selectors.deviceById(deviceId);
   const code = activationCodeSelectors.activationCodeByDeviceId(deviceId);
 
-  console.log('5555', device?.uid);
-
   useEffect(() => {
     dispatch(actions.fetchDeviceById(deviceId));
   }, [dispatch, deviceId]);

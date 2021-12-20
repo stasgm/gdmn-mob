@@ -1,5 +1,5 @@
 import { DeviceState, IResponse, IUser, IUserCredentials } from '@lib/types';
-import { device as mockDevice, user as mockUser } from '@lib/mock';
+import { user as mockUser } from '@lib/mock';
 
 import { error, auth as types } from '../types';
 import { sleep } from '../utils';
@@ -23,7 +23,8 @@ class Auth extends BaseRequest {
 
     const body = {
       name: userCredentials.name,
-      password: userCredentials.name,
+      password: userCredentials.password,
+      email: userCredentials.email,
       // companies: companyId ? [companyId] : undefined,
       // creatorId: creatorId ?? name,
     };
@@ -46,20 +47,17 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка создания пользователя',
+        message: err instanceof TypeError ? err.message : 'ошибка создания пользователя',
+        //err?.response?.data?.error || 'ошибка создания пользователя',
       } as error.INetworkError;
     }
   };
 
   login = async (userCredentials: IUserCredentials) => {
-    // console.log('login', JSON.stringify(this.api.config));
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      if (
-        (userCredentials.name === 'ГОЦЕЛЮК' && userCredentials.password === '@123!') ||
-        (userCredentials.name === 'Stas' && userCredentials.password === '@123!')
-      ) {
+      if (userCredentials.name === mockUser.name && userCredentials.password === mockUser.password) {
         return {
           type: 'LOGIN',
           user: mockUser,
@@ -94,7 +92,8 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
+        message: err instanceof TypeError ? err.message : 'ошибка подключения',
+        //err?.response?.data?.error || 'ошибка подключения',
       } as error.INetworkError;
     }
   };
@@ -109,7 +108,7 @@ class Auth extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<undefined>>('/auth/logout');
+      const res = await this.api.axios.post<IResponse<undefined>>('/auth/logout');
       const resData = res.data;
 
       if (resData.result) {
@@ -124,8 +123,13 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка выхода',
+        message: err instanceof TypeError ? err.message : 'ошибка выхода',
       } as error.INetworkError;
+
+      // return {
+      //   type: 'ERROR',
+      //   message: err?.response?.data?.error || 'ошибка выхода',
+      // } as error.INetworkError;
     }
   };
 
@@ -152,7 +156,8 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных о пользователе',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
+        //err?.response?.data?.error || 'ошибка получения данных о пользователе',
       } as error.INetworkError;
     }
   };
@@ -181,22 +186,20 @@ class Auth extends BaseRequest {
   // };
 
   verifyCode = async (code: string) => {
-    console.log('verifyCode api');
-    if (this.api.config.debug?.isMock) {
-      await sleep(this.api.config.debug?.mockDelay || 0);
-
-      if (code === '1111') {
-        console.log('verifyCode code', code, mockDevice);
-        return {
-          type: 'VERIFY_CODE',
-          uid: mockDevice.uid,
-        } as types.IVerifyCodeResponse;
-      }
-      return {
-        type: 'ERROR',
-        message: 'Неверный код',
-      } as error.INetworkError;
-    }
+    // if (this.api.config.debug?.isMock) {
+    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    //   if (code === '1111') {
+    //     console.log('verifyCode code', code, mockDevice);
+    //     return {
+    //       type: 'VERIFY_CODE',
+    //       uid: mockDevice.uid,
+    //     } as types.IVerifyCodeResponse;
+    //   }
+    //   return {
+    //     type: 'ERROR',
+    //     message: 'Неверный код',
+    //   } as error.INetworkError;
+    // }
 
     try {
       const body = { code };
@@ -206,10 +209,6 @@ class Auth extends BaseRequest {
       const resData = res?.data;
 
       if (resData?.result) {
-        // if (resData?.data?.uid) {
-        //   this.api.config.deviceId = resData.data.uid;
-        //   console.log('this.api.config.deviceId set', this.api.config.deviceId);
-        // }
         return {
           type: 'VERIFY_CODE',
           uid: resData?.data,
@@ -223,12 +222,22 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка подключения',
+        message: err instanceof TypeError ? err.message : 'ошибка подключения',
+        //err?.response?.data?.error || 'ошибка подключения',
       } as error.INetworkError;
     }
   };
 
   getDeviceStatus = async (uid: string) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'GET_DEVICE_STATUS',
+        status: 'ACTIVE',
+      } as types.IDeviceStatusResponse; // активация устройства в mock
+    }
+
     try {
       const res = await this.api.axios.get<IResponse<DeviceState>>(`/auth/deviceStatus/${uid}`);
       const resData = res.data;
@@ -246,7 +255,8 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения статуса устройства',
+        message: err instanceof TypeError ? err.message : 'ошибка получения статуса устройства',
+        //err?.response?.data?.error || 'ошибка получения статуса устройства',
       } as error.INetworkError;
     }
   };

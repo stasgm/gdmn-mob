@@ -1,7 +1,7 @@
 import { SettingValue } from '@lib/types';
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Subheading, Switch, useTheme } from 'react-native-paper';
+import { Subheading, Switch } from 'react-native-paper';
 
 import Input from './Input';
 
@@ -33,15 +33,15 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               onEndEditing={() => onValueChange(currentValue)}
               keyboardType={'numeric'}
             />
-          // ) : typeof currentValue === 'string' ? (
-          //   <Input
-          //     label={label}
-          //     value={currentValue}
-          //     onChangeText={(text) => setCurrentValue(text)}
-          //     keyboardType={'default'}
-          //     onEndEditing={() => onValueChange(currentValue)}
-          //   />
           ) : (
+            // ) : typeof currentValue === 'string' ? (
+            //   <Input
+            //     label={label}
+            //     value={currentValue}
+            //     onChangeText={(text) => setCurrentValue(text)}
+            //     keyboardType={'default'}
+            //     onEndEditing={() => onValueChange(currentValue)}
+            //   />
             <Input
               label={label}
               value={currentValue}

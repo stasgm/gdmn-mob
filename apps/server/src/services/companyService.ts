@@ -111,8 +111,11 @@ const deleteOne = async (id: string): Promise<string> => {
 
   const delDevices = async (deviceList: IDBDevice[]) => {
     for (const item of deviceList) {
+      // eslint-disable-next-line no-await-in-loop
       await deviceBindings.delete((b) => b.deviceId === item.id);
+      // eslint-disable-next-line no-await-in-loop
       await codes.delete((c) => c.deviceId === item.id);
+      // eslint-disable-next-line no-await-in-loop
       await devices.delete((i) => i.id === item.id);
     }
   };

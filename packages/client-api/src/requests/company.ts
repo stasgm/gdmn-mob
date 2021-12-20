@@ -29,10 +29,7 @@ class Company extends BaseRequest {
       } as types.IAddCompanyResponse;
     }
 
-    //  try {
-    // console.log('company', company);
     const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-    // console.log('res', res);
     const resData = res.data;
 
     if (resData?.result) {
@@ -91,7 +88,8 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка обновления компании',
+        message: err instanceof TypeError ? err.message : 'ошибка обновления компании',
+        //err?.response?.data?.error || 'ошибка обновления компании',
       } as error.INetworkError;
     }
   };
@@ -122,7 +120,8 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления компании',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления компании',
+        //err?.response?.data?.error || 'ошибка удаления компании',
       } as error.INetworkError;
     }
   };
@@ -163,7 +162,8 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных о компании',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о компании',
+        //err?.response?.data?.error || 'ошибка получения данных о компании',
       } as error.INetworkError;
     }
   };
@@ -203,7 +203,8 @@ class Company extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения данных о компаниях',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о компаниях',
+        //err?.response?.data?.error || 'ошибка получения данных о компаниях',
       } as error.INetworkError;
     }
   };

@@ -37,7 +37,6 @@ class Api extends BaseApi {
     this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
-
     this.setAxios(config);
   }
 

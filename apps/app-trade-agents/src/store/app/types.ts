@@ -1,37 +1,63 @@
-import { INamedEntity, StatusType } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 
-export interface IFormParam {
-  [fieldName: string]: unknown;
+export type AppTradeState = {
+  readonly goodModel: IModelData<IGoodModel>;
+  readonly loading: boolean;
+  readonly errorMessage: string;
+};
+
+// export interface IModel<T = unknown> {
+//   [contactId: string]: T;
+// }
+
+// export interface IParentGroupModel {
+//   [parentGroupId: string]: IGroupModel;
+// }
+
+// export interface IGroupModel<T = unknown> {
+//   [groupId: string]: T[];
+// }
+
+// Товары
+export interface IGood extends INamedEntity {
+  alias: string;
+  barcode: string;
+  vat: string; //НДС
+  goodgroup: INamedEntity; // группа товаров
+  valuename: string; // Наименование ед. изм.
+  invWeight: number; // Вес единицы товара
+  priceFso: number; // цена ФСО
+  priceFsn: number; // цена ФСН
+  priceFsoSklad: number; // цена ФСО склад
+  priceFsnSklad: number; // цена ФСН склад
+  scale: number; //количество единиц в месте
 }
 
-export interface IAppState {
-  formParams?: IFormParam;
+//* Model *//
+export type IMGood = Omit<IGood, 'goodgroup' | 'id'>;
+
+// // export interface IMGoodRemain extends IGood {
+// //   remains?: IModelRem[];
+// // }
+
+export interface IGoodModel {
+  contactName: string;
+  onDate: Date;
+  goods: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>;
 }
 
-export interface IOrderFormParam extends IFormParam {
-  contact?: INamedEntity;
-  outlet?: INamedEntity;
-  depart?: INamedEntity;
-  number?: string;
-  documentDate?: string;
-  onDate?: string;
-  status?: StatusType;
-  route?: INamedEntity;
+export interface IMParentGroupData<T = unknown> {
+  [id: string]: T;
 }
 
-export interface IReturnFormParam extends IFormParam {
-  contact?: INamedEntity;
-  outlet?: INamedEntity;
-  number?: string;
-  documentDate?: string;
-  depart?: INamedEntity;
-  reason?: string;
-  route?: INamedEntity;
-  status?: StatusType;
+export interface IMGroupData<T = unknown> {
+  [id: string]: T;
 }
 
-export interface ISellBillFormParam extends IFormParam {
-  dateBegin?: string;
-  dateEnd?: string;
-  good?: INamedEntity;
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IModelData<T = unknown> {
+  [contactId: string]: T;
 }

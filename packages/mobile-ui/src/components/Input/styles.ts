@@ -12,8 +12,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   containerInput: {
+    width: '100%',
     flexDirection: 'row',
     paddingBottom: 15,
+    position: 'relative',
+  },
+  button: {
+    alignItems: 'flex-end',
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    zIndex: 5,
+    // width: '100%',
   },
 });
 

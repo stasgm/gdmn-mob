@@ -1,11 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text, ListRenderItem } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { Divider, Snackbar, useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, authActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   SelectableInput,
@@ -20,13 +20,17 @@ import {
 import { IResponse, ISettingsOption } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { IGood, IReturnDocument, ISellBill } from '../../store/types';
-import { ISellBillFormParam } from '../../store/app/types';
+import { IGood, IReturnDocument, ISellBill, IToken, ISellBillFormParam } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
+
+import config from '../../config';
 
 import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 
-const SellBillScreen = () => {
+const onlineUser = config.USER_NAME;
+const onlineUserPass = config.USER_PASSWORD;
+
+function SellBillScreen() {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'SellBill'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SellBill'>>();
   const dispatch = useDispatch();
@@ -36,7 +40,6 @@ const SellBillScreen = () => {
 
   const [barVisible, setBarVisible] = useState(false);
   const [message, setMessage] = useState('');
-  const [info, setInfo] = useState('');
 
   const { colors } = useTheme();
 
@@ -44,6 +47,9 @@ const SellBillScreen = () => {
 
   const { data: settings } = useSelector((state) => state.settings);
   const formParams = useSelector((state) => state.app.formParams);
+  const { userToken } = useSelector((state) => state.auth);
+
+  const sellBilSettings = useSelector((state) => state.auth);
 
   const {
     dateBegin: docDateBegin,
@@ -61,7 +67,6 @@ const SellBillScreen = () => {
   //   };
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, []);
-
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
   const serverName = (settings.serverName as ISettingsOption<string>).data || 0;
@@ -149,25 +154,34 @@ const SellBillScreen = () => {
   const renderItem: ListRenderItem<ISellBillListRenderItemProps> = ({ item }) =>
     returnDoc?.id && docGood ? <SellBillItem item={item} /> : null;
 
-  const handleSearchSellBills = async () => {
-    if (!(docDateBegin && docDateEnd && docGood && outletId)) {
-      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
+  const setUserToken = useCallback((token: string) => dispatch(authActions.setUserToken(token)), [dispatch]);
+
+  const fetchLogin = async () => {
+    const pathLogin = `${serverName}:${serverPort}/v1/login`;
+    const userData = {
+      username: onlineUser,
+      password: onlineUserPass,
+    };
 
     try {
-      setLoading(true);
+      const tokenFetched = await fetch(pathLogin, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
+      const parsedToken: IResponse<IToken> = await tokenFetched.json();
 
-      const fetched = await fetch(path, {});
-      const parsed: IResponse<ISellBill[]> = await fetched.json();
-      console.log('pars', parsed);
-
-      if (parsed.result) {
-        setSellBills(parsed.data);
-      } else {
-        setMessage(parsed.error || 'Неизвестная ошибка');
+      if (parsedToken.result) {
+        const token: IToken | undefined = parsedToken.data;
+        if (token?.access_token) {
+          setUserToken(token?.access_token);
+          return token.access_token;
+        }
       }
+      return undefined;
     } catch (e) {
       if (e instanceof TypeError) {
         setMessage(e.message);
@@ -175,8 +189,104 @@ const SellBillScreen = () => {
         setMessage('Неизвестная ошибка');
       }
       setBarVisible(true);
+      return undefined;
     }
+  };
+
+  const fetchSellBill = async (isFirst = true, parToken: string | undefined = userToken) => {
+    if (!(docDateBegin && docDateEnd && docGood && outletId)) {
+      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+    }
+    if (sellBilSettings.settings.debug?.isMock) {
+      const mockSellBills: ISellBill[] = [
+        {
+          ID: '1246759230',
+          NUMBER: '1448516',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTNAME: 'Магазин-склад',
+          DEPARTKEY: '323658854',
+          DOCUMENTDATE: '2021-04-27T21:00:00.000Z',
+          QUANTITY: 4.95,
+          PRICE: 5.35,
+        },
+        {
+          ID: '1215293118',
+          NUMBER: '5376518',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTKEY: '323658854',
+          DEPARTNAME: 'Магазин-склад',
+          DOCUMENTDATE: '2021-04-16T21:00:00.000Z',
+          QUANTITY: 5.25,
+          PRICE: 6.12,
+        },
+        {
+          ID: '1308039951',
+          NUMBER: '1453027',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTNAME: 'Магазин-склад',
+          DEPARTKEY: '323658854',
+          DOCUMENTDATE: '2021-05-13T21:00:00.000Z',
+          QUANTITY: 6.4,
+          PRICE: 6.12,
+        },
+        {
+          ID: '1334757495',
+          NUMBER: '5947875',
+          CONTRACT: '53 от 2013-12-10',
+          CONTRACTKEY: '165934057',
+          DEPARTNAME: 'Магазин-склад',
+          DEPARTKEY: '323658854',
+          DOCUMENTDATE: '2021-05-20T21:00:00.000Z',
+          QUANTITY: 5.6,
+          PRICE: 6.12,
+        },
+      ] as any;
+      setSellBills(mockSellBills);
+    } else {
+      try {
+        setLoading(true);
+        const newToken = parToken ?? (await fetchLogin()) ?? '';
+
+        const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
+
+        const fetched = await fetch(path, {
+          headers: {
+            authorization: newToken,
+          },
+        });
+        const parsed: IResponse<ISellBill[]> = await fetched.json();
+
+        if (parsed.result) {
+          setSellBills(parsed.data);
+        } else {
+          setMessage(parsed.error || 'Неизвестная ошибка');
+          if (parsed.error?.slice(0, 3) === '401') {
+            const token = await fetchLogin();
+            if (isFirst && token) {
+              await fetchSellBill(false, token);
+            }
+          } else {
+            setBarVisible(true);
+          }
+        }
+      } catch (e) {
+        if (e instanceof TypeError) {
+          setMessage(e.message);
+        } else {
+          setMessage('Неизвестная ошибка');
+        }
+        setBarVisible(true);
+      }
+    }
+
     setLoading(false);
+  };
+
+  const handleSearchSellBills = async () => {
+    await fetchSellBill();
   };
 
   const handleSearchStop = () => {
@@ -250,7 +360,7 @@ const SellBillScreen = () => {
       </Snackbar>
     </AppScreen>
   );
-};
+}
 
 export default SellBillScreen;
 

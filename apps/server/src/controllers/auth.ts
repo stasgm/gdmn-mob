@@ -10,11 +10,11 @@ import { created, ok } from '../utils/apiHelpers';
  * Регистрация нового пользователя (Администратора компании)
  * */
 const signUp = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, password } = ctx.request.body as IUserCredentials;
-  console.log('signUp', name);
+  const { name, password, email } = ctx.request.body as IUserCredentials;
   await authService.signUp({
     password,
     name,
+    email,
   });
 
   created(ctx as Context);
@@ -48,16 +48,17 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
   log.info(`getCurrentUser: user '${ctx.state.user.name}' authenticated`);
 };
 
-const logOut = async (ctx: Context): Promise<void> => {
+const logout = async (ctx: Context): Promise<void> => {
   const user = ctx.state.user as IUser;
 
   await authService.logout(user.id);
 
   ctx.logout();
+  ctx.session = null;
 
   ok(ctx as Context);
 
-  log.info(`logOut: user '${user.name}' successfully logged out`);
+  log.info(`logout: user '${user.name}' successfully logged out`);
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
@@ -80,4 +81,4 @@ const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getDeviceStatus: ok');
 };
 
-export { signUp, logIn, logOut, getCurrentUser, verifyCode, getDeviceStatus };
+export { signUp, logIn, logout, getCurrentUser, verifyCode, getDeviceStatus };

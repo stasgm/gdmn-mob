@@ -7,7 +7,17 @@ import { docSelectors, documentActions, refSelectors, useSelector } from '@lib/s
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { BackButton, BottomSheet, InfoBlock, ItemSeparator, PrimeButton, RadioGroup } from '@lib/mobile-ui';
+import {
+  BackButton,
+  BottomSheet,
+  InfoBlock,
+  ItemSeparator,
+  PrimeButton,
+  RadioGroup,
+  ScreenListItem,
+  IListItemProps,
+  SwipeListItem,
+} from '@lib/mobile-ui';
 import { useSendDocs } from '@lib/mobile-app';
 
 import { useDispatch } from '../../../store';
@@ -15,10 +25,6 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
-import { IReturnListRenderItemProps } from '../../Returns/components/ReturnListItem';
-import ReturnSwipeListItem from '../../Returns/components/ReturnSwipeListItem';
-import OrderSwipeListItem from '../../Orders/components/OrderSwipeListItem';
-import { IOrderListRenderItemProps } from '../../Orders/components/OrderListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -29,14 +35,14 @@ interface IVisitProps {
   route: INamedEntity;
 }
 
-const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
+const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
 
   const [process, setProcess] = useState(false);
 
-  const dateBegin = new Date(item.head.dateBegin);
-  const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
+  const dateBegin = new Date(visit.head.dateBegin);
+  const dateEnd = visit.head.dateEnd ? new Date(visit.head.dateEnd) : undefined;
 
   const { loading } = useSelector((state) => state.app);
 
@@ -58,7 +64,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
   const timeProcess = () => {
     // TODO Вынести в helpers
     const diffMinutes = Math.floor(
-      ((item.head.dateEnd ? Date.parse(item.head.dateEnd) : Date.now()) - Date.parse(item.head.dateBegin)) / 60000,
+      ((visit.head.dateEnd ? Date.parse(visit.head.dateEnd) : Date.now()) - Date.parse(visit.head.dateBegin)) / 60000,
     );
     const hour = Math.floor(diffMinutes / 60);
     return `${hour} часов ${diffMinutes - hour * 60} минут`;
@@ -85,13 +91,13 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     const date = new Date().toISOString();
 
     const updatedVisit: IVisitDocument = {
-      ...item,
+      ...visit,
       head: {
-        ...item.head,
+        ...visit.head,
         dateEnd: date,
         endGeoPoint: coords,
       },
-      creationDate: item.creationDate || date,
+      creationDate: visit.creationDate || date,
       editionDate: date,
     };
 
@@ -132,7 +138,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         outlet,
         route,
         onDate: newOrderDate,
-        takenOrder: item.head.takenType,
+        takenOrder: visit.head.takenType,
         depart: defaultDepart,
       },
       lines: [],
@@ -208,7 +214,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
     docTypeRef.current?.present();
   };
 
-  const orders: IOrderListRenderItemProps[] = useMemo(() => {
+  const orders: IListItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
       const creationDate = new Date(i.editionDate || i.creationDate || 0);
       return {
@@ -219,16 +225,20 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: false,
         lineCount: i.lines.length,
-      } as IOrderListRenderItemProps;
+      } as IListItemProps;
     });
   }, [orderDocs]);
 
-  const renderOrderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
+  const renderOrderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = orderDocs.find((r) => r.id === item.id);
-    return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
+        <ScreenListItem {...item} routeName="ReturnView" />
+      </SwipeListItem>
+    ) : null;
   };
 
-  const returns: IReturnListRenderItemProps[] = useMemo(() => {
+  const returns: IListItemProps[] = useMemo(() => {
     return returnDocs.map((i) => {
       const creationDate = new Date(i.editionDate || i.creationDate || 0);
       return {
@@ -239,13 +249,17 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
         isFromRoute: false,
         lineCount: i.lines.length,
-      } as IReturnListRenderItemProps;
+      } as IListItemProps;
     });
   }, [returnDocs]);
 
-  const renderReturnItem: ListRenderItem<IReturnListRenderItemProps> = ({ item }) => {
+  const renderReturnItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = returnDocs.find((r) => r.id === item.id);
-    return doc ? <ReturnSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
+        <ScreenListItem {...item} routeName="ReturnView" />
+      </SwipeListItem>
+    ) : null;
   };
 
   const readyDocs = useMemo(() => {
@@ -278,7 +292,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title="Заявки">
+          <InfoBlock colorLabel="#E3C920" title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -289,7 +303,7 @@ const Visit = ({ item, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#4479D4" title="Возвраты">
+          <InfoBlock colorLabel="#E3C920" title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}

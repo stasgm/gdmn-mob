@@ -1,8 +1,54 @@
-import { INamedEntity, IEntity, IDocument, MandateProps, IHead, IReferenceData, IDocumentType } from '@lib/types';
-// import { AnyAction } from 'redux';
-// import { ThunkAction } from 'redux-thunk';
+import { AnyAction } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+
+import {
+  StatusType,
+  IEntity,
+  IDocument,
+  MandateProps,
+  IHead,
+  IReferenceData,
+  IDocumentType,
+  INamedEntity,
+} from '@lib/types';
 
 import { ICoords } from './geo/types';
+
+import { IGood } from './app/types';
+
+export { IGood };
+
+export interface IFormParam {
+  [fieldName: string]: unknown;
+}
+
+export interface IOrderFormParam extends IFormParam {
+  contact?: INamedEntity;
+  outlet?: INamedEntity;
+  depart?: INamedEntity;
+  number?: string;
+  documentDate?: string;
+  onDate?: string;
+  status?: StatusType;
+  route?: INamedEntity;
+}
+
+export interface IReturnFormParam extends IFormParam {
+  contact?: INamedEntity;
+  outlet?: INamedEntity;
+  number?: string;
+  documentDate?: string;
+  depart?: INamedEntity;
+  reason?: string;
+  route?: INamedEntity;
+  status?: StatusType;
+}
+
+export interface ISellBillFormParam extends IFormParam {
+  dateBegin?: string;
+  dateEnd?: string;
+  good?: INamedEntity;
+}
 
 // export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
 
@@ -34,29 +80,29 @@ export interface IDebt extends IEntity {
 export interface IGoodGroup extends INamedEntity {
   parent?: INamedEntity;
 }
-// Товары
-export interface IGood extends INamedEntity {
-  alias: string;
-  barcode: string;
-  vat: string; //НДС
-  goodgroup: INamedEntity; // группа товаров
-  valuename: string; // Наименование ед. изм.
-  invWeight: number; // Вес единицы товара
-  priceFso: number; // цена ФСО
-  priceFsn: number; // цена ФСН
-  priceFsoSklad: number; // цена ФСО склад
-  priceFsnSklad: number; // цена ФСН склад
-  scale: number; //количество единиц в месте
-}
 
 //Подразделения-склады
 export type IDepartment = INamedEntity;
 // Интерфейс для матрицы номенклатур для организаций
-export interface INetPrice extends IEntity {
-  contact: INamedEntity; // организация
-  good: INamedEntity; // ID товара
-  pricefso?: number; // цена ФСО
-  pricefsn?: number; // цена ФСН
+// export interface INetPrice extends IEntity {
+//   contactId: string; // организация
+//   goodId: string; // ID товара
+//   pricefso?: number; // цена ФСО
+//   pricefsn?: number; // цена ФСН
+//   priceFsoSklad?: number; // цена ФСО склад
+//   priceFsnSklad?: number; // цена ФСН склад
+// }
+
+export interface IGoodMatrix extends IEntity {
+  contactId: string;
+  onDate: string;
+  data: IMatrixData[];
+}
+
+export interface IMatrixData {
+  goodId: string;
+  priceFso?: number; // цена ФСО
+  priceFsn?: number; // цена ФСН
   priceFsoSklad?: number; // цена ФСО склад
   priceFsnSklad?: number; // цена ФСН склад
 }
@@ -78,7 +124,7 @@ export interface IOrderHead extends IHead {
 }
 
 export interface IOrderLine extends IEntity {
-  good: INamedEntity;
+  good: IGood;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
 }
@@ -176,27 +222,13 @@ export const visitDocumentType: IDocumentType = {
   description: 'Визит',
 };
 
-// export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
-//   ReturnType,
-//   S,
-//   unknown,
-//   A
-// >;
+export interface IToken {
+  access_token: string;
+}
 
-/* export interface ICoords {
-  latitude: number;
-  longitude: number;
-}
- */
-/* export type resutVisit = 'DONE' | 'NOT DONE' | 'PART';
-export interface IVisitDocument extends IEntity {
-  routeLineId: number;
-  comment?: string;
-  dateBegin: string; //начало визита
-  dateEnd?: string; // конец визита
-  beginGeoPoint: ICoords; //место начало визита
-  endGeoPoint?: ICoords; // место завершения визита
-  result?: resutVisit;
-  takenType: typeTakeOrder; //тип визита - это поле забрать из заявки
-}
-*/
+export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
+  ReturnType,
+  S,
+  unknown,
+  A
+>;

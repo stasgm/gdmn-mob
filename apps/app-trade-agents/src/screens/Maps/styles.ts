@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   statusContainer: {
+    display: 'flex',
+    flexDirection: 'row',
     position: 'absolute',
     // right: 0,
     // bottom: 0,
@@ -65,7 +67,8 @@ const styles = StyleSheet.create({
     left: 0,
     width: '100%',
     backgroundColor: 'rgba(255,255,255,0.6)',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
+    alignItems: 'center',
     overflow: 'hidden',
     height: 50,
   },
@@ -83,6 +86,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   routeName: {
+    textAlign: 'center',
+  },
+  routeIcon: {
     textAlign: 'center',
   },
 });
