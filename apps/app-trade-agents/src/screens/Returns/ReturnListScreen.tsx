@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { FlatList, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 

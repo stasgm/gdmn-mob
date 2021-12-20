@@ -91,6 +91,9 @@ const styles = StyleSheet.create({
   routeIcon: {
     textAlign: 'center',
   },
+  routeWidth: {
+    width: '80%',
+  },
 });
 
 export default styles;
