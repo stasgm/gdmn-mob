@@ -58,9 +58,9 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   //   formik.values.password = '';
   // };
 
-  const MaskedTextInput = (values: any) => {
-    return <Input {...values} component={MaskedInput} />;
-  };
+  // const MaskedTextInput = (values: any) => {
+  //   return <Input {...values} component={MaskedInput} />;
+  // };
 
   const phoneNumberMask = ['(', /[1-9]/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, '-', /\d/, /\d/];
   //  \+375 \((17|29|33|44)\) [0-9]{3}-[0-9]{2}-[0-9]{2}$;
@@ -137,19 +137,20 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                 </Grid>
                 <Grid item md={6} xs={12}>
                   {/* <TextField */}
-                  {/* <TextField
+                  <TextField
                     error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                     fullWidth
                     label="Телефон"
                     name="phoneNumber"
                     variant="outlined"
-                    // onBlur={formik.handleBlur}
-                    // onChange={formik.handleChange}
-                    // type="phoneNumber"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="phoneNumber"
                     disabled={loading}
-                    // value={formik.values.phoneNumber}
-                  */}
+                    value={formik.values.phoneNumber}
+                  />
 
+                  {/* 1
                   <InputMask
                     mask="+ 999 (99) 999-99-99"
                     value={formik.values.phoneNumber}
@@ -157,7 +158,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     maskChar=" "
-                  >
+                  > */}
+
                   {/* <MuiPhoneNumber
                     // name={name}
                     value={formik.values.phoneNumber}
@@ -171,6 +173,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     // margin="normal"
                     // error={Boolean(errors.phone)}
                   >*/}
+
+                  {/*             1
                     {() => (
                       <TextField
                         error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
@@ -183,7 +187,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                         // value={formik.values.phoneNumber}
                       />
                     )}
-                  </InputMask>
+                  </InputMask> */}
+
                   {/* <MaskedTextInput
                     mask={phoneNumberMask}
                     id="phone"

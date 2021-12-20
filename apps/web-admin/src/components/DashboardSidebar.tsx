@@ -62,7 +62,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
 
   const { user } = useSelector((state) => state.auth);
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   // const fetchUsers = useCallback(
   //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -72,7 +72,6 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
   // );
 
   // useEffect(() => {
-  //   /* Загружаем данные при загрузке компонента */
   //   dispatch(actions.fetchUsers(''));
   //   //   },
   //   //   [dispatch],
@@ -108,13 +107,11 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
         <Typography color="textPrimary" variant="h5">
           {!isCompact
             ? `${user?.lastName || ''} ${user?.firstName || ''}`
-            : `${user?.lastName?.slice(0, 1)}${user?.firstName?.slice(0, 1)}`}
+            : `${user?.lastName?.slice(0, 1) || ''}${user?.firstName?.slice(0, 1) || ''}`}
         </Typography>
-        {!isCompact && (
-          <Typography color="textSecondary" variant="body2">
-            {userInfo.jobTitle}
-          </Typography>
-        )}
+        <Typography color="textSecondary" variant="body2">
+          {userInfo.jobTitle}
+        </Typography>
       </Box>
       <Divider />
       <Box sx={{ p: Number(isCompact ? 0 : 2) }}>

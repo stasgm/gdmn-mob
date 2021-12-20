@@ -152,7 +152,11 @@ const UserView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
+            <DialogContentText color="black">
+              {user.role === 'Admin'
+                ? 'Вы действительно хотите удалить пользователя, являющегося администратором?'
+                : 'Вы действительно хотите удалить пользователя?'}
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDelete} color="primary" variant="contained">
