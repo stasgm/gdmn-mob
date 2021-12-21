@@ -1,12 +1,12 @@
 import { Navigate, useRoutes } from 'react-router-dom';
-import { PartialRouteObject } from 'react-router';
+import { RouteObject } from 'react-router';
 
 import CompanyView from './CompanyView';
 import CompanyEdit from './CompanyEdit';
 import CompanyCreate from './CompanyCreate';
 import CompanyList from './CompanyList';
 
-const routes: PartialRouteObject[] = [
+const routes: RouteObject[] = [
   { path: '/', element: <CompanyList /> },
   { path: '/new', element: <CompanyCreate /> },
   { path: '/:id', element: <CompanyView /> },
