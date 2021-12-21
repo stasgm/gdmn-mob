@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -50,10 +50,13 @@ const MapScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
-  const currentList: IListItem[] = routeList.map((item) => ({
-    id: item.id,
-    value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
-  }));
+  const currentList: IListItem[] = useMemo(() => {
+    const newCurrentList = routeList.map((item) => ({
+      id: item.id,
+      value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
+    }));
+    return newCurrentList;
+  }, [routeList]);
 
   const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
   const [newSelectedRoute, setNewSelectedRoute] = useState(selectedRoute);
@@ -64,7 +67,11 @@ const MapScreen = () => {
     routeRef.current?.present();
   }, [routeRef]);
 
-  const selectedItem = routeList.find((item) => item.id === selectedRoute.id);
+  const selectedItem = useMemo(
+    () => routeList.find((item) => item.id === selectedRoute.id),
+    [routeList, selectedRoute.id],
+  );
+
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
       const initialList: ILocation[] = selectedItem.lines.map((e) => {
