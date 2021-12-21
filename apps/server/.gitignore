@@ -42,3 +42,5 @@ yarn-error.log*
 
 admin/**/bundle*.*
 admin/**/react
+admin/assets/**
+admin/index.html

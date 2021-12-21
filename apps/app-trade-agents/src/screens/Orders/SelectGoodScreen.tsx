@@ -90,7 +90,7 @@ const SelectGoodScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good');
 
-  const list = Object.entries(groupsModel[groupId]).map(([id, good]) => good);
+  const list = Object.entries(groupsModel[groupId]).map(([_, good]) => good);
 
   const filteredList = useMemo(() => {
     return (

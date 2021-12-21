@@ -13,6 +13,7 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -98,7 +99,9 @@ const ReturnViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IReturnLine }) => (
-    <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+    <SwipeLineItem docId={returnDoc.id} item={item} readonly={isBlocked} copy={false} routeName="ReturnLine">
+      <ReturnItem docId={returnDoc.id} item={item} readonly={isBlocked} />
+    </SwipeLineItem>
   );
 
   return (

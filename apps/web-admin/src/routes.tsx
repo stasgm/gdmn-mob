@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { PartialRouteObject } from 'react-router';
+import { RouteObject } from 'react-router';
 
 import DashboardLayout from './components/DashboardLayout';
 import MainLayout from './components/MainLayout';
@@ -16,7 +16,7 @@ import Login from './pages/Login';
 
 import { adminPath } from './utils/constants';
 
-const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
+const routes = (isLoggedIn: boolean): RouteObject[] => [
   {
     path: 'admin/app',
     element: isLoggedIn ? <DashboardLayout /> : <Navigate to={`${adminPath}/login`} />,
@@ -26,22 +26,23 @@ const routes = (isLoggedIn: boolean): PartialRouteObject[] => [
       { path: 'companies/*', element: <Companies /> },
       { path: 'users/*', element: <Users /> },
       { path: 'devices/*', element: <Devices /> },
-      { path: '/', element: <Navigate to={`${adminPath}/app/dashboard`} /> },
-      { path: '*', element: <Navigate to="/404" /> },
+      { path: '', element: <Dashboard /> },
+      { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
     ],
   },
   {
     path: '/',
     element: !isLoggedIn ? <MainLayout /> : <Navigate to={`${adminPath}/app/dashboard`} />,
     children: [
-      { path: '/admin/login', element: <Login /> },
-      { path: '/admin/register', element: <Register /> },
-      { path: '404', element: <NotFound /> },
-      { path: '/', element: <Navigate to={`${adminPath}/login`} /> },
-      { path: '/admin', element: <Navigate to={`${adminPath}/login`} /> },
+      { path: 'admin/login', element: <Login /> },
+      { path: 'admin/register', element: <Register /> },
+      { path: 'admin/404', element: <NotFound /> },
+      { path: '', element: <Navigate to={`${adminPath}/login`} /> },
+      { path: 'admin', element: <Navigate to={`${adminPath}/login`} /> },
+      { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
     ],
   },
-  { path: '*', element: <Navigate to="/404" /> },
+  { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
 ];
 
 export default routes;

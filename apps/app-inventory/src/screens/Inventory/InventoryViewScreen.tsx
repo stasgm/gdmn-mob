@@ -16,6 +16,7 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
@@ -107,7 +108,9 @@ export const InventoryViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+    <SwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} copy={false} routeName="InventoryLine">
+      <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+    </SwipeLineItem>
   );
 
   return (
