@@ -1,5 +1,6 @@
 export { InventoryListScreen } from './InventoryListScreen';
-export { InventoryEditScreen1 } from './InventoryEditScreen1';
+export { InventoryEditScreen2 } from './InventoryEditScreen2';
+// export { InventoryEditScreen } from './InventoryEditScreen';
 export { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
 export { InventoryLineScreen } from './InventoryLineScreen';
 export { InventoryViewScreen } from './InventoryViewScreen';

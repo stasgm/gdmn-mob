@@ -3,7 +3,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { IReference, Settings, SettingsDoc } from '@lib/types';
+import { IReference, Settings } from '@lib/types';
 import { PersistGate } from 'redux-persist/integration/react';
 import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles } from '@lib/mobile-ui';
@@ -13,7 +13,7 @@ import { Caption } from 'react-native-paper';
 import { persistor, store } from './src/store';
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
-import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/types';
+import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData, IDepartment } from './src/store/types';
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
 
 const Root = () => {
@@ -24,6 +24,13 @@ const Root = () => {
       {
         name: 'Inventorys',
         title: 'Инвентаризации',
+        icon: 'file-document-outline',
+        component: InventoryNavigator,
+        // metaData:
+      },
+      {
+        name: 'Inventorys1',
+        title: 'Инвентаризации1',
         icon: 'file-document-outline',
         component: InventoryNavigator,
       },
@@ -108,8 +115,9 @@ const Root = () => {
     }
   }, [storeSettings]);
 
-  const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const departments = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
+  // const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
+  const good = refSelectors.selectByName<IGood>('good')?.data;
+  const departments = (refSelectors.selectByName('department') as IReference<IContact>)?.data;
   const remains = (refSelectors.selectByName('remain') as IReference<IRemains>)?.data;
 
   const [loading, setLoading] = useState(false);
@@ -118,8 +126,8 @@ const Root = () => {
     setLoading(true);
     const getRemainsModel = async () => {
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
-        (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
-          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+        (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
+          const remGoods = good?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
             goodsprev[g.id] = {
               ...g,
               remains:
@@ -139,7 +147,7 @@ const Root = () => {
     };
     getRemainsModel();
     setLoading(false);
-  }, [appInventoryDispatch, departments, goods, remains]);
+  }, [appInventoryDispatch, departments, good, remains]);
   return loading ? (
     <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
   ) : (

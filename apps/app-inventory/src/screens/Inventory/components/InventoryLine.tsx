@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
 
 import { ISettingsOption } from '@lib/types';
 
 import { IInventoryLine } from '../../../store/types';
-import { InventorysStackParamList } from '../../../navigation/Root/types';
 
-import { ScanDataMatrix } from './Scanners/ScanDataMatrix';
-import { ScanDataMatrixReader } from './Scanners/ScanDataMatrixReader';
+import { ScanDataMatrix } from '../../../components/Scanners/ScanDataMatrix';
+import { ScanDataMatrixReader } from '../../../components/Scanners/ScanDataMatrixReader';
 
 interface IProps {
   item: IInventoryLine;
@@ -22,10 +20,6 @@ interface IProps {
 }
 
 export const InventoryLine = ({ item, onSetLine }: IProps) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
-
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);

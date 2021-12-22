@@ -9,15 +9,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IDocumentType, IReference } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import {
-  useDispatch as useDocDispatch,
-  docSelectors,
-  useDispatch,
-  documentActions,
-  appActions,
-  refSelectors,
-  useSelector,
-} from '@lib/store';
+import { docSelectors, useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -35,7 +27,6 @@ export const InventoryEditScreen = () => {
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryEdit'>>();
   const dispatch = useDispatch();
-  const docDispatch = useDocDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
   const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
@@ -61,7 +52,9 @@ export const InventoryEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const department = refSelectors.selectByName<IDepartment>('contact')?.data?.find((e) => e.id === docDepartment?.id);
+  const department = refSelectors
+    .selectByName<IDepartment>('department')
+    ?.data?.find((e) => e.id === docDepartment?.id);
 
   useEffect(() => {
     if (!docDepartment) {
@@ -87,7 +80,6 @@ export const InventoryEditScreen = () => {
           comment: inventory.head.comment,
           department: inventory.head.department,
           status: inventory.status,
-          depart: inventory.head.depart,
         }),
       );
     } else {
@@ -130,7 +122,7 @@ export const InventoryEditScreen = () => {
         editionDate: newOntDate,
       };
 
-      docDispatch(documentActions.addDocument(newInventory));
+      dispatch(documentActions.addDocument(newInventory));
 
       navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
     } else {
@@ -158,20 +150,20 @@ export const InventoryEditScreen = () => {
         editionDate: updatedOrderDate,
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
       navigation.navigate('InventoryView', { id });
     }
   }, [
-    docNumber,
     docType,
+    docNumber,
     docDepartment,
-    docComment,
     docOnDate,
+    docInventoryDate,
     id,
-    docDispatch,
+    docComment,
+    dispatch,
     navigation,
     inventory,
-    docInventoryDate,
     docStatus,
   ]);
 
@@ -212,7 +204,7 @@ export const InventoryEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: 'contact',
+      refName: 'department',
       fieldName: 'department',
       value: docDepartment && [docDepartment],
     });

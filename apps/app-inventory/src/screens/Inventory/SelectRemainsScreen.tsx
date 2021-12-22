@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-children-prop */
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';

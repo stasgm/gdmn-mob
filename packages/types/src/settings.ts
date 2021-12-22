@@ -67,8 +67,8 @@ interface ISettingsOptionDoc<T = SettingValueDoc> extends IEntity {
   requeried?: boolean;
 }
 
-type SettingsDoc<T = Record<string, SettingValueDoc>> = {
+type MetaData1<T = Record<string, SettingValueDoc>> = {
   [P in keyof T]?: ISettingsOptionDoc<T[P]>;
 };
 
-export { Settings, ISettingsOption, IBaseSettings, SettingsDoc, ISettingsOptionDoc };
+export { Settings, ISettingsOption, IBaseSettings, MetaData1, ISettingsOptionDoc };

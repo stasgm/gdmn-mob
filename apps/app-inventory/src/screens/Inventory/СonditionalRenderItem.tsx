@@ -1,48 +1,55 @@
-/* eslint-disable valid-typeof */
-/* eslint-disable react-native/no-unused-styles */
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-//import { Divider, Subheading, Switch } from 'react-native-paper';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 
-import { ISettingsOptionDoc, RefTypeChoose, SettingsDoc, SettingValueDoc } from '@lib/types';
 import { Input, globalStyles as styles, SelectableInput } from '@lib/mobile-ui';
+import { getDateString } from '@lib/mobile-ui/src/components/Datapicker';
 
 type Props = {
-  type: string;
-  value: any;
-  sortOrder: number;
-  description: string;
-  disabled?: boolean;
-  clearInput?: boolean;
+  dsescription?: any;
+  item: any;
   onChangeText: (text: string) => void;
   onPress: () => void;
+  disabled?: boolean;
 };
-// optionName: string, value: ISettingsOptionDoc
-export const ConditionalRenderItem = ({
-  type,
-  description,
-  disabled,
-  clearInput,
-  sortOrder,
-  onChangeText,
-  onPress,
-  value,
-}: Props) => {
+
+export const ConditionalRenderItem = ({ onChangeText, onPress, item, disabled, dsescription }: Props) => {
+  console.log('type', item.type);
   return (
     <View>
-      {type === 'string' ? (
-        <View style={styles.container}>
+      {/* {item.type === 'string' ? ( */}
+      {typeof item === 'string' ? (
+        <View style={(styles.container, localStyles.switchContainer)}>
           <Input
-            label={description}
-            value={value}
+            label={dsescription} //{item.description}
+            maxLength={40}
+            value={item} //{item?.type === 'date' ? getDateString(item?.value || '') : item?.value}
             onChangeText={onChangeText}
             disabled={disabled}
-            clearInput={clearInput}
+            // clearInput={item.clearInput}
           />
         </View>
+      ) :
+      item.type === 'ref' ? (
+        <SelectableInput
+          label={item.description}
+          value={item.value ? String(Object.entries(item.value).find((i) => i[0] === 'name')?.[1]) : ''}
+          onPress={onPress}
+          disabled={disabled}
+        />
       ) : (
-        <SelectableInput label={description} value={value} onPress={onPress} disabled={disabled} />
+        <SelectableInput
+          label={item.description}
+          value={getDateString(item.value)}
+          onPress={onPress}
+          disabled={disabled}
+        />
       )}
     </View>
   );
 };
+
+export const localStyles = StyleSheet.create({
+  switchContainer: {
+    // margin: 5,
+  },
+});

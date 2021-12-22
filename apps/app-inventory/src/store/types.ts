@@ -20,17 +20,30 @@ export { IGood };
 export interface IFormParam {
   [fieldName: string]: unknown;
 }
-
 export interface IInventoryFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   onDate?: string;
   status?: StatusType;
-  documentType?: IDocumentType;
-  depart?: IContact;
   department?: IDepartment;
   comment?: string;
 }
+
+export interface INewFormParam<T = Set> extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  onDate?: string;
+  status?: StatusType;
+  department?: IDepartment;
+  comment?: string;
+}
+
+export type Set = string | number | boolean | undefined;
+type MetaData<T = Record<string, Set>> = {
+  [P in keyof T]?: INewFormParam<T[P]>;
+};
+
+export { MetaData };
 
 //Группы товаров
 export interface IGoodGroup extends INamedEntity {
