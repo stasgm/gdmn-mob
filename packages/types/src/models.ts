@@ -17,13 +17,15 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   role: UserRole;
   firstName?: string;
   lastName?: string;
-  surName?: string;
+  middleName?: string;
   email?: string;
   phoneNumber?: string;
   creator?: INamedEntity;
   company?: INamedEntity;
   settings?: IUserSettings;
 }
+
+export type n = Omit<IUser, 'id' | 'name'>;
 
 export type NewUser = Omit<IUser, 'id'> & { password: string; verifyPassword?: string };
 

@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import { Provider, useDispatch as useDocDispatch } from 'react-redux';
+import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { IReference, Settings } from '@lib/types';
@@ -10,7 +10,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { Caption } from 'react-native-paper';
 
 import { persistor, store } from './src/store';
-import { InventorysNavigator } from './src/navigation/InventorysNavigator';
+import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
 import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/types';
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
@@ -22,7 +22,7 @@ const Root = () => {
         name: 'Inventorys',
         title: 'Инвентаризации',
         icon: 'file-document-outline',
-        component: InventorysNavigator,
+        component: InventoryNavigator,
       },
     ],
     [],
@@ -90,7 +90,6 @@ const Root = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log('useEffect setModel');
     setLoading(true);
     const getRemainsModel = async () => {
       const model: IModelData<IMDGoodRemain> = departments?.reduce(

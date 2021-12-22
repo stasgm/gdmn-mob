@@ -4,8 +4,9 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { ISettingsOption } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   MenuButton,
@@ -15,6 +16,7 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
@@ -29,27 +31,29 @@ export const InventoryViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
 
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryView'>>().params?.id;
-  //console.log();
+
+  const { data: settings } = useSelector((state) => state.settings);
+  const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
+
   const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
-    navigation.navigate('SelectGoodItem', {
+    navigation.navigate('SelectRemainsItem', {
       docId: id,
     });
   }, [navigation, id]);
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const handleScannerGood = useCallback(() => {}, []); //Scan
+  const handleScannerGood = useCallback(() => {}, []);
 
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
-
   const handleScanner = useCallback(() => {
-    navigation.navigate('ScanBarcode', { docId: id });
-  }, [navigation, id]);
+    navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
+  }, [navigation, id, scanUsetSetting]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -104,7 +108,9 @@ export const InventoryViewScreen = () => {
   }
 
   const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+    <SwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} copy={false} routeName="InventoryLine">
+      <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+    </SwipeLineItem>
   );
 
   return (

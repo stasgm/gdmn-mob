@@ -14,23 +14,19 @@ import {
   Status,
   AppScreen,
   SubTitle,
+  SwipeListItem,
+  ScreenListItem,
+  IListItemProps,
 } from '@lib/mobile-ui';
 
 import { IOrderDocument } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
 
-import { IOrderListRenderItemProps } from './components/OrderListItem';
-import OrderSwipeListItem from './components/OrderSwipeListItem';
-
-export interface OrderListProps {
-  orders: IOrderListRenderItemProps[];
-}
-
 export interface OrderListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IOrderListRenderItemProps, OrderListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
 const OrderListScreen = () => {
   const navigation = useNavigation();
@@ -44,7 +40,7 @@ const OrderListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: IOrderListRenderItemProps[] = useMemo(() => {
+  const filteredList: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
         ? list
@@ -65,7 +61,7 @@ const OrderListScreen = () => {
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-        } as IOrderListRenderItemProps),
+        } as IListItemProps),
     );
   }, [status, list]);
 
@@ -120,9 +116,13 @@ const OrderListScreen = () => {
     });
   }, [actionsMenu, handleAddDocument, navigation]);
 
-  const renderItem: ListRenderItem<IOrderListRenderItemProps> = ({ item }) => {
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
-    return doc ? <OrderSwipeListItem renderItem={item} item={doc} /> : null;
+    return doc ? (
+      <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
+        <ScreenListItem {...item} routeName="OrderView" />
+      </SwipeListItem>
+    ) : null;
   };
 
   return (

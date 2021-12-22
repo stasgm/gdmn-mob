@@ -1,8 +1,8 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, TouchableOpacity, Vibration } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { v4 as uuid } from 'uuid';
-import { Text, IconButton } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 
@@ -10,7 +10,6 @@ import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/
 
 import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
-import { ScanButton } from '@lib/mobile-ui';
 import { useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
@@ -59,10 +58,6 @@ export const ScanBarcodeScreen = () => {
     setBarcode(data);
   };
 
-  const handleScannerGood = useCallback(() => {
-    navigation.navigate('InventoryEdit');
-  }, [navigation]);
-
   useEffect(() => {
     vibroMode && Vibration.vibrate(oneSecund);
   }, [vibroMode]);
@@ -82,7 +77,10 @@ export const ScanBarcodeScreen = () => {
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc) || ''];
+        const remItem =
+          goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown') || ''];
+        // Находим товар из модели остатков по баркоду, если баркод не найден, ищем товар с id равным unknown и добавляем в позицию документа
+        // Если таких товаров нет, то товар не найден
 
         if (!remItem) {
           return;
@@ -96,7 +94,7 @@ export const ScanBarcodeScreen = () => {
           quantity: 1,
           price: remains?.length ? remains[0].price : 0,
           remains: remains?.length ? remains?.[0].q : 0,
-          barcode: good.barcode,
+          barcode: good.id === 'unknown' ? barcode : good.barcode,
         };
       }
 
@@ -190,7 +188,7 @@ export const ScanBarcodeScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanStyle.transparent}
-            onPress={() => setFlashMode(!flashMode)} //navigation.navigate('RemainsList', { docId: document?.id })
+            onPress={() => navigation.navigate('SelectRemainsItem', { docId: document?.id })}
           />
         </View>
         {!scanned ? (
@@ -218,9 +216,12 @@ export const ScanBarcodeScreen = () => {
             <View style={scanStyle.buttonsContainer}>
               <TouchableOpacity
                 style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
-                onPress={() => setScanned(false)}
+                onPress={() => {
+                  setScanned(false);
+                  setItemLine(undefined);
+                }}
               >
-                <ScanButton onPress={handleScannerGood} />
+                <IconButton icon="barcode-scan" size={30} />
                 <Text style={scanStyle.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
@@ -238,7 +239,10 @@ export const ScanBarcodeScreen = () => {
             {scanned && itemLine && (
               <View style={scanStyle.buttonsContainer}>
                 <TouchableOpacity
-                  style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
+                  style={[
+                    scanStyle.buttons,
+                    { backgroundColor: itemLine.good.id === 'unknown' ? '#CC3C4D' : '#4380D3' },
+                  ]}
                   onPress={() => {
                     navigation.navigate('InventoryLine', {
                       mode: 0,
@@ -265,7 +269,7 @@ export const ScanBarcodeScreen = () => {
         {!scanned && (
           <View style={scanStyle.footer}>
             <>
-              <ScanButton onPress={handleScannerGood} />
+              <IconButton icon="barcode-scan" size={30} />
               <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>

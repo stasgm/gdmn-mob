@@ -1,6 +1,8 @@
 import { IUser } from '@lib/types';
 import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@material-ui/core';
 
+const avatar1 = require('../../../assets/images/avatar1.svg');
+
 interface IProps {
   user: IUser;
 }
@@ -16,7 +18,7 @@ const AccountProfile = ({ user }: IProps) => (
         }}
       >
         <Avatar
-          src={'/assets/images/avatar1.svg'}
+          src={avatar1}
           sx={{
             height: 100,
             width: 100,
