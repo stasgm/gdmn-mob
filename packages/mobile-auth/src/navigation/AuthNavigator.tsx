@@ -1,14 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import {
-  // configActions,
-  authActions,
-  useSelector,
-  useAuthThunkDispatch,
-  useDispatch,
-  // useConfigThunkDispatch,
-} from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
@@ -35,7 +28,6 @@ const AuthNavigator: React.FC = () => {
   const user = useSelector((state) => state.auth.user);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
-  // const configDispatch = useConfigThunkDispatch();
   const dispatch = useDispatch();
 
   /*
@@ -47,12 +39,21 @@ const AuthNavigator: React.FC = () => {
   const [isInit, setInit] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   console.log('useEffect loadSuperDataFromDisc', user?.id);
+  //   if (!user?.id) {
+  //     return;
+  //   }
+  //   dispatch(appActions.loadSuperDataFromDisc());
+  // }, [dispatch, user?.id]);
+
   useEffect(() => {
     // authDispatch(authActions.init());
     setLoading(true);
 
     let isMock = isDemo;
     if (connectionStatus === 'not-connected' && (!config.deviceId || isDemo)) {
+      console.log('isInit 111', config.deviceId, connectionStatus);
       //Если загружается приложение в демо режиме, а перед этим не вышли из аккаунта
       //то выполняем disconnect, меняем признак демо режима в false
       if (isDemo && user) {
@@ -61,6 +62,7 @@ const AuthNavigator: React.FC = () => {
       }
       setInit(true);
     } else {
+      console.log('isInit 222', config.deviceId, connectionStatus);
       setInit(false);
     }
     //При запуске приложения записываем настройки в апи
@@ -177,6 +179,8 @@ const AuthNavigator: React.FC = () => {
     Если connectionStatus = 'connected' и есть user, то переходим на окно с компаниями
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
+
+  console.log('isInit', isInit);
 
   return !loading ? (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>

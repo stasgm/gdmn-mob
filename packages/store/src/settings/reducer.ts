@@ -36,7 +36,7 @@ const baseSettings: Settings<IBaseSettings> = {
   },
 };
 
-const initialState: Readonly<SettingsState> = {
+export const initialState: Readonly<SettingsState> = {
   data: baseSettings,
   loading: false,
   errorMessage: '',
@@ -47,7 +47,10 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.addSetting):
+    case getType(actions.loadData):
+      return { ...action.payload, loading: false, errorMessage: '' };
+
+    case getType(actions.addOption):
       return {
         ...state,
         data: {
@@ -76,7 +79,6 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.deleteOption): {
       const removeProps = action.payload;
-      // state.data[action.payload];
       const { [removeProps]: remove, ...rest } = state.data;
       return { ...state, data: rest };
     }
@@ -84,24 +86,6 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
 
-    // Loading
-    /*     case getType(actions.fetchMessagesAsync.request):
-          return { ...state, loading: true };
-
-        case getType(actions.fetchMessagesAsync.success):
-          return {
-            ...state,
-            loading: false,
-            data: [...state.data, ...action.payload],
-          };
-
-        case getType(actions.fetchMessagesAsync.failure):
-          return {
-            ...state,
-            loading: false,
-            errorMessage: action.payload || 'error',
-          };
-     */
     default:
       return state;
   }

@@ -48,7 +48,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
         {
           text: 'Удалить',
           onPress: () => {
-            dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
+            dispatch(documentActions.removeDocumentLine({ docId, lineId: item.id }));
             navigation.goBack();
           },
         },

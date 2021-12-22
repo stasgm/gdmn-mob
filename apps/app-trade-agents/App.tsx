@@ -1,16 +1,13 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { PersistGate } from 'redux-persist/integration/react';
-import { IReference, ISettingsOption, Settings } from '@lib/types';
-import { authActions, refSelectors, settingsActions, useDispatch, useSelector, saveState, loadState } from '@lib/store';
+import { ISettingsOption, Settings } from '@lib/types';
+import { appActions, refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
 
-import { Caption } from 'react-native-paper';
+import { ActivityIndicator } from 'react-native';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
-
-import { Store } from 'redux';
+import { AppScreen } from '@lib/mobile-ui';
 
 import { store, useAppTradeThunkDispatch, appTradeActions } from './src/store';
 
@@ -91,38 +88,51 @@ const Root = () => {
     },
   };
 
-  const storeSettings = useSelector((state) => state.settings);
+  const storeSettings = useSelector((state) => state.settings)?.data;
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
   const appDispatch = useAppTradeThunkDispatch();
 
-  // useEffect(() => {
-  //   console.log('useEffect loadData');
-  //   dispatch(authActions.loadData());
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  useEffect(() => {
+    console.log('useEffect loadData');
+    // dispatch(documentActions.init());
+    // dispatch(authActions.init());
+    // saveDataToDisk('documents', store.getState().documents, '5ae8c930-0584-11ec-991a-779431d580c9');
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    console.log('useEffect loadSuperDataFromDisc', user?.id);
+    if (!user?.id) {
+      return;
+    }
+    dispatch(appActions.loadSuperDataFromDisc());
+  }, [dispatch, user?.id]);
 
   useEffect(() => {
     if (appSettings) {
       Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings.data[optionName];
+        const storeSet = storeSettings[optionName];
         if (!storeSet && value) {
-          dispatch(settingsActions.addSetting({ optionName, value }));
+          dispatch(settingsActions.addOption({ optionName, value }));
         }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeSettings]);
 
-  const { data: settings } = useSelector((state) => state.settings);
+  const settings = useSelector((state) => state.settings).data;
   const isUseNetPrice = (settings?.isUseNetPrice as ISettingsOption<boolean>)?.data;
 
-  const groups = (refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>)?.data;
-  const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
-  const goodMatrix = (refSelectors.selectByName('goodMatrix') as IReference<IGoodMatrix>)?.data;
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
+  const loading = useSelector((state) => state.app.loading);
 
-  const [loading, setLoading] = useState(false);
+  const [goodModelLoading, setGoodModelLoading] = useState(false);
 
   // useEffect(() => {
   //   setLoading(true);
@@ -192,7 +202,7 @@ const Root = () => {
 
   useEffect(() => {
     console.log('useEffect setModel');
-    setLoading(true);
+    setGoodModelLoading(true);
     const setModel = async () => {
       if (!goods?.length || !contacts?.length || !groups.length) {
         return;
@@ -260,7 +270,7 @@ const Root = () => {
       await appDispatch(appTradeActions.setGoodModel(goodModel));
     };
     setModel();
-    setLoading(false);
+    setGoodModelLoading(false);
   }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
 
   // const persistedState = loadState();
@@ -334,8 +344,12 @@ const Root = () => {
   //   setLoading(false);
   // }, [appTradeDispatch, contacts, goods, groups, netPrice, isUseNetPrice]);
 
+  console.log('222', loading, goodModelLoading);
+
   return loading ? (
-    <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
+    <AppScreen>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </AppScreen>
   ) : (
     <MobileApp items={navItems} />
   );

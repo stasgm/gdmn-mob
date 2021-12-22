@@ -1,4 +1,4 @@
-import { appStorage, saveState, loadState } from './src/utils/appStorage';
+import { appStorage, saveDataToDisk, loadDataFromDisk } from './src/utils/appStorage';
 export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
 export { TActions, IFormParam } from './src/types';
 // export { default as configActions } from './src/config';
@@ -18,4 +18,4 @@ export { default as refSelectors } from './src/references/selectors';
 export { default as settingsActions } from './src/settings';
 export { useSettingThunkDispatch } from './src/settings';
 export { default as appActions } from './src/app';
-export { appStorage, saveState, loadState };
+export { appStorage, saveDataToDisk, loadDataFromDisk };

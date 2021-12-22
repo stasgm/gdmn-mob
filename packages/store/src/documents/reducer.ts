@@ -6,7 +6,7 @@ import { StatusType } from '@lib/types';
 import { DocumentState } from './types';
 import { DocumentActionType, actions } from './actions';
 
-const initialState: Readonly<DocumentState> = {
+export const initialState: Readonly<DocumentState> = {
   list: [],
   loading: false,
   errorMessage: '',
@@ -16,6 +16,9 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
   switch (action.type) {
     case getType(actions.init):
       return initialState;
+
+    case getType(actions.loadData):
+      return { ...action.payload, loading: false, errorMessage: '' };
 
     case getType(actions.setDocumentsAsync.request):
       return { ...state, loading: true, errorMessage: '' };
@@ -101,15 +104,6 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         errorMessage: action.payload || 'error',
       };
 
-    // case getType(actions.setDocuments):
-    //   return {
-    //     ...state,
-    //     list: action.payload.map((doc) => state.list.find((d) => d.id === doc.id && d.status !== 'DRAFT') || doc),
-    //   };
-
-    // case getType(actions.deleteDocuments):
-    //   return { ...state, list: [] };
-
     case getType(actions.addDocument):
       return {
         ...state,
@@ -191,7 +185,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         ),
       };
 
-    case getType(actions.deleteDocumentLine):
+    case getType(actions.removeDocumentLine):
       return {
         ...state,
         list: state.list.map((doc) =>

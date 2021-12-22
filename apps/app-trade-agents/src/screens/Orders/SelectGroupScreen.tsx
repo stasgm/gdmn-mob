@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
-import { IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
@@ -30,7 +29,7 @@ const Group = ({
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const groups = refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>;
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
   const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
 

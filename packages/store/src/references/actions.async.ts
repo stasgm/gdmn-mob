@@ -83,21 +83,6 @@ const clearReferences = (): AppThunk<
   };
 };
 
-/*export const addReference = (reference: IReference): AppThunk => {
-  return async (dispatch) => {
-    dispatch(actions.addReferenceAsync.request(''));
-
-    await sleep(1000);
-
-    //TODO: проверка
-    if (reference) {
-      return dispatch(actions.addReferenceAsync.success(reference));
-    }
-
-    return dispatch(actions.addReferenceAsync.failure('something wrong'));
-  };
-};*/
-
 export default {
   setReferences,
   addReferences,

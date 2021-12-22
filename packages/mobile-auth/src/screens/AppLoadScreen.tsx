@@ -3,7 +3,8 @@ import { Text, View } from 'react-native';
 
 import { ScreenTitle, AppScreen, PrimeButton, globalStyles as styles, RoundButton } from '@lib/mobile-ui';
 import { ICompany, INamedEntity } from '@lib/types';
-import api from '@lib/client-api';
+
+import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import localStyles from './styles';
 
@@ -20,6 +21,8 @@ const AppLoadScreen = (props: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
+  const dispatch = useAuthThunkDispatch();
+
   const loadCompany = useCallback(async () => {
     // Вынести в store/auth в async actions
     if (!company) {
@@ -30,21 +33,27 @@ const AppLoadScreen = (props: Props) => {
     setLoading(true);
 
     console.log(company);
-    const response = await api.company.getCompany(company.id);
-
-    if (response.type === 'ERROR') {
+    const res = await dispatch(authActions.getCompany(company.id));
+    if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
+      setUserCompany(res.payload);
+    } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
+      setError(res.payload.toLocaleLowerCase());
     }
+    // const response = await api.company.getCompany(company.id);
 
-    if (response.type === 'GET_COMPANY') {
-      setUserCompany(response.company);
-    }
+    // if (response.type === 'ERROR') {
+    // }
 
-    if (response.type === 'ERROR') {
-      setError(response.message.toLocaleLowerCase());
-    }
+    // if (response.type === 'GET_COMPANY') {
+    //   setUserCompany(response.company);
+    // }
+
+    // if (response.type === 'ERROR') {
+    //   setError(response.message.toLocaleLowerCase());
+    // }
 
     setLoading(false);
-  }, [company]);
+  }, [company, dispatch]);
 
   useEffect(() => {
     company ? loadCompany() : setError('Компания для пользователя не задана');

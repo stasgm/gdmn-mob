@@ -90,7 +90,7 @@ const SelectGoodScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good');
 
-  const list = Object.entries(groupsModel[groupId]).map(([id, good]) => good);
+  const list = Object.entries(groupsModel[groupId]).map(([_, good]) => good);
 
   const filteredList = useMemo(() => {
     return (
@@ -112,6 +112,9 @@ const SelectGoodScreen = () => {
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
+              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />

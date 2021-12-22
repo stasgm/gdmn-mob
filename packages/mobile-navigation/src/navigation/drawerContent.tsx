@@ -33,7 +33,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       <View style={styles.userProfile}>
         <View style={styles.userInfoSection}>
           <TouchableOpacity onPress={props.navigation.toggleDrawer}>
-            <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
+            <Avatar.Icon size={50} icon="badge-account-horizontal-outline" children={undefined} />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
             <Title style={styles.title}>{user?.firstName}</Title>
@@ -78,7 +78,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       {/* <Divider /> */}
       <View style={styles.systemInfo}>
         <TouchableOpacity disabled={loading} onPress={onSync}>
-          <Avatar.Icon size={50} style={loading && { opacity: 0.2 }} icon="cloud-refresh" />
+          <Avatar.Icon size={50} style={loading && { opacity: 0.2 }} icon="cloud-refresh" children={undefined} />
         </TouchableOpacity>
         <View style={styles.updateSection}>
           <Caption style={styles.caption}>{loading ? 'Синхронизация данных...' : ''}</Caption>

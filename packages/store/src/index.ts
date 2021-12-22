@@ -3,12 +3,6 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { StateType } from 'typesafe-actions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { persistReducer } from 'redux-persist';
-
-// import { reducer as configReducer } from './config';
-import throttle from 'lodash/throttle';
 
 import { reducer as documentReducer } from './documents';
 import { reducer as authReducer } from './auth';
@@ -17,44 +11,45 @@ import { reducer as settingsReducer } from './settings';
 import { reducer as msgReducer } from './messages';
 import { reducer as appReducer } from './app';
 import { TActions } from './types';
-import { UserAsyncStorage } from './utils/userAsyncStore';
-import { appStorage, loadState, saveState } from './utils/appStorage';
-import { AuthState } from './auth/types';
-import { initialState } from './auth/reducer';
+import { authMiddleware } from './auth/middleware';
+import { documentMiddleware } from './documents/middleware';
+import { referenceMiddleware } from './references/middleware';
+import { settingMiddleware } from './settings/middleware';
+
 // const persistConfig = {
 //   key: 'config',
 //   storage: UserAsyncStorage,
 // };
 
-const persistAuthConfig = {
-  key: 'auth',
-  storage: UserAsyncStorage,
-  whitelist: ['user', 'settings', 'company', 'device', 'isDemo'],
-};
+// const persistAuthConfig = {
+//   key: 'auth',
+//   storage: UserAsyncStorage,
+//   whitelist: ['user', 'settings', 'company', 'device', 'isDemo'],
+// };
 
-const persistDocsConfig = {
-  key: 'documents',
-  storage: UserAsyncStorage,
-  whitelist: ['list'],
-};
+// const persistDocsConfig = {
+//   key: 'documents',
+//   storage: UserAsyncStorage,
+//   whitelist: ['list'],
+// };
 
-const persistRefsConfig = {
-  key: 'references',
-  storage: UserAsyncStorage,
-  whitelist: ['list'],
-};
+// const persistRefsConfig = {
+//   key: 'references',
+//   storage: UserAsyncStorage,
+//   whitelist: ['list'],
+// };
 
-const persistSettingsConfig = {
-  key: 'settings',
-  storage: UserAsyncStorage,
-  whitelist: ['data'],
-};
+// const persistSettingsConfig = {
+//   key: 'settings',
+//   storage: UserAsyncStorage,
+//   whitelist: ['data'],
+// };
 
-const persistAppConfig = {
-  key: 'app',
-  storage: UserAsyncStorage,
-  whitelist: ['formParams', 'errorList'],
-};
+// const persistAppConfig = {
+//   key: 'app',
+//   storage: UserAsyncStorage,
+//   whitelist: ['formParams', 'errorList'],
+// };
 
 // export const rootReducer = {
 //   // config: persistReducer(persistConfig, configReducer),
@@ -83,11 +78,17 @@ const createReducer = <S, A extends AnyAction>(asyncReducers: AppReducers<S, A>)
 };
 
 // <S, A extends AnyAction>
-export const configureStore = (appReducers: AppReducers<any, AnyAction>) => {
-  const middleware = [thunkMiddleware];
-  const middleWareEnhancer = applyMiddleware(...middleware);
-
+export const configureStore = (appReducers: AppReducers<any, AnyAction>, middlewares: any) => {
   console.log('configureStore');
+  const middleware = [
+    thunkMiddleware,
+    authMiddleware,
+    documentMiddleware,
+    referenceMiddleware,
+    settingMiddleware,
+    ...middlewares,
+  ];
+  const middleWareEnhancer = applyMiddleware(...middleware);
 
   const store = createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
   // const store = loadState()

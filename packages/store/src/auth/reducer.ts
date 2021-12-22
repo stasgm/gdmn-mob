@@ -41,6 +41,7 @@ export const initialState: Readonly<AuthState> = {
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
+  console.log('reducer auth', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -51,14 +52,10 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setConfig):
       return { ...state, config: action.payload };
 
-    case getType(actions.loadDataAsync.request):
-      return { ...state, loading: true, status: '', error: false };
-
-    case getType(actions.loadDataAsync.success):
-      return { ...state, ...action.payload, loading: false, status: '', error: false };
-
-    case getType(actions.loadDataAsync.failure):
-      return { ...state, loading: false, status: action.payload, error: true };
+    case getType(actions.loadData): {
+      console.log('reducer loadData', action.payload);
+      return { ...action.payload, loading: false, status: '', error: false };
+    }
 
     case getType(actions.getDeviceByUidAsync.request):
       return { ...state, loading: true, status: '', error: false, device: undefined };
@@ -114,35 +111,17 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         status: '',
         loading: false,
         company: undefined,
-        // connectionStatus: state.settings.deviceId ? 'connected' : 'not-connected',
-        // settings: { ...state.settings, debug: { ...state.settings.debug, isMock: false } },
         isDemo: false,
       };
 
     case getType(actions.logoutUserAsync.failure):
       return { ...state, error: true, status: action.payload, loading: false, user: undefined };
 
-    // case getType(actions.logout):
-    //   return { ...state, user: undefined, error: false, status: '', loading: false };
-    // Misc
     case getType(actions.setCompany):
       return { ...state, company: action.payload };
 
     case getType(actions.setUserToken):
       return { ...state, userToken: action.payload };
-
-    // case getType(actions.disconnect):
-    //   return {
-    //     ...state,
-    //     user: undefined,
-    //     device: undefined,
-    //     connectionStatus: 'not-connected',
-    //     error: false,
-    //     status: '',
-    //     loading: false,
-    //     isDemo: false,
-    //     // settings: { ...state.settings, debug: { ...state.settings.debug, isMock: false } },
-    //   };
 
     case getType(actions.disconnectAsync.request):
       return { ...state, error: false, status: '', loading: true };
@@ -196,17 +175,6 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setConnectionStatus):
       return { ...state, error: false, connectionStatus: action.payload };
 
-    // case getType(actions.setDemoMode):
-    //   return {
-    //     ...state,
-    //     connectionStatus: 'connected',
-    //     user: mockUser,
-    //     device: mockDevice,
-    //     company: mockUser.company as ICompany,
-    //     // settings: { ...state.settings, debug: { ...state.settings.debug, isMock: true } },
-    //     isDemo: true,
-    //   };
-
     case getType(actions.setDemoModeAsync.request):
       return {
         ...state,
@@ -222,7 +190,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         user: mockUser,
         device: mockDevice,
         company: mockUser.company as ICompany,
-        // settings: { ...state.settings, debug: { ...state.settings.debug, isMock: true } },
+        loading: false,
         isDemo: true,
       };
 

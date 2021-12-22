@@ -1,7 +1,5 @@
 import * as FileSystem from 'expo-file-system';
 
-import { AuthState } from '../auth/types';
-
 const dbDir = `${FileSystem.documentDirectory}db/`;
 
 const getDirectory = (path: string): string => {
@@ -57,56 +55,120 @@ export const appStorage = {
   },
 };
 
-export const loadState = async () => {
+export const loadDataFromDisk = async (key: string, userId?: string) => {
   try {
-    const state: any | null = await appStorage.getItem('state');
-    if (!state.auth.user) {
-      console.log('loadState 1', { auth: state.auth });
-      return state ? { auth: state.auth } : undefined;
-    }
-
-    const userId = state.auth.user.id;
-    const userStore = Object.entries(state).reduce((prev: any, cur: any) => {
-      if (!cur[0].includes(`${userId}/` && cur[0] !== 'auth')) {
-        return prev;
-      }
-      const key = cur[0].replace(`${userId}/`, '');
-      prev[key] = cur[1];
-      return prev;
-    }, {});
-
-    console.log('loadState 2', userStore.auth?.user?.id, userStore.documents?.list?.length);
-
-    return userStore;
+    const fileName = userId ? `${userId}/${key}` : key;
+    const data = await appStorage.getItem(fileName);
+    console.log('loadDataFromDisk', fileName, data);
+    return data;
   } catch (err) {
     console.log('err', err);
     return undefined;
   }
 };
 
-export const saveState = async (state: any) => {
+export const saveDataToDisk = async (key: string, newData: any, userId?: string) => {
   try {
-    if (!state.auth.user) {
-      console.log('saveState 1', { auth: state.auth });
-      await appStorage.setItem('state', { auth: state.auth });
-      return;
-    }
-    const userId = state.auth.user.id;
-    const userStore = Object.entries(state).reduce((prev: any, cur: any) => {
-      if (cur[0] === 'auth') {
-        prev[cur[0]] = cur[1];
-        return prev;
-      }
-      prev[`${userId}/${cur[0]}`] = cur[1];
-      return prev;
-    }, {});
-    const newState = { auth: state.auth, ...userStore };
-    console.log('saveState 2', newState.auth?.user?.id, newState.documents?.list?.length);
-    await appStorage.setItem('state', newState);
+    const fileName = userId ? `${userId}/${key}` : key;
+    await appStorage.setItem(fileName, newData);
+    console.log('saveDataToDisk', fileName, newData);
   } catch (err) {
     console.log('err', err);
   }
 };
+
+// export const loadState = async () => {
+//   try {
+//     const state: any | null = await appStorage.getItem('state');
+//     if (!state.auth.user) {
+//       console.log('loadState 1', { auth: state.auth });
+//       return state ? { auth: state.auth } : undefined;
+//     }
+
+//     const userId = state.auth.user.id;
+//     const userStore = Object.entries(state).reduce((prev: any, cur: any) => {
+//       if (!cur[0].includes(`${userId}/` && cur[0] !== 'auth')) {
+//         return prev;
+//       }
+//       const key = cur[0].replace(`${userId}/`, '');
+//       prev[key] = cur[1];
+//       return prev;
+//     }, {});
+
+//     console.log('loadState 2', userStore.auth?.user?.id, userStore.documents?.list?.length);
+
+//     return userStore;
+//   } catch (err) {
+//     console.log('err', err);
+//     return undefined;
+//   }
+// };
+
+// export const loadStateByKey = async (key: string) => {
+//   try {
+//     const state: any | null = await appStorage.getItem('state');
+//     if (!state.auth.user) {
+//       return undefined;
+//     }
+
+//     const userId = state.auth.user.id;
+//     const userStore = state[`${userId}/${key}`];
+
+//     console.log('loadState 2', key, userStore.list?.length);
+
+//     return userStore;
+//   } catch (err) {
+//     console.log('err', err);
+//     return undefined;
+//   }
+// };
+
+// export const saveState = async (state: any) => {
+//   try {
+//     if (!state.auth.user) {
+//       console.log('saveState 1', { auth: state.auth });
+//       await appStorage.setItem('state', { auth: state.auth });
+//       return;
+//     }
+//     const userId = state.auth.user.id;
+//     const userStore = Object.entries(state).reduce((prev: any, cur: any) => {
+//       if (cur[0] === 'auth') {
+//         prev[cur[0]] = cur[1];
+//         return prev;
+//       }
+//       prev[`${userId}/${cur[0]}`] = cur[1];
+//       return prev;
+//     }, {});
+//     console.log('saveState 2');
+//     await appStorage.setItem('state', { auth: state.auth, ...userStore });
+//   } catch (err) {
+//     console.log('err', err);
+//   }
+// };
+
+// export const saveState = async (state: any) => {
+//   try {
+//     if (!state.auth.user) {
+//       console.log('saveState 1', { auth: state.auth });
+//       await appStorage.setItem('state', { auth: state.auth });
+//       return;
+//     }
+//     const userId = state.auth.user.id;
+//     const userStore = Object.entries(state).reduce((prev: any, cur: any) => {
+//       if (cur[0] === 'auth') {
+//         prev[cur[0]] = cur[1];
+//         return prev;
+//       }
+//       prev[`${userId}/${cur[0]}`] = cur[1];
+//       return prev;
+//     }, {});
+//     const newState = { auth: state.auth, ...userStore };
+//     console.log('saveState 2', newState.auth?.user?.id, newState.documents?.list?.length);
+//     await appStorage.setItem('state', newState);
+//   } catch (err) {
+//     console.log('err', err);
+//   }
+// };
 
 // const loadData = async () => {
 //   console.log('Load data', 'Начало загрузки данных из Storage');

@@ -9,40 +9,42 @@ import { useDispatch } from 'react-redux';
 
 import { AppThunk } from '../types';
 
+import { UserAsyncStorage } from '../utils/userAsyncStore';
+
+import { appActions } from '../app/actions';
+
 import { AuthState } from './types';
 import { actions, AuthActionType } from './actions';
-import { UserAsyncStorage } from '../utils/userAsyncStore';
-import { user as mockUser } from '@lib/mock';
-import { appStorage, loadState } from '../utils/appStorage';
 
 export type AuthDispatch = ThunkDispatch<AuthState, any, AuthActionType>;
 
 export const useAuthThunkDispatch = () => useDispatch<AuthDispatch>();
 
-const loadData = (): AppThunk<
-  Promise<ActionType<typeof actions.loadDataAsync>>,
-  AuthState,
-  ActionType<typeof actions.loadDataAsync>
-> => {
-  return async (dispatch) => {
-    dispatch(actions.loadDataAsync.request());
-    try {
-      // const auth: AuthState = await appStorage.getItem('auth');
-      console.log('loadData');
-      const newState = await loadState();
-      return dispatch(actions.loadDataAsync.success(newState));
-    } catch {
-      return dispatch(actions.loadDataAsync.failure('Ошибка загрузки данных из json'));
-    }
-  };
-};
+// const loadData = (): AppThunk<
+//   Promise<ActionType<typeof actions.loadDataAsync>>,
+//   AuthState,
+//   ActionType<typeof actions.loadDataAsync>
+// > => {
+//   return async (dispatch, getState) => {
+//     dispatch(actions.loadDataAsync.request());
+//     try {
+//       // const auth: AuthState = await appStorage.getItem('auth');
+//       // console.log('loadData');
+//       // const newState = await loadStateByKey('auth');
+//       const newState = getState();
+//       return dispatch(actions.loadDataAsync.success(newState));
+//     } catch {
+//       return dispatch(actions.loadDataAsync.failure('Ошибка загрузки данных из json'));
+//     }
+//   };
+// };
 
 const getDeviceByUid = (
   uid: string,
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
-  ActionType<typeof actions.getDeviceByUidAsync>
+  ActionType<typeof actions.getDeviceByUidAsync> | ActionType<typeof appActions.loadSuperDataFromDisc>
 > => {
   return async (dispatch) => {
     dispatch(actions.getDeviceByUidAsync.request(''));
@@ -50,6 +52,7 @@ const getDeviceByUid = (
     const response = await api.device.getDevices({ uid });
 
     if (response.type === 'GET_DEVICES') {
+      dispatch(appActions.loadSuperDataFromDisc());
       return dispatch(actions.getDeviceByUidAsync.success(response.devices[0]));
     }
 
@@ -118,8 +121,8 @@ const login = (
     const response = await api.auth.login(credentials);
 
     if (response.type === 'LOGIN') {
-      UserAsyncStorage.setUserId(response.user.id);
-      //UserAsyncStorage.setUserId('5ae8c930-0584-11ec-991a-779431d580c9');
+      // const newState = getState();
+      // dispatch(actions.loadData(newState));
       return dispatch(actions.loginUserAsync.success(response.user));
     }
 
@@ -194,13 +197,13 @@ const setUserSettings = (
 const setDemoMode = (): AppThunk<
   Promise<ActionType<typeof actions.setDemoModeAsync>>,
   AuthState,
-  ActionType<typeof actions.setDemoModeAsync>
+  ActionType<typeof actions.setDemoModeAsync> | ActionType<typeof appActions.loadSuperDataFromDisc>
 > => {
   return async (dispatch) => {
     dispatch(actions.setDemoModeAsync.request(''));
 
     try {
-      UserAsyncStorage.setUserId(mockUser.id);
+      dispatch(appActions.loadSuperDataFromDisc());
       return dispatch(actions.setDemoModeAsync.success());
     } catch {
       return dispatch(actions.setDemoModeAsync.failure('Ошибка установки демо режима'));
@@ -261,7 +264,6 @@ const getCompany = (
 };
 
 export default {
-  loadData,
   getDeviceByUid,
   activateDevice,
   signup,
