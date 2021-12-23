@@ -39,7 +39,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   useEffect(() => {
     //TODO временное решение
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 500);
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
   }, []);
 
   const handleDelete = useCallback(() => {
@@ -62,8 +62,6 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
-  const priceFSN = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
-
   const qtyRef = useRef<TextInput>(null);
 
   return (
@@ -82,7 +80,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           <View style={[styles.item, { backgroundColor: colors.background }]}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{priceFSN.toString()}</Text>
+              <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.priceFromSellBill?.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
@@ -109,7 +107,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
                 keyboardType="numeric"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
-                // autoFocus={isFocused}
+                autoFocus={true}
                 value={goodQty}
               />
             </View>

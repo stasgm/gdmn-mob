@@ -75,7 +75,7 @@ const SelectGoodScreen = () => {
 
   const renderItem = ({ item }: { item: INamedEntity }) => <Good item={item} />;
 
-  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
   // if (!contact) {
   //   return <Text style={styles.title}>Организация не определена</Text>;
@@ -85,8 +85,11 @@ const SelectGoodScreen = () => {
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
 
-  const groupsModel =
-    goodModel[contact?.id || ''].goods[groups.find((gr) => gr.id === groupId)?.parent?.id || ''] || {};
+  const parentGroup = groups.find((gr) => gr.id === groupId)?.parent?.id;
+
+  const allGoods = goodModel[contactId]?.goods || {};
+
+  const groupsModel = parentGroup ? allGoods[parentGroup] : {};
 
   const goods = refSelectors.selectByName<IGood>('good');
 

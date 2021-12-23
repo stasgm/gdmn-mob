@@ -52,7 +52,7 @@ const getDeviceByUid = (
     const response = await api.device.getDevices({ uid });
 
     if (response.type === 'GET_DEVICES') {
-      dispatch(appActions.loadSuperDataFromDisc());
+      // dispatch(appActions.loadSuperDataFromDisc());
       return dispatch(actions.getDeviceByUidAsync.success(response.devices[0]));
     }
 
@@ -203,7 +203,7 @@ const setDemoMode = (): AppThunk<
     dispatch(actions.setDemoModeAsync.request(''));
 
     try {
-      dispatch(appActions.loadSuperDataFromDisc());
+      // dispatch(appActions.loadSuperDataFromDisc());
       return dispatch(actions.setDemoModeAsync.success());
     } catch {
       return dispatch(actions.setDemoModeAsync.failure('Ошибка установки демо режима'));

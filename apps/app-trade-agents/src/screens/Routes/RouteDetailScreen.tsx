@@ -13,17 +13,15 @@ import { getDateString } from '../../utils/helpers';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';
+import { useTheme } from 'react-native-paper';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
-  // console.log(
-  //   'visits',
-  //   useSelector((state) => state.documents.list),
-  // );
 
   const [process, setProcess] = useState(false);
 
@@ -50,10 +48,7 @@ const RouteDetailScreen = () => {
   const outlet = point
     ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
     : undefined;
-  // const outlet = (outletRefMock as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
-  // const contact = outlet
-  //   ? (contactRefMock as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
-  //   : undefined;
+
   const contact = outlet
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
     : undefined;
@@ -107,7 +102,7 @@ const RouteDetailScreen = () => {
 
   return (
     <AppScreen style={styles.contentTop}>
-      <InfoBlock colorLabel="#4479D4" title={point.outlet.name}>
+      <InfoBlock colorLabel={colors.placeholder} title={point.outlet.name}>
         <>
           {outlet && (
             <>
@@ -118,7 +113,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? '#FC3F4D' : '#00C322'}
+        colorLabel={debt.saldo > 0 ? colors.error : '#a91160'}
         title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>

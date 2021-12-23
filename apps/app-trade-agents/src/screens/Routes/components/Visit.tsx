@@ -25,6 +25,7 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
+import { useTheme } from 'react-native-paper';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -38,6 +39,7 @@ interface IVisitProps {
 const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
+  const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
 
@@ -145,8 +147,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       creationDate: newOrderDate,
       editionDate: newOrderDate,
     };
-
-    console.log('newOrder id', newOrder.id);
 
     dispatch(documentActions.addDocument(newOrder));
 
@@ -276,7 +276,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   return (
     <>
       <View style={localStyles.container}>
-        <InfoBlock colorLabel="#4E9600" title="Визит">
+        <InfoBlock colorLabel='#7d0656' title="Визит">
           <>
             <Text>{visitTextBegin}</Text>
             {dateEnd && <Text>{visitTextEnd}</Text>}
@@ -294,7 +294,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#E3C920" title="Заявки">
+          <InfoBlock colorLabel='#567d06' title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -305,7 +305,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#E3C920" title="Возвраты">
+          <InfoBlock colorLabel={colors.error} title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}

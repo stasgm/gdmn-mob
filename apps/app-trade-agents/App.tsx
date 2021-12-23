@@ -7,7 +7,7 @@ import { appActions, documentActions, refSelectors, settingsActions, useDispatch
 
 import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
-import { Caption } from 'react-native-paper';
+import { ActivityIndicator, Caption } from 'react-native-paper';
 
 import { store, useAppTradeThunkDispatch, appTradeActions } from './src/store';
 
@@ -54,7 +54,7 @@ const Root = () => {
     },
   ];
 
-  const storeSettings = useSelector((state) => state.settings)?.data || {};
+  const baseSettings = useSelector((state) => state.settings?.data) || {};
   const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
@@ -63,6 +63,7 @@ const Root = () => {
   useEffect(() => {
     console.log('useEffect loadData');
     // dispatch(documentActions.init());
+    // dispatch(settingsActions.init());
     // dispatch(authActions.init());
     // saveDataToDisk('documents', store.getState().documents, '5ae8c930-0584-11ec-991a-779431d580c9');
     dispatch(appActions.loadGlobalDataFromDisc());
@@ -77,28 +78,26 @@ const Root = () => {
     dispatch(appActions.loadSuperDataFromDisc());
   }, [dispatch, user?.id]);
 
-  // useEffect(() => {
-  //   if (appSettings) {
-  //     Object.entries(appSettings).forEach(([optionName, value]) => {
-  //       const storeSet = storeSettings[optionName];
-  //       if (!storeSet && value) {
-  //         dispatch(settingsActions.addOption({ optionName, value }));
-  //       }
-  //     });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [storeSettings]);
+  useEffect(() => {
+    if (appSettings) {
+      Object.entries(appSettings).forEach(([optionName, value]) => {
+        const storeSet = baseSettings[optionName];
+        if (!storeSet && value) {
+          dispatch(settingsActions.addOption({ optionName, value }));
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseSettings]);
 
-  // const settings = useSelector((state) => state.settings).data;
-  // const isUseNetPrice = (settings?.isUseNetPrice as ISettingsOption<boolean>)?.data;
-
-  // const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
-  // const goods = refSelectors.selectByName<IGood>('good')?.data;
-  // const contacts = refSelectors.selectByName<IContact>('contact')?.data;
-  // const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data);
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
   const loading = useSelector((state) => state.app.loading);
 
-  const [goodModelLoading, setGoodModelLoading] = useState(false);
+  // const [goodModelLoading, setGoodModelLoading] = useState(false);
 
   // useEffect(() => {
   //   setLoading(true);
@@ -166,78 +165,84 @@ const Root = () => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [contacts, goods, groups, goodMatrix, isUseNetPrice]);
 
-  // useEffect(() => {
-  //   console.log('useEffect setModel');
-  //   setGoodModelLoading(true);
-  //   const setModel = async () => {
-  //     if (!goods?.length || !contacts?.length || !groups.length) {
-  //       return;
-  //     }
-  //     // const today = new Date();
-  //     const refGoods = groups
-  //       .filter((gr) => gr.parent !== undefined)
-  //       ?.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IGoodGroup) => {
-  //         if (!cur.parent) {
-  //           return prev;
-  //         }
-  //         const goodList = goods
-  //           .filter((g) => g.goodgroup.id === cur.id)
-  //           .reduce((gPrev: IMGoodData<IGood>, gCur: IGood) => {
-  //             gPrev[gCur.id] = gCur;
-  //             return gPrev;
-  //           }, {});
+  useEffect(() => {
+    console.log('useEffect setModel');
+    // setGoodModelLoading(true);
+    // if (!loading) {
+    //   dispatch(appActions.setLoading(true));
+    // }
+    const setModel = async () => {
+      if (!goods?.length || !contacts?.length || !groups.length) {
+        return;
+      }
+      // const today = new Date();
+      const refGoods = groups
+        .filter((gr) => gr.parent !== undefined)
+        ?.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IGoodGroup) => {
+          if (!cur.parent) {
+            return prev;
+          }
+          const goodList = goods
+            .filter((g) => g.goodgroup.id === cur.id)
+            .reduce((gPrev: IMGoodData<IGood>, gCur: IGood) => {
+              gPrev[gCur.id] = gCur;
+              return gPrev;
+            }, {});
 
-  //         const gr = prev[cur.parent.id] || {};
-  //         gr[cur.id] = goodList;
-  //         prev[cur.parent.id] = gr;
-  //         return prev;
-  //       }, {});
+          const gr = prev[cur.parent.id] || {};
+          gr[cur.id] = goodList;
+          prev[cur.parent.id] = gr;
+          return prev;
+        }, {});
 
-  //     const goodModel: IModelData<IGoodModel> = contacts.reduce((oPrev: IModelData<IGoodModel>, oCur: IContact) => {
-  //       const matrixContact = goodMatrix?.find((n) => n.contactId === oCur.id);
-  //       const onDate = matrixContact?.onDate ? new Date(matrixContact?.onDate) : new Date();
-  //       const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
-  //         matrixContact?.data && matrixContact.data.length && isUseNetPrice
-  //           ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
-  //               const good = goods.find((g) => g.id === cur.goodId);
-  //               if (!good) {
-  //                 return prev;
-  //               }
+      const goodModel: IModelData<IGoodModel> = contacts.reduce((oPrev: IModelData<IGoodModel>, oCur: IContact) => {
+        const matrixContact = goodMatrix?.find((n) => n.contactId === oCur.id);
+        const onDate = matrixContact?.onDate ? new Date(matrixContact?.onDate) : new Date();
+        const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
+          matrixContact?.data && matrixContact.data.length && isUseNetPrice
+            ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
+                const good = goods.find((g) => g.id === cur.goodId);
+                if (!good) {
+                  return prev;
+                }
 
-  //               const group = groups.find((gr) => gr.id === good.goodgroup.id);
-  //               if (!group) {
-  //                 return prev;
-  //               }
-  //               //Если есть родитель, то возьмем все группы из родителя,
-  //               //иначе эта группа первого уровня, здесь не должно быть таких
-  //               if (!group.parent) {
-  //                 return prev;
-  //               }
+                const group = groups.find((gr) => gr.id === good.goodgroup.id);
+                if (!group) {
+                  return prev;
+                }
+                //Если есть родитель, то возьмем все группы из родителя,
+                //иначе эта группа первого уровня, здесь не должно быть таких
+                if (!group.parent) {
+                  return prev;
+                }
 
-  //               const newGood = {
-  //                 ...good,
-  //                 priceFsn: cur.priceFsn,
-  //                 priceFso: cur.priceFso,
-  //                 priceFsnSklad: cur.priceFsnSklad,
-  //                 priceFsoSklad: cur.priceFsoSklad,
-  //               } as IGood;
+                const newGood = {
+                  ...good,
+                  priceFsn: cur.priceFsn,
+                  priceFso: cur.priceFso,
+                  priceFsnSklad: cur.priceFsnSklad,
+                  priceFsoSklad: cur.priceFsoSklad,
+                } as IGood;
 
-  //               const newParentGroup = prev[group.parent.id] || {};
-  //               const newGroup = newParentGroup[group.id] || {};
-  //               newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
-  //               return { ...prev, [group.parent.id]: newParentGroup };
-  //             }, {})
-  //           : refGoods;
+                const newParentGroup = prev[group.parent.id] || {};
+                const newGroup = newParentGroup[group.id] || {};
+                newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
+                return { ...prev, [group.parent.id]: newParentGroup };
+              }, {})
+            : refGoods;
 
-  //       oPrev[oCur.id] = { contactName: oCur.name, onDate, goods: parentGroupList };
-  //       return oPrev;
-  //     }, {});
+        oPrev[oCur.id] = { contactName: oCur.name, onDate, goods: parentGroupList };
+        return oPrev;
+      }, {});
 
-  //     await appDispatch(appTradeActions.setGoodModel(goodModel));
-  //   };
-  //   setModel();
-  //   setGoodModelLoading(false);
-  // }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
+      await appDispatch(appTradeActions.setGoodModel(goodModel));
+    };
+    setModel();
+    // setGoodModelLoading(false);
+    // if (!loading) {
+    //   dispatch(appActions.setLoading(false));
+    // }
+  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
 
   // const persistedState = loadState();
 
@@ -310,38 +315,29 @@ const Root = () => {
   //   setLoading(false);
   // }, [appTradeDispatch, contacts, goods, groups, netPrice, isUseNetPrice]);
 
-  console.log('222', loading, goodModelLoading);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     console.log('1111');
+  //     setTimeout(() => {}, 5000);
+  //     console.log('2222');
+  //   }
+  // }, [loading]);
+  // console.log('33333', loading);
 
-  return loading || goodModelLoading ? (
+  return loading ? (
     <AppScreen>
-      <Caption style={styles.text}>{'Загрузка данных...'}</Caption>
+      <ActivityIndicator size="large" color="#0000ff" >
+      </ActivityIndicator>
+      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} />
   );
 };
 
-// const StoreProvider = ({ children }: { children?: ReactNode }) => {
-//   const [myStore, setStore] = useState<Store | null>(null);
-//   // const userId = useSelector((state) => state.auth.user?.id);
-//   console.log('store', myStore);
-
-//   useEffect(() => {
-//     store.then((str: any) => setStore(str)).catch(() => console.log('err'));
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, []);
-
-//   if (!myStore) {
-//     return <></>;
-//   } // or whatever
-//   return <Provider store={myStore}>{children}</Provider>;
-// };
-
 const App = () => (
   <Provider store={store}>
-    {/* <PersistGate loading={null} persistor={persistor}> */}
     <Root />
-    {/* </PersistGate> */}
   </Provider>
 );
 

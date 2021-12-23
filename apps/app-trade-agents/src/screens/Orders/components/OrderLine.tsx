@@ -40,7 +40,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
 
   useEffect(() => {
     //TODO временное решение
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 500);
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
   }, []);
 
   const handelQuantityChange = useCallback((value: string) => {

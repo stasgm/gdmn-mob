@@ -59,14 +59,6 @@ function SellBillScreen() {
     return formParams as ISellBillFormParam;
   }, [formParams]);
 
-  console.log('good', docGood);
-
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(appActions.clearFormParams());
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
   const serverName = (settings.serverName as ISettingsOption<string>).data || 0;
@@ -207,7 +199,7 @@ function SellBillScreen() {
           DEPARTNAME: 'Магазин-склад',
           DEPARTKEY: '323658854',
           DOCUMENTDATE: '2021-04-27T21:00:00.000Z',
-          QUANTITY: 4.95,
+          QUANTITY: 4.9511,
           PRICE: 5.35,
         },
         {

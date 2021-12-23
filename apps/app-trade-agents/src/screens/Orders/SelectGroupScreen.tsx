@@ -31,15 +31,15 @@ const Group = ({
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const groupsModel = goodModel[contact?.id || ''].goods[item.parent?.id || item.id] || {};
+  const goods = goodModel[contactId]?.goods || {};
+
+  const groupsModel = goods[item.parent?.id || item.id];
 
   const goodsObj = groupsModel[item.id];
-
-  // console.log('goodsObj', goodsObj);
 
   const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
 
@@ -108,7 +108,7 @@ const SelectGroupScreen = () => {
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const groupsModel = goodModel[contact?.id || ''].goods;
+  const groupsModel = contact?.id ? goodModel[contact.id]?.goods || {} : {};
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
