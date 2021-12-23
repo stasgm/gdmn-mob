@@ -49,7 +49,7 @@ function SellBillScreen() {
   const formParams = useSelector((state) => state.app.formParams);
   const { userToken } = useSelector((state) => state.auth);
 
-  const sellBilSettings = useSelector((state) => state.auth);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   const {
     dateBegin: docDateBegin,
@@ -197,7 +197,7 @@ function SellBillScreen() {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
-    if (sellBilSettings.settings.debug?.isMock) {
+    if (isDemo) {
       const mockSellBills: ISellBill[] = [
         {
           ID: '1246759230',

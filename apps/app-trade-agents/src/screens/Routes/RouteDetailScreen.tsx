@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 import { v4 as uuid } from 'uuid';
@@ -20,6 +20,10 @@ const RouteDetailScreen = () => {
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
+  // console.log(
+  //   'visits',
+  //   useSelector((state) => state.documents.list),
+  // );
 
   const [process, setProcess] = useState(false);
 
@@ -94,17 +98,9 @@ const RouteDetailScreen = () => {
       editionDate: date,
     };
 
-    dispatch(documentActions.addDocument(newVisit));
+    console.log('newVisit id', visitId);
 
-    // dispatch(
-    //   documentActions.addDocument({
-    //     id: `${id}${date}`,
-    //     routeLineId: Number(id),
-    //     dateBegin: date,
-    //     beginGeoPoint: coords,
-    //     takenType: 'ON_PLACE',
-    //   }),
-    // );
+    dispatch(documentActions.addDocument(newVisit));
 
     setProcess(false);
   };

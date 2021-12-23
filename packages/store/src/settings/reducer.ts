@@ -7,6 +7,8 @@ import { actions, SettingsActionType } from './actions';
 
 import { SettingsState } from './types';
 
+export const baseGroup = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
+
 const baseSettings: Settings<IBaseSettings> = {
   serverAutoCheck: {
     id: '1',
@@ -14,7 +16,7 @@ const baseSettings: Settings<IBaseSettings> = {
     description: 'Опрашивать сервер автоматически',
     data: true,
     type: 'boolean',
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
+    group: baseGroup,
   },
   refLoadType: {
     id: '2',
@@ -23,7 +25,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 2,
     visible: true,
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
+    group: baseGroup,
   },
   cleanDocTime: {
     id: '3',
@@ -32,7 +34,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
+    group: baseGroup,
   },
 };
 
@@ -43,6 +45,7 @@ export const initialState: Readonly<SettingsState> = {
 };
 
 const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialState, action): SettingsState => {
+  // console.log('reducer settings', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;

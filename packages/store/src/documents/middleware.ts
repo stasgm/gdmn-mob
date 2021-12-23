@@ -20,15 +20,21 @@ export const documentMiddleware = (store: any) => (next: any) => (action: any) =
 
   //doc.global.json
   //doc.user.<user_ID>.json
-  const userId = store.getState().auth.user?.id;
+  const state = store.getState();
+  const userId = state.auth.user?.id;
+  const loading = state.app.loading;
 
-  if (action.type === 'APP/LOAD_GLOBAL_DATA_FROM_DISC') {
+  if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
     // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-    store.dispatch(appActions.setLoading(true));
+    if (!loading) {
+      store.dispatch(appActions.setLoading(true));
+    }
     loadDataFromDisk('documents')
       .then((data) => store.dispatch(actions.loadData(data || initialState)))
       .finally(() => {
-        store.dispatch(appActions.setLoading(false));
+        if (!loading) {
+          store.dispatch(appActions.setLoading(false));
+        }
       })
       .catch((err) => {
         /* что, если ошибка */
@@ -38,16 +44,20 @@ export const documentMiddleware = (store: any) => (next: any) => (action: any) =
       });
   }
 
-  if (action.type === 'APP/LOAD_SUPER_DATA_FROM_DISC' && userId) {
+  if (action.type === getType(appActions.loadSuperDataFromDisc) && userId) {
     // а здесь мы грузим данные для залогиненого пользователя
-    store.dispatch(appActions.setLoading(true));
+    if (!loading) {
+      store.dispatch(appActions.setLoading(true));
+    }
     loadDataFromDisk('documents', userId)
       .then((data) => {
-        console.log('docs userssssss', data || initialState);
+        console.log('loadDataFromDisk docs', data?.list?.length);
         return store.dispatch(actions.loadData(data || initialState));
       })
       .finally(() => {
-        store.dispatch(appActions.setLoading(false));
+        if (!loading) {
+          store.dispatch(appActions.setLoading(false));
+        }
       })
       .catch((err) => {
         /* что, если ошибка */
@@ -71,9 +81,10 @@ export const documentMiddleware = (store: any) => (next: any) => (action: any) =
       case getType(actions.setDocumentsAsync.success):
       case getType(actions.updateDocumentsAsync.success):
       case getType(actions.removeDocumentsAsync.success): {
-        next(action);
+        const result = next(action);
 
         saveDataToDisk('documents', store.getState().documents, userId);
+        return result;
       }
     }
   }

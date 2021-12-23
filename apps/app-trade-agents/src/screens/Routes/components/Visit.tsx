@@ -146,6 +146,8 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       editionDate: newOrderDate,
     };
 
+    console.log('newOrder id', newOrder.id);
+
     dispatch(documentActions.addDocument(newOrder));
 
     navigation.navigate('OrderView', { id: newOrder.id });
@@ -233,7 +235,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const doc = orderDocs.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
-        <ScreenListItem {...item} routeName="ReturnView" />
+        <ScreenListItem {...item} routeName="OrderView" />
       </SwipeListItem>
     ) : null;
   };

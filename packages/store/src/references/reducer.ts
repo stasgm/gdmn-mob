@@ -11,6 +11,7 @@ export const initialState: Readonly<ReferenceState> = {
 };
 
 const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialState, action): ReferenceState => {
+  // console.log('reducer refs', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;

@@ -3,7 +3,7 @@ import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 import { AppTradeState, IGoodModel, IModelData } from './types';
 
 const init = createAction('APP_TRADE/INIT')();
-const loadData = createAction('LOAD_DATA')<AppTradeState>();
+const loadData = createAction('APP_TRADE/LOAD_DATA')<AppTradeState>();
 
 const setGoodModelAsync = createAsyncAction(
   'APP_TRADE/SET_GOOD_MODEL',

@@ -41,7 +41,7 @@ export const initialState: Readonly<AuthState> = {
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
-  console.log('reducer auth', action.type);
+  // console.log('reducer auth', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;

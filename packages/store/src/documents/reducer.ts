@@ -13,6 +13,7 @@ export const initialState: Readonly<DocumentState> = {
 };
 
 const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialState, action): DocumentState => {
+  // console.log('reducer docs', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -104,11 +105,14 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         errorMessage: action.payload || 'error',
       };
 
-    case getType(actions.addDocument):
+    case getType(actions.addDocument): {
+      console.log('reducer addDocument', action.payload);
+      console.log('reducer newList', [...(state.list || []), action.payload]);
       return {
         ...state,
         list: [...(state.list || []), action.payload],
       };
+    }
 
     case getType(actions.updateDocument):
       return {

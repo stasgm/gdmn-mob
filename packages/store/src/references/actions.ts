@@ -7,7 +7,7 @@ const init = createAction('REFERENCES/INIT')();
 const deleteReference = createAction('REFERENCES/DELETE')<string>();
 const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
 const clearError = createAction('REFERENCES/CLEAR_ERROR')();
-const loadData = createAction('LOAD_DATA')<ReferenceState>();
+const loadData = createAction('REFERENCES/LOAD_DATA')<ReferenceState>();
 
 const setReferencesAsync = createAsyncAction(
   'REFERENCES/SET_ALL',

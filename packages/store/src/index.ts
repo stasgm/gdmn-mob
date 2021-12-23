@@ -78,7 +78,7 @@ const createReducer = <S, A extends AnyAction>(asyncReducers: AppReducers<S, A>)
 };
 
 // <S, A extends AnyAction>
-export const configureStore = (appReducers: AppReducers<any, AnyAction>, middlewares: any) => {
+export const configureStore = (appReducers: AppReducers<any, AnyAction>, middlewares?: any) => {
   console.log('configureStore');
   const middleware = [
     thunkMiddleware,

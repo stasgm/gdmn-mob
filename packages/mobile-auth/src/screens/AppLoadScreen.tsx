@@ -23,6 +23,8 @@ const AppLoadScreen = (props: Props) => {
 
   const dispatch = useAuthThunkDispatch();
 
+  console.log('AppLoadScreen 11', company);
+
   const loadCompany = useCallback(async () => {
     // Вынести в store/auth в async actions
     if (!company) {
@@ -32,7 +34,7 @@ const AppLoadScreen = (props: Props) => {
     setError(undefined);
     setLoading(true);
 
-    console.log(company);
+    console.log('AppLoadScreen22', company);
     const res = await dispatch(authActions.getCompany(company.id));
     if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
       setUserCompany(res.payload);

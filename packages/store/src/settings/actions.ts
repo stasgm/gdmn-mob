@@ -10,7 +10,7 @@ const addSettings = createAction('SETTINGS/ADD_MANY')<Settings>();
 const deleteOption = createAction('SETTINGS/DELETE_ONE')<keyof IBaseSettings>();
 const deleteAllSettings = createAction('SETTINGS/DELETE_ALL')();
 const clearError = createAction('SETTINGS/CLEAR_ERROR')();
-const loadData = createAction('LOAD_DATA')<SettingsState>();
+const loadData = createAction('SETTINGS/LOAD_DATA')<SettingsState>();
 
 const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS', 'SETTINGS/ADD_FAILURE')<
   string | undefined,

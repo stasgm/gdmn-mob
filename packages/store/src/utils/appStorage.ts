@@ -59,7 +59,7 @@ export const loadDataFromDisk = async (key: string, userId?: string) => {
   try {
     const fileName = userId ? `${userId}/${key}` : key;
     const data = await appStorage.getItem(fileName);
-    console.log('loadDataFromDisk', fileName, data);
+    console.log('loadDataFromDisk', fileName);
     return data;
   } catch (err) {
     console.log('err', err);
@@ -71,7 +71,7 @@ export const saveDataToDisk = async (key: string, newData: any, userId?: string)
   try {
     const fileName = userId ? `${userId}/${key}` : key;
     await appStorage.setItem(fileName, newData);
-    console.log('saveDataToDisk', fileName, newData);
+    console.log('saveDataToDisk', fileName);
   } catch (err) {
     console.log('err', err);
   }

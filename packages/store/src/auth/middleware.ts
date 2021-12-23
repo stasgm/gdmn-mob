@@ -24,17 +24,21 @@ export const authMiddleware = (store: any) => (next: any) => (action: any) => {
    *  Данные в файлы кэша записываются только когда меняются.
    */
   // const userId = store.getState().auth.user?.id;
-
-  if (action.type === 'APP/LOAD_GLOBAL_DATA_FROM_DISC') {
+  if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
     // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-    store.dispatch(appActions.setLoading(true));
+    const loading = store.getState().app.loading;
+    if (!loading) {
+      store.dispatch(appActions.setLoading(true));
+    }
     loadDataFromDisk('auth')
       .then((data) => {
-        console.log('loadDataFromDisk auth', data || initialState);
+        // console.log('loadDataFromDisk auth', data || initialState);
         return store.dispatch(actions.loadData({ ...initialState, ...data, connectionStatus: 'not-connected' }));
       })
       .finally(() => {
-        store.dispatch(appActions.setLoading(false));
+        if (!loading) {
+          store.dispatch(appActions.setLoading(false));
+        }
       })
       .catch((err) => {
         /* что, если ошибка */
@@ -54,10 +58,11 @@ export const authMiddleware = (store: any) => (next: any) => (action: any) => {
     case getType(actions.loginUserAsync.success):
     case getType(actions.setUserSettingsAsync.success):
     case getType(actions.setDemoModeAsync.success): {
-      next(action);
+      const result = next(action);
 
       const newData = store.getState().auth;
       saveDataToDisk('auth', { ...newData, connectionStatus: 'not-connected' });
+      return result;
     }
   }
 

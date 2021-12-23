@@ -12,14 +12,8 @@ const SettingsSceen = () => {
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
 
-  const { data } = useSelector((state) => state.settings);
-  const { settings } = useSelector((state) => state.auth);
-  /////
-  // const settingList = useMemo(() => {
-  //   return Object.entries(data)
-  //     .map(([key, value]) => ({ ...value, setName: key } as SettingListItem))
-  //     .filter((i) => i.visible);
-  // }, [data]);
+  const data = useSelector((state) => state.settings.data);
+  const config = useSelector((state) => state.auth.config);
 
   Object.entries(data).forEach((item) => {
     if (!item[1]?.group) {
@@ -69,19 +63,7 @@ const SettingsSceen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  const serverPath = `${settings?.protocol}${settings?.server}:${settings?.port}/${settings?.apiPath}`;
-
-  // const renderItem = ({ item }: { item: SettingListItem }) => (
-  //   <SettingsItem
-  //     key={item.id}
-  //     label={item.description || item.setName}
-  //     value={item.data}
-  //     onValueChange={(newValue) => {
-  //       const { setName, ...rest } = item;
-  //       handleUpdate(item.setName, { ...rest, data: newValue });
-  //     }}
-  //   />
-  // );
+  const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
   return (
     <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
@@ -92,34 +74,8 @@ const SettingsSceen = () => {
           <Text style={styles.name}>Путь к серверу</Text>
           <Text style={[styles.number, styles.field]}>{serverPath}</Text>
         </View>
-        <Divider />
-        <View style={styles.details}>
-          <Text style={styles.name}>Время ожидания ответа сервера, мс.</Text>
-          <Text style={[styles.number, styles.field]}>{settings?.timeout}</Text>
-        </View>
       </View>
       <View>
-        {/* <Text style={[styles.title]}>Настройки приложения</Text> */}
-        <Divider />
-        {/* <View>
-          {/* <View style={[localStyles.border, { borderColor: colors.primary }]}> *
-          {Object.entries(data)
-            .filter(([_, item]) => item?.visible)
-            .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
-            .map(([key, item]) => {
-              return item ? (
-                <View key={key}>
-                  <SettingsItem
-                    key={key}
-                    label={item.description || key}
-                    value={item.data}
-                    onValueChange={(newValue) => handleUpdate(key, { ...item, data: newValue })}
-                  />
-                  <Divider />
-                </View>
-              ) : null;
-            })}
-        </View> */}
         <View>
           {parents.map((item, key) => {
             return item ? (
@@ -135,12 +91,6 @@ const SettingsSceen = () => {
             ) : null;
           })}
         </View>
-        {/* <FlatList
-              data={settingList}
-              keyExtractor={(item, _) => item.id}
-              renderItem={renderItem}
-              ItemSeparatorComponent={Divider}
-            /> */}
       </View>
     </KeyboardAwareScrollView>
   );
