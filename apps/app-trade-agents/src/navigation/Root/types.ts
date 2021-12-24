@@ -46,3 +46,14 @@ export type MapStackParamList = {
   MapGeoView: undefined;
   ListGeoView: undefined;
 };
+
+export type GoodMatrixParamList = RefParamList & {
+  ContactView: { id: string };
+  GoodsList: { id: string } | undefined;
+  // ReturnLine: { mode: number; docId: string; item: IReturnLine };
+  // SelectItemReturn: { docId: string; name: string };
+  // SellBill: { id: string } | undefined;
+  // SellBillLine: { mode: number; docId?: string; item: ISellBillLine };
+};
+
+export type GoodMatrixStackParamList = { ContactList: undefined } & GoodMatrixParamList;
