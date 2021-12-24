@@ -1,91 +1,80 @@
 import { getType } from 'typesafe-actions';
 
-import { loadDataFromDisk, saveDataToDisk } from '../utils/appStorage';
-
 import { appActions } from '../app/actions';
+
+import { PersistedMiddleware } from '../types';
 
 import { initialState } from './reducer';
 
 import { actions } from './actions';
 
-export const settingMiddleware = (store: any) => (next: any) => (action: any) => {
-  /**
-   *  Данные одной подсистемы кэшируются в одном или нескольких файлах.
-   *  Мы не сохраняем ВЕСЬ стэйт в ОДНОМ файле, так как он может быть ОЧЕНЬ
-   *  большим и при сохранении мы не можем сделать операцию JSON.stringify
-   *  асинхронной.
-   *
-   *  Данные в файлы кэша записываются только когда меняются.
-   */
+export const settingMiddlewareFactory: PersistedMiddleware =
+  (load, save) => (store: any) => (next: any) => (action: any) => {
+    /**
+     *  Данные одной подсистемы кэшируются в одном или нескольких файлах.
+     *  Мы не сохраняем ВЕСЬ стэйт в ОДНОМ файле, так как он может быть ОЧЕНЬ
+     *  большим и при сохранении мы не можем сделать операцию JSON.stringify
+     *  асинхронной.
+     *
+     *  Данные в файлы кэша записываются только когда меняются.
+     */
 
-  //doc.global.json
-  //doc.user.<user_ID>.json
-  const state = store.getState();
-  const userId = state.auth.user?.id;
-  const loading = state.app.loading;
-
-  if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
-    // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-    if (!loading) {
-      store.dispatch(appActions.setLoading(true));
+    if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
+      // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
+      store.dispatch(actions.setLoading(true));
+      load('settings')
+        .then((data) => store.dispatch(actions.loadData(data || initialState)))
+        .finally(() => {
+          store.dispatch(actions.setLoading(false));
+        })
+        .catch((err) => {
+          /* что, если ошибка */
+          console.error(
+            err instanceof Error || typeof err !== 'object' ? err : 'При загрузке настроек с диска произошла ошибка',
+          );
+        });
     }
-    loadDataFromDisk('settings')
-      .then((data) => store.dispatch(actions.loadData(data || initialState)))
-      .finally(() => {
-        if (!loading) {
-          store.dispatch(appActions.setLoading(false));
-        }
-      })
-      .catch((err) => {
-        /* что, если ошибка */
-        console.error(
-          err instanceof Error || typeof err !== 'object' ? err : 'При загрузке настроек с диска произошла ошибка',
-        );
-      });
-  }
 
-  if (action.type === getType(appActions.loadSuperDataFromDisc) && userId) {
-    // а здесь мы грузим данные для залогиненого пользователя
-    if (!loading) {
-      store.dispatch(appActions.setLoading(true));
+    if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
+      // а здесь мы грузим данные для залогиненого пользователя
+      store.dispatch(actions.setLoading(true));
+      load('settings', store.getState().auth.user?.id)
+        .then((data) => {
+          // console.log('settings userssssss', data || initialState);
+          return store.dispatch(actions.loadData(data || initialState));
+        })
+        .finally(() => {
+          store.dispatch(actions.setLoading(false));
+        })
+        .catch((err) => {
+          /* что, если ошибка */
+          console.error(
+            err instanceof Error || typeof err !== 'object'
+              ? err
+              : 'При загрузке справочников с диска произошла ошибка',
+          );
+        });
     }
-    loadDataFromDisk('settings', userId)
-      .then((data) => {
-        // console.log('settings userssssss', data || initialState);
-        return store.dispatch(actions.loadData(data || initialState));
-      })
-      .finally(() => {
-        if (!loading) {
-          store.dispatch(appActions.setLoading(false));
+
+    if (store.getState().auth.user?.id) {
+      switch (action.type) {
+        case getType(actions.init):
+        case getType(actions.addOption):
+        case getType(actions.updateOption):
+        case getType(actions.addSettings):
+        case getType(actions.deleteOption):
+        case getType(actions.deleteAllSettings):
+        case getType(actions.addSettingsAsync.success): {
+          const result = next(action);
+
+          save('settings', store.getState().settings, store.getState().auth.user?.id);
+          return result;
         }
-      })
-      .catch((err) => {
-        /* что, если ошибка */
-        console.error(
-          err instanceof Error || typeof err !== 'object' ? err : 'При загрузке справочников с диска произошла ошибка',
-        );
-      });
-  }
-
-  if (userId) {
-    switch (action.type) {
-      case getType(actions.init):
-      case getType(actions.addOption):
-      case getType(actions.updateOption):
-      case getType(actions.addSettings):
-      case getType(actions.deleteOption):
-      case getType(actions.deleteAllSettings):
-      case getType(actions.addSettingsAsync.success): {
-        const result = next(action);
-
-        saveDataToDisk('settings', store.getState().settings, userId);
-        return result;
       }
     }
-  }
 
-  return next(action);
-};
+    return next(action);
+  };
 
 /*
 А как избавиться от того, чтобы не сохранять руками для каждой подсистемы?

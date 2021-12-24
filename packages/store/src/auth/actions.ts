@@ -11,6 +11,7 @@ const setConfig = createAction('AUTH/SET_CONFIG')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
 const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
+const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -90,6 +91,7 @@ export const actions = {
   setConnectionStatus,
   getCompanyAsync,
   setDemoModeAsync,
+  setLoading,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

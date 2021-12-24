@@ -20,12 +20,13 @@ import {
 } from '@lib/mobile-ui';
 import { useSendDocs } from '@lib/mobile-app';
 
+import { useTheme } from 'react-native-paper';
+
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
-import { useTheme } from 'react-native-paper';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -276,7 +277,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   return (
     <>
       <View style={localStyles.container}>
-        <InfoBlock colorLabel='#7d0656' title="Визит">
+        <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
             <Text>{visitTextBegin}</Text>
             {dateEnd && <Text>{visitTextEnd}</Text>}
@@ -294,7 +295,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel='#567d06' title="Заявки">
+          <InfoBlock colorLabel="#567d06" title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}

@@ -80,7 +80,9 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           <View style={[styles.item, { backgroundColor: colors.background }]}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.priceFromSellBill?.toString()}</Text>
+              <Text style={[styles.number, styles.field, { color: colors.text }]}>
+                {item.priceFromSellBill?.toString()}
+              </Text>
             </View>
           </View>
           <ItemSeparator />

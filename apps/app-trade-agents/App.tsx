@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { ISettingsOption, Settings } from '@lib/types';
-import { appActions, documentActions, refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  refSelectors,
+  settingsActions,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
 
 import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 import { ActivityIndicator, Caption } from 'react-native-paper';
 
-import { store, useAppTradeThunkDispatch, appTradeActions } from './src/store';
+import { appTradeActions, store, useAppTradeThunkDispatch } from './src/store';
 
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
 import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
-import config from './src/config';
 import { IContact, IGood, IGoodMatrix, IGoodGroup, IMatrixData } from './src/store/types';
 import { IGoodModel, IMGoodData, IMGroupData, IModelData, IMParentGroupData } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
@@ -63,6 +67,8 @@ const Root = () => {
   useEffect(() => {
     console.log('useEffect loadData');
     // dispatch(documentActions.init());
+    // dispatch(appTradeActions.init());
+    // dispatch(referenceActions.init());
     // dispatch(settingsActions.init());
     // dispatch(authActions.init());
     // saveDataToDisk('documents', store.getState().documents, '5ae8c930-0584-11ec-991a-779431d580c9');
@@ -326,8 +332,7 @@ const Root = () => {
 
   return loading ? (
     <AppScreen>
-      <ActivityIndicator size="large" color="#0000ff" >
-      </ActivityIndicator>
+      <ActivityIndicator size="large" color="#0000ff" />
       <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
     </AppScreen>
   ) : (

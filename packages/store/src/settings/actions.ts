@@ -11,6 +11,7 @@ const deleteOption = createAction('SETTINGS/DELETE_ONE')<keyof IBaseSettings>();
 const deleteAllSettings = createAction('SETTINGS/DELETE_ALL')();
 const clearError = createAction('SETTINGS/CLEAR_ERROR')();
 const loadData = createAction('SETTINGS/LOAD_DATA')<SettingsState>();
+const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
 
 const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS', 'SETTINGS/ADD_FAILURE')<
   string | undefined,
@@ -28,6 +29,7 @@ export const actions = {
   init,
   clearError,
   loadData,
+  setLoading,
 };
 
 export type SettingsActionType = ActionType<typeof actions>;

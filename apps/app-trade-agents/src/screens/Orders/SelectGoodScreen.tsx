@@ -75,7 +75,8 @@ const SelectGoodScreen = () => {
 
   const renderItem = ({ item }: { item: INamedEntity }) => <Good item={item} />;
 
-  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
+  const contactId =
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
   // if (!contact) {
   //   return <Text style={styles.title}>Организация не определена</Text>;

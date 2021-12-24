@@ -8,6 +8,7 @@ const deleteReference = createAction('REFERENCES/DELETE')<string>();
 const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
 const clearError = createAction('REFERENCES/CLEAR_ERROR')();
 const loadData = createAction('REFERENCES/LOAD_DATA')<ReferenceState>();
+const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
 
 const setReferencesAsync = createAsyncAction(
   'REFERENCES/SET_ALL',
@@ -43,6 +44,7 @@ export const actions = {
   clearReferencesAsync,
   clearError,
   init,
+  setLoading,
 };
 
 export type ReferenceActionType = ActionType<typeof actions>;

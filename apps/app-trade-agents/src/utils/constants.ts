@@ -1,5 +1,6 @@
 import { baseGroup } from '@lib/store/src/settings';
 import { Settings, StatusType } from '@lib/types';
+
 import config from '../config';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;

@@ -46,6 +46,9 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.init):
       return initialState;
 
+    case getType(actions.setLoading):
+      return { ...state, loading: action.payload };
+
     case getType(actions.clearError):
       return { ...state, error: false, status: '' };
 

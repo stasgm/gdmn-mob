@@ -1,8 +1,5 @@
-import { appStorage, saveDataToDisk, loadDataFromDisk } from './src/utils/appStorage';
 export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
-export { TActions, IFormParam } from './src/types';
-// export { default as configActions } from './src/config';
-// export { useConfigThunkDispatch } from './src/config';
+export { TActions, IFormParam, PersistedMiddleware, SaveDataToDisk, LoadDataFromDisk, AppStorage } from './src/types';
 export { default as authActions } from './src/auth';
 export { useAuthThunkDispatch } from './src/auth';
 export { default as authSelectors } from './src/auth/selectors';
@@ -18,4 +15,3 @@ export { default as refSelectors } from './src/references/selectors';
 export { default as settingsActions } from './src/settings';
 export { useSettingThunkDispatch } from './src/settings';
 export { default as appActions } from './src/app';
-export { appStorage, saveDataToDisk, loadDataFromDisk };

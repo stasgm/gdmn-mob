@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
@@ -10,11 +11,11 @@ import { reducer as referenceReducer } from './references';
 import { reducer as settingsReducer } from './settings';
 import { reducer as msgReducer } from './messages';
 import { reducer as appReducer } from './app';
-import { TActions } from './types';
-import { authMiddleware } from './auth/middleware';
-import { documentMiddleware } from './documents/middleware';
-import { referenceMiddleware } from './references/middleware';
-import { settingMiddleware } from './settings/middleware';
+import { LoadDataFromDisk, PersistedMiddleware, SaveDataToDisk, TActions } from './types';
+import { authMiddlewareFactory } from './auth/middleware';
+import { documentMiddlewareFactory } from './documents/middleware';
+import { referenceMiddlewareFactory } from './references/middleware';
+import { settingMiddlewareFactory } from './settings/middleware';
 
 // const persistConfig = {
 //   key: 'config',
@@ -78,44 +79,27 @@ const createReducer = <S, A extends AnyAction>(asyncReducers: AppReducers<S, A>)
 };
 
 // <S, A extends AnyAction>
-export const configureStore = (appReducers: AppReducers<any, AnyAction>, middlewares?: any) => {
+export const configureStore = (
+  load: LoadDataFromDisk,
+  save: SaveDataToDisk,
+  appReducers: AppReducers<any, AnyAction>,
+  appMiddlewares: any[] = [],
+  persistedMiddlewares: PersistedMiddleware[] = [],
+) => {
   console.log('configureStore');
+
+  const corePersistedMiddlewares = [documentMiddlewareFactory, authMiddlewareFactory,
+    referenceMiddlewareFactory, settingMiddlewareFactory];
+
   const middleware = [
     thunkMiddleware,
-    authMiddleware,
-    documentMiddleware,
-    referenceMiddleware,
-    settingMiddleware,
-    ...middlewares,
+    ...[...corePersistedMiddlewares, ...persistedMiddlewares].map(m => m(load, save)),
+    ...appMiddlewares,
   ];
   const middleWareEnhancer = applyMiddleware(...middleware);
 
   const store = createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
-  // const store = loadState()
-  //   .then((state: any) => {
-  //     console.log('loadState', state.auth?.user?.id, state.documents?.list?.length);
-  //     const store = createStore(createReducer(appReducers), state, composeWithDevTools(middleWareEnhancer));
-  //     return store;
-  //   })
-  //   .then((store) => {
-  //     store.subscribe(
-  //       throttle(() => {
-  //         const state = store.getState();
-  //         // if (!state.auth.user) {
-  //         //   saveState(state);
-  //         //   return;
-  //         // }
-  //         // const userId = state.auth.user.id;
-  //         // const userStore = Object.entries(state).reduce((prev: any, cur: any) => {
-  //         //   prev[`${userId}/${cur[0]}`] = cur[1];
-  //         //   return prev;
-  //         // }, {});
-  //         console.log('saveState');
-  //         saveState(state);
-  //       }, 1000),
-  //     );
-  //     return store;
-  //   });
+
   return { store };
 };
 

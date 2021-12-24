@@ -6,6 +6,8 @@ import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 import { v4 as uuid } from 'uuid';
 
+import { useTheme } from 'react-native-paper';
+
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
@@ -13,7 +15,6 @@ import { getDateString } from '../../utils/helpers';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';
-import { useTheme } from 'react-native-paper';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();

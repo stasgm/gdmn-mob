@@ -50,6 +50,9 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.init):
       return initialState;
 
+    case getType(actions.setLoading):
+      return { ...state, loading: action.payload };
+
     case getType(actions.loadData):
       return { ...action.payload, loading: false, errorMessage: '' };
 

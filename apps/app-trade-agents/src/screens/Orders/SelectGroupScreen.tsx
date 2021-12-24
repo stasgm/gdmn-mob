@@ -31,7 +31,8 @@ const Group = ({
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
+  const contactId =
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
