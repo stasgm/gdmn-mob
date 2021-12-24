@@ -10,6 +10,7 @@ import {
   IReferenceData,
   IDocumentType,
   StatusType,
+  RefTypeChoose,
 } from '@lib/types';
 
 // eslint-disable-next-line import/no-cycle
@@ -36,6 +37,7 @@ export interface INewFormParam<T = Set> extends IFormParam {
   status?: StatusType;
   department?: IDepartment;
   comment?: string;
+  type?: /*string; // |*/ RefTypeChoose | string;
 }
 
 export type Set = string | number | boolean | undefined;

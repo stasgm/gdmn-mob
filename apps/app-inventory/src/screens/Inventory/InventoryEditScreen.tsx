@@ -36,7 +36,6 @@ export const InventoryEditScreen = () => {
 
   const {
     department: docDepartment,
-    onDate: docOnDate,
     documentDate: docInventoryDate,
     number: docNumber,
     comment: docComment,
@@ -75,7 +74,6 @@ export const InventoryEditScreen = () => {
         appActions.setFormParams({
           number: inventory.number,
           documentType: inventory.documentType,
-          onDate: inventory.head.onDate,
           documentDate: inventory.documentDate,
           comment: inventory.head.comment,
           department: inventory.head.department,
@@ -86,7 +84,6 @@ export const InventoryEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: '1',
-          onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
         }),
@@ -98,7 +95,7 @@ export const InventoryEditScreen = () => {
     if (!docType) {
       return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     }
-    if (!(docNumber && docDepartment && docOnDate && docInventoryDate)) {
+    if (!(docNumber && docDepartment && docInventoryDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -110,11 +107,10 @@ export const InventoryEditScreen = () => {
         id: docId,
         documentType: docType,
         number: '1',
-        documentDate: newOntDate,
+        documentDate: docInventoryDate, //newOntDate,
         status: 'DRAFT',
         head: {
           comment: docComment,
-          onDate: docOnDate,
           department: docDepartment,
         },
         lines: [],
@@ -137,12 +133,12 @@ export const InventoryEditScreen = () => {
         id,
         number: docNumber as string,
         status: docStatus || 'DRAFT',
+        documentDate: docInventoryDate,
         documentType: docType,
         errorMessage: undefined,
         head: {
           ...inventory.head,
           comment: docComment as string,
-          onDate: docOnDate,
           department: docDepartment,
         },
         lines: inventory.lines,
@@ -153,19 +149,7 @@ export const InventoryEditScreen = () => {
       dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
       navigation.navigate('InventoryView', { id });
     }
-  }, [
-    docType,
-    docNumber,
-    docDepartment,
-    docOnDate,
-    docInventoryDate,
-    id,
-    docComment,
-    dispatch,
-    navigation,
-    inventory,
-    docStatus,
-  ]);
+  }, [docType, docNumber, docDepartment, docInventoryDate, id, docComment, dispatch, navigation, inventory, docStatus]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -186,7 +170,7 @@ export const InventoryEditScreen = () => {
     setShowOnDate(false);
 
     if (selectedOnDate) {
-      dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
+      dispatch(appActions.setFormParams({ documentDate: selectedOnDate.toISOString().slice(0, 10) }));
     }
   };
 
@@ -239,7 +223,7 @@ export const InventoryEditScreen = () => {
 
         <SelectableInput
           label="Дата"
-          value={getDateString(docOnDate || '')}
+          value={getDateString(docInventoryDate || '')}
           onPress={handlePresentOnDate}
           disabled={docStatus !== 'DRAFT'}
         />
@@ -264,7 +248,7 @@ export const InventoryEditScreen = () => {
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docOnDate || '')}
+          value={new Date(docInventoryDate || '')}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyOnDate}

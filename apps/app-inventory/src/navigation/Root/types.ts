@@ -16,7 +16,7 @@ export type RefParamList = {
 
 export type InventoryParamList = RefParamList & {
   InventoryView: { id: string };
-  InventoryEdit: { id: string } | undefined;
+  InventoryEdit: { itemId: string, id: string } | undefined;
   InventoryLine: { mode: number; docId: string; item: IInventoryLine };
   SelectGoodItem: { docId: string };
   SelectRemainsItem: { docId: string };

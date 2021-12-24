@@ -35,6 +35,7 @@ import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IDepartment, MetaData } from '../../store/types';
 
 import { ConditionalRenderItem } from './СonditionalRenderItem';
+import { metaData, inv } from '../../utils/constants';
 
 export const InventoryEditScreen2 = () => {
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;
@@ -42,7 +43,6 @@ export const InventoryEditScreen2 = () => {
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams);
-  //const storeSettings = useSelector((state) => state.settings);
 
   const documentTypeProps = 'inventory';
 
@@ -52,41 +52,22 @@ export const InventoryEditScreen2 = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === documentTypeProps);
 
-  const listRequisitesWithValuProps: MetaData /*: /*MetaData1*/ = {
-    number: {
-      id: '1',
-      type: 'string',
-      sortOrder: 1,
-      description: 'Номер документа',
-      clearInput: true,
-      requeried: true,
-      // onChangeText: 'onChangeText',
-    },
-    documentDate: {
-      id: '2',
-      type: 'date',
-      sortOrder: 1,
-      description: 'Дата',
-      requeried: true,
-    },
-    department: {
-      id: '3',
-      type: 'ref',
-      sortOrder: 1,
-      description: 'Подразделение',
-      refName: 'department',
-      requeried: true,
-    },
-    comment: {
-      id: '4',
-      // name: 'comment',
-      type: 'string',
-      sortOrder: 2,
-      description: 'Комментарий',
-      clearInput: true,
-      // onChangeText: 'onChangeText',
-    },
-  };
+  const valuesList = metaData;
+
+  // const f = valuesList.find((item) => {
+  // return Object.entries(item).find((i) => i[0] === 'Inventorys');
+  // });
+  // console.log('valueList', valuesList);
+
+  // const doc = Object.entries(f).map((item) => {return item[1]})[0];
+
+  const listRequisitesWithValuProps: any = Object.entries(
+    valuesList.find((item) => {
+      return Object.entries(item).find((i) => i[0] === 'Inventorys1');
+    }),
+  ).map((item) => {
+    return item[1];
+  })[0];
 
   const listRequisitesWithValue = useMemo(() => {
     console.log('listRequisitesWithValue');
@@ -105,7 +86,6 @@ export const InventoryEditScreen2 = () => {
       : {};
   }, [formParams]);
 
-  console.log('fff', formParams);
 
   console.log('listRequisitesWithValue', listRequisitesWithValue);
 
@@ -125,18 +105,6 @@ export const InventoryEditScreen2 = () => {
       dispatch(appActions.clearFormParams());
     };
   }, []);
-
-  const department = refSelectors.selectByName<IDepartment>('department')?.data;
-
-  const e = Object.entries(listRequisitesWithValue).find((item) => {
-    return item[0] === 'department' ? item : null;
-  });
-
-  console.log('e', e);
-
-  const a = e?.[1];
-
-  console.log('a', a);
 
   useEffect(() => {
     // Инициализируем параметры
@@ -164,10 +132,10 @@ export const InventoryEditScreen2 = () => {
     }
   }, [dispatch, inventory]);
 
-  const docStatus = String(formParams?.status) || 'DRAFT';
-  console.log('docStatus', docStatus);
+  const docStatus = formParams?.status || 'DRAFT';
+
   const isBlocked = docStatus !== 'DRAFT';
-  console.log('isBlocked', isBlocked);
+
 
   const handleSave = useCallback(() => {
     if (!docType) {
@@ -176,6 +144,8 @@ export const InventoryEditScreen2 = () => {
 
     const docId = !id ? uuid() : id;
     const newDate = new Date().toISOString();
+
+    const newDate1 = new Date().toISOString();
 
     if (!id) {
       const head = formParams
@@ -192,7 +162,7 @@ export const InventoryEditScreen2 = () => {
         id: docId,
         documentType: docType,
         number: '1',
-        documentDate: newDate,
+        documentDate: new Date().toISOString(), //newDate1, //currentValue, // newDate,
         status: 'DRAFT',
         head: head,
         lines: [],
@@ -330,21 +300,20 @@ export const InventoryEditScreen2 = () => {
           </>
         )}
 
-        {/* {Object.entries(listRequisitesWithValue).map(([key, item]) => { */}
-        {Object.entries(formParams).forEach(([key, item]) => {
-          //
+        {Object.entries(listRequisitesWithValue).map(([key, item]) => {
           const description = key;
-          console.log('descr', description);
           return (
             <ConditionalRenderItem
               key={key}
-              dsescription={description}
-              item={item}
+              description={item?.description}
+              item={item?.value}
+              type={(item?.type && item?.type) || ''}
               disabled={isBlocked}
+              clearInput={item?.clearInput || true}
               onChangeText={(text: string) => {
                 dispatch(appActions.setFormParams({ [key]: text.trim() || '' }));
               }}
-              onPress={() => handlePress(item!.type, key, item?.refName || '', item?.value)}
+              onPress={() => handlePress(item?.type, key, item?.refName || '', item?.value)}
             />
           );
         })}

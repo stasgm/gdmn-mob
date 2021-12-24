@@ -13,30 +13,42 @@ import { Caption } from 'react-native-paper';
 import { persistor, store } from './src/store';
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
-import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData, IDepartment } from './src/store/types';
+import {
+  IContact,
+  IGood,
+  IRemains,
+  IMDGoodRemain,
+  IMGoodData,
+  IMGoodRemain,
+  IModelData,
+  IDepartment,
+} from './src/store/types';
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
+
+import { metaData, inv } from './src/utils/constants';
 
 const Root = () => {
   //const newDispatch = useDocDispatch();
   //newDispatch(settingsActions.init());
-  const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'Inventorys',
-        title: 'Инвентаризации',
-        icon: 'file-document-outline',
-        component: InventoryNavigator,
-        // metaData:
-      },
-      {
-        name: 'Inventorys1',
-        title: 'Инвентаризации1',
-        icon: 'file-document-outline',
-        component: InventoryNavigator,
-      },
-    ],
-    [],
-  );
+  // const navItems: INavItem[] = useMemo(
+  //   () => [
+  //     {
+  //       name: 'Inventorys',
+  //       title: 'Инвентаризации',
+  //       icon: 'file-document-outline',
+  //       component: InventoryNavigator,
+  //     },
+  //     {
+  //       name: 'Inventorys1',
+  //       title: 'Инвентаризации1',
+  //       icon: 'file-document-outline',
+  //       component: InventoryNavigator,
+  //     },
+  //   ],
+  //   [],
+  // );
+
+  const navItems: INavItem[] = useMemo(() => inv, []);
 
   const appSettings: Settings = {
     scannerUse: {
