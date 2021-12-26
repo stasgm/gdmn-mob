@@ -1,4 +1,4 @@
-import { DrawerButton, globalStyles as styles, ItemSeparator } from '@lib/mobile-ui';
+import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -65,41 +65,40 @@ const ContactListScreen = () => {
   }, [colors.card, filterVisible, handleAddDocument, navigation]);
 
   const renderItem = ({ item }: { item: any }) => {
-    const a = contacts.find((i) => i.id === item.id);
-    console.log('1234567', a);
-    return <ContactItem item={a} />;
+    const contact = contacts.find((i) => i.id === item.id);
+    return <ContactItem item={contact} />;
   };
   // };
 
   return (
-    <>
-      <View>
-        {filterVisible && (
-          <>
-            <View style={styles.flexDirectionRow}>
-              <Searchbar
-                placeholder="Поиск"
-                onChangeText={setSearchQuery}
-                value={searchQuery}
-                style={[styles.flexGrow, styles.searchBar]}
-                // eslint-disable-next-line react/no-children-prop
-                children={undefined}
-                autoComplete={undefined}
-              />
-            </View>
-            <ItemSeparator />
-          </>
-        )}
-        <FlatList
-          data={contacts}
-          keyExtractor={(_, i) => String(i)}
-          renderItem={renderItem}
-          scrollEventThrottle={400}
-          ItemSeparatorComponent={ItemSeparator}
-        />
-        <Text>123</Text>
-      </View>
-    </>
+    <AppScreen>
+      {/* <View> */}
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
+              autoComplete={undefined}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
+      <FlatList
+        data={contacts}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        scrollEventThrottle={400}
+        ItemSeparatorComponent={ItemSeparator}
+      />
+      <Text>123</Text>
+      {/* </View> */}
+    </AppScreen>
   );
 };
 

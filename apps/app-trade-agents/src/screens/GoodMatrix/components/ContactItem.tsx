@@ -16,8 +16,6 @@ export interface IRefItem {
   item: any;
 }
 
-// type ViewScreenProp = StackNavigationProp<GoodMatrixStackParamList, 'ReferenceDetals'>;
-
 const ContactItem = ({ item, refName }: IRefItem) => {
   const navigation = useNavigation();
   // console.log('ítem', item);
@@ -35,45 +33,12 @@ const ContactItem = ({ item, refName }: IRefItem) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name|| a.id}</Text>
+            <Text style={styles.name}>{item.name}</Text>
           </View>
         </View>
       </View>
     </TouchableOpacity>
   );
 };
-
-// interface IProps {
-//   docId: string;
-//   item: IReturnLine;
-//   readonly?: boolean;
-// }
-
-// const ContactItem = ({ docId, item, readonly = false }: IProps) => {
-//   const { colors } = useTheme();
-//   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
-
-//   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
-
-//   return (
-//     <TouchableOpacity
-//       onPress={() => {
-//         !readonly && navigation.navigate('ReturnLine', { mode: 1, docId, item });
-//       }}
-//     >
-//       <View style={[styles.item]}>
-//         <View style={[styles.icon]}>
-//           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
-//         </View>
-//         <View style={styles.details}>
-//           <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
-//           <Text style={[styles.field, { color: colors.text }]}>
-//             {item.quantity} {good?.valuename} x {(good?.priceFsn || 0).toString()} р.
-//           </Text>
-//         </View>
-//       </View>
-//     </TouchableOpacity>
-//   );
-// };
 
 export default ContactItem;

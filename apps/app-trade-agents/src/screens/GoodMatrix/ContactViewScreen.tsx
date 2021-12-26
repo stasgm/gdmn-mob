@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
@@ -9,11 +9,11 @@ import { refSelectors } from '@lib/store';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';
+import GoodItem from './components/GoodItem';
 
 const ContactViewScreen = () => {
   const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'ContactView'>>().params;
   const contact = refSelectors.selectByName<IContact>('contact')?.data.find((e) => e.id === id);
-
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data.find((item) => item.contactId === id);
 
@@ -44,6 +44,12 @@ const ContactViewScreen = () => {
       ),
     });
   }, [navigation, filterVisible, colors.card]);
+
+  const renderItem = ({ item }: { item: any /*IReturnLine*/ }) => {
+    const good = goodMatrix?.data.find((i) => i.goodId === item.goodId);
+    return <GoodItem contactId={contact?.id} item={good} />;
+  };
+
   return (
     <>
       <SubTitle style={[styles.title]}>{contact?.name}</SubTitle>
@@ -63,6 +69,13 @@ const ContactViewScreen = () => {
           <ItemSeparator />
         </>
       )}
+      <FlatList
+        data={goodMatrix?.data}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        scrollEventThrottle={400}
+        ItemSeparatorComponent={ItemSeparator}
+      />
 
       <View>
         <Text>123</Text>

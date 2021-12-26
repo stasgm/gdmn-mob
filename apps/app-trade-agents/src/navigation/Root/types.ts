@@ -50,6 +50,7 @@ export type MapStackParamList = {
 export type GoodMatrixParamList = RefParamList & {
   ContactView: { id: string };
   GoodsList: { id: string } | undefined;
+  GoodLine: { contactId: string; item: any }; //{ id: string }; // | undefined;
   // ReturnLine: { mode: number; docId: string; item: IReturnLine };
   // SelectItemReturn: { docId: string; name: string };
   // SellBill: { id: string } | undefined;
