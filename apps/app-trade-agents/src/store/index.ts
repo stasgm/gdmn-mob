@@ -17,22 +17,22 @@ export { useAppTradeThunkDispatch } from './app/actions.async';
 
 type TActions = GeoActionType | AppTradeActionType;
 
-export const combinedReducer = {
+export const reducers = {
   appTrade: appTradeReducer,
   geo: geoReducer,
 };
 
-const rootReducer = combineReducers(combinedReducer);
+const appReducer = combineReducers(reducers);
 
 export const { store } = configureStore(
   loadDataFromDisk,
   saveDataToDisk,
-  combinedReducer,
+  reducers,
   [],
   [appTradeMiddlewareFactory],
 );
 
-export type AppState = ReturnType<typeof rootReducer>;
+export type AppState = ReturnType<typeof appReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
 export type AppDispatch = ThunkDispatch<AppState, any, TActions>;
 

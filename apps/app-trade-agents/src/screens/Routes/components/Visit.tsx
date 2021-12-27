@@ -282,7 +282,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
             <Text>{visitTextBegin}</Text>
             {dateEnd && <Text>{visitTextEnd}</Text>}
             {process ? (
-              <ActivityIndicator size="large" color="#0000ff" />
+              <ActivityIndicator size="large" color={colors.primary} />
             ) : (
               <>
                 {!dateEnd && (
@@ -324,7 +324,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       ) : (
         readyDocs?.length > 0 &&
         (loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={colors.primary} />
         ) : (
           <PrimeButton icon="file-send" onPress={handleSendDocs}>
             Отправить

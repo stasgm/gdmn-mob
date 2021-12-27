@@ -14,6 +14,7 @@ import { mockGeo } from '../../store/geo/mock';
 import { ILocation } from '../../store/geo/types';
 
 import localStyles from './styles';
+import { useTheme } from 'react-native-paper';
 
 interface Region {
   latitude: number;
@@ -31,6 +32,7 @@ const MapScreen = () => {
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
 
   // const [currentPoint, setCurrentPoint] = useState<ILocation>();
 
@@ -159,7 +161,7 @@ const MapScreen = () => {
       </View>
       {loading && (
         <View style={localStyles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
       <MapView

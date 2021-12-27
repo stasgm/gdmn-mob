@@ -192,7 +192,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         connectionStatus: 'connected',
         user: mockUser,
         device: mockDevice,
-        company: mockUser.company as ICompany,
+        // company: mockUser.company as ICompany,
         loading: false,
         isDemo: true,
       };

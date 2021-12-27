@@ -1,5 +1,5 @@
 import { IUserCredentials, IUserSettings } from '@lib/types';
-import api from '@lib/client-api';
+import api, { sleep } from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
 
@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 
 import { AppThunk } from '../types';
 
-import { UserAsyncStorage } from '../utils/userAsyncStore';
+// import { UserAsyncStorage } from '../utils/userAsyncStore';
 
 import { appActions } from '../app/actions';
 
@@ -141,10 +141,9 @@ const disconnect = (): AppThunk<
 > => {
   return async (dispatch) => {
     dispatch(actions.disconnectAsync.request());
-
     try {
       // dispatch(actions.setConnectionStatus('not-connected'));
-      UserAsyncStorage.setUserId('');
+      // UserAsyncStorage.setUserId('');
       return dispatch(actions.disconnectAsync.success());
     } catch {
       return dispatch(actions.disconnectAsync.failure('Ошибка выхода'));
@@ -163,7 +162,7 @@ const logout = (): AppThunk<
     const response = await api.auth.logout();
 
     if (response.type === 'LOGOUT') {
-      UserAsyncStorage.setUserId('');
+      // UserAsyncStorage.setUserId('');
       dispatch(actions.setConnectionStatus(api.config.deviceId ? 'connected' : 'not-connected'));
       return dispatch(actions.logoutUserAsync.success());
     }

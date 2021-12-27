@@ -97,14 +97,15 @@ export const configureStore = (
     ...appMiddlewares,
   ];
   const middleWareEnhancer = applyMiddleware(...middleware);
+  const combinedReducer = createReducer(appReducers);
 
-  const store = createStore(createReducer(appReducers), composeWithDevTools(middleWareEnhancer));
+  const store = createStore(combinedReducer, composeWithDevTools(middleWareEnhancer));
 
   return { store };
 };
 
 export type RootState = StateType<typeof rootReducer>;
-export type AppDispatch = ThunkDispatch<RootState, any, TActions>; // TActions
+export type AppDispatch = ThunkDispatch<RootState, any, TActions>;
 
 export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;

@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useAuthThunkDispatch, useDispatch, appActions } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
 import api from '@lib/client-api';
-
-import { ActivityIndicator } from 'react-native';
 
 import {
   SplashScreen,
@@ -19,6 +17,8 @@ import {
 } from '../screens';
 
 import { AuthStackParamList } from './types';
+import { Caption, useTheme } from 'react-native-paper';
+import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
@@ -29,6 +29,7 @@ const AuthNavigator: React.FC = () => {
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
+  const { colors } = useTheme();
 
   /*
     При запуске приложения
@@ -36,19 +37,10 @@ const AuthNavigator: React.FC = () => {
       если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
     - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
   */
-  const [isInit, setInit] = useState(true);
+  const [isInit, setInit] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   console.log('useEffect loadSuperDataFromDisc', user?.id);
-  //   if (!user?.id) {
-  //     return;
-  //   }
-  //   dispatch(appActions.loadSuperDataFromDisc());
-  // }, [dispatch, user?.id]);
-
   useEffect(() => {
-    // authDispatch(authActions.init());
     setLoading(true);
 
     let isMock = isDemo;
@@ -72,8 +64,8 @@ const AuthNavigator: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const disconnect = useCallback(() => {
-    authDispatch(authActions.disconnect());
+  const disconnect = useCallback(async () => {
+    await authDispatch(authActions.disconnect());
   }, [authDispatch]);
 
   const saveConfig = useCallback(
@@ -81,7 +73,6 @@ const AuthNavigator: React.FC = () => {
       if (newConfig.deviceId === '') {
         disconnect();
       }
-      // authDispatch(authActions.setSettings(newSettings));
       authDispatch(authActions.setConfig(newConfig));
       api.config = { ...api.config, ...newConfig };
     },
@@ -149,8 +140,8 @@ const AuthNavigator: React.FC = () => {
     [logout, setCompany, user?.company],
   );
 
-  const onSetServerMode = useCallback(() => {
-    disconnect();
+  const onSetServerMode = useCallback(async () => {
+    await disconnect();
     setInit(false);
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,13 +182,13 @@ const AuthNavigator: React.FC = () => {
           <AuthStack.Screen
             name="Login"
             component={SignInWithParams}
-            options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
+            options={{ animationTypeForReplace: 'push' }}
           />
         ) : (
           <AuthStack.Screen
             name="LoginCompany"
             component={AppLoadWithParams}
-            options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
+            options={{ animationTypeForReplace: 'pop' }}
           />
         )
       ) : connectionStatus === 'not-connected' ? (
@@ -219,9 +210,7 @@ const AuthNavigator: React.FC = () => {
         <AuthStack.Screen name="Activation" component={ActivateWithParams} />
       )}
     </AuthStack.Navigator>
-  ) : (
-    <ActivityIndicator size="large" color="#0000ff" />
-  );
+  ) : (<></>);
 };
 
 export default AuthNavigator;

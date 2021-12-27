@@ -54,8 +54,7 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.setDemoModeAsync.success): {
         const result = next(action);
 
-        const newData = store.getState().auth;
-        save('auth', { ...newData, connectionStatus: 'not-connected' });
+        save('auth', store.getState().auth);
         return result;
       }
     }

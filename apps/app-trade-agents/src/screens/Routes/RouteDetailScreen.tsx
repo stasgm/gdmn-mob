@@ -127,7 +127,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       {process ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={colors.primary} />
       ) : visits.length > 0 ? (
         <>
           {visits.map((visit) => (

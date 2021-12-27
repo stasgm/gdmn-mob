@@ -289,7 +289,7 @@ function SellBillScreen() {
     <AppScreen style={localStyles.appScreen}>
       <View style={localStyles.title}>
         <SubTitle>{statusName}</SubTitle>
-        {loading ? <ActivityIndicator size="small" color="#70667D" /> : <View style={localStyles.blank} />}
+        {loading ? <ActivityIndicator size="small" color={colors.primary} /> : <View style={localStyles.blank} />}
       </View>
       <Divider />
       <SelectableInput label="Дата начала" value={getDateString(docDateBegin || '')} onPress={handlePresentDateBegin} />

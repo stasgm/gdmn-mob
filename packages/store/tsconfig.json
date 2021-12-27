@@ -6,6 +6,6 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src/**/*", "index.ts", "../mobile-app/src/appStorageMobile.ts", "../../apps/web-admin/src/store/appStorage.ts"],
+  "include": ["src/**/*", "index.ts"],
   "exclude": ["node_modules", "dist"]
 }

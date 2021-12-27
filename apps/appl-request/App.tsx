@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Provider } from 'react-redux';
 
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { PersistGate } from 'redux-persist/integration/react';
 
-import { persistor, store } from './src/store';
+import { store } from './src/store';
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
+import { appActions, useDispatch, useSelector } from '@lib/store';
+import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -21,6 +22,29 @@ const Root = () => {
     [],
   );
 
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+
+  useEffect(() => {
+    console.log('useEffect loadData');
+    // dispatch(documentActions.init());
+    // dispatch(appTradeActions.init());
+    // dispatch(referenceActions.init());
+    // dispatch(settingsActions.init());
+    // dispatch(authActions.init());
+    // saveDataToDisk('documents', store.getState().documents, '5ae8c930-0584-11ec-991a-779431d580c9');
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    console.log('useEffect loadSuperDataFromDisc', user?.id);
+    if (!user?.id) {
+      return;
+    }
+    dispatch(appActions.loadSuperDataFromDisc());
+  }, [dispatch, user?.id]);
+
   return (
     // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне
     <MobileApp items={navItems} />
@@ -29,9 +53,9 @@ const Root = () => {
 
 const App = () => (
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+    <UIProvider theme={defaultTheme}>
       <Root />
-    </PersistGate>
+    </UIProvider>
   </Provider>
 );
 

@@ -2,6 +2,21 @@
 
 import * as FileSystem from 'expo-file-system';
 
+// export interface AppStorage<T = any> {
+//   setItem: (key: string, data: T) => Promise<void>;
+//   getItem: (key: string) => Promise<T>;
+//   removeItem: (key: string) => Promise<void>;
+// }
+
+// export type LoadDataFromDisk = (key: string, userId?: string) => Promise<any>;
+// export type SaveDataToDisk = (key: string, newData: any, userId?: string) => Promise<void>;
+
+// /**
+//  * Мидлвэр для записи и восстановления стэйт из кэша (локального хранилища)
+//  */
+// export type PersistedMiddleware = (load: LoadDataFromDisk, save: SaveDataToDisk) => (action: any) => any;
+
+
 import { AppStorage, LoadDataFromDisk, SaveDataToDisk } from '@lib/store';
 
 const dbDir = `${FileSystem.documentDirectory}db/`;

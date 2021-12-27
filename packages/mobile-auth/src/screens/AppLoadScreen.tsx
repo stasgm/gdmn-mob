@@ -23,10 +23,7 @@ const AppLoadScreen = (props: Props) => {
 
   const dispatch = useAuthThunkDispatch();
 
-  console.log('AppLoadScreen 11', company);
-
   const loadCompany = useCallback(async () => {
-    // Вынести в store/auth в async actions
     if (!company) {
       return;
     }
@@ -34,25 +31,12 @@ const AppLoadScreen = (props: Props) => {
     setError(undefined);
     setLoading(true);
 
-    console.log('AppLoadScreen22', company);
     const res = await dispatch(authActions.getCompany(company.id));
     if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
       setUserCompany(res.payload);
     } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
       setError(res.payload.toLocaleLowerCase());
     }
-    // const response = await api.company.getCompany(company.id);
-
-    // if (response.type === 'ERROR') {
-    // }
-
-    // if (response.type === 'GET_COMPANY') {
-    //   setUserCompany(response.company);
-    // }
-
-    // if (response.type === 'ERROR') {
-    //   setError(response.message.toLocaleLowerCase());
-    // }
 
     setLoading(false);
   }, [company, dispatch]);
