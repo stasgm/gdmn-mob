@@ -57,7 +57,7 @@ const Root = () => {
     {
       name: 'GoodMatrix',
       title: 'Матрицы',
-      icon: 'map-outline',
+      icon: 'tag-text-outline',
       component: GoodMatrixNavigator,
     },
   ];

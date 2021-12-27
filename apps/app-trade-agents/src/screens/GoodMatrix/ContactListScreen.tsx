@@ -1,45 +1,68 @@
-import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator } from '@lib/mobile-ui';
+import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { SectionList, SectionListData, View } from 'react-native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';
+import { getDateString } from '../../utils/helpers';
 
 import ContactItem from './components/ContactItem';
 
 export type RefListItem = IReference & { refName: string };
 
+export interface ContactListSectionProps {
+  title: string;
+}
+
+export type SectionDataProps = SectionListData<IContact, ContactListSectionProps>[];
+
 const ContactListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<GoodMatrixStackParamList, 'ContactList'>>();
   const [searchQuery, setSearchQuery] = useState('');
-
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
-  // const { loading } = useSelector((state) => state.documents);
-  // const { list } = useSelector((state) => state.references);
-
-  // const refData = useMemo(() => {
-  //   return Object.entries(list)
-  //     .map(([key, value]) => ({ ...value, refName: key } as RefListItem))
-  //     .filter((i) => i.visible !== false);
-  // }, [list]);
-
-  // console.log('ref', refData);
-
-  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
 
-  console.log('çontacts', contacts);
-  console.log('matrix', goodMatrix);
-  const handleAddDocument = useCallback(() => {
-    navigation.navigate('ContactView');
-  }, [navigation]);
+  const contacts = refSelectors
+    .selectByName<IContact>('contact')
+    ?.data.filter((i) => i.id === goodMatrix.find((item) => item.contactId === i.id)?.contactId);
+
+  const filteredList = useMemo(() => {
+    return (
+      contacts
+        ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
+    );
+  }, [contacts, searchQuery]);
+
+  const sections = useMemo(
+    () =>
+      filteredList.reduce<SectionDataProps>((prev, item) => {
+        const matrixDate = goodMatrix.find((i) => i.contactId === item.id)?.onDate;
+        const sectionTitle = matrixDate ? getDateString(matrixDate) : '';
+        const sectionExists = prev.some(({ title }) => title === sectionTitle);
+        if (sectionExists) {
+          return prev.map((section) =>
+            section.title === sectionTitle ? { ...section, data: [...section.data, item] } : section,
+          );
+        }
+
+        return [
+          ...prev,
+          {
+            title: sectionTitle,
+            data: [item],
+          },
+        ];
+      }, []),
+    [filteredList, goodMatrix],
+  );
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -47,9 +70,6 @@ const ContactListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  ////////////////////////////
-  //SEARCH/////
-  ////////////////////////////
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
@@ -62,17 +82,15 @@ const ContactListScreen = () => {
         />
       ),
     });
-  }, [colors.card, filterVisible, handleAddDocument, navigation]);
+  }, [colors.card, filterVisible, navigation]);
 
   const renderItem = ({ item }: { item: any }) => {
     const contact = contacts.find((i) => i.id === item.id);
     return <ContactItem item={contact} />;
   };
-  // };
 
   return (
     <AppScreen>
-      {/* <View> */}
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -89,15 +107,17 @@ const ContactListScreen = () => {
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        data={contacts}
-        keyExtractor={(_, i) => String(i)}
+      <SectionList
+        sections={sections}
+        keyExtractor={({ id }) => id}
         renderItem={renderItem}
-        scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+        renderSectionHeader={({ section }) => (
+          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
+        )}
+        scrollEventThrottle={400}
+        onEndReached={() => ({})}
       />
-      <Text>123</Text>
-      {/* </View> */}
     </AppScreen>
   );
 };
