@@ -49,8 +49,8 @@ export type MapStackParamList = {
 
 export type GoodMatrixParamList = RefParamList & {
   ContactView: { id: string };
-  GoodsList: { id: string };
-  GoodLine: { item: IMatrixDataNamed | undefined }; //{ id: string }; // | undefined;
+  GoodList: { id: string };
+  GoodLine: { item: IMatrixDataNamed };
 };
 
 export type GoodMatrixStackParamList = { ContactList: undefined } & GoodMatrixParamList;

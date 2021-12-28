@@ -72,8 +72,6 @@ const MapScreen = () => {
     [routeList, selectedRoute?.id],
   );
 
-  console.log('SI', selectedItem, 'SR', selectedRoute);
-
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
       const initialList: ILocation[] = selectedItem.lines.map((e) => {
@@ -210,7 +208,6 @@ const MapScreen = () => {
   };
 
   const handleClickMarker = (props: ILocation) => {
-    console.log('props', props);
     setCurrentPoint(props);
   };
 

@@ -84,10 +84,7 @@ const ContactListScreen = () => {
     });
   }, [colors.card, filterVisible, navigation]);
 
-  const renderItem = ({ item }: { item: IContact }) => {
-    const contact = contacts.find((i) => i.id === item.id);
-    return <ContactItem item={contact} />;
-  };
+  const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
 
   return (
     <AppScreen>

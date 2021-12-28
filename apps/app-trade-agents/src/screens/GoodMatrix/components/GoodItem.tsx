@@ -10,12 +10,12 @@ import { GoodMatrixParamList } from '../../../navigation/Root/types';
 import { IMatrixDataNamed } from '../../../store/types';
 
 interface IProps {
-  item?: IMatrixDataNamed;
+  item: IMatrixDataNamed;
 }
 
 const GoodItem = ({ item }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'GoodsList'>>();
+  const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'GoodList'>>();
 
   return (
     <TouchableOpacity

@@ -7,7 +7,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { IContact } from '../../../store/types';
 
 export interface IRefItem {
-  item?: IContact;
+  item: IContact;
 }
 
 const ContactItem = ({ item }: IRefItem) => {
@@ -16,7 +16,7 @@ const ContactItem = ({ item }: IRefItem) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('GoodsList', { id: item?.id });
+        navigation.navigate('GoodList', { id: item?.id });
       }}
     >
       <View style={(styles.item, localStyles.line)}>

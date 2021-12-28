@@ -9,11 +9,8 @@ import { refSelectors } from '@lib/store';
 import { INamedEntity, IRefMetadata } from '@lib/types';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IGoodMatrix } from '../../store/types';
+import { IGoodMatrix, IMatrixDataNamed } from '../../store/types';
 
-interface IRefEntity extends INamedEntity {
-  [fieldName: string]: string | undefined | IRefEntity;
-}
 interface IProperty {
   sortOrder: number;
   name: string;
@@ -37,7 +34,7 @@ const GoodLineScreen = () => {
   const navigation = useNavigation();
   const item = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params?.item;
 
-  const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IRefEntity>;
+  const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IMatrixDataNamed>;
 
   const refData = useMemo(
     () =>
@@ -57,8 +54,6 @@ const GoodLineScreen = () => {
         .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),
     [metadata, item],
   );
-
-  console.log('refdata', refData);
 
   const { colors } = useTheme();
 
@@ -82,7 +77,6 @@ const GoodLineScreen = () => {
         />
         <ItemSeparator />
       </View>
-      <Text>123</Text>
       <ItemSeparator />
     </>
   );

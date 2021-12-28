@@ -12,8 +12,8 @@ import { IContact, IGood, IGoodMatrix, IMatrixDataNamed } from '../../store/type
 
 import GoodItem from './components/GoodItem';
 
-const GoodsListScreen = () => {
-  const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodsList'>>().params;
+const GoodListScreen = () => {
+  const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodList'>>().params;
   const contact = refSelectors.selectByName<IContact>('contact')?.data.find((e) => e.id === id);
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data.find((item) => item.contactId === id);
@@ -27,15 +27,15 @@ const GoodsListScreen = () => {
 
   const filteredList = useMemo(() => {
     const res = goodMatrix?.data;
-    const list = res?.map((item) => {
-      const name = goods.find((i) => i.id === item.goodId)?.name;
-      return {
-        ...item,
-        goodName: name,
-      } as IMatrixDataNamed;
-    });
     return (
-      list
+      res
+        ?.map((item) => {
+          const name = goods.find((i) => i.id === item.goodId)?.name;
+          return {
+            ...item,
+            goodName: name,
+          } as IMatrixDataNamed;
+        })
         ?.filter((i) =>
           i.goodName || i.priceFsn
             ? i.goodName.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -66,10 +66,7 @@ const GoodsListScreen = () => {
     });
   }, [navigation, filterVisible, colors.card]);
 
-  const renderItem = ({ item }: { item: IMatrixDataNamed }) => {
-    const good = filteredList?.find((i) => i.goodId === item.goodId);
-    return <GoodItem item={good} />;
-  };
+  const renderItem = ({ item }: { item: IMatrixDataNamed }) => <GoodItem item={item} />;
 
   return (
     <>
@@ -103,4 +100,4 @@ const GoodsListScreen = () => {
   );
 };
 
-export default GoodsListScreen;
+export default GoodListScreen;
