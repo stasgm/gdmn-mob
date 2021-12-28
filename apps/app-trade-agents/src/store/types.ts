@@ -107,6 +107,11 @@ export interface IMatrixData {
   priceFsnSklad?: number; // цена ФСН склад
 }
 
+export interface IMatrixDataNamed extends IMatrixData {
+  [fieldName: string]: number | string | undefined;
+  goodName: string;
+}
+
 export type IPackage = INamedEntity;
 
 export interface IPackageGood extends IEntity {
