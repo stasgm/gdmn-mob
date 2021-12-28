@@ -108,6 +108,7 @@ export interface IMatrixData {
 }
 
 export interface IMatrixDataNamed extends IMatrixData {
+  [fieldName: string]: number | string | undefined;
   goodName: string;
 }
 

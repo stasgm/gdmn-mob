@@ -4,8 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
+import { IContact } from '../../../store/types';
+
 export interface IRefItem {
-  item: any;
+  item?: IContact;
 }
 
 const ContactItem = ({ item }: IRefItem) => {
@@ -14,7 +16,7 @@ const ContactItem = ({ item }: IRefItem) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('ContactView', { id: item.id });
+        navigation.navigate('GoodsList', { id: item?.id });
       }}
     >
       <View style={(styles.item, localStyles.line)}>
@@ -23,7 +25,7 @@ const ContactItem = ({ item }: IRefItem) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.name}>{item?.name}</Text>
           </View>
         </View>
       </View>

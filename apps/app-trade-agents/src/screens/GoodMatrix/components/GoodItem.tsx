@@ -10,24 +10,17 @@ import { GoodMatrixParamList } from '../../../navigation/Root/types';
 import { IMatrixDataNamed } from '../../../store/types';
 
 interface IProps {
-  contactId: string | undefined;
-  item: IMatrixDataNamed | undefined; //IReturnLine
+  item?: IMatrixDataNamed;
 }
 
-const GoodItem = ({ contactId, item }: IProps) => {
+const GoodItem = ({ item }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'ContactView'>>();
-
-  console.log('item', item);
-
-  // const good = refSelectors.selectByName<IGood>('good')?.data.find((e) => e.id === item?.goodId);
-
-  // console.log('good', good);
+  const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'GoodsList'>>();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('GoodLine', { contactId, item });
+        navigation.navigate('GoodLine', { item });
       }}
     >
       <View style={[styles.item]}>

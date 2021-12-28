@@ -4,7 +4,7 @@ import { IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionList, SectionListData, View } from 'react-native';
+import { SectionList, SectionListData, View, Text } from 'react-native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
@@ -31,7 +31,7 @@ const ContactListScreen = () => {
 
   const contacts = refSelectors
     .selectByName<IContact>('contact')
-    ?.data.filter((i) => i.id === goodMatrix.find((item) => item.contactId === i.id)?.contactId);
+    ?.data.filter((i) => i.id === goodMatrix?.find((item) => item.contactId === i.id)?.contactId);
 
   const filteredList = useMemo(() => {
     return (
@@ -84,7 +84,7 @@ const ContactListScreen = () => {
     });
   }, [colors.card, filterVisible, navigation]);
 
-  const renderItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: IContact }) => {
     const contact = contacts.find((i) => i.id === item.id);
     return <ContactItem item={contact} />;
   };
@@ -117,6 +117,7 @@ const ContactListScreen = () => {
         )}
         scrollEventThrottle={400}
         onEndReached={() => ({})}
+        ListEmptyComponent={!contacts || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>
   );

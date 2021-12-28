@@ -6,10 +6,10 @@ import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
-import { INamedEntity } from '@lib/types';
+import { INamedEntity, IRefMetadata } from '@lib/types';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodMatrix } from '../../store/types';
+import { IGoodMatrix } from '../../store/types';
 
 interface IRefEntity extends INamedEntity {
   [fieldName: string]: string | undefined | IRefEntity;
@@ -35,31 +35,27 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
 
 const GoodLineScreen = () => {
   const navigation = useNavigation();
-  const { contactId, item } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params;
+  const item = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params?.item;
 
-  const good = refSelectors.selectByName<IGood>('good')?.data.find((e) => e.id === item?.goodId);
+  const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IRefEntity>;
 
-  const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata;
-
-  // Object.entries(item).forEach(([key, value]) => {
-  //   console.log('key', key, 'value', value);
-  // });
-
-  const refData: IProperty[] = useMemo(
+  const refData = useMemo(
     () =>
-      Object.entries(item)?.map(
+      item &&
+      Object.entries(metadata)
+        ?.map(
           ([key, value]) =>
             ({
-              sortOrder: metadata?.[key]?.sortOrder || 999,
+              sortOrder: value?.sortOrder,
               name: key,
-              title: metadata?.[key]?.name || key,
-              visible: metadata?.[key]?.visible !== false,
-              value: value instanceof Object ? value.name || '-' : value,
+              title: value?.name,
+              visible: value?.visible !== false,
+              value: item[key],
             } as IProperty),
         )
         .filter((i) => i.visible && i.name !== 'goodName')
         .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),
-    [item, metadata],
+    [metadata, item],
   );
 
   console.log('refdata', refData);
@@ -76,7 +72,7 @@ const GoodLineScreen = () => {
 
   return (
     <>
-      <SubTitle style={[styles.title]}>{item.goodName}</SubTitle>
+      <SubTitle style={[styles.title]}>{item?.goodName}</SubTitle>
       <View style={[styles.content]}>
         <FlatList
           data={refData}
@@ -88,52 +84,6 @@ const GoodLineScreen = () => {
       </View>
       <Text>123</Text>
       <ItemSeparator />
-      {/* <ScrollView>
-        <View style={[styles.content]}>
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>id</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.goodId}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>PriceFSN</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {(item.priceFsn || 0).toString()}
-              </Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>PriceFSNSklad</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {(item.priceFsnSklad || 0).toString()}
-              </Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>PriceFSO</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {(item.priceFso || 0).toString()}
-              </Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
-            <View style={styles.details}>
-              <Text style={[styles.name, { color: colors.text }]}>PriceFSOSklad</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {(item.priceFsoSklad || 0).toString()}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </ScrollView> */}
     </>
   );
 };
