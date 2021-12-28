@@ -6,11 +6,11 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IContact } from '../../../store/types';
 
-export interface IRefItem {
+export interface IContactItem {
   item: IContact;
 }
 
-const ContactItem = ({ item }: IRefItem) => {
+const ContactItem = ({ item }: IContactItem) => {
   const navigation = useNavigation();
 
   return (
