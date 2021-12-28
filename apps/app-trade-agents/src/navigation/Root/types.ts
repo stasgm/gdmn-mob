@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-import { IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
+import { IMatrixDataNamed, IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -46,3 +46,11 @@ export type MapStackParamList = {
   MapGeoView: undefined;
   ListGeoView: undefined;
 };
+
+export type GoodMatrixParamList = RefParamList & {
+  ContactView: { id: string };
+  GoodList: { id: string };
+  GoodLine: { item: IMatrixDataNamed };
+};
+
+export type GoodMatrixStackParamList = { ContactList: undefined } & GoodMatrixParamList;

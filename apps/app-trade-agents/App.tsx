@@ -16,6 +16,8 @@ import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
 import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
+import GoodMatrixNavigator from './src/navigation/Root/GoodMatrixNavigator';
+
 import config from './src/config';
 import { IContact, IGood, IGoodMatrix, IGoodGroup, IMatrixData } from './src/store/types';
 import { IGoodModel, IMGoodData, IMGroupData, IModelData, IMParentGroupData } from './src/store/app/types';
@@ -51,6 +53,12 @@ const Root = () => {
       title: 'Карта',
       icon: 'map-outline',
       component: MapNavigator,
+    },
+    {
+      name: 'GoodMatrix',
+      title: 'Матрицы',
+      icon: 'tag-text-outline',
+      component: GoodMatrixNavigator,
     },
   ];
 
