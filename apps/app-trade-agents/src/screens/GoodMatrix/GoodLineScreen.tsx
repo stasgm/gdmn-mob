@@ -9,7 +9,7 @@ import { refSelectors } from '@lib/store';
 import { INamedEntity, IRefMetadata } from '@lib/types';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IGoodMatrix, IMatrixDataNamed } from '../../store/types';
+import { IGoodMatrix, IMatrixDataNamed, IMatrixData } from '../../store/types';
 
 interface IProperty {
   sortOrder: number;
@@ -34,7 +34,7 @@ const GoodLineScreen = () => {
   const navigation = useNavigation();
   const item = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params?.item;
 
-  const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IMatrixDataNamed>;
+  const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IMatrixData>;
 
   const refData = useMemo(
     () =>
