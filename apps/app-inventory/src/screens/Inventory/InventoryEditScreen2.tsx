@@ -34,8 +34,9 @@ import {
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IDepartment, MetaData } from '../../store/types';
 
-import { ConditionalRenderItem } from './СonditionalRenderItem';
 import { metaData, inv } from '../../utils/constants';
+
+import { ConditionalRenderItem } from './СonditionalRenderItem';
 
 export const InventoryEditScreen2 = () => {
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;
@@ -63,7 +64,7 @@ export const InventoryEditScreen2 = () => {
 
   const listRequisitesWithValuProps: any = Object.entries(
     valuesList.find((item) => {
-      return Object.entries(item).find((i) => i[0] === 'Inventorys1');
+      return Object.entries(item).find((i) => i[0] === 'Prihod');
     }),
   ).map((item) => {
     return item[1];
@@ -85,7 +86,6 @@ export const InventoryEditScreen2 = () => {
         }, listRequisitesWithValuProps)
       : {};
   }, [formParams]);
-
 
   console.log('listRequisitesWithValue', listRequisitesWithValue);
 
@@ -132,10 +132,9 @@ export const InventoryEditScreen2 = () => {
     }
   }, [dispatch, inventory]);
 
-  const docStatus = formParams?.status || 'DRAFT';
+  const docStatus = (formParams?.status as string) || 'DRAFT';
 
   const isBlocked = docStatus !== 'DRAFT';
-
 
   const handleSave = useCallback(() => {
     if (!docType) {
@@ -162,7 +161,7 @@ export const InventoryEditScreen2 = () => {
         id: docId,
         documentType: docType,
         number: '1',
-        documentDate: new Date().toISOString(), //newDate1, //currentValue, // newDate,
+        documentDate: new Date().toISOString(),
         status: 'DRAFT',
         head: head,
         lines: [],
@@ -313,7 +312,7 @@ export const InventoryEditScreen2 = () => {
               onChangeText={(text: string) => {
                 dispatch(appActions.setFormParams({ [key]: text.trim() || '' }));
               }}
-              onPress={() => handlePress(item?.type, key, item?.refName || '', item?.value)}
+              onPress={() => handlePress(item?.type as 'string', key, item?.refName as string, item?.value)}
             />
           );
         })}

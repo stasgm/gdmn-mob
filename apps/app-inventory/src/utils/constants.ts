@@ -1,3 +1,5 @@
+/* eslint-disable import/order */
+/* eslint-disable @typescript-eslint/no-unused-vars-experimental */
 import { INavItem } from '@lib/mobile-navigation';
 import { StatusType } from '@lib/types';
 import { InventoryNavigator } from '../navigation/InventoryNavigator';
@@ -71,7 +73,7 @@ export const metaData: any[] = [
     },
   },
   {
-    Inventorys1: {
+    Prihod: {
       number: {
         id: '1',
         type: 'string',
@@ -163,11 +165,11 @@ export const inv: any = [
     component: InventoryNavigator,
   },
   {
-    name: 'Inventorys1',
+    name: 'Prihod',
     title: 'Приход',
     icon: 'file-document-outline',
     head: {
-      Inventorys1: {
+      Prihod: {
         number: {
           id: '1',
           type: 'string',

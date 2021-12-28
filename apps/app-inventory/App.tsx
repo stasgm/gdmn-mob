@@ -39,7 +39,7 @@ const Root = () => {
   //       component: InventoryNavigator,
   //     },
   //     {
-  //       name: 'Inventorys1',
+  //       name: 'Prihod',
   //       title: 'Инвентаризации1',
   //       icon: 'file-document-outline',
   //       component: InventoryNavigator,
@@ -88,29 +88,6 @@ const Root = () => {
       group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
     },
   };
-
-  /* const listRequisites: SettingsDoc = {
-    docNumber: {
-      id: '1',
-      name: 'number',
-      typeInput: 'string',
-      sortOrder: 1,
-      description: 'Номер документа',
-      clearInput: true,
-      disabled: true,
-      onChangeText: 'onChangeText',
-    },
-    docComment: {
-      id: '2',
-      name: 'comment',
-      typeInput: 'string',
-      sortOrder: 2,
-      description: 'Комментарий',
-      clearInput: true,
-      disabled: true,
-      onChangeText: 'onChangeText',
-    },
-  }; */
 
   const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();

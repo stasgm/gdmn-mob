@@ -8,7 +8,6 @@ import {
   MandateProps,
   IHead,
   IReferenceData,
-  IDocumentType,
   StatusType,
   RefTypeChoose,
 } from '@lib/types';
