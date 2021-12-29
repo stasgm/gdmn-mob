@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -30,13 +31,16 @@ export interface InventoryListSectionProps {
 }
 export type SectionDataProps = SectionListData<IListItemProps, InventoryListSectionProps>[];
 
-export const InventoryListScreen = () => {
+export const InventoryListScreen = (props: any) => {
+  const { params } = props.route;
+  const docType = params?.docType as string;
+
   const navigation = useNavigation();
 
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
+    .selectByDocType<IInventoryDocument>(docType)
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');

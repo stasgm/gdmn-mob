@@ -5,13 +5,12 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import { IReference, Settings } from '@lib/types';
 import { PersistGate } from 'redux-persist/integration/react';
-import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import { refSelectors, settingsActions, useDispatch, useSelector, useDispatch as useDocDispatch } from '@lib/store';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { Caption } from 'react-native-paper';
 
 import { persistor, store } from './src/store';
-import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
 import {
   IContact,
@@ -30,23 +29,6 @@ import { metaData, inv } from './src/utils/constants';
 const Root = () => {
   //const newDispatch = useDocDispatch();
   //newDispatch(settingsActions.init());
-  // const navItems: INavItem[] = useMemo(
-  //   () => [
-  //     {
-  //       name: 'Inventorys',
-  //       title: 'Инвентаризации',
-  //       icon: 'file-document-outline',
-  //       component: InventoryNavigator,
-  //     },
-  //     {
-  //       name: 'Prihod',
-  //       title: 'Инвентаризации1',
-  //       icon: 'file-document-outline',
-  //       component: InventoryNavigator,
-  //     },
-  //   ],
-  //   [],
-  // );
 
   const navItems: INavItem[] = useMemo(() => inv, []);
 

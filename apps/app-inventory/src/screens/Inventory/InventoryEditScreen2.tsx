@@ -8,9 +8,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocument, IDocumentType, IReference, RefTypeChoose, MetaData1, SettingValueDoc } from '@lib/types';
+import { IDocument, IDocumentType, IReference, RefTypeChoose } from '@lib/types';
 
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
+//import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import {
   docSelectors,
   useDispatch,
@@ -21,15 +21,7 @@ import {
   settingsActions,
   IFormParam,
 } from '@lib/store';
-import {
-  BackButton,
-  AppInputScreen,
-  SelectableInput,
-  Input,
-  SaveButton,
-  globalStyles as styles,
-  SubTitle,
-} from '@lib/mobile-ui';
+import { BackButton, AppInputScreen, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IDepartment, MetaData } from '../../store/types';
@@ -38,56 +30,45 @@ import { metaData, inv } from '../../utils/constants';
 
 import { ConditionalRenderItem } from './СonditionalRenderItem';
 
-export const InventoryEditScreen2 = () => {
+export const InventoryEditScreen2 = (props: any) => {
+  const { params } = props.route;
+  const documentTypeProps = params?.docType as string;
+
   const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryEdit'>>();
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  const documentTypeProps = 'inventory';
-
   const inventory = docSelectors.selectByDocType(documentTypeProps)?.find((e) => e.id === id);
 
-  const docType = refSelectors
+  const docTypeEdit = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === documentTypeProps);
 
   const valuesList = metaData;
 
-  // const f = valuesList.find((item) => {
-  // return Object.entries(item).find((i) => i[0] === 'Inventorys');
-  // });
-  // console.log('valueList', valuesList);
-
-  // const doc = Object.entries(f).map((item) => {return item[1]})[0];
-
   const listRequisitesWithValuProps: any = Object.entries(
     valuesList.find((item) => {
-      return Object.entries(item).find((i) => i[0] === 'Prihod');
+      return Object.entries(item).find((i) => i[0] === documentTypeProps);
     }),
   ).map((item) => {
     return item[1];
   })[0];
 
   const listRequisitesWithValue = useMemo(() => {
-    console.log('listRequisitesWithValue');
     return formParams
       ? Object.entries(formParams).reduce((prev: MetaData, cur) => {
           const key = cur[0];
           const param = listRequisitesWithValuProps[key];
 
           if (param) {
-            console.log('form', cur);
-            console.log('key', key, ' param', param);
             prev[key] = { ...param, value: cur[1] };
           }
           return prev;
         }, listRequisitesWithValuProps)
       : {};
   }, [formParams]);
-
-  console.log('listRequisitesWithValue', listRequisitesWithValue);
 
   // const {
   //   department: docDepartment,
@@ -137,14 +118,12 @@ export const InventoryEditScreen2 = () => {
   const isBlocked = docStatus !== 'DRAFT';
 
   const handleSave = useCallback(() => {
-    if (!docType) {
+    if (!docTypeEdit) {
       return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
     const newDate = new Date().toISOString();
-
-    const newDate1 = new Date().toISOString();
 
     if (!id) {
       const head = formParams
@@ -159,7 +138,7 @@ export const InventoryEditScreen2 = () => {
 
       const newInventory: IDocument = {
         id: docId,
-        documentType: docType,
+        documentType: docTypeEdit,
         number: '1',
         documentDate: new Date().toISOString(),
         status: 'DRAFT',
@@ -245,15 +224,12 @@ export const InventoryEditScreen2 = () => {
       return;
     }
 
-    console.log('value', value);
-
     setCurrentValue(value);
 
     setShowDate(true);
   };
 
   const handlePress = (refType: RefTypeChoose, fieldName: string, refName: string, value: any) => {
-    console.log('handlePress', refType, fieldName, value);
     switch (refType) {
       case 'date':
         handlePresentDate(fieldName, value);
@@ -272,7 +248,6 @@ export const InventoryEditScreen2 = () => {
     if (isBlocked) {
       return;
     }
-    console.log('load');
     navigation.navigate('SelectRefItem', {
       refName: refName,
       fieldName: fieldName,

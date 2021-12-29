@@ -42,7 +42,6 @@ export const ScanBarcodeScreen = () => {
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
     ?.find((e) => e.id === docId) as IInventoryDocument;
-  console.log('barcode', document);
 
   const goods = model[document?.head?.department?.id || ''].goods;
 

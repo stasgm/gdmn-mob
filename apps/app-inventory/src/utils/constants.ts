@@ -36,7 +36,7 @@ export const getStatusColor = (status: StatusType) => {
 
 export const metaData: any[] = [
   {
-    Inventorys: {
+    inventory: {
       number: {
         id: '1',
         type: 'string',
@@ -73,7 +73,7 @@ export const metaData: any[] = [
     },
   },
   {
-    Prihod: {
+    prihod: {
       number: {
         id: '1',
         type: 'string',
@@ -115,17 +115,25 @@ export const metaData: any[] = [
         clearInput: true,
         // onChangeText: 'onChangeText',
       },
+      numberTwo: {
+        id: '6',
+        type: 'string',
+        sortOrder: 1,
+        description: 'Номер два документа',
+        clearInput: true,
+        requeried: true,
+      },
     },
   },
 ];
 
 export const inv: any = [
   {
-    name: 'Inventorys',
+    name: 'inventory',
     title: 'Инвентаризации',
     icon: 'file-document-outline',
     head: {
-      Inventorys: {
+      inventory: {
         number: {
           id: '1',
           type: 'string',
@@ -165,11 +173,11 @@ export const inv: any = [
     component: InventoryNavigator,
   },
   {
-    name: 'Prihod',
+    name: 'prihod',
     title: 'Приход',
     icon: 'file-document-outline',
     head: {
-      Prihod: {
+      prihod: {
         number: {
           id: '1',
           type: 'string',
@@ -177,7 +185,6 @@ export const inv: any = [
           description: 'Номер документа',
           clearInput: true,
           requeried: true,
-          // onChangeText: 'onChangeText',
         },
         documentDate: {
           id: '2',
@@ -210,6 +217,14 @@ export const inv: any = [
           description: 'Комментарий',
           clearInput: true,
           // onChangeText: 'onChangeText',
+        },
+        numberTwo: {
+          id: '6',
+          type: 'string',
+          sortOrder: 1,
+          description: 'Номер два документа',
+          clearInput: true,
+          requeried: true,
         },
       },
     },

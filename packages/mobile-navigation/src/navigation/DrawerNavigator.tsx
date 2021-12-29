@@ -55,10 +55,8 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
   const { colors } = useTheme();
   const { loading, errorList } = useSelector((state) => state.app);
 
-  //console.log('errorList', errorList);
 
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
-
   return (
     <Drawer.Navigator
       drawerContentOptions={{
@@ -67,24 +65,20 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
       }}
       drawerContent={(props) => <DrawerContent {...props} onSync={onSyncClick} />}
     >
-      {navList.map(
-        (item) => (
-          console.log('ИтемK', item.component),
-          (
-            <Drawer.Screen
-              name={item.name}
-              key={item.name}
-              component={item.component}
-              options={{
-                title: item.title,
-                drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
-                gestureEnabled: !loading,
-                swipeEnabled: !loading,
-              }}
-            />
-          )
-        ),
-      )}
+      {navList.map((item) => (
+        <Drawer.Screen
+          name={item.name}
+          key={item.name}
+          component={item.component}
+          initialParams={{ titleDoc: item.title }}
+          options={{
+            title: item.title,
+            drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
+            gestureEnabled: !loading,
+            swipeEnabled: !loading,
+          }}
+        />
+      ))}
     </Drawer.Navigator>
   );
 };

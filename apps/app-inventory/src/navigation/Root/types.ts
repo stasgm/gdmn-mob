@@ -8,6 +8,7 @@ export type IRefSelectParams = {
   value?: INamedEntity[];
   clause?: Record<string, string>;
   isMulti?: boolean;
+  docType?: string;
 };
 
 export type RefParamList = {
@@ -15,13 +16,13 @@ export type RefParamList = {
 };
 
 export type InventoryParamList = RefParamList & {
-  InventoryView: { id: string };
-  InventoryEdit: { itemId: string, id: string } | undefined;
-  InventoryLine: { mode: number; docId: string; item: IInventoryLine };
-  SelectGoodItem: { docId: string };
-  SelectRemainsItem: { docId: string };
-  ScanBarcode: { docId: string };
-  ScanBarcodeReader: { docId: string };
+  InventoryView: { id: string; docType?: string };
+  InventoryEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  InventoryLine: { mode: number; docId: string; item: IInventoryLine; docType?: string };
+  SelectGoodItem: { docId: string; docType?: string };
+  SelectRemainsItem: { docId: string; docType?: string };
+  ScanBarcode: { docId: string; docType?: string };
+  ScanBarcodeReader: { docId: string; docType?: string };
   InventoryLineEdit: {
     docId: string;
     prodId: string;
@@ -30,6 +31,7 @@ export type InventoryParamList = RefParamList & {
     price?: number;
     remains?: number;
     modeCor?: boolean;
+    docType?: string;
   };
 };
 
