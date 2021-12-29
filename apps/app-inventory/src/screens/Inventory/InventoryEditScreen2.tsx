@@ -39,7 +39,6 @@ export const InventoryEditScreen2 = (props: any) => {
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams);
-
   const inventory = docSelectors.selectByDocType(documentTypeProps)?.find((e) => e.id === id);
 
   const docTypeEdit = refSelectors
@@ -47,7 +46,6 @@ export const InventoryEditScreen2 = (props: any) => {
     ?.data.find((t) => t.name === documentTypeProps);
 
   const valuesList = metaData;
-
   const listRequisitesWithValuProps: any = Object.entries(
     valuesList.find((item) => {
       return Object.entries(item).find((i) => i[0] === documentTypeProps);
@@ -69,17 +67,6 @@ export const InventoryEditScreen2 = (props: any) => {
         }, listRequisitesWithValuProps)
       : {};
   }, [formParams]);
-
-  // const {
-  //   department: docDepartment,
-  //   onDate: docOnDate,
-  //   documentDate: docInventoryDate,
-  //   number: docNumber,
-  //   comment: docComment,
-  //   status: docStatus,
-  // } = useMemo(() => {
-  //   return formParams;
-  // }, [formParams]);
 
   useEffect(() => {
     return () => {
@@ -149,7 +136,7 @@ export const InventoryEditScreen2 = (props: any) => {
       };
 
       dispatch(documentActions.addDocument(newInventory));
-
+      console.log('formParams', listRequisitesWithValuProps);
       navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
     } else {
       if (!inventory) {
@@ -192,6 +179,8 @@ export const InventoryEditScreen2 = (props: any) => {
       };
 
       dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
+      console.log('formParams', listRequisitesWithValuProps);
+
       navigation.navigate('InventoryView', { id });
     }
   }, [formParams, inventory]);

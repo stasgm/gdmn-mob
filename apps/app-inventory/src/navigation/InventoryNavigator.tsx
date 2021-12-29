@@ -8,7 +8,6 @@ import { inventoryListScreens, inventoryScreens } from './Root/screens';
 const Stack = createStackNavigator<InventorysStackParamList>();
 
 export const InventoryNavigator = (props: any) => {
-  console.log('PPN', props);
   const { name } = props.route;
   const nameDocument = name as string;
 

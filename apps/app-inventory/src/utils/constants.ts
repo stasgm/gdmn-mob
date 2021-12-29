@@ -98,12 +98,12 @@ export const metaData: any[] = [
         refName: 'department',
         requeried: true,
       },
-      contragent: {
+      contact: {
         id: '4',
         type: 'ref',
         sortOrder: 1,
         description: 'Контрагент',
-        refName: 'contragent',
+        refName: 'contact',
         requeried: true,
       },
       comment: {
@@ -201,12 +201,12 @@ export const inv: any = [
           refName: 'department',
           requeried: true,
         },
-        contragent: {
+        contact: {
           id: '4',
           type: 'ref',
           sortOrder: 1,
           description: 'Контрагент',
-          refName: 'contragent',
+          refName: 'contact',
           requeried: true,
         },
         comment: {
