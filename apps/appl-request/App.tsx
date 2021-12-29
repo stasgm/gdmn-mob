@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import { MobileApp } from '@lib/mobile-app';
@@ -6,8 +6,9 @@ import { INavItem } from '@lib/mobile-navigation';
 
 import { store } from './src/store';
 import ApplNavigator from './src/navigation/Root/ApplNavigator';
-import { appActions, useDispatch, useSelector } from '@lib/store';
-import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
+import { appActions, appSelectors, useDispatch, useSelector } from '@lib/store';
+import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -23,7 +24,10 @@ const Root = () => {
   );
 
   const dispatch = useDispatch();
+  const { colors } = useTheme();
   const user = useSelector((state) => state.auth.user);
+  const authLoading = useSelector((state) => state.auth.loading);
+  const appLoading = appSelectors.selectLoading();
 
   useEffect(() => {
     console.log('useEffect loadGlobalDataFromDisc');
@@ -45,8 +49,28 @@ const Root = () => {
     dispatch(appActions.loadSuperDataFromDisc());
   }, [dispatch, user?.id]);
 
-  return (
-    // <MobileApp store={store} items={navItems} /> - если не нужен доступ к Store извне
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    //Для отрисовки при первом подключении
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  console.log('loading', loading);
+  console.log('authLoading', authLoading);
+  console.log('appLoading', appLoading);
+
+  return authLoading || loading || appLoading ? (
+    <AppScreen>
+      <ActivityIndicator size="large" color={colors.primary}>
+        <></>
+      </ActivityIndicator>
+      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+    </AppScreen>
+  ) : (
     <MobileApp items={navItems} />
   );
 };
