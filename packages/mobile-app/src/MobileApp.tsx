@@ -45,37 +45,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
-  const appLoading = appSelectors.selectLoading();
-  const { colors } = useTheme();
-  const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     console.log('useEffect loadSuperDataFromDisc', user.id);
-  //     dispatch(appActions.loadSuperDataFromDisc());
-  //   }
-  //   setLoading(false);
-  //   // dispatch(documentActions.init());
-  //   // dispatch(appTradeActions.init());
-  //   // dispatch(referenceActions.init());
-  //   // dispatch(settingsActions.init());
-  //   // dispatch(authActions.init());
-  // }, [dispatch, user?.id]);
-
-  // console.log('appLoading 1111', appLoading);
-  // console.log('loading 1111', loading);
-
   const Router = () =>
-    // loading || appLoading ? (
-    //   <AppScreen>
-    //     <ActivityIndicator size="large" color={colors.primary}>
-    //       <></>
-    //     </ActivityIndicator>
-    //     <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
-    //   </AppScreen>
-    // ) :
     (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
   return store ? (

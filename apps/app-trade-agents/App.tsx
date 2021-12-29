@@ -5,9 +5,9 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  authActions,
-  documentActions,
-  referenceActions,
+  // authActions,
+  // documentActions,
+  // referenceActions,
   refSelectors,
   settingsActions,
   useDispatch,
@@ -75,26 +75,11 @@ const Root = () => {
     // dispatch(referenceActions.init());
     // dispatch(settingsActions.init());
     // dispatch(authActions.init());
-    // saveDataToDisk('documents', store.getState().documents, '5ae8c930-0584-11ec-991a-779431d580c9');
     dispatch(appActions.loadGlobalDataFromDisc());
-    // setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     console.log('useEffect loadSuperDataFromDisc', user.id);
-  //     dispatch(appActions.loadSuperDataFromDisc());
-  //   }
-  //   setLoading(false);
-  //   // dispatch(documentActions.init());
-  //   // dispatch(appTradeActions.init());
-  //   // dispatch(referenceActions.init());
-  //   // dispatch(settingsActions.init());
-  //   // dispatch(authActions.init());
-  // }, [dispatch, user?.id]);
-
-  //Загружаем в сторе дополнительные настройки приложения
+  //Загружаем в стор дополнительные настройки приложения
   const baseSettings = useSelector((state) => state.settings?.data) || {};
   useEffect(() => {
     if (appSettings) {
@@ -116,16 +101,14 @@ const Root = () => {
   const appLoading = appSelectors.selectLoading();
   const authLoading = useSelector((state) => state.auth.loading);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loading);
-  const connectionStatus = useSelector((state) => state.auth.connectionStatus);
 
   useEffect(() => {
     console.log('useEffect user', loading, user?.id);
     if (user?.id) {
       console.log('useEffect loadSuperDataFromDisc', user.id);
       dispatch(appActions.loadSuperDataFromDisc());
-      // setLoading(false);
     }
-    setLoading(false);
+    // setLoading(false);
     // setLoading(!user?.id);
     // dispatch(documentActions.init());
     // dispatch(appTradeActions.init());
@@ -167,34 +150,34 @@ const Root = () => {
         const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
           matrixContact?.data && matrixContact.data.length && isUseNetPrice
             ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
-                const good = goods.find((g) => g.id === cur.goodId);
-                if (!good) {
-                  return prev;
-                }
+              const good = goods.find((g) => g.id === cur.goodId);
+              if (!good) {
+                return prev;
+              }
 
-                const group = groups.find((gr) => gr.id === good.goodgroup.id);
-                if (!group) {
-                  return prev;
-                }
-                //Если есть родитель, то возьмем все группы из родителя,
-                //иначе эта группа первого уровня, здесь не должно быть таких
-                if (!group.parent) {
-                  return prev;
-                }
+              const group = groups.find((gr) => gr.id === good.goodgroup.id);
+              if (!group) {
+                return prev;
+              }
+              //Если есть родитель, то возьмем все группы из родителя,
+              //иначе эта группа первого уровня, здесь не должно быть таких
+              if (!group.parent) {
+                return prev;
+              }
 
-                const newGood = {
-                  ...good,
-                  priceFsn: cur.priceFsn,
-                  priceFso: cur.priceFso,
-                  priceFsnSklad: cur.priceFsnSklad,
-                  priceFsoSklad: cur.priceFsoSklad,
-                } as IGood;
+              const newGood = {
+                ...good,
+                priceFsn: cur.priceFsn,
+                priceFso: cur.priceFso,
+                priceFsnSklad: cur.priceFsnSklad,
+                priceFsoSklad: cur.priceFsoSklad,
+              } as IGood;
 
-                const newParentGroup = prev[group.parent.id] || {};
-                const newGroup = newParentGroup[group.id] || {};
-                newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
-                return { ...prev, [group.parent.id]: newParentGroup };
-              }, {})
+              const newParentGroup = prev[group.parent.id] || {};
+              const newGroup = newParentGroup[group.id] || {};
+              newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
+              return { ...prev, [group.parent.id]: newParentGroup };
+            }, {})
             : refGoods;
 
         oPrev[oCur.id] = { contactName: oCur.name, onDate, goods: parentGroupList };
@@ -208,26 +191,19 @@ const Root = () => {
   }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
 
   const [loading, setLoading] = useState(true);
-  // useEffect(() => {
-  //   console.log('loading appLoading', appLoading, loading);
-  //   if (!appLoading) {
-  //     setLoading(appLoading);
-  //   }
-  // }, [appLoading]);
 
   console.log('loading', loading);
   console.log('authLoading', authLoading);
   console.log('appLoading', appLoading);
   console.log('tradeLoading', tradeLoading);
 
-  // useEffect(() => {
-  //   //Для отрисовки при первом подключении
-  //   const timer = setTimeout(() => {
-  //     setLoading(false);
-  //   }, 1000);
-  //   return () => clearTimeout(timer);
-  // }, []);
-  //goodModelLoading loading
+  useEffect(() => {
+    //Для отрисовки при первом подключении
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return authLoading || loading || appLoading || tradeLoading ? (
     <AppScreen>

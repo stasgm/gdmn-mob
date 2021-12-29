@@ -31,7 +31,6 @@ const AuthNavigator: React.FC = () => {
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
-  // const { colors } = useTheme();
 
   /*
     При запуске приложения
@@ -44,7 +43,6 @@ const AuthNavigator: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    // console.log('isInit 000', config.deviceId, connectionStatus, isDemo, user);
     let isMock = isDemo;
     if (connectionStatus === 'not-connected' && (!config.deviceId || isDemo)) {
       console.log('isInit 111', isDemo, config.deviceId, connectionStatus, isInit);
