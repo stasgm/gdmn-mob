@@ -63,7 +63,7 @@ export const InventoryEditScreen2 = () => {
 
   const listRequisitesWithValuProps: any = Object.entries(
     valuesList.find((item) => {
-      return Object.entries(item).find((i) => i[0] === 'Inventorys1');
+      return Object.entries(item).find((i) => i[0] === 'Inventorys');
     }),
   ).map((item) => {
     return item[1];
@@ -85,7 +85,6 @@ export const InventoryEditScreen2 = () => {
         }, listRequisitesWithValuProps)
       : {};
   }, [formParams]);
-
 
   console.log('listRequisitesWithValue', listRequisitesWithValue);
 
@@ -135,7 +134,6 @@ export const InventoryEditScreen2 = () => {
   const docStatus = formParams?.status || 'DRAFT';
 
   const isBlocked = docStatus !== 'DRAFT';
-
 
   const handleSave = useCallback(() => {
     if (!docType) {
