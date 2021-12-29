@@ -5,7 +5,7 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  // authActions,
+  authActions,
   // documentActions,
   // referenceActions,
   refSelectors,
@@ -117,14 +117,14 @@ const Root = () => {
     // dispatch(authActions.init());
   }, [user?.id]);
 
-  const [goodModelLoading, setGoodModelLoading] = useState(false);
+  // const [goodModelLoading, setGoodModelLoading] = useState(false);
 
   useEffect(() => {
     const setModel = async () => {
       if (!goods?.length || !contacts?.length || !groups.length) {
         return;
       }
-      setGoodModelLoading(true);
+      // setGoodModelLoading(true);
       const refGoods = groups
         .filter((gr) => gr.parent !== undefined)
         ?.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IGoodGroup) => {
@@ -185,17 +185,12 @@ const Root = () => {
       }, {});
 
       await appDispatch(appTradeActions.setGoodModel(goodModel));
-      setGoodModelLoading(false);
+      // setGoodModelLoading(false);
     };
     setModel();
   }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
 
   const [loading, setLoading] = useState(true);
-
-  console.log('loading', loading);
-  console.log('authLoading', authLoading);
-  console.log('appLoading', appLoading);
-  console.log('tradeLoading', tradeLoading);
 
   useEffect(() => {
     //Для отрисовки при первом подключении
@@ -204,6 +199,11 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  console.log('loading', loading);
+  console.log('authLoading', authLoading);
+  console.log('appLoading', appLoading);
+  console.log('tradeLoading', tradeLoading);
 
   return authLoading || loading || appLoading || tradeLoading ? (
     <AppScreen>

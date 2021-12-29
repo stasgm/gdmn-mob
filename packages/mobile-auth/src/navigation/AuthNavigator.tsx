@@ -4,12 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { authActions, useSelector, useAuthThunkDispatch, useDispatch, appActions } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
-
 import api from '@lib/client-api';
-
-// import { Caption, useTheme } from 'react-native-paper';
-
-// import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 import {
   SplashScreen,
@@ -38,30 +33,11 @@ const AuthNavigator: React.FC = () => {
       если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
     - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
   */
-  const [isInit, setInit] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
 
   useEffect(() => {
-    setLoading(true);
-    let isMock = isDemo;
-    if (connectionStatus === 'not-connected' && (!config.deviceId || isDemo)) {
-      console.log('isInit 111', isDemo, config.deviceId, connectionStatus, isInit);
-      //Если загружается приложение в демо режиме, а перед этим не вышли из аккаунта
-      //то выполняем disconnect, меняем признак демо режима в false
-      if (isDemo && user) {
-        console.log('isInit 222');
-        disconnect();
-        isMock = false;
-      }
-      setInit(true);
-    } else {
-      console.log('isInit 333');
-      setInit(false);
-    }
     //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock } };
-
-    setLoading(false);
+    api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock: isDemo } };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -177,7 +153,7 @@ const AuthNavigator: React.FC = () => {
 
   console.log('isInit', isInit);
 
-  return !loading ? (
+  return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
         <AuthStack.Screen name="Mode" component={ModeSelection} />
@@ -210,8 +186,6 @@ const AuthNavigator: React.FC = () => {
         <AuthStack.Screen name="Activation" component={ActivateWithParams} />
       )}
     </AuthStack.Navigator>
-  ) : (
-    <></>
   );
 };
 
