@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch, useDispatch, appActions } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 
 import api from '@lib/client-api';
+
+// import { Caption, useTheme } from 'react-native-paper';
+
+// import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 import {
   SplashScreen,
@@ -17,8 +21,6 @@ import {
 } from '../screens';
 
 import { AuthStackParamList } from './types';
-import { Caption, useTheme } from 'react-native-paper';
-import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
@@ -29,7 +31,7 @@ const AuthNavigator: React.FC = () => {
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
-  const { colors } = useTheme();
+  // const { colors } = useTheme();
 
   /*
     При запуске приложения
@@ -42,19 +44,20 @@ const AuthNavigator: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-
+    // console.log('isInit 000', config.deviceId, connectionStatus, isDemo, user);
     let isMock = isDemo;
     if (connectionStatus === 'not-connected' && (!config.deviceId || isDemo)) {
-      console.log('isInit 111', config.deviceId, connectionStatus);
+      console.log('isInit 111', isDemo, config.deviceId, connectionStatus, isInit);
       //Если загружается приложение в демо режиме, а перед этим не вышли из аккаунта
       //то выполняем disconnect, меняем признак демо режима в false
       if (isDemo && user) {
+        console.log('isInit 222');
         disconnect();
         isMock = false;
       }
       setInit(true);
     } else {
-      console.log('isInit 222', config.deviceId, connectionStatus);
+      console.log('isInit 333');
       setInit(false);
     }
     //При запуске приложения записываем настройки в апи
@@ -141,8 +144,11 @@ const AuthNavigator: React.FC = () => {
   );
 
   const onSetServerMode = useCallback(async () => {
-    await disconnect();
+    if (user) {
+      await disconnect();
+    }
     setInit(false);
+    console.log('init 222');
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disconnect, authDispatch]);
@@ -179,11 +185,7 @@ const AuthNavigator: React.FC = () => {
         <AuthStack.Screen name="Mode" component={ModeSelection} />
       ) : connectionStatus === 'connected' ? (
         !user ? (
-          <AuthStack.Screen
-            name="Login"
-            component={SignInWithParams}
-            options={{ animationTypeForReplace: 'push' }}
-          />
+          <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
         ) : (
           <AuthStack.Screen
             name="LoginCompany"
@@ -210,7 +212,9 @@ const AuthNavigator: React.FC = () => {
         <AuthStack.Screen name="Activation" component={ActivateWithParams} />
       )}
     </AuthStack.Navigator>
-  ) : (<></>);
+  ) : (
+    <></>
+  );
 };
 
 export default AuthNavigator;

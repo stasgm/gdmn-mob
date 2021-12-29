@@ -2,9 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { appActions, appSelectors, authActions, documentActions, referenceActions, refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  appSelectors,
+  authActions,
+  documentActions,
+  referenceActions,
+  refSelectors,
+  settingsActions,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
 
-import { globalStyles as styles, AppScreen } from '@lib/mobile-ui';
+import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
@@ -17,7 +27,6 @@ import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
 import { IContact, IGood, IGoodMatrix, IGoodGroup, IMatrixData } from './src/store/types';
 import { IGoodModel, IMGoodData, IMGroupData, IModelData, IMParentGroupData } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
-import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 const Root = () => {
   const navItems: INavItem[] = [
@@ -53,7 +62,6 @@ const Root = () => {
     },
   ];
 
-  const baseSettings = useSelector((state) => state.settings?.data) || {};
   const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
@@ -61,8 +69,7 @@ const Root = () => {
   const { colors } = useTheme();
 
   useEffect(() => {
-    console.log('useEffect loadData');
-    setGoodModelLoading(false);
+    console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(documentActions.init());
     // dispatch(appTradeActions.init());
     // dispatch(referenceActions.init());
@@ -70,22 +77,25 @@ const Root = () => {
     // dispatch(authActions.init());
     // saveDataToDisk('documents', store.getState().documents, '5ae8c930-0584-11ec-991a-779431d580c9');
     dispatch(appActions.loadGlobalDataFromDisc());
+    // setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log('useEffect loadSuperDataFromDisc', user?.id);
-    if (!user?.id) {
-      return;
-    }
-    // dispatch(documentActions.init());
-    // dispatch(appTradeActions.init());
-    // dispatch(referenceActions.init());
-    // dispatch(settingsActions.init());
-    // dispatch(authActions.init());
-    dispatch(appActions.loadSuperDataFromDisc());
-  }, [dispatch, user?.id]);
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     console.log('useEffect loadSuperDataFromDisc', user.id);
+  //     dispatch(appActions.loadSuperDataFromDisc());
+  //   }
+  //   setLoading(false);
+  //   // dispatch(documentActions.init());
+  //   // dispatch(appTradeActions.init());
+  //   // dispatch(referenceActions.init());
+  //   // dispatch(settingsActions.init());
+  //   // dispatch(authActions.init());
+  // }, [dispatch, user?.id]);
 
+  //Загружаем в сторе дополнительные настройки приложения
+  const baseSettings = useSelector((state) => state.settings?.data) || {};
   useEffect(() => {
     if (appSettings) {
       Object.entries(appSettings).forEach(([optionName, value]) => {
@@ -104,8 +114,27 @@ const Root = () => {
   const contacts = refSelectors.selectByName<IContact>('contact')?.data;
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
   const appLoading = appSelectors.selectLoading();
+  const authLoading = useSelector((state) => state.auth.loading);
+  const tradeLoading = useAppTradeSelector((state) => state.appTrade.loading);
+  const connectionStatus = useSelector((state) => state.auth.connectionStatus);
 
-  const [goodModelLoading, setGoodModelLoading] = useState(true);
+  useEffect(() => {
+    console.log('useEffect user', loading, user?.id);
+    if (user?.id) {
+      console.log('useEffect loadSuperDataFromDisc', user.id);
+      dispatch(appActions.loadSuperDataFromDisc());
+      // setLoading(false);
+    }
+    setLoading(false);
+    // setLoading(!user?.id);
+    // dispatch(documentActions.init());
+    // dispatch(appTradeActions.init());
+    // dispatch(referenceActions.init());
+    // dispatch(settingsActions.init());
+    // dispatch(authActions.init());
+  }, [user?.id]);
+
+  const [goodModelLoading, setGoodModelLoading] = useState(false);
 
   useEffect(() => {
     const setModel = async () => {
@@ -179,18 +208,32 @@ const Root = () => {
   }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
 
   const [loading, setLoading] = useState(true);
+  // useEffect(() => {
+  //   console.log('loading appLoading', appLoading, loading);
+  //   if (!appLoading) {
+  //     setLoading(appLoading);
+  //   }
+  // }, [appLoading]);
 
-  useEffect(() => {
-    //Для отрисовки при первом подключении
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  console.log('loading', loading);
+  console.log('authLoading', authLoading);
+  console.log('appLoading', appLoading);
+  console.log('tradeLoading', tradeLoading);
 
-  return goodModelLoading || appLoading || loading ? (
+  // useEffect(() => {
+  //   //Для отрисовки при первом подключении
+  //   const timer = setTimeout(() => {
+  //     setLoading(false);
+  //   }, 1000);
+  //   return () => clearTimeout(timer);
+  // }, []);
+  //goodModelLoading loading
+
+  return authLoading || loading || appLoading || tradeLoading ? (
     <AppScreen>
-      <ActivityIndicator size="large" color={colors.primary} children={undefined}/>
+      <ActivityIndicator size="large" color={colors.primary}>
+        <></>
+      </ActivityIndicator>
       <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
     </AppScreen>
   ) : (

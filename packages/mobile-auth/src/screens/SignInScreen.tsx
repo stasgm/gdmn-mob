@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Keyboard } from 'react-native';
 
 import { IUserCredentials } from '@lib/types';
@@ -25,27 +25,16 @@ type Props = {
 const SignInScreen = (props: Props) => {
   const { onDisconnect, onSignIn } = props;
 
-  const { error, loading, status } = useSelector((state) => state.auth);
+  const error = useSelector((state) => state.auth.error);
+  const loading = useSelector((state) => state.auth.loading);
+  const status = useSelector((state) => state.auth.status);
 
-  const initialCredentials: IUserCredentials = {
-    name: '',
-    password: '',
-  };
+  const [credential, setCredentials] = useState<IUserCredentials>({ name: '', password: '' });
 
-  // if (api.config.debug?.isMock) {
-  //   // config.debug?.useMockup
-  //   initialCredentials = {
-  //     name: mockUser.name,
-  //     password: mockUser.password || '',
-  //   };
-  // }
-
-  const [credential, setCredentials] = useState<IUserCredentials>(initialCredentials);
-
-  const handleLogIn = () => {
+  const handleLogIn = useCallback(() => {
     Keyboard.dismiss();
     onSignIn(credential);
-  };
+  }, [onSignIn, credential]);
 
   return (
     <>

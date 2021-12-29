@@ -141,19 +141,6 @@ const SelectGroupScreen = () => {
     );
   };
 
-  // useEffect(() => {
-  //   if (formParams?.groupId !== expend?.id) {
-  //     console.log('useEffect setFormParams');
-  //     dispatch(
-  //       appActions.setFormParams({
-  //         ...formParams,
-  //         ['groupId']: expend?.id,
-  //       }),
-  //     );
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [dispatch, expend]);
-
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 

@@ -18,21 +18,22 @@ export const documentMiddlewareFactory: PersistedMiddleware =
      *  Данные в файлы кэша записываются только когда меняются.
      */
 
-    if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
-      // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-      store.dispatch(actions.setLoading(true));
-      load('documents')
-        .then((data) => store.dispatch(actions.loadData(data || initialState)))
-        .finally(() => {
-          store.dispatch(actions.setLoading(false));
-        })
-        .catch((err) => {
-          /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object' ? err : 'При загрузке документов с диска произошла ошибка',
-          );
-        });
-    }
+    // if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
+    //   // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
+    //   store.dispatch(actions.setLoading(true));
+    //   load('documents')
+    //     .then((data) => store.dispatch(actions.loadData(data || initialState)))
+    //     .finally(() => {
+    //       store.dispatch(actions.setLoading(false));
+    //     })
+    //     .catch((err) => {
+    //       /* что, если ошибка */
+    //       console.error(
+    //         err instanceof Error || typeof err !== 'object'
+    // ? err : 'При загрузке документов с диска произошла ошибка',
+    //       );
+    //     });
+    // }
 
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя

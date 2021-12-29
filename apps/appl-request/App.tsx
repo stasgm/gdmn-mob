@@ -26,7 +26,7 @@ const Root = () => {
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    console.log('useEffect loadData');
+    console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(documentActions.init());
     // dispatch(appTradeActions.init());
     // dispatch(referenceActions.init());

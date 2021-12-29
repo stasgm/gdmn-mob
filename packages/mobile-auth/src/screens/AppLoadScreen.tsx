@@ -17,7 +17,6 @@ type Props = {
 const AppLoadScreen = (props: Props) => {
   const { onSetCompany, company, onLogout } = props;
 
-  const [userCompany, setUserCompany] = useState<ICompany | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -33,22 +32,16 @@ const AppLoadScreen = (props: Props) => {
 
     const res = await dispatch(authActions.getCompany(company.id));
     if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
-      setUserCompany(res.payload);
+      onSetCompany(res.payload);
     } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
+      setLoading(false);
       setError(res.payload.toLocaleLowerCase());
     }
-
-    setLoading(false);
-  }, [company, dispatch]);
+  }, [company, dispatch, onSetCompany]);
 
   useEffect(() => {
     company ? loadCompany() : setError('Компания для пользователя не задана');
   }, [company, loadCompany]);
-
-  useEffect(() => {
-    // Если компания получена то загружаем данные и входим в компанию
-    userCompany && onSetCompany(userCompany);
-  }, [userCompany, onSetCompany]);
 
   const handleLogOut = async () => {
     onLogout();

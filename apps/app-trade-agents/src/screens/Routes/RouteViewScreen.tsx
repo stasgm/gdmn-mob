@@ -60,14 +60,12 @@ const RouteViewScreen = () => {
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
       const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
-      const geoRes = dispatch(actions.geoActions.removeMany(geoList));
+      dispatch(actions.geoActions.removeMany(geoList));
       if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
         navigation.goBack();
       }
-      console.log('geoList', geoRes);
     };
     deleteRoute();
-    //dispatch(documentActions.removeDocument(id));
   }, [dispatch, docDispatch, geoList, id, navigation, orderList, returnList, visitList]);
 
   const actionsMenu = useCallback(() => {

@@ -16,6 +16,7 @@ import { authMiddlewareFactory } from './auth/middleware';
 import { documentMiddlewareFactory } from './documents/middleware';
 import { referenceMiddlewareFactory } from './references/middleware';
 import { settingMiddlewareFactory } from './settings/middleware';
+import { logMiddleware } from './logMiddleware';
 
 // const persistConfig = {
 //   key: 'config',
@@ -63,7 +64,6 @@ import { settingMiddlewareFactory } from './settings/middleware';
 // };
 
 export const rootReducer = {
-  // config: persistReducer(persistConfig, configReducer),
   auth: authReducer,
   messages: msgReducer,
   references: referenceReducer,
@@ -78,7 +78,6 @@ const createReducer = <S, A extends AnyAction>(asyncReducers: AppReducers<S, A>)
   return combineReducers({ ...rootReducer, ...asyncReducers });
 };
 
-// <S, A extends AnyAction>
 export const configureStore = (
   load: LoadDataFromDisk,
   save: SaveDataToDisk,
@@ -96,7 +95,7 @@ export const configureStore = (
     ...[...corePersistedMiddlewares, ...persistedMiddlewares].map(m => m(load, save)),
     ...appMiddlewares,
   ];
-  const middleWareEnhancer = applyMiddleware(...middleware);
+  const middleWareEnhancer = applyMiddleware(logMiddleware, ...middleware);
   const combinedReducer = createReducer(appReducers);
 
   const store = createStore(combinedReducer, composeWithDevTools(middleWareEnhancer));

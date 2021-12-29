@@ -94,8 +94,6 @@ const RouteDetailScreen = () => {
       editionDate: date,
     };
 
-    console.log('newVisit id', visitId);
-
     dispatch(documentActions.addDocument(newVisit));
 
     setProcess(false);

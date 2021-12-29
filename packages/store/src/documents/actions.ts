@@ -13,7 +13,7 @@ const updateDocumentLine = createAction('DOCUMENTS/UPDATE_LINE_ONE')<{ docId: st
 const removeDocumentLine = createAction('DOCUMENTS/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
 const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
 const loadData = createAction('DOCUMENTS/LOAD_DATA')<DocumentState>();
-const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
+const setLoading = createAction('DOCUMENTS/SET_LOADING')<boolean>();
 
 const setDocumentsAsync = createAsyncAction(
   'DOCUMENTS/SET_ALL',

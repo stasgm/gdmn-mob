@@ -209,7 +209,6 @@ const MapScreen = () => {
   };
 
   const handleClickMarker = (props: ILocation) => {
-    console.log('props', props);
     setCurrentPoint(props);
   };
 

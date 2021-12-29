@@ -4,7 +4,7 @@ import { AppTradeState, IGoodModel, IModelData } from './types';
 
 const init = createAction('APP_TRADE/INIT')();
 const loadData = createAction('APP_TRADE/LOAD_DATA')<AppTradeState>();
-const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
+const setLoading = createAction('APP_TRADE/SET_LOADING')<boolean>();
 
 const setGoodModelAsync = createAsyncAction(
   'APP_TRADE/SET_GOOD_MODEL',
