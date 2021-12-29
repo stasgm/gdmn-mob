@@ -69,8 +69,8 @@ const MapScreen = () => {
   }, [routeRef]);
 
   const selectedItem = useMemo(
-    () => routeList.find((item) => item.id === selectedRoute.id),
-    [routeList, selectedRoute.id],
+    () => routeList.find((item) => item.id === selectedRoute?.id) || '',
+    [routeList, selectedRoute?.id],
   );
 
   const initLocations = useCallback(() => {
@@ -262,7 +262,7 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      {selectedItem && (
+      {selectedItem ? (
         <View style={localStyles.statusContainer}>
           <View style={localStyles.routeWidth}>
             <Text style={localStyles.routeName}>
@@ -278,7 +278,7 @@ const MapScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
@@ -310,7 +310,7 @@ const MapScreen = () => {
         <RadioGroup
           options={currentList}
           onChange={(option) => setNewSelectedRoute(option)}
-          activeButtonId={newSelectedRoute.id}
+          activeButtonId={newSelectedRoute?.id}
         />
       </BottomSheet>
 
