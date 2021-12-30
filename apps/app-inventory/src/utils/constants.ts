@@ -169,7 +169,30 @@ export const inv: any = [
         },
       },
     },
-    // lines:
+    lines: {
+      metadata: {
+        good: {
+          sortOrder: 0,
+          name: 'Наименование',
+        },
+        price: {
+          sortOrder: 0,
+          name: 'Цена',
+        },
+        remains: {
+          sortOrder: 0,
+          name: 'Остаток',
+        },
+        EID: {
+          sortOrder: 0,
+          name: 'EID',
+        },
+        quantity: {
+          sortOrder: 0,
+          name: 'Количество',
+        },
+      },
+    },
     component: InventoryNavigator,
   },
   {
