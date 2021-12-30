@@ -10,7 +10,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IDocument, IDocumentType, IReference, RefTypeChoose } from '@lib/types';
 
-//import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import {
   docSelectors,
   useDispatch,
@@ -18,15 +17,14 @@ import {
   appActions,
   refSelectors,
   useSelector,
-  settingsActions,
   IFormParam,
 } from '@lib/store';
 import { BackButton, AppInputScreen, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IDepartment, MetaData } from '../../store/types';
+import { MetaData } from '../../store/types';
 
-import { metaData, inv } from '../../utils/constants';
+import { metaData } from '../../utils/constants';
 
 import { ConditionalRenderItem } from './СonditionalRenderItem';
 
@@ -53,7 +51,7 @@ export const InventoryEditScreen2 = (props: any) => {
   ).map((item) => {
     return item[1];
   })[0];
-
+  /// убрать
   const listRequisitesWithValue = useMemo(() => {
     return formParams
       ? Object.entries(formParams).reduce((prev: MetaData, cur) => {
@@ -108,7 +106,9 @@ export const InventoryEditScreen2 = (props: any) => {
     if (!docTypeEdit) {
       return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     }
-
+    //////
+    //Проверка обязат реквизитов
+    //////
     const docId = !id ? uuid() : id;
     const newDate = new Date().toISOString();
 
@@ -136,7 +136,6 @@ export const InventoryEditScreen2 = (props: any) => {
       };
 
       dispatch(documentActions.addDocument(newInventory));
-      console.log('formParams', listRequisitesWithValuProps);
       navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
     } else {
       if (!inventory) {
@@ -179,7 +178,6 @@ export const InventoryEditScreen2 = (props: any) => {
       };
 
       dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
-      console.log('formParams', listRequisitesWithValuProps);
 
       navigation.navigate('InventoryView', { id });
     }
@@ -264,12 +262,11 @@ export const InventoryEditScreen2 = (props: any) => {
         )}
 
         {Object.entries(listRequisitesWithValue).map(([key, item]) => {
-          const description = key;
           return (
             <ConditionalRenderItem
               key={key}
               description={item?.description}
-              item={item?.value}
+              item={item?.value} // из formparams
               type={(item?.type && item?.type) || ''}
               disabled={isBlocked}
               clearInput={item?.clearInput || true}
