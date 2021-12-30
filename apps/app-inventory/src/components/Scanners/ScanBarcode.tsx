@@ -58,6 +58,7 @@ export const ScanBarcodeScreen = (props: any) => {
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
+
     setBarcode(data);
   };
 
