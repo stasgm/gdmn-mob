@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-children-prop */
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
@@ -58,7 +59,10 @@ const GoodRemains = ({ item }: { item: IRem }) => {
   );
 };
 
-export const SelectRemainsScreen = () => {
+export const SelectRemainsScreen = (props: any) => {
+  const { params } = props.route;
+  const docType = params?.docType as string;
+
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
@@ -71,7 +75,7 @@ export const SelectRemainsScreen = () => {
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
+    .selectByDocType<IInventoryDocument>(docType)
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
   const handleScanner = useCallback(() => {

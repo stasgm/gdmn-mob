@@ -245,7 +245,7 @@ export const inv: any = [
           id: '6',
           type: 'string',
           sortOrder: 1,
-          description: 'Номер два документа',
+          description: 'Номер два документа(для теста)',
           clearInput: true,
           requeried: true,
         },
