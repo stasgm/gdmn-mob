@@ -1,10 +1,11 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Modal } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { documentActions, useDispatch } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles, ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ISettingsOption } from '@lib/types';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine } from '../../store/types';
@@ -12,6 +13,8 @@ import { IInventoryLine } from '../../store/types';
 import { inv } from '../../utils/constants';
 
 import { LineItem } from './components/InvLine';
+import { ScanDataMatrixReader } from '../../components/Scanners/ScanDataMatrixReader';
+import { ScanDataMatrix } from '../../components/Scanners/ScanDataMatrix';
 
 interface IProperty {
   sortOrder?: number;
@@ -27,6 +30,11 @@ export const InventoryLineScreen1 = () => {
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
   const [line, setLine] = useState<IInventoryLine>(item);
+
+  const [doScanned, setDoScanned] = useState(false);
+
+  const { data: settings } = useSelector((state) => state.settings);
+  const scanUsetSetting = settings.scannerUse as ISettingsOption<string>;
 
   const handleSave = useCallback(() => {
     dispatch(
@@ -83,6 +91,13 @@ export const InventoryLineScreen1 = () => {
 
   return (
     <View>
+      <Modal animationType="slide" visible={doScanned}>
+        {scanUsetSetting.data ? (
+          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        ) : (
+          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        )}
+      </Modal>
       <View style={[styles.content]}>
         <FlatList
           data={refData}
