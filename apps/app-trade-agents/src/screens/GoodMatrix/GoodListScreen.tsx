@@ -3,7 +3,7 @@ import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
@@ -69,35 +69,33 @@ const GoodListScreen = () => {
   const renderItem = ({ item }: { item: IMatrixDataNamed }) => <GoodItem item={item} />;
 
   return (
-    <View>
+    <AppScreen>
       <SubTitle style={[localStyles.title]}>{contact?.name}</SubTitle>
-      <View style={[styles.content]}>
-        {filterVisible && (
-          <>
-            <View style={styles.flexDirectionRow}>
-              <Searchbar
-                placeholder="Поиск"
-                onChangeText={setSearchQuery}
-                value={searchQuery}
-                style={[styles.flexGrow, styles.searchBar]}
-                // eslint-disable-next-line react/no-children-prop
-                children={undefined}
-                autoComplete={undefined}
-              />
-            </View>
-            <ItemSeparator />
-          </>
-        )}
-        <FlatList
-          data={filteredList}
-          keyExtractor={(_, i) => String(i)}
-          renderItem={renderItem}
-          scrollEventThrottle={400}
-          ItemSeparatorComponent={ItemSeparator}
-          ListEmptyComponent={!goods || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        />
-      </View>
-    </View>
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
+              autoComplete={undefined}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
+      <FlatList
+        data={filteredList}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        scrollEventThrottle={400}
+        ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={!goods || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+      />
+    </AppScreen>
   );
 };
 
