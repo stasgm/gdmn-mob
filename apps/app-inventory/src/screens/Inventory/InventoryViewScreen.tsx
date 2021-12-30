@@ -43,6 +43,7 @@ export const InventoryViewScreen = (props: any) => {
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
+    console.log('ИД', id);
     navigation.navigate('SelectRemainsItem', {
       docId: id,
     });

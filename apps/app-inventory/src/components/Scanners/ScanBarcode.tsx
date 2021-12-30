@@ -20,7 +20,10 @@ import { IInventoryLine, IInventoryDocument } from '../../store/types';
 
 const oneSecund = 1000;
 
-export const ScanBarcodeScreen = () => {
+export const ScanBarcodeScreen = (props: any) => {
+  const { params } = props.route;
+  const docType = params?.docType as string;
+
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation();
   const { data: settings } = useSelector((state) => state.settings);
@@ -40,7 +43,7 @@ export const ScanBarcodeScreen = () => {
   const model = useAppInventorySelector((state) => state.appInventory.model);
 
   const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
+    .selectByDocType<IInventoryDocument>(docType)
     ?.find((e) => e.id === docId) as IInventoryDocument;
 
   const goods = model[document?.head?.department?.id || ''].goods;

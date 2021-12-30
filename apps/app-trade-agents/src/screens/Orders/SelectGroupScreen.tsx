@@ -108,7 +108,6 @@ const SelectGroupScreen = () => {
   const formParams = useSelector((state) => state.app.formParams);
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
-
   const groupsModel = goodModel[contact?.id || ''].goods;
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');

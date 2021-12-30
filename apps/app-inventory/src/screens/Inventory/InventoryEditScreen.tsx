@@ -107,7 +107,7 @@ export const InventoryEditScreen = () => {
         id: docId,
         documentType: docType,
         number: '1',
-        documentDate: docInventoryDate, //newOntDate,
+        documentDate: docInventoryDate,
         status: 'DRAFT',
         head: {
           comment: docComment,
