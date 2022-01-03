@@ -6,6 +6,7 @@ import {
   appActions,
   appSelectors,
   authActions,
+  // authActions,
   // documentActions,
   // referenceActions,
   refSelectors,
@@ -32,38 +33,32 @@ import { appSettings } from './src/utils/constants';
 
 const Root = () => {
   const navItems: INavItem[] = [
-    /*   {
-      name: 'Dashboard',
-      title: 'Дашборд',
-      icon: 'view-dashboard-outline',
-      component: DashboardNavigator,
-    }, */
     {
-      name: 'Routes',
+      name: 'RoutesNav',
       title: 'Маршруты',
       icon: 'routes',
       component: RoutesNavigator,
     },
     {
-      name: 'Orders',
+      name: 'OrdersNav',
       title: 'Заявки',
       icon: 'clipboard-list-outline',
       component: OrdersNavigator,
     },
     {
-      name: 'Returns',
+      name: 'ReturnsNav',
       title: 'Возвраты',
       icon: 'file-restore',
       component: ReturnsNavigator,
     },
     {
-      name: 'Map',
+      name: 'MapNav',
       title: 'Карта',
       icon: 'map-outline',
       component: MapNavigator,
     },
     {
-      name: 'GoodMatrix',
+      name: 'GoodMatrixNav',
       title: 'Матрицы',
       icon: 'tag-text-outline',
       component: GoodMatrixNavigator,
@@ -78,10 +73,6 @@ const Root = () => {
 
   useEffect(() => {
     console.log('useEffect loadGlobalDataFromDisc');
-    // dispatch(documentActions.init());
-    // dispatch(appTradeActions.init());
-    // dispatch(referenceActions.init());
-    // dispatch(settingsActions.init());
     // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,28 +102,17 @@ const Root = () => {
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loading);
 
   useEffect(() => {
-    console.log('useEffect user', loading, user?.id);
-    if (user?.id) {
+    if (user) {
       console.log('useEffect loadSuperDataFromDisc', user.id);
       dispatch(appActions.loadSuperDataFromDisc());
     }
-    // setLoading(false);
-    // setLoading(!user?.id);
-    // dispatch(documentActions.init());
-    // dispatch(appTradeActions.init());
-    // dispatch(referenceActions.init());
-    // dispatch(settingsActions.init());
-    // dispatch(authActions.init());
-  }, [user?.id]);
-
-  // const [goodModelLoading, setGoodModelLoading] = useState(false);
+  }, [dispatch, user]);
 
   useEffect(() => {
     const setModel = async () => {
       if (!goods?.length || !contacts?.length || !groups.length) {
         return;
       }
-      // setGoodModelLoading(true);
       const refGoods = groups
         .filter((gr) => gr.parent !== undefined)
         ?.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IGoodGroup) => {
@@ -207,11 +187,6 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  console.log('loading', loading);
-  console.log('authLoading', authLoading);
-  console.log('appLoading', appLoading);
-  console.log('tradeLoading', tradeLoading);
 
   return authLoading || loading || appLoading || tradeLoading ? (
     <AppScreen>

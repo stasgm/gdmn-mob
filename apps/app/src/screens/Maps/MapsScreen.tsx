@@ -140,13 +140,9 @@ const MapScreen = () => {
     }
 
     let idx = list.findIndex((e) => e.id === currentPoint?.id);
-
     idx = idx >= 0 ? idx : 0;
-
     idx = idx <= 0 ? listLen - 1 : idx - 1;
-    console.log(idx);
 
-    // moveTo(list[idx].coords);
     setCurrentPoint(list[idx]);
   };
 
@@ -186,8 +182,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                  ? localStyles.selectedMark
-                  : localStyles.mark,
+                    ? localStyles.selectedMark
+                    : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>

@@ -40,7 +40,6 @@ export const settingMiddlewareFactory: PersistedMiddleware =
       store.dispatch(actions.setLoading(true));
       load('settings', store.getState().auth.user?.id)
         .then((data) => {
-          // console.log('settings userssssss', data || initialState);
           return store.dispatch(actions.loadData(data || initialState));
         })
         .finally(() => {

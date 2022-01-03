@@ -51,7 +51,7 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.getDeviceByUidAsync.success):
       case getType(actions.loginUserAsync.success):
       case getType(actions.setUserSettingsAsync.success):
-      case getType(actions.setDemoModeAsync.success): {
+      case getType(actions.setDemoMode): {
         const result = next(action);
 
         save('auth', store.getState().auth);

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { authActions, useSelector, useAuthThunkDispatch, useDispatch, appActions } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { ICompany, IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
-import api from '@lib/client-api';
+import api, { sleep } from '@lib/client-api';
 
 import {
   SplashScreen,
@@ -36,6 +36,7 @@ const AuthNavigator: React.FC = () => {
   const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
 
   useEffect(() => {
+    //  setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock: isDemo } };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,13 +123,16 @@ const AuthNavigator: React.FC = () => {
       await disconnect();
     }
     setInit(false);
-    console.log('init 222');
+
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disconnect, authDispatch]);
 
   const onSetDemoMode = useCallback(async () => {
+    dispatch(authActions.setLoading(true));
     dispatch(authActions.setDemoMode());
+    await sleep(500);
+    dispatch(authActions.setLoading(false));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, authDispatch, setCompany, login]);
@@ -151,8 +155,6 @@ const AuthNavigator: React.FC = () => {
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
 
-  console.log('isInit', isInit);
-
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
@@ -168,9 +170,6 @@ const AuthNavigator: React.FC = () => {
           />
         )
       ) : connectionStatus === 'not-connected' ? (
-        // settings.deviceId
-        //   ? (<AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />)
-        //   : (<AuthStack.Screen name="Config" component={CongfigWithParams} />)
         config.deviceId ? (
           <>
             <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />

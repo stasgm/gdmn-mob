@@ -6,8 +6,6 @@ import { config } from '@lib/client-config';
 
 import { device as mockDevice, user as mockUser } from '@lib/mock';
 
-import { ICompany } from '@lib/types';
-
 import { AuthState } from './types';
 import { AuthActionType, actions } from './actions';
 
@@ -41,7 +39,6 @@ export const initialState: Readonly<AuthState> = {
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
-  // console.log('reducer auth', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -55,10 +52,8 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setConfig):
       return { ...state, config: action.payload };
 
-    case getType(actions.loadData): {
-      console.log('reducer loadData', action.payload);
+    case getType(actions.loadData):
       return { ...action.payload, loading: false, status: '', error: false };
-    }
 
     case getType(actions.getDeviceByUidAsync.request):
       return { ...state, loading: true, status: '', error: false, device: undefined };
@@ -178,27 +173,37 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setConnectionStatus):
       return { ...state, error: false, connectionStatus: action.payload };
 
-    case getType(actions.setDemoModeAsync.request):
-      return {
-        ...state,
-        loading: true,
-        status: '',
-        error: false,
-      };
-
-    case getType(actions.setDemoModeAsync.success):
+    case getType(actions.setDemoMode):
       return {
         ...state,
         connectionStatus: 'connected',
         user: mockUser,
         device: mockDevice,
-        // company: mockUser.company as ICompany,
-        loading: false,
+        // loading: false,
         isDemo: true,
       };
 
-    case getType(actions.setDemoModeAsync.failure):
-      return { ...state, loading: false, status: '', error: true };
+    // case getType(actions.setDemoModeAsync.request):
+    //   return {
+    //     ...state,
+    //     loading: true,
+    //     status: '',
+    //     error: false,
+    //   };
+
+    // case getType(actions.setDemoModeAsync.success):
+    //   return {
+    //     ...state,
+    //     connectionStatus: 'connected',
+    //     user: mockUser,
+    //     device: mockDevice,
+    //     // company: mockUser.company as ICompany,
+    //     loading: false,
+    //     isDemo: true,
+    //   };
+
+    // case getType(actions.setDemoModeAsync.failure):
+    //   return { ...state, loading: false, status: '', error: true };
 
     default:
       return state;

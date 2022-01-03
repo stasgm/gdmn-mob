@@ -19,7 +19,6 @@ import { IInventoryDocument, IRem } from '../../store/types';
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  console.log('III', item);
   const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
@@ -95,8 +94,8 @@ export const SelectRemainsScreen = () => {
 
         remains && remains.length > 0
           ? remains.forEach((re) => {
-              r.push({ ...goodPos, price: re.price, remains: re.q });
-            })
+            r.push({ ...goodPos, price: re.price, remains: re.q });
+          })
           : r.push(goodPos);
         return r;
       }, [])

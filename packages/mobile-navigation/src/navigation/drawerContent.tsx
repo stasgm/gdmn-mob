@@ -1,13 +1,13 @@
 import {
   DrawerContentComponentProps,
-  DrawerContentOptions,
   DrawerContentScrollView,
   DrawerItemList,
+  useDrawerProgress,
 } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
-import Animated from 'react-native-reanimated';
+import Animated, { Extrapolate } from 'react-native-reanimated';
 import Constants from 'expo-constants';
 import { useSelector } from '@lib/store';
 
@@ -16,17 +16,19 @@ interface ICutsomProps {
   syncing?: boolean;
 }
 
-type Props = DrawerContentComponentProps<DrawerContentOptions> & ICutsomProps;
+type Props = DrawerContentComponentProps & ICutsomProps;
 
 export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
   // const loading = useSelector((state) => state.app.loading);
   const user = useSelector((state) => state.auth.user);
   const company = useSelector((state) => state.auth.company);
+  const progress = useDrawerProgress();
 
-  const translateX = Animated.interpolateNode(props.progress, {
-    inputRange: [0, 0.5, 0.7, 0.8, 1],
-    outputRange: [-100, -85, -70, -45, 0],
+  const translateX = Animated.interpolateNode(progress as any, {
+    inputRange: [0, 1],
+    outputRange: [1, 0.8],
+    extrapolate: Extrapolate.CLAMP,
   });
 
   return (
@@ -55,7 +57,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
               transform: [{ translateX }],
             },
           ]}
-          // pointerEvents={loading ? 'none' : 'auto'}
+        // pointerEvents={loading ? 'none' : 'auto'}
         >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />

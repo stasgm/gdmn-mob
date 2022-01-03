@@ -138,7 +138,6 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
-    console.log('comp user', user);
     done(null, user);
   } else {
     done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null

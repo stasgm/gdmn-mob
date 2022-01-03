@@ -40,7 +40,6 @@ export const documentMiddlewareFactory: PersistedMiddleware =
       store.dispatch(actions.setLoading(true));
       load('documents', store.getState().auth.user?.id)
         .then((data) => {
-          console.log('loadDataFromDisk docs', data?.list?.length);
           return store.dispatch(actions.loadData(data || initialState));
         })
         .finally(() => {

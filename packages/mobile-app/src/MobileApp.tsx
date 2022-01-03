@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import { appActions, appSelectors, authSelectors, useDispatch } from '@lib/store';
+import { appSelectors, authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
@@ -14,6 +14,7 @@ import { useSelector } from '@lib/store';
 import { useSync } from './hooks';
 import api from '@lib/client-api';
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+import { useReduxDevToolsExtension } from '@react-navigation/devtools';
 
 export interface IApp {
   items?: INavItem[];
@@ -45,6 +46,9 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
+  const navigationRef = useNavigationContainerRef();
+  useReduxDevToolsExtension(navigationRef);
+
   const Router = () =>
     (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
@@ -52,7 +56,7 @@ const MobileApp = ({ store, ...props }: IApp) => {
     <Provider store={store}>
       <UIProvider theme={defaultTheme}>
         <ActionSheetProvider>
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef}>
             <Router />
           </NavigationContainer>
         </ActionSheetProvider>
@@ -61,7 +65,7 @@ const MobileApp = ({ store, ...props }: IApp) => {
   ) : (
     <UIProvider theme={defaultTheme}>
       <ActionSheetProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <Router />
         </NavigationContainer>
       </ActionSheetProvider>

@@ -12,6 +12,7 @@ const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
 const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
+const setDemoMode = createAction('AUTH/SET_DEMOMODE')();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -67,11 +68,11 @@ const setUserSettingsAsync = createAsyncAction(
   'AUTH/SET_USER_SETTINGS_FAILURE',
 )<string, IUserSettings, string>();
 
-const setDemoModeAsync = createAsyncAction(
-  'AUTH/SET_DEMOMODE',
-  'AUTH/SET_DEMOMODE_SUCCESS',
-  'AUTH/SET_DEMOMODE_FAILURE',
-)<string, undefined, string>();
+// const setDemoModeAsync = createAsyncAction(
+//   'AUTH/SET_DEMOMODE',
+//   'AUTH/SET_DEMOMODE_SUCCESS',
+//   'AUTH/SET_DEMOMODE_FAILURE',
+// )<string, undefined, string>();
 
 export const actions = {
   init,
@@ -90,7 +91,8 @@ export const actions = {
   setUserSettingsAsync,
   setConnectionStatus,
   getCompanyAsync,
-  setDemoModeAsync,
+  // setDemoModeAsync,
+  setDemoMode,
   setLoading,
 };
 
