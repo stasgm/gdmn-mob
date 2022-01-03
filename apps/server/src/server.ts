@@ -115,9 +115,9 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         // origin: 'http://localhost:8080',
       }),
     )
+    .use(router.routes())
     .use(historyApiFallback({ index: '/admin/index.html' }))
     .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
-    .use(router.routes())
     .use(router.allowedMethods());
 
   return app;
