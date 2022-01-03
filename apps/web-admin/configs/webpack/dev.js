@@ -38,7 +38,6 @@ module.exports = merge(commonConfig, {
     new webpack.DefinePlugin({
       'process.env': {
         MOCK: JSON.stringify(process.env.MOCK),
-        // DEVICE_ID: JSON.stringify(process.env.DEVICE_ID),
       },
     }),
   ],
