@@ -32,7 +32,7 @@ export interface OrderListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
 const OrderListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const showActionSheet = useActionSheet();
 
   const { loading } = useSelector((state) => state.documents);
@@ -48,23 +48,23 @@ const OrderListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED')
+          : status === 'archive'
+            ? list.filter((e) => e.status === 'PROCESSED')
+            : [];
 
     return res.map(
       (i) =>
-        ({
-          id: i.id,
-          title: i.head.outlet?.name,
-          documentDate: getDateString(i.documentDate),
-          status: i.status,
-          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
-          isFromRoute: !!i.head.route,
-          lineCount: i.lines.length,
-          errorMessage: i.errorMessage,
-        } as IListItemProps),
+      ({
+        id: i.id,
+        title: i.head.outlet?.name,
+        documentDate: getDateString(i.documentDate),
+        status: i.status,
+        subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+        isFromRoute: !!i.head.route,
+        lineCount: i.lines.length,
+        errorMessage: i.errorMessage,
+      } as IListItemProps),
     );
   }, [status, list]);
 

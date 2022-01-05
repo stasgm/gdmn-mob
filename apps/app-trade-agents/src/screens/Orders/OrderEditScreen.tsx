@@ -24,7 +24,7 @@ import { getDateString } from '../../utils/helpers';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
 
   const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);

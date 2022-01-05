@@ -51,6 +51,7 @@ export const InventoryViewScreen = () => {
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
+  
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
   }, [navigation, id, scanUsetSetting]);

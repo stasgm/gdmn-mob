@@ -5,13 +5,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IContact } from '../../../store/types';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { GoodMatrixStackParamList } from '../../../navigation/Root/types';
 
 export interface IContactItem {
   item: IContact;
 }
 
 const ContactItem = ({ item }: IContactItem) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<GoodMatrixStackParamList, 'ContactList'>>();
 
   return (
     <TouchableOpacity
