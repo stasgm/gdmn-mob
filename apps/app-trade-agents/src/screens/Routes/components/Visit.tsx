@@ -16,7 +16,6 @@ import {
   RadioGroup,
   ScreenListItem,
   IListItemProps,
-  SwipeListItem,
 } from '@lib/mobile-ui';
 import { useSendDocs } from '@lib/mobile-app';
 
@@ -27,6 +26,7 @@ import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
+import SwipeListItem from '../../../components/SwipeListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -236,7 +236,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const doc = orderDocs.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
-        <ScreenListItem {...item} routeName="OrderView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };
@@ -260,7 +260,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const doc = returnDocs.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
-        <ScreenListItem {...item} routeName="ReturnView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

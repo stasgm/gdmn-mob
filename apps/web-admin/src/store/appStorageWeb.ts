@@ -1,11 +1,9 @@
-
 import { AppStorage, LoadDataFromDisk, SaveDataToDisk } from '@lib/store';
 
-const dbDir = 'db/'
+const dbDir = 'db/';
 
 export const appStorageWeb: AppStorage = {
   setItem: async (key: string, data: any) => {
-
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
@@ -51,8 +49,6 @@ export const saveDataToDisk: SaveDataToDisk = async (key: string, newData: any, 
     console.log('err', err);
   }
 };
-
-
 
 // import path from 'path';
 // import fs from 'fs';

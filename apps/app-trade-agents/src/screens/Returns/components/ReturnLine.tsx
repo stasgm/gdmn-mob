@@ -1,14 +1,11 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator } from '@lib/mobile-ui';
-import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
+import { ScrollView, TextInput, View, Text } from 'react-native';
 
-import { ReturnsStackParamList } from '../../../navigation/Root/types';
-
-import { IGood, IReturnLine } from '../../../store/types';
+import { IReturnLine } from '../../../store/types';
 
 interface IProps {
   item: IReturnLine;
@@ -16,11 +13,6 @@ interface IProps {
 }
 
 const ReturnLine = ({ item, onSetLine }: IProps) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  const { docId, mode } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
-
   const [goodQty, setGoodQty] = useState<string>(item.quantity.toString());
 
   const { colors } = useTheme();
@@ -41,20 +33,6 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
     //TODO временное решение
     qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
   }, []);
-
-  const handleDelete = useCallback(() => {
-    !!mode &&
-      Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-        {
-          text: 'Удалить',
-          onPress: () => {
-            dispatch(documentActions.removeDocumentLine({ docId, lineId: item.id }));
-            navigation.goBack();
-          },
-        },
-        { text: 'Отмена' },
-      ]);
-  }, [dispatch, docId, item.id, mode, navigation]);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
@@ -117,11 +95,6 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
         </View>
         <ItemSeparator />
       </ScrollView>
-      {/* {mode ? (
-        <PrimeButton icon="delete" onPress={handleDelete} outlined>
-          Удалить позицию
-        </PrimeButton>
-      ) : null} */}
     </>
   );
 };

@@ -6,10 +6,10 @@ import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
-import { INamedEntity, IRefMetadata } from '@lib/types';
+import { IRefMetadata } from '@lib/types';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IGoodMatrix, IMatrixDataNamed, IMatrixData } from '../../store/types';
+import { IGoodMatrix, IMatrixData } from '../../store/types';
 
 interface IProperty {
   sortOrder: number;
@@ -32,13 +32,14 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
 
 const GoodLineScreen = () => {
   const navigation = useNavigation();
-  const item = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params?.item;
+  const matrixItem = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params?.item;
 
   const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IMatrixData>;
 
   const refData = useMemo(
     () =>
-      item &&
+      matrixItem &&
+      metadata &&
       Object.entries(metadata)
         ?.map(
           ([key, value]) =>
@@ -47,12 +48,12 @@ const GoodLineScreen = () => {
               name: key,
               title: value?.name,
               visible: value?.visible !== false,
-              value: item[key],
+              value: matrixItem[key],
             } as IProperty),
         )
         .filter((i) => i.visible && i.name !== 'goodName')
         .sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1)),
-    [metadata, item],
+    [metadata, matrixItem],
   );
 
   const { colors } = useTheme();
@@ -67,7 +68,7 @@ const GoodLineScreen = () => {
 
   return (
     <>
-      <SubTitle style={[styles.title]}>{item?.goodName}</SubTitle>
+      <SubTitle style={[styles.title]}>{matrixItem?.goodName}</SubTitle>
       <View style={[styles.content]}>
         <FlatList
           data={refData}

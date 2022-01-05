@@ -57,7 +57,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
               transform: [{ translateX }],
             },
           ]}
-        // pointerEvents={loading ? 'none' : 'auto'}
+          // pointerEvents={loading ? 'none' : 'auto'}
         >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />

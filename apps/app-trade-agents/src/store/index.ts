@@ -24,13 +24,7 @@ export const reducers = {
 
 const appReducer = combineReducers(reducers);
 
-export const { store } = configureStore(
-  loadDataFromDisk,
-  saveDataToDisk,
-  reducers,
-  [],
-  [appTradeMiddlewareFactory],
-);
+export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers, [], [appTradeMiddlewareFactory]);
 
 export type AppState = ReturnType<typeof appReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

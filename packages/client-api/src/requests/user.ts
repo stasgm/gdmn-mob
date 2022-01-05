@@ -18,7 +18,7 @@ class User extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-     // const uu = user.
+      // const uu = user.
 
       return {
         type: 'ADD_USER',

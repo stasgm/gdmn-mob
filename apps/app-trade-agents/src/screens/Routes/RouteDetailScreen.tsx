@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 import { v4 as uuid } from 'uuid';

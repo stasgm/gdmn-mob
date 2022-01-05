@@ -6,8 +6,9 @@ import { persistStore } from 'redux-persist';
 
 // import appReducer from './app/reducer';
 
-import { AppActionType } from './app/actions';
 import { loadDataFromDisk, saveDataToDisk } from '@lib/mobile-app';
+
+import { AppActionType } from './app/actions';
 
 type TActions = AppActionType;
 
@@ -15,11 +16,7 @@ export const reducers = {};
 
 const rootReducer = combineReducers(reducers);
 
-export const { store } = configureStore(
-  loadDataFromDisk,
-  saveDataToDisk,
-  reducers
-);
+export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers);
 
 export const persistor = persistStore(store);
 

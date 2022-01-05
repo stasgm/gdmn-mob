@@ -16,7 +16,6 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
-  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
@@ -24,6 +23,7 @@ import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import { InventoryItem } from './components/InventoryItem';
+import SwipeLineItem from '../../components/SwipeLineItem';
 
 export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();

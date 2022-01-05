@@ -14,13 +14,16 @@ import {
   Status,
   AppScreen,
   SubTitle,
-  SwipeListItem,
   ScreenListItem,
   IListItemProps,
 } from '@lib/mobile-ui';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { IOrderDocument } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
+import SwipeListItem from '../../components/SwipeListItem';
+import { OrdersStackParamList } from '../../navigation/Root/types';
 
 export interface OrderListSectionProps {
   title: string;
@@ -29,7 +32,7 @@ export interface OrderListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
 const OrderListScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const showActionSheet = useActionSheet();
 
   const { loading } = useSelector((state) => state.documents);
@@ -120,7 +123,7 @@ const OrderListScreen = () => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
-        <ScreenListItem {...item} routeName="OrderView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };
