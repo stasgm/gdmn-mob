@@ -8,12 +8,13 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": false,
     "checkJs": false,
+    "module": "ESNext",
     "jsx": "react-native",
     "lib": ["dom", "esnext"],
     "typeRoots": ["./src/types"],
     "noEmit": true,
     "rootDir": "."
   },
-  "include": ["src/**/*", "__tests__/**/*", "./App.tsx"],
+  "include": ["src/**/*", "__tests__/**/*", "./App.tsx", "../../packages/store/src/ReactotronConfig.ts"],
   "exclude": ["dist", "node_modules", "*.sample"]
 }

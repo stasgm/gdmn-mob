@@ -6,15 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import {
-  docSelectors,
-  documentActions,
-  refSelectors,
-  useDispatch as useDocDispatch,
-  useSelector,
-  appActions,
-  useDispatch,
-} from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -32,9 +24,8 @@ import { getDateString } from '../../utils/helpers';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   const dispatch = useDispatch();
-  const docDispatch = useDocDispatch();
 
   const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
 
@@ -152,7 +143,7 @@ const OrderEditScreen = () => {
         editionDate: newOrderDate,
       };
 
-      docDispatch(documentActions.addDocument(newOrder));
+      dispatch(documentActions.addDocument(newOrder));
 
       navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
       // navigation.navigate('OrderView', { id: newOrder.id });
@@ -183,7 +174,7 @@ const OrderEditScreen = () => {
         editionDate: updatedOrderDate,
       };
 
-      docDispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
       navigation.navigate('OrderView', { id });
     }
   }, [
@@ -194,11 +185,11 @@ const OrderEditScreen = () => {
     docOnDate,
     docDocumentDate,
     id,
-    docDispatch,
+    docDepart,
+    dispatch,
     navigation,
     order,
     docStatus,
-    docDepart,
   ]);
 
   useLayoutEffect(() => {

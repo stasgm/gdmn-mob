@@ -28,7 +28,7 @@
     "@lib/mobile-ui": "*",
     "@react-native-community/masked-view": "0.1.10",
     "@expo/react-native-action-sheet": "^3.9.0",
-    "@react-navigation/native": "^5.9.4",
+    "@react-navigation/native": "^6.0.6",
     "@types/node": "^15.12.4",
     "@types/react": "~17.0.11",
     "@types/react-native": "~0.64.10",
@@ -38,13 +38,14 @@
     "react": "17.0.2",
     "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
     "react-native-paper": "4.10.1",
-    "react-native-reanimated": "~2.1.0",
+    "react-native-reanimated": "~2.2.0",
     "react-redux": "^7.2.4",
     "typescript": "^4.3.4"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
+    "@react-navigation/devtools": "^6.0.4",
     "lint-staged": "^11.0.0"
   }
 }

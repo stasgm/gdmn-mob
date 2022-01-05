@@ -7,6 +7,8 @@ import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
 
 import localStyles from './styles';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AuthStackParamList } from '../navigation/types';
 
 type Props = {
   settings: IApiConfig | undefined;
@@ -15,7 +17,7 @@ type Props = {
 };
 
 const SplashScreen = (props: Props) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<AuthStackParamList>>();
 
   const { onCheckDevice, onBreakConnection } = props;
   const { error, loading, status } = useSelector((state) => state.auth);

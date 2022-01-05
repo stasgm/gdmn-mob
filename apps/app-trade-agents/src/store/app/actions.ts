@@ -1,8 +1,10 @@
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { IGoodModel, IModelData } from './types';
+import { AppTradeState, IGoodModel, IModelData } from './types';
 
 const init = createAction('APP_TRADE/INIT')();
+const loadData = createAction('APP_TRADE/LOAD_DATA')<AppTradeState>();
+const setLoading = createAction('APP_TRADE/SET_LOADING')<boolean>();
 
 const setGoodModelAsync = createAsyncAction(
   'APP_TRADE/SET_GOOD_MODEL',
@@ -13,6 +15,8 @@ const setGoodModelAsync = createAsyncAction(
 export const actions = {
   init,
   setGoodModelAsync,
+  loadData,
+  setLoading,
 };
 
 export type AppTradeActionType = ActionType<typeof actions>;

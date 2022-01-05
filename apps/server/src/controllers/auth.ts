@@ -9,9 +9,9 @@ import { created, ok } from '../utils/apiHelpers';
 /**
  * Регистрация нового пользователя (Администратора компании)
  * */
-const signUp = async (ctx: ParameterizedContext): Promise<void> => {
+const signup = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password, email } = ctx.request.body as IUserCredentials;
-  await authService.signUp({
+  await authService.signup({
     password,
     name,
     email,
@@ -19,7 +19,7 @@ const signUp = async (ctx: ParameterizedContext): Promise<void> => {
 
   created(ctx as Context);
 
-  log.info(`signUp: user '${name}' is successfully signed up`);
+  log.info(`signup: user '${name}' is successfully signed up`);
 };
 
 /**
@@ -81,4 +81,4 @@ const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getDeviceStatus: ok');
 };
 
-export { signUp, logIn, logout, getCurrentUser, verifyCode, getDeviceStatus };
+export { signup, logIn, logout, getCurrentUser, verifyCode, getDeviceStatus };

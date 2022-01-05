@@ -1,16 +1,19 @@
 import { IEntity, IDocument } from '@lib/types';
+
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-const init = createAction('DOCUMENT/INIT')();
-const addDocument = createAction('DOCUMENT/ADD_ONE')<IDocument>();
-const updateDocument = createAction('DOCUMENT/UPDATE_ONE')<{ docId: string; document: IDocument }>();
-const removeDocument = createAction('DOCUMENT/REMOVE_ONE')<string>();
+import { DocumentState } from './types';
 
-const addDocumentLine = createAction('DOCUMENT/ADD_LINE_ONE')<{ docId: string; line: IEntity }>();
-const updateDocumentLine = createAction('DOCUMENT_LINE/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
-const deleteDocumentLine = createAction('DOCUMENT_LINE/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
-
+const init = createAction('DOCUMENTS/INIT')();
+const addDocument = createAction('DOCUMENTS/ADD_ONE')<IDocument>();
+const updateDocument = createAction('DOCUMENTS/UPDATE_ONE')<{ docId: string; document: IDocument }>();
+const removeDocument = createAction('DOCUMENTS/REMOVE_ONE')<string>();
+const addDocumentLine = createAction('DOCUMENTS/ADD_LINE_ONE')<{ docId: string; line: IEntity }>();
+const updateDocumentLine = createAction('DOCUMENTS/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
+const removeDocumentLine = createAction('DOCUMENTS/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
 const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
+const loadData = createAction('DOCUMENTS/LOAD_DATA')<DocumentState>();
+const setLoading = createAction('DOCUMENTS/SET_LOADING')<boolean>();
 
 const setDocumentsAsync = createAsyncAction(
   'DOCUMENTS/SET_ALL',
@@ -44,6 +47,7 @@ const clearDocumentsAsync = createAsyncAction(
 
 export const actions = {
   init,
+  loadData,
   addDocumentsAsync,
   clearDocumentsAsync,
   setDocumentsAsync,
@@ -54,8 +58,9 @@ export const actions = {
   removeDocumentsAsync,
   addDocumentLine,
   updateDocumentLine,
-  deleteDocumentLine,
+  removeDocumentLine,
   clearError,
+  setLoading,
 };
 
 export type DocumentActionType = ActionType<typeof actions>;

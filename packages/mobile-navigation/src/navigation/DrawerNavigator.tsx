@@ -3,8 +3,6 @@ import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import { useSelector } from '@lib/store';
-
 import SettingsNavigator from './Root/SettingsNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
@@ -14,32 +12,20 @@ import { DrawerContent } from './drawerContent';
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
 const baseNavList: INavItem[] = [
-  /*   {
-      name: 'Documents',
-      component: DocumentsNavigator,
-      icon: 'file-document-outline',
-      title: 'Документы',
-    }, */
   {
-    name: 'References',
+    name: 'ReferencesNav',
     component: ReferencesNavigator,
     icon: 'file-cabinet',
     title: 'Справочники',
   },
-  // {
-  //   name: 'Messages',
-  //   component: MessagesNavigator,
-  //   icon: 'message-text-outline',
-  //   title: 'Сообщения',
-  // },
   {
-    name: 'Settings',
+    name: 'SettingsNav',
     component: SettingsNavigator,
     icon: 'tune',
     title: 'Настройки',
   },
   {
-    name: 'Profile',
+    name: 'ProfileNav',
     component: ProfileNavigator,
     icon: 'account-circle-outline',
     title: 'Профиль',
@@ -53,17 +39,12 @@ export interface IProps {
 
 const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
   const { colors } = useTheme();
-  const { loading, errorList } = useSelector((state) => state.app);
-
-  console.log('errorList', errorList);
-
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
 
   return (
     <Drawer.Navigator
-      drawerContentOptions={{
-        activeBackgroundColor: colors.primary,
-        activeTintColor: '#ffffff',
+      screenOptions={{
+        headerShown: false,
       }}
       drawerContent={(props) => <DrawerContent {...props} onSync={onSyncClick} />}
     >
@@ -74,9 +55,11 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
           component={item.component}
           options={{
             title: item.title,
+            drawerActiveBackgroundColor: colors.primary,
+            drawerActiveTintColor: '#ffffff',
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
-            gestureEnabled: !loading,
-            swipeEnabled: !loading,
+            // gestureEnabled: !loading,
+            // swipeEnabled: !loading,
           }}
         />
       ))}

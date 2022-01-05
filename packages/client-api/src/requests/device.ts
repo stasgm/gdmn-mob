@@ -154,7 +154,6 @@ class Device extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка подключения',
-        //err?.response?.data?.error || 'ошибка подключения',
       } as error.INetworkError;
     }
   };

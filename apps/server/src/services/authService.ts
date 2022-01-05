@@ -68,7 +68,7 @@ const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
  * @param user NewUser
  * @returns IUser
  */
-const signUp = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefined> => {
+const signup = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefined> => {
   const { users } = getDb();
 
   // Кол-во пользователей
@@ -138,7 +138,6 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   }
 
   if (await bcrypt.compare(password, hashedPassword)) {
-    console.log('comp user', user);
     done(null, user);
   } else {
     done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
@@ -204,4 +203,4 @@ const getDeviceStatus = async (uid: string): Promise<DeviceState> => {
   return device.state;
 };
 
-export { authenticate, validateAuthCreds, signUp, verifyCode, logout, getDeviceStatus };
+export { authenticate, validateAuthCreds, signup, verifyCode, logout, getDeviceStatus };

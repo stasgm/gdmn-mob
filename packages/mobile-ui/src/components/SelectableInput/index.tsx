@@ -2,8 +2,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
-// import colors from '../../styles/colors';
-
 import styles from './styles';
 
 interface Props {

@@ -5,6 +5,7 @@ import { Appbar } from 'react-native-paper';
 interface IHeaderViewProps extends StackHeaderProps {
   backAction?: () => void;
   menuAction?: () => void;
+  scene: any;
 }
 
 const HeaderView = ({ scene, backAction, menuAction }: IHeaderViewProps) => {

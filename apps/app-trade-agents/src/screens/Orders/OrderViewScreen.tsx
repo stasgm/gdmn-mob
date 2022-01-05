@@ -14,7 +14,6 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
-  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { IOrderDocument, IOrderLine } from '../../store/types';
@@ -24,6 +23,8 @@ import { getDateString } from '../../utils/helpers';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
+
+import SwipeLineItem from '../../components/SwipeLineItem';
 
 import OrderItem from './components/OrderItem';
 
@@ -98,10 +99,6 @@ const OrderViewScreen = () => {
       </View>
     );
   }
-
-  // const renderItem = ({ item }: { item: IOrderLine }) => (
-  //   <OrderItem docId={order.id} item={item} readonly={isBlocked} />
-  // );
 
   const renderItem = ({ item }: { item: IOrderLine }) => (
     <SwipeLineItem docId={order.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">

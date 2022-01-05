@@ -15,6 +15,7 @@ type IRefMetadata<T> = {
 interface IReference<T = IReferenceData> {
   id: string;
   name: string;
+  sortOrder?: number;
   description?: string;
   metadata?: IRefMetadata<T>;
   visible?: boolean;

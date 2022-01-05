@@ -7,6 +7,8 @@ import { actions, SettingsActionType } from './actions';
 
 import { SettingsState } from './types';
 
+export const baseGroup = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
+
 const baseSettings: Settings<IBaseSettings> = {
   serverAutoCheck: {
     id: '1',
@@ -14,7 +16,7 @@ const baseSettings: Settings<IBaseSettings> = {
     description: 'Опрашивать сервер автоматически',
     data: true,
     type: 'boolean',
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
+    group: baseGroup,
   },
   refLoadType: {
     id: '2',
@@ -23,7 +25,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 2,
     visible: true,
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
+    group: baseGroup,
   },
   cleanDocTime: {
     id: '3',
@@ -32,22 +34,29 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
-    group: { id: '1', name: 'Настройки приложения', sortOrder: 1 },
+    group: baseGroup,
   },
 };
 
-const initialState: Readonly<SettingsState> = {
+export const initialState: Readonly<SettingsState> = {
   data: baseSettings,
   loading: false,
   errorMessage: '',
 };
 
 const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialState, action): SettingsState => {
+  // console.log('reducer settings', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;
 
-    case getType(actions.addSetting):
+    case getType(actions.setLoading):
+      return { ...state, loading: action.payload };
+
+    case getType(actions.loadData):
+      return { ...action.payload, loading: false, errorMessage: '' };
+
+    case getType(actions.addOption):
       return {
         ...state,
         data: {
@@ -76,7 +85,6 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.deleteOption): {
       const removeProps = action.payload;
-      // state.data[action.payload];
       const { [removeProps]: remove, ...rest } = state.data;
       return { ...state, data: rest };
     }
@@ -84,24 +92,6 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
 
-    // Loading
-    /*     case getType(actions.fetchMessagesAsync.request):
-          return { ...state, loading: true };
-
-        case getType(actions.fetchMessagesAsync.success):
-          return {
-            ...state,
-            loading: false,
-            data: [...state.data, ...action.payload],
-          };
-
-        case getType(actions.fetchMessagesAsync.failure):
-          return {
-            ...state,
-            loading: false,
-            errorMessage: action.payload || 'error',
-          };
-     */
     default:
       return state;
   }

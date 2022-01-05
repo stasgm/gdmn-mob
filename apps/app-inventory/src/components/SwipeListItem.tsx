@@ -6,7 +6,7 @@ import { documentActions, useDispatch } from '@lib/store';
 
 import { IDocument } from '@lib/types';
 
-import SwipeItem from './SwipeItem';
+import { SwipeItem } from '@lib/mobile-ui';
 
 interface IProps {
   children?: ReactNode;
@@ -22,25 +22,25 @@ const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) =
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
+  const handleSwipe = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate(routeName, { id });
+      navigation.navigate(routeName as never, { id } as never);
     } else if (name === 'copy') {
-      const newReturnDate = new Date().toISOString();
+      const newDocDate = new Date().toISOString();
 
-      const newInventory: IDocument = {
+      const newDoc: IDocument = {
         ...item,
         id: uuid(),
         number: 'б\\н',
         status: 'DRAFT',
-        documentDate: newReturnDate,
-        creationDate: newReturnDate,
-        editionDate: newReturnDate,
+        documentDate: newDocDate,
+        creationDate: newDocDate,
+        editionDate: newDocDate,
       };
 
-      dispatch(documentActions.addDocument(newInventory));
+      dispatch(documentActions.addDocument(newDoc));
 
-      navigation.navigate(routeName, { id: newInventory.id });
+      navigation.navigate(routeName as never, { id: newDoc.id } as never);
     } else if (name === 'delete') {
       if (isBlocked) {
         return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);
@@ -62,7 +62,7 @@ const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) =
 
   return (
     <SwipeItem
-      onPress={(name) => handlePressSwipeOrder(name, item.id, item?.status !== 'DRAFT')}
+      onPress={(name) => handleSwipe(name, item.id, item?.status !== 'DRAFT')}
       edit={edit}
       copy={copy}
       del={del}

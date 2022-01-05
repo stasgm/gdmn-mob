@@ -13,9 +13,10 @@ import { INamedEntity } from '@lib/types';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/types';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 const Good = ({ item }: { item: INamedEntity }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList>>();
 
   const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectGoodItem'>>().params;
 
