@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Snackbar } from 'react-native-paper';
+import { Snackbar, useTheme } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
@@ -40,6 +40,7 @@ const MapScreen = () => {
   const [message, setMessage] = useState('');
 
   const dispatch = useDispatch();
+  const { colors } = useTheme();
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
@@ -227,7 +228,7 @@ const MapScreen = () => {
     <View style={localStyles.containerMap}>
       {loading && (
         <View style={localStyles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
       <MapView

@@ -71,25 +71,24 @@ const Root = () => {
     },
   };
 
-  const storeSettings = useSelector((state) => state.settings);
+  const storeSettings = useSelector((state) => state.settings)?.data;
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
 
   useEffect(() => {
     if (appSettings) {
       Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings.data[optionName];
+        const storeSet = storeSettings[optionName];
         if (!storeSet && value) {
-          dispatch(settingsActions.addSetting({ optionName, value }));
+          dispatch(settingsActions.addOption({ optionName, value }));
         }
       });
     }
   }, [storeSettings]);
 
-  // const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const good = refSelectors.selectByName<IGood>('good')?.data;
-  const departments = (refSelectors.selectByName('department') as IReference<IContact>)?.data;
-  const remains = (refSelectors.selectByName('remain') as IReference<IRemains>)?.data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const departments = refSelectors.selectByName<IContact>('contact')?.data;
+  const remains = refSelectors.selectByName<IRemains>('remain')?.data;
 
   const [loading, setLoading] = useState(false);
 

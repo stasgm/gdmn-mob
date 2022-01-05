@@ -17,9 +17,9 @@ const ProfileScreen = () => {
   const user = useSelector((state) => state.auth.user);
   const company = useSelector((state) => state.auth.company);
   const device = useSelector((state) => state.auth.device);
-  const isMock = useSelector((state) => state.auth.settings.debug?.isMock);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
-  const settings = user?.settings;
+  const userSettings = user?.settings;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -56,13 +56,13 @@ const ProfileScreen = () => {
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   };
 
-  const visibleList = settings && Object.entries(settings).filter(([_, item]) => item.visible);
+  const visibleList = userSettings && Object.entries(userSettings).filter(([_, item]) => item.visible);
 
   return (
     <View style={styles.container}>
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
+          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" children={undefined} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
@@ -75,7 +75,7 @@ const ProfileScreen = () => {
       <Divider />
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="devices" />
+          <Avatar.Icon size={50} icon="devices" children={undefined} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{device?.name || ''}</Text>
@@ -100,7 +100,7 @@ const ProfileScreen = () => {
       )}
       <View>
         <PrimeButton outlined onPress={handleLogout}>
-          {isMock ? 'Выйти из демо режима' : 'Сменить пользователя'}
+          {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
       </View>
     </View>

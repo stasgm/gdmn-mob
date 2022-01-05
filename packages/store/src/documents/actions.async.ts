@@ -104,4 +104,11 @@ const clearDocuments = (): AppThunk<
   };
 };
 
-export default { setDocuments, addDocuments, updateDocuments, removeDocuments, clearDocuments, useDocThunkDispatch };
+export default {
+  setDocuments,
+  addDocuments,
+  updateDocuments,
+  removeDocuments,
+  clearDocuments,
+  useDocThunkDispatch,
+};

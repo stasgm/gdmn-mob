@@ -23,12 +23,6 @@ const loginController = async (req: Request, res: Response, next: NextFunction) 
     return;
   }
 
-  //const salt = bcrypt.genSaltSync(10);
-  // шифруем пароль
-  //const passwordToSave = bcrypt.hashSync(user.password, salt);
-  // выводим результат
-  //console.log('passwordToSave=', passwordToSave);
-
   //Сравним пришедший пароль с тем, который хранится у нас
 
   const hashedPassword = user.password;

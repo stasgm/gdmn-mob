@@ -31,7 +31,7 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   created(ctx as Context, newUser);
 
-  log.info(`signUp: user '${name}' is successfully signed up`);
+  log.info(`signup: user '${name}' is successfully signed up`);
 };
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {

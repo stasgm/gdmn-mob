@@ -1,8 +1,8 @@
 import {
   DrawerContentComponentProps,
-  DrawerContentOptions,
   DrawerContentScrollView,
   DrawerItemList,
+  DrawerContentOptions,
 } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -20,8 +20,9 @@ type Props = DrawerContentComponentProps<DrawerContentOptions> & ICutsomProps;
 
 export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
-  const { loading } = useSelector((state) => state.app);
-  const { user, company } = useSelector((state) => state.auth);
+  // const loading = useSelector((state) => state.app.loading);
+  const user = useSelector((state) => state.auth.user);
+  const company = useSelector((state) => state.auth.company);
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -33,7 +34,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       <View style={styles.userProfile}>
         <View style={styles.userInfoSection}>
           <TouchableOpacity onPress={props.navigation.toggleDrawer}>
-            <Avatar.Icon size={50} icon="badge-account-horizontal-outline" />
+            <Avatar.Icon size={50} icon="badge-account-horizontal-outline" children={undefined} />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
             <Title style={styles.title}>{user?.firstName}</Title>
@@ -54,7 +55,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
               transform: [{ translateX }],
             },
           ]}
-          pointerEvents={loading ? 'none' : 'auto'}
+          // pointerEvents={loading ? 'none' : 'auto'}
         >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />
@@ -77,11 +78,11 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       </DrawerContentScrollView>
       {/* <Divider /> */}
       <View style={styles.systemInfo}>
-        <TouchableOpacity disabled={loading} onPress={onSync}>
-          <Avatar.Icon size={50} style={loading && { opacity: 0.2 }} icon="cloud-refresh" />
+        <TouchableOpacity onPress={onSync}>
+          <Avatar.Icon size={50} icon="cloud-refresh" children={undefined} />
         </TouchableOpacity>
         <View style={styles.updateSection}>
-          <Caption style={styles.caption}>{loading ? 'Синхронизация данных...' : ''}</Caption>
+          {/* <Caption style={styles.caption}>{loading ? 'Синхронизация данных...' : ''}</Caption> */}
           <Caption style={styles.caption}>
             Версия программы: {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
           </Caption>

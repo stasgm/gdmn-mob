@@ -2,45 +2,31 @@ import { combineReducers, Action } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { persistStore, persistReducer } from 'redux-persist';
+import { loadDataFromDisk, saveDataToDisk } from '@lib/mobile-app';
 
 import geoReducer from './geo/reducer';
 import { GeoActionType } from './geo/actions';
 import appTradeReducer from './app/reducer';
 import { AppTradeActionType } from './app/actions';
+import { appTradeMiddlewareFactory } from './app/middleware';
 
 export { default as geoActions } from './geo';
 
-export { default as appTradeActions } from './app/actions.async';
+export { default as appTradeActions } from './app';
 export { useAppTradeThunkDispatch } from './app/actions.async';
 
 type TActions = GeoActionType | AppTradeActionType;
 
-const persistGeoConfig = {
-  key: 'geo',
-  storage: AsyncStorage,
-  whitelist: ['list'],
+export const reducers = {
+  appTrade: appTradeReducer,
+  geo: geoReducer,
 };
 
-const persistAppTradeConfig = {
-  key: 'appTrade',
-  storage: AsyncStorage,
-  whitelist: ['goodModel'],
-};
+const appReducer = combineReducers(reducers);
 
-export const combinedReducer = {
-  appTrade: persistReducer(persistAppTradeConfig, appTradeReducer),
-  geo: persistReducer(persistGeoConfig, geoReducer),
-};
+export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers, [], [appTradeMiddlewareFactory]);
 
-const rootReducer = combineReducers(combinedReducer);
-
-export const { store } = configureStore(combinedReducer);
-export const persistor = persistStore(store);
-
-export type AppState = ReturnType<typeof rootReducer>;
+export type AppState = ReturnType<typeof appReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;
 export type AppDispatch = ThunkDispatch<AppState, any, TActions>;
 

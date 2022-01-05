@@ -16,6 +16,7 @@ import routes from './routes';
 
 const Router = () => {
   const isLogged = authSelectors.isLogged();
+  console.log('isLogged', isLogged);
 
   return useRoutes(routes(isLogged));
 };
@@ -23,12 +24,10 @@ const Router = () => {
 const App = () => {
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider theme={theme}>
-          <GlobalStyles />
-          <Router />
-        </ThemeProvider>
-      </PersistGate>
+      <ThemeProvider theme={theme}>
+        <GlobalStyles />
+        <Router />
+      </ThemeProvider>
     </Provider>
   );
 };

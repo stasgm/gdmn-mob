@@ -2,7 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { GoodMatrixStackParamList } from './types';
-import { returnListScreens, returnScreens, goodMatrixScreens, goodMatrixListScreens } from './screens';
+import { goodMatrixScreens, goodMatrixListScreens } from './screens';
 
 const Stack = createStackNavigator<GoodMatrixStackParamList>();
 

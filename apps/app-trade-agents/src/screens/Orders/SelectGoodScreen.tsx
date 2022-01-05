@@ -3,7 +3,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
-import { INamedEntity } from '@lib/types';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
@@ -12,16 +11,17 @@ import { Searchbar, IconButton, Divider } from 'react-native-paper';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
 import { useSelector as useAppTradeSelector } from '../../store/';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { IGoodModel } from '../../store/app/types';
 
-const Good = ({ item }: { item: INamedEntity }) => {
-  const navigation = useNavigation();
+const Good = ({ item }: { item: IGood }) => {
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();
 
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
 
   return (
     <TouchableOpacity
       onPress={() => {
-        // dispatch(documentActions.);
         navigation.navigate('OrderLine', {
           mode: 0,
           docId,
@@ -70,23 +70,25 @@ const SelectGoodScreen = () => {
     });
   }, [navigation, filterVisible, colors.card]);
 
-  const refList = React.useRef<FlatList<INamedEntity>>(null);
+  const refList = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: INamedEntity }) => <Good item={item} />;
+  const renderItem = ({ item }: { item: IGood }) => <Good item={item} />;
 
-  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
-
-  // if (!contact) {
-  //   return <Text style={styles.title}>Организация не определена</Text>;
-  // }
+  const contactId =
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
 
-  const groupsModel =
-    goodModel[contact?.id || ''].goods[groups.find((gr) => gr.id === groupId)?.parent?.id || ''] || {};
+  const onDate = goodModel[contactId].onDate;
+
+  const allGoods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
+
+  const parentGroup = groups.find((gr) => gr.id === groupId)?.parent?.id;
+
+  const groupsModel = parentGroup ? allGoods[parentGroup] : {};
 
   const goods = refSelectors.selectByName<IGood>('good');
 

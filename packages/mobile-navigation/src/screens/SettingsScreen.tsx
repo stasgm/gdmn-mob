@@ -12,8 +12,9 @@ const SettingsSceen = () => {
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
 
-  const { data } = useSelector((state) => state.settings);
-  const { settings } = useSelector((state) => state.auth);
+  const data = useSelector((state) => state.settings.data);
+  const config = useSelector((state) => state.auth.config);
+
   Object.entries(data).forEach((item) => {
     if (!item[1]?.group) {
       item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
@@ -64,7 +65,7 @@ const SettingsSceen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  const serverPath = `${settings?.protocol}${settings?.server}:${settings?.port}/${settings?.apiPath}`;
+  const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
   return (
     <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
@@ -74,11 +75,6 @@ const SettingsSceen = () => {
         <View style={styles.details}>
           <Text style={styles.name}>Путь к серверу</Text>
           <Text style={[styles.number, styles.field]}>{serverPath}</Text>
-        </View>
-        <Divider />
-        <View style={styles.details}>
-          <Text style={styles.name}>Время ожидания ответа сервера, мс.</Text>
-          <Text style={[styles.number, styles.field]}>{settings?.timeout}</Text>
         </View>
       </View>
       <View>
@@ -97,12 +93,6 @@ const SettingsSceen = () => {
             ) : null;
           })}
         </View>
-        {/* <FlatList
-              data={settingList}
-              keyExtractor={(item, _) => item.id}
-              renderItem={renderItem}
-              ItemSeparatorComponent={Divider}
-            /> */}
       </View>
     </KeyboardAwareScrollView>
   );

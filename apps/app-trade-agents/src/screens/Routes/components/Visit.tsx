@@ -16,15 +16,17 @@ import {
   RadioGroup,
   ScreenListItem,
   IListItemProps,
-  SwipeListItem,
 } from '@lib/mobile-ui';
 import { useSendDocs } from '@lib/mobile-app';
+
+import { useTheme } from 'react-native-paper';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getDateString } from '../../../utils/helpers';
+import SwipeListItem from '../../../components/SwipeListItem';
 
 type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteDetails'>;
 
@@ -38,6 +40,7 @@ interface IVisitProps {
 const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation<RouteLineProp>();
   const dispatch = useDispatch();
+  const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
 
@@ -233,7 +236,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const doc = orderDocs.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
-        <ScreenListItem {...item} routeName="ReturnView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };
@@ -257,7 +260,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const doc = returnDocs.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
-        <ScreenListItem {...item} routeName="ReturnView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };
@@ -274,12 +277,12 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   return (
     <>
       <View style={localStyles.container}>
-        <InfoBlock colorLabel="#4E9600" title="Визит">
+        <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
             <Text>{visitTextBegin}</Text>
             {dateEnd && <Text>{visitTextEnd}</Text>}
             {process ? (
-              <ActivityIndicator size="large" color="#0000ff" />
+              <ActivityIndicator size="large" color={colors.primary} />
             ) : (
               <>
                 {!dateEnd && (
@@ -292,7 +295,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length !== 0 && (
-          <InfoBlock colorLabel="#E3C920" title="Заявки">
+          <InfoBlock colorLabel="#567d06" title="Заявки">
             <FlatList
               data={orders}
               keyExtractor={(_, i) => String(i)}
@@ -303,7 +306,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel="#E3C920" title="Возвраты">
+          <InfoBlock colorLabel={colors.error} title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}
@@ -321,7 +324,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       ) : (
         readyDocs?.length > 0 &&
         (loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={colors.primary} />
         ) : (
           <PrimeButton icon="file-send" onPress={handleSendDocs}>
             Отправить

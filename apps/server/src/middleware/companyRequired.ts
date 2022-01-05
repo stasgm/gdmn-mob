@@ -6,7 +6,6 @@ export const companyMiddleware = async (ctx: Context, next: Next): Promise<void>
 
   if (user?.role !== 'SuperAdmin') {
     ctx.request.query.adminId = user.id;
-    console.log('companyMiddleware', ctx.request.query.adminId);
   }
 
   await next();

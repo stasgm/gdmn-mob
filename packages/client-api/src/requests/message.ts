@@ -52,7 +52,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка отправки сообщения',
+        message: err instanceof TypeError ? err.message : 'ошибка отправки сообщения',
       } as error.INetworkError;
     }
   };
@@ -90,7 +90,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения сообщения',
+        message: err instanceof TypeError ? err.message : 'ошибка получения сообщения',
       } as error.INetworkError;
     }
   };
@@ -120,7 +120,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления сообщения',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления сообщения',
       } as error.INetworkError;
     }
   };
@@ -151,7 +151,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления сообщений',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления сообщений',
       } as error.INetworkError;
     }
   };

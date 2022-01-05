@@ -95,8 +95,8 @@ export const SelectRemainsScreen = (props: any) => {
 
         remains && remains.length > 0
           ? remains.forEach((re) => {
-              r.push({ ...goodPos, price: re.price, remains: re.q });
-            })
+            r.push({ ...goodPos, price: re.price, remains: re.q });
+          })
           : r.push(goodPos);
         return r;
       }, [])

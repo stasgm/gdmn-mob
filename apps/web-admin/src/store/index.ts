@@ -15,6 +15,7 @@ import { DeviceActionType } from './device/actions';
 import { ActivationCodeActionType } from './activationCode/actions';
 import { UserActionType } from './user/actions';
 import { DeviceBindingActionType } from './deviceBinding/actions';
+import { loadDataFromDisk, saveDataToDisk } from './appStorageWeb';
 
 export const reducers = {
   companies: companyReducer,
@@ -31,11 +32,11 @@ type TActions =
   | UserActionType
   | DeviceBindingActionType;
 
-const rootReducer = combineReducers(reducers);
+const appReducer = combineReducers(reducers);
 
 export type RootState = ReturnType<typeof store.getState>;
-export type AppState = ReturnType<typeof rootReducer> & RootState;
-export const { store } = configureStore(reducers);
+export type AppState = ReturnType<typeof appReducer> & RootState;
+export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers, [], []);
 export const persistor = persistStore(store);
 
 export type AppDispatch = ThunkDispatch<AppState & RootState, any, TActions>;

@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import { authSelectors } from '@lib/store';
+import { appSelectors, authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
-import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
+import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 
 import { useSelector } from '@lib/store';
 
 import { useSync } from './hooks';
 import api from '@lib/client-api';
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 export interface IApp {
   items?: INavItem[];
@@ -23,20 +24,30 @@ export interface IApp {
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
 
-  const settings = useSelector( state => state.auth.settings );
+  const config = useSelector((state) => state.auth.config);
+  const appLoading = appSelectors.selectLoading();
+  const { colors } = useTheme();
 
   useEffect(() => {
-    // authDispatch(authActions.init());
     // //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...settings };
+    api.config = { ...api.config, ...config };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
+  return appLoading ? (
+    <AppScreen>
+      <ActivityIndicator size="large" color={colors.primary} children={undefined} />
+      <Caption style={styles.title}>{'Синхронизация данных...'}</Caption>
+    </AppScreen>
+  ) : (
+    <DrawerNavigator items={items} onSyncClick={handleSyncData} />
+  );
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
-  const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
+
+  const Router = () =>
+    (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
   return store ? (
     <Provider store={store}>

@@ -2,7 +2,6 @@ import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import { StatusType } from '@lib/types';
 
 import styles from '../../styles/global';
@@ -17,28 +16,22 @@ export interface IListItemProps {
   lineCount?: number;
   errorMessage?: string;
   id: string;
-  routeName: string;
+  onSelectItem?: () => void;
 }
 
 const ScreenListItem = ({
-  id,
   title,
   subtitle,
   status,
   lineCount,
   isFromRoute,
   errorMessage,
-  routeName,
+  onSelectItem,
 }: IListItemProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate(routeName, { id });
-      }}
-    >
+    <TouchableOpacity onPress={onSelectItem}>
       <View style={styles.item}>
         <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
           <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />

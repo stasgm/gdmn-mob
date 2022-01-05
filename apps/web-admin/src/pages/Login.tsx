@@ -30,7 +30,7 @@ const Login = () => {
       password: yup.string().required('Заполните это поле'),
     }),
     onSubmit: (values: IUserCredentials) => {
-      dispatch(authActions.signIn(values));
+      dispatch(authActions.login(values));
     },
   });
 
