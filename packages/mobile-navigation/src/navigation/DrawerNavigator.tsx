@@ -43,8 +43,9 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
 
   return (
     <Drawer.Navigator
-      screenOptions={{
-        headerShown: false,
+      drawerContentOptions={{
+        activeBackgroundColor: colors.primary,
+        activeTintColor: '#ffffff',
       }}
       drawerContent={(props) => <DrawerContent {...props} onSync={onSyncClick} />}
     >
@@ -55,8 +56,6 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
           component={item.component}
           options={{
             title: item.title,
-            drawerActiveBackgroundColor: colors.primary,
-            drawerActiveTintColor: '#ffffff',
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
             // gestureEnabled: !loading,
             // swipeEnabled: !loading,
