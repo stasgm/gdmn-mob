@@ -36,7 +36,7 @@ const AuthNavigator: React.FC = () => {
   const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
 
   useEffect(() => {
-    //  setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+    // setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock: isDemo } };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,7 +48,7 @@ const AuthNavigator: React.FC = () => {
 
   const saveConfig = useCallback(
     (newConfig: IApiConfig) => {
-      if (newConfig.deviceId === '') {
+      if (newConfig.deviceId === '' && config.deviceId !== '') {
         disconnect();
       }
       authDispatch(authActions.setConfig(newConfig));
@@ -154,6 +154,8 @@ const AuthNavigator: React.FC = () => {
     Если connectionStatus = 'connected' и есть user, то переходим на окно с компаниями
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
+
+  console.log('isInit', isInit);
 
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
