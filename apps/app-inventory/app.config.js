@@ -11,7 +11,6 @@ export default ({ config }) => {
       },
     },
     extra: {
-      SYSTEM_NAME: 'Inventory',
       appVesion: config.version,
       buildVersion: config.android.versionCode,
       slug: config.slug,

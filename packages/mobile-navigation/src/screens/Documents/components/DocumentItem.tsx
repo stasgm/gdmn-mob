@@ -5,8 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
-import { styles } from '../styles';
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { styles } from '../styles';
 import { DocumentsTabsStackParamsList } from '../../../navigation/Root/types';
 
 interface IField {

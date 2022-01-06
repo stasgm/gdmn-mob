@@ -54,6 +54,7 @@ const AuthNavigator: React.FC = () => {
       authDispatch(authActions.setConfig(newConfig));
       api.config = { ...api.config, ...newConfig };
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [disconnect, authDispatch],
   );
 

@@ -8,8 +8,8 @@ import {
 } from '../../screens/Inventory';
 
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
-import { ScanBarcodeScreen } from '../../screens/Inventory/components/Scanners/ScanBarcode';
-import { ScanBarcodeReaderScreen } from '../../screens/Inventory/components/Scanners/ScanBarcodeReader';
+import { ScanBarcodeScreen } from '../../components/Scanners/ScanBarcode';
+import { ScanBarcodeReaderScreen } from '../../components/Scanners/ScanBarcodeReader';
 
 export const inventoryScreens = {
   InventoryEdit: InventoryEditScreen,

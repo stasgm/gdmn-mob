@@ -8,8 +8,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
-import { IGood, IInventoryLine } from '../../../store/types';
-import { InventorysStackParamList } from '../../../navigation/Root/types';
+import { IGood, IInventoryLine } from '../store/types';
+import { InventorysStackParamList } from '../navigation/Root/types';
 
 interface IProps {
   docId: string;
