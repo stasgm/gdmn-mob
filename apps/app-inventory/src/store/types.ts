@@ -12,7 +12,6 @@ import {
   RefTypeChoose,
 } from '@lib/types';
 
-// eslint-disable-next-line import/no-cycle
 import { IGood } from './app/types';
 
 export { IGood };
@@ -80,12 +79,6 @@ export interface IInventoryLine extends IEntity {
 
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
 
-//* Model *//
-export interface IModelRem {
-  price?: number;
-  q?: number;
-}
-
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
@@ -101,23 +94,6 @@ export interface IRemainsData {
   goodId: string;
   q?: number;
   price?: number;
-}
-
-export interface IMGoodRemain extends IGood {
-  remains?: IModelRem[];
-}
-
-export interface IMDGoodRemain {
-  contactName: string;
-  goods: IMGoodData<IMGoodRemain>;
-}
-
-export interface IMGoodData<T = unknown> {
-  [id: string]: T;
-}
-
-export interface IModelData<T = unknown> {
-  [id: string]: T;
 }
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<

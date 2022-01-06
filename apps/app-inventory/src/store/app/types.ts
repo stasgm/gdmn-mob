@@ -1,7 +1,26 @@
 import { INamedEntity } from '@lib/types';
 
-// eslint-disable-next-line import/no-cycle
-import { IMDGoodRemain, IModelData } from '../types';
+export interface IModelData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IModelRem {
+  price?: number;
+  q?: number;
+}
+
+export interface IMGoodRemain extends IGood {
+  remains?: IModelRem[];
+}
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMDGoodRemain {
+  contactName: string;
+  goods: IMGoodData<IMGoodRemain>;
+}
 
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemain>;

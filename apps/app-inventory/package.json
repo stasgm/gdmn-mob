@@ -1,11 +1,11 @@
 {
   "name": "@apps/inventory",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "main": "__generated__/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "start:dev": "cross-env MOCK=true DEVICE_ID=123 yarn start",
+    "start:dev": "cross-env MOCK=false DEVICE_ID=123 yarn start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -25,7 +25,7 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@expo/react-native-action-sheet": "^3.9.0",
+    "@expo/react-native-action-sheet": "^3.8.0",
     "@expo/vector-icons": "^12.0.5",
     "@gorhom/bottom-sheet": "^2.3.0",
     "@lib/client-api": "*",
@@ -36,7 +36,7 @@
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@react-native-async-storage/async-storage": "^1.15.4",
+    "@lib/mobile-app": "*",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.10",
     "@react-navigation/drawer": "^5.12.5",
@@ -44,7 +44,6 @@
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "@types/react-test-renderer": "^17.0.1",
-    "@types/redux-persist": "^4.3.1",
     "axios": "^0.21.1",
     "babel-plugin-inline-dotenv": "^1.6.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
@@ -71,8 +70,6 @@
     "react-test-renderer": "^17.0.2",
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
-    "redux-persist": "^6.0.0",
-    "redux-persist-expo-filesystem": "^2.0.0",
     "redux-thunk": "^2.3.0",
     "reselect": "4.0.0",
     "typesafe-actions": "^5.1.0"

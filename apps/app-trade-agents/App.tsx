@@ -5,7 +5,6 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  authActions,
   // authActions,
   // documentActions,
   // referenceActions,
@@ -193,13 +192,9 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  console.log('111111111111111111');
-
   return authLoading || loading || appLoading || tradeLoading ? (
     <AppScreen>
-      <ActivityIndicator size="large" color={colors.primary}>
-        <></>
-      </ActivityIndicator>
+      <ActivityIndicator size="large" color={colors.primary} />
       <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
     </AppScreen>
   ) : (

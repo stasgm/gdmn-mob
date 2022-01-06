@@ -21,9 +21,8 @@ import {
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
-
-import { InventoryItem } from './components/InventoryItem';
 import SwipeLineItem from '../../components/SwipeLineItem';
+import { InventoryItem } from '../../components/InventoryItem';
 
 export const InventoryViewScreen = (props: any) => {
   const { params } = props.route;
@@ -55,7 +54,7 @@ export const InventoryViewScreen = (props: any) => {
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
-  
+
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
   }, [navigation, id, scanUsetSetting]);

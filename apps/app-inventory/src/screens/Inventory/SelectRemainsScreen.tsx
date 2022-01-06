@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/no-children-prop */
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
@@ -95,8 +93,8 @@ export const SelectRemainsScreen = (props: any) => {
 
         remains && remains.length > 0
           ? remains.forEach((re) => {
-            r.push({ ...goodPos, price: re.price, remains: re.q });
-          })
+              r.push({ ...goodPos, price: re.price, remains: re.q });
+            })
           : r.push(goodPos);
         return r;
       }, [])
@@ -146,8 +144,6 @@ export const SelectRemainsScreen = (props: any) => {
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
-              children={undefined}
-              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />

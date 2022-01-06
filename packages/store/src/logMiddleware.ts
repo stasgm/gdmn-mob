@@ -1,4 +1,4 @@
-export const logMiddleware = (store: any) => (next: any) => (action: any) => {
+export const logMiddleware = () => (next: any) => (action: any) => {
   if (__DEV__) {
     console.log('Middleware App action: ', JSON.stringify(action));
   }

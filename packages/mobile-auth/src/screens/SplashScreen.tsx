@@ -6,9 +6,11 @@ import { globalStyles as styles, PrimeButton, RoundButton, AppScreen, ScreenTitl
 import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
 
-import localStyles from './styles';
 import { StackNavigationProp } from '@react-navigation/stack';
+
 import { AuthStackParamList } from '../navigation/types';
+
+import localStyles from './styles';
 
 type Props = {
   settings: IApiConfig | undefined;

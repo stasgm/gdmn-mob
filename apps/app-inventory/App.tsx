@@ -3,27 +3,18 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { IReference, Settings } from '@lib/types';
-import { PersistGate } from 'redux-persist/integration/react';
-import { refSelectors, settingsActions, useDispatch, useSelector, useDispatch as useDocDispatch } from '@lib/store';
-import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { Caption } from 'react-native-paper';
+import { appActions, appSelectors, refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import { AppScreen, globalStyles as styles, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
-import { persistor, store } from './src/store';
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
-import {
-  IContact,
-  IGood,
-  IRemains,
-  IMDGoodRemain,
-  IMGoodData,
-  IMGoodRemain,
-  IModelData,
-  IDepartment,
-} from './src/store/types';
-import actions, { useAppInventoryThunkDispatch } from './src/store/app';
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
+
+import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
+
+import { IContact, IDepartment, IGood, IRemains } from './src/store/types';
+import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
@@ -33,8 +24,8 @@ const Root = () => {
   const navItems: INavItem[] = useMemo(
     () => [
       {
-        name: 'Inventorys',
-        title: 'Инвентаризации',
+        name: 'Inventory',
+        title: 'Инвентаризация',
         icon: 'file-document-outline',
         component: InventoryNavigator,
       },
@@ -42,9 +33,10 @@ const Root = () => {
     [],
   );
 
-  const storeSettings = useSelector((state) => state.settings)?.data;
+  const storeSettings = useSelector((state) => state.settings?.data);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
+  const { colors } = useTheme();
 
   useEffect(() => {
     if (appSettings) {
@@ -60,11 +52,26 @@ const Root = () => {
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IContact>('contact')?.data;
   const remains = refSelectors.selectByName<IRemains>('remain')?.data;
-
-  const [loading, setLoading] = useState(false);
+  const user = useSelector((state) => state.auth.user);
+  const appLoading = appSelectors.selectLoading();
+  const authLoading = useSelector((state) => state.auth.loading);
+  const invLoading = useInvSelector((state) => state.appInventory.loading);
 
   useEffect(() => {
-    setLoading(true);
+    console.log('useEffect loadGlobalDataFromDisc');
+    // dispatch(authActions.init());
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      console.log('useEffect loadSuperDataFromDisc', user.id);
+      dispatch(appActions.loadSuperDataFromDisc());
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
     const getRemainsModel = async () => {
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
         (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
@@ -84,22 +91,39 @@ const Root = () => {
         },
         {},
       );
-      await appInventoryDispatch(actions.setModel(model));
+      await appInventoryDispatch(appInventoryActions.setModel(model));
     };
     getRemainsModel();
-    setLoading(false);
   }, [appInventoryDispatch, departments, goods, remains]);
-  return loading ? (
-    <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    //Для отрисовки при первом подключении
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // console.log('111', authLoading || loading || appLoading || invLoading);
+
+  return authLoading || loading || appLoading || invLoading ? (
+    <AppScreen>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+    </AppScreen>
   ) : (
     <MobileApp items={navItems} />
   );
 };
 
-export const App = () => (
+const App = () => (
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+    <UIProvider theme={defaultTheme}>
       <Root />
-    </PersistGate>
+    </UIProvider>
   </Provider>
 );
+
+export default App;

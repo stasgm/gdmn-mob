@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars-experimental */
-import { INavItem } from '@lib/mobile-navigation';
 import { Settings, StatusType } from '@lib/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;

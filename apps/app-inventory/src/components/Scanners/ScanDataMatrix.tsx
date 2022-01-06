@@ -1,13 +1,16 @@
-/* eslint-disable react-native/no-inline-styles */
-import { useTheme } from '@react-navigation/native';
+import { useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, Vibration } from 'react-native';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { View, StyleSheet, TouchableOpacity, StatusBar, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
 import styles from '@lib/mobile-ui/src/styles/global';
-import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
+
+import { InventorysStackParamList } from '../../navigation/Root/types';
+import { IInventoryLine } from '../../store/types';
+
+// import { useAppStore } from '../../../../store';
 
 const oneSecond = 1000;
 
@@ -16,8 +19,11 @@ interface IProps {
   onCancel: () => void;
 }
 
+// const ScanDataMatrixScreen = ({ onSave, onCancel }: IProps) => {
 export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
+  // const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanDataMatrix'>>().params?.docId;
+  const navigation = useNavigation();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
@@ -52,7 +58,7 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }
 
   return (
-    <View style={[scanStyle.content, { backgroundColor: colors.card }]}>
+    <View style={[localStyles.content, { backgroundColor: colors.card }]}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
@@ -61,25 +67,31 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={scanStyle.camera}
+        style={localStyles.camera}
       >
-        <View style={scanStyle.header}>
-          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanStyle.transparent} onPress={onCancel} />
+        <View style={localStyles.header}>
+          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={localStyles.transparent} onPress={onCancel} />
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={localStyles.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={localStyles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
+          {/* <IconButton
+            icon={'feature-search-outline'}
+            color={'#FFF'}
+            style={localStyles.transparent}
+            onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
+          /> */}
         </View>
         {!scanned ? (
-          <View style={[scanStyle.scannerContainer, { alignItems: 'center' }]}>
+          <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
             <View
               style={{
                 width: '70%',
@@ -89,38 +101,48 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
               }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderLeft]} />
-                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderRight]} />
+                <View style={[localStyles.border, localStyles.borderTop, localStyles.borderLeft]} />
+                <View style={[localStyles.border, localStyles.borderTop, localStyles.borderRight]} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderLeft]} />
-                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderRight]} />
+                <View style={[localStyles.border, localStyles.borderBottom, localStyles.borderLeft]} />
+                <View style={[localStyles.border, localStyles.borderBottom, localStyles.borderRight]} />
               </View>
             </View>
           </View>
         ) : (
-          <View style={scanStyle.scannerContainer}>
-            <View style={scanStyle.buttonsContainer}>
+          <View style={localStyles.scannerContainer}>
+            <View style={localStyles.buttonsContainer}>
               <TouchableOpacity
-                style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
+                style={[localStyles.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
-                <IconButton icon="barcode-scan" size={30} />
-                <Text style={scanStyle.text}>Пересканировать</Text>
+                <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
+                <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-
+            {/* {scanned && !goodItem && (
+              <View style={localStyles.infoContainer}>
+                <View style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}>
+                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
+                  <View>
+                    <Text style={localStyles.text}>{barcode}</Text>
+                    <Text style={localStyles.text}>{'Товар не найден'}</Text>
+                  </View>
+                </View>
+              </View>
+            )} */}
             {scanned && barcode && (
-              <View style={scanStyle.buttonsContainer}>
+              <View style={localStyles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
+                  style={[localStyles.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
                     onSave(barcode);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={scanStyle.goodInfo}>
-                    <Text style={scanStyle.barcode}>{barcode}</Text>
+                  <View style={localStyles.goodInfo}>
+                    <Text style={localStyles.barcode}>{barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -128,10 +150,10 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
           </View>
         )}
         {!scanned && (
-          <View style={scanStyle.footer}>
+          <View style={localStyles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
+              <Text style={localStyles.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>
         )}
@@ -139,3 +161,94 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     </View>
   );
 };
+
+// export default ScanDataMatrixScreen;
+
+const localStyles = StyleSheet.create({
+  barcode: {
+    color: '#fff',
+    fontSize: 16,
+    opacity: 0.5,
+  },
+  border: {
+    height: 50,
+    width: 50,
+  },
+  borderBottom: {
+    borderBottomColor: '#FF8',
+    borderBottomWidth: 2,
+  },
+  borderLeft: {
+    borderLeftColor: '#FF8',
+    borderLeftWidth: 2,
+  },
+  borderRight: {
+    borderRightColor: '#FF8',
+    borderRightWidth: 2,
+  },
+  borderTop: {
+    borderTopColor: '#FF8',
+    borderTopWidth: 2,
+  },
+  buttons: {
+    alignItems: 'center',
+    borderRadius: 10,
+    elevation: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    minHeight: 100,
+  },
+  buttonsContainer: {
+    margin: 10,
+  },
+  camera: {
+    flex: 1,
+    flexGrow: 1,
+  },
+  content: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight ?? 0,
+  },
+  footer: {
+    alignItems: 'center',
+    backgroundColor: '#0008',
+    height: 100,
+    justifyContent: 'center',
+  },
+  goodInfo: {
+    flexShrink: 1,
+    paddingRight: 10,
+  },
+  goodName: {
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
+  header: {
+    alignItems: 'center',
+    backgroundColor: '#0008',
+    flexDirection: 'row',
+    height: 70,
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingTop: 30,
+  },
+  infoContainer: {
+    height: 100,
+    padding: 10,
+    // justifyContent: 'center',
+  },
+  scannerContainer: {
+    flex: 1,
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  text: {
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
+  transparent: {
+    backgroundColor: 'transparent',
+  },
+});

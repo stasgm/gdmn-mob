@@ -9,10 +9,10 @@ import { IconButton } from 'react-native-paper';
 
 import { ISettingsOption } from '@lib/types';
 
-import { IInventoryLine } from '../../../store/types';
+import { IInventoryLine } from '../store/types';
 
-import { ScanDataMatrix } from '../../../components/Scanners/ScanDataMatrix';
-import { ScanDataMatrixReader } from '../../../components/Scanners/ScanDataMatrixReader';
+import { ScanDataMatrix } from './Scanners/ScanDataMatrix';
+import { ScanDataMatrixReader } from './Scanners/ScanDataMatrixReader';
 
 interface IProps {
   item: IInventoryLine;
@@ -20,6 +20,10 @@ interface IProps {
 }
 
 export const InventoryLine = ({ item, onSetLine }: IProps) => {
+  // const navigation = useNavigation();
+  // const dispatch = useDispatch();
+  // const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
+
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);

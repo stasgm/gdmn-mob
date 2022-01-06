@@ -16,7 +16,7 @@ import { authMiddlewareFactory } from './auth/middleware';
 import { documentMiddlewareFactory } from './documents/middleware';
 import { referenceMiddlewareFactory } from './references/middleware';
 import { settingMiddlewareFactory } from './settings/middleware';
-import { logMiddleware } from './logMiddleware';
+// import { logMiddleware } from './logMiddleware';
 
 // const persistConfig = {
 //   key: 'config',
@@ -85,8 +85,6 @@ export const configureStore = (
   appMiddlewares: any[] = [],
   persistedMiddlewares: PersistedMiddleware[] = [],
 ) => {
-  console.log('configureStore');
-
   const corePersistedMiddlewares = [documentMiddlewareFactory, authMiddlewareFactory,
     referenceMiddlewareFactory, settingMiddlewareFactory];
 
@@ -95,7 +93,7 @@ export const configureStore = (
     ...[...corePersistedMiddlewares, ...persistedMiddlewares].map(m => m(load, save)),
     ...appMiddlewares,
   ];
-  const middleWareEnhancer = applyMiddleware(logMiddleware, ...middleware);
+  const middleWareEnhancer = applyMiddleware(...middleware);
   const combinedReducer = createReducer(appReducers);
 
   const store = createStore(combinedReducer, composeWithDevTools(middleWareEnhancer));
