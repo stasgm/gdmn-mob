@@ -14,14 +14,14 @@ import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, app
 
 import { IContact, IGood, IRemains } from './src/store/types';
 import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/app/types';
+import { appSettings } from './src/utils/constants';
 
 const Root = () => {
-  console.log('000');
   const navItems: INavItem[] = useMemo(
     () => [
       {
         name: 'Inventory',
-        title: 'Инвентаризации',
+        title: 'Инвентаризация',
         icon: 'file-document-outline',
         component: InventoryNavigator,
       },
@@ -29,22 +29,22 @@ const Root = () => {
     [],
   );
 
-  // const storeSettings = useSelector((state) => state.settings?.data);
+  const storeSettings = useSelector((state) => state.settings?.data);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
   const { colors } = useTheme();
 
-  // useEffect(() => {
-  //   if (appSettings) {
-  //     Object.entries(appSettings).forEach(([optionName, value]) => {
-  //       const storeSet = storeSettings[optionName];
-  //       if (!storeSet && value) {
-  //         dispatch(settingsActions.addOption({ optionName, value }));
-  //       }
-  //     });
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [storeSettings]);
+  useEffect(() => {
+    if (appSettings) {
+      Object.entries(appSettings).forEach(([optionName, value]) => {
+        const storeSet = storeSettings[optionName];
+        if (!storeSet && value) {
+          dispatch(settingsActions.addOption({ optionName, value }));
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeSettings]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IContact>('contact')?.data;
