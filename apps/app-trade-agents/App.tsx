@@ -138,41 +138,39 @@ const Root = () => {
         //Если стоит признак Использовать матрицы, то берем дату и данные по товарам из матриц
         //(если в матрицах нет товаров по клиенту, то возвращаем пустой набор данных)
         //Если не стоит признак Использовать матрицы, то берем текущую дату, а данные по товарам из справочника тмц
-        const onDate = isUseNetPrice && matrixContact?.onDate
-          ? new Date(matrixContact?.onDate)
-          : new Date();
+        const onDate = isUseNetPrice && matrixContact?.onDate ? new Date(matrixContact?.onDate) : new Date();
 
         const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
           matrixContact?.data && matrixContact.data.length && isUseNetPrice
             ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
-              const good = goods.find((g) => g.id === cur.goodId);
-              if (!good) {
-                return prev;
-              }
+                const good = goods.find((g) => g.id === cur.goodId);
+                if (!good) {
+                  return prev;
+                }
 
-              const group = groups.find((gr) => gr.id === good.goodgroup.id);
-              if (!group) {
-                return prev;
-              }
-              //Если есть родитель, то возьмем все группы из родителя,
-              //иначе эта группа первого уровня, здесь не должно быть таких
-              if (!group.parent) {
-                return prev;
-              }
+                const group = groups.find((gr) => gr.id === good.goodgroup.id);
+                if (!group) {
+                  return prev;
+                }
+                //Если есть родитель, то возьмем все группы из родителя,
+                //иначе эта группа первого уровня, здесь не должно быть таких
+                if (!group.parent) {
+                  return prev;
+                }
 
-              const newGood = {
-                ...good,
-                priceFsn: cur.priceFsn,
-                priceFso: cur.priceFso,
-                priceFsnSklad: cur.priceFsnSklad,
-                priceFsoSklad: cur.priceFsoSklad,
-              } as IGood;
+                const newGood = {
+                  ...good,
+                  priceFsn: cur.priceFsn,
+                  priceFso: cur.priceFso,
+                  priceFsnSklad: cur.priceFsnSklad,
+                  priceFsoSklad: cur.priceFsoSklad,
+                } as IGood;
 
-              const newParentGroup = prev[group.parent.id] || {};
-              const newGroup = newParentGroup[group.id] || {};
-              newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
-              return { ...prev, [group.parent.id]: newParentGroup };
-            }, {})
+                const newParentGroup = prev[group.parent.id] || {};
+                const newGroup = newParentGroup[group.id] || {};
+                newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
+                return { ...prev, [group.parent.id]: newParentGroup };
+              }, {})
             : refGoods;
 
         oPrev[oCur.id] = { contactName: oCur.name, onDate, goods: parentGroupList };

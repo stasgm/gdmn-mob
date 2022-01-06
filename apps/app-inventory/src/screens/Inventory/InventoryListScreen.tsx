@@ -40,7 +40,7 @@ export const InventoryListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
-    .selectByDocType<IInventoryDocument>(docType)
+    .selectByDocType<IInventoryDocument>('iventory')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');

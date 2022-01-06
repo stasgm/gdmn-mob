@@ -1,8 +1,6 @@
-/* eslint-disable import/order */
 /* eslint-disable @typescript-eslint/no-unused-vars-experimental */
 import { INavItem } from '@lib/mobile-navigation';
-import { StatusType } from '@lib/types';
-import { InventoryNavigator } from '../navigation/InventoryNavigator';
+import { Settings, StatusType } from '@lib/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
@@ -34,223 +32,41 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-export const metaData: any[] = [
-  {
-    inventory: {
-      number: {
-        id: '1',
-        type: 'string',
-        sortOrder: 1,
-        description: 'Номер документа',
-        clearInput: true,
-        requeried: true,
-        // onChangeText: 'onChangeText',
-      },
-      documentDate: {
-        id: '2',
-        type: 'date',
-        sortOrder: 1,
-        description: 'Дата',
-        requeried: true,
-      },
-      department: {
-        id: '3',
-        type: 'ref',
-        sortOrder: 1,
-        description: 'Подразделение',
-        refName: 'department',
-        requeried: true,
-      },
-      comment: {
-        id: '4',
-        // name: 'comment',
-        type: 'string',
-        sortOrder: 2,
-        description: 'Комментарий',
-        clearInput: true,
-        // onChangeText: 'onChangeText',
-      },
-    },
+export const appSettings: Settings = {
+  scannerUse: {
+    id: '4',
+    sortOrder: 4,
+    description: 'Использовать сканер',
+    data: true,
+    type: 'boolean',
+    visible: true,
+    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
   },
-  {
-    prihod: {
-      number: {
-        id: '1',
-        type: 'string',
-        sortOrder: 1,
-        description: 'Номер документа',
-        clearInput: true,
-        requeried: true,
-        // onChangeText: 'onChangeText',
-      },
-      documentDate: {
-        id: '2',
-        type: 'date',
-        sortOrder: 1,
-        description: 'Дата',
-        requeried: true,
-      },
-      department: {
-        id: '3',
-        type: 'ref',
-        sortOrder: 1,
-        description: 'Подразделение',
-        refName: 'department',
-        requeried: true,
-      },
-      contact: {
-        id: '4',
-        type: 'ref',
-        sortOrder: 1,
-        description: 'Контрагент',
-        refName: 'contact',
-        requeried: true,
-      },
-      comment: {
-        id: '5',
-        // name: 'comment',
-        type: 'string',
-        sortOrder: 2,
-        description: 'Комментарий',
-        clearInput: true,
-        // onChangeText: 'onChangeText',
-      },
-      numberTwo: {
-        id: '6',
-        type: 'string',
-        sortOrder: 1,
-        description: 'Номер два документа',
-        clearInput: true,
-        requeried: true,
-      },
-    },
+  weightCode: {
+    id: '5',
+    sortOrder: 5,
+    description: 'Идентификатор весового товара',
+    data: '22',
+    type: 'string',
+    visible: true,
+    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
   },
-];
-
-export const inv: any = [
-  {
-    name: 'inventory',
-    title: 'Инвентаризации',
-    icon: 'file-document-outline',
-    head: {
-      inventory: {
-        number: {
-          id: '1',
-          type: 'string',
-          sortOrder: 1,
-          description: 'Номер документа',
-          clearInput: true,
-          requeried: true,
-          // onChangeText: 'onChangeText',
-        },
-        documentDate: {
-          id: '2',
-          type: 'date',
-          sortOrder: 1,
-          description: 'Дата',
-          requeried: true,
-        },
-        department: {
-          id: '3',
-          type: 'ref',
-          sortOrder: 1,
-          description: 'Подразделение',
-          refName: 'department',
-          requeried: true,
-        },
-        comment: {
-          id: '4',
-          // name: 'comment',
-          type: 'string',
-          sortOrder: 2,
-          description: 'Комментарий',
-          clearInput: true,
-          // onChangeText: 'onChangeText',
-        },
-      },
-    },
-    lines: {
-      metadata: {
-        good: {
-          sortOrder: 0,
-          name: 'Наименование',
-        },
-        price: {
-          sortOrder: 0,
-          name: 'Цена',
-        },
-        remains: {
-          sortOrder: 0,
-          name: 'Остаток',
-        },
-        EID: {
-          sortOrder: 0,
-          name: 'EID',
-        },
-        quantity: {
-          sortOrder: 0,
-          name: 'Количество',
-        },
-      },
-    },
-    component: InventoryNavigator,
+  countCode: {
+    id: '6',
+    sortOrder: 6,
+    description: 'Количество символов для кода товара',
+    data: 5,
+    type: 'number',
+    visible: true,
+    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
   },
-  {
-    name: 'prihod',
-    title: 'Приход',
-    icon: 'file-document-outline',
-    head: {
-      prihod: {
-        number: {
-          id: '1',
-          type: 'string',
-          sortOrder: 1,
-          description: 'Номер документа',
-          clearInput: true,
-          requeried: true,
-        },
-        documentDate: {
-          id: '2',
-          type: 'date',
-          sortOrder: 1,
-          description: 'Дата',
-          requeried: true,
-        },
-        department: {
-          id: '3',
-          type: 'ref',
-          sortOrder: 1,
-          description: 'Подразделение',
-          refName: 'department',
-          requeried: true,
-        },
-        contact: {
-          id: '4',
-          type: 'ref',
-          sortOrder: 1,
-          description: 'Контрагент',
-          refName: 'contact',
-          requeried: true,
-        },
-        comment: {
-          id: '5',
-          // name: 'comment',
-          type: 'string',
-          sortOrder: 2,
-          description: 'Комментарий',
-          clearInput: true,
-          // onChangeText: 'onChangeText',
-        },
-        numberTwo: {
-          id: '6',
-          type: 'string',
-          sortOrder: 1,
-          description: 'Номер два документа(для теста)',
-          clearInput: true,
-          requeried: true,
-        },
-      },
-    },
-    component: InventoryNavigator,
+  countWeight: {
+    id: '7',
+    sortOrder: 7,
+    description: 'Количество символов для веса (в гр.)',
+    data: 5,
+    type: 'number',
+    visible: true,
+    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
   },
-];
+};

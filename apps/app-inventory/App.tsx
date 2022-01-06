@@ -23,53 +23,24 @@ import {
   IDepartment,
 } from './src/store/types';
 import actions, { useAppInventoryThunkDispatch } from './src/store/app';
-
-import { metaData, inv } from './src/utils/constants';
+import { InventoryNavigator } from './src/navigation/InventoryNavigator';
+import { appSettings } from './src/utils/constants';
 
 const Root = () => {
   //const newDispatch = useDocDispatch();
   //newDispatch(settingsActions.init());
 
-  const navItems: INavItem[] = useMemo(() => inv, []);
-
-  const appSettings: Settings = {
-    scannerUse: {
-      id: '4',
-      sortOrder: 4,
-      description: 'Использовать сканер',
-      data: true,
-      type: 'boolean',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-    weightCode: {
-      id: '5',
-      sortOrder: 5,
-      description: 'Идентификатор весового товара',
-      data: '22',
-      type: 'string',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-    countCode: {
-      id: '6',
-      sortOrder: 6,
-      description: 'Количество символов для кода товара',
-      data: 5,
-      type: 'number',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-    countWeight: {
-      id: '7',
-      sortOrder: 7,
-      description: 'Количество символов для веса (в гр.)',
-      data: 5,
-      type: 'number',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-  };
+  const navItems: INavItem[] = useMemo(
+    () => [
+      {
+        name: 'Inventorys',
+        title: 'Инвентаризации',
+        icon: 'file-document-outline',
+        component: InventoryNavigator,
+      },
+    ],
+    [],
+  );
 
   const storeSettings = useSelector((state) => state.settings)?.data;
   const dispatch = useDispatch();
@@ -97,7 +68,7 @@ const Root = () => {
     const getRemainsModel = async () => {
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
         (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = good?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
             goodsprev[g.id] = {
               ...g,
               remains:
@@ -117,7 +88,7 @@ const Root = () => {
     };
     getRemainsModel();
     setLoading(false);
-  }, [appInventoryDispatch, departments, good, remains]);
+  }, [appInventoryDispatch, departments, goods, remains]);
   return loading ? (
     <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
   ) : (
