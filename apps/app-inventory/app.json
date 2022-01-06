@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "gdmn-mobile",
-    "slug": "app-inventory",
+    "name": "GDMN Инвентаризация",
+    "slug": "gdmn-inventory",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",

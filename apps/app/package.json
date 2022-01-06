@@ -36,7 +36,6 @@
     "@lib/mobile-ui": "*",
     "@lib/store": "*",
     "@lib/types": "*",
-    "@react-native-async-storage/async-storage": "^1.13.0",
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/bottom-tabs": "^5.11.10",
     "@react-navigation/drawer": "^5.12.5",
@@ -44,7 +43,6 @@
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "@types/react-test-renderer": "^17.0.1",
-    "@types/redux-persist": "^4.3.1",
     "axios": "^0.21.1",
     "babel-plugin-inline-dotenv": "^1.6.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
@@ -71,7 +69,6 @@
     "react-test-renderer": "^17.0.2",
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
-    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "reselect": "4.0.0",
     "typesafe-actions": "^5.1.0"

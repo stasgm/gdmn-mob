@@ -1,4 +1,3 @@
-/* eslint-disable react/no-children-prop */
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
@@ -139,8 +138,6 @@ export const SelectRefItemScreen = () => {
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
-              children={undefined}
-              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />
