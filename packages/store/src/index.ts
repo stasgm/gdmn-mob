@@ -85,8 +85,6 @@ export const configureStore = (
   appMiddlewares: any[] = [],
   persistedMiddlewares: PersistedMiddleware[] = [],
 ) => {
-  console.log('configureStore');
-
   const corePersistedMiddlewares = [documentMiddlewareFactory, authMiddlewareFactory,
     referenceMiddlewareFactory, settingMiddlewareFactory];
 
@@ -99,8 +97,6 @@ export const configureStore = (
   const combinedReducer = createReducer(appReducers);
 
   const store = createStore(combinedReducer, composeWithDevTools(middleWareEnhancer));
-
-  console.log('configureStore end');
 
   return { store };
 };
