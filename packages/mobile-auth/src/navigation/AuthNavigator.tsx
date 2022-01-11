@@ -97,7 +97,27 @@ const AuthNavigator: React.FC = () => {
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
 
-  const setCompany = useCallback((company: ICompany) => authDispatch(authActions.setCompany(company)), [authDispatch]);
+  const [companyLoading, setCompanyLoading] = useState<boolean>(false);
+
+  const setCompany = useCallback(async () => {
+    console.log('1', user?.company);
+    if (!user?.company) {
+      return;
+    }
+
+    // setError(undefined);
+    setCompanyLoading(true);
+    // await sleep(1000);
+    const res = await authDispatch(authActions.getCompany(user.company.id));
+    if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
+      console.log('2', res.payload);
+      authDispatch(authActions.setCompany(res.payload));
+    } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
+      setCompanyLoading(false);
+      // setError(res.payload.toLocaleLowerCase());
+    }
+    console.log('3');
+  }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
     () => <SplashScreen settings={config} onCheckDevice={checkDevice} />,
@@ -115,8 +135,10 @@ const AuthNavigator: React.FC = () => {
   );
 
   const AppLoadWithParams = useCallback(
-    () => <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} />,
-    [logout, setCompany, user?.company],
+    () => (
+      <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} loading={companyLoading} />
+    ),
+    [companyLoading, logout, setCompany, user?.company],
   );
 
   const onSetServerMode = useCallback(async () => {
@@ -130,13 +152,12 @@ const AuthNavigator: React.FC = () => {
   }, [disconnect, authDispatch]);
 
   const onSetDemoMode = useCallback(async () => {
-    dispatch(authActions.setLoading(true));
+    dispatch(authActions.setLoadingData(true));
     dispatch(authActions.setDemoMode());
-    await sleep(500);
-    dispatch(authActions.setLoading(false));
+    // await sleep(500);
+    dispatch(authActions.setLoadingData(false));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, authDispatch, setCompany, login]);
+  }, [dispatch]);
 
   const CongfigWithParams = useCallback(
     () => <ConfigScreen onSetSettings={saveConfig} onSetDemoMode={onSetDemoMode} settings={config} />,
@@ -156,8 +177,6 @@ const AuthNavigator: React.FC = () => {
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
 
-  console.log('isInit', isInit);
-
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
@@ -169,7 +188,7 @@ const AuthNavigator: React.FC = () => {
           <AuthStack.Screen
             name="LoginCompany"
             component={AppLoadWithParams}
-            options={{ animationTypeForReplace: 'pop' }}
+            options={{ animationTypeForReplace: 'push' }}
           />
         )
       ) : connectionStatus === 'not-connected' ? (

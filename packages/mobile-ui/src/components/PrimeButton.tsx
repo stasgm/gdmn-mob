@@ -2,7 +2,7 @@ import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 
 import React from 'react';
 import { StyleProp, TouchableOpacity, View, StyleSheet, ViewStyle, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { ActivityIndicator, useTheme } from 'react-native-paper';
 
 import styles from '../styles/global';
 
@@ -11,12 +11,13 @@ interface IProps {
   icon?: keyof typeof Icon.glyphMap;
   outlined?: boolean;
   disabled?: boolean;
+  loadIcon?: boolean;
   onPress?: () => void;
   children: React.ReactNode;
   type?: 'cancel' | 'normal';
 }
 
-const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type = 'normal' }: IProps) => {
+const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type = 'normal', loadIcon = false }: IProps) => {
   const { colors } = useTheme();
 
   return (
@@ -28,10 +29,10 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type 
         styles.rectangularButton,
         outlined
           ? {
-              borderWidth: 1,
-              borderColor: colors.primary,
-              backgroundColor: disabled ? colors.disabled : colors.background,
-            }
+            borderWidth: 1,
+            borderColor: colors.primary,
+            backgroundColor: disabled ? colors.disabled : colors.background,
+          }
           : { backgroundColor: disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160' },
         style,
       ]}
@@ -47,6 +48,9 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type 
           {'  '}
           {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>
+        {loadIcon ? <ActivityIndicator size="small"
+          color={!outlined ? disabled ? colors.disabled : colors.background : disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160'}
+          style={localStyles.indicator} /> : <View style={localStyles.blank} />}
       </View>
     </TouchableOpacity>
   );
@@ -88,5 +92,11 @@ const localStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     letterSpacing: 1,
+  },
+  blank: {
+    width: 20,
+  },
+  indicator: {
+    paddingLeft: 10,
   },
 });

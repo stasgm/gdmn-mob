@@ -13,6 +13,8 @@ const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<Connectio
 const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
 const setDemoMode = createAction('AUTH/SET_DEMOMODE')();
+const setLoadingData = createAction('AUTH/SET_LOADING_DATA')<boolean>();
+const setLoadErrorList = createAction('AUTH/SET_LOAD_ERROR_LIST')<string>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -91,9 +93,10 @@ export const actions = {
   setUserSettingsAsync,
   setConnectionStatus,
   getCompanyAsync,
-  // setDemoModeAsync,
   setDemoMode,
   setLoading,
+  setLoadingData,
+  setLoadErrorList,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

@@ -26,19 +26,18 @@ export const authMiddlewareFactory: PersistedMiddleware =
 
     if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
       // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-      store.dispatch(actions.setLoading(true));
+      store.dispatch(actions.setLoadingData(true));
       load('auth')
         .then((data) => {
           return store.dispatch(actions.loadData({ ...initialState, ...data, connectionStatus: 'not-connected' }));
         })
         .finally(() => {
-          store.dispatch(actions.setLoading(false));
+          store.dispatch(actions.setLoadingData(false));
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object' ? err : 'При загрузки данных с диска произошла ошибка',
-          );
+          console.error(err || 'При загрузки данных с диска произошла ошибка');
+          store.dispatch(err || 'При загрузки данных с диска произошла ошибка');
         });
     }
 

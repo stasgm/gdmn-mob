@@ -71,7 +71,7 @@ const RouteViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Удалить',
+        title: 'Удалить маршрут и его документы',
         type: 'destructive',
         onPress: handleDelete,
       },

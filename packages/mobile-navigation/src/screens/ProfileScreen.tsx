@@ -18,6 +18,7 @@ const ProfileScreen = () => {
   const company = useSelector((state) => state.auth.company);
   const device = useSelector((state) => state.auth.device);
   const isDemo = useSelector((state) => state.auth.isDemo);
+  const loading = useSelector((state) => state.auth.loading);
 
   const userSettings = user?.settings;
 
@@ -99,7 +100,7 @@ const ProfileScreen = () => {
         </View>
       )}
       <View>
-        <PrimeButton outlined onPress={handleLogout}>
+        <PrimeButton outlined onPress={handleLogout} loadIcon={loading}>
           {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
       </View>

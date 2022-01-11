@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity } from '@lib/types';
@@ -7,6 +7,8 @@ import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, Ba
 import { v4 as uuid } from 'uuid';
 
 import { useTheme } from 'react-native-paper';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -18,7 +20,7 @@ import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
   const { colors } = useTheme();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
@@ -124,9 +126,7 @@ const RouteDetailScreen = () => {
           )}
         </>
       </InfoBlock>
-      {process ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : visits.length > 0 ? (
+      {visits.length > 0 ? (
         <>
           {visits.map((visit) => (
             <Visit
@@ -139,7 +139,7 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit}>
+        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit} loadIcon={process}>
           Начать визит
         </PrimeButton>
       )}

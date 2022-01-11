@@ -4,7 +4,7 @@ import { getType } from 'typesafe-actions';
 
 import { config } from '@lib/client-config';
 
-import { device as mockDevice, user as mockUser } from '@lib/mock';
+import { device as mockDevice, user as mockUser, company as mockCompany } from '@lib/mock';
 
 import { AuthState } from './types';
 import { AuthActionType, actions } from './actions';
@@ -34,6 +34,8 @@ export const initialState: Readonly<AuthState> = {
   },
   error: false,
   loading: false,
+  loadingData: false,
+  loadErrorList: [],
   status: '',
   isDemo: useMockup,
 };
@@ -45,6 +47,15 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setLoading):
       return { ...state, loading: action.payload };
+
+    case getType(actions.setLoadingData):
+      return { ...state, loadingData: action.payload };
+
+    case getType(actions.setLoadErrorList):
+      return {
+        ...state,
+        loadErrorList: [...state.loadErrorList, action.payload],
+      };
 
     case getType(actions.clearError):
       return { ...state, error: false, status: '' };
@@ -129,6 +140,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         ...state,
         user: undefined,
         device: undefined,
+        company: undefined,
         connectionStatus: 'not-connected',
         error: false,
         status: '',
@@ -179,6 +191,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         connectionStatus: 'connected',
         user: mockUser,
         device: mockDevice,
+        company: mockCompany,
         // loading: false,
         isDemo: true,
       };

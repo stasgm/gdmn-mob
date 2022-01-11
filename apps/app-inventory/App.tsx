@@ -103,8 +103,6 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // console.log('111', authLoading || loading || appLoading || invLoading);
-
   return authLoading || loading || appLoading || invLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />

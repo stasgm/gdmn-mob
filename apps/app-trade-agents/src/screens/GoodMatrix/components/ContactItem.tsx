@@ -4,8 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IContact } from '../../../store/types';
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { IContact } from '../../../store/types';
 import { GoodMatrixStackParamList } from '../../../navigation/Root/types';
 
 export interface IContactItem {

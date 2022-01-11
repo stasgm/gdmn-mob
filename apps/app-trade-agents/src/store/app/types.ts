@@ -3,6 +3,7 @@ import { INamedEntity } from '@lib/types';
 export type AppTradeState = {
   readonly goodModel: IModelData<IGoodModel>;
   readonly loading: boolean;
+  readonly loadingData: boolean;
   readonly errorMessage: string;
 };
 

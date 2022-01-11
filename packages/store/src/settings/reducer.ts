@@ -41,6 +41,8 @@ const baseSettings: Settings<IBaseSettings> = {
 export const initialState: Readonly<SettingsState> = {
   data: baseSettings,
   loading: false,
+  loadingData: false,
+  loadErrorList: [],
   errorMessage: '',
 };
 
@@ -55,6 +57,9 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.loadData):
       return { ...action.payload, loading: false, errorMessage: '' };
+
+    case getType(actions.setLoadingData):
+      return { ...state, loadingData: action.payload };
 
     case getType(actions.addOption):
       return {
@@ -74,11 +79,18 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
         },
       };
 
-    case getType(actions.addSettings):
+    case getType(actions.addSettings): {
+      const newSetts = Object.entries(action.payload).reduce((setts: Settings, [field, newSet]) => {
+        const oldRef = state.data[field];
+        setts[field] = oldRef ? oldRef : newSet;
+        return setts;
+      }, {});
+
       return {
         ...state,
-        data: action.payload,
+        data: { ...state.data, ...newSetts },
       };
+    }
 
     case getType(actions.deleteAllSettings):
       return { ...state, data: {} };
