@@ -29,22 +29,17 @@ const Root = () => {
     [],
   );
 
-  const storeSettings = useSelector((state) => state.settings?.data);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
   const { colors } = useTheme();
 
+  //Загружаем в стор дополнительные настройки приложения
   useEffect(() => {
     if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings[optionName];
-        if (!storeSet && value) {
-          dispatch(settingsActions.addOption({ optionName, value }));
-        }
-      });
+      dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeSettings]);
+  }, []);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IContact>('contact')?.data;
@@ -102,8 +97,6 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  // console.log('111', authLoading || loading || appLoading || invLoading);
 
   return authLoading || loading || appLoading || invLoading ? (
     <AppScreen>

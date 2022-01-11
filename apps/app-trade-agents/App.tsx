@@ -6,6 +6,7 @@ import {
   appActions,
   appSelectors,
   // authActions,
+  authSelectors,
   // documentActions,
   // referenceActions,
   refSelectors,
@@ -64,8 +65,6 @@ const Root = () => {
     },
   ];
 
-  const user = useSelector((state) => state.auth.user);
-
   const dispatch = useDispatch();
   const appDispatch = useAppTradeThunkDispatch();
   const { colors } = useTheme();
@@ -78,38 +77,36 @@ const Root = () => {
   }, []);
 
   //Загружаем в стор дополнительные настройки приложения
-  const baseSettings = useSelector((state) => state.settings?.data) || {};
+  const isInit = useSelector((state) => state.settings.isInit);
+
   useEffect(() => {
-    if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = baseSettings[optionName];
-        if (!storeSet && value) {
-          dispatch(settingsActions.addOption({ optionName, value }));
-        }
-      });
+    if (appSettings && isInit) {
+      dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseSettings]);
+  }, [isInit]);
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data);
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const contacts = refSelectors.selectByName<IContact>('contact')?.data;
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
-  const appLoading = appSelectors.selectLoading();
-  const authLoading = useSelector((state) => state.auth.loading);
-  const tradeLoading = useAppTradeSelector((state) => state.appTrade.loading);
+  const appDataLoading = appSelectors.selectLoading();
+  const appLoading = useSelector((state) => state.app.loading);
+  const authLoading = useSelector((state) => state.auth.loadingData);
+  const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
+  const isLogged = authSelectors.isLoggedWithCompany();
 
   useEffect(() => {
-    if (user) {
-      console.log('useEffect loadSuperDataFromDisc', user.id);
+    if (isLogged) {
+      console.log('useEffect loadSuperDataFromDisc', isLogged);
       dispatch(appActions.loadSuperDataFromDisc());
     }
-  }, [dispatch, user]);
+  }, [dispatch, isLogged]);
 
   useEffect(() => {
     const setModel = async () => {
-      if (!goods?.length || !contacts?.length || !groups.length) {
+      if (!goods?.length || !contacts?.length || !groups.length || !isLogged) {
         return;
       }
       const refGoods = groups
@@ -177,10 +174,9 @@ const Root = () => {
       }, {});
 
       await appDispatch(appTradeActions.setGoodModel(goodModel));
-      // setGoodModelLoading(false);
     };
     setModel();
-  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
+  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix, isLogged]);
 
   const [loading, setLoading] = useState(true);
 
@@ -192,7 +188,13 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  return authLoading || loading || appLoading || tradeLoading ? (
+  // console.log('authLoading', authLoading);
+  // console.log('loading', loading);
+  // console.log('appLoading', appLoading);
+  // console.log('tradeLoading', tradeLoading);
+  // console.log('appDataLoading', appDataLoading);
+
+  return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
       <Caption style={styles.title}>{'Загрузка данных...'}</Caption>

@@ -12,6 +12,8 @@ export type AuthState = {
   readonly connectionStatus: ConnectionStatus;
   readonly isDemo: boolean;
   readonly loading: boolean;
+  readonly loadingData: boolean;
+  readonly loadErrorList: string[];
   readonly error: boolean;
   readonly status: string;
 };

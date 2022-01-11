@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-//import { SearchBar } from 'react-native-elements';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
@@ -17,8 +16,7 @@ import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/types';
 
 const Good = ({ item }: { item: INamedEntity }) => {
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList>>();
-
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'SelectGoodItem'>>();
   const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectGoodItem'>>().params;
 
   return (

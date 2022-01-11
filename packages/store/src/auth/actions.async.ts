@@ -136,7 +136,6 @@ const logout = (): AppThunk<
     const response = await api.auth.logout();
 
     if (response.type === 'LOGOUT') {
-      dispatch(actions.setConnectionStatus(api.config.deviceId ? 'connected' : 'not-connected'));
       return dispatch(actions.logoutUserAsync.success());
     }
 
