@@ -121,6 +121,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         loading: false,
         company: undefined,
         isDemo: false,
+        connectionStatus: state.config.deviceId ? 'connected' : 'not-connected',
       };
 
     case getType(actions.logoutUserAsync.failure):

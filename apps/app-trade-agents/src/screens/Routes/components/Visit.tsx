@@ -321,7 +321,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
                     icon={!process ? 'stop-circle-outline' : 'block-helper'}
                     onPress={handleCloseVisit}
                     outlined={true}
-                    loadIcon={process}
+                    disabled={process}
                   >
                     Завершить визит
                   </PrimeButton>
@@ -359,7 +359,12 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         </PrimeButton>
       ) : (
         readyDocs?.length > 0 && (
-          <PrimeButton icon={!loading ? 'file-send' : 'block-helper'} onPress={handleSendDocs} loadIcon={loading}>
+          <PrimeButton
+            icon={!loading ? 'file-send' : 'block-helper'}
+            onPress={handleSendDocs}
+            disabled={loading}
+            loadIcon={loading}
+          >
             Отправить
           </PrimeButton>
         )

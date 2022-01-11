@@ -100,23 +100,16 @@ const AuthNavigator: React.FC = () => {
   const [companyLoading, setCompanyLoading] = useState<boolean>(false);
 
   const setCompany = useCallback(async () => {
-    console.log('1', user?.company);
     if (!user?.company) {
       return;
     }
-
-    // setError(undefined);
     setCompanyLoading(true);
-    // await sleep(1000);
     const res = await authDispatch(authActions.getCompany(user.company.id));
     if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
-      console.log('2', res.payload);
       authDispatch(authActions.setCompany(res.payload));
     } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
       setCompanyLoading(false);
-      // setError(res.payload.toLocaleLowerCase());
     }
-    console.log('3');
   }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
@@ -154,7 +147,6 @@ const AuthNavigator: React.FC = () => {
   const onSetDemoMode = useCallback(async () => {
     dispatch(authActions.setLoadingData(true));
     dispatch(authActions.setDemoMode());
-    // await sleep(500);
     dispatch(authActions.setLoadingData(false));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
   }, [dispatch]);

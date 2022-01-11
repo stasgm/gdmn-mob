@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 
-import { appActions, appSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, appSelectors, authActions, authSelectors, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
@@ -26,10 +26,14 @@ const Root = () => {
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const user = useSelector((state) => state.auth.user);
   const authLoading = useSelector((state) => state.auth.loading);
   const appLoading = appSelectors.selectLoading();
+  const isLogged = authSelectors.isLoggedWithCompany();
   const [loading, setLoading] = useState(true);
+
+  // const sss = useSelector((state) => state.settings.data);
+
+  // console.log('sss', sss);
 
   useEffect(() => {
     console.log('useEffect loadGlobalDataFromDisc');
@@ -39,12 +43,11 @@ const Root = () => {
   }, []);
 
   useEffect(() => {
-    console.log('useEffect loadSuperDataFromDisc', user?.id);
-    if (!user) {
-      return;
+    console.log('useEffect loadSuperDataFromDisc', isLogged);
+    if (isLogged) {
+      dispatch(appActions.loadSuperDataFromDisc());
     }
-    dispatch(appActions.loadSuperDataFromDisc());
-  }, [dispatch, user]);
+  }, [dispatch, isLogged]);
 
   useEffect(() => {
     //Для отрисовки при первом подключении

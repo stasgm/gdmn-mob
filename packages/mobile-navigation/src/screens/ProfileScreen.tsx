@@ -100,7 +100,7 @@ const ProfileScreen = () => {
         </View>
       )}
       <View>
-        <PrimeButton outlined onPress={handleLogout} loadIcon={loading}>
+        <PrimeButton outlined onPress={handleLogout} disabled={loading}>
           {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
         </PrimeButton>
       </View>

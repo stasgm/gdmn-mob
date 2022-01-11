@@ -1,37 +1,47 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, Text } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { settingsActions, useDispatch, useSelector } from '@lib/store';
+import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, DrawerButton, MenuButton, useActionSheet, SettingsGroup } from '@lib/mobile-ui';
-import { INamedEntity, ISettingsOption, SettingValue } from '@lib/types';
+import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
 
 const SettingsSceen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
-
   const data = useSelector((state) => state.settings.data);
   const config = useSelector((state) => state.auth.config);
 
-  Object.entries(data).forEach((item) => {
-    if (!item[1]?.group) {
-      item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
-    }
-  });
-
-  const parents = Object.entries(data).reduce(
-    (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-      const obj = cur[1];
-
-      if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+  const settsData = useMemo(
+    () =>
+      Object.entries(data).reduce((prev: Settings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+        if (cur[1]) {
+          const newCur = cur[1]?.group ? cur[1] : { ...cur[1], group: baseSettingGroup };
+          prev[cur[0]] = newCur;
+        }
         return prev;
-      }
+      }, {}),
+    [data],
+  );
 
-      return [...prev, obj.group];
-    },
-    [],
+  //Массив уникальных групп настроек
+  const parents = useMemo(
+    () =>
+      Object.entries(settsData).reduce(
+        (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+          const obj = cur[1];
+
+          if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+            return prev;
+          }
+
+          return [...prev, obj.group];
+        },
+        [],
+      ),
+    [settsData],
   );
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
@@ -77,18 +87,16 @@ const SettingsSceen = () => {
       </View>
       <View>
         <View>
-          {parents.map((item, key) => {
-            return item ? (
-              <View key={key}>
-                <SettingsGroup
-                  key={key}
-                  group={item}
-                  data={data}
-                  onValueChange={(optionName, value) => handleUpdate(optionName, value)}
-                />
+          {parents.map((group, groupKey) => {
+            const list = Object.entries(settsData)
+              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
+              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+            return (
+              <View key={groupKey}>
+                <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
                 <Divider />
               </View>
-            ) : null;
+            );
           })}
         </View>
       </View>

@@ -6,4 +6,5 @@ export type SettingsState = {
   readonly loadingData: boolean;
   readonly loadErrorList: string[];
   readonly errorMessage: string;
+  readonly isInit: boolean;
 };

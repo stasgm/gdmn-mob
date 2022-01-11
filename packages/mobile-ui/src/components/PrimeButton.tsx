@@ -17,7 +17,16 @@ interface IProps {
   type?: 'cancel' | 'normal';
 }
 
-const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type = 'normal', loadIcon = false }: IProps) => {
+const PrimeButton = ({
+  onPress,
+  style,
+  children,
+  icon,
+  disabled,
+  outlined,
+  type = 'normal',
+  loadIcon = false,
+}: IProps) => {
   const { colors } = useTheme();
 
   return (
@@ -29,10 +38,10 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type 
         styles.rectangularButton,
         outlined
           ? {
-            borderWidth: 1,
-            borderColor: colors.primary,
-            backgroundColor: disabled ? colors.disabled : colors.background,
-          }
+              borderWidth: 1,
+              borderColor: colors.primary,
+              backgroundColor: disabled ? colors.disabled : colors.background,
+            }
           : { backgroundColor: disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160' },
         style,
       ]}
@@ -48,9 +57,25 @@ const PrimeButton = ({ onPress, style, children, icon, disabled, outlined, type 
           {'  '}
           {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>
-        {loadIcon ? <ActivityIndicator size="small"
-          color={!outlined ? disabled ? colors.disabled : colors.background : disabled ? colors.disabled : type === 'normal' ? colors.primary : '#a91160'}
-          style={localStyles.indicator} /> : <View style={localStyles.blank} />}
+        {loadIcon ? (
+          <ActivityIndicator
+            size="small"
+            color={
+              !outlined
+                ? disabled
+                  ? colors.disabled
+                  : colors.background
+                : disabled
+                ? colors.disabled
+                : type === 'normal'
+                ? colors.primary
+                : '#a91160'
+            }
+            style={localStyles.indicator}
+          />
+        ) : (
+          <View style={localStyles.blank} />
+        )}
       </View>
     </TouchableOpacity>
   );

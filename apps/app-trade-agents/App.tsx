@@ -5,7 +5,8 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  authActions,
+  // authActions,
+  authSelectors,
   // documentActions,
   // referenceActions,
   refSelectors,
@@ -64,9 +65,6 @@ const Root = () => {
     },
   ];
 
-  const user = useSelector((state) => state.auth.user);
-  const company = useSelector((state) => state.auth.company);
-
   const dispatch = useDispatch();
   const appDispatch = useAppTradeThunkDispatch();
   const { colors } = useTheme();
@@ -78,22 +76,15 @@ const Root = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // //Загружаем в стор дополнительные настройки приложения
-  // const baseSettings = useSelector((state) => state.settings?.data) || {};
+  //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+
   useEffect(() => {
-    if (appSettings) {
+    if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
     }
-    // if (appSettings) {
-    //   Object.entries(appSettings).forEach(([optionName, value]) => {
-    //     const storeSet = baseSettings[optionName];
-    //     if (!storeSet && value) {
-    //       dispatch(settingsActions.addOption({ optionName, value }));
-    //     }
-    //   });
-    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isInit]);
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data);
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
@@ -104,17 +95,18 @@ const Root = () => {
   const appLoading = useSelector((state) => state.app.loading);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
+  const isLogged = authSelectors.isLoggedWithCompany();
 
   useEffect(() => {
-    if (user?.id && company?.id) {
-      console.log('useEffect loadSuperDataFromDisc', user.id);
+    if (isLogged) {
+      console.log('useEffect loadSuperDataFromDisc', isLogged);
       dispatch(appActions.loadSuperDataFromDisc());
     }
-  }, [dispatch, user?.id, company?.id]);
+  }, [dispatch, isLogged]);
 
   useEffect(() => {
     const setModel = async () => {
-      if (!goods?.length || !contacts?.length || !groups.length || !user?.id) {
+      if (!goods?.length || !contacts?.length || !groups.length || !isLogged) {
         return;
       }
       const refGoods = groups
@@ -147,34 +139,34 @@ const Root = () => {
         const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
           matrixContact?.data && matrixContact.data.length && isUseNetPrice
             ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
-              const good = goods.find((g) => g.id === cur.goodId);
-              if (!good) {
-                return prev;
-              }
+                const good = goods.find((g) => g.id === cur.goodId);
+                if (!good) {
+                  return prev;
+                }
 
-              const group = groups.find((gr) => gr.id === good.goodgroup.id);
-              if (!group) {
-                return prev;
-              }
-              //Если есть родитель, то возьмем все группы из родителя,
-              //иначе эта группа первого уровня, здесь не должно быть таких
-              if (!group.parent) {
-                return prev;
-              }
+                const group = groups.find((gr) => gr.id === good.goodgroup.id);
+                if (!group) {
+                  return prev;
+                }
+                //Если есть родитель, то возьмем все группы из родителя,
+                //иначе эта группа первого уровня, здесь не должно быть таких
+                if (!group.parent) {
+                  return prev;
+                }
 
-              const newGood = {
-                ...good,
-                priceFsn: cur.priceFsn,
-                priceFso: cur.priceFso,
-                priceFsnSklad: cur.priceFsnSklad,
-                priceFsoSklad: cur.priceFsoSklad,
-              } as IGood;
+                const newGood = {
+                  ...good,
+                  priceFsn: cur.priceFsn,
+                  priceFso: cur.priceFso,
+                  priceFsnSklad: cur.priceFsnSklad,
+                  priceFsoSklad: cur.priceFsoSklad,
+                } as IGood;
 
-              const newParentGroup = prev[group.parent.id] || {};
-              const newGroup = newParentGroup[group.id] || {};
-              newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
-              return { ...prev, [group.parent.id]: newParentGroup };
-            }, {})
+                const newParentGroup = prev[group.parent.id] || {};
+                const newGroup = newParentGroup[group.id] || {};
+                newParentGroup[group.id] = { ...newGroup, [good.id]: newGood };
+                return { ...prev, [group.parent.id]: newParentGroup };
+              }, {})
             : refGoods;
 
         oPrev[oCur.id] = { contactName: oCur.name, onDate, goods: parentGroupList };
@@ -182,10 +174,9 @@ const Root = () => {
       }, {});
 
       await appDispatch(appTradeActions.setGoodModel(goodModel));
-      // setGoodModelLoading(false);
     };
     setModel();
-  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
+  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix, isLogged]);
 
   const [loading, setLoading] = useState(true);
 
@@ -197,11 +188,11 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  console.log('authLoading', authLoading);
-  console.log('loading', loading);
-  console.log('appLoading', appLoading);
-  console.log('tradeLoading', tradeLoading);
-  console.log('appDataLoading', appDataLoading);
+  // console.log('authLoading', authLoading);
+  // console.log('loading', loading);
+  // console.log('appLoading', appLoading);
+  // console.log('tradeLoading', tradeLoading);
+  // console.log('appDataLoading', appDataLoading);
 
   return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>

@@ -139,7 +139,7 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit} loadIcon={process}>
+        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit}>
           Начать визит
         </PrimeButton>
       )}

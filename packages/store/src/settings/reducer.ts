@@ -7,7 +7,7 @@ import { actions, SettingsActionType } from './actions';
 
 import { SettingsState } from './types';
 
-export const baseGroup = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
+export const baseSettingGroup = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
 
 const baseSettings: Settings<IBaseSettings> = {
   serverAutoCheck: {
@@ -16,7 +16,7 @@ const baseSettings: Settings<IBaseSettings> = {
     description: 'Опрашивать сервер автоматически',
     data: true,
     type: 'boolean',
-    group: baseGroup,
+    group: baseSettingGroup,
   },
   refLoadType: {
     id: '2',
@@ -25,7 +25,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'boolean',
     sortOrder: 2,
     visible: true,
-    group: baseGroup,
+    group: baseSettingGroup,
   },
   cleanDocTime: {
     id: '3',
@@ -34,7 +34,7 @@ const baseSettings: Settings<IBaseSettings> = {
     type: 'number',
     sortOrder: 3,
     visible: true,
-    group: baseGroup,
+    group: baseSettingGroup,
   },
 };
 
@@ -44,6 +44,7 @@ export const initialState: Readonly<SettingsState> = {
   loadingData: false,
   loadErrorList: [],
   errorMessage: '',
+  isInit: true,
 };
 
 const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialState, action): SettingsState => {
@@ -88,6 +89,7 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
       return {
         ...state,
+        isInit: false,
         data: { ...state.data, ...newSetts },
       };
     }
