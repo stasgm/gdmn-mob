@@ -10,20 +10,17 @@ import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/
 
 import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
-import { useSelector, docSelectors } from '@lib/store';
+import { useSelector, docSelectors, refSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument } from '../../store/types';
+import { IInventoryLine, IInventoryDocument, IGood } from '../../store/types';
 
 const oneSecund = 1000;
 
 export const ScanBarcodeScreen = (props: any) => {
-  const { params } = props.route;
-  const docType = params?.docType as string;
-
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation();
   const { data: settings } = useSelector((state) => state.settings);
@@ -43,7 +40,7 @@ export const ScanBarcodeScreen = (props: any) => {
   const model = useAppInventorySelector((state) => state.appInventory.model);
 
   const document = docSelectors
-    .selectByDocType<IInventoryDocument>(docType)
+    .selectByDocType<IInventoryDocument>('inventory')
     ?.find((e) => e.id === docId) as IInventoryDocument;
 
   const goods = model[document?.head?.department?.id || ''].goods;

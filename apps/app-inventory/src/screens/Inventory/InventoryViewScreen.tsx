@@ -25,9 +25,6 @@ import SwipeLineItem from '../../components/SwipeLineItem';
 import { InventoryItem } from '../../components/InventoryItem';
 
 export const InventoryViewScreen = (props: any) => {
-  const { params } = props.route;
-  const docType = params?.docType as string;
-
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
@@ -37,7 +34,7 @@ export const InventoryViewScreen = (props: any) => {
   const { data: settings } = useSelector((state) => state.settings);
   const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
 
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>(docType)?.find((e) => e.id === id);
+  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
   const isBlocked = inventory?.status !== 'DRAFT';
 
@@ -57,6 +54,7 @@ export const InventoryViewScreen = (props: any) => {
 
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
+    // console.log('123456', inventory?.head.department?.id);
   }, [navigation, id, scanUsetSetting]);
 
   const handleDelete = useCallback(() => {

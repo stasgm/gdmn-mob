@@ -58,8 +58,8 @@ const GoodRemains = ({ item }: { item: IRem }) => {
 };
 
 export const SelectRemainsScreen = (props: any) => {
-  const { params } = props.route;
-  const docType = params?.docType as string;
+  // const { params } = props.route;
+  // const docType = params?.docType as string;
 
   const navigation = useNavigation();
   const { colors } = useTheme();
@@ -73,7 +73,8 @@ export const SelectRemainsScreen = (props: any) => {
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
-    .selectByDocType<IInventoryDocument>(docType)
+    .selectByDocType<IInventoryDocument>('inventory')
+    // .selectByDocType<IInventoryDocument>(docType)
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
   const handleScanner = useCallback(() => {
@@ -100,6 +101,7 @@ export const SelectRemainsScreen = (props: any) => {
       }, [])
       .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
   }, [model, document?.head?.department?.id]);
+
   useEffect(() => {
     if (!filterVisible && searchText) {
       setSearchText('');

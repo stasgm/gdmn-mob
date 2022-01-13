@@ -2435,7 +2435,7 @@ export const messageInventory: IMessage<MessageType>[] = [
           description: 'Остатки ТМЦ',
           data: [
             {
-              contactId: '176424776',
+              departmentId: '176424776',
               onDate: '2021-12-16',
               data: [
                 {

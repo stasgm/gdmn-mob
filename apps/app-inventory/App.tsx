@@ -16,6 +16,7 @@ import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, app
 import { IContact, IDepartment, IGood, IRemains } from './src/store/types';
 import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
+import { IReference } from '@lib/types';
 
 const Root = () => {
   //const newDispatch = useDocDispatch();
@@ -50,7 +51,7 @@ const Root = () => {
   }, [storeSettings]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
-  const departments = refSelectors.selectByName<IContact>('contact')?.data;
+  const departments = refSelectors.selectByName<IDepartment>('department')?.data;
   const remains = refSelectors.selectByName<IRemains>('remain')?.data;
   const user = useSelector((state) => state.auth.user);
   const appLoading = appSelectors.selectLoading();
