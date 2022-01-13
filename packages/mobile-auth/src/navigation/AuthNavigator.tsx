@@ -22,6 +22,7 @@ const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthNavigator: React.FC = () => {
   const config = useSelector((state) => state.auth.config);
   const isDemo = useSelector((state) => state.auth.isDemo);
+  const isInit = useSelector((state) => state.auth.isInit);
   const user = useSelector((state) => state.auth.user);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
@@ -33,7 +34,15 @@ const AuthNavigator: React.FC = () => {
       если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
     - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
   */
-  const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+  // const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+
+  // useEffect(() => {
+  //   // const i = connectionStatus === 'not-connected' && (!config.deviceId || isDemo);
+  //   // if (i !== isInit) {
+  //   console.log('isInit', connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+  //   authDispatch(authActions.setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo)));
+  //   // }
+  // }, []);
 
   useEffect(() => {
     // setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
@@ -138,7 +147,7 @@ const AuthNavigator: React.FC = () => {
     if (user) {
       await disconnect();
     }
-    setInit(false);
+    authDispatch(authActions.setInit(false));
 
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps

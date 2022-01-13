@@ -48,8 +48,8 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
       return { ...state, list: rest };
     }
 
-    case getType(actions.deleteAllReferences):
-      return { ...state, list: {} };
+    // case getType(actions.deleteAllReferences):
+    //   return { ...state, list: {} };
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
