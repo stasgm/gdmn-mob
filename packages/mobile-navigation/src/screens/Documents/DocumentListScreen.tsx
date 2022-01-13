@@ -43,7 +43,7 @@ const DocumentListScreen = () => {
         onPress: handleLoad,
       },
       {
-        title: 'Удалить все',
+        title: 'Удалить все документы',
         type: 'destructive',
         onPress: handleReset,
       },

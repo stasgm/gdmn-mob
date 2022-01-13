@@ -38,6 +38,7 @@ export const initialState: Readonly<AuthState> = {
   loadErrorList: [],
   status: '',
   isDemo: useMockup,
+  isInit: false,
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
@@ -47,6 +48,9 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setLoading):
       return { ...state, loading: action.payload };
+
+    case getType(actions.setInit):
+      return { ...state, isInit: action.payload };
 
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
@@ -147,6 +151,7 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         status: '',
         loading: false,
         isDemo: false,
+        // isInit: false,
       };
 
     case getType(actions.disconnectAsync.failure):

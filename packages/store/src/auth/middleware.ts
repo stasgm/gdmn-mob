@@ -29,7 +29,11 @@ export const authMiddlewareFactory: PersistedMiddleware =
       store.dispatch(actions.setLoadingData(true));
       load('auth')
         .then((data) => {
-          return store.dispatch(actions.loadData({ ...initialState, ...data, connectionStatus: 'not-connected' }));
+          return store.dispatch(actions.loadData({
+            ...initialState, ...data,
+            connectionStatus: 'not-connected',
+            isInit: !data.config.deviceId || data.isDemo
+          }));
         })
         .finally(() => {
           store.dispatch(actions.setLoadingData(false));
@@ -45,12 +49,13 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.init):
       case getType(actions.setConfig):
       case getType(actions.setCompany):
+      case getType(actions.setDemoMode):
+      case getType(actions.setLoadErrorList):
       case getType(actions.disconnectAsync.success):
       case getType(actions.logoutUserAsync.success):
       case getType(actions.getDeviceByUidAsync.success):
       case getType(actions.loginUserAsync.success):
-      case getType(actions.setUserSettingsAsync.success):
-      case getType(actions.setDemoMode): {
+      case getType(actions.setUserSettingsAsync.success): {
         const result = next(action);
 
         save('auth', store.getState().auth);

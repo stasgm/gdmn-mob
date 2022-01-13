@@ -34,12 +34,14 @@ const Root = () => {
   const { colors } = useTheme();
 
   //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+
   useEffect(() => {
-    if (appSettings) {
+    if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isInit]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IContact>('contact')?.data;

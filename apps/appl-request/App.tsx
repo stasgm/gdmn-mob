@@ -27,7 +27,8 @@ const Root = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
   const authLoading = useSelector((state) => state.auth.loading);
-  const appLoading = appSelectors.selectLoading();
+  const appDataLoading = appSelectors.selectLoading();
+  const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const [loading, setLoading] = useState(true);
 
@@ -57,7 +58,7 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  return authLoading || loading || appLoading ? (
+  return authLoading || loading || appLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary}>
         <></>

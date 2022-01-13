@@ -34,7 +34,7 @@ const ProfileScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Очистить данные',
+        title: 'Удалить все справочники и документы',
         type: 'destructive',
         onPress: handleClearData,
       },

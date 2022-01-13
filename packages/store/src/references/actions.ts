@@ -5,7 +5,7 @@ import { ReferenceState } from './types';
 
 const init = createAction('REFERENCES/INIT')();
 const deleteReference = createAction('REFERENCES/DELETE')<string>();
-const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
+// const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
 const clearError = createAction('REFERENCES/CLEAR_ERROR')();
 const loadData = createAction('REFERENCES/LOAD_DATA')<ReferenceState>();
 const setLoading = createAction('REFERENCES/SET_LOADING')<boolean>();
@@ -41,7 +41,7 @@ export const actions = {
   loadData,
   setReferencesAsync,
   deleteReference,
-  deleteAllReferences,
+  // deleteAllReferences,
   removeReferenceAsync,
   clearReferencesAsync,
   clearError,
