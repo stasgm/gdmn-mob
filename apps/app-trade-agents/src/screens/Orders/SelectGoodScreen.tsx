@@ -8,11 +8,11 @@ import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
 import { useSelector as useAppTradeSelector } from '../../store/';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { IGoodModel } from '../../store/app/types';
 
 const Good = ({ item }: { item: IGood }) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();

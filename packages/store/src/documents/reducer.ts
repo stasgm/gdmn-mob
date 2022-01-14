@@ -9,6 +9,8 @@ import { DocumentActionType, actions } from './actions';
 export const initialState: Readonly<DocumentState> = {
   list: [],
   loading: false,
+  loadingData: false,
+  loadErrorList: [],
   errorMessage: '',
 };
 
@@ -19,6 +21,15 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
 
     case getType(actions.setLoading):
       return { ...state, loading: action.payload };
+
+    case getType(actions.setLoadingData):
+      return { ...state, loadingData: action.payload };
+
+    case getType(actions.setLoadErrorList):
+      return {
+        ...state,
+        loadErrorList: [...state.loadErrorList, action.payload],
+      };
 
     case getType(actions.loadData):
       return { ...action.payload, loading: false, errorMessage: '' };
@@ -60,7 +71,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
             ? newDoc
             : newDoc.status === 'PROCESSED'
             ? {
-                ...oldDoc,
+                ...(newDoc.head ? newDoc : oldDoc),
                 status: 'PROCESSED' as StatusType,
               }
             : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'

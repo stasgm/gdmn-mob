@@ -19,39 +19,20 @@ export const settingMiddlewareFactory: PersistedMiddleware =
      *  Данные в файлы кэша записываются только когда меняются.
      */
 
-    // if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
-    //   // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-    //   store.dispatch(actions.setLoading(true));
-    //   load('settings')
-    //     .then((data) => store.dispatch(actions.loadData(data || initialState)))
-    //     .finally(() => {
-    //       store.dispatch(actions.setLoading(false));
-    //     })
-    //     .catch((err) => {
-    //       /* что, если ошибка */
-    //       console.error(
-    //         err instanceof Error || typeof err !== 'object' ? err : 'При загрузке настроек с диска произошла ошибка',
-    //       );
-    //     });
-    // }
-
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
-      store.dispatch(actions.setLoading(true));
+      store.dispatch(actions.setLoadingData(true));
       load('settings', store.getState().auth.user?.id)
         .then((data) => {
           return store.dispatch(actions.loadData(data || initialState));
         })
         .finally(() => {
-          store.dispatch(actions.setLoading(false));
+          store.dispatch(actions.setLoadingData(false));
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object'
-              ? err
-              : 'При загрузке справочников с диска произошла ошибка',
-          );
+          console.error(err || 'При загрузке настроек с диска произошла ошибка');
+          store.dispatch(action.setLoadErrorList(err || 'При загрузке настроек с диска произошла ошибка'));
         });
     }
 
@@ -63,6 +44,7 @@ export const settingMiddlewareFactory: PersistedMiddleware =
         case getType(actions.addSettings):
         case getType(actions.deleteOption):
         case getType(actions.deleteAllSettings):
+        case getType(actions.setLoadErrorList):
         case getType(actions.addSettingsAsync.success): {
           const result = next(action);
 

@@ -26,19 +26,22 @@ export const authMiddlewareFactory: PersistedMiddleware =
 
     if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
       // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-      store.dispatch(actions.setLoading(true));
+      store.dispatch(actions.setLoadingData(true));
       load('auth')
         .then((data) => {
-          return store.dispatch(actions.loadData({ ...initialState, ...data, connectionStatus: 'not-connected' }));
+          return store.dispatch(actions.loadData({
+            ...initialState, ...data,
+            connectionStatus: 'not-connected',
+            isInit: !data.config.deviceId || data.isDemo
+          }));
         })
         .finally(() => {
-          store.dispatch(actions.setLoading(false));
+          store.dispatch(actions.setLoadingData(false));
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object' ? err : 'При загрузки данных с диска произошла ошибка',
-          );
+          console.error(err || 'При загрузки данных с диска произошла ошибка');
+          store.dispatch(err || 'При загрузки данных с диска произошла ошибка');
         });
     }
 
@@ -46,12 +49,13 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.init):
       case getType(actions.setConfig):
       case getType(actions.setCompany):
+      case getType(actions.setDemoMode):
+      case getType(actions.setLoadErrorList):
       case getType(actions.disconnectAsync.success):
       case getType(actions.logoutUserAsync.success):
       case getType(actions.getDeviceByUidAsync.success):
       case getType(actions.loginUserAsync.success):
-      case getType(actions.setUserSettingsAsync.success):
-      case getType(actions.setDemoMode): {
+      case getType(actions.setUserSettingsAsync.success): {
         const result = next(action);
 
         save('auth', store.getState().auth);

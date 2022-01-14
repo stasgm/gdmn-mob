@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
+import React, { useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   DrawerButton,
@@ -10,8 +10,6 @@ import {
   Status,
   AppScreen,
   SubTitle,
-  MenuButton,
-  useActionSheet,
 } from '@lib/mobile-ui';
 
 import { IApplDocument } from '../../store/types';
@@ -33,10 +31,8 @@ const renderItem: ListRenderItem<ApplListRenderItemProps> = ({ item }) => {
 
 const ApplListScreen = () => {
   const navigation = useNavigation();
-  const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
 
-  const { loading } = useSelector((state) => state.documents);
+  const loading = useSelector((state) => state.documents.loading);
 
   const list = docSelectors
     .selectByDocType<IApplDocument>('request')
@@ -51,27 +47,26 @@ const ApplListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
-        : [];
+          ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
+          : status === 'archive'
+            ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
+            : [];
 
     return res.map(
       (i) =>
-        ({
-          id: i.id,
-          title: i.head.headCompany.name,
-          dept: i.head.dept.name,
-          documentDate: getDateString(i.documentDate),
-          status: i.status,
-          applStatus: `${i.head.applStatus.name} ${
-            i.head.cancelReason ? '(' + shortenString(i.head.cancelReason, 50) + ')' : ''
+      ({
+        id: i.id,
+        title: i.head.headCompany.name,
+        dept: i.head.dept.name,
+        documentDate: getDateString(i.documentDate),
+        status: i.status,
+        applStatus: `${i.head.applStatus.name} ${i.head.cancelReason ? '(' + shortenString(i.head.cancelReason, 50) + ')' : ''
           }`,
-          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
-          description: shortenString(i.head.justification, 90),
-          lineCount: i.lines.length,
-          errorMessage: i.errorMessage,
-        } as ApplListRenderItemProps),
+        subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
+        description: shortenString(i.head.justification, 90),
+        lineCount: i.lines.length,
+        errorMessage: i.errorMessage,
+      } as ApplListRenderItemProps),
     );
   }, [status, list]);
 
@@ -98,34 +93,11 @@ const ApplListScreen = () => {
     [filteredList],
   );
 
-  const handleReset = useCallback(() => {
-    dispatch(documentActions.init());
-  }, [dispatch]);
-
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      // {
-      //   title: 'Загрузить',
-      //   onPress: handleLoad,
-      // },
-      {
-        title: 'Удалить все',
-        type: 'destructive',
-        onPress: handleReset,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [handleReset, showActionSheet]);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
-  }, [navigation, actionsMenu]);
+  }, [navigation]);
 
   return (
     <AppScreen>

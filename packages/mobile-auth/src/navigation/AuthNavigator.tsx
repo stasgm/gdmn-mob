@@ -22,6 +22,7 @@ const AuthStack = createStackNavigator<AuthStackParamList>();
 const AuthNavigator: React.FC = () => {
   const config = useSelector((state) => state.auth.config);
   const isDemo = useSelector((state) => state.auth.isDemo);
+  const isInit = useSelector((state) => state.auth.isInit);
   const user = useSelector((state) => state.auth.user);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
@@ -33,7 +34,15 @@ const AuthNavigator: React.FC = () => {
       если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
     - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
   */
-  const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+  // const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+
+  // useEffect(() => {
+  //   // const i = connectionStatus === 'not-connected' && (!config.deviceId || isDemo);
+  //   // if (i !== isInit) {
+  //   console.log('isInit', connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+  //   authDispatch(authActions.setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo)));
+  //   // }
+  // }, []);
 
   useEffect(() => {
     // setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
@@ -97,7 +106,20 @@ const AuthNavigator: React.FC = () => {
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
 
-  const setCompany = useCallback((company: ICompany) => authDispatch(authActions.setCompany(company)), [authDispatch]);
+  const [companyLoading, setCompanyLoading] = useState<boolean>(false);
+
+  const setCompany = useCallback(async () => {
+    if (!user?.company) {
+      return;
+    }
+    setCompanyLoading(true);
+    const res = await authDispatch(authActions.getCompany(user.company.id));
+    if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
+      authDispatch(authActions.setCompany(res.payload));
+    } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
+      setCompanyLoading(false);
+    }
+  }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
     () => <SplashScreen settings={config} onCheckDevice={checkDevice} />,
@@ -115,28 +137,28 @@ const AuthNavigator: React.FC = () => {
   );
 
   const AppLoadWithParams = useCallback(
-    () => <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} />,
-    [logout, setCompany, user?.company],
+    () => (
+      <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} loading={companyLoading} />
+    ),
+    [companyLoading, logout, setCompany, user?.company],
   );
 
   const onSetServerMode = useCallback(async () => {
     if (user) {
       await disconnect();
     }
-    setInit(false);
+    authDispatch(authActions.setInit(false));
 
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disconnect, authDispatch]);
 
   const onSetDemoMode = useCallback(async () => {
-    dispatch(authActions.setLoading(true));
+    dispatch(authActions.setLoadingData(true));
     dispatch(authActions.setDemoMode());
-    await sleep(500);
-    dispatch(authActions.setLoading(false));
+    dispatch(authActions.setLoadingData(false));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, authDispatch, setCompany, login]);
+  }, [dispatch]);
 
   const CongfigWithParams = useCallback(
     () => <ConfigScreen onSetSettings={saveConfig} onSetDemoMode={onSetDemoMode} settings={config} />,
@@ -156,8 +178,6 @@ const AuthNavigator: React.FC = () => {
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
 
-  console.log('isInit', isInit);
-
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
@@ -169,7 +189,7 @@ const AuthNavigator: React.FC = () => {
           <AuthStack.Screen
             name="LoginCompany"
             component={AppLoadWithParams}
-            options={{ animationTypeForReplace: 'pop' }}
+            options={{ animationTypeForReplace: 'push' }}
           />
         )
       ) : connectionStatus === 'not-connected' ? (

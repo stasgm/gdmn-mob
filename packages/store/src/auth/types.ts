@@ -11,7 +11,10 @@ export type AuthState = {
   readonly config: IApiConfig;
   readonly connectionStatus: ConnectionStatus;
   readonly isDemo: boolean;
+  readonly isInit: boolean;
   readonly loading: boolean;
+  readonly loadingData: boolean;
+  readonly loadErrorList: string[];
   readonly error: boolean;
   readonly status: string;
 };

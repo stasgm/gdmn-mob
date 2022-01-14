@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
@@ -29,46 +29,23 @@ const ReferenceListScreen = () => {
   // const showActionSheet = useActionSheet();
   // const dispatch = useDispatch();
 
-  /*   const handleLoad = () => {
-      dispatch(
-        referenceActions.addReferences({
-          people: peopleRefMock,
-          departmens: depRefMock,
-          companies: companyRefMock,
-          docTypes: docTypeRefMock,
-        }),
-      );
-    };
-
-    const handleReset = () => {
-      dispatch(referenceActions.init());
-    };
-
-    const handleDeleteAll = () => {
-      dispatch(referenceActions.deleteAllReferences());
-    }; */
+  // const handleReset = () => {
+  //   dispatch(referenceActions.init());
+  // };
 
   // const actionsMenu = useCallback(() => {
   //   showActionSheet([
   //     {
-  //       title: 'Загрузить',
-  //       onPress: handleLoad,
-  //     },
-  //     {
-  //       title: 'Сбросить',
-  //       onPress: handleReset,
-  //     },
-  //     {
-  //       title: 'Удалить',
+  //       title: 'Удалить все справочники',
   //       type: 'destructive',
-  //       onPress: handleDeleteAll,
+  //       onPress: handleReset,
   //     },
   //     {
   //       title: 'Отмена',
   //       type: 'cancel',
   //     },
   //   ]);
-  // }, [showActionSheet]);
+  // }, [handleReset, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

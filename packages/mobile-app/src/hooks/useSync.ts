@@ -5,7 +5,6 @@ import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOpti
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
-import { Consumer } from '@expo/react-native-action-sheet/lib/typescript/context';
 
 const useSync = (onSync?: () => void): (() => void) => {
   const docDispatch = useDocThunkDispatch();

@@ -1,5 +1,5 @@
+import React from 'react';
 import { SettingValue } from '@lib/types';
-import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Subheading, Switch } from 'react-native-paper';
 
@@ -8,43 +8,30 @@ import Input from './Input';
 type Props = {
   label: string;
   value: SettingValue;
-  onValueChange: (newValue: any) => void;
+  onValueChange: (newValue: SettingValue) => void;
 };
 
 const SettingsItem = ({ label, value, onValueChange }: Props) => {
-  //console.log('Svalue', value);
-  //console.log('Slabel', label);
-  //console.log('Sfuction', onValueChange);
-
-  const [currentValue, setCurrentValue] = useState(value);
-  //console.log('valueS', value);
   return (
     <View>
-      {typeof currentValue === 'boolean' ? (
+      {typeof value === 'boolean' ? (
         <View style={localStyles.container}>
           <Subheading numberOfLines={5} style={localStyles.subHeading}>
             {label}
           </Subheading>
-          <Switch value={currentValue} onValueChange={(item) => onValueChange(item)} children={undefined} />
+          <Switch value={value} onValueChange={() => onValueChange(!value)} />
         </View>
       ) : (
         <View style={localStyles.settingsContainer}>
-          {typeof currentValue === 'number' ? (
+          {typeof value === 'number' ? (
             <Input
               label={label}
-              value={currentValue === 0 ? '' : currentValue.toString()}
-              onChangeText={(text) => setCurrentValue(text !== '' ? Number(text) : 0)}
-              onEndEditing={() => onValueChange(currentValue)}
+              value={value === 0 ? '' : value.toString()}
+              onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
               keyboardType={'numeric'}
             />
           ) : (
-            <Input
-              label={label}
-              value={currentValue}
-              onChangeText={(text) => setCurrentValue(text)}
-              keyboardType={'default'}
-              onEndEditing={() => onValueChange(currentValue)}
-            />
+            <Input label={label} value={value} onChangeText={(text) => onValueChange(text)} keyboardType={'default'} />
           )}
         </View>
       )}
@@ -56,14 +43,10 @@ const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     paddingHorizontal: 12,
-    // width: '100%',
   },
   settingsContainer: {
-    // alignItems: 'center',
     flexDirection: 'column',
-    // justifyContent: 'space-between',
     paddingTop: 6,
     width: '100%',
   },

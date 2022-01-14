@@ -19,41 +19,20 @@ export const referenceMiddlewareFactory: PersistedMiddleware =
      *  Данные в файлы кэша записываются только когда меняются.
      */
 
-    // if (action.type === getType(appActions.loadGlobalDataFromDisc)) {
-    //   // здесь мы грузим какие-то данные не зависимые от залогиненого пользователя
-    //   store.dispatch(actions.setLoading(true));
-    //   load('references')
-    //     .then((data) => store.dispatch(actions.loadData(data || initialState)))
-    //     .finally(() => {
-    //       store.dispatch(actions.setLoading(false));
-    //     })
-    //     .catch((err) => {
-    //       /* что, если ошибка */
-    //       console.error(
-    //         err instanceof Error || typeof err !== 'object'
-    //           ? err
-    //           : 'При загрузке справочников с диска произошла ошибка',
-    //       );
-    //     });
-    // }
-
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
-      store.dispatch(actions.setLoading(true));
+      store.dispatch(actions.setLoadingData(true));
       load('references', store.getState().auth.user?.id)
         .then((data) => {
           return store.dispatch(actions.loadData(data || initialState));
         })
         .finally(() => {
-          store.dispatch(actions.setLoading(false));
+          store.dispatch(actions.setLoadingData(false));
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object'
-              ? err
-              : 'При загрузке справочников с диска произошла ошибка',
-          );
+          console.error(err || 'При загрузке справочников с диска произошла ошибка');
+          store.dispatch(action.setLoadErrorList(err || 'При загрузке справочников с диска произошла ошибка'));
         });
     }
 
@@ -61,7 +40,8 @@ export const referenceMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.init):
         case getType(actions.deleteReference):
-        case getType(actions.deleteAllReferences):
+        // case getType(actions.deleteAllReferences):
+        case getType(actions.setLoadErrorList):
         case getType(actions.setReferencesAsync.success):
         case getType(actions.addReferencesAsync.success):
         case getType(actions.removeReferenceAsync.success):

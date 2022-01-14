@@ -20,8 +20,8 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
     if (!company || !user) {
       return;
     }
-
-    dispatch(appActions.setLoading(true));
+    console.log('useSendDocs');
+    dispatch(documentActions.setLoading(true));
     dispatch(appActions.setErrorList([]));
 
     const errList: string[] = [];
@@ -48,6 +48,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
         );
 
         if (sendMessageResponse.type === 'SEND_MESSAGE') {
+          console.log('readyDocs', readyDocs.length);
           const updateDocResponse = await docDispatch(
             documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT' }))),
           );
@@ -60,9 +61,9 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
         }
       }
 
-      dispatch(appActions.setLoading(false));
+      dispatch(documentActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
-
+      console.log('readyDocs 2', errList);
       if (errList?.length) {
         Alert.alert('Внимание!', 'Во время отправки документов произошли ошибки...', [{ text: 'OK' }]);
       }

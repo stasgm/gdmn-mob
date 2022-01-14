@@ -34,21 +34,19 @@ const Root = () => {
     [],
   );
 
-  const storeSettings = useSelector((state) => state.settings?.data);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
   const { colors } = useTheme();
 
+  //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+
   useEffect(() => {
-    if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings[optionName];
-        if (!storeSet && value) {
-          dispatch(settingsActions.addOption({ optionName, value }));
-        }
-      });
+    if (appSettings && isInit) {
+      dispatch(settingsActions.addSettings(appSettings));
     }
-  }, [storeSettings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInit]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IDepartment>('department')?.data;
@@ -106,8 +104,6 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  // console.log('111', authLoading || loading || appLoading || invLoading);
 
   return authLoading || loading || appLoading || invLoading ? (
     <AppScreen>

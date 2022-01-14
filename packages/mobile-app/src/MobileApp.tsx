@@ -13,7 +13,6 @@ import { useSelector } from '@lib/store';
 
 import { useSync } from './hooks';
 import api from '@lib/client-api';
-import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 export interface IApp {
   items?: INavItem[];
@@ -23,10 +22,10 @@ export interface IApp {
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
-
   const config = useSelector((state) => state.auth.config);
-  const appLoading = appSelectors.selectLoading();
-  const { colors } = useTheme();
+
+  const errorList = useSelector((state) => state.app.errorList);
+  console.log('errorList', errorList);
 
   useEffect(() => {
     // //При запуске приложения записываем настройки в апи
@@ -34,14 +33,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return appLoading ? (
-    <AppScreen>
-      <ActivityIndicator size="large" color={colors.primary} children={undefined} />
-      <Caption style={styles.title}>{'Синхронизация данных...'}</Caption>
-    </AppScreen>
-  ) : (
-    <DrawerNavigator items={items} onSyncClick={handleSyncData} />
-  );
+  return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {

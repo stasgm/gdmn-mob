@@ -48,7 +48,6 @@ export type MapStackParamList = {
 };
 
 export type GoodMatrixParamList = RefParamList & {
-  ContactView: { id: string };
   GoodList: { id: string };
   GoodLine: { item: IMatrixDataNamed };
 };

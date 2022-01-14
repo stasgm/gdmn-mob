@@ -11,8 +11,6 @@ import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 import { getDateString } from '../../../utils/helpers';
 
-type RouteLineProp = StackNavigationProp<RoutesStackParamList, 'RouteView'>;
-
 export interface IItem {
   routeId: string;
   item: IRouteLine;
@@ -21,7 +19,7 @@ export interface IItem {
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const RouteItem = ({ item, routeId }: IItem) => {
-  const navigation = useNavigation<RouteLineProp>();
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
 
   //TODO получить адрес item.outlet.id
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === item.outlet.id);
@@ -29,9 +27,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
   const address = outlet ? outlet.address : '';
 
   const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
-  // const visits = (useSelector((state) => state.visits)?.list as IVisitDocument[]).filter(
-  //   (visit) => visit.head.routeLineId === item.id,
-  // );
+
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === item.id);
 
   const lastVisit = visits

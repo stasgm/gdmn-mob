@@ -35,7 +35,7 @@ export interface InventoryListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, InventoryListSectionProps>[];
 
 export const InventoryListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
 
   const { loading } = useSelector((state) => state.documents);
 
