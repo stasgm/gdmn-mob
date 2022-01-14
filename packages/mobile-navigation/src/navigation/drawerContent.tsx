@@ -6,11 +6,10 @@ import {
 } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ActivityIndicator, Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
+import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import Constants from 'expo-constants';
-import { appSelectors, useSelector } from '@lib/store';
-import { AppScreen } from '@lib/mobile-ui';
+import { useSelector } from '@lib/store';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -56,7 +55,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
               transform: [{ translateX }],
             },
           ]}
-        // pointerEvents={loading ? 'none' : 'auto'}
+          // pointerEvents={loading ? 'none' : 'auto'}
         >
           <Drawer.Section style={styles.drawerSection}>
             <DrawerItemList {...props} />

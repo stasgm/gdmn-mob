@@ -40,7 +40,6 @@ export const referenceMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.init):
         case getType(actions.deleteReference):
-        // case getType(actions.deleteAllReferences):
         case getType(actions.setLoadErrorList):
         case getType(actions.setReferencesAsync.success):
         case getType(actions.addReferencesAsync.success):

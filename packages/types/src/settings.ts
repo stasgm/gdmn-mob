@@ -1,5 +1,3 @@
-//import { IDepartment } from '../src/document';
-
 import { IEntity, ISortEntity } from './common';
 
 export type SettingValue = string | number | boolean;
@@ -52,23 +50,23 @@ const InvSettings: Settings<IInvSettings> =  {
   },
 }; */
 
-export type SettingValueDoc = string | number | boolean | undefined;
-export type RefTypeChoose = 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
+// export type SettingValueDoc = string | number | boolean | undefined;
+// export type RefTypeChoose = 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
 
-interface ISettingsOptionDoc<T = SettingValueDoc> extends IEntity {
-  description: string;
-  type: RefTypeChoose;
-  refName?: string;
-  sortOrder?: number;
-  clearInput?: boolean;
-  disabled?: boolean;
-  onChangeText?: string;
-  value?: any;
-  requeried?: boolean;
-}
+// interface ISettingsOptionDoc extends IEntity {
+//   description: string;
+//   type: RefTypeChoose;
+//   refName?: string;
+//   sortOrder?: number;
+//   clearInput?: boolean;
+//   disabled?: boolean;
+//   onChangeText?: string;
+//   value?: any;
+//   requeried?: boolean;
+// }
 
-type MetaData1<T = Record<string, SettingValueDoc>> = {
-  [P in keyof T]?: ISettingsOptionDoc<T[P]>;
-};
+// type MetaData1<T = Record<string, SettingValueDoc>> = {
+//   [P in keyof T]?: ISettingsOptionDoc<T[P]>;
+// };
 
-export { Settings, ISettingsOption, IBaseSettings, MetaData1, ISettingsOptionDoc };
+export { Settings, ISettingsOption, IBaseSettings };

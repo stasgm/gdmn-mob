@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
-import { ICompany, IUserCredentials } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
-import api, { sleep } from '@lib/client-api';
+import api from '@lib/client-api';
 
 import {
   SplashScreen,

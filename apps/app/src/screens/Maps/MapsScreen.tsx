@@ -6,6 +6,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
+import { useTheme } from 'react-native-paper';
+
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
 
@@ -14,7 +16,6 @@ import { mockGeo } from '../../store/geo/mock';
 import { ILocation } from '../../store/geo/types';
 
 import localStyles from './styles';
-import { useTheme } from 'react-native-paper';
 
 interface Region {
   latitude: number;
@@ -182,8 +183,8 @@ const MapScreen = () => {
                 point.number === 0
                   ? localStyles.myLocationMark
                   : point.id === currentPoint?.id
-                    ? localStyles.selectedMark
-                    : localStyles.mark,
+                  ? localStyles.selectedMark
+                  : localStyles.mark,
               ]}
             >
               <Text style={styles.lightText}>{point.number}</Text>

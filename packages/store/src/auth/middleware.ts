@@ -29,11 +29,14 @@ export const authMiddlewareFactory: PersistedMiddleware =
       store.dispatch(actions.setLoadingData(true));
       load('auth')
         .then((data) => {
-          return store.dispatch(actions.loadData({
-            ...initialState, ...data,
-            connectionStatus: 'not-connected',
-            isInit: !data.config.deviceId || data.isDemo
-          }));
+          return store.dispatch(
+            actions.loadData({
+              ...initialState,
+              ...data,
+              connectionStatus: 'not-connected',
+              isInit: !data.config.deviceId || data.isDemo,
+            }),
+          );
         })
         .finally(() => {
           store.dispatch(actions.setLoadingData(false));

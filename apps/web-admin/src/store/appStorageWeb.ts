@@ -10,7 +10,7 @@ export const appStorageWeb: AppStorage = {
       console.log('error', e);
     }
   },
-  getItem: async (key: string, check?: any) => {
+  getItem: async (key: string) => {
     try {
       const result = localStorage.getItem(key);
       return result ? JSON.parse(result) : null;
