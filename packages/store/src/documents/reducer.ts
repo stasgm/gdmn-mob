@@ -71,7 +71,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
             ? newDoc
             : newDoc.status === 'PROCESSED'
             ? {
-                ...oldDoc,
+                ...(newDoc.head ? newDoc : oldDoc),
                 status: 'PROCESSED' as StatusType,
               }
             : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'
