@@ -13,7 +13,6 @@ type Props = {
 
 const SettingsGroup = ({ group, list, onValueChange }: Props) => {
   const { colors } = useTheme();
-
   return (
     <View style={[localStyles.container]}>
       <View>

@@ -57,9 +57,10 @@ const GoodRemains = ({ item }: { item: IRem }) => {
   );
 };
 
-//////////
+export const SelectRemainsScreen = (props: any) => {
+  // const { params } = props.route;
+  // const docType = params?.docType as string;
 
-export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
@@ -73,13 +74,13 @@ export const SelectRemainsScreen = () => {
   const docId = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
+    // .selectByDocType<IInventoryDocument>(docType)
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
   }, [navigation, docId, scanUsetSetting]);
 
-  //////
   const goodRemains: IRem[] = useMemo(() => {
     const goods = model[document?.head?.department?.id || ''].goods;
     if (!goods) {
@@ -100,6 +101,7 @@ export const SelectRemainsScreen = () => {
       }, [])
       .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
   }, [model, document?.head?.department?.id]);
+
   useEffect(() => {
     if (!filterVisible && searchText) {
       setSearchText('');

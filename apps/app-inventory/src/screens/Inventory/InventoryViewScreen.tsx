@@ -24,7 +24,7 @@ import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { InventoryItem } from '../../components/InventoryItem';
 
-export const InventoryViewScreen = () => {
+export const InventoryViewScreen = (props: any) => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
@@ -39,6 +39,7 @@ export const InventoryViewScreen = () => {
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
+    console.log('ИД', id);
     navigation.navigate('SelectRemainsItem', {
       docId: id,
     });
@@ -53,6 +54,7 @@ export const InventoryViewScreen = () => {
 
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
+    // console.log('123456', inventory?.head.department?.id);
   }, [navigation, id, scanUsetSetting]);
 
   const handleDelete = useCallback(() => {

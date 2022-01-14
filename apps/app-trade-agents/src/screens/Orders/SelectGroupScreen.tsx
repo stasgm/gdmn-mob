@@ -67,9 +67,9 @@ const Group = ({
           nextLevelGroups.length > 0
             ? setExpend(!isExpand ? item : undefined)
             : navigation.navigate('SelectGoodItem', {
-              docId,
-              groupId: item.id,
-            })
+                docId,
+                groupId: item.id,
+              })
         }
       >
         <View style={styles.details}>
@@ -105,7 +105,8 @@ const SelectGroupScreen = () => {
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
-  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;
+  const contactId =
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -117,9 +118,7 @@ const SelectGroupScreen = () => {
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const firstLevelGroups = groups.data?.filter(
-    (item) => !item.parent && Object.keys(goods[item.id] || []).length > 0,
-  );
+  const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 

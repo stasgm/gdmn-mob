@@ -10,17 +10,17 @@ import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/
 
 import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
-import { useSelector, docSelectors } from '@lib/store';
+import { useSelector, docSelectors, refSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument } from '../../store/types';
+import { IInventoryLine, IInventoryDocument, IGood } from '../../store/types';
 
 const oneSecund = 1000;
 
-export const ScanBarcodeScreen = () => {
+export const ScanBarcodeScreen = (props: any) => {
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation();
   const { data: settings } = useSelector((state) => state.settings);
@@ -55,6 +55,7 @@ export const ScanBarcodeScreen = () => {
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
+
     setBarcode(data);
   };
 
@@ -269,7 +270,7 @@ export const ScanBarcodeScreen = () => {
         {!scanned && (
           <View style={scanStyle.footer}>
             <>
-              <IconButton icon="barcode-scan" size={30} />
+              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
               <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>

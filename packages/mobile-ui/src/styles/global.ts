@@ -17,7 +17,6 @@ const globalstyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     borderWidth: 0.5,
-    // borderRadius: 50,
     padding: 10,
     marginHorizontal: 1,
     justifyContent: 'center',
@@ -189,6 +188,10 @@ const globalstyles = StyleSheet.create({
   },
   barcode: {
     alignItems: 'flex-end',
+  },
+  textDescriptionLeft: {
+    fontSize: 5,
+    textAlign: 'left',
   },
 });
 

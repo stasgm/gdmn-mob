@@ -49,20 +49,6 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
     });
   }, []);
 
-  // const handleDelete = useCallback(() => {
-  //   !!mode &&
-  //     Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-  //       {
-  //         text: 'Удалить',
-  //         onPress: () => {
-  //           dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
-  //           navigation.goBack();
-  //         },
-  //       },
-  //       { text: 'Отмена' },
-  //     ]);
-  // }, [dispatch, docId, item.id, mode, navigation]);
-
   const handleEIDScanned = (data: string) => {
     setDoScanned(false);
     setGoodEID(data);
@@ -160,10 +146,8 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
     position: 'absolute',
-    // top: 5,
     right: -10,
     zIndex: 5,
-    // width: '100%',
   },
   new: {
     width: '90%',
@@ -171,7 +155,6 @@ const localStyles = StyleSheet.create({
   details: {
     flex: 1,
     margin: 5,
-    // alignItems: 'center',
     justifyContent: 'center',
   },
 });

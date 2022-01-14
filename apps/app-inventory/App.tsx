@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
@@ -12,11 +13,15 @@ import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
-import { IContact, IGood, IRemains } from './src/store/types';
+import { IContact, IDepartment, IGood, IRemains } from './src/store/types';
 import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
+import { IReference } from '@lib/types';
 
 const Root = () => {
+  //const newDispatch = useDocDispatch();
+  //newDispatch(settingsActions.init());
+
   const navItems: INavItem[] = useMemo(
     () => [
       {
@@ -44,7 +49,7 @@ const Root = () => {
   }, [isInit]);
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
-  const departments = refSelectors.selectByName<IContact>('contact')?.data;
+  const departments = refSelectors.selectByName<IDepartment>('department')?.data;
   const remains = refSelectors.selectByName<IRemains>('remain')?.data;
   const user = useSelector((state) => state.auth.user);
   const appLoading = appSelectors.selectLoading();
@@ -68,7 +73,7 @@ const Root = () => {
   useEffect(() => {
     const getRemainsModel = async () => {
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
-        (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
+        (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
           const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
             goodsprev[g.id] = {
               ...g,

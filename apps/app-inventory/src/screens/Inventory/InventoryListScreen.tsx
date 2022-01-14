@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';

@@ -43,6 +43,8 @@ const SettingsSceen = () => {
       ),
     [settsData],
   );
+  //console.log('SettS1', parents);
+  //console.log('SettS2', data);
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     dispatch(settingsActions.updateOption({ optionName, value }));

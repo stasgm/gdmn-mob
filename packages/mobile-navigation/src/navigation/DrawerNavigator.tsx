@@ -40,7 +40,6 @@ export interface IProps {
 const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
   const { colors } = useTheme();
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
-
   return (
     <Drawer.Navigator
       drawerContentOptions={{
@@ -54,6 +53,7 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
           name={item.name}
           key={item.name}
           component={item.component}
+          initialParams={{ titleDoc: item.title }}
           options={{
             title: item.title,
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,

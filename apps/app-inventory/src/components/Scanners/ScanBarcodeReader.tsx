@@ -25,7 +25,7 @@ import { IInventoryLine, IInventoryDocument } from '../../store/types';
 
 const oneSecund = 1000;
 
-export const ScanBarcodeReaderScreen = () => {
+export const ScanBarcodeReaderScreen = (props: any) => {
   const ref = useRef<TextInput>(null);
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
@@ -186,7 +186,7 @@ export const ScanBarcodeReaderScreen = () => {
                 style={[scanReader.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
-                <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
+                <IconButton icon="barcode-scan" size={30} />
                 <Text style={scanReader.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>

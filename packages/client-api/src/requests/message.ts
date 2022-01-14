@@ -1,5 +1,5 @@
 import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
-import { messageRequest, messageAgent } from '@lib/mock';
+import { messageRequest, messageAgent, messageInventory } from '@lib/mock';
 
 import { error, message as types } from '../types';
 import { sleep } from '../utils';
@@ -63,7 +63,12 @@ class Message extends BaseRequest {
 
       return {
         type: 'GET_MESSAGES',
-        messageList: systemName === 'gdmn-appl-request' ? messageRequest : messageAgent,
+        messageList:
+          systemName === 'gdmn-appl-request'
+            ? messageRequest
+            : systemName === 'gdmn-sales-representative'
+            ? messageAgent
+            : messageInventory,
       } as types.IGetMessagesResponse;
     }
 

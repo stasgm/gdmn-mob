@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 export { InventoryListScreen } from './InventoryListScreen';
 export { InventoryEditScreen } from './InventoryEditScreen';
 // export { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
