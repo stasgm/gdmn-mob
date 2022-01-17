@@ -29,9 +29,11 @@ const useSync = (onSync?: () => void): (() => void) => {
     if (!company || !user) {
       return;
     }
-
+    console.log('1');
     dispatch(appActions.setLoading(true));
+    console.log('2');
     dispatch(appActions.setErrorList([]));
+    console.log('3');
 
     const errList: string[] = [];
 
@@ -142,7 +144,7 @@ const useSync = (onSync?: () => void): (() => void) => {
         maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
 
         const delPromises = documents
-          .filter((d) => d.status === 'PROCESSED' && new Date(d.documentDate) <= maxDocDate)
+          .filter((d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE') && new Date(d.documentDate) <= maxDocDate)
           .map(async (d) => {
             docDispatch(documentActions.removeDocument(d.id));
           });

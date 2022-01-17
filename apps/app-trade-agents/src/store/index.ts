@@ -33,4 +33,3 @@ export type AppDispatch = ThunkDispatch<AppState, any, TActions>;
 export const useSelector: TypedUseSelectorHook<AppState> = useReduxSelector;
 export const useDispatch = useReduxDispatch;
 export const useThunkDispatch = () => useReduxDispatch<AppDispatch>();
-

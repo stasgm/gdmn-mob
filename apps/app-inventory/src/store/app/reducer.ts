@@ -8,6 +8,7 @@ import { AppInventoryState } from './types';
 export const initialState: Readonly<AppInventoryState> = {
   model: {},
   loading: false,
+  loadingData: false,
   errorMessage: '',
 };
 
@@ -24,6 +25,9 @@ const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
 
     case getType(actions.loadData):
       return { ...action.payload, loading: false, errorMessage: '' };
+
+    case getType(actions.setLoadingData):
+      return { ...state, loadingData: action.payload };
 
     case getType(actions.setModelAsync.request):
       return { ...state, loading: true, errorMessage: '' };

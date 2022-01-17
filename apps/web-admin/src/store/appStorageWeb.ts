@@ -7,7 +7,7 @@ export const appStorageWeb: AppStorage = {
     try {
       localStorage.setItem(key, JSON.stringify(data));
     } catch (e) {
-      console.log('error', e);
+      console.log('error setItem', e);
     }
   },
   getItem: async (key: string) => {
@@ -15,7 +15,7 @@ export const appStorageWeb: AppStorage = {
       const result = localStorage.getItem(key);
       return result ? JSON.parse(result) : null;
     } catch (e) {
-      console.log('error', e);
+      console.log('error getItem', e);
     }
   },
 
@@ -23,7 +23,7 @@ export const appStorageWeb: AppStorage = {
     try {
       localStorage.removeItem(key);
     } catch (e) {
-      console.log('error', e);
+      console.log('error removeItem', e);
     }
   },
 };

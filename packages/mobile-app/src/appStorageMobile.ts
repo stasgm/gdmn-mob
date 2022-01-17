@@ -47,7 +47,7 @@ export const appStorage: AppStorage = {
       await ensureDirExists(getDirectory(key));
       await FileSystem.writeAsStringAsync(`${dbDir}${key}.json`, JSON.stringify(data));
     } catch (e) {
-      console.log('error', e);
+      console.log('error setItem', e);
     }
   },
 
@@ -60,7 +60,7 @@ export const appStorage: AppStorage = {
       const result = await FileSystem.readAsStringAsync(`${dbDir}${key}.json`);
       return result ? JSON.parse(result) : null;
     } catch (e) {
-      console.log('error', e);
+      console.log('error getItem', e);
     }
   },
 
@@ -69,7 +69,7 @@ export const appStorage: AppStorage = {
       await ensureDirExists('');
       await FileSystem.deleteAsync(`${dbDir}${key}.json`);
     } catch (e) {
-      console.log('error', e);
+      console.log('error removeItem', e);
     }
   },
 };
@@ -78,10 +78,8 @@ export const loadDataFromDisk: LoadDataFromDisk = async (key: string, userId?: s
   try {
     const fileName = userId ? `${userId}/${key}` : key;
     const data = await appStorage.getItem(fileName);
-    console.log('loadDataFromDisk', fileName);
     return data;
   } catch (err) {
-    console.log('err', err);
     return undefined;
   }
 };
@@ -90,8 +88,7 @@ export const saveDataToDisk: SaveDataToDisk = async (key: string, newData: any, 
   try {
     const fileName = userId ? `${userId}/${key}` : key;
     await appStorage.setItem(fileName, newData);
-    console.log('saveDataToDisk', fileName);
   } catch (err) {
-    console.log('err', err);
+    console.log('saveDataToDisk err: ', err);
   }
 };

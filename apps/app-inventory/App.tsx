@@ -1,10 +1,18 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 
-import { appActions, appSelectors, refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  appSelectors,
+  authActions,
+  authSelectors,
+  refSelectors,
+  settingsActions,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
 import { AppScreen, globalStyles as styles, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
@@ -13,10 +21,9 @@ import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
-import { IContact, IDepartment, IGood, IRemains } from './src/store/types';
-import { IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/app/types';
+import { IDepartment } from './src/store/types';
+import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
-import { IReference } from '@lib/types';
 
 const Root = () => {
   //const newDispatch = useDocDispatch();
@@ -40,21 +47,22 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const departments = refSelectors.selectByName<IDepartment>('department')?.data;
+  const remains = refSelectors.selectByName<IRemains>('remain')?.data;
+  const authLoading = useSelector((state) => state.auth.loading);
+  const appDataLoading = appSelectors.selectLoading();
+  const appLoading = useSelector((state) => state.app.loading);
+  const isLogged = authSelectors.isLoggedWithCompany();
+  const invLoading = useInvSelector((state) => state.appInventory.loading);
 
   useEffect(() => {
     if (appSettings && isInit) {
+      console.log('isInit', isInit);
       dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
-
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
-  const departments = refSelectors.selectByName<IDepartment>('department')?.data;
-  const remains = refSelectors.selectByName<IRemains>('remain')?.data;
-  const user = useSelector((state) => state.auth.user);
-  const appLoading = appSelectors.selectLoading();
-  const authLoading = useSelector((state) => state.auth.loading);
-  const invLoading = useInvSelector((state) => state.appInventory.loading);
 
   useEffect(() => {
     console.log('useEffect loadGlobalDataFromDisc');
@@ -64,27 +72,32 @@ const Root = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      console.log('useEffect loadSuperDataFromDisc', user.id);
+    if (isLogged) {
+      console.log('useEffect loadSuperDataFromDisc');
       dispatch(appActions.loadSuperDataFromDisc());
     }
-  }, [dispatch, user]);
+  }, [dispatch, isLogged]);
 
   useEffect(() => {
     const getRemainsModel = async () => {
+      if (!goods?.length || !departments?.length || !isLogged) {
+        return;
+      }
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
         (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-            goodsprev[g.id] = {
-              ...g,
-              remains:
+          const remGoods = goods
+            ?.reduce((goodsprev: IMGoodData<IRem>, g: IGood) => {
+              const rem =
                 remains
                   ?.find((r) => r.contactId === c.id)
                   ?.data?.filter((i) => i.goodId === g.id)
-                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
-            };
-            return goodsprev;
-          }, {});
+                  ?.map((r) => ({ price: r.price, remains: r.q })) || [];
+              goodsprev[g.id] = {
+                ...g,
+                ...rem[0],
+              };
+              return goodsprev;
+            }, {});
           contsprev[c.id] = { contactName: c.name, goods: remGoods };
           return contsprev;
         },
@@ -92,8 +105,9 @@ const Root = () => {
       );
       await appInventoryDispatch(appInventoryActions.setModel(model));
     };
+
     getRemainsModel();
-  }, [appInventoryDispatch, departments, goods, remains]);
+  }, [appInventoryDispatch, departments, goods, remains, isLogged]);
 
   const [loading, setLoading] = useState(true);
 
@@ -105,7 +119,7 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  return authLoading || loading || appLoading || invLoading ? (
+  return authLoading || loading || appLoading || invLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
       <Caption style={styles.title}>{'Загрузка данных...'}</Caption>

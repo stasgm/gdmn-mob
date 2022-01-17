@@ -30,11 +30,6 @@ const Root = () => {
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
-  const [loading, setLoading] = useState(true);
-
-  // const sss = useSelector((state) => state.settings.data);
-
-  // console.log('sss', sss);
 
   useEffect(() => {
     console.log('useEffect loadGlobalDataFromDisc');
@@ -50,6 +45,7 @@ const Root = () => {
     }
   }, [dispatch, isLogged]);
 
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     //Для отрисовки при первом подключении
     const timer = setTimeout(() => {
