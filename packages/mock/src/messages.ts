@@ -139,7 +139,7 @@ export const messageRequest: IMessage<MessageType>[] = [
         {
           id: '180625193',
           number: '324',
-          documentDate: '2021-08-24',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '168063006',
             name: 'request',
@@ -174,7 +174,7 @@ export const messageRequest: IMessage<MessageType>[] = [
               name: 'Маркова Вероника Николаевна',
             },
             specApprove: { id: '650002', name: 'Администратор' },
-            verificationDate: '2021-08-24',
+            verificationDate: new Date().toISOString(),
           },
           lines: [
             {
@@ -203,7 +203,7 @@ export const messageRequest: IMessage<MessageType>[] = [
         {
           id: '180822999',
           number: '837',
-          documentDate: '2021-08-25',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '168063006',
             name: 'request',
@@ -240,7 +240,7 @@ export const messageRequest: IMessage<MessageType>[] = [
               name: 'Маркова Вероника Николаевна',
             },
             specApprove: { id: '650002', name: 'Администратор' },
-            verificationDate: '2021-08-26',
+            verificationDate: new Date().toISOString(),
           },
           lines: [
             {
@@ -276,7 +276,7 @@ export const messageRequest: IMessage<MessageType>[] = [
         {
           id: '172472175',
           number: '474',
-          documentDate: '2021-06-17',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '168063006',
             name: 'request',
@@ -311,7 +311,7 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '147257062',
               name: 'Маркова Вероника Николаевна',
             },
-            verificationDate: '2021-08-20',
+            verificationDate: new Date().toISOString(),
             note: 'Выполнено',
           },
           lines: [
@@ -348,7 +348,7 @@ export const messageRequest: IMessage<MessageType>[] = [
         {
           id: '178210557',
           number: '745',
-          documentDate: '2021-08-04',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '168063006',
             name: 'request',
@@ -381,7 +381,7 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '147257062',
               name: 'Маркова Вероника Николаевна',
             },
-            verificationDate: '2021-08-20',
+            verificationDate: new Date().toISOString(),
             faGood: {
               id: '151911526',
               name: 'АВТОМОБИЛЬ МАЗ-457043-325',
@@ -402,7 +402,7 @@ export const messageRequest: IMessage<MessageType>[] = [
         {
           id: '178594244',
           number: '778',
-          documentDate: '2021-08-11',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '168063006',
             name: 'request',
@@ -441,9 +441,7 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '147257062',
               name: 'Маркова Вероника Николаевна',
             },
-            verificationDate: '2021-08-20',
-            note: 'Канцелярия заказывается службами 1 раз в год. Бумага по необходимости.',
-            cancelReason: 'НА КАКОЙ ПЕРИОД ДАННЫЙ ОБЪЁМ МАТЕРИАЛОВ?',
+            verificationDate: new Date().toISOString(),
           },
           lines: [
             {
@@ -521,7 +519,7 @@ export const messageRequest: IMessage<MessageType>[] = [
         {
           id: '178594254',
           number: '758',
-          documentDate: '2021-08-10',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '168063006',
             name: 'request',
@@ -560,7 +558,7 @@ export const messageRequest: IMessage<MessageType>[] = [
               id: '147257062',
               name: 'Маркова Вероника Николаевна',
             },
-            verificationDate: '2021-08-20',
+            verificationDate: new Date().toISOString(),
           },
           lines: [
             {
@@ -650,7 +648,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               id: '147042924',
               name: 'ОАО "МаркетКомпани"',
               contractNumber: '53',
-              contractDate: '2013-12-10',
+              contractDate: new Date().toISOString(),
               paycond: 'отсрочка 20 б/д_поручение',
               phoneNumber: '8-017-000-00-00, 000-00-00',
             },
@@ -658,7 +656,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               id: '1788296478',
               name: 'ООО "ЕдаЭксперт"',
               contractNumber: '573/18',
-              contractDate: '2018-04-19',
+              contractDate: new Date().toISOString(),
               paycond: 'отсрочка 3 к/д_поручение',
               phoneNumber: '8-017-101-01-01',
             },
@@ -666,7 +664,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               id: '1908473665',
               name: 'ООО "ПродуктМаг"',
               contractNumber: '309-СР',
-              contractDate: '2020-01-24',
+              contractDate: new Date().toISOString(),
               paycond: 'отсрочка 45 к/д_ поручение',
               phoneNumber: '8-017-999-99-99, 99-99-99',
             },
@@ -1513,7 +1511,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 id: '147042924',
                 name: 'ОАО "МаркетКомпани"',
               },
-              ondate: '2021-11-24T10:31:35.138Z',
+              ondate: new Date().toISOString(),
               saldo: 2345600,
               saldoDebt: 1745,
             },
@@ -1523,7 +1521,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 id: '1788296478',
                 name: 'ООО "ЕдаЭксперт"',
               },
-              ondate: '2021-11-24T10:31:35.138Z',
+              ondate: new Date().toISOString(),
               saldo: -16750,
               saldoDebt: 0,
             },
@@ -1533,7 +1531,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 id: '1788296478',
                 name: 'ООО "ПродуктМаг"',
               },
-              ondate: '2021-11-24T10:31:35.138Z',
+              ondate: new Date().toISOString(),
               saldo: 689571,
               saldoDebt: 12456,
             },
@@ -1574,7 +1572,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           data: [
             {
               contactId: '147042924',
-              onDate: '2021-12-07',
+              onDate: new Date().toISOString(),
               data: [
                 {
                   goodId: '955211845',
@@ -1594,7 +1592,7 @@ export const messageAgent: IMessage<MessageType>[] = [
             },
             {
               contactId: '1788296478',
-              onDate: '2021-12-07T10:31:35.138Z',
+              onDate: new Date().toISOString(),
               data: [
                 {
                   goodId: '955211846',
@@ -1655,7 +1653,7 @@ export const messageAgent: IMessage<MessageType>[] = [
         {
           id: '1367139385',
           number: '1',
-          documentDate: '2021-09-16',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '1366949042',
             name: 'route',
@@ -1724,7 +1722,7 @@ export const messageAgent: IMessage<MessageType>[] = [
         {
           id: '1367136392',
           number: '2',
-          documentDate: '2021-09-17',
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '1366949042',
             name: 'route',
@@ -1788,14 +1786,14 @@ export const messageAgent: IMessage<MessageType>[] = [
             description: '05. Заявка1 (организация)',
           },
           number: '1',
-          documentDate: '2021-11-24T10:31:35.138Z',
+          documentDate: new Date().toISOString(),
           status: 'DRAFT',
           head: {
             contact: {
               id: '1788296478',
               name: 'ООО "ЕдаЭксперт"',
             },
-            onDate: '2021-11-24T10:31:26.332Z',
+            onDate: new Date().toISOString(),
             outlet: {
               id: '819293369',
               name: 'Магазин "ЕдаЭксперт" № 1',
@@ -1833,8 +1831,8 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
           ],
-          creationDate: '2021-11-24T10:31:35.138Z',
-          editionDate: '2021-11-24T10:33:21.499Z',
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
         },
         {
           id: '21b5e719-f3dc-411e-ab83-16735d95f1d3',
@@ -1844,14 +1842,14 @@ export const messageAgent: IMessage<MessageType>[] = [
             description: '05. Заявка1 (организация)',
           },
           number: '1',
-          documentDate: '2021-11-24T10:31:35.138Z',
+          documentDate: new Date().toISOString(),
           status: 'READY',
           head: {
             contact: {
               id: '1788296478',
               name: 'ООО "ЕдаЭксперт"',
             },
-            onDate: '2021-11-24T10:31:26.332Z',
+            onDate: new Date().toISOString(),
             outlet: {
               id: '498076351',
               name: 'Магазин "ЕдаЭксперт" № 2',
@@ -1889,8 +1887,8 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
           ],
-          creationDate: '2021-11-24T10:31:35.138Z',
-          editionDate: '2021-11-24T10:33:21.499Z',
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
         },
         {
           id: '21b5e719-f3dc-411e-ab83-16735d95f1d5',
@@ -1900,14 +1898,14 @@ export const messageAgent: IMessage<MessageType>[] = [
             description: '05. Заявка1 (организация)',
           },
           number: '1',
-          documentDate: '2021-11-24T10:31:35.138Z',
+          documentDate: new Date().toISOString(),
           status: 'SENT',
           head: {
             contact: {
               id: '147042924',
               name: 'ОАО "МаркетКомпани"',
             },
-            onDate: '2021-11-24T10:31:26.332Z',
+            onDate: new Date().toISOString(),
             outlet: {
               id: '1121464445',
               name: 'Магазин "МаркетКомпани" № 2',
@@ -1945,8 +1943,8 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
           ],
-          creationDate: '2021-11-24T10:31:35.138Z',
-          editionDate: '2021-11-24T10:33:21.499Z',
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
         },
         {
           id: '67fbdb01-e089-4d80-b318-7ec9ae0f27da',
@@ -1956,7 +1954,7 @@ export const messageAgent: IMessage<MessageType>[] = [
             description: '02. Накладная на возврат готовой продукции',
           },
           number: '1',
-          documentDate: '2021-11-24T14:02:55.886Z',
+          documentDate: new Date().toISOString(),
           status: 'DRAFT',
           head: {
             contact: {
@@ -1994,8 +1992,8 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
           ],
-          creationDate: '2021-11-24T14:02:55.886Z',
-          editionDate: '2021-11-24T14:03:29.490Z',
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
         },
         {
           id: '67fbdb01-e089-4d80-b318-7ec9ae0f27dd',
@@ -2005,7 +2003,7 @@ export const messageAgent: IMessage<MessageType>[] = [
             description: '02. Накладная на возврат готовой продукции',
           },
           number: '1',
-          documentDate: '2021-11-24T14:02:55.886Z',
+          documentDate: new Date().toISOString(),
           status: 'READY',
           head: {
             contact: {
@@ -2043,8 +2041,8 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
           ],
-          creationDate: '2021-11-24T14:02:55.886Z',
-          editionDate: '2021-11-24T14:03:29.490Z',
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
         },
         {
           id: '67fbdb01-e089-4d80-b318-7ec9ae0f27db',
@@ -2054,7 +2052,7 @@ export const messageAgent: IMessage<MessageType>[] = [
             description: '02. Накладная на возврат готовой продукции',
           },
           number: '1',
-          documentDate: '2021-11-24T14:02:55.886Z',
+          documentDate: new Date().toISOString(),
           status: 'SENT',
           head: {
             contact: {
@@ -2104,8 +2102,8 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
           ],
-          creationDate: '2021-11-24T14:02:55.886Z',
-          editionDate: '2021-11-24T14:03:29.490Z',
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
         },
       ] as any[],
     },
@@ -2368,23 +2366,23 @@ export const messageInventory: IMessage<MessageType>[] = [
           data: [
             {
               id: '176424776',
-              name: '"ПАЧАСТУНАК З ВАУКАВЫСКА" (г.Брест,ул.Пушкинская,1-63а)',
+              name: 'Подразделение №1',
             },
             {
               id: '147030694',
-              name: 'Склад_минск',
+              name: 'Подразделение №2',
             },
             {
               id: '147016473',
-              name: 'Отдел сбыта',
+              name: 'Подразделение №3',
             },
             {
               id: '147030695',
-              name: 'Склад_новополоцк',
+              name: 'Подразделение №4',
             },
             {
               id: '147030696',
-              name: 'Склад_Лида',
+              name: 'Подразделение №5',
             },
           ],
         },
@@ -2396,35 +2394,26 @@ export const messageInventory: IMessage<MessageType>[] = [
           data: [
             {
               id: '147016471',
-              name: 'ООО "ГРИНрозница"',
+              name: 'ОАО "МаркетКомпани"',
               contractNumber: '11/20',
-              contractDate: '2020-12-01',
+              contractDate: new Date().toISOString(),
               paycond: 'отсрочка 15 к/д_поручение',
-              phoneNumber: '8-029-677-37-84,8-0162-46-21-66',
+              phoneNumber: '8-017-000-00-00, 000-00-00',
             },
             {
               id: '147016507',
-              name: 'ООО "Евроторг"',
+              name: 'ООО "ЕдаЭксперт"',
               contractNumber: '1/2001',
-              contractDate: '2020-12-01',
+              contractDate: new Date().toISOString(),
               paycond: 'отсрочка 15 б/д_требование',
-              phoneNumber: '',
+              phoneNumber: '8-017-101-01-01',
             },
             {
               id: '147016513',
-              name: 'ЗАО "Раница"',
+              name: 'ООО "ПродуктМаг"',
               contractNumber: '20/20',
-              contractDate: '2020-12-01',
+              contractDate: new Date().toISOString(),
               paycond: 'отсрочка 14 к/д_поручение',
-              phoneNumber: '816-21-30,210-76-24',
-            },
-            {
-              id: '147016523',
-              name: 'ОДО "Атлас"',
-              contractNumber: '34/20',
-              contractDate: '2020-12-01',
-              paycond: 'по факту поставки_поручение',
-              phoneNumber: '8-0214-46-04-33',
             },
           ],
         },
@@ -2436,7 +2425,7 @@ export const messageInventory: IMessage<MessageType>[] = [
           data: [
             {
               departmentId: '176424776',
-              onDate: '2021-12-16',
+              onDate: new Date().toISOString(),
               data: [
                 {
                   goodId: '153359486',

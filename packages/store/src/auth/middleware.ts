@@ -34,7 +34,7 @@ export const authMiddlewareFactory: PersistedMiddleware =
               ...initialState,
               ...data,
               connectionStatus: 'not-connected',
-              isInit: !data.config.deviceId || data.isDemo,
+              isInit: data ? !data.config.deviceId || data.isDemo : true,
             }),
           );
         })

@@ -146,6 +146,9 @@ export const SelectRemainsScreen = (props: any) => {
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
+              // eslint-disable-next-line react/no-children-prop
+              children={undefined}
+              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />
