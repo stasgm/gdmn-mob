@@ -43,7 +43,6 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   );
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
-    // console.log('use', pageParams?.filterText);
     fetchActivationCodes();
     fetchDeviceBindings(pageParams?.filterText as string);
   }, [fetchActivationCodes, fetchDeviceBindings, pageParams?.filterText]);

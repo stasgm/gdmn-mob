@@ -105,7 +105,6 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
 
   // Проверяем есть ли в базе переданный creator
   const creatorId = userData?.creator ? (await users.find(userData.creator.id))?.id : oldUser.creatorId;
-  console.log('userData.lastName', userData.lastName);
 
   const newUser: IDBUser = {
     id: userId,
@@ -124,11 +123,9 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     email: userData.email === undefined ? oldUser.email : userData.email,
   };
 
-  console.log('srever', newUser);
   await users.update(newUser);
 
   const updatedUser = await users.find(userId);
-  console.log('updated', updatedUser);
 
   return makeUser(updatedUser);
 };
