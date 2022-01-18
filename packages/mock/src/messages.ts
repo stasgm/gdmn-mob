@@ -2425,7 +2425,7 @@ export const messageInventory: IMessage<MessageType>[] = [
           data: [
             {
               contactId: '176424776',
-              onDate: '2021-12-16',
+              onDate: new Date().toISOString(),
               data: [
                 {
                   goodId: '153359486',

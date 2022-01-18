@@ -28,8 +28,6 @@ const useGoogleMaps = true;
 
 const DEFAULT_PADDING = { top: 40, right: 40, bottom: 40, left: 40 };
 
-const apiKey = process.env.GOOGLE_API_KEY;
-
 const MapScreen = () => {
   const dispatch = useDispatch();
 
@@ -47,8 +45,6 @@ const MapScreen = () => {
   const refMap = useRef<MapView>(null);
 
   useEffect(() => {
-    apiKey && Location.setGoogleApiKey(apiKey);
-
     dispatch(geoActions.addMany(mockGeo));
 
     setRegion({
