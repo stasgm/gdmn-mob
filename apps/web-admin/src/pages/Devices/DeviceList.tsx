@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
@@ -26,7 +26,7 @@ const DeviceList = () => {
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.devices);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
 
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
+  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 

@@ -17,7 +17,7 @@ import {
   Tooltip,
   Typography,
 } from '@material-ui/core';
-import { IDeviceBinding, IDevice, IActivationCode } from '@lib/types';
+import { IDeviceBinding, IActivationCode } from '@lib/types';
 
 import RefreshIcon from '@material-ui/icons/Refresh';
 
@@ -26,7 +26,7 @@ import { deviceStates, adminPath } from '../../utils/constants';
 interface IProps {
   deviceBindings?: IDeviceBinding[];
   activationCodes?: IActivationCode[];
-  devices?: IDevice[];
+  onCreateCode?: (deviceId: string) => void;
   selectedDevices?: IDeviceBinding[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
@@ -34,8 +34,8 @@ interface IProps {
 
 const DeviceBindingListTable = ({
   deviceBindings = [],
-  devices = [],
   activationCodes = [],
+  onCreateCode,
   onChangeSelectedDevices,
   selectedDevices = [],
   limitRows = 0,
@@ -105,7 +105,6 @@ const DeviceBindingListTable = ({
   const TableRows = () => {
     const deviceList = deviceBindings.slice(page * limit, page * limit + limit).map((binding: IDeviceBinding) => {
       const code = activationCodes.find((a) => a.device.id === binding.device.id)?.code;
-      console.log('code', code);
       return (
         <TableRow
           hover
@@ -150,21 +149,18 @@ const DeviceBindingListTable = ({
           <TableCell>{new Date(binding.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <Box style={{ width: '40px' }}>
-                {/* {devices.find((item) => item.id === binding.device.id)?.activationCode} */}
-                {code}
-              </Box>
+              <Box style={{ width: '40px' }}>{code}</Box>
               <Box>
-                {/* {onCreateCode && ( */}
-                <Tooltip title="Создать код">
-                  {/* <Button
-                    // component={RouterLink}
-                    onClick={() => onCreateCode(device.id)}
-                  > */}
-                  <RefreshIcon />
-                  {/* </Button> */}
-                </Tooltip>
-                {/* )} */}
+                {onCreateCode && (
+                  <Tooltip title="Создать код">
+                    <Button
+                      // component={RouterLink}
+                      onClick={() => onCreateCode(binding.device.id)}
+                    >
+                      <RefreshIcon />
+                    </Button>
+                  </Tooltip>
+                )}
               </Box>
             </Box>
           </TableCell>

@@ -21,6 +21,7 @@ import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
 import bindingSelectors from '../../store/deviceBinding/selectors';
 import bindingActions from '../../store/deviceBinding';
+import codeActions from '../../store/activationCode';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 import UserDetailsView from '../../components/user/UserDetailsView';
@@ -64,6 +65,8 @@ const UserView = () => {
   const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
+    dispatch(codeActions.fetchActivationCodes());
+
     // dispatch(deviceActions.fetchDevices());
   }, [dispatch, userId]);
 
