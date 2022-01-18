@@ -89,7 +89,7 @@ const Login = () => {
               error={formik.touched.name && Boolean(formik.errors.name)}
               fullWidth
               helperText={formik.values.name && formik.errors.name}
-              label="Имя пользователя"
+              label="Учетная запись"
               margin="normal"
               name="name"
               onBlur={formik.handleBlur}

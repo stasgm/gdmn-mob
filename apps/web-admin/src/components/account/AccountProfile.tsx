@@ -1,5 +1,5 @@
 import { IUser } from '@lib/types';
-import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography } from '@material-ui/core';
+import { Avatar, Box, Button, Card, CardActions, CardContent, Divider, Typography, Input } from '@material-ui/core';
 
 const avatar1 = require('../../../assets/images/avatar1.svg');
 
@@ -37,6 +37,7 @@ const AccountProfile = ({ user }: IProps) => (
     </CardContent>
     <Divider />
     <CardActions>
+      {/* <Input type="file" id="file-input" name="ImageStyle" /> */}
       <Button color="primary" fullWidth variant="text">
         Загрузить картинку
       </Button>

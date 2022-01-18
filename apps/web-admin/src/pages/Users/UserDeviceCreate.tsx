@@ -10,8 +10,12 @@ import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
 import DeviceBindingDetails from '../../components/deviceBinding/DeviceBindingDetails';
 
+export type Params = {
+  id: string;
+};
+
 const UserDeviceCreate = () => {
-  const { id: userId } = useParams();
+  const { id: userId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();

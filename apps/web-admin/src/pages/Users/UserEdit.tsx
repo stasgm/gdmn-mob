@@ -9,8 +9,12 @@ import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
 import SnackBar from '../../components/SnackBar';
 
+export type Params = {
+  id: string;
+};
+
 const UserEdit = () => {
-  const { id: userId } = useParams();
+  const { id: userId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 

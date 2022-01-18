@@ -50,7 +50,6 @@ const UserList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.userActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-
     fetchUsers(pageParamLocal?.filterText as string);
   };
 
@@ -99,9 +98,9 @@ const UserList = () => {
     { id: 'lastName', label: 'Фамилия', sortEnable: true },
     { id: 'firstName', label: 'Имя', sortEnable: true },
     { id: 'phoneNumber', label: 'Телефон', sortEnable: false },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: false },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: false },
     { id: 'alias', label: 'Пользователь ERP', sortEnable: true },
+    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
+    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
   ];
 
   return (

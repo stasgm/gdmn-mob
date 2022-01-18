@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
@@ -12,7 +12,7 @@ import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch'
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import codeActions from '../../store/activationCode';
-import { IToolBarButton } from '../../types';
+import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
 import DeviceListTable from '../../components/device/DeviceListTable';
@@ -23,10 +23,12 @@ const DeviceList = () => {
   const dispatch = useDispatch();
   const authDispatch = useAuthThunkDispatch();
 
-  const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.devices);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
 
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
+  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
+
+  const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
   const fetchDevices = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -43,12 +45,15 @@ const DeviceList = () => {
     },
     [dispatch],
   );
+
   useEffect(() => {
-    fetchDevices();
-  }, [fetchDevices]);
+    fetchDevices(pageParams?.filterText as string);
+  }, [fetchDevices, pageParams?.filterText]);
 
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
+
+    setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
 
@@ -56,15 +61,19 @@ const DeviceList = () => {
   };
 
   const handleSearchClick = () => {
-    const inputValue = valueRef?.current?.value;
-    fetchDevices(inputValue);
+    dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+    fetchDevices(pageParamLocal?.filterText as string);
+
+    // const inputValue = valueRef?.current?.value;
+    // fetchDevices(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
-    const inputValue = valueRef?.current?.value;
-    fetchDevices(inputValue);
+    handleSearchClick();
+    // const inputValue = valueRef?.current?.value;
+    // fetchDevices(inputValue);
   };
 
   const handleClearError = () => {
@@ -132,6 +141,7 @@ const DeviceList = () => {
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}
+            value={(pageParamLocal?.filterText as undefined) || ''}
           />
           {loading ? (
             <CircularProgressWithContent content={'Идет загрузка данных...'} />

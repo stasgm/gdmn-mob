@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
@@ -9,9 +9,11 @@ import {
   Users as UsersIcon,
 } from 'react-feather';
 
-import { useSelector } from '@lib/store';
+import { useSelector, useDispatch } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
+
+import actions from '../store/user';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
@@ -33,7 +35,7 @@ const items = [
   {
     href: `${adminPath}/app/companies`,
     icon: UsersIcon,
-    title: 'Организации',
+    title: 'Компании',
   },
   {
     href: `${adminPath}/app/users`,
@@ -61,6 +63,21 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
   const [isCompact, setCompact] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
+
+  // const dispatch = useDispatch();
+
+  // const fetchUsers = useCallback(
+  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
+  //     dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
+  //   },
+  //   [dispatch],
+  // );
+
+  // useEffect(() => {
+  //   dispatch(actions.fetchUsers(''));
+  //   //   },
+  //   //   [dispatch],
+  // }, [dispatch]);
 
   const content = (
     <Box
@@ -92,13 +109,11 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
         <Typography color="textPrimary" variant="h5">
           {!isCompact
             ? `${user?.lastName || ''} ${user?.firstName || ''}`
-            : `${user?.lastName?.slice(0, 1)}${user?.firstName?.slice(0, 1)}`}
+            : `${user?.lastName?.slice(0, 1) || ''}${user?.firstName?.slice(0, 1) || ''}`}
         </Typography>
-        {!isCompact && (
-          <Typography color="textSecondary" variant="body2">
-            {userInfo.jobTitle}
-          </Typography>
-        )}
+        <Typography color="textSecondary" variant="body2">
+          {userInfo.jobTitle}
+        </Typography>
       </Box>
       <Divider />
       <Box sx={{ p: Number(isCompact ? 0 : 2) }}>

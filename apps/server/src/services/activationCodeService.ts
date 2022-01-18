@@ -1,4 +1,4 @@
-import { IActivationCode, IDBActivationCode } from '@lib/types';
+import { IActivationCode, IDBActivationCode, IDBDeviceBinding } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
@@ -28,9 +28,11 @@ const findAll = async (params?: Record<string, string>): Promise<IActivationCode
 };
 
 const genActivationCode = async (deviceId: string) => {
-  const { devices, codes } = getDb();
+  const { devices, codes, deviceBindings } = getDb();
 
   const device = await devices.find(deviceId);
+
+  const deviceBinding = await deviceBindings.read((deviceBinding) => deviceBinding.deviceId === deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -54,6 +56,13 @@ const genActivationCode = async (deviceId: string) => {
   const createdCode = await codes.find(newCode);
 
   await devices.update({ ...device, state: 'NON-ACTIVATED' });
+
+  const updateDeviceBindings = async (deviceBindingList: IDBDeviceBinding[]) => {
+    for (const item of deviceBindingList) {
+      await deviceBindings.update({ ...item, state: 'NON-ACTIVATED' });
+    }
+  };
+  updateDeviceBindings(deviceBinding);
 
   const retCode = await makeCode(createdCode);
 

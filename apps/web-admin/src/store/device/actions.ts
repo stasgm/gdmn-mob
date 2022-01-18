@@ -1,6 +1,8 @@
 import { IDevice } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
+import { IPageParam } from '../../types';
+
 const init = createAction('DEVICE/INIT')();
 const clearError = createAction('DEVICE/CLEAR_ERROR')();
 
@@ -34,12 +36,17 @@ const removeDeviceAsync = createAsyncAction('DEVICE/REMOVE', 'DEVICE/REMOVE_SUCC
   string
 >();
 
+const setPageParam = createAction('DEVICE/SET_PARAM')<IPageParam | undefined>();
+const clearPageParams = createAction('DEVICE/CLEAR_PARAMS')();
+
 export const deviceActions = {
   fetchDevicesAsync,
   fetchDeviceAsync,
   addDeviceAsync,
   updateDeviceAsync,
   removeDeviceAsync,
+  clearPageParams,
+  setPageParam,
   clearError,
   init,
 };

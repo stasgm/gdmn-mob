@@ -4,7 +4,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import bcrypt from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials, DeviceState } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, DeviceState, IDBDeviceBinding } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
@@ -146,7 +146,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
 
 const verifyCode = async (code: string) => {
   const db = getDb();
-  const { devices, codes } = db;
+  const { devices, codes, deviceBindings } = db;
 
   const rec = await codes.find((i) => i.code === code);
 
@@ -171,6 +171,7 @@ const verifyCode = async (code: string) => {
   // обновляем uid у устройства
   const uid = uuidv1();
   const device = await devices.find(rec.deviceId);
+  const deviceBinding = await deviceBindings.read((deviceBinding) => deviceBinding.deviceId === rec.deviceId);
 
   if (!device) {
     throw new DataNotFoundException('По данному коду устройство не найдено');
@@ -178,6 +179,14 @@ const verifyCode = async (code: string) => {
 
   await devices.update({ ...device, uid: uid, state: 'ACTIVE' });
 
+  const updateDeviceBindings = async (deviceBindingList: IDBDeviceBinding[]) => {
+    for (const item of deviceBindingList) {
+      await deviceBindings.update({ ...item, state: 'ACTIVE' });
+    }
+  };
+  // await devic  eBindings.update({ ...deviceBinding, state: 'ACTIVE' });
+
+  updateDeviceBindings(deviceBinding);
   await codes.delete((i) => i.code === code);
 
   const updatedDevice = await devices.find(device.id);
