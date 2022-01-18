@@ -1,15 +1,14 @@
 import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationBuilder } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
-import { IGood, IInventoryLine } from '../../../store/types';
-import { InventorysStackParamList } from '../../../navigation/Root/types';
+import { IGood, IInventoryLine } from '../store/types';
 
 interface IProps {
   docId: string;
@@ -19,7 +18,7 @@ interface IProps {
 
 export const InventoryItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
+  const navigation = useNavigation();
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 

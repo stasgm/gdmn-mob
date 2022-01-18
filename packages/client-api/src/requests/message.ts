@@ -1,5 +1,5 @@
 import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
-import { messageRequest, messageAgent } from '@lib/mock';
+import { messageRequest, messageAgent, messageInventory } from '@lib/mock';
 
 import { error, message as types } from '../types';
 import { sleep } from '../utils';
@@ -52,7 +52,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка отправки сообщения',
+        message: err instanceof TypeError ? err.message : 'ошибка отправки сообщения',
       } as error.INetworkError;
     }
   };
@@ -63,7 +63,12 @@ class Message extends BaseRequest {
 
       return {
         type: 'GET_MESSAGES',
-        messageList: systemName === 'gdmn-appl-request' ? messageRequest : messageAgent,
+        messageList:
+          systemName === 'gdmn-appl-request'
+            ? messageRequest
+            : systemName === 'gdmn-sales-representative'
+            ? messageAgent
+            : messageInventory,
       } as types.IGetMessagesResponse;
     }
 
@@ -85,7 +90,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка получения сообщения',
+        message: err instanceof TypeError ? err.message : 'ошибка получения сообщения',
       } as error.INetworkError;
     }
   };
@@ -115,7 +120,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления сообщения',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления сообщения',
       } as error.INetworkError;
     }
   };
@@ -146,7 +151,7 @@ class Message extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err?.response?.data?.error || 'ошибка удаления сообщений',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления сообщений',
       } as error.INetworkError;
     }
   };

@@ -1,24 +1,49 @@
 import { INamedEntity } from '@lib/types';
 
-// eslint-disable-next-line import/no-cycle
-import { IMDGoodRemain, IModelData } from '../types';
-
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemain>;
   readonly loading: boolean;
+  readonly loadingData: boolean;
   readonly errorMessage: string;
 };
 
-export interface IModel {
-  [contactId: string]: IParentGroupModel;
+export interface IMDGoodRemain {
+  contactName: string;
+  goods: IMGoodData<IRem>;
 }
 
-export interface IParentGroupModel {
-  [parentGroupId: string]: IGroupModel;
+export interface IModelData<T = unknown> {
+  [id: string]: T;
 }
 
-export interface IGroupModel {
-  [groupId: string]: IGood[];
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMGoodRemain extends IGood {
+  remains?: IModelRem[];
+}
+
+export interface IModelRem {
+  price?: number;
+  q?: number;
+}
+
+export interface IRem extends IGood {
+  remains?: number;
+  price?: number;
+}
+
+export interface IRemains {
+  contactId: string;
+  date: Date;
+  data: IRemainsData[];
+}
+
+export interface IRemainsData {
+  goodId: string;
+  q?: number;
+  price?: number;
 }
 
 // Товары
@@ -32,9 +57,4 @@ export interface IGood extends INamedEntity {
   invWeight?: number; // Вес единицы товара
   price?: number; //Цена
   scale?: number; //количество единиц в месте
-}
-
-export interface IRem extends IGood {
-  remains?: number;
-  price?: number;
 }

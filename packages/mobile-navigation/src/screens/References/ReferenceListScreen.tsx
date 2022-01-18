@@ -21,53 +21,31 @@ const ReferenceListScreen = () => {
   const refData = useMemo(() => {
     return Object.entries(list)
       .map(([key, value]) => ({ ...value, refName: key } as RefListItem))
-      .filter((i) => i.visible !== false);
+      .filter((i) => i.visible !== false)
+      .sort((a, b) => ((a?.description || a?.name) < (b?.description || b?.name) ? -1 : 1));
   }, [list]);
 
   const navigation = useNavigation<ViewScreenProp>();
   // const showActionSheet = useActionSheet();
   // const dispatch = useDispatch();
 
-  /*   const handleLoad = () => {
-      dispatch(
-        referenceActions.addReferences({
-          people: peopleRefMock,
-          departmens: depRefMock,
-          companies: companyRefMock,
-          docTypes: docTypeRefMock,
-        }),
-      );
-    };
-
-    const handleReset = () => {
-      dispatch(referenceActions.init());
-    };
-
-    const handleDeleteAll = () => {
-      dispatch(referenceActions.deleteAllReferences());
-    }; */
+  // const handleReset = () => {
+  //   dispatch(referenceActions.init());
+  // };
 
   // const actionsMenu = useCallback(() => {
   //   showActionSheet([
   //     {
-  //       title: 'Загрузить',
-  //       onPress: handleLoad,
-  //     },
-  //     {
-  //       title: 'Сбросить',
-  //       onPress: handleReset,
-  //     },
-  //     {
-  //       title: 'Удалить',
+  //       title: 'Удалить все справочники',
   //       type: 'destructive',
-  //       onPress: handleDeleteAll,
+  //       onPress: handleReset,
   //     },
   //     {
   //       title: 'Отмена',
   //       type: 'cancel',
   //     },
   //   ]);
-  // }, [showActionSheet]);
+  // }, [handleReset, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

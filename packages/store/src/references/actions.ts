@@ -1,17 +1,16 @@
 import { IReferences } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-const init = createAction('REFERENCES/INIT')();
-// const setList = createAction('REFERENCES/UPDATE_LIST')<IReferences>();
-const deleteReference = createAction('REFERENCES/DELETE')<string>();
-const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
-const clearError = createAction('REFERENCES/CLEAR_ERROR')();
+import { ReferenceState } from './types';
 
-/*const addReferencesAsync = createAsyncAction(
-  'REFERENCES/ADD_MANY',
-  'REFERENCES/ADD_MANY_SUCCESS',
-  'REFERENCES/ADD_MANY_FAILURE',
-)<string | undefined, IReferences, string>();*/
+const init = createAction('REFERENCES/INIT')();
+const deleteReference = createAction('REFERENCES/DELETE')<string>();
+// const deleteAllReferences = createAction('REFERENCES/DELETE_ALL')();
+const clearError = createAction('REFERENCES/CLEAR_ERROR')();
+const loadData = createAction('REFERENCES/LOAD_DATA')<ReferenceState>();
+const setLoading = createAction('REFERENCES/SET_LOADING')<boolean>();
+const setLoadingData = createAction('REFERENCES/SET_LOADING_DATA')<boolean>();
+const setLoadErrorList = createAction('REFERENCES/SET_LOAD_ERROR_LIST')<string>();
 
 const setReferencesAsync = createAsyncAction(
   'REFERENCES/SET_ALL',
@@ -37,22 +36,19 @@ const clearReferencesAsync = createAsyncAction(
   'REFERENCES/CLEAR_REFERENCES_FAILURE',
 )<string | undefined, undefined, string>();
 
-/*const addReferenceAsync = createAsyncAction(
-  'REFERENCES/ADD_ONE',
-  'REFERENCES/ADD_ONE_SUCCESS',
-  'REFERENCES/ADD_ONE_FAILURE',
-)<string | undefined, IReferences, string>();*/
-
 export const actions = {
   addReferencesAsync,
-  //addReferenceAsync,
+  loadData,
   setReferencesAsync,
   deleteReference,
-  deleteAllReferences,
+  // deleteAllReferences,
   removeReferenceAsync,
   clearReferencesAsync,
   clearError,
   init,
+  setLoading,
+  setLoadingData,
+  setLoadErrorList,
 };
 
 export type ReferenceActionType = ActionType<typeof actions>;

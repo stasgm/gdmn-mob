@@ -13,7 +13,6 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
-  SwipeLineItem,
 } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -25,6 +24,8 @@ import { getDateString } from '../../utils/helpers';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
+
+import SwipeLineItem from '../../components/SwipeLineItem';
 
 import ReturnItem from './components/ReturnItem';
 

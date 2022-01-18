@@ -6,6 +6,10 @@ import { globalStyles as styles, PrimeButton, RoundButton, AppScreen, ScreenTitl
 import { IApiConfig } from '@lib/client-types';
 import { useSelector } from '@lib/store';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
+import { AuthStackParamList } from '../navigation/types';
+
 import localStyles from './styles';
 
 type Props = {
@@ -15,7 +19,7 @@ type Props = {
 };
 
 const SplashScreen = (props: Props) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<AuthStackParamList>>();
 
   const { onCheckDevice, onBreakConnection } = props;
   const { error, loading, status } = useSelector((state) => state.auth);

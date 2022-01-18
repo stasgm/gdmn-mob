@@ -1,17 +1,14 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator } from '@lib/mobile-ui';
-import { documentActions, refSelectors, useDispatch } from '@lib/store';
+import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View, Text, Alert } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
-
-import { OrdersStackParamList } from '../../../navigation/Root/types';
 
 import Checkbox from './Checkbox';
 
@@ -23,13 +20,7 @@ interface IProps {
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const OrderLine = ({ item, onSetLine }: IProps) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  const { docId, mode } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
-
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
-  // const isFocused = useIsFocused();
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
   const packages = refSelectors
@@ -40,7 +31,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
 
   useEffect(() => {
     //TODO временное решение
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 500);
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
   }, []);
 
   const handelQuantityChange = useCallback((value: string) => {
@@ -54,20 +45,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
-
-  const handleDelete = useCallback(() => {
-    !!mode &&
-      Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-        {
-          text: 'Удалить',
-          onPress: () => {
-            dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
-            navigation.goBack();
-          },
-        },
-        { text: 'Отмена' },
-      ]);
-  }, [dispatch, docId, item.id, mode, navigation]);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
@@ -148,11 +125,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
         </View>
       </ScrollView>
-      {/* {mode ? (
-        <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
-          Удалить позицию
-        </PrimeButton>
-      ) : null} */}
     </>
   );
 };

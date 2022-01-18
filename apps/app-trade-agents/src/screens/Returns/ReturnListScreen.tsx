@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { FlatList, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,7 +14,6 @@ import {
   ItemSeparator,
   Status,
   AppScreen,
-  SwipeListItem,
   ScreenListItem,
   IListItemProps,
   SubTitle,
@@ -23,6 +22,7 @@ import {
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getDateString } from '../../utils/helpers';
+import SwipeListItem from '../../components/SwipeListItem';
 
 export interface OrderListSectionProps {
   title: string;
@@ -121,7 +121,7 @@ const ReturnListScreen = () => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
-        <ScreenListItem {...item} routeName="ReturnView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

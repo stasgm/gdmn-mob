@@ -2,22 +2,18 @@ import { combineReducers, Action } from 'redux';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
-import { persistStore } from 'redux-persist';
 
-// import appReducer from './app/reducer';
+import { loadDataFromDisk, saveDataToDisk } from '@lib/mobile-app';
 
 import { AppActionType } from './app/actions';
 
 type TActions = AppActionType;
 
-export const combinedReducer = {
-  //app: appReducer,
-};
+export const reducers = {};
 
-const rootReducer = combineReducers(combinedReducer);
+const rootReducer = combineReducers(reducers);
 
-export const { store } = configureStore(combinedReducer);
-export const persistor = persistStore(store);
+export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers);
 
 export type AppState = ReturnType<typeof rootReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

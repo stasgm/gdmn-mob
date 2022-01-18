@@ -2,198 +2,113 @@ import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { PersistGate } from 'redux-persist/integration/react';
-import { IReference, ISettingsOption, Settings } from '@lib/types';
-import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  appSelectors,
+  // authActions,
+  authSelectors,
+  // documentActions,
+  // referenceActions,
+  refSelectors,
+  settingsActions,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
 
-import { Caption } from 'react-native-paper';
+import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
-import { persistor, store, useAppTradeThunkDispatch, appTradeActions } from './src/store';
+import { appTradeActions, store, useAppTradeThunkDispatch, useSelector as useAppTradeSelector } from './src/store';
 
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
 import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
 import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
 import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
-import config from './src/config';
+import GoodMatrixNavigator from './src/navigation/Root/GoodMatrixNavigator';
+
 import { IContact, IGood, IGoodMatrix, IGoodGroup, IMatrixData } from './src/store/types';
 import { IGoodModel, IMGoodData, IMGroupData, IModelData, IMParentGroupData } from './src/store/app/types';
+import { appSettings } from './src/utils/constants';
 
 const Root = () => {
   const navItems: INavItem[] = [
-    /*   {
-      name: 'Dashboard',
-      title: 'Дашборд',
-      icon: 'view-dashboard-outline',
-      component: DashboardNavigator,
-    }, */
     {
-      name: 'Routes',
+      name: 'RoutesNav',
       title: 'Маршруты',
       icon: 'routes',
       component: RoutesNavigator,
     },
     {
-      name: 'Orders',
+      name: 'OrdersNav',
       title: 'Заявки',
       icon: 'clipboard-list-outline',
       component: OrdersNavigator,
     },
     {
-      name: 'Returns',
+      name: 'ReturnsNav',
       title: 'Возвраты',
       icon: 'file-restore',
       component: ReturnsNavigator,
     },
     {
-      name: 'Map',
+      name: 'MapNav',
       title: 'Карта',
       icon: 'map-outline',
       component: MapNavigator,
     },
+    {
+      name: 'GoodMatrixNav',
+      title: 'Матрицы',
+      icon: 'tag-text-outline',
+      component: GoodMatrixNavigator,
+    },
   ];
-
-  const appSettings: Settings = {
-    isUseNetPrice: {
-      id: '5',
-      description: 'Использовать матрицы',
-      data: true,
-      type: 'boolean',
-      sortOrder: 3,
-      visible: true,
-      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
-    },
-    serverName: {
-      id: '6',
-      sortOrder: 5,
-      description: 'Бэк-офис. Адрес сервера',
-      data: config.BACK_URL,
-      type: 'string',
-      visible: true,
-      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
-    },
-    serverPort: {
-      id: '7',
-      description: 'Бэк-офис. Порт сервера',
-      data: config.BACK_PORT,
-      type: 'number',
-      sortOrder: 6,
-      visible: true,
-      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
-    },
-    returnDocTime: {
-      id: '8',
-      description: 'Время поиска накладных возврата, дн',
-      data: 30,
-      type: 'number',
-      sortOrder: 7,
-      visible: true,
-      group: { id: '2', name: 'Настройки заявок и возвратов', sortOrder: 2 },
-    },
-  };
-
-  const storeSettings = useSelector((state) => state.settings);
 
   const dispatch = useDispatch();
   const appDispatch = useAppTradeThunkDispatch();
+  const { colors } = useTheme();
 
   useEffect(() => {
-    if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings.data[optionName];
-        if (!storeSet && value) {
-          dispatch(settingsActions.addSetting({ optionName, value }));
-        }
-      });
+    console.log('useEffect loadGlobalDataFromDisc');
+    // dispatch(authActions.init());
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+
+  useEffect(() => {
+    if (appSettings && isInit) {
+      dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeSettings]);
+  }, [isInit]);
 
-  const { data: settings } = useSelector((state) => state.settings);
-  const isUseNetPrice = (settings?.isUseNetPrice as ISettingsOption<boolean>)?.data;
-
-  const groups = (refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>)?.data;
-  const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const contacts = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
-  const goodMatrix = (refSelectors.selectByName('goodMatrix') as IReference<IGoodMatrix>)?.data;
-
-  const [loading, setLoading] = useState(false);
-
-  // useEffect(() => {
-  //   setLoading(true);
-
-  //   const createGoodModel = async () => {
-  //     console.log('createModel');
-  //     if (!goods?.length || !contacts?.length || !groups.length) {
-  //       return;
-  //     }
-  //     console.log('createModel 2');
-  //     const parentGroups = groups.filter((gr) => !gr.parent);
-  //     const today = new Date();
-
-  //     const goodModel: IModelData<IGoodModel> = contacts?.reduce(
-  //       (contactPrev: IModelData<IGoodModel>, contact: IContact) => {
-  //         const parentGroupList = parentGroups.reduce(
-  //           (parentGrPrev: IMParentGroupData<IMGroupData<IMGoodData<IMGood>>>, parentGr: IGoodGroup) => {
-  //             const groupList = groups.filter((gr) => gr.parent?.id === parentGr.id);
-  //             const goodList = groupList.reduce((groupPrev: IMGroupData<IMGoodData<IMGood>>, group: IGoodGroup) => {
-  //               const list = goods
-  //                 .filter((g) => g.goodgroup.id === group.id)
-  //                 .reduce((goodPrev: IMGoodData<IMGood>, good: IGood) => {
-  //                   //Оставляем поля, которые нам нужны для модели с товаром
-  //                   const { id, goodgroup, creationDate, editionDate, ...goodRest } = good;
-  //                   //Если в настройках установлен параметр Использовать матрицы
-  //                   if (isUseNetPrice) {
-  //                     //Находим в матрице запись по контакту и товару
-  //                     const matrix = goodMatrix
-  //                       .find((m) => m.contactId === contact.id)
-  //                       ?.data?.find((i) => i.goodId === good.id);
-  //                     //Если матрица есть, в модель товара подставляем признаки из матрицы,
-  //                     //иначе товар не будет добавлен в модель
-  //                     if (matrix) {
-  //                       const { goodId, ...rest } = matrix;
-  //                       goodPrev[good.id] = { ...goodRest, ...rest };
-  //                     }
-  //                   } else {
-  //                     //Добавляем товар в модель с признаками из справочника товаров
-  //                     goodPrev[good.id] = { ...goodRest };
-  //                   }
-  //                   return goodPrev;
-  //                 }, {});
-
-  //               groupPrev[group.id] = list;
-  //               return groupPrev;
-  //             }, {});
-
-  //             parentGrPrev[parentGr.id] = goodList;
-  //             return parentGrPrev;
-  //           },
-  //           {},
-  //         );
-
-  //         contactPrev[contact.id] = { contactName: contact.name, onDate: today, goods: parentGroupList };
-  //         return contactPrev;
-  //       },
-  //       {},
-  //     );
-  //     console.log('goodModel is created');
-  //     appDispatch(appTradeActions.setGoodModel(goodModel));
-  //   };
-
-  //   createGoodModel();
-  //   setLoading(false);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [contacts, goods, groups, goodMatrix, isUseNetPrice]);
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data);
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
+  const appDataLoading = appSelectors.selectLoading();
+  const appLoading = useSelector((state) => state.app.loading);
+  const authLoading = useSelector((state) => state.auth.loadingData);
+  const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
+  const isLogged = authSelectors.isLoggedWithCompany();
 
   useEffect(() => {
-    console.log('useEffect setModel');
-    setLoading(true);
+    if (isLogged) {
+      console.log('useEffect loadSuperDataFromDisc', isLogged);
+      dispatch(appActions.loadSuperDataFromDisc());
+    }
+  }, [dispatch, isLogged]);
+
+  useEffect(() => {
     const setModel = async () => {
-      if (!goods?.length || !contacts?.length || !groups.length) {
+      if (!goods?.length || !contacts?.length || !groups.length || !isLogged) {
         return;
       }
-      // const today = new Date();
       const refGoods = groups
         .filter((gr) => gr.parent !== undefined)
         ?.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IGoodGroup) => {
@@ -215,7 +130,12 @@ const Root = () => {
 
       const goodModel: IModelData<IGoodModel> = contacts.reduce((oPrev: IModelData<IGoodModel>, oCur: IContact) => {
         const matrixContact = goodMatrix?.find((n) => n.contactId === oCur.id);
-        const onDate = matrixContact?.onDate ? new Date(matrixContact?.onDate) : new Date();
+
+        //Если стоит признак Использовать матрицы, то берем дату и данные по товарам из матриц
+        //(если в матрицах нет товаров по клиенту, то возвращаем пустой набор данных)
+        //Если не стоит признак Использовать матрицы, то берем текущую дату, а данные по товарам из справочника тмц
+        const onDate = isUseNetPrice && matrixContact?.onDate ? new Date(matrixContact?.onDate) : new Date();
+
         const parentGroupList: IMParentGroupData<IMGroupData<IMGoodData<IGood>>> =
           matrixContact?.data && matrixContact.data.length && isUseNetPrice
             ? matrixContact.data.reduce((prev: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>, cur: IMatrixData) => {
@@ -256,80 +176,29 @@ const Root = () => {
       await appDispatch(appTradeActions.setGoodModel(goodModel));
     };
     setModel();
-    setLoading(false);
-  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix]);
+  }, [contacts, goods, groups, isUseNetPrice, appDispatch, goodMatrix, isLogged]);
 
-  // useEffect(() => {
-  //   console.log('useEffect setModel');
-  //   setLoading(true);
-  //   const setModel = async () => {
-  //     if (!!goods?.length && !!contacts?.length) {
-  //       const refGoods = groups
-  //         .filter((gr) => gr.parent !== undefined)
-  //         ?.reduce((prev: IParentGroupModel, cur: IGoodGroup) => {
-  //           if (!cur.parent) {
-  //             return prev;
-  //           }
+  const [loading, setLoading] = useState(true);
 
-  //           const goodList = goods.filter((g) => g.goodgroup.id === cur.id);
-  //           const groupsModel = prev[cur.parent.id];
+  useEffect(() => {
+    //Для отрисовки при первом подключении
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  //           const newGroupsModel: IGroupModel = { ...groupsModel, [cur.id]: goodList };
+  // console.log('authLoading', authLoading);
+  // console.log('loading', loading);
+  // console.log('appLoading', appLoading);
+  // console.log('tradeLoading', tradeLoading);
+  // console.log('appDataLoading', appDataLoading);
 
-  //           return { ...prev, [cur.parent.id]: newGroupsModel };
-  //         }, {});
-
-  //       const goodModel: IModel = contacts.reduce((oPrev: IModel, oCur: IContact) => {
-  //         const netContact = netPrice.filter((n) => n.contactId === oCur.id);
-  //         const parentGroupList: IParentGroupModel =
-  //           netContact.length > 0 && isUseNetPrice
-  //             ? netContact.reduce((prev: IParentGroupModel, cur: INetPrice) => {
-  //                 const good = goods.find((g) => g.id === cur.goodId);
-  //                 if (!good) {
-  //                   return prev;
-  //                 }
-
-  //                 const group = groups.find((gr) => gr.id === good.goodgroup.id);
-  //                 if (!group) {
-  //                   return prev;
-  //                 }
-  //                 //Если есть родитель, то возьмем все группы из родителя,
-  //                 //иначе эта группа первого уровня, здесь не должно быть таких
-  //                 if (!group.parent) {
-  //                   return prev;
-  //                 }
-
-  //                 const newGood = {
-  //                   ...good,
-  //                   pricefsn: cur.pricefsn,
-  //                   pricefso: cur.pricefso,
-  //                   priceFsnSklad: cur.priceFsnSklad,
-  //                   priceFsoSklad: cur.priceFsoSklad,
-  //                 } as IGood;
-
-  //                 const groupsModel = prev[group.parent.id];
-
-  //                 const goodList =
-  //                   groupsModel && groupsModel[group.id]
-  //                     ? [...groupsModel[group.id].filter((i) => i.id !== good.id), newGood]
-  //                     : [newGood];
-
-  //                 const newGroupsModel: IGroupModel = { ...groupsModel, [group.id]: goodList };
-
-  //                 return { ...prev, [group.parent.id]: newGroupsModel };
-  //               }, {})
-  //             : refGoods;
-  //         return { ...oPrev, [oCur.id]: parentGroupList };
-  //       }, {});
-  //       await appDispatch(appTradeActions.setGoodModel(goodModel));
-  //     }
-  //   };
-  //   setModel();
-  //   setLoading(false);
-  // }, [appTradeDispatch, contacts, goods, groups, netPrice, isUseNetPrice]);
-
-  return loading ? (
-    <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
+  return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
+    <AppScreen>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+    </AppScreen>
   ) : (
     <MobileApp items={navItems} />
   );
@@ -337,9 +206,9 @@ const Root = () => {
 
 const App = () => (
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+    <UIProvider theme={defaultTheme}>
       <Root />
-    </PersistGate>
+    </UIProvider>
   </Provider>
 );
 

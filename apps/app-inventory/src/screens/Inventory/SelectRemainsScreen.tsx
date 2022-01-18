@@ -1,7 +1,6 @@
-/* eslint-disable react/no-children-prop */
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, IconButton } from 'react-native-paper';
+import { Searchbar, Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
@@ -14,12 +13,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { formatValue } from '../../utils/helpers';
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryDocument, IRem } from '../../store/types';
+import { IInventoryDocument } from '../../store/types';
+import { IRem } from '../../store/app/types';
 
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  console.log('III', item);
   const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
@@ -59,9 +58,10 @@ const GoodRemains = ({ item }: { item: IRem }) => {
   );
 };
 
-//////////
+export const SelectRemainsScreen = (props: any) => {
+  // const { params } = props.route;
+  // const docType = params?.docType as string;
 
-export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
@@ -71,37 +71,47 @@ export const SelectRemainsScreen = () => {
   const { data: settings } = useSelector((state) => state.settings);
   const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
   const model = useAppInventorySelector((state) => state.appInventory.model);
+  // console.log('model111', model);
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
+    // .selectByDocType<IInventoryDocument>(docType)
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
   }, [navigation, docId, scanUsetSetting]);
 
-  //////
   const goodRemains: IRem[] = useMemo(() => {
-    const goods = model[document?.head?.department?.id || ''].goods;
+    if (!document?.head?.department?.id) {
+      return [];
+    }
+
+    const goods = model[document?.head?.department?.id]?.goods;
     if (!goods) {
       return [];
     }
 
-    return Object.keys(goods)
-      ?.reduce((r: IRem[], e) => {
-        const { remains, ...goodInfo } = goods[e];
-        const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
+    return Object.entries(goods).reduce((prev: IRem[], [_, item]) => {
+      return [...prev, item];
+    }, []);
 
-        remains && remains.length > 0
-          ? remains.forEach((re) => {
-              r.push({ ...goodPos, price: re.price, remains: re.q });
-            })
-          : r.push(goodPos);
-        return r;
-      }, [])
-      .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
-  }, [model, document?.head?.department?.id]);
+    // return Object.keys(goods)
+    //   ?.reduce((r: IRem[], e) => {
+    //     const { , ...goodInfo } = goods[e];
+    //     const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
+
+    //     remains && remains.length > 0
+    //       ? remains.forEach((re) => {
+    //         r.push({ ...goodPos, price: re.price, remains: re.q });
+    //       })
+    //       : r.push(goodPos);
+    //     return r;
+    //   }, [])
+    //   .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
+  }, [document?.head?.department, model]);
+
   useEffect(() => {
     if (!filterVisible && searchText) {
       setSearchText('');
@@ -146,8 +156,6 @@ export const SelectRemainsScreen = () => {
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
-              children={undefined}
-              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />

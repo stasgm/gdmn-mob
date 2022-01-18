@@ -1,5 +1,6 @@
-export { default as configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
-export { TActions, IFormParam } from './src/types';
+export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
+export { PersistedMiddleware, SaveDataToDisk, LoadDataFromDisk, AppStorage } from './src/types';
+export { IFormParam } from './src/app/types';
 export { default as authActions } from './src/auth';
 export { useAuthThunkDispatch } from './src/auth';
 export { default as authSelectors } from './src/auth/selectors';
@@ -13,5 +14,6 @@ export { default as referenceActions } from './src/references';
 export { useRefThunkDispatch } from './src/references';
 export { default as refSelectors } from './src/references/selectors';
 export { default as settingsActions } from './src/settings';
-export { useSettingThunkDispatch } from './src/settings';
+export { useSettingThunkDispatch, baseSettingGroup } from './src/settings';
 export { default as appActions } from './src/app';
+export { default as appSelectors } from './src/app/selectors';

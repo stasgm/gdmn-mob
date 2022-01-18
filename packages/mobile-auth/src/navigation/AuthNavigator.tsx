@@ -2,12 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
-import { ICompany, IUserCredentials } from '@lib/types';
+import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
-
 import api from '@lib/client-api';
-
-import { ActivityIndicator } from 'react-native';
 
 import {
   SplashScreen,
@@ -23,7 +20,9 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const settings = useSelector((state) => state.auth.settings);
+  const config = useSelector((state) => state.auth.config);
+  const isDemo = useSelector((state) => state.auth.isDemo);
+  const isInit = useSelector((state) => state.auth.isInit);
   const user = useSelector((state) => state.auth.user);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
@@ -35,56 +34,48 @@ const AuthNavigator: React.FC = () => {
       если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
     - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
   */
-  const [isInit, setInit] = useState(true);
-  const [loading, setLoading] = useState(true);
+  // const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+
+  // useEffect(() => {
+  //   // const i = connectionStatus === 'not-connected' && (!config.deviceId || isDemo);
+  //   // if (i !== isInit) {
+  //   console.log('isInit', connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
+  //   authDispatch(authActions.setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo)));
+  //   // }
+  // }, []);
 
   useEffect(() => {
-    // authDispatch(authActions.init());
-    setLoading(true);
-    let debug = { ...api.config.debug, ...settings.debug };
-
-    if (connectionStatus === 'not-connected' && (!settings.deviceId || settings.debug?.isMock)) {
-      //Если загружается приложение в демо режиме, а перед этим не вышли из аккаунта
-      //то выполняем disconnect, меняем признак демо режима в false
-      if (settings.debug?.isMock && user) {
-        disconnect();
-        debug = { ...debug, isMock: false };
-      }
-      setInit(true);
-    } else {
-      setInit(false);
-    }
+    // setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
     //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...settings, debug };
-
-    setLoading(false);
+    api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock: isDemo } };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const disconnect = useCallback(() => {
-    authDispatch(authActions.disconnect());
+  const disconnect = useCallback(async () => {
+    await authDispatch(authActions.disconnect());
   }, [authDispatch]);
 
-  const saveSettings = useCallback(
-    (newSettings: IApiConfig) => {
-      if (newSettings.deviceId === '') {
+  const saveConfig = useCallback(
+    (newConfig: IApiConfig) => {
+      if (newConfig.deviceId === '' && config.deviceId !== '') {
         disconnect();
       }
-      authDispatch(authActions.setSettings(newSettings));
-      api.config = { ...api.config, ...newSettings };
+      authDispatch(authActions.setConfig(newConfig));
+      api.config = { ...api.config, ...newConfig };
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [disconnect, authDispatch],
   );
 
-  const checkDevice = useCallback(() => {
+  const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
-    authDispatch(authActions.getDeviceStatus(settings?.deviceId));
+    await authDispatch(authActions.getDeviceStatus(config?.deviceId));
     //Получим устройство по uid
-    if (settings?.deviceId && user) {
-      authDispatch(authActions.getDeviceByUid(settings.deviceId));
+    if (config?.deviceId && user) {
+      authDispatch(authActions.getDeviceByUid(config.deviceId));
     }
-  }, [authDispatch, settings?.deviceId, user]);
+  }, [authDispatch, config?.deviceId, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
@@ -92,21 +83,22 @@ const AuthNavigator: React.FC = () => {
       if (res.type === 'AUTH/ACTIVATE_DEVICE_SUCCESS') {
         //Если устройство прошло активацию по коду,
         //то запишем uId в конфиг api и в настройки
-        authDispatch(authActions.setSettings({ ...settings, deviceId: res.payload }));
+        // authDispatch(authActions.setSettings({ ...config, deviceId: res.payload }));
+        authDispatch(authActions.setConfig({ ...config, deviceId: res.payload }));
         api.config.deviceId = res.payload;
       }
     },
-    [authDispatch, settings],
+    [authDispatch, config],
   );
 
-  const signIn = useCallback(
+  const login = useCallback(
     async (credentials: IUserCredentials) => {
-      const res = await authDispatch(authActions.signIn(credentials));
-      if (settings?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
-        authDispatch(authActions.getDeviceByUid(settings.deviceId));
+      const res = await authDispatch(authActions.login(credentials));
+      if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
+        authDispatch(authActions.getDeviceByUid(config.deviceId));
       }
     },
-    [authDispatch, settings.deviceId],
+    [authDispatch, config.deviceId],
   );
 
   const logout = useCallback(async () => {
@@ -114,16 +106,29 @@ const AuthNavigator: React.FC = () => {
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
 
-  const setCompany = useCallback((company: ICompany) => authDispatch(authActions.setCompany(company)), [authDispatch]);
+  const [companyLoading, setCompanyLoading] = useState<boolean>(false);
+
+  const setCompany = useCallback(async () => {
+    if (!user?.company) {
+      return;
+    }
+    setCompanyLoading(true);
+    const res = await authDispatch(authActions.getCompany(user.company.id));
+    if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
+      authDispatch(authActions.setCompany(res.payload));
+    } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
+      setCompanyLoading(false);
+    }
+  }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(
-    () => <SplashScreen settings={settings} onCheckDevice={checkDevice} />,
-    [checkDevice, settings],
+    () => <SplashScreen settings={config} onCheckDevice={checkDevice} />,
+    [checkDevice, config],
   );
 
   const SignInWithParams = useCallback(
-    () => <SignInScreen onDisconnect={disconnect} onSignIn={signIn} />,
-    [signIn, disconnect],
+    () => <SignInScreen onDisconnect={disconnect} onSignIn={login} />,
+    [login, disconnect],
   );
 
   const ActivateWithParams = useCallback(
@@ -132,26 +137,32 @@ const AuthNavigator: React.FC = () => {
   );
 
   const AppLoadWithParams = useCallback(
-    () => <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} />,
-    [logout, setCompany, user?.company],
+    () => (
+      <AppLoadScreen onSetCompany={setCompany} company={user?.company} onLogout={logout} loading={companyLoading} />
+    ),
+    [companyLoading, logout, setCompany, user?.company],
   );
 
-  const onSetServerMode = useCallback(() => {
-    disconnect();
-    setInit(false);
+  const onSetServerMode = useCallback(async () => {
+    if (user) {
+      await disconnect();
+    }
+    authDispatch(authActions.setInit(false));
+
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disconnect, authDispatch]);
 
   const onSetDemoMode = useCallback(async () => {
+    dispatch(authActions.setLoadingData(true));
     dispatch(authActions.setDemoMode());
+    dispatch(authActions.setLoadingData(false));
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, authDispatch, setCompany, signIn]);
+  }, [dispatch]);
 
   const CongfigWithParams = useCallback(
-    () => <ConfigScreen onSetSettings={saveSettings} onSetDemoMode={onSetDemoMode} settings={settings} />,
-    [onSetDemoMode, saveSettings, settings],
+    () => <ConfigScreen onSetSettings={saveConfig} onSetDemoMode={onSetDemoMode} settings={config} />,
+    [onSetDemoMode, saveConfig, config],
   );
 
   const ModeSelection = useCallback(
@@ -167,29 +178,22 @@ const AuthNavigator: React.FC = () => {
     Если connectionStatus = 'not-activated', то переходим на окно активации устройства
   */
 
-  return !loading ? (
+  return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       {isInit ? (
         <AuthStack.Screen name="Mode" component={ModeSelection} />
       ) : connectionStatus === 'connected' ? (
         !user ? (
-          <AuthStack.Screen
-            name="Login"
-            component={SignInWithParams}
-            options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
-          />
+          <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
         ) : (
           <AuthStack.Screen
             name="LoginCompany"
             component={AppLoadWithParams}
-            options={{ animationTypeForReplace: user ? 'pop' : 'push' }}
+            options={{ animationTypeForReplace: 'push' }}
           />
         )
       ) : connectionStatus === 'not-connected' ? (
-        // settings.deviceId
-        //   ? (<AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />)
-        //   : (<AuthStack.Screen name="Config" component={CongfigWithParams} />)
-        settings.deviceId ? (
+        config.deviceId ? (
           <>
             <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
             <AuthStack.Screen name="Config" component={CongfigWithParams} />
@@ -204,8 +208,6 @@ const AuthNavigator: React.FC = () => {
         <AuthStack.Screen name="Activation" component={ActivateWithParams} />
       )}
     </AuthStack.Navigator>
-  ) : (
-    <ActivityIndicator size="large" color="#0000ff" />
   );
 };
 

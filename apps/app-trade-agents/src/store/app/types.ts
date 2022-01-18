@@ -3,20 +3,9 @@ import { INamedEntity } from '@lib/types';
 export type AppTradeState = {
   readonly goodModel: IModelData<IGoodModel>;
   readonly loading: boolean;
+  readonly loadingData: boolean;
   readonly errorMessage: string;
 };
-
-// export interface IModel<T = unknown> {
-//   [contactId: string]: T;
-// }
-
-// export interface IParentGroupModel {
-//   [parentGroupId: string]: IGroupModel;
-// }
-
-// export interface IGroupModel<T = unknown> {
-//   [groupId: string]: T[];
-// }
 
 // Товары
 export interface IGood extends INamedEntity {
@@ -35,10 +24,6 @@ export interface IGood extends INamedEntity {
 
 //* Model *//
 export type IMGood = Omit<IGood, 'goodgroup' | 'id'>;
-
-// // export interface IMGoodRemain extends IGood {
-// //   remains?: IModelRem[];
-// // }
 
 export interface IGoodModel {
   contactName: string;

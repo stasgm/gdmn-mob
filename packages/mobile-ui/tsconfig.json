@@ -4,6 +4,6 @@
     "noEmit": true,
     "jsx": "react-native"
   },
-  "include": ["src", "index.ts"],
+  "include": ["src", "index.ts", "../../apps/app-trade-agents/src/components/SwipeListItem.tsx", "../../apps/app-trade-agents/src/components/SwipeLineItem.tsx"],
   "exclude": ["node_modules"]
 }

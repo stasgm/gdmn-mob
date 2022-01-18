@@ -1,17 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
 
 import { ISettingsOption } from '@lib/types';
 
-import { IInventoryLine } from '../../../store/types';
-import { InventorysStackParamList } from '../../../navigation/Root/types';
+import { IInventoryLine } from '../store/types';
 
 import { ScanDataMatrix } from './Scanners/ScanDataMatrix';
 import { ScanDataMatrixReader } from './Scanners/ScanDataMatrixReader';
@@ -22,9 +20,9 @@ interface IProps {
 }
 
 export const InventoryLine = ({ item, onSetLine }: IProps) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
+  // const navigation = useNavigation();
+  // const dispatch = useDispatch();
+  // const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
@@ -50,20 +48,6 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
-
-  // const handleDelete = useCallback(() => {
-  //   !!mode &&
-  //     Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-  //       {
-  //         text: 'Удалить',
-  //         onPress: () => {
-  //           dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
-  //           navigation.goBack();
-  //         },
-  //       },
-  //       { text: 'Отмена' },
-  //     ]);
-  // }, [dispatch, docId, item.id, mode, navigation]);
 
   const handleEIDScanned = (data: string) => {
     setDoScanned(false);
@@ -162,10 +146,8 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
     position: 'absolute',
-    // top: 5,
     right: -10,
     zIndex: 5,
-    // width: '100%',
   },
   new: {
     width: '90%',
@@ -173,7 +155,6 @@ const localStyles = StyleSheet.create({
   details: {
     flex: 1,
     margin: 5,
-    // alignItems: 'center',
     justifyContent: 'center',
   },
 });

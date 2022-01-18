@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Snackbar } from 'react-native-paper';
+import { Snackbar, useTheme } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
@@ -40,6 +40,7 @@ const MapScreen = () => {
   const [message, setMessage] = useState('');
 
   const dispatch = useDispatch();
+  const { colors } = useTheme();
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
@@ -50,19 +51,28 @@ const MapScreen = () => {
     .selectByDocType<IRouteDocument>('route')
     ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
-  const currentList: IListItem[] = routeList.map((item) => ({
-    id: item.id,
-    value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
-  }));
+  const currentList: IListItem[] = useMemo(() => {
+    const newCurrentList = routeList.map((item) => ({
+      id: item.id,
+      value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
+    }));
+    return newCurrentList;
+  }, [routeList]);
 
   const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
+  const [newSelectedRoute, setNewSelectedRoute] = useState(selectedRoute);
+
   const routeRef = useRef<BottomSheetModal>(null);
 
   const handlePresentRoute = useCallback(() => {
     routeRef.current?.present();
   }, [routeRef]);
 
-  const selectedItem = routeList.find((item) => item.id === selectedRoute.id);
+  const selectedItem = useMemo(
+    () => routeList.find((item) => item.id === selectedRoute?.id) || '',
+    [routeList, selectedRoute?.id],
+  );
+
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
       const initialList: ILocation[] = selectedItem.lines.map((e) => {
@@ -79,6 +89,10 @@ const MapScreen = () => {
       dispatch(geoActions.addMany(initialList));
     }
   }, [dispatch, outlets, selectedItem]);
+
+  useEffect(() => {
+    initLocations();
+  }, [initLocations]);
 
   const list = (useSelector((state) => state.geo)?.list || [])?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo?.currentPoint);
@@ -198,18 +212,23 @@ const MapScreen = () => {
     setCurrentPoint(props);
   };
 
-  const handleDismissRoute = () => routeRef.current?.dismiss();
+  const handleDismissRoute = () => {
+    routeRef.current?.dismiss();
+    setNewSelectedRoute(selectedRoute);
+  };
 
   const handleApplyRoute = () => {
     routeRef.current?.dismiss();
+    setSelectedRoute(newSelectedRoute);
     initLocations();
+    dispatch(geoActions.setCurrentPoint(undefined));
   };
 
   return (
     <View style={localStyles.containerMap}>
       {loading && (
         <View style={localStyles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
       <MapView
@@ -222,8 +241,8 @@ const MapScreen = () => {
           <Marker
             key={point.id}
             coordinate={point.coords}
-            title={point.name}
-            description={point.id}
+            title={currentPoint?.name}
+            description={`${point.coords.latitude}, ${point.coords.longitude}`}
             pinColor={point.id === 'current' ? 'blue' : 'red'}
             onPress={() => handleClickMarker(point)}
           >
@@ -243,21 +262,23 @@ const MapScreen = () => {
         ))}
         <Polyline coordinates={list.map((e) => e.coords)} />
       </MapView>
-      {selectedItem && (
+      {selectedItem ? (
         <View style={localStyles.statusContainer}>
-          <View style={{ width: '80%' }}>
+          <View style={localStyles.routeWidth}>
             <Text style={localStyles.routeName}>
               Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}
+              {/* {selectedRoute.value} */}
             </Text>
             {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
           </View>
           <View>
             <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-              <MaterialCommunityIcons style={localStyles.routeIcon} name="arrow-decision" size={30} color="#000" />
+              {/* <MaterialCommunityIcons style={localStyles.routeIcon} name="cached" size={25} color="#000" /> */}
+              <MaterialCommunityIcons style={localStyles.routeIcon} name="autorenew" size={25} color="#000" />
             </TouchableOpacity>
           </View>
         </View>
-      )}
+      ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
@@ -288,8 +309,8 @@ const MapScreen = () => {
       >
         <RadioGroup
           options={currentList}
-          onChange={(option) => setSelectedRoute(option)}
-          activeButtonId={selectedItem?.id}
+          onChange={(option) => setNewSelectedRoute(option)}
+          activeButtonId={newSelectedRoute?.id}
         />
       </BottomSheet>
 

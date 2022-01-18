@@ -3,7 +3,7 @@ import { Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 
-import SwipeItem from './SwipeItem';
+import { SwipeItem } from '@lib/mobile-ui';
 
 interface IProps {
   children?: ReactNode;
@@ -20,15 +20,19 @@ const SwipeLineItem = ({ children, docId, item, readonly, edit, copy, del, route
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const handlePressSwipeOrder = (name: 'edit' | 'copy' | 'delete', id: string) => {
+  const handleSwipe = (name: 'edit' | 'copy' | 'delete', isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate(routeName, { mode: 0, docId, item });
+      navigation.navigate(routeName as never, { mode: 0, docId, item } as never);
     } else if (name === 'delete') {
+      if (isBlocked) {
+        return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);
+      }
+
       Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
         {
           text: 'Да',
           onPress: async () => {
-            dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
+            dispatch(documentActions.removeDocumentLine({ docId, lineId: item.id }));
           },
         },
         {
@@ -39,7 +43,7 @@ const SwipeLineItem = ({ children, docId, item, readonly, edit, copy, del, route
   };
 
   return !readonly ? (
-    <SwipeItem onPress={(name) => handlePressSwipeOrder(name, item.id)} edit={edit} copy={copy} del={del}>
+    <SwipeItem onPress={(name) => handleSwipe(name)} edit={edit} copy={copy} del={del}>
       <View>{children}</View>
     </SwipeItem>
   ) : (

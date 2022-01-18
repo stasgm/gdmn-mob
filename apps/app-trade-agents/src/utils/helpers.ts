@@ -32,4 +32,14 @@ const isNamedEntity = (obj: any): obj is INamedEntity => {
   return typeof obj === 'object' && 'name' in obj;
 };
 
-export { getDateString, extraPredicate, isNamedEntity };
+const getTimeProcess = (db: string, de?: string) => {
+  const diffMinutes = Math.floor(((de ? Date.parse(de) : Date.now()) - Date.parse(db)) / 60000);
+  const hour = Math.floor(diffMinutes / 60);
+  return `${hour} часов ${diffMinutes - hour * 60} минут`;
+};
+
+const twoDigits = (value: number) => {
+  return value >= 10 ? value : `0${value}`;
+};
+
+export { getDateString, extraPredicate, isNamedEntity, getTimeProcess, twoDigits };

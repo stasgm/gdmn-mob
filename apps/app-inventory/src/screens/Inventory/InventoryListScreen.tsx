@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -11,7 +12,6 @@ import {
   SubTitle,
   AddButton,
   FilterButtons,
-  SwipeListItem,
   ScreenListItem,
   IListItemProps,
 } from '@lib/mobile-ui';
@@ -19,7 +19,11 @@ import {
 import { docSelectors, useSelector } from '@lib/store';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { IInventoryDocument } from '../../store/types';
+import SwipeListItem from '../../components/SwipeListItem';
+import { InventorysStackParamList } from '../../navigation/Root/types';
 
 export interface InventoryListProps {
   orders: IListItemProps[];
@@ -31,7 +35,7 @@ export interface InventoryListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, InventoryListSectionProps>[];
 
 export const InventoryListScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
 
   const { loading } = useSelector((state) => state.documents);
 
@@ -107,7 +111,7 @@ export const InventoryListScreen = () => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="InventoryView">
-        <ScreenListItem {...item} routeName="InventoryView" />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('InventoryView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

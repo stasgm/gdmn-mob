@@ -26,7 +26,7 @@ const ConfigScreen = (props: Props) => {
   const [timeout] = useState(settings?.timeout?.toString() || '');
   const [deviceId, setDeviceId] = useState(settings?.deviceId || '');
 
-  const handleSaveSettings = () => {
+  const handleSaveConfig = () => {
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
     const protocol: string = match?.[1] || '';
     const server: string = match?.[2] || '';
@@ -55,7 +55,7 @@ const ConfigScreen = (props: Props) => {
       <View style={localStyles.buttonsView}>
         <PrimeButton
           icon="check"
-          onPress={handleSaveSettings}
+          onPress={handleSaveConfig}
           style={localStyles.button}
           disabled={!serverName || !serverPort || !timeout}
         >

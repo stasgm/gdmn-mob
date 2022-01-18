@@ -3,8 +3,6 @@ import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as u
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore /* , RootState */ } from '@lib/store';
 
-import { persistStore } from 'redux-persist';
-
 import docsReducer from './docs/reducer';
 import geoReducer from './geo/reducer';
 import { DocActionType } from './docs/actions';
@@ -19,7 +17,6 @@ export const combinedReducer = {
 const rootReducer = combineReducers(combinedReducer);
 
 export const { store } = configureStore(combinedReducer);
-export const persistor = persistStore(store);
 
 export type AppState = ReturnType<typeof rootReducer>; // & RootState;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

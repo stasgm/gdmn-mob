@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { RouteProp, useRoute, useScrollToTop } from '@react-navigation/native';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
@@ -60,20 +60,29 @@ const RouteViewScreen = () => {
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
       const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
-      const geoRes = dispatch(actions.geoActions.removeMany(geoList));
+      dispatch(actions.geoActions.removeMany(geoList));
       if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
         navigation.goBack();
       }
-      console.log('geoList', geoRes);
     };
-    deleteRoute();
-    //dispatch(documentActions.removeDocument(id));
+
+    Alert.alert('Вы уверены, что хотите удалить маршрут и его документы?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          deleteRoute();
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
   }, [dispatch, docDispatch, geoList, id, navigation, orderList, returnList, visitList]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Удалить',
+        title: 'Удалить маршрут и его документы',
         type: 'destructive',
         onPress: handleDelete,
       },

@@ -5,7 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { styles } from '../styles';
+import { DocumentsTabsStackParamsList } from '../../../navigation/Root/types';
 
 interface IField {
   name: keyof IDocument;
@@ -24,7 +27,7 @@ type typeValue = 'number' | 'date' | 'INamedEntity' | 'string';
 
 const DocumentItem = ({ item, fields }: { item: IDocument; fields: IFields }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<DocumentsTabsStackParamsList>>();
 
   //TODO вынести в отдельное место от компонента
   //функция для приведения других типов к строке

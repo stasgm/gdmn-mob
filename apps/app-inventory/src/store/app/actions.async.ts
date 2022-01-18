@@ -2,10 +2,10 @@ import { useDispatch } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { ActionType } from 'typesafe-actions';
 
-import { AppThunk, IMDGoodRemain, IModelData } from '../types';
+import { AppThunk } from '../types';
 
 import { actions, AppInventoryActionType } from './actions';
-import { AppInventoryState } from './types';
+import { AppInventoryState, IMDGoodRemain, IModelData } from './types';
 
 export type appInventoryDispatch = ThunkDispatch<AppInventoryState, any, AppInventoryActionType>;
 

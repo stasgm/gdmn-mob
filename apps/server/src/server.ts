@@ -13,6 +13,7 @@ import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
 import serve from 'koa-static-server';
+import historyApiFallback from 'koa2-connect-history-api-fallback';
 
 import { IUser } from '@lib/types';
 
@@ -114,9 +115,9 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         // origin: 'http://localhost:8080',
       }),
     )
-
-    .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
     .use(router.routes())
+    .use(historyApiFallback({ index: '/admin/index.html' }))
+    .use(serve({ rootDir: 'admin', rootPath: '/admin' }))
     .use(router.allowedMethods());
 
   return app;

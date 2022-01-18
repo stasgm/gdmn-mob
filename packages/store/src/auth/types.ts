@@ -8,9 +8,13 @@ export type AuthState = {
   readonly device: IDevice | undefined;
   readonly company: ICompany | undefined;
   readonly userToken: string | undefined;
-  readonly settings: IApiConfig;
+  readonly config: IApiConfig;
+  readonly connectionStatus: ConnectionStatus;
+  readonly isDemo: boolean;
+  readonly isInit: boolean;
   readonly loading: boolean;
+  readonly loadingData: boolean;
+  readonly loadErrorList: string[];
   readonly error: boolean;
   readonly status: string;
-  readonly connectionStatus: ConnectionStatus;
 };

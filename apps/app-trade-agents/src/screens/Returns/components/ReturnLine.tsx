@@ -1,14 +1,11 @@
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator } from '@lib/mobile-ui';
-import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ScrollView, TextInput, View, Text, Alert } from 'react-native';
+import { ScrollView, TextInput, View, Text } from 'react-native';
 
-import { ReturnsStackParamList } from '../../../navigation/Root/types';
-
-import { IGood, IReturnLine } from '../../../store/types';
+import { IReturnLine } from '../../../store/types';
 
 interface IProps {
   item: IReturnLine;
@@ -16,11 +13,6 @@ interface IProps {
 }
 
 const ReturnLine = ({ item, onSetLine }: IProps) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  const { docId, mode } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnLine'>>().params;
-
   const [goodQty, setGoodQty] = useState<string>(item.quantity.toString());
 
   const { colors } = useTheme();
@@ -39,30 +31,14 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   useEffect(() => {
     //TODO временное решение
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 500);
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
   }, []);
-
-  const handleDelete = useCallback(() => {
-    !!mode &&
-      Alert.alert('Предупреждение', 'Вы действительно хотите удалить позицию?', [
-        {
-          text: 'Удалить',
-          onPress: () => {
-            dispatch(documentActions.deleteDocumentLine({ docId, lineId: item.id }));
-            navigation.goBack();
-          },
-        },
-        { text: 'Отмена' },
-      ]);
-  }, [dispatch, docId, item.id, mode, navigation]);
 
   useEffect(() => {
     onSetLine({ ...item, quantity: parseFloat(goodQty) });
     //TODO Исправить
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
-
-  const priceFSN = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
 
   const qtyRef = useRef<TextInput>(null);
 
@@ -82,7 +58,9 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           <View style={[styles.item, { backgroundColor: colors.background }]}>
             <View style={styles.details}>
               <Text style={[styles.name, { color: colors.text }]}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{priceFSN.toString()}</Text>
+              <Text style={[styles.number, styles.field, { color: colors.text }]}>
+                {item.priceFromSellBill?.toString()}
+              </Text>
             </View>
           </View>
           <ItemSeparator />
@@ -109,7 +87,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
                 keyboardType="numeric"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
-                // autoFocus={isFocused}
+                autoFocus={true}
                 value={goodQty}
               />
             </View>
@@ -117,11 +95,6 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
         </View>
         <ItemSeparator />
       </ScrollView>
-      {/* {mode ? (
-        <PrimeButton icon="delete" onPress={handleDelete} outlined>
-          Удалить позицию
-        </PrimeButton>
-      ) : null} */}
     </>
   );
 };

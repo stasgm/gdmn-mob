@@ -2,8 +2,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
-// import colors from '../../styles/colors';
-
 import styles from './styles';
 
 interface Props {
@@ -50,6 +48,8 @@ const SelectableInput: React.FC<Props> = ({
           right={!disabled && <TextInput.Icon name="chevron-right" style={{ marginTop: 14 }} onPress={onPress} />}
           editable={editable}
           disabled={disabled}
+          children={undefined}
+          autoComplete={undefined}
         />
       </View>
     </View>

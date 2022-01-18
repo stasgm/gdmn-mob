@@ -49,7 +49,7 @@ function SellBillScreen() {
   const formParams = useSelector((state) => state.app.formParams);
   const { userToken } = useSelector((state) => state.auth);
 
-  const sellBilSettings = useSelector((state) => state.auth);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   const {
     dateBegin: docDateBegin,
@@ -59,14 +59,6 @@ function SellBillScreen() {
     return formParams as ISellBillFormParam;
   }, [formParams]);
 
-  console.log('good', docGood);
-
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(appActions.clearFormParams());
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const returnDocTime = (settings.returnDocTime as ISettingsOption<number>).data || 0;
   const serverName = (settings.serverName as ISettingsOption<string>).data || 0;
@@ -197,7 +189,7 @@ function SellBillScreen() {
     if (!(docDateBegin && docDateEnd && docGood && outletId)) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
-    if (sellBilSettings.settings.debug?.isMock) {
+    if (isDemo) {
       const mockSellBills: ISellBill[] = [
         {
           ID: '1246759230',
@@ -207,7 +199,7 @@ function SellBillScreen() {
           DEPARTNAME: 'Магазин-склад',
           DEPARTKEY: '323658854',
           DOCUMENTDATE: '2021-04-27T21:00:00.000Z',
-          QUANTITY: 4.95,
+          QUANTITY: 4.9511,
           PRICE: 5.35,
         },
         {
@@ -297,7 +289,7 @@ function SellBillScreen() {
     <AppScreen style={localStyles.appScreen}>
       <View style={localStyles.title}>
         <SubTitle>{statusName}</SubTitle>
-        {loading ? <ActivityIndicator size="small" color="#70667D" /> : <View style={localStyles.blank} />}
+        {loading ? <ActivityIndicator size="small" color={colors.primary} /> : <View style={localStyles.blank} />}
       </View>
       <Divider />
       <SelectableInput label="Дата начала" value={getDateString(docDateBegin || '')} onPress={handlePresentDateBegin} />

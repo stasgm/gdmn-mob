@@ -1,10 +1,14 @@
 import React, { useLayoutEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
 import { v4 as uuid } from 'uuid';
+
+import { useTheme } from 'react-native-paper';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -16,7 +20,8 @@ import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
+  const { colors } = useTheme();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
@@ -46,10 +51,7 @@ const RouteDetailScreen = () => {
   const outlet = point
     ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
     : undefined;
-  // const outlet = (outletRefMock as IReference<IOutlet>).data?.find((item) => item.id === point.outlet.id);
-  // const contact = outlet
-  //   ? (contactRefMock as IReference<IContact>).data?.find((item) => item.id === outlet?.company.id)
-  //   : undefined;
+
   const contact = outlet
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
     : undefined;
@@ -96,22 +98,12 @@ const RouteDetailScreen = () => {
 
     dispatch(documentActions.addDocument(newVisit));
 
-    // dispatch(
-    //   documentActions.addDocument({
-    //     id: `${id}${date}`,
-    //     routeLineId: Number(id),
-    //     dateBegin: date,
-    //     beginGeoPoint: coords,
-    //     takenType: 'ON_PLACE',
-    //   }),
-    // );
-
     setProcess(false);
   };
 
   return (
     <AppScreen style={styles.contentTop}>
-      <InfoBlock colorLabel="#4479D4" title={point.outlet.name}>
+      <InfoBlock colorLabel={colors.placeholder} title={point.outlet.name}>
         <>
           {outlet && (
             <>
@@ -122,7 +114,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? '#FC3F4D' : '#00C322'}
+        colorLabel={debt.saldo > 0 ? colors.error : '#a91160'}
         title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>
@@ -134,9 +126,7 @@ const RouteDetailScreen = () => {
           )}
         </>
       </InfoBlock>
-      {process ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : visits.length > 0 ? (
+      {visits.length > 0 ? (
         <>
           {visits.map((visit) => (
             <Visit

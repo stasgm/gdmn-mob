@@ -8,8 +8,7 @@ import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine } from '../../store/types';
-
-import { InventoryLine } from './components/InventoryLine';
+import { InventoryLine } from '../../components/InventoryLine';
 
 export const InventoryLineScreen = () => {
   const navigation =
@@ -38,6 +37,10 @@ export const InventoryLineScreen = () => {
       ),
     });
   }, [navigation, handleSave]);
+
+  Object.entries(line)?.map(([key, value]) => {
+    console.log('key', key, 'value', value);
+  });
 
   return (
     <View style={[styles.container]}>

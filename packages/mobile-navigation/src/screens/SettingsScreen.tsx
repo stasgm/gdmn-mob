@@ -1,44 +1,50 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, Text } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { settingsActions, useDispatch, useSelector } from '@lib/store';
+import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, DrawerButton, MenuButton, useActionSheet, SettingsGroup } from '@lib/mobile-ui';
-import { INamedEntity, ISettingsOption, SettingValue } from '@lib/types';
+import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
 
 const SettingsSceen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
+  const data = useSelector((state) => state.settings.data);
+  const config = useSelector((state) => state.auth.config);
 
-  const { data } = useSelector((state) => state.settings);
-  const { settings } = useSelector((state) => state.auth);
-  /////
-  // const settingList = useMemo(() => {
-  //   return Object.entries(data)
-  //     .map(([key, value]) => ({ ...value, setName: key } as SettingListItem))
-  //     .filter((i) => i.visible);
-  // }, [data]);
-
-  Object.entries(data).forEach((item) => {
-    if (!item[1]?.group) {
-      item[1]!.group = { id: '1', name: 'Настройки приложения', sortOrder: 1 };
-    }
-  });
-
-  const parents = Object.entries(data).reduce(
-    (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-      const obj = cur[1];
-
-      if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+  const settsData = useMemo(
+    () =>
+      Object.entries(data).reduce((prev: Settings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+        if (cur[1]) {
+          const newCur = cur[1]?.group ? cur[1] : { ...cur[1], group: baseSettingGroup };
+          prev[cur[0]] = newCur;
+        }
         return prev;
-      }
-
-      return [...prev, obj.group];
-    },
-    [],
+      }, {}),
+    [data],
   );
+
+  //Массив уникальных групп настроек
+  const parents = useMemo(
+    () =>
+      Object.entries(settsData).reduce(
+        (prev: INamedEntity[], cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+          const obj = cur[1];
+
+          if (obj?.group === undefined || prev.find((gr) => gr.id === obj?.group?.id)) {
+            return prev;
+          }
+
+          return [...prev, obj.group];
+        },
+        [],
+      ),
+    [settsData],
+  );
+  //console.log('SettS1', parents);
+  //console.log('SettS2', data);
 
   const handleUpdate = (optionName: string, value: ISettingsOption) => {
     dispatch(settingsActions.updateOption({ optionName, value }));
@@ -69,19 +75,7 @@ const SettingsSceen = () => {
     });
   }, [navigation, actionsMenu]);
 
-  const serverPath = `${settings?.protocol}${settings?.server}:${settings?.port}/${settings?.apiPath}`;
-
-  // const renderItem = ({ item }: { item: SettingListItem }) => (
-  //   <SettingsItem
-  //     key={item.id}
-  //     label={item.description || item.setName}
-  //     value={item.data}
-  //     onValueChange={(newValue) => {
-  //       const { setName, ...rest } = item;
-  //       handleUpdate(item.setName, { ...rest, data: newValue });
-  //     }}
-  //   />
-  // );
+  const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
   return (
     <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
@@ -92,55 +86,21 @@ const SettingsSceen = () => {
           <Text style={styles.name}>Путь к серверу</Text>
           <Text style={[styles.number, styles.field]}>{serverPath}</Text>
         </View>
-        <Divider />
-        <View style={styles.details}>
-          <Text style={styles.name}>Время ожидания ответа сервера, мс.</Text>
-          <Text style={[styles.number, styles.field]}>{settings?.timeout}</Text>
-        </View>
       </View>
       <View>
-        {/* <Text style={[styles.title]}>Настройки приложения</Text> */}
-        <Divider />
-        {/* <View>
-          {/* <View style={[localStyles.border, { borderColor: colors.primary }]}> *
-          {Object.entries(data)
-            .filter(([_, item]) => item?.visible)
-            .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0))
-            .map(([key, item]) => {
-              return item ? (
-                <View key={key}>
-                  <SettingsItem
-                    key={key}
-                    label={item.description || key}
-                    value={item.data}
-                    onValueChange={(newValue) => handleUpdate(key, { ...item, data: newValue })}
-                  />
-                  <Divider />
-                </View>
-              ) : null;
-            })}
-        </View> */}
         <View>
-          {parents.map((item, key) => {
-            return item ? (
-              <View key={key}>
-                <SettingsGroup
-                  key={key}
-                  group={item}
-                  data={data}
-                  onValueChange={(optionName, value) => handleUpdate(optionName, value)}
-                />
+          {parents.map((group, groupKey) => {
+            const list = Object.entries(settsData)
+              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
+              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+            return (
+              <View key={groupKey}>
+                <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
                 <Divider />
               </View>
-            ) : null;
+            );
           })}
         </View>
-        {/* <FlatList
-              data={settingList}
-              keyExtractor={(item, _) => item.id}
-              renderItem={renderItem}
-              ItemSeparatorComponent={Divider}
-            /> */}
       </View>
     </KeyboardAwareScrollView>
   );

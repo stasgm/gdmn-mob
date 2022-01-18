@@ -2,18 +2,20 @@ import { IApiConfig } from '@lib/client-types';
 import { IDevice, IUser, ICompany, DeviceState, IUserSettings } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
-import { ConnectionStatus } from './types';
+import { AuthState, ConnectionStatus } from './types';
 
 const init = createAction('AUTH/INIT')();
 const clearError = createAction('AUTH/CLEAR_ERROR')();
-
-const setSettings = createAction('AUTH/SET_SETTINGS')<IApiConfig>();
+const loadData = createAction('AUTH/LOAD_DATA')<AuthState>();
+const setConfig = createAction('AUTH/SET_CONFIG')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
-const disconnect = createAction('AUTH/DISCONNECT')();
-const setDemoMode = createAction('AUTH/SET_DEMO')();
-//const logout = createAction('AUTH/LOGOUT')(); // TODO Сделать sync c выходом пользователя на сервере
-const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
+const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
+const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
+const setDemoMode = createAction('AUTH/SET_DEMOMODE')();
+const setLoadingData = createAction('AUTH/SET_LOADING_DATA')<boolean>();
+const setLoadErrorList = createAction('AUTH/SET_LOAD_ERROR_LIST')<string>();
+const setInit = createAction('AUTH/SET_IS_INIT')<boolean>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
   string | undefined,
@@ -33,13 +35,19 @@ const loginUserAsync = createAsyncAction('AUTH/LOGIN', 'AUTH/LOGIN_SUCCESS', 'AU
   string
 >();
 
-const signUpAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUTH/SIGNUP_FAILURE')<
+const signupAsync = createAsyncAction('AUTH/SIGNUP', 'AUTH/SIGNUP_SUCCESS', 'AUTH/SIGNUP_FAILURE')<
   string | undefined,
   undefined,
   string
 >();
 
 const logoutUserAsync = createAsyncAction('AUTH/LOGOUT', 'AUTH/LOGOUT_SUCCESS', 'AUTH/LOGOUT_FAILURE')<
+  undefined,
+  undefined,
+  string
+>();
+
+const disconnectAsync = createAsyncAction('AUTH/DISCONNECT', 'AUTH/DISCONNECT_SUCCESS', 'AUTH/DISCONNECT_FAILURE')<
   undefined,
   undefined,
   string
@@ -63,23 +71,34 @@ const setUserSettingsAsync = createAsyncAction(
   'AUTH/SET_USER_SETTINGS_FAILURE',
 )<string, IUserSettings, string>();
 
+// const setDemoModeAsync = createAsyncAction(
+//   'AUTH/SET_DEMOMODE',
+//   'AUTH/SET_DEMOMODE_SUCCESS',
+//   'AUTH/SET_DEMOMODE_FAILURE',
+// )<string, undefined, string>();
+
 export const actions = {
   init,
+  loadData,
   clearError,
-  setSettings,
-  disconnect,
+  setConfig,
+  disconnectAsync,
   logoutUserAsync,
   setCompany,
   setUserToken,
   getDeviceByUidAsync,
   loginUserAsync,
-  signUpAsync,
+  signupAsync,
   activateDeviceAsync,
   getDeviceStatusAsync,
   setUserSettingsAsync,
   setConnectionStatus,
   getCompanyAsync,
   setDemoMode,
+  setLoading,
+  setLoadingData,
+  setLoadErrorList,
+  setInit,
 };
 
 export type AuthActionType = ActionType<typeof actions>;

@@ -20,6 +20,8 @@ import {
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 
+import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens/GoodMatrix';
+
 const orderListScreens = {
   OrderList: OrderListScreen,
 };
@@ -52,4 +54,21 @@ const routerScreen = {
   RouteDetails: RouteDetailsScreen,
 };
 
-export { orderListScreens, orderScreens, returnListScreens, returnScreens, routerScreen };
+const goodMatrixListScreens = {
+  ContactList: ContactListScreen,
+};
+
+const goodMatrixScreens = {
+  GoodList: GoodListScreen,
+  GoodLine: GoodLineScreen,
+};
+
+export {
+  orderListScreens,
+  orderScreens,
+  returnListScreens,
+  returnScreens,
+  routerScreen,
+  goodMatrixListScreens,
+  goodMatrixScreens,
+};

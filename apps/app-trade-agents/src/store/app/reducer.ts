@@ -5,9 +5,10 @@ import { actions, AppTradeActionType } from './actions';
 
 import { AppTradeState } from './types';
 
-const initialState: Readonly<AppTradeState> = {
+export const initialState: Readonly<AppTradeState> = {
   goodModel: {},
   loading: false,
+  loadingData: false,
   errorMessage: '',
 };
 
@@ -15,6 +16,15 @@ const reducer: Reducer<AppTradeState, AppTradeActionType> = (state = initialStat
   switch (action.type) {
     case getType(actions.init):
       return initialState;
+
+    case getType(actions.setLoading):
+      return { ...state, loading: action.payload };
+
+    case getType(actions.loadData):
+      return { ...action.payload, loading: false, errorMessage: '' };
+
+    case getType(actions.setLoadingData):
+      return { ...state, loadingData: action.payload };
 
     case getType(actions.setGoodModelAsync.request):
       return { ...state, loading: true, errorMessage: '' };

@@ -2,25 +2,38 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
-import { IReference, Settings } from '@lib/types';
-import { PersistGate } from 'redux-persist/integration/react';
-import { refSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
-import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { Caption } from 'react-native-paper';
+import {
+  appActions,
+  appSelectors,
+  authActions,
+  authSelectors,
+  refSelectors,
+  settingsActions,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
+import { AppScreen, globalStyles as styles, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
-import { persistor, store } from './src/store';
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
-import { IContact, IGood, IRemains, IMDGoodRemain, IMGoodData, IMGoodRemain, IModelData } from './src/store/types';
-import actions, { useAppInventoryThunkDispatch } from './src/store/app';
+import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
+
+import { IDepartment } from './src/store/types';
+import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains } from './src/store/app/types';
+import { appSettings } from './src/utils/constants';
 
 const Root = () => {
+  //const newDispatch = useDocDispatch();
+  //newDispatch(settingsActions.init());
+
   const navItems: INavItem[] = useMemo(
     () => [
       {
-        name: 'Inventorys',
-        title: 'Инвентаризации',
+        name: 'Inventory',
+        title: 'Инвентаризация',
         icon: 'file-document-outline',
         component: InventoryNavigator,
       },
@@ -28,104 +41,100 @@ const Root = () => {
     [],
   );
 
-  const appSettings: Settings = {
-    scannerUse: {
-      id: '4',
-      sortOrder: 4,
-      description: 'Использовать сканер',
-      data: true,
-      type: 'boolean',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-    weightCode: {
-      id: '5',
-      sortOrder: 5,
-      description: 'Идентификатор весового товара',
-      data: '22',
-      type: 'string',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-    countCode: {
-      id: '6',
-      sortOrder: 6,
-      description: 'Количество символов для кода товара',
-      data: 5,
-      type: 'number',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-    countWeight: {
-      id: '7',
-      sortOrder: 7,
-      description: 'Количество символов для веса (в гр.)',
-      data: 5,
-      type: 'number',
-      visible: true,
-      group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
-    },
-  };
-
-  const storeSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
   const appInventoryDispatch = useAppInventoryThunkDispatch();
+  const { colors } = useTheme();
+
+  //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const departments = refSelectors.selectByName<IDepartment>('department')?.data;
+  const remains = refSelectors.selectByName<IRemains>('remain')?.data;
+  const authLoading = useSelector((state) => state.auth.loading);
+  const appDataLoading = appSelectors.selectLoading();
+  const appLoading = useSelector((state) => state.app.loading);
+  const isLogged = authSelectors.isLoggedWithCompany();
+  const invLoading = useInvSelector((state) => state.appInventory.loading);
 
   useEffect(() => {
-    if (appSettings) {
-      Object.entries(appSettings).forEach(([optionName, value]) => {
-        const storeSet = storeSettings.data[optionName];
-        if (!storeSet && value) {
-          dispatch(settingsActions.addSetting({ optionName, value }));
-        }
-      });
+    if (appSettings && isInit) {
+      console.log('isInit', isInit);
+      dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeSettings]);
-
-  const goods = (refSelectors.selectByName('good') as IReference<IGood>)?.data;
-  const departments = (refSelectors.selectByName('contact') as IReference<IContact>)?.data;
-  const remains = (refSelectors.selectByName('remain') as IReference<IRemains>)?.data;
-
-  const [loading, setLoading] = useState(false);
+  }, [isInit]);
 
   useEffect(() => {
-    setLoading(true);
+    console.log('useEffect loadGlobalDataFromDisc');
+    // dispatch(authActions.init());
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (isLogged) {
+      console.log('useEffect loadSuperDataFromDisc');
+      dispatch(appActions.loadSuperDataFromDisc());
+    }
+  }, [dispatch, isLogged]);
+
+  useEffect(() => {
     const getRemainsModel = async () => {
+      if (!goods?.length || !departments?.length || !isLogged) {
+        return;
+      }
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
-        (contsprev: IModelData<IMDGoodRemain>, c: IContact) => {
-          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-            goodsprev[g.id] = {
-              ...g,
-              remains:
+        (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
+          const remGoods = goods
+            ?.reduce((goodsprev: IMGoodData<IRem>, g: IGood) => {
+              const rem =
                 remains
                   ?.find((r) => r.contactId === c.id)
                   ?.data?.filter((i) => i.goodId === g.id)
-                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
-            };
-            return goodsprev;
-          }, {});
+                  ?.map((r) => ({ price: r.price, remains: r.q })) || [];
+              goodsprev[g.id] = {
+                ...g,
+                ...rem[0],
+              };
+              return goodsprev;
+            }, {});
           contsprev[c.id] = { contactName: c.name, goods: remGoods };
           return contsprev;
         },
         {},
       );
-      await appInventoryDispatch(actions.setModel(model));
+      await appInventoryDispatch(appInventoryActions.setModel(model));
     };
+
     getRemainsModel();
-    setLoading(false);
-  }, [appInventoryDispatch, departments, goods, remains]);
-  return loading ? (
-    <Caption style={styles.text}>{loading ? 'Формирование данных...' : ''}</Caption>
+  }, [appInventoryDispatch, departments, goods, remains, isLogged]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    //Для отрисовки при первом подключении
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return authLoading || loading || appLoading || invLoading || appDataLoading ? (
+    <AppScreen>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+    </AppScreen>
   ) : (
     <MobileApp items={navItems} />
   );
 };
 
-export const App = () => (
+const App = () => (
   <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
+    <UIProvider theme={defaultTheme}>
       <Root />
-    </PersistGate>
+    </UIProvider>
   </Provider>
 );
+
+export default App;

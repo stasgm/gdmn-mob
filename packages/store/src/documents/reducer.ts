@@ -6,9 +6,11 @@ import { StatusType } from '@lib/types';
 import { DocumentState } from './types';
 import { DocumentActionType, actions } from './actions';
 
-const initialState: Readonly<DocumentState> = {
+export const initialState: Readonly<DocumentState> = {
   list: [],
   loading: false,
+  loadingData: false,
+  loadErrorList: [],
   errorMessage: '',
 };
 
@@ -16,6 +18,21 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
   switch (action.type) {
     case getType(actions.init):
       return initialState;
+
+    case getType(actions.setLoading):
+      return { ...state, loading: action.payload };
+
+    case getType(actions.setLoadingData):
+      return { ...state, loadingData: action.payload };
+
+    case getType(actions.setLoadErrorList):
+      return {
+        ...state,
+        loadErrorList: [...state.loadErrorList, action.payload],
+      };
+
+    case getType(actions.loadData):
+      return { ...action.payload, loading: false, errorMessage: '' };
 
     case getType(actions.setDocumentsAsync.request):
       return { ...state, loading: true, errorMessage: '' };
@@ -54,7 +71,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
             ? newDoc
             : newDoc.status === 'PROCESSED'
             ? {
-                ...oldDoc,
+                ...(newDoc.head ? newDoc : oldDoc),
                 status: 'PROCESSED' as StatusType,
               }
             : newDoc.status === 'PROCESSED_DEADLOCK' || newDoc.status === 'PROCESSED_INCORRECT'
@@ -100,15 +117,6 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         loading: false,
         errorMessage: action.payload || 'error',
       };
-
-    // case getType(actions.setDocuments):
-    //   return {
-    //     ...state,
-    //     list: action.payload.map((doc) => state.list.find((d) => d.id === doc.id && d.status !== 'DRAFT') || doc),
-    //   };
-
-    // case getType(actions.deleteDocuments):
-    //   return { ...state, list: [] };
 
     case getType(actions.addDocument):
       return {
@@ -191,7 +199,7 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         ),
       };
 
-    case getType(actions.deleteDocumentLine):
+    case getType(actions.removeDocumentLine):
       return {
         ...state,
         list: state.list.map((doc) =>

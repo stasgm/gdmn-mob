@@ -7,8 +7,8 @@ import { IconButton } from 'react-native-paper';
 
 import styles from '@lib/mobile-ui/src/styles/global';
 
-import { InventorysStackParamList } from '../../../../navigation/Root/types';
-import { IInventoryLine } from '../../../../store/types';
+import { InventorysStackParamList } from '../../navigation/Root/types';
+import { IInventoryLine } from '../../store/types';
 
 // import { useAppStore } from '../../../../store';
 

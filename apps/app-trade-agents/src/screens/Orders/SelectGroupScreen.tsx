@@ -7,7 +7,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
-import { IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
@@ -30,17 +29,20 @@ const Group = ({
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const groups = refSelectors.selectByName('goodGroup') as IReference<IGoodGroup>;
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+  const contactId =
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const groupsModel = goodModel[contact?.id || ''].goods[item.parent?.id || item.id] || {};
+  const onDate = goodModel[contactId].onDate;
+
+  const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
+
+  const groupsModel = goods[item.parent?.id || item.id];
 
   const goodsObj = groupsModel[item.id];
-
-  // console.log('goodsObj', goodsObj);
 
   const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
 
@@ -103,19 +105,20 @@ const SelectGroupScreen = () => {
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
-  const contact = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact;
+  const contactId =
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;
 
   const formParams = useSelector((state) => state.app.formParams);
 
   const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const groupsModel = goodModel[contact?.id || ''].goods;
+  const onDate = goodModel[contactId].onDate;
+
+  const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const firstLevelGroups = groups.data?.filter(
-    (item) => !item.parent && Object.keys(groupsModel[item.id] || []).length > 0,
-  );
+  const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
@@ -140,19 +143,6 @@ const SelectGroupScreen = () => {
       }),
     );
   };
-
-  // useEffect(() => {
-  //   if (formParams?.groupId !== expend?.id) {
-  //     console.log('useEffect setFormParams');
-  //     dispatch(
-  //       appActions.setFormParams({
-  //         ...formParams,
-  //         ['groupId']: expend?.id,
-  //       }),
-  //     );
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [dispatch, expend]);
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);

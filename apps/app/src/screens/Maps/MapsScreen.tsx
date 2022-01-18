@@ -6,6 +6,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
+import { useTheme } from 'react-native-paper';
+
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
 
@@ -31,6 +33,7 @@ const MapScreen = () => {
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
 
   // const [currentPoint, setCurrentPoint] = useState<ILocation>();
 
@@ -138,13 +141,9 @@ const MapScreen = () => {
     }
 
     let idx = list.findIndex((e) => e.id === currentPoint?.id);
-
     idx = idx >= 0 ? idx : 0;
-
     idx = idx <= 0 ? listLen - 1 : idx - 1;
-    console.log(idx);
 
-    // moveTo(list[idx].coords);
     setCurrentPoint(list[idx]);
   };
 
@@ -159,7 +158,7 @@ const MapScreen = () => {
       </View>
       {loading && (
         <View style={localStyles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0000ff" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       )}
       <MapView

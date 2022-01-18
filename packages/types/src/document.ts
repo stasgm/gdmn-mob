@@ -40,6 +40,8 @@ type MandateProps<T extends IEntity, K extends keyof T> = Omit<T, K> &
     [MK in K]-?: NonNullable<T[MK]>;
   };
 
+export type IDepartment = INamedEntity;
+
 // Examples
 
 // type IOrder = MandateProps<IDocument<IHead, ILine[]>, 'head' | 'lines'>;

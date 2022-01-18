@@ -4,10 +4,10 @@ import { Store } from 'redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import { authSelectors } from '@lib/store';
+import { appSelectors, authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
-import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
+import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 
 import { useSelector } from '@lib/store';
 
@@ -22,13 +22,14 @@ export interface IApp {
 
 const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
+  const config = useSelector((state) => state.auth.config);
 
-  const settings = useSelector( state => state.auth.settings );
+  const errorList = useSelector((state) => state.app.errorList);
+  console.log('errorList', errorList);
 
   useEffect(() => {
-    // authDispatch(authActions.init());
     // //При запуске приложения записываем настройки в апи
-    api.config = { ...api.config, ...settings };
+    api.config = { ...api.config, ...config };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -36,7 +37,9 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
-  const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
+
+  const Router = () =>
+    (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
   return store ? (
     <Provider store={store}>

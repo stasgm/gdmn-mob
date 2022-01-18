@@ -18,9 +18,11 @@ import actions from '../store/user';
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
 
+const avatar1 = require('../../assets/images/avatar1.svg');
+
 const userInfo = {
-  avatar: '/assets/images/avatar1.svg',
-  jobTitle: 'User',
+  avatar: avatar1,
+  jobTitle: 'Senior Developer',
   name: 'Katarina Smith',
 };
 
