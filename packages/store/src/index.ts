@@ -16,7 +16,7 @@ import { authMiddlewareFactory } from './auth/middleware';
 import { documentMiddlewareFactory } from './documents/middleware';
 import { referenceMiddlewareFactory } from './references/middleware';
 import { settingMiddlewareFactory } from './settings/middleware';
-// import { logMiddleware } from './logMiddleware';
+import { logMiddleware } from './logMiddleware';
 
 // const persistConfig = {
 //   key: 'config',

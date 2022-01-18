@@ -2135,7 +2135,7 @@ export const messageInventory: IMessage<MessageType>[] = [
     id: '147293383',
     status: 'READY',
     head: {
-      appSystem: 'app-inventory',
+      appSystem: 'gdmn-inventory',
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user1,
@@ -2424,8 +2424,8 @@ export const messageInventory: IMessage<MessageType>[] = [
           description: 'Остатки ТМЦ',
           data: [
             {
-              departmentId: '176424776',
-              onDate: new Date().toISOString(),
+              contactId: '176424776',
+              onDate: '2021-12-16',
               data: [
                 {
                   goodId: '153359486',

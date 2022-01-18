@@ -1,7 +1,27 @@
 import { INamedEntity } from '@lib/types';
 
+export type AppInventoryState = {
+  readonly model: IModelData<IMDGoodRemain>;
+  readonly loading: boolean;
+  readonly loadingData: boolean;
+  readonly errorMessage: string;
+};
+
+export interface IMDGoodRemain {
+  contactName: string;
+  goods: IMGoodData<IRem>;
+}
+
 export interface IModelData<T = unknown> {
   [id: string]: T;
+}
+
+export interface IMGoodData<T = unknown> {
+  [id: string]: T;
+}
+
+export interface IMGoodRemain extends IGood {
+  remains?: IModelRem[];
 }
 
 export interface IModelRem {
@@ -9,35 +29,21 @@ export interface IModelRem {
   q?: number;
 }
 
-export interface IMGoodRemain extends IGood {
-  remains?: IModelRem[];
+export interface IRem extends IGood {
+  remains?: number;
+  price?: number;
 }
 
-export interface IMGoodData<T = unknown> {
-  [id: string]: T;
+export interface IRemains {
+  contactId: string;
+  date: Date;
+  data: IRemainsData[];
 }
 
-export interface IMDGoodRemain {
-  contactName: string;
-  goods: IMGoodData<IMGoodRemain>;
-}
-
-export type AppInventoryState = {
-  readonly model: IModelData<IMDGoodRemain>;
-  readonly loading: boolean;
-  readonly errorMessage: string;
-};
-
-export interface IModel {
-  [contactId: string]: IParentGroupModel;
-}
-
-export interface IParentGroupModel {
-  [parentGroupId: string]: IGroupModel;
-}
-
-export interface IGroupModel {
-  [groupId: string]: IGood[];
+export interface IRemainsData {
+  goodId: string;
+  q?: number;
+  price?: number;
 }
 
 // Товары
@@ -51,9 +57,4 @@ export interface IGood extends INamedEntity {
   invWeight?: number; // Вес единицы товара
   price?: number; //Цена
   scale?: number; //количество единиц в месте
-}
-
-export interface IRem extends IGood {
-  remains?: number;
-  price?: number;
 }

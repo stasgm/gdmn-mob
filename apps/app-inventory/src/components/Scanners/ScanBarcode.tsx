@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { v4 as uuid } from 'uuid';
 import { IconButton } from 'react-native-paper';
@@ -16,7 +16,8 @@ import { INamedEntity, ISettingsOption } from '@lib/types';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument, IGood } from '../../store/types';
+import { IInventoryLine, IInventoryDocument } from '../../store/types';
+import { IRem } from '../../store/app/types';
 
 const oneSecund = 1000;
 
@@ -43,7 +44,20 @@ export const ScanBarcodeScreen = (props: any) => {
     .selectByDocType<IInventoryDocument>('inventory')
     ?.find((e) => e.id === docId) as IInventoryDocument;
 
-  const goods = model[document?.head?.department?.id || ''].goods;
+  // const goods = document?.head?.department?.id ? model[document.head.department.id]?.goods : {};
+
+  const goodRemains: IRem[] = useMemo(() => {
+    if (!document?.head?.department?.id) {
+      return [];
+    }
+
+    const goods = model[document?.head?.department?.id]?.goods;
+    if (!goods) {
+      return [];
+    }
+
+    return Object.values(goods);
+  }, [document?.head?.department, model]);
 
   useEffect(() => {
     const permission = async () => {
@@ -78,24 +92,26 @@ export const ScanBarcodeScreen = (props: any) => {
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem =
-          goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown') || ''];
+        const remItem = goodRemains.find((item) => item.barcode === brc || item.id === 'unknown');
+        // goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown') || ''];
         // Находим товар из модели остатков по баркоду, если баркод не найден, ищем товар с id равным unknown и добавляем в позицию документа
         // Если таких товаров нет, то товар не найден
+
+        console.log('remItem', remItem);
 
         if (!remItem) {
           return;
         }
 
-        const { remains, ...good } = remItem;
+        // const { remains, ...good } = remItem;
 
         return {
-          good: { id: good.id, name: good.name } as INamedEntity,
+          good: { id: remItem.id, name: remItem.name } as INamedEntity,
           id: uuid(),
           quantity: 1,
-          price: remains?.length ? remains[0].price : 0,
-          remains: remains?.length ? remains?.[0].q : 0,
-          barcode: good.id === 'unknown' ? barcode : good.barcode,
+          price: remItem.price || 0,
+          remains: remItem.remains || 0,
+          barcode: remItem.id === 'unknown' ? barcode : remItem.barcode,
         };
       }
 
@@ -108,21 +124,21 @@ export const ScanBarcodeScreen = (props: any) => {
 
       const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
 
-      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code) || ''];
+      const remItem = goodRemains.find((item) => item.weightCode === code);
 
       if (!remItem) {
         return;
       }
 
-      const { remains, ...good } = remItem;
+      // const { remains, ...good } = remItem;
 
       return {
-        good: { id: good.id, name: good.name } as INamedEntity,
+        good: { id: remItem.id, name: remItem.name } as INamedEntity,
         id: uuid(),
         quantity: qty,
-        price: remains?.length ? remains[0].price : 0,
-        remains: remains?.length ? remains?.[0].q : 0,
-        barcode: good.barcode,
+        price: remItem.price || 0,
+        remains: remItem.remains || 0,
+        barcode: remItem.barcode,
       };
     };
     vibroMode && Vibration.vibrate(oneSecund);
@@ -134,7 +150,7 @@ export const ScanBarcodeScreen = (props: any) => {
   }, [
     barcode,
     scanned,
-    goods,
+    goodRemains,
     vibroMode,
     weightSettingsWeightCode,
     weightSettingsCountCode,
