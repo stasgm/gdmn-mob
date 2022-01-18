@@ -11,8 +11,12 @@ import actions from '../../store/device';
 
 import activationCodeSelectors from '../../store/activationCode/selectors';
 
+export type Params = {
+  id: string;
+};
+
 const DeviceEdit = () => {
-  const { id: deviceId } = useParams();
+  const { id: deviceId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 

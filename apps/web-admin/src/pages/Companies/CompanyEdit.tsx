@@ -8,8 +8,12 @@ import actions from '../../store/company';
 import selectors from '../../store/company/selectors';
 import SnackBar from '../../components/SnackBar';
 
+export type Params = {
+  id: string;
+};
+
 const CompanyEdit = () => {
-  const { id: companyId } = useParams();
+  const { id: companyId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 

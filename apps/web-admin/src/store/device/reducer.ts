@@ -108,6 +108,19 @@ const reducer: Reducer<IDeviceState, DeviceActionType> = (state = initialState, 
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
+    case getType(deviceActions.setPageParam):
+      return {
+        ...state,
+        pageParams: { ...state.pageParams, ...action.payload },
+      };
+
+    case getType(deviceActions.clearPageParams):
+      return {
+        ...state,
+        pageParams: undefined,
+      };
+
     default:
       return state;
   }

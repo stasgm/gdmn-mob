@@ -1,6 +1,8 @@
 import { IDeviceBinding } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
+import { IPageParam } from '../../types';
+
 const init = createAction('DEVICEBINDING/INIT')();
 const clearError = createAction('DEVICEBINDING/CLEAR_ERROR')();
 
@@ -34,12 +36,17 @@ const removeDeviceBindingAsync = createAsyncAction(
   'DEVICEBINDING/REMOVE_FAILURE',
 )<string | undefined, undefined, string>();
 
+const setPageParam = createAction('DEVICEBINDING/SET_PARAM')<IPageParam | undefined>();
+const clearPageParams = createAction('DEVICEBINDING/CLEAR_PARAMS')();
+
 export const deviceBindingActions = {
   fetchDeviceBindingsAsync,
   fetchDeviceBindingAsync,
   addDeviceBindingAsync,
   updateDeviceBindingAsync,
   removeDeviceBindingAsync,
+  clearPageParams,
+  setPageParam,
   clearError,
   init,
 };

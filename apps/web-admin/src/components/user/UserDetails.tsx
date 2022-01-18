@@ -53,11 +53,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     setOpen(true);
   };
 
-  // const handleClickClose = () => {
-  //   setOpen(false);
-  //   formik.values.password = '';
-  // };
-
   return (
     <>
       <Box
@@ -128,6 +123,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
+                  {/* <TextField */}
                   <TextField
                     error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                     fullWidth
@@ -147,6 +143,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     fullWidth
                     label="Email"
                     name="email"
+                    placeholder="email@example.com"
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}

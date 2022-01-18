@@ -21,6 +21,7 @@ import actions from '../../store/user';
 import selectors from '../../store/user/selectors';
 import bindingSelectors from '../../store/deviceBinding/selectors';
 import bindingActions from '../../store/deviceBinding';
+import codeActions from '../../store/activationCode';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 import UserDetailsView from '../../components/user/UserDetailsView';
@@ -29,8 +30,12 @@ import SnackBar from '../../components/SnackBar';
 
 import { adminPath } from '../../utils/constants';
 
+export type Params = {
+  id: string;
+};
+
 const UserView = () => {
-  const { id: userId } = useParams();
+  const { id: userId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 
@@ -64,6 +69,8 @@ const UserView = () => {
   const refreshData = useCallback(() => {
     dispatch(actions.fetchUserById(userId));
     dispatch(bindingActions.fetchDeviceBindings(userId));
+    dispatch(codeActions.fetchActivationCodes());
+
     // dispatch(deviceActions.fetchDevices());
   }, [dispatch, userId]);
 
@@ -152,7 +159,11 @@ const UserView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить пользователя?</DialogContentText>
+            <DialogContentText color="black">
+              {user.role === 'Admin'
+                ? 'Вы действительно хотите удалить пользователя, являющегося администратором?'
+                : 'Вы действительно хотите удалить пользователя?'}
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDelete} color="primary" variant="contained">

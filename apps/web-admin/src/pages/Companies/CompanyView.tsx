@@ -29,8 +29,12 @@ import userSelectors from '../../store/user/selectors';
 
 import { adminPath } from '../../utils/constants';
 
+export type Params = {
+  id: string;
+};
+
 const CompanyView = () => {
-  const { id: companyId } = useParams();
+  const { id: companyId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 
@@ -39,6 +43,7 @@ const CompanyView = () => {
   const { loading, errorMessage } = useSelector((state) => state.companies);
 
   const company = companySelectors.companyById(companyId);
+
   const users = userSelectors.usersByCompanyId(companyId);
 
   const [open, setOpen] = useState(false);
@@ -70,6 +75,13 @@ const CompanyView = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  // const fetchUsers = useCallback(
+  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
+  //     dispatch(userActions.fetchUsers(companyId, filterText, fromRecord, toRecord));
+  //   },
+  //   [companyId, dispatch],
+  // );
 
   const refreshData = useCallback(() => {
     dispatch(actions.fetchCompanyById(companyId));
@@ -127,7 +139,7 @@ const CompanyView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить организацию?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить компанию?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDelete} color="primary" variant="contained">

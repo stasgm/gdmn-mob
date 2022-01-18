@@ -36,7 +36,7 @@ const TotalUsers = (props: IProps) => {
             </Avatar>
           </Grid>
         </Grid>
-        <Box
+        {/* <Box
           sx={{
             alignItems: 'center',
             display: 'flex',
@@ -56,7 +56,7 @@ const TotalUsers = (props: IProps) => {
           <Typography color="textSecondary" variant="caption">
             За последний месяц
           </Typography>
-        </Box>
+        </Box> */}
       </CardContent>
     </Card>
   );

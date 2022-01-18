@@ -1,6 +1,8 @@
 import { ICompany } from '@lib/types';
 import { ActionType, createAction, createAsyncAction } from 'typesafe-actions';
 
+import { IPageParam } from '../../types';
+
 const init = createAction('COMPANY/INIT')();
 const clearError = createAction('COMPANY/CLEAR_ERROR')();
 const setError = createAction('COMPANY/SET_ERROR')();
@@ -35,12 +37,17 @@ const removeCompanyAsync = createAsyncAction('COMPANY/REMOVE', 'COMPANY/REMOVE_S
   string
 >();
 
+const setPageParam = createAction('COMPANY/SET_PARAM')<IPageParam | undefined>();
+const clearPageParams = createAction('COMPANY/CLEAR_PARAMS')();
+
 export const companyActions = {
   fetchCompaniesAsync,
   fetchCompanyAsync,
   addCompanyAsync,
   updateCompanyAsync,
   removeCompanyAsync,
+  clearPageParams,
+  setPageParam,
   clearError,
   init,
   setError,

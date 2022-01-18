@@ -9,8 +9,12 @@ import SnackBar from '../../components/SnackBar';
 import actions from '../../store/deviceBinding';
 import selectors from '../../store/deviceBinding/selectors';
 
+export type Params = {
+  bindingid: string;
+};
+
 const UserDeviceEdit = () => {
-  const { bindingid } = useParams();
+  const { bindingid } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
 
   const dispatch: AppDispatch = useDispatch();

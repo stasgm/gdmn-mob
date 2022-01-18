@@ -8,6 +8,7 @@ const initialState: Readonly<ICompanyState> = {
   list: [],
   loading: false,
   errorMessage: '',
+  pageParams: undefined,
 };
 
 const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState, action): ICompanyState => {
@@ -111,6 +112,19 @@ const reducer: Reducer<ICompanyState, CompanyActionType> = (state = initialState
         loading: false,
         errorMessage: action.payload || 'error',
       };
+
+    case getType(companyActions.setPageParam):
+      return {
+        ...state,
+        pageParams: { ...state.pageParams, ...action.payload },
+      };
+
+    case getType(companyActions.clearPageParams):
+      return {
+        ...state,
+        pageParams: undefined,
+      };
+
     default:
       return state;
   }

@@ -108,19 +108,19 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
 
   const newUser: IDBUser = {
     id: userId,
-    alias: userData.alias || oldUser.alias,
+    alias: userData.alias === undefined ? oldUser.alias : userData.alias,
     name: userData.name || oldUser.name,
     company: newCompany,
     password: passwordHash,
-    role: userData.role || oldUser.role,
+    role: oldUser.role,
     creatorId,
     externalId: userData.externalId || oldUser.externalId,
-    firstName: userData.firstName || oldUser.firstName,
-    lastName: userData.lastName || oldUser.lastName,
-    phoneNumber: userData.phoneNumber || oldUser.phoneNumber,
+    firstName: userData.firstName === undefined ? oldUser.firstName : userData.firstName,
+    lastName: userData.lastName === undefined ? oldUser.lastName : userData.lastName,
+    phoneNumber: userData.phoneNumber === undefined ? oldUser.phoneNumber : userData.phoneNumber,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
-    email: userData.email || oldUser.email,
+    email: userData.email === undefined ? oldUser.email : userData.email,
   };
 
   await users.update(newUser);
