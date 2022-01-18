@@ -5,13 +5,16 @@ import { IDeviceBinding } from '@lib/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { deviceBinding } from '@lib/mock';
-
+import { authActions, useAuthThunkDispatch } from '@lib/store';
 import SortableTable from '../../components/SortableTable';
 
 import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import actionsBinding from '../../store/deviceBinding';
+import actions from '../../store/device';
+import codeActions from '../../store/activationCode';
+import DeviceBindingListTable from '../deviceBinding/DeviceBindingListTable';
 
 interface IProps {
   userId: string;
@@ -21,17 +24,36 @@ interface IProps {
 
 const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   const dispatch = useDispatch();
+  const authDispatch = useAuthThunkDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { pageParams } = useSelector((state) => state.deviceBindings);
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
+  const { list, loading, errorMessage } = useSelector((state) => state.devices);
+  const { list: activationCodes } = useSelector((state) => state.activationCodes);
+
   const fetchDeviceBindings = useCallback(
     (filterText?: string, fromRecord?: number, toRecord?: number) => {
       dispatch(actionsBinding.fetchDeviceBindings(userId, filterText, fromRecord, toRecord));
     },
     [dispatch, userId],
+  );
+  const fetchDevices = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
+    },
+    [dispatch],
+  );
+
+  const fetchActivationCodes = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
+    (deviceId?: string) => {
+      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
+    },
+    [dispatch],
   );
 
   useEffect(() => {
@@ -69,6 +91,17 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     // fetchDeviceBindings(inputValue);
   };
 
+  const handleCreateCode = (deviceId: string) => {
+    dispatch(codeActions.createActivationCode(deviceId));
+    fetchActivationCodes(deviceId);
+  };
+
+  const handleCreateUid = async (code: string, deviceId: string) => {
+    await authDispatch(authActions.activateDevice(code));
+    dispatch(actions.fetchDeviceById(deviceId));
+    fetchActivationCodes(deviceId);
+  };
+
   const deviceButtons: IToolBarButton[] = [
     {
       name: 'Добавить',
@@ -104,7 +137,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
           value={(pageParamLocal?.filterText as undefined) || ''}
         />
         <Box sx={{ pt: 2 }}>
-          {/* <DeviceBindingListTable deviceBindings={userBindingDevices} limitRows={5} /> */}
+          <DeviceBindingListTable deviceBindings={userBindingDevices} devices={list} activationCodes={activationCodes} limitRows={5} />
           <SortableTable<IDeviceBinding>
             headCells={headCells}
             data={userBindingDevices}

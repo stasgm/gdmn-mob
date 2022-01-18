@@ -5,6 +5,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import {
   Box,
+  Button,
   Card,
   Checkbox,
   Table,
@@ -13,14 +14,19 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
-import { IDeviceBinding } from '@lib/types';
+import { IDeviceBinding, IDevice, IActivationCode } from '@lib/types';
+
+import RefreshIcon from '@material-ui/icons/Refresh';
 
 import { deviceStates, adminPath } from '../../utils/constants';
 
 interface IProps {
   deviceBindings?: IDeviceBinding[];
+  activationCodes?: IActivationCode[];
+  devices?: IDevice[];
   selectedDevices?: IDeviceBinding[];
   limitRows?: number;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
@@ -28,6 +34,8 @@ interface IProps {
 
 const DeviceBindingListTable = ({
   deviceBindings = [],
+  devices = [],
+  activationCodes = [],
   onChangeSelectedDevices,
   selectedDevices = [],
   limitRows = 0,
@@ -95,50 +103,74 @@ const DeviceBindingListTable = ({
   }, [limitRows, selectedDeviceIds.length, selectedDevices]);
 
   const TableRows = () => {
-    const deviceList = deviceBindings.slice(page * limit, page * limit + limit).map((binding: IDeviceBinding) => (
-      <TableRow
-        hover
-        key={binding.id}
-        selected={
-          selectedDeviceIds
-            .map((item: IDeviceBinding) => {
-              return item.id;
-            })
-            .indexOf(binding.id) !== -1
-        }
-      >
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={
-              selectedDeviceIds
-                .map((item: IDeviceBinding) => {
-                  return item.id;
-                })
-                .indexOf(binding.id) !== -1
-            }
-            onChange={(event) => handleSelectOne(event, binding)}
-            value="true"
-          />
-        </TableCell>
-        <TableCell style={{ padding: '0 16px' }}>
-          <Box
-            sx={{
-              alignItems: 'center',
-              display: 'flex',
-            }}
-          >
-            <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}>
-              <Typography color="textPrimary" variant="body1" key={binding.id}>
-                {binding.device?.name}
-              </Typography>
-            </NavLink>
-          </Box>
-        </TableCell>
-        <TableCell>{deviceStates[binding.state]}</TableCell>
-        <TableCell>{new Date(binding.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
-        <TableCell>{new Date(binding.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
-      </TableRow>
-    ));
+    const deviceList = deviceBindings.slice(page * limit, page * limit + limit).map((binding: IDeviceBinding) => {
+      const code = activationCodes.find((a) => a.device.id === binding.device.id)?.code;
+      console.log('code', code);
+      return (
+        <TableRow
+          hover
+          key={binding.id}
+          selected={
+            selectedDeviceIds
+              .map((item: IDeviceBinding) => {
+                return item.id;
+              })
+              .indexOf(binding.id) !== -1
+          }
+        >
+          <TableCell padding="checkbox">
+            <Checkbox
+              checked={
+                selectedDeviceIds
+                  .map((item: IDeviceBinding) => {
+                    return item.id;
+                  })
+                  .indexOf(binding.id) !== -1
+              }
+              onChange={(event) => handleSelectOne(event, binding)}
+              value="true"
+            />
+          </TableCell>
+          <TableCell style={{ padding: '0 16px' }}>
+            <Box
+              sx={{
+                alignItems: 'center',
+                display: 'flex',
+              }}
+            >
+              <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}>
+                <Typography color="textPrimary" variant="body1" key={binding.id}>
+                  {binding.device?.name}
+                </Typography>
+              </NavLink>
+            </Box>
+          </TableCell>
+          <TableCell>{deviceStates[binding.state]}</TableCell>
+          <TableCell>{new Date(binding.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell>{new Date(binding.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell>
+            <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <Box style={{ width: '40px' }}>
+                {/* {devices.find((item) => item.id === binding.device.id)?.activationCode} */}
+                {code}
+              </Box>
+              <Box>
+                {/* {onCreateCode && ( */}
+                <Tooltip title="Создать код">
+                  {/* <Button
+                    // component={RouterLink}
+                    onClick={() => onCreateCode(device.id)}
+                  > */}
+                  <RefreshIcon />
+                  {/* </Button> */}
+                </Tooltip>
+                {/* )} */}
+              </Box>
+            </Box>
+          </TableCell>
+        </TableRow>
+      );
+    });
 
     const emptyRows = limit - Math.min(limit, deviceBindings.length - page * limit);
 
@@ -173,6 +205,7 @@ const DeviceBindingListTable = ({
                 <TableCell>Состояние</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
+                <TableCell>Код активации</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
