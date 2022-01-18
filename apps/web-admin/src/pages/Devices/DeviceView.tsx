@@ -40,8 +40,12 @@ import SortableTable from '../../components/SortableTable';
 
 import { adminPath } from '../../utils/constants';
 
+export type Params = {
+  id: string;
+};
+
 const DeviceView = () => {
-  const { id: deviceId } = useParams();
+  const { id: deviceId } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const valueRef = useRef<HTMLInputElement>(null); // reference to TextField

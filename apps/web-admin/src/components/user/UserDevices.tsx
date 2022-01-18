@@ -4,11 +4,7 @@ import { IDeviceBinding } from '@lib/types';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { deviceBinding } from '@lib/mock';
-
-import SortableTable from '../../components/SortableTable';
-
-import { IHeadCells, IToolBarButton, IPageParam } from '../../types';
+import { IToolBarButton, IPageParam } from '../../types';
 import ToolbarActionsWithSearch from '../ToolbarActionsWithSearch';
 import { useDispatch, useSelector } from '../../store';
 import actionsBinding from '../../store/deviceBinding';
@@ -96,13 +92,6 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     },
   ];
 
-  const headCells: IHeadCells<IDeviceBinding>[] = [
-    { id: 'device', label: 'Наименование', sortEnable: true },
-    { id: 'state', label: 'Состояние', sortEnable: true },
-    { id: 'creationDate', label: 'Дата создания', sortEnable: true },
-    { id: 'editionDate', label: 'Дата редактирования', sortEnable: true },
-  ];
-
   return (
     <Box
       sx={{
@@ -126,11 +115,6 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
             activationCodes={activationCodes}
             onCreateCode={handleCreateCode}
             limitRows={5}
-          />
-          <SortableTable<IDeviceBinding>
-            headCells={headCells}
-            data={userBindingDevices}
-            path={`/app/users/${deviceBinding.user.id}/binding/`}
           />
         </Box>
       </Container>

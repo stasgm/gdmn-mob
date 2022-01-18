@@ -29,8 +29,12 @@ import userSelectors from '../../store/user/selectors';
 
 import { adminPath } from '../../utils/constants';
 
+export type Params = {
+  id: string;
+};
+
 const CompanyView = () => {
-  const { id: companyId } = useParams();
+  const { id: companyId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 
@@ -39,6 +43,7 @@ const CompanyView = () => {
   const { loading, errorMessage } = useSelector((state) => state.companies);
 
   const company = companySelectors.companyById(companyId);
+
   const users = userSelectors.usersByCompanyId(companyId);
 
   const [open, setOpen] = useState(false);

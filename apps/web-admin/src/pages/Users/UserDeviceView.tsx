@@ -27,8 +27,12 @@ import SnackBar from '../../components/SnackBar';
 import { adminPath } from '../../utils/constants';
 import DeviceBindingDetailsView from '../../components/deviceBinding/DeviceBindingDetailsView';
 
+export type Params = {
+  bindingid: string;
+};
+
 const UserDeviceView = () => {
-  const { bindingid } = useParams();
+  const { bindingid } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

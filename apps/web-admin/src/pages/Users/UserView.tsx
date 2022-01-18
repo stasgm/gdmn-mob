@@ -30,8 +30,12 @@ import SnackBar from '../../components/SnackBar';
 
 import { adminPath } from '../../utils/constants';
 
+export type Params = {
+  id: string;
+};
+
 const UserView = () => {
-  const { id: userId } = useParams();
+  const { id: userId } = useParams<keyof Params>() as Params;
 
   const navigate = useNavigate();
 

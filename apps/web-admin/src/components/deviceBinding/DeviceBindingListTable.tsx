@@ -145,8 +145,6 @@ const DeviceBindingListTable = ({
             </Box>
           </TableCell>
           <TableCell>{deviceStates[binding.state]}</TableCell>
-          <TableCell>{new Date(binding.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          <TableCell>{new Date(binding.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>
             <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
               <Box style={{ width: '40px' }}>{code}</Box>
@@ -164,6 +162,8 @@ const DeviceBindingListTable = ({
               </Box>
             </Box>
           </TableCell>
+          <TableCell>{new Date(binding.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell>{new Date(binding.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
       );
     });

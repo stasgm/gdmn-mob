@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
 import { useNavigate } from 'react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
@@ -26,7 +26,7 @@ const CompanyList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch: AppDispatch = useDispatch();
-  const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
+  // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.companies);
 
