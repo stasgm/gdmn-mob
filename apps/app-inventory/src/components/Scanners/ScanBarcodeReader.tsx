@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
@@ -22,11 +21,10 @@ import { scanReader } from '@lib/mobile-ui/src/styles/scanReader';
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
-import { IRem } from '../../store/app/types';
 
-const oneSecund = 1000;
+const oneSecond = 1000;
 
-export const ScanBarcodeReaderScreen = (props: any) => {
+export const ScanBarcodeReaderScreen = () => {
   const ref = useRef<TextInput>(null);
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
@@ -48,21 +46,10 @@ export const ScanBarcodeReaderScreen = (props: any) => {
     .selectByDocType<IInventoryDocument>('inventory')
     ?.find((e) => e.id === docId) as IInventoryDocument;
 
-  // const goods = document?.head?.department?.id ? model[document.head.department.id]?.goods : {};
-
-  const goodRemains: IRem[] = useMemo(() => {
-    if (!document?.head?.department?.id) {
-      return [];
-    }
-
-    const goods = model[document?.head?.department?.id]?.goods;
-    if (!goods) {
-      return [];
-    }
-
-    return Object.values(goods);
-
-  }, [document?.head?.department, model]);
+  const goods = useMemo(
+    () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),
+    [document?.head?.department?.id, model],
+  );
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
@@ -94,21 +81,21 @@ export const ScanBarcodeReaderScreen = (props: any) => {
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goodRemains.find((item) => item.barcode === brc);
+        const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc) || ''];
 
         if (!remItem) {
           return;
         }
 
-        // const { remains, ...good } = remItem;
+        const { remains, ...good } = remItem;
 
         return {
-          good: { id: remItem.id, name: remItem.name } as INamedEntity,
+          good: { id: good.id, name: good.name } as INamedEntity,
           id: uuid(),
           quantity: 1,
-          price: remItem.price || 0,
-          remains: remItem.remains || 0,
-          barcode: remItem.barcode,
+          price: remains!.length ? remains![0].price : 0,
+          remains: remains!.length ? remains![0].q : 0,
+          barcode: good.barcode,
         };
       }
 
@@ -121,25 +108,25 @@ export const ScanBarcodeReaderScreen = (props: any) => {
 
       const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
 
-      const remItem = goodRemains.find((item) => item.weightCode === code);
+      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code) || ''];
 
       if (!remItem) {
         return;
       }
 
-      // const { remains, ...good } = remItem;
+      const { remains, ...good } = remItem;
 
       return {
-        good: { id: remItem.id, name: remItem.name } as INamedEntity,
+        good: { id: good.id, name: good.name } as INamedEntity,
         id: uuid(),
         quantity: qty,
-        price: remItem.price || 0,
-        remains: remItem.remains || 0,
-        barcode: remItem.barcode,
+        price: remains?.length ? remains[0].price : 0,
+        remains: remains?.length ? remains?.[0].q : 0,
+        barcode: good.barcode,
       };
     };
 
-    vibroMode && Vibration.vibrate(oneSecund);
+    vibroMode && Vibration.vibrate(oneSecond);
 
     const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
@@ -148,7 +135,7 @@ export const ScanBarcodeReaderScreen = (props: any) => {
   }, [
     barcode,
     scanned,
-    goodRemains,
+    goods,
     vibroMode,
     weightSettingsWeightCode,
     weightSettingsCountCode,

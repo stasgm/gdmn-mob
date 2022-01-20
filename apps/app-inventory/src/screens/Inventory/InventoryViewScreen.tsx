@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -24,7 +24,7 @@ import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { InventoryItem } from '../../components/InventoryItem';
 
-export const InventoryViewScreen = (props: any) => {
+export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
@@ -39,22 +39,30 @@ export const InventoryViewScreen = (props: any) => {
   const isBlocked = inventory?.status !== 'DRAFT';
 
   const handleAddInventoryLine = useCallback(() => {
-    console.log('ИД', id);
     navigation.navigate('SelectRemainsItem', {
       docId: id,
     });
   }, [navigation, id]);
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const handleScannerGood = useCallback(() => {}, []);
+  // const handleScannerGood = useCallback(() => { }, []);
 
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
 
+  // const [showScan, setShowScan] = useState<boolean>(false);
+  // const [showScanReader, setShowScanReader] = useState<boolean>(false);
+
+  // const handleScanner = useCallback(() => {
+  //   if (scanUsetSetting.data) {
+  //     setShowScanReader(true);
+  //   } else {
+  //     setShowScan(false);
+  //   }
+  // }, [scanUsetSetting.data]);
+
   const handleScanner = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
-    // console.log('123456', inventory?.head.department?.id);
   }, [navigation, id, scanUsetSetting]);
 
   const handleDelete = useCallback(() => {
@@ -99,7 +107,7 @@ export const InventoryViewScreen = (props: any) => {
           </View>
         ),
     });
-  }, [navigation, handleAddInventoryLine, handleScannerGood, actionsMenu, handleScanner, isBlocked]);
+  }, [navigation, handleAddInventoryLine, actionsMenu, handleScanner, isBlocked]);
 
   if (!inventory) {
     return (

@@ -22,7 +22,7 @@ import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
 import { IDepartment } from './src/store/types';
-import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains } from './src/store/app/types';
+import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains, IMGoodRemain } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
@@ -85,24 +85,23 @@ const Root = () => {
       }
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
         (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = goods
-            ?.reduce((goodsprev: IMGoodData<IRem>, g: IGood) => {
-              const rem =
+          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+            goodsprev[g.id] = {
+              ...g,
+              remains:
                 remains
                   ?.find((r) => r.contactId === c.id)
                   ?.data?.filter((i) => i.goodId === g.id)
-                  ?.map((r) => ({ price: r.price, remains: r.q })) || [];
-              goodsprev[g.id] = {
-                ...g,
-                ...rem[0],
-              };
-              return goodsprev;
-            }, {});
+                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
+            };
+            return goodsprev;
+          }, {});
           contsprev[c.id] = { contactName: c.name, goods: remGoods };
           return contsprev;
         },
         {},
       );
+      console.log('model', model);
       await appInventoryDispatch(appInventoryActions.setModel(model));
     };
 

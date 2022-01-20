@@ -58,7 +58,7 @@ const GoodRemains = ({ item }: { item: IRem }) => {
   );
 };
 
-export const SelectRemainsScreen = (props: any) => {
+export const SelectRemainsScreen = () => {
   // const { params } = props.route;
   // const docType = params?.docType as string;
 
@@ -83,34 +83,26 @@ export const SelectRemainsScreen = (props: any) => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
   }, [navigation, docId, scanUsetSetting]);
 
+  const goods = useMemo(
+    () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),
+    [document?.head?.department?.id, model],
+  );
+
   const goodRemains: IRem[] = useMemo(() => {
-    if (!document?.head?.department?.id) {
-      return [];
-    }
+    return Object.keys(goods)
+      ?.reduce((r: IRem[], e) => {
+        const { remains, ...goodInfo } = goods[e];
+        const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
 
-    const goods = model[document?.head?.department?.id]?.goods;
-    if (!goods) {
-      return [];
-    }
-
-    return Object.entries(goods).reduce((prev: IRem[], [_, item]) => {
-      return [...prev, item];
-    }, []);
-
-    // return Object.keys(goods)
-    //   ?.reduce((r: IRem[], e) => {
-    //     const { , ...goodInfo } = goods[e];
-    //     const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
-
-    //     remains && remains.length > 0
-    //       ? remains.forEach((re) => {
-    //         r.push({ ...goodPos, price: re.price, remains: re.q });
-    //       })
-    //       : r.push(goodPos);
-    //     return r;
-    //   }, [])
-    //   .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
-  }, [document?.head?.department, model]);
+        remains && remains.length > 0
+          ? remains.forEach((re) => {
+              r.push({ ...goodPos, price: re.price, remains: re.q });
+            })
+          : r.push(goodPos);
+        return r;
+      }, [])
+      .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
+  }, [goods]);
 
   useEffect(() => {
     if (!filterVisible && searchText) {
@@ -156,9 +148,6 @@ export const SelectRemainsScreen = (props: any) => {
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
-              // eslint-disable-next-line react/no-children-prop
-              children={undefined}
-              autoComplete={undefined}
             />
           </View>
           <ItemSeparator />
