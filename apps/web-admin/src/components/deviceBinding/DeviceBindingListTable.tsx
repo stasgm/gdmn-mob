@@ -199,9 +199,9 @@ const DeviceBindingListTable = ({
                 </TableCell>
                 <TableCell>Наименование</TableCell>
                 <TableCell>Состояние</TableCell>
+                <TableCell>Код активации</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
-                <TableCell>Код активации</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
