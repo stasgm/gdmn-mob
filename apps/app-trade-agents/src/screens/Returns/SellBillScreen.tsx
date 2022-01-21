@@ -26,6 +26,7 @@ import { getDateString } from '../../utils/helpers';
 import config from '../../config';
 
 import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
+import { mockSellBills } from '../../utils/constants';
 
 const onlineUser = config.USER_NAME;
 const onlineUserPass = config.USER_PASSWORD;
@@ -190,52 +191,6 @@ function SellBillScreen() {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
     if (isDemo) {
-      const mockSellBills: ISellBill[] = [
-        {
-          ID: '1246759230',
-          NUMBER: '1448516',
-          CONTRACT: '53 от 2013-12-10',
-          CONTRACTKEY: '165934057',
-          DEPARTNAME: 'Магазин-склад',
-          DEPARTKEY: '323658854',
-          DOCUMENTDATE: '2021-04-27T21:00:00.000Z',
-          QUANTITY: 4.9511,
-          PRICE: 5.35,
-        },
-        {
-          ID: '1215293118',
-          NUMBER: '5376518',
-          CONTRACT: '53 от 2013-12-10',
-          CONTRACTKEY: '165934057',
-          DEPARTKEY: '323658854',
-          DEPARTNAME: 'Магазин-склад',
-          DOCUMENTDATE: '2021-04-16T21:00:00.000Z',
-          QUANTITY: 5.25,
-          PRICE: 6.12,
-        },
-        {
-          ID: '1308039951',
-          NUMBER: '1453027',
-          CONTRACT: '53 от 2013-12-10',
-          CONTRACTKEY: '165934057',
-          DEPARTNAME: 'Магазин-склад',
-          DEPARTKEY: '323658854',
-          DOCUMENTDATE: '2021-05-13T21:00:00.000Z',
-          QUANTITY: 6.4,
-          PRICE: 6.12,
-        },
-        {
-          ID: '1334757495',
-          NUMBER: '5947875',
-          CONTRACT: '53 от 2013-12-10',
-          CONTRACTKEY: '165934057',
-          DEPARTNAME: 'Магазин-склад',
-          DEPARTKEY: '323658854',
-          DOCUMENTDATE: '2021-05-20T21:00:00.000Z',
-          QUANTITY: 5.6,
-          PRICE: 6.12,
-        },
-      ] as any;
       setSellBills(mockSellBills);
     } else {
       try {
