@@ -241,7 +241,6 @@ function SellBillScreen() {
     setLoading(false);
   };
 
-  console.log('bills', bills);
   return (
     <AppScreen style={localStyles.appScreen}>
       <View style={localStyles.title}>
