@@ -209,9 +209,9 @@ export const messageRequest: IMessage<MessageType>[] = [
             name: 'request',
             description: 'Заявки на закупку ТМЦ',
           },
-          status: 'ARCHIVE',
+          status: 'DRAFT',
           head: {
-            applStatus: { id: '168062978', name: 'Утвержден' },
+            applStatus: { id: '168062978', name: 'Предварительно согласован' },
             purchaseType: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
@@ -282,7 +282,7 @@ export const messageRequest: IMessage<MessageType>[] = [
             name: 'request',
             description: 'Заявки на закупку ТМЦ',
           },
-          status: 'SENT',
+          status: 'DRAFT',
           head: {
             applStatus: {
               id: '168062979',
@@ -354,7 +354,7 @@ export const messageRequest: IMessage<MessageType>[] = [
             name: 'request',
             description: 'Заявки на закупку ТМЦ',
           },
-          status: 'READY',
+          status: 'DRAFT',
           head: {
             applStatus: {
               id: '168062979',
@@ -525,9 +525,8 @@ export const messageRequest: IMessage<MessageType>[] = [
             name: 'request',
             description: 'Заявки на закупку ТМЦ',
           },
-          status: 'ARCHIVE',
+          status: 'DRAFT',
           head: {
-            applStatus: { id: '168062974', name: 'Отказано' },
             purchaseType: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
@@ -1540,7 +1539,7 @@ export const messageAgent: IMessage<MessageType>[] = [
         goodMatrix: {
           id: '147040781',
           name: 'goodMatrix',
-          visible: true,
+          visible: false,
           description: 'Матрицы',
           metadata: {
             contactId: {
@@ -1843,7 +1842,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           },
           number: '1',
           documentDate: new Date().toISOString(),
-          status: 'READY',
+          status: 'DRAFT',
           head: {
             contact: {
               id: '1788296478',
@@ -1899,7 +1898,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           },
           number: '1',
           documentDate: new Date().toISOString(),
-          status: 'SENT',
+          status: 'DRAFT',
           head: {
             contact: {
               id: '147042924',
@@ -2004,7 +2003,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           },
           number: '1',
           documentDate: new Date().toISOString(),
-          status: 'READY',
+          status: 'DRAFT',
           head: {
             contact: {
               id: '147042924',
@@ -2053,7 +2052,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           },
           number: '1',
           documentDate: new Date().toISOString(),
-          status: 'SENT',
+          status: 'DRAFT',
           head: {
             contact: {
               id: '1908473665',

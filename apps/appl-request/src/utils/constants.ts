@@ -1,6 +1,6 @@
 import { StatusType } from '@lib/types';
 
-const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
+const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700', '#1F92CC'] as const;
 
 const getStatusColor = (status: StatusType) => {
   let statusColor: typeof statusColors[number];
@@ -11,6 +11,9 @@ const getStatusColor = (status: StatusType) => {
       break;
 
     case 'PROCESSED':
+      statusColor = statusColors[4];
+      break;
+
     case 'ARCHIVE':
       statusColor = statusColors[1];
       break;
