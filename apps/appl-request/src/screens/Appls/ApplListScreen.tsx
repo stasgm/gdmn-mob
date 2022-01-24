@@ -47,7 +47,7 @@ const ApplListScreen = () => {
         !!d.head &&
         (d.number || d.documentDate || d.head.headCompany.name || d.head.dept.name
           ? d.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            d.documentDate.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            getDateString(d.documentDate).includes(searchQuery.toUpperCase()) ||
             d.head.headCompany.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             d.head.dept.name.toUpperCase().includes(searchQuery.toUpperCase())
           : true),
