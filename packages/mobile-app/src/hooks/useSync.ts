@@ -29,11 +29,8 @@ const useSync = (onSync?: () => void): (() => void) => {
     if (!company || !user) {
       return;
     }
-    console.log('1');
     dispatch(appActions.setLoading(true));
-    console.log('2');
     dispatch(appActions.setErrorList([]));
-    console.log('3');
 
     const errList: string[] = [];
 

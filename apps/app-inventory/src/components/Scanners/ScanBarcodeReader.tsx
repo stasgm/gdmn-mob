@@ -26,7 +26,7 @@ import { IRem } from '../../store/app/types';
 
 const oneSecund = 1000;
 
-export const ScanBarcodeReaderScreen = (props: any) => {
+export const ScanBarcodeReaderScreen = () => {
   const ref = useRef<TextInput>(null);
 
   const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
@@ -61,7 +61,6 @@ export const ScanBarcodeReaderScreen = (props: any) => {
     }
 
     return Object.values(goods);
-
   }, [document?.head?.department, model]);
 
   const handleBarCodeScanned = (data: string) => {

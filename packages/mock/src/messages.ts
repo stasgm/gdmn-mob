@@ -211,7 +211,7 @@ export const messageRequest: IMessage<MessageType>[] = [
           },
           status: 'DRAFT',
           head: {
-            applStatus: { id: '168062978', name: 'Предварительно согласован' },
+            applStatus: { id: '168062979', name: 'Согласован инженерной службой' },
             purchaseType: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
@@ -410,7 +410,7 @@ export const messageRequest: IMessage<MessageType>[] = [
           },
           status: 'DRAFT',
           head: {
-            applStatus: { id: '168062980', name: 'Предварительно согласован' },
+            applStatus: { id: '168062979', name: 'Согласован инженерной службой' },
             purchaseType: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',
@@ -527,6 +527,7 @@ export const messageRequest: IMessage<MessageType>[] = [
           },
           status: 'DRAFT',
           head: {
+            applStatus: { id: '168062979', name: 'Согласован инженерной службой' },
             purchaseType: {
               id: '168643228',
               name: 'Канцтовары, хозтовары, бланки строгой отчетности',

@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo } from 'react';
 import { ListRenderItem, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
 import {
@@ -13,13 +13,14 @@ import {
   ItemSeparator,
 } from '@lib/mobile-ui';
 
+import { IconButton, Searchbar } from 'react-native-paper';
+
 import { IApplDocument } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
 
 import { shortenString } from '../../utils/stringOperations';
 
 import ApplListItem, { ApplListRenderItemProps } from './components/ApplListItem';
-import { IconButton, Searchbar, useTheme } from 'react-native-paper';
 
 export interface ApplListSectionProps {
   title: string;

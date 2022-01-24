@@ -6,7 +6,6 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  authActions,
   authSelectors,
   refSelectors,
   settingsActions,
@@ -85,19 +84,18 @@ const Root = () => {
       }
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
         (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = goods
-            ?.reduce((goodsprev: IMGoodData<IRem>, g: IGood) => {
-              const rem =
-                remains
-                  ?.find((r) => r.contactId === c.id)
-                  ?.data?.filter((i) => i.goodId === g.id)
-                  ?.map((r) => ({ price: r.price, remains: r.q })) || [];
-              goodsprev[g.id] = {
-                ...g,
-                ...rem[0],
-              };
-              return goodsprev;
-            }, {});
+          const remGoods = goods?.reduce((goodsprev: IMGoodData<IRem>, g: IGood) => {
+            const rem =
+              remains
+                ?.find((r) => r.contactId === c.id)
+                ?.data?.filter((i) => i.goodId === g.id)
+                ?.map((r) => ({ price: r.price, remains: r.q })) || [];
+            goodsprev[g.id] = {
+              ...g,
+              ...rem[0],
+            };
+            return goodsprev;
+          }, {});
           contsprev[c.id] = { contactName: c.name, goods: remGoods };
           return contsprev;
         },
@@ -122,7 +120,13 @@ const Root = () => {
   return authLoading || loading || appLoading || invLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
-      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+      <Caption style={styles.title}>
+        {appDataLoading || invLoading
+          ? 'Загрузка данных...'
+          : appLoading
+          ? 'Синхронизация данных..'
+          : 'Пожалуйста, подождите..'}
+      </Caption>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} />
