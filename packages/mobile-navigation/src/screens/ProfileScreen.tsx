@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Alert, View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
@@ -27,8 +27,18 @@ const ProfileScreen = () => {
   const showActionSheet = useActionSheet();
 
   const handleClearData = () => {
-    dispatch(documentActions.init());
-    dispatch(referenceActions.init());
+    Alert.alert('Вы уверены, что хотите удалить все данные?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          dispatch(documentActions.init());
+          dispatch(referenceActions.init());
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
   };
 
   const actionsMenu = useCallback(() => {
