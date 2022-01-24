@@ -56,11 +56,15 @@ const RouteDetailScreen = () => {
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
     : undefined;
 
+  const debtSaldo = contact
+    ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.contact.id === contact.id)
+    : undefined;
+
   const debt: IDebt = {
     id: '1',
     contact: contact as INamedEntity,
     ondate: '2021-01-01',
-    saldo: 1000,
+    saldo: debtSaldo?.saldo || 0,
     saldoDebt: 0,
   };
 

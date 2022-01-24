@@ -5,10 +5,7 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  // authActions,
   authSelectors,
-  // documentActions,
-  // referenceActions,
   refSelectors,
   settingsActions,
   useDispatch,
@@ -70,7 +67,7 @@ const Root = () => {
   const { colors } = useTheme();
 
   useEffect(() => {
-    console.log('useEffect loadGlobalDataFromDisc');
+    // console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -99,7 +96,7 @@ const Root = () => {
 
   useEffect(() => {
     if (isLogged) {
-      console.log('useEffect loadSuperDataFromDisc', isLogged);
+      // console.log('useEffect loadSuperDataFromDisc', isLogged);
       dispatch(appActions.loadSuperDataFromDisc());
     }
   }, [dispatch, isLogged]);
@@ -188,16 +185,16 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // console.log('authLoading', authLoading);
-  // console.log('loading', loading);
-  // console.log('appLoading', appLoading);
-  // console.log('tradeLoading', tradeLoading);
-  // console.log('appDataLoading', appDataLoading);
-
   return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
-      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+      <Caption style={styles.title}>
+        {appDataLoading || tradeLoading
+          ? 'Загрузка данных...'
+          : appLoading
+          ? 'Синхронизация данных..'
+          : 'Пожалуйста, подождите..'}
+      </Caption>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} />

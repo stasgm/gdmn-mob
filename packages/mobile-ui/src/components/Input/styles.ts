@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     position: 'absolute',
     top: 5,
-    right: 5,
+    right: 7,
     zIndex: 5,
     // width: '100%',
   },

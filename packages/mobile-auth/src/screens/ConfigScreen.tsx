@@ -48,8 +48,8 @@ const ConfigScreen = (props: Props) => {
   return (
     <AppInputScreen>
       <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
-      <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} />
-      <Input label="Порт" value={serverPort} onChangeText={setServerPort} />
+      <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} clearInput={true} />
+      <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
       {/* <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} /> */}
       <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} />
       <View style={localStyles.buttonsView}>

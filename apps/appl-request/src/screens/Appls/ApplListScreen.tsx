@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo } from 'react';
-import { ListRenderItem, SectionList, SectionListData, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { ListRenderItem, SectionList, SectionListData, Text, View } from 'react-native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
 import {
@@ -10,7 +10,10 @@ import {
   Status,
   AppScreen,
   SubTitle,
+  ItemSeparator,
 } from '@lib/mobile-ui';
+
+import { IconButton, Searchbar } from 'react-native-paper';
 
 import { IApplDocument } from '../../store/types';
 import { getDateString } from '../../utils/helpers';
@@ -31,12 +34,24 @@ const renderItem: ListRenderItem<ApplListRenderItemProps> = ({ item }) => {
 
 const ApplListScreen = () => {
   const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+  const { colors } = useTheme();
 
   const loading = useSelector((state) => state.documents.loading);
 
   const list = docSelectors
     .selectByDocType<IApplDocument>('request')
-    .filter((d) => !!d.head) //временно не выводить документы, если нет head
+    .filter(
+      (d) =>
+        !!d.head &&
+        (d.number || d.documentDate || d.head.headCompany.name || d.head.dept.name
+          ? d.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            d.documentDate.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            d.head.headCompany.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            d.head.dept.name.toUpperCase().includes(searchQuery.toUpperCase())
+          : true),
+    ) //временно не выводить документы, если нет head
     .sort((a, b) => (a.number > b.number ? -1 : 1))
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
@@ -47,26 +62,27 @@ const ApplListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-          ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
-          : status === 'archive'
-            ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
-            : [];
+        ? list.filter((e) => e.status !== 'PROCESSED' && e.status !== 'ARCHIVE')
+        : status === 'archive'
+        ? list.filter((e) => e.status === 'PROCESSED' || e.status === 'ARCHIVE')
+        : [];
 
     return res.map(
       (i) =>
-      ({
-        id: i.id,
-        title: i.head.headCompany.name,
-        dept: i.head.dept.name,
-        documentDate: getDateString(i.documentDate),
-        status: i.status,
-        applStatus: `${i.head.applStatus.name} ${i.head.cancelReason ? '(' + shortenString(i.head.cancelReason, 50) + ')' : ''
+        ({
+          id: i.id,
+          title: i.head.headCompany.name,
+          dept: i.head.dept.name,
+          documentDate: getDateString(i.documentDate),
+          status: i.status,
+          applStatus: `${i.head.applStatus.name} ${
+            i.head.cancelReason ? '(' + shortenString(i.head.cancelReason, 50) + ')' : ''
           }`,
-        subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
-        description: shortenString(i.head.justification, 90),
-        lineCount: i.lines.length,
-        errorMessage: i.errorMessage,
-      } as ApplListRenderItemProps),
+          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)}`,
+          description: shortenString(i.head.justification, 90),
+          lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
+        } as ApplListRenderItemProps),
     );
   }, [status, list]);
 
@@ -96,12 +112,33 @@ const ApplListScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
+      headerRight: () => (
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+        />
+      ),
     });
-  }, [navigation]);
+  }, [colors.card, filterVisible, navigation]);
 
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <SectionList
         sections={sections}
         renderItem={renderItem}

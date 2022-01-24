@@ -6,7 +6,6 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  authActions,
   authSelectors,
   refSelectors,
   settingsActions,
@@ -26,9 +25,6 @@ import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains, IMGoodRem
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
-  //const newDispatch = useDocDispatch();
-  //newDispatch(settingsActions.init());
-
   const navItems: INavItem[] = useMemo(
     () => [
       {
@@ -120,7 +116,13 @@ const Root = () => {
   return authLoading || loading || appLoading || invLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
-      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+      <Caption style={styles.title}>
+        {appDataLoading || invLoading
+          ? 'Загрузка данных...'
+          : appLoading
+          ? 'Синхронизация данных..'
+          : 'Пожалуйста, подождите..'}
+      </Caption>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} />

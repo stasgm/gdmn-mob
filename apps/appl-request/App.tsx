@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 
-import { appActions, appSelectors, authActions, authSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, appSelectors, authSelectors, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
@@ -32,14 +32,13 @@ const Root = () => {
   const isLogged = authSelectors.isLoggedWithCompany();
 
   useEffect(() => {
-    console.log('useEffect loadGlobalDataFromDisc');
+    // console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    console.log('useEffect loadSuperDataFromDisc', isLogged);
     if (isLogged) {
       dispatch(appActions.loadSuperDataFromDisc());
     }
@@ -59,7 +58,9 @@ const Root = () => {
       <ActivityIndicator size="large" color={colors.primary}>
         <></>
       </ActivityIndicator>
-      <Caption style={styles.title}>{'Загрузка данных...'}</Caption>
+      <Caption style={styles.title}>
+        {appDataLoading ? 'Загрузка данных...' : appLoading ? 'Синхронизация данных..' : 'Пожалуйста, подождите..'}
+      </Caption>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} />

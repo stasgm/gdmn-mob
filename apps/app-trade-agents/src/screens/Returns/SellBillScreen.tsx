@@ -25,8 +25,9 @@ import { getDateString } from '../../utils/helpers';
 
 import config from '../../config';
 
-import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 import { mockSellBills } from '../../utils/constants';
+
+import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 
 const onlineUser = config.USER_NAME;
 const onlineUserPass = config.USER_PASSWORD;
@@ -260,12 +261,15 @@ function SellBillScreen() {
         (sellBills?.length ? (
           <View style={localStyles.sellBill}>
             <InfoBlock colorLabel={colors.primary} title="Накладные">
-              <FlatList
-                data={bills}
-                keyExtractor={(_, i) => String(i)}
-                renderItem={renderItem}
-                ItemSeparatorComponent={ItemSeparator}
-              />
+              <View style={localStyles.list}>
+                <FlatList
+                  data={bills}
+                  keyExtractor={(_, i) => String(i)}
+                  renderItem={renderItem}
+                  scrollEventThrottle={400}
+                  ItemSeparatorComponent={ItemSeparator}
+                />
+              </View>
             </InfoBlock>
           </View>
         ) : (
@@ -312,8 +316,9 @@ function SellBillScreen() {
 export default SellBillScreen;
 
 const localStyles = StyleSheet.create({
-  sellBill: { display: 'flex', flex: 1, padding: 10 },
+  sellBill: { display: 'flex', flex: 1, padding: 10, marginBottom: 10 },
   appScreen: { justifyContent: 'flex-start' },
   title: { flexDirection: 'row', justifyContent: 'center', padding: 5 },
   blank: { width: 20 },
+  list: { marginBottom: 20 },
 });

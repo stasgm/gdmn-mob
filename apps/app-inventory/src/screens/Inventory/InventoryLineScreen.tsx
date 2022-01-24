@@ -38,10 +38,6 @@ export const InventoryLineScreen = () => {
     });
   }, [navigation, handleSave]);
 
-  // Object.entries(line)?.map(([key, value]) => {
-  //   console.log('key', key, 'value', value);
-  // });
-
   return (
     <View style={[styles.container]}>
       <InventoryLine item={line} onSetLine={setLine} />
