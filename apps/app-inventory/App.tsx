@@ -101,7 +101,6 @@ const Root = () => {
         },
         {},
       );
-      console.log('model', model);
       await appInventoryDispatch(appInventoryActions.setModel(model));
     };
 

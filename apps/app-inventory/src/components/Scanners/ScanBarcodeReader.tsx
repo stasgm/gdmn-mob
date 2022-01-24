@@ -13,21 +13,27 @@ import {
 import { IconButton } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { INamedEntity, ISettingsOption } from '@lib/types';
 import { useSelector, docSelectors } from '@lib/store';
 import { scanReader } from '@lib/mobile-ui/src/styles/scanReader';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
-import { InventorysStackParamList } from '../../navigation/Root/types';
+// import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
 
 const oneSecond = 1000;
 
-export const ScanBarcodeReaderScreen = () => {
+interface IProps {
+  docId: string;
+  onSave: (item: IInventoryLine) => void;
+  onCancel: () => void;
+}
+
+export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
   const ref = useRef<TextInput>(null);
 
-  const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
+  // const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
   const navigation = useNavigation();
   const { data: settings } = useSelector((state) => state.settings);
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
@@ -166,7 +172,7 @@ export const ScanBarcodeReaderScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanReader.transparent}
-            onPress={() => navigation.navigate('InventoryList', { docId: document?.id })}
+            onPress={onCancel}
           />
         </View>
         {!scanned ? (
@@ -207,13 +213,7 @@ export const ScanBarcodeReaderScreen = () => {
               <View style={scanReader.buttonsContainer}>
                 <TouchableOpacity
                   style={[scanReader.buttons, { backgroundColor: '#4380D3' }]}
-                  onPress={() => {
-                    navigation.navigate('InventoryLine', {
-                      mode: 0,
-                      docId,
-                      item: itemLine,
-                    });
-                  }}
+                  onPress={() => onSave(itemLine)}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={scanReader.goodInfo}>

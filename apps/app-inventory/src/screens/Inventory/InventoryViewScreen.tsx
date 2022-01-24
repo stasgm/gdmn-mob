@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, Modal } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -23,6 +23,8 @@ import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { InventoryItem } from '../../components/InventoryItem';
+import { ScanBarcodeReader } from '../../components/Scanners/ScanBarcodeReader';
+import { ScanBarcode } from '../../components/Scanners/ScanBarcode';
 
 export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -50,18 +52,11 @@ export const InventoryViewScreen = () => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
 
-  // const [showScan, setShowScan] = useState<boolean>(false);
-  // const [showScanReader, setShowScanReader] = useState<boolean>(false);
+  // const [doScanned, setDoScanned] = useState(false);
 
-  // const handleScanner = useCallback(() => {
-  //   if (scanUsetSetting.data) {
-  //     setShowScanReader(true);
-  //   } else {
-  //     setShowScan(false);
-  //   }
-  // }, [scanUsetSetting.data]);
+  // const handleDoScan = useCallback(() => setDoScanned(true), []);
 
-  const handleScanner = useCallback(() => {
+  const handleDoScan = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
   }, [navigation, id, scanUsetSetting]);
 
@@ -102,12 +97,12 @@ export const InventoryViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
-            <ScanButton onPress={handleScanner} />
+            <ScanButton onPress={handleDoScan} />
             <MenuButton actionsMenu={actionsMenu} />
           </View>
         ),
     });
-  }, [navigation, handleAddInventoryLine, actionsMenu, handleScanner, isBlocked]);
+  }, [navigation, handleAddInventoryLine, actionsMenu, handleDoScan, isBlocked]);
 
   if (!inventory) {
     return (
@@ -122,6 +117,8 @@ export const InventoryViewScreen = () => {
       <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );
+
+  console.log('ViewScreen');
 
   return (
     <View style={[styles.container]}>
