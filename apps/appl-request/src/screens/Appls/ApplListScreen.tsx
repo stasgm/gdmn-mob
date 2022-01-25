@@ -45,11 +45,12 @@ const ApplListScreen = () => {
     .filter(
       (d) =>
         !!d.head &&
-        (d.number || d.documentDate || d.head.headCompany.name || d.head.dept.name
+        (d.number || d.documentDate || d.head.headCompany.name || d.head.dept.name || d.head.applStatus.name
           ? d.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
             getDateString(d.documentDate).includes(searchQuery.toUpperCase()) ||
             d.head.headCompany.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            d.head.dept.name.toUpperCase().includes(searchQuery.toUpperCase())
+            d.head.dept.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            d.head.applStatus.name.toUpperCase().includes(searchQuery.toUpperCase())
           : true),
     ) //временно не выводить документы, если нет head
     .sort((a, b) => (a.number > b.number ? -1 : 1))
