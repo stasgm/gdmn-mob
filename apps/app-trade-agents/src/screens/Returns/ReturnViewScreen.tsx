@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Alert, Text, View, FlatList } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -43,9 +43,18 @@ const ReturnViewScreen = () => {
     if (!id) {
       return;
     }
-
-    dispatch(documentActions.removeDocument(id));
-    navigation.goBack();
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          dispatch(documentActions.removeDocument(id));
+          navigation.goBack();
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
   }, [dispatch, id, navigation]);
 
   const handleEditReturnHead = useCallback(() => {

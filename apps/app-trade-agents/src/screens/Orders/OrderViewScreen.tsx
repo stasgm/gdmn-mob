@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Alert, Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -53,8 +53,18 @@ const OrderViewScreen = () => {
       return;
     }
 
-    dispatch(documentActions.removeDocument(id));
-    navigation.goBack();
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          dispatch(documentActions.removeDocument(id));
+          navigation.goBack();
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
   }, [dispatch, id, navigation]);
 
   const actionsMenu = useCallback(() => {
