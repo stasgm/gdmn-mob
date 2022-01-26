@@ -1,9 +1,10 @@
-import React, { useCallback, useLayoutEffect } from 'react';
-import { Alert, Text, View, FlatList } from 'react-native';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { useTheme } from 'react-native-paper';
 
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
   BackButton,
@@ -16,6 +17,8 @@ import {
 } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { sleep } from '@lib/client-api';
 
 import { IReturnDocument, IReturnLine } from '../../store/types';
 
@@ -31,9 +34,12 @@ import ReturnItem from './components/ReturnItem';
 
 const ReturnViewScreen = () => {
   const showActionSheet = useActionSheet();
-  const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
   const { id } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
+
+  const { colors } = useTheme();
+  const [del, setDel] = useState(false);
 
   const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
 
@@ -43,19 +49,25 @@ const ReturnViewScreen = () => {
     if (!id) {
       return;
     }
-    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+    Alert.alert('Вы уверены, что хотите удалить возврат?', '', [
       {
         text: 'Да',
         onPress: async () => {
-          dispatch(documentActions.removeDocument(id));
-          navigation.goBack();
+          // await dispatch(documentActions.removeDocument(id));
+          // navigation.goBack();
+          const res = await docDispatch(documentActions.removeDocument(id));
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            setDel(true);
+            await sleep(500);
+            navigation.goBack();
+          }
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [dispatch, id, navigation]);
+  }, [docDispatch, id, navigation]);
 
   const handleEditReturnHead = useCallback(() => {
     navigation.navigate('ReturnEdit', { id });
@@ -100,12 +112,23 @@ const ReturnViewScreen = () => {
     });
   }, [navigation, actionsMenu, isBlocked, handleAddSellBill]);
 
-  if (!returnDoc) {
+  if (del) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        <View style={localStyles.del}>
+          <SubTitle style={styles.title}>Удаление</SubTitle>
+          <ActivityIndicator size="small" color={colors.primary} />
+        </View>
       </View>
     );
+  } else {
+    if (!returnDoc) {
+      return (
+        <View style={styles.container}>
+          <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        </View>
+      );
+    }
   }
 
   const renderItem = ({ item }: { item: IReturnLine }) => (
@@ -139,3 +162,11 @@ const ReturnViewScreen = () => {
 };
 
 export default ReturnViewScreen;
+
+const localStyles = StyleSheet.create({
+  del: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

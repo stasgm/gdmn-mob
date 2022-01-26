@@ -88,6 +88,24 @@ const removeDocuments = (
   };
 };
 
+const removeDocument = (
+  documentId: string,
+): AppThunk<
+  Promise<ActionType<typeof actions.removeDocumentAsync>>,
+  DocumentState,
+  ActionType<typeof actions.removeDocumentAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.removeDocumentAsync.request('Удаление документов'));
+
+    try {
+      return dispatch(actions.removeDocumentAsync.success(documentId));
+    } catch {
+      return dispatch(actions.removeDocumentAsync.failure('Ошибка удаления документов'));
+    }
+  };
+};
+
 const clearDocuments = (): AppThunk<
   Promise<ActionType<typeof actions.clearDocumentsAsync>>,
   DocumentState,
@@ -111,4 +129,5 @@ export default {
   removeDocuments,
   clearDocuments,
   useDocThunkDispatch,
+  removeDocument,
 };

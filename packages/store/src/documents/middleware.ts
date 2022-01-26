@@ -39,8 +39,7 @@ export const documentMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.init):
         case getType(actions.addDocument):
-        case getType(actions.updateDocument):
-        case getType(actions.removeDocument):
+        case getType(actions.updateDocument): // case getType(actions.removeDocument):
         case getType(actions.addDocumentLine):
         case getType(actions.updateDocumentLine):
         case getType(actions.removeDocumentLine):
@@ -49,6 +48,7 @@ export const documentMiddlewareFactory: PersistedMiddleware =
         case getType(actions.clearDocumentsAsync.success):
         case getType(actions.setDocumentsAsync.success):
         case getType(actions.updateDocumentsAsync.success):
+        case getType(actions.removeDocumentAsync.success):
         case getType(actions.removeDocumentsAsync.success): {
           const result = next(action);
 
