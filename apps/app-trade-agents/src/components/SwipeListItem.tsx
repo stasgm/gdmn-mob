@@ -1,12 +1,13 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { documentActions, useDispatch } from '@lib/store';
+import { documentActions, useDispatch, useDocThunkDispatch } from '@lib/store';
 
 import { IDocument } from '@lib/types';
 
 import { SwipeItem } from '@lib/mobile-ui';
+import { sleep } from '@lib/client-api';
 
 interface IProps {
   children?: ReactNode;
@@ -21,6 +22,7 @@ interface IProps {
 const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const handleSwipe = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
@@ -50,7 +52,7 @@ const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) =
         {
           text: 'Да',
           onPress: async () => {
-            dispatch(documentActions.removeDocument(id));
+            await docDispatch(documentActions.removeDocument(id));
           },
         },
         {

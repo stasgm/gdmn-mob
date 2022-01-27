@@ -53,8 +53,6 @@ const ReturnViewScreen = () => {
       {
         text: 'Да',
         onPress: async () => {
-          // await dispatch(documentActions.removeDocument(id));
-          // navigation.goBack();
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
             setDel(true);
