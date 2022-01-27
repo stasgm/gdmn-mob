@@ -23,8 +23,6 @@ import { InventorysStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { InventoryItem } from '../../components/InventoryItem';
-import { ScanBarcodeReader } from '../../components/Scanners/ScanBarcodeReader';
-import { ScanBarcode } from '../../components/Scanners/ScanBarcode';
 
 export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -46,15 +44,9 @@ export const InventoryViewScreen = () => {
     });
   }, [navigation, id]);
 
-  // const handleScannerGood = useCallback(() => { }, []);
-
   const handleEditInventoryHead = useCallback(() => {
     navigation.navigate('InventoryEdit', { id });
   }, [navigation, id]);
-
-  // const [doScanned, setDoScanned] = useState(false);
-
-  // const handleDoScan = useCallback(() => setDoScanned(true), []);
 
   const handleDoScan = useCallback(() => {
     navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });

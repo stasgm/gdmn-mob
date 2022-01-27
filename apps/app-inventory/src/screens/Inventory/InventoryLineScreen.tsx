@@ -23,7 +23,6 @@ export const InventoryLineScreen = () => {
         ? documentActions.addDocumentLine({ docId, line })
         : documentActions.updateDocumentLine({ docId, line }),
     );
-
     navigation.goBack();
   }, [navigation, line, docId, dispatch, mode]);
 

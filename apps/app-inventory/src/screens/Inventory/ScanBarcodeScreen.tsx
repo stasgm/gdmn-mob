@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useLayoutEffect } from 'react';
 import { Text } from 'react-native';
 import { v4 as uuid } from 'uuid';
 
@@ -8,6 +8,8 @@ import styles from '@lib/mobile-ui/src/styles/global';
 import { useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
+
+import { BackButton } from '@lib/mobile-ui';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventorysStackParamList } from '../../navigation/Root/types';
@@ -23,8 +25,13 @@ const ScanBarcodeScreen = () => {
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
 
-  // const [barcode, setBarcode] = useState('');
   const model = useAppInventorySelector((state) => state.appInventory.model);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackButton />,
+    });
+  }, [navigation]);
 
   const handleSaveScannedItem = useCallback(
     (item: IInventoryLine) => {
@@ -119,7 +126,6 @@ const ScanBarcodeScreen = () => {
   return (
     <ScanBarcode
       onSave={(item) => handleSaveScannedItem(item)}
-      onCancel={handleCancel}
       onShowRemains={handleShowRemains}
       getScannedObject={getScannedObject}
     />

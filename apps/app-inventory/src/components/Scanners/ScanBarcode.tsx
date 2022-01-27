@@ -4,7 +4,7 @@ import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 
-import { useTheme } from '@react-navigation/native';
+import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import styles from '@lib/mobile-ui/src/styles/global';
 import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
@@ -17,17 +17,18 @@ import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 interface IProps {
   onSave: (item: IInventoryLine) => void;
-  onCancel: () => void;
   onShowRemains: () => void;
   getScannedObject: (brc: string) => IInventoryLine | undefined;
 }
 
-export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject }: IProps) => {
+export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const settings = useSelector((state) => state.settings.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
+
+  const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
@@ -38,16 +39,7 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IInventoryLine | undefined>(undefined);
 
-  // useEffect(() => {
-  //   console.log('isInit 22', isInit);
-  //   if (isInit) {
-  //     setItemLine(undefined);
-  //   }
-  // }, [isInit]);
-  console.log('ScanBarcode');
-
   useEffect(() => {
-    console.log('ScanBarcode111');
     const permission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
@@ -99,8 +91,8 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
     return <Text style={styles.title}>Нет доступа к камере</Text>;
   }
 
-  return (
-    <View style={[scanStyle.content, { backgroundColor: colors.card }]}>
+  return isFocused ? (
+    <View style={[scanStyle.content]}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
@@ -109,10 +101,9 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={scanStyle.camera}
+        style={[scanStyle.camera, { backgroundColor: colors.card }]}
       >
         <View style={scanStyle.header}>
-          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanStyle.transparent} onPress={onCancel} />
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             color={'#FFF'}
@@ -133,20 +124,13 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
           />
         </View>
         {!scanned ? (
-          <View style={[scanStyle.scannerContainer, { alignItems: 'center' }]}>
-            <View
-              style={{
-                width: '70%',
-                height: '50%',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-            >
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={scanStyle.notScannedContainer}>
+            <View style={scanStyle.notScannedHeader}>
+              <View style={scanStyle.notScannedFrame}>
                 <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderLeft]} />
                 <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderRight]} />
               </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={scanStyle.notScannedFrame}>
                 <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderLeft]} />
                 <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderRight]} />
               </View>
@@ -156,19 +140,19 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
           <View style={scanStyle.scannerContainer}>
             <View style={scanStyle.buttonsContainer}>
               <TouchableOpacity
-                style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
+                style={[scanStyle.buttons, scanStyle.btnReScan]}
                 onPress={() => {
                   setScanned(false);
                   setItemLine(undefined);
                 }}
               >
-                <IconButton icon="barcode-scan" size={30} />
+                <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
                 <Text style={scanStyle.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && !itemLine && (
               <View style={scanStyle.infoContainer}>
-                <View style={[scanStyle.buttons, { backgroundColor: '#CC3C4D' }]}>
+                <View style={[scanStyle.buttons, scanStyle.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
                     <Text style={scanStyle.text}>{barcode}</Text>
@@ -180,21 +164,23 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
             {scanned && itemLine && (
               <View style={scanStyle.buttonsContainer}>
                 <TouchableOpacity
-                  style={[
-                    scanStyle.buttons,
-                    { backgroundColor: itemLine.good.id === 'unknown' ? '#CC3C4D' : '#4380D3' },
-                  ]}
-                  onPress={() => onSave(itemLine)}
+                  style={[scanStyle.buttons, itemLine.good.id === 'unknown' ? scanStyle.btnUnknown : scanStyle.btnFind]}
+                  onPress={() => {
+                    onSave(itemLine);
+                    setScanned(false);
+                    setItemLine(undefined);
+                  }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={scanStyle.goodInfo}>
                     <Text style={scanStyle.goodName} numberOfLines={3}>
                       {itemLine?.good.name}
                     </Text>
-                    <Text style={scanStyle.barcode}>
-                      цена: {itemLine?.price || 0}, остаток: {itemLine?.remains}, кол-во: {itemLine?.quantity}
-                    </Text>
                     <Text style={scanStyle.barcode}>{itemLine?.barcode}</Text>
+                    <Text style={scanStyle.barcode}>
+                      цена: {itemLine?.price || 0} р., остаток: {itemLine?.remains}
+                    </Text>
+                    <Text style={scanStyle.barcode}>количество: {itemLine?.quantity}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -211,5 +197,7 @@ export const ScanBarcode = ({ onSave, onCancel, onShowRemains, getScannedObject 
         )}
       </Camera>
     </View>
+  ) : (
+    <></>
   );
 };

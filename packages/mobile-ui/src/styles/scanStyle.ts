@@ -65,7 +65,7 @@ export const scanStyle = StyleSheet.create({
     flexDirection: 'row',
     height: 70,
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: 50,
     paddingTop: 30,
   },
   infoContainer: {
@@ -84,5 +84,33 @@ export const scanStyle = StyleSheet.create({
   },
   transparent: {
     backgroundColor: 'transparent',
+  },
+  notScannedContainer: {
+    flex: 1,
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notScannedHeader: {
+    width: '70%',
+    height: '50%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  notScannedFrame: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  btnReScan: {
+    backgroundColor: '#d9b227',
+  },
+  btnNotFind: {
+    backgroundColor: '#CC3C4D',
+  },
+  btnFind: {
+    backgroundColor: '#4380D3',
+  },
+  btnUnknown: {
+    backgroundColor: '#CC3C4D',
   },
 });
