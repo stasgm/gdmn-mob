@@ -6,6 +6,7 @@ export default {
   },
   timeout: 10000,
   apiPath: 'api',
+  version: 'v1',
   debug: {
     useMockup: false,
   },

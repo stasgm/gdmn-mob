@@ -21,13 +21,10 @@ import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
 import { IDepartment } from './src/store/types';
-import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains } from './src/store/app/types';
+import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains, IMGoodRemain } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
-  //const newDispatch = useDocDispatch();
-  //newDispatch(settingsActions.init());
-
   const navItems: INavItem[] = useMemo(
     () => [
       {
@@ -84,15 +81,14 @@ const Root = () => {
       }
       const model: IModelData<IMDGoodRemain> = departments?.reduce(
         (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = goods?.reduce((goodsprev: IMGoodData<IRem>, g: IGood) => {
-            const rem =
-              remains
-                ?.find((r) => r.contactId === c.id)
-                ?.data?.filter((i) => i.goodId === g.id)
-                ?.map((r) => ({ price: r.price, remains: r.q })) || [];
+          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
             goodsprev[g.id] = {
               ...g,
-              ...rem[0],
+              remains:
+                remains
+                  ?.find((r) => r.contactId === c.id)
+                  ?.data?.filter((i) => i.goodId === g.id)
+                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
             };
             return goodsprev;
           }, {});

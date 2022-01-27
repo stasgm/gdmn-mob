@@ -1,2 +1,2 @@
-export { ScanBarcodeScreen } from './ScanBarcode';
-export { ScanBarcodeReaderScreen } from './ScanBarcodeReader';
+export { ScanBarcode as ScanBarcodeScreen } from './ScanBarcode';
+export { ScanBarcodeReader as ScanBarcodeReaderScreen } from './ScanBarcodeReader';

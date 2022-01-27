@@ -9,7 +9,7 @@ export type AppInventoryState = {
 
 export interface IMDGoodRemain {
   contactName: string;
-  goods: IMGoodData<IRem>;
+  goods: IMGoodData<IMGoodRemain>;
 }
 
 export interface IModelData<T = unknown> {
