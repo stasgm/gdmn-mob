@@ -150,95 +150,108 @@ function SellBillScreen() {
 
   const setUserToken = useCallback((token: string) => dispatch(authActions.setUserToken(token)), [dispatch]);
 
-  const fetchLogin = async () => {
-    const pathLogin = `${serverName}:${serverPort}/v1/login`;
-    const userData = {
-      username: onlineUser,
-      password: onlineUserPass,
-    };
+  const [isSearch, setIsSearch] = useState(false);
 
-    try {
-      const tokenFetched = await fetch(pathLogin, {
-        method: 'POST',
-        body: JSON.stringify(userData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  useEffect(() => {
+    let mounted = true;
+    if (isSearch) {
+      const fetchLogin = async () => {
+        const pathLogin = `${serverName}:${serverPort}/v1/login`;
+        const userData = {
+          username: onlineUser,
+          password: onlineUserPass,
+        };
 
-      const parsedToken: IResponse<IToken> = await tokenFetched.json();
+        try {
+          const tokenFetched = await fetch(pathLogin, {
+            method: 'POST',
+            body: JSON.stringify(userData),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
 
-      if (parsedToken.result) {
-        const token: IToken | undefined = parsedToken.data;
-        if (token?.access_token) {
-          setUserToken(token?.access_token);
-          return token.access_token;
-        }
-      }
-      return undefined;
-    } catch (e) {
-      if (e instanceof TypeError) {
-        setMessage(e.message);
-      } else {
-        setMessage('Неизвестная ошибка');
-      }
-      setBarVisible(true);
-      return undefined;
-    }
-  };
+          const parsedToken: IResponse<IToken> = await tokenFetched.json();
 
-  const fetchSellBill = async (isFirst = true, parToken: string | undefined = userToken) => {
-    if (!(docDateBegin && docDateEnd && docGood && outletId)) {
-      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
-    if (isDemo) {
-      setSellBills(mockSellBills);
-    } else {
-      try {
-        setLoading(true);
-        const newToken = parToken ?? (await fetchLogin()) ?? '';
-
-        const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
-
-        const fetched = await fetch(path, {
-          headers: {
-            authorization: newToken,
-          },
-        });
-        const parsed: IResponse<ISellBill[]> = await fetched.json();
-
-        if (parsed.result) {
-          setSellBills(parsed.data);
-        } else {
-          setMessage(parsed.error || 'Неизвестная ошибка');
-          if (parsed.error?.slice(0, 3) === '401') {
-            const token = await fetchLogin();
-            if (isFirst && token) {
-              await fetchSellBill(false, token);
+          if (parsedToken.result) {
+            const token: IToken | undefined = parsedToken.data;
+            if (token?.access_token) {
+              setUserToken(token?.access_token);
+              return token.access_token;
             }
+          }
+          return undefined;
+        } catch (e) {
+          if (e instanceof TypeError) {
+            setMessage(e.message);
           } else {
-            setBarVisible(true);
+            setMessage('Неизвестная ошибка');
+          }
+          setBarVisible(true);
+          return undefined;
+        }
+      };
+
+      const fetchSellBill = async (isFirst = true, parToken: string | undefined = userToken) => {
+        if (!(docDateBegin && docDateEnd && docGood && outletId)) {
+          return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        }
+        setLoading(true);
+
+        if (isDemo) {
+          setSellBills(mockSellBills);
+        } else {
+          try {
+            const newToken = parToken ?? (await fetchLogin()) ?? '';
+
+            const path = `${serverName}:${serverPort}/v1/sellbills?dateBegin=${docDateBegin}&dateEnd=${docDateEnd}&outletId=${outletId}&goodId=${docGood.id}`;
+
+            const fetched = await fetch(path, {
+              headers: {
+                authorization: newToken,
+              },
+            });
+            const parsed: IResponse<ISellBill[]> = await fetched.json();
+
+            if (parsed.result) {
+              setSellBills(parsed.data);
+            } else {
+              setMessage(parsed.error || 'Неизвестная ошибка');
+              if (parsed.error?.slice(0, 3) === '401') {
+                const token = await fetchLogin();
+                if (isFirst && token) {
+                  await fetchSellBill(false, token);
+                }
+              } else {
+                setBarVisible(true);
+              }
+            }
+          } catch (e) {
+            if (mounted) {
+              if (e instanceof TypeError) {
+                setMessage(e.message);
+              } else {
+                setMessage('Неизвестная ошибка');
+              }
+              setBarVisible(true);
+            }
           }
         }
-      } catch (e) {
-        if (e instanceof TypeError) {
-          setMessage(e.message);
-        } else {
-          setMessage('Неизвестная ошибка');
+        if (mounted) {
+          setLoading(false);
+          setIsSearch(false);
         }
-        setBarVisible(true);
-      }
+      };
+      fetchSellBill();
     }
-
-    setLoading(false);
-  };
+    return () => {
+      mounted = false;
+    };
+  }, [docDateBegin, docDateEnd, docGood, isDemo, isSearch, outletId, serverName, serverPort, setUserToken, userToken]);
 
   const handleSearchSellBills = async () => {
-    await fetchSellBill();
-  };
-
-  const handleSearchStop = () => {
-    setLoading(false);
+    setSellBills(undefined);
+    setIsSearch(true);
   };
 
   return (
@@ -251,11 +264,8 @@ function SellBillScreen() {
       <SelectableInput label="Дата начала" value={getDateString(docDateBegin || '')} onPress={handlePresentDateBegin} />
       <SelectableInput label="Дата окончания" value={getDateString(docDateEnd || '')} onPress={handlePresentDateEnd} />
       <SelectableInput label="Товар" value={docGood?.name || ''} onPress={handlePresentGood} />
-      <PrimeButton
-        icon={!loading ? 'magnify' : 'block-helper'}
-        onPress={!loading ? handleSearchSellBills : handleSearchStop}
-      >
-        {!loading ? 'Найти' : 'Прервать'}
+      <PrimeButton icon={'magnify'} onPress={handleSearchSellBills} disabled={loading}>
+        {'Найти'}
       </PrimeButton>
       {sellBills &&
         (sellBills?.length ? (

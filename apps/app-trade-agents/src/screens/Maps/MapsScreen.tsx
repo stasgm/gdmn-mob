@@ -87,6 +87,9 @@ const MapScreen = () => {
       });
 
       dispatch(geoActions.addMany(initialList));
+    } else {
+      dispatch(geoActions.init());
+      console.log('initt');
     }
   }, [dispatch, outlets, selectedItem]);
 

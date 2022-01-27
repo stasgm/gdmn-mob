@@ -7,7 +7,7 @@ import { DocumentState } from './types';
 const init = createAction('DOCUMENTS/INIT')();
 const addDocument = createAction('DOCUMENTS/ADD_ONE')<IDocument>();
 const updateDocument = createAction('DOCUMENTS/UPDATE_ONE')<{ docId: string; document: IDocument }>();
-const removeDocument = createAction('DOCUMENTS/REMOVE_ONE')<string>();
+// const removeDocument = createAction('DOCUMENTS/REMOVE_ONE')<string>();
 const addDocumentLine = createAction('DOCUMENTS/ADD_LINE_ONE')<{ docId: string; line: IEntity }>();
 const updateDocumentLine = createAction('DOCUMENTS/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
 const removeDocumentLine = createAction('DOCUMENTS/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
@@ -41,6 +41,12 @@ const removeDocumentsAsync = createAsyncAction(
   'DOCUMENTS/REMOVE_MANY_FAILURE',
 )<string | undefined, string[], string>();
 
+const removeDocumentAsync = createAsyncAction(
+  'DOCUMENTS/REMOVE_ONE',
+  'DOCUMENTS/REMOVE_ONE_SUCCESS',
+  'DOCUMENTS/REMOVE_ONE_FAILURE',
+)<string, string, string>();
+
 const clearDocumentsAsync = createAsyncAction(
   'DOCUMENTS/CLEAR_DOCUMENTS',
   'DOCUMENTS/CLEAR_DOCUMENTS_SUCCESS',
@@ -56,7 +62,8 @@ export const actions = {
   addDocument,
   updateDocument,
   updateDocumentsAsync,
-  removeDocument,
+  // removeDocument,
+  removeDocumentAsync,
   removeDocumentsAsync,
   addDocumentLine,
   updateDocumentLine,
