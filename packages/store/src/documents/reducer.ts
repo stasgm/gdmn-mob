@@ -139,9 +139,6 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
     case getType(actions.clearDocumentsAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
-    // case getType(actions.removeDocument):
-    //   return { ...state, loading: false, list: state.list.filter((i) => i.id !== action.payload) };
-
     case getType(actions.removeDocumentsAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
@@ -155,8 +152,6 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
     case getType(actions.removeDocumentsAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
 
-    //////////////////////////
-
     case getType(actions.removeDocumentAsync.request):
       return { ...state, loading: true, errorMessage: '' };
 
@@ -165,13 +160,10 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         ...state,
         loading: false,
         list: state.list.filter((i) => i.id !== action.payload),
-        // state.list.filter((doc) => action.payload.indexOf(doc.id) === -1),
       };
 
     case getType(actions.removeDocumentAsync.failure):
       return { ...state, loading: false, errorMessage: action.payload || 'error' };
-
-    //////////////////////////
 
     case getType(actions.clearError):
       return { ...state, errorMessage: '' };
