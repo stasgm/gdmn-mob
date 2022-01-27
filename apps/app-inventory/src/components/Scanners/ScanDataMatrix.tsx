@@ -1,16 +1,11 @@
-import { useTheme, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { useTheme, useNavigation } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity, StatusBar, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
 import styles from '@lib/mobile-ui/src/styles/global';
-
-import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine } from '../../store/types';
-
-// import { useAppStore } from '../../../../store';
 
 const oneSecond = 1000;
 
@@ -19,11 +14,8 @@ interface IProps {
   onCancel: () => void;
 }
 
-// const ScanDataMatrixScreen = ({ onSave, onCancel }: IProps) => {
 export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
-  // const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanDataMatrix'>>().params?.docId;
-  const navigation = useNavigation();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);

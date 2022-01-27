@@ -20,10 +20,6 @@ interface IProps {
 }
 
 export const InventoryLine = ({ item, onSetLine }: IProps) => {
-  // const navigation = useNavigation();
-  // const dispatch = useDispatch();
-  // const { docId, mode } = useRoute<RouteProp<InventorysStackParamList, 'InventoryLine'>>().params;
-
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
@@ -34,10 +30,10 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const scanUsetSetting = settings.scannerUse as ISettingsOption<string>;
 
   useEffect(() => {
-    currRef?.current && setTimeout(() => currRef.current?.focus(), 500);
+    currRef?.current && setTimeout(() => currRef.current?.focus(), 1000);
   }, []);
 
-  const handelQuantityChange = useCallback((value: string) => {
+  const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
       value = value.replace(',', '.');
 
@@ -52,6 +48,10 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const handleEIDScanned = (data: string) => {
     setDoScanned(false);
     setGoodEID(data);
+  };
+
+  const handleDoScan = () => {
+    setDoScanned(true);
   };
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
                 style={[styles.number, styles.field]}
                 editable={true}
                 keyboardType="numeric"
-                onChangeText={handelQuantityChange}
+                onChangeText={handleQuantityChange}
                 returnKeyType="done"
                 ref={currRef}
                 value={goodQty}
@@ -126,17 +126,12 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <View>
-            <PrimeButton icon="barcode-scan" onPress={() => setDoScanned(true)}>
+            <PrimeButton icon="barcode-scan" onPress={handleDoScan}>
               Сканировать EID
             </PrimeButton>
           </View>
         </View>
       </ScrollView>
-      {/* {mode ? (
-        <PrimeButton icon="delete" onPress={handleDelete} outlined disabled={!mode}>
-          Удалить позицию
-        </PrimeButton>
-      ) : null} */}
     </>
   );
 };

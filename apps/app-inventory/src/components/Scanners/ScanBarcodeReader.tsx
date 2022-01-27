@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
@@ -14,22 +13,27 @@ import {
 import { IconButton } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
-import { useNavigation, useTheme, RouteProp, useRoute } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { INamedEntity, ISettingsOption } from '@lib/types';
 import { useSelector, docSelectors } from '@lib/store';
 import { scanReader } from '@lib/mobile-ui/src/styles/scanReader';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
-import { InventorysStackParamList } from '../../navigation/Root/types';
+// import { InventorysStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
-import { IRem } from '../../store/app/types';
 
-const oneSecund = 1000;
+const oneSecond = 1000;
 
-export const ScanBarcodeReaderScreen = () => {
+interface IProps {
+  docId: string;
+  onSave: (item: IInventoryLine) => void;
+  onCancel: () => void;
+}
+
+export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
   const ref = useRef<TextInput>(null);
 
-  const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
+  // const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
   const navigation = useNavigation();
   const { data: settings } = useSelector((state) => state.settings);
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
@@ -48,20 +52,10 @@ export const ScanBarcodeReaderScreen = () => {
     .selectByDocType<IInventoryDocument>('inventory')
     ?.find((e) => e.id === docId) as IInventoryDocument;
 
-  // const goods = document?.head?.department?.id ? model[document.head.department.id]?.goods : {};
-
-  const goodRemains: IRem[] = useMemo(() => {
-    if (!document?.head?.department?.id) {
-      return [];
-    }
-
-    const goods = model[document?.head?.department?.id]?.goods;
-    if (!goods) {
-      return [];
-    }
-
-    return Object.values(goods);
-  }, [document?.head?.department, model]);
+  const goods = useMemo(
+    () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),
+    [document?.head?.department?.id, model],
+  );
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
@@ -93,21 +87,21 @@ export const ScanBarcodeReaderScreen = () => {
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goodRemains.find((item) => item.barcode === brc);
+        const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc) || ''];
 
         if (!remItem) {
           return;
         }
 
-        // const { remains, ...good } = remItem;
+        const { remains, ...good } = remItem;
 
         return {
-          good: { id: remItem.id, name: remItem.name } as INamedEntity,
+          good: { id: good.id, name: good.name } as INamedEntity,
           id: uuid(),
           quantity: 1,
-          price: remItem.price || 0,
-          remains: remItem.remains || 0,
-          barcode: remItem.barcode,
+          price: remains!.length ? remains![0].price : 0,
+          remains: remains!.length ? remains![0].q : 0,
+          barcode: good.barcode,
         };
       }
 
@@ -120,25 +114,25 @@ export const ScanBarcodeReaderScreen = () => {
 
       const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
 
-      const remItem = goodRemains.find((item) => item.weightCode === code);
+      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code) || ''];
 
       if (!remItem) {
         return;
       }
 
-      // const { remains, ...good } = remItem;
+      const { remains, ...good } = remItem;
 
       return {
-        good: { id: remItem.id, name: remItem.name } as INamedEntity,
+        good: { id: good.id, name: good.name } as INamedEntity,
         id: uuid(),
         quantity: qty,
-        price: remItem.price || 0,
-        remains: remItem.remains || 0,
-        barcode: remItem.barcode,
+        price: remains?.length ? remains[0].price : 0,
+        remains: remains?.length ? remains?.[0].q : 0,
+        barcode: good.barcode,
       };
     };
 
-    vibroMode && Vibration.vibrate(oneSecund);
+    vibroMode && Vibration.vibrate(oneSecond);
 
     const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
@@ -147,7 +141,7 @@ export const ScanBarcodeReaderScreen = () => {
   }, [
     barcode,
     scanned,
-    goodRemains,
+    goods,
     vibroMode,
     weightSettingsWeightCode,
     weightSettingsCountCode,
@@ -178,7 +172,7 @@ export const ScanBarcodeReaderScreen = () => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanReader.transparent}
-            onPress={() => navigation.navigate('InventoryList', { docId: document?.id })}
+            onPress={onCancel}
           />
         </View>
         {!scanned ? (
@@ -219,13 +213,7 @@ export const ScanBarcodeReaderScreen = () => {
               <View style={scanReader.buttonsContainer}>
                 <TouchableOpacity
                   style={[scanReader.buttons, { backgroundColor: '#4380D3' }]}
-                  onPress={() => {
-                    navigation.navigate('InventoryLine', {
-                      mode: 0,
-                      docId,
-                      item: itemLine,
-                    });
-                  }}
+                  onPress={() => onSave(itemLine)}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={scanReader.goodInfo}>
