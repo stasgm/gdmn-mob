@@ -79,8 +79,6 @@ const Input: React.FC<Props> = ({
           spellCheck={spellCheck}
           disabled={disabled}
           editable={editable}
-          children={undefined}
-          autoComplete={undefined}
         />
         {!!value && !!clearInput && (
           <View style={styles.button}>

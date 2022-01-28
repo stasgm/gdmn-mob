@@ -22,11 +22,11 @@ interface IProps {
 }
 
 export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
-  const settings = useSelector((state) => state.settings.data);
+  const settings = useSelector((state) => state.settings?.data);
 
-  const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
-  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
-  const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
+  const weightSettingsWeightCode = (settings?.weightCode as ISettingsOption<string>) || '';
+  const weightSettingsCountCode = (settings?.countCode as ISettingsOption<number>).data || 0;
+  const weightSettingsCountWeight = (settings?.countWeight as ISettingsOption<number>).data || 0;
 
   const isFocused = useIsFocused();
 
@@ -49,7 +49,6 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
-
     setBarcode(data);
   };
 
@@ -124,7 +123,7 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
           />
         </View>
         {!scanned ? (
-          <View style={scanStyle.notScannedContainer}>
+          <View style={[scanStyle.scannerContainer, scanStyle.notScannedContainer]}>
             <View style={scanStyle.notScannedHeader}>
               <View style={scanStyle.notScannedFrame}>
                 <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderLeft]} />

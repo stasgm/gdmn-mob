@@ -47,7 +47,14 @@ const PrimeButton = ({
       ]}
     >
       <View style={localStyles.buttons}>
-        {icon && <Icon name={icon} size={16} color={outlined ? colors.primary : colors.background} />}
+        {icon && (
+          <Icon
+            name={icon}
+            size={16}
+            color={outlined ? colors.primary : colors.background}
+            // style={{ backgroundColor: 'red' }}
+          />
+        )}
         <Text
           style={[
             localStyles.text,
@@ -119,7 +126,7 @@ const localStyles = StyleSheet.create({
     letterSpacing: 1,
   },
   blank: {
-    width: 20,
+    // width: 20,
   },
   indicator: {
     paddingLeft: 10,

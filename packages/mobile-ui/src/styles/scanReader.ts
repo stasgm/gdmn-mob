@@ -44,7 +44,7 @@ export const scanReader = StyleSheet.create({
     backgroundColor: '#0008',
     flexDirection: 'row',
     height: 70,
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingHorizontal: 10,
     paddingTop: 30,
   },
@@ -65,5 +65,20 @@ export const scanReader = StyleSheet.create({
   },
   transparent: {
     backgroundColor: 'transparent',
+  },
+  notScannedContainer: {
+    alignItems: 'center',
+  },
+  btnReScan: {
+    backgroundColor: '#D9B227',
+  },
+  btnNotFind: {
+    backgroundColor: '#CC3C4D',
+  },
+  btnFind: {
+    backgroundColor: '#4380D3',
+  },
+  btnUnknown: {
+    backgroundColor: '#CC3C4D',
   },
 });

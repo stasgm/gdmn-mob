@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -11,34 +11,28 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { INamedEntity, ISettingsOption } from '@lib/types';
-import { useSelector, docSelectors } from '@lib/store';
+import { useIsFocused, useTheme } from '@react-navigation/native';
+import { ISettingsOption } from '@lib/types';
+import { useSelector } from '@lib/store';
 import { scanReader } from '@lib/mobile-ui/src/styles/scanReader';
 
-import { useSelector as useAppInventorySelector } from '../../store/index';
-// import { InventorysStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument } from '../../store/types';
-
-const oneSecond = 1000;
+import { IInventoryLine } from '../../store/types';
+import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 interface IProps {
-  docId: string;
   onSave: (item: IInventoryLine) => void;
-  onCancel: () => void;
+  onShowRemains: () => void;
+  getScannedObject: (brc: string) => IInventoryLine | undefined;
 }
-
-export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
+export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const ref = useRef<TextInput>(null);
 
-  // const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcodeReader'>>().params?.docId;
-  const navigation = useNavigation();
-  const { data: settings } = useSelector((state) => state.settings);
-  const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
-  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
-  const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
+  const settings = useSelector((state) => state.settings?.data);
+
+  const weightSettingsWeightCode = (settings?.weightCode as ISettingsOption<string>) || '';
+  const weightSettingsCountCode = (settings?.countCode as ISettingsOption<number>).data || 0;
+  const weightSettingsCountWeight = (settings?.countWeight as ISettingsOption<number>).data || 0;
 
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -46,16 +40,8 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
 
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IInventoryLine>();
-  const model = useAppInventorySelector((state) => state.appInventory.model);
 
-  const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
-    ?.find((e) => e.id === docId) as IInventoryDocument;
-
-  const goods = useMemo(
-    () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),
-    [document?.head?.department?.id, model],
-  );
+  const isFocused = useIsFocused();
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
@@ -82,57 +68,7 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
       return;
     }
 
-    const getScannedObject = (brc: string): IInventoryLine | undefined => {
-      let charFrom = 0;
-      let charTo = weightSettingsWeightCode.data.length;
-
-      if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc) || ''];
-
-        if (!remItem) {
-          return;
-        }
-
-        const { remains, ...good } = remItem;
-
-        return {
-          good: { id: good.id, name: good.name } as INamedEntity,
-          id: uuid(),
-          quantity: 1,
-          price: remains!.length ? remains![0].price : 0,
-          remains: remains!.length ? remains![0].q : 0,
-          barcode: good.barcode,
-        };
-      }
-
-      charFrom = charTo;
-      charTo = charFrom + weightSettingsCountCode;
-      const code = Number(barcode.substring(charFrom, charTo)).toString();
-
-      charFrom = charTo;
-      charTo = charFrom + weightSettingsCountWeight;
-
-      const qty = Number(barcode.substring(charFrom, charTo)) / 1000;
-
-      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code) || ''];
-
-      if (!remItem) {
-        return;
-      }
-
-      const { remains, ...good } = remItem;
-
-      return {
-        good: { id: good.id, name: good.name } as INamedEntity,
-        id: uuid(),
-        quantity: qty,
-        price: remains?.length ? remains[0].price : 0,
-        remains: remains?.length ? remains?.[0].q : 0,
-        barcode: good.barcode,
-      };
-    };
-
-    vibroMode && Vibration.vibrate(oneSecond);
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
     const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
@@ -141,27 +77,21 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
   }, [
     barcode,
     scanned,
-    goods,
     vibroMode,
     weightSettingsWeightCode,
     weightSettingsCountCode,
     weightSettingsCountWeight,
+    getScannedObject,
   ]);
 
-  return (
+  return isFocused ? (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[scanReader.content, { backgroundColor: colors.card }]}
     >
       <View style={scanReader.camera}>
         <View style={scanReader.header}>
-          <IconButton
-            icon="arrow-left"
-            color={'#FFF'}
-            size={30}
-            style={scanReader.transparent}
-            onPress={() => navigation.goBack()}
-          />
+          {/* <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanReader.transparent} onPress={onGoBack} /> */}
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
@@ -172,11 +102,11 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
             icon={'feature-search-outline'}
             color={'#FFF'}
             style={scanReader.transparent}
-            onPress={onCancel}
+            onPress={onShowRemains}
           />
         </View>
         {!scanned ? (
-          <View style={[scanReader.scannerContainer, { alignItems: 'center' }]}>
+          <View style={[scanReader.scannerContainer, scanReader.notScannedContainer]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
                 style={{ width: 0 }}
@@ -191,8 +121,11 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
           <View style={scanReader.scannerContainer}>
             <View style={scanReader.buttonsContainer}>
               <TouchableOpacity
-                style={[scanReader.buttons, { backgroundColor: '#FFCA00' }]}
-                onPress={() => setScanned(false)}
+                style={[scanReader.buttons, scanReader.btnReScan]}
+                onPress={() => {
+                  setScanned(false);
+                  setItemLine(undefined);
+                }}
               >
                 <IconButton icon="barcode-scan" size={30} />
                 <Text style={scanReader.text}>Пересканировать</Text>
@@ -200,7 +133,7 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
             </View>
             {scanned && !itemLine && (
               <View style={scanReader.infoContainer}>
-                <View style={[scanReader.buttons, { backgroundColor: '#CC3C4D' }]}>
+                <View style={[scanReader.buttons, scanReader.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
                     <Text style={scanReader.text}>{barcode}</Text>
@@ -212,18 +145,26 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
             {scanned && itemLine && (
               <View style={scanReader.buttonsContainer}>
                 <TouchableOpacity
-                  style={[scanReader.buttons, { backgroundColor: '#4380D3' }]}
-                  onPress={() => onSave(itemLine)}
+                  style={[
+                    scanReader.buttons,
+                    itemLine.good.id === 'unknown' ? scanReader.btnUnknown : scanReader.btnFind,
+                  ]}
+                  onPress={() => {
+                    onSave(itemLine);
+                    setScanned(false);
+                    setItemLine(undefined);
+                  }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={scanReader.goodInfo}>
                     <Text style={scanReader.goodName} numberOfLines={3}>
                       {itemLine?.good.name}
                     </Text>
-                    <Text style={scanReader.barcode}>
-                      цена: {itemLine?.price || 0}, кол-во: {itemLine?.quantity}
-                    </Text>
                     <Text style={scanReader.barcode}>{itemLine?.barcode}</Text>
+                    <Text style={scanReader.barcode}>
+                      цена: {itemLine?.price || 0} р., остаток: {itemLine?.remains}
+                    </Text>
+                    <Text style={scanReader.barcode}>количество: {itemLine?.quantity}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -240,5 +181,7 @@ export const ScanBarcodeReader = ({ docId, onSave, onCancel }: IProps) => {
         )}
       </View>
     </KeyboardAvoidingView>
+  ) : (
+    <></>
   );
 };

@@ -35,4 +35,4 @@ export type InventoryParamList = RefParamList & {
   };
 };
 
-export type InventorysStackParamList = { InventoryList: undefined } & InventoryParamList;
+export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;

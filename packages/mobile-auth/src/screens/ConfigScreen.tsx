@@ -67,7 +67,7 @@ const ConfigScreen = (props: Props) => {
       </View>
       <View style={localStyles.buttonsView}>
         <PrimeButton outlined icon="presentation-play" onPress={onSetDemoMode} style={localStyles.button}>
-          Подключиться в демо режиме
+          Демо режим
         </PrimeButton>
       </View>
     </AppInputScreen>

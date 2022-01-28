@@ -12,14 +12,14 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { formatValue } from '../../utils/helpers';
 import { useSelector as useAppInventorySelector } from '../../store/index';
-import { InventorysStackParamList } from '../../navigation/Root/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument } from '../../store/types';
 import { IRem } from '../../store/app/types';
 
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
-  const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params;
+  const { docId } = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
   return (
@@ -68,20 +68,18 @@ export const SelectRemainsScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const [list, setList] = useState<IRem[]>([]);
 
-  const { data: settings } = useSelector((state) => state.settings);
-  const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data) || true;
   const model = useAppInventorySelector((state) => state.appInventory.model);
-  // console.log('model111', model);
 
-  const docId = useRoute<RouteProp<InventorysStackParamList, 'SelectRemainsItem'>>().params?.docId;
+  const docId = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
     // .selectByDocType<IInventoryDocument>(docType)
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
   const handleScanner = useCallback(() => {
-    navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
-  }, [navigation, docId, scanUsetSetting]);
+    navigation.navigate(isScanerReader ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
+  }, [navigation, docId, isScanerReader]);
 
   const goods = useMemo(
     () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),

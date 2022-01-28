@@ -12,6 +12,7 @@ const MenuButton = ({ actionsMenu }: IProps) => {
       icon={Platform.OS === 'android' ? 'dots-vertical' : 'dots-horizontal'}
       size={30}
       onPress={actionsMenu}
+      animated={true}
     />
   );
 };

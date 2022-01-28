@@ -64,8 +64,8 @@ export const scanStyle = StyleSheet.create({
     backgroundColor: '#0008',
     flexDirection: 'row',
     height: 70,
-    justifyContent: 'space-between',
-    paddingHorizontal: 50,
+    justifyContent: 'space-around',
+    paddingHorizontal: 10,
     paddingTop: 30,
   },
   infoContainer: {
@@ -86,9 +86,6 @@ export const scanStyle = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   notScannedContainer: {
-    flex: 1,
-    flexGrow: 1,
-    justifyContent: 'center',
     alignItems: 'center',
   },
   notScannedHeader: {
@@ -102,7 +99,7 @@ export const scanStyle = StyleSheet.create({
     justifyContent: 'space-between',
   },
   btnReScan: {
-    backgroundColor: '#d9b227',
+    backgroundColor: '#D9B227',
   },
   btnNotFind: {
     backgroundColor: '#CC3C4D',

@@ -75,12 +75,6 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
             style={localStyles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
-          {/* <IconButton
-            icon={'feature-search-outline'}
-            color={'#FFF'}
-            style={localStyles.transparent}
-            onPress={() => navigation.navigate('RemainsList', { docId: document?.id })}
-          /> */}
         </View>
         {!scanned ? (
           <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
@@ -113,17 +107,6 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
                 <Text style={localStyles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {/* {scanned && !goodItem && (
-              <View style={localStyles.infoContainer}>
-                <View style={[localStyles.buttons, { backgroundColor: '#CC3C4D' }]}>
-                  <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
-                  <View>
-                    <Text style={localStyles.text}>{barcode}</Text>
-                    <Text style={localStyles.text}>{'Товар не найден'}</Text>
-                  </View>
-                </View>
-              </View>
-            )} */}
             {scanned && barcode && (
               <View style={localStyles.buttonsContainer}>
                 <TouchableOpacity
@@ -153,8 +136,6 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     </View>
   );
 };
-
-// export default ScanDataMatrixScreen;
 
 const localStyles = StyleSheet.create({
   barcode: {

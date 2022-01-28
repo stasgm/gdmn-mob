@@ -10,6 +10,8 @@ const styles = StyleSheet.create({
     height: 40,
     flex: 1,
     marginHorizontal: 10,
+    // position: 'absolute',
+    zIndex: 0,
   },
   containerInput: {
     flexDirection: 'row',
