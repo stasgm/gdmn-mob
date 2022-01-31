@@ -75,20 +75,23 @@ const Input: React.FC<Props> = ({
           style={[styles.input]}
           maxLength={maxLength}
           placeholderTextColor={colors.text}
+          right={
+            !!value &&
+            !!clearInput && (
+              <TextInput.Icon
+                name="close"
+                size={20}
+                style={{ marginTop: 14 }}
+                onPress={() => onChangeText && onChangeText('')}
+              />
+            )
+          }
           secureTextEntry={secureText}
           spellCheck={spellCheck}
           disabled={disabled}
           editable={editable}
           children={undefined}
-          autoComplete={undefined}
         />
-        {!!value && !!clearInput && (
-          <View style={styles.button}>
-            <TouchableOpacity>
-              <IconButton icon="close" size={20} onPress={() => onChangeText && onChangeText('')} />
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
     </View>
   );

@@ -92,30 +92,30 @@ const ReturnListScreen = () => {
     navigation.navigate('ReturnEdit');
   }, [navigation]);
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить',
-        onPress: handleAddDocument,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddDocument]);
+  // const actionsMenu = useCallback(() => {
+  //   showActionSheet([
+  //     {
+  //       title: 'Добавить',
+  //       onPress: handleAddDocument,
+  //     },
+  //     {
+  //       title: 'Отмена',
+  //       type: 'cancel',
+  //     },
+  //   ]);
+  // }, [showActionSheet, handleAddDocument]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
+          {/* <MenuButton actionsMenu={actionsMenu} /> */}
           <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
-  }, [actionsMenu, handleAddDocument, navigation]);
+  }, [handleAddDocument, navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);

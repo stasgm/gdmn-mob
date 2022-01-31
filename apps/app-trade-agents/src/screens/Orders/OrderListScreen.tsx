@@ -48,23 +48,23 @@ const OrderListScreen = () => {
       status === 'all'
         ? list
         : status === 'active'
-          ? list.filter((e) => e.status !== 'PROCESSED')
-          : status === 'archive'
-            ? list.filter((e) => e.status === 'PROCESSED')
-            : [];
+        ? list.filter((e) => e.status !== 'PROCESSED')
+        : status === 'archive'
+        ? list.filter((e) => e.status === 'PROCESSED')
+        : [];
 
     return res.map(
       (i) =>
-      ({
-        id: i.id,
-        title: i.head.outlet?.name,
-        documentDate: getDateString(i.documentDate),
-        status: i.status,
-        subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
-        isFromRoute: !!i.head.route,
-        lineCount: i.lines.length,
-        errorMessage: i.errorMessage,
-      } as IListItemProps),
+        ({
+          id: i.id,
+          title: i.head.outlet?.name,
+          documentDate: getDateString(i.documentDate),
+          status: i.status,
+          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+          isFromRoute: !!i.head.route,
+          lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
+        } as IListItemProps),
     );
   }, [status, list]);
 
@@ -94,30 +94,30 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить',
-        onPress: handleAddDocument,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddDocument]);
+  // const actionsMenu = useCallback(() => {
+  //   showActionSheet([
+  //     {
+  //       title: 'Добавить',
+  //       onPress: handleAddDocument,
+  //     },
+  //     {
+  //       title: 'Отмена',
+  //       type: 'cancel',
+  //     },
+  //   ]);
+  // }, [showActionSheet, handleAddDocument]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
+          {/* <MenuButton actionsMenu={actionsMenu} /> */}
           <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
-  }, [actionsMenu, handleAddDocument, navigation]);
+  }, [handleAddDocument, navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);

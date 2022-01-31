@@ -160,7 +160,7 @@ const AuthNavigator: React.FC = () => {
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
   }, [dispatch]);
 
-  const CongfigWithParams = useCallback(
+  const ConfigWithParams = useCallback(
     () => <ConfigScreen onSetSettings={saveConfig} onSetDemoMode={onSetDemoMode} settings={config} />,
     [onSetDemoMode, saveConfig, config],
   );
@@ -196,11 +196,11 @@ const AuthNavigator: React.FC = () => {
         config.deviceId ? (
           <>
             <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
-            <AuthStack.Screen name="Config" component={CongfigWithParams} />
+            <AuthStack.Screen name="Config" component={ConfigWithParams} />
           </>
         ) : (
           <>
-            <AuthStack.Screen name="Config" component={CongfigWithParams} />
+            <AuthStack.Screen name="Config" component={ConfigWithParams} />
             <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
           </>
         )
