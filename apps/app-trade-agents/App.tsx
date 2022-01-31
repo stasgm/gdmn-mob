@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch as useDocDispatch } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import {
@@ -15,6 +15,10 @@ import {
 import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+
+import { Settings } from 'react-native';
+
+import { ISettingsOption } from '@lib/types';
 
 import { appTradeActions, store, useAppTradeThunkDispatch, useSelector as useAppTradeSelector } from './src/store';
 
@@ -68,17 +72,23 @@ const Root = () => {
 
   useEffect(() => {
     // console.log('useEffect loadGlobalDataFromDisc');
-    // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
+  const settings = useSelector((state) => state.settings?.data);
 
   useEffect(() => {
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'getReferences',
+          value: { ...settings.getReferences, data: false } as ISettingsOption,
+        }),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);

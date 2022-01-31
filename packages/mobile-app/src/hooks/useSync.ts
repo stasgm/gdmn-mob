@@ -94,15 +94,6 @@ const useSync = (onSync?: () => void): (() => void) => {
         errList.push(getMessagesResponse.message);
       }
 
-      //Формируем запрос на получение справочников для следующего раза
-      const messageGetRef: IMessage['body'] = {
-        type: 'CMD',
-        version: refVersion,
-        payload: {
-          name: 'GET_REF',
-        },
-      };
-
       //Формируем запрос на получение документов для следующего раза
       const messageGetDoc: IMessage['body'] = {
         type: 'CMD',
@@ -121,11 +112,22 @@ const useSync = (onSync?: () => void): (() => void) => {
         },
       };
 
-      //3. Отправляем запрос на получение справочников
-      const sendMesRefResponse = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetRef);
+      if (settings.getReferences?.data) {
+        //Формируем запрос на получение справочников для следующего раза
+        const messageGetRef: IMessage['body'] = {
+          type: 'CMD',
+          version: refVersion,
+          payload: {
+            name: 'GET_REF',
+          },
+        };
 
-      if (sendMesRefResponse.type === 'ERROR') {
-        errList.push(sendMesRefResponse.message);
+        //3. Отправляем запрос на получение справочнико
+        const sendMesRefResponse  = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetRef);
+
+        if (sendMesRefResponse?.type === 'ERROR') {
+          errList.push(sendMesRefResponse.message);
+        }
       }
 
       //4. Отправляем запрос на получение документов
