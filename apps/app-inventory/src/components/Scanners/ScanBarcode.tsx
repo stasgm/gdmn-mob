@@ -6,14 +6,12 @@ import { Camera } from 'expo-camera';
 
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
-import styles from '@lib/mobile-ui/src/styles/global';
-import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
-import { useSelector } from '@lib/store';
-
-import { ISettingsOption } from '@lib/types';
+import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { IInventoryLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
+
+import { scanStyle } from './scanStyle';
 
 interface IProps {
   onSave: (item: IInventoryLine) => void;
@@ -22,12 +20,6 @@ interface IProps {
 }
 
 export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
-  const settings = useSelector((state) => state.settings?.data);
-
-  const weightSettingsWeightCode = (settings?.weightCode as ISettingsOption<string>) || '';
-  const weightSettingsCountCode = (settings?.countCode as ISettingsOption<number>).data || 0;
-  const weightSettingsCountWeight = (settings?.countWeight as ISettingsOption<number>).data || 0;
-
   const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -72,15 +64,7 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
-  }, [
-    barcode,
-    scanned,
-    vibroMode,
-    weightSettingsWeightCode,
-    weightSettingsCountCode,
-    weightSettingsCountWeight,
-    getScannedObject,
-  ]);
+  }, [barcode, scanned, vibroMode, getScannedObject]);
 
   if (hasPermission === null) {
     return <View />;

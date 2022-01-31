@@ -47,14 +47,7 @@ const PrimeButton = ({
       ]}
     >
       <View style={localStyles.buttons}>
-        {icon && (
-          <Icon
-            name={icon}
-            size={16}
-            color={outlined ? colors.primary : colors.background}
-            // style={{ backgroundColor: 'red' }}
-          />
-        )}
+        {icon && <Icon name={icon} size={16} color={outlined ? colors.primary : colors.background} />}
         <Text
           style={[
             localStyles.text,

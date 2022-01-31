@@ -21,7 +21,7 @@ import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
 import { IDepartment } from './src/store/types';
-import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRem, IRemains, IMGoodRemain } from './src/store/app/types';
+import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRemains, IMGoodRemain } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {

@@ -48,6 +48,7 @@ const SelectableInput: React.FC<Props> = ({
           right={!disabled && <TextInput.Icon name="chevron-right" style={{ marginTop: 14 }} onPress={onPress} />}
           editable={editable}
           disabled={disabled}
+          children={undefined}
         />
       </View>
     </View>

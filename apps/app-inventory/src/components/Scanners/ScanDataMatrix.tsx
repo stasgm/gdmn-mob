@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme, useNavigation } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import { View, StyleSheet, TouchableOpacity, StatusBar, Text, Vibration } from 'react-native';
+import { View, TouchableOpacity, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
-import styles from '@lib/mobile-ui/src/styles/global';
+import { globalStyles as styles } from '@lib/mobile-ui';
+
+import { scanStyle } from './scanStyle';
 
 const oneSecond = 1000;
 
@@ -50,7 +52,7 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }
 
   return (
-    <View style={[localStyles.content, { backgroundColor: colors.card }]}>
+    <View style={[scanStyle.content, { backgroundColor: colors.card }]}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
@@ -59,25 +61,25 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={localStyles.camera}
+        style={scanStyle.camera}
       >
-        <View style={localStyles.header}>
-          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={localStyles.transparent} onPress={onCancel} />
+        <View style={scanStyle.header}>
+          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanStyle.transparent} onPress={onCancel} />
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             color={'#FFF'}
-            style={localStyles.transparent}
+            style={scanStyle.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
-            style={localStyles.transparent}
+            style={scanStyle.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
         </View>
         {!scanned ? (
-          <View style={[localStyles.scannerContainer, { alignItems: 'center' }]}>
+          <View style={[scanStyle.scannerContainer, { alignItems: 'center' }]}>
             <View
               style={{
                 width: '70%',
@@ -87,37 +89,37 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
               }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={[localStyles.border, localStyles.borderTop, localStyles.borderLeft]} />
-                <View style={[localStyles.border, localStyles.borderTop, localStyles.borderRight]} />
+                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderLeft]} />
+                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderRight]} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={[localStyles.border, localStyles.borderBottom, localStyles.borderLeft]} />
-                <View style={[localStyles.border, localStyles.borderBottom, localStyles.borderRight]} />
+                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderLeft]} />
+                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderRight]} />
               </View>
             </View>
           </View>
         ) : (
-          <View style={localStyles.scannerContainer}>
-            <View style={localStyles.buttonsContainer}>
+          <View style={scanStyle.scannerContainer}>
+            <View style={scanStyle.buttonsContainer}>
               <TouchableOpacity
-                style={[localStyles.buttons, { backgroundColor: '#FFCA00' }]}
+                style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
                 <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
-                <Text style={localStyles.text}>Пересканировать</Text>
+                <Text style={scanStyle.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && barcode && (
-              <View style={localStyles.buttonsContainer}>
+              <View style={scanStyle.buttonsContainer}>
                 <TouchableOpacity
-                  style={[localStyles.buttons, { backgroundColor: '#4380D3' }]}
+                  style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
                     onSave(barcode);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={localStyles.goodInfo}>
-                    <Text style={localStyles.barcode}>{barcode}</Text>
+                  <View style={scanStyle.goodInfo}>
+                    <Text style={scanStyle.barcode}>{barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -125,10 +127,10 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
           </View>
         )}
         {!scanned && (
-          <View style={localStyles.footer}>
+          <View style={scanStyle.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={localStyles.text}>Наведите рамку на штрихкод</Text>
+              <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>
         )}
@@ -137,91 +139,116 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   );
 };
 
-const localStyles = StyleSheet.create({
-  barcode: {
-    color: '#fff',
-    fontSize: 16,
-    opacity: 0.5,
-  },
-  border: {
-    height: 50,
-    width: 50,
-  },
-  borderBottom: {
-    borderBottomColor: '#FF8',
-    borderBottomWidth: 2,
-  },
-  borderLeft: {
-    borderLeftColor: '#FF8',
-    borderLeftWidth: 2,
-  },
-  borderRight: {
-    borderRightColor: '#FF8',
-    borderRightWidth: 2,
-  },
-  borderTop: {
-    borderTopColor: '#FF8',
-    borderTopWidth: 2,
-  },
-  buttons: {
-    alignItems: 'center',
-    borderRadius: 10,
-    elevation: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    minHeight: 100,
-  },
-  buttonsContainer: {
-    margin: 10,
-  },
-  camera: {
-    flex: 1,
-    flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight ?? 0,
-  },
-  footer: {
-    alignItems: 'center',
-    backgroundColor: '#0008',
-    height: 100,
-    justifyContent: 'center',
-  },
-  goodInfo: {
-    flexShrink: 1,
-    paddingRight: 10,
-  },
-  goodName: {
-    color: '#fff',
-    fontSize: 18,
-    textTransform: 'uppercase',
-  },
-  header: {
-    alignItems: 'center',
-    backgroundColor: '#0008',
-    flexDirection: 'row',
-    height: 70,
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingTop: 30,
-  },
-  infoContainer: {
-    height: 100,
-    padding: 10,
-    // justifyContent: 'center',
-  },
-  scannerContainer: {
-    flex: 1,
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  text: {
-    color: '#fff',
-    fontSize: 18,
-    textTransform: 'uppercase',
-  },
-  transparent: {
-    backgroundColor: 'transparent',
-  },
-});
+// const localStyles = StyleSheet.create({
+//   barcode: {
+//     color: '#fff',
+//     fontSize: 16,
+//     opacity: 0.5,
+//   },
+//   border: {
+//     height: 50,
+//     width: 50,
+//   },
+//   borderBottom: {
+//     borderBottomColor: '#FF8',
+//     borderBottomWidth: 2,
+//   },
+//   borderLeft: {
+//     borderLeftColor: '#FF8',
+//     borderLeftWidth: 2,
+//   },
+//   borderRight: {
+//     borderRightColor: '#FF8',
+//     borderRightWidth: 2,
+//   },
+//   borderTop: {
+//     borderTopColor: '#FF8',
+//     borderTopWidth: 2,
+//   },
+//   buttons: {
+//     alignItems: 'center',
+//     borderRadius: 10,
+//     elevation: 8,
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     minHeight: 100,
+//   },
+//   buttonsContainer: {
+//     margin: 10,
+//   },
+//   camera: {
+//     flex: 1,
+//     flexGrow: 1,
+//   },
+//   content: {
+//     flex: 1,
+//     paddingTop: StatusBar.currentHeight ?? 0,
+//   },
+//   footer: {
+//     alignItems: 'center',
+//     backgroundColor: '#0008',
+//     height: 100,
+//     justifyContent: 'center',
+//   },
+//   goodInfo: {
+//     flexShrink: 1,
+//     paddingRight: 10,
+//   },
+//   goodName: {
+//     color: '#fff',
+//     fontSize: 18,
+//     textTransform: 'uppercase',
+//   },
+//   header: {
+//     alignItems: 'center',
+//     backgroundColor: '#0008',
+//     flexDirection: 'row',
+//     height: 70,
+//     justifyContent: 'space-between',
+//     paddingHorizontal: 10,
+//     paddingTop: 30,
+//   },
+//   infoContainer: {
+//     height: 100,
+//     padding: 10,
+//     // justifyContent: 'center',
+//   },
+//   scannerContainer: {
+//     flex: 1,
+//     flexGrow: 1,
+//     justifyContent: 'center',
+//   },
+//   text: {
+//     color: '#fff',
+//     fontSize: 18,
+//     textTransform: 'uppercase',
+//   },
+//   transparent: {
+//     backgroundColor: 'transparent',
+//   },
+//   notScannedContainer: {
+//     alignItems: 'center',
+//   },
+//   notScannedHeader: {
+//     width: '70%',
+//     height: '50%',
+//     flexDirection: 'column',
+//     justifyContent: 'space-between',
+//   },
+//   notScannedFrame: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//   },
+//   btnReScan: {
+//     backgroundColor: '#D9B227',
+//   },
+//   btnNotFind: {
+//     backgroundColor: '#CC3C4D',
+//   },
+//   btnFind: {
+//     backgroundColor: '#4380D3',
+//   },
+//   btnUnknown: {
+//     backgroundColor: '#CC3C4D',
+//   },
+// });

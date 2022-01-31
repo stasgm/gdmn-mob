@@ -15,10 +15,11 @@ import { IconButton } from 'react-native-paper';
 import { useIsFocused, useTheme } from '@react-navigation/native';
 import { ISettingsOption } from '@lib/types';
 import { useSelector } from '@lib/store';
-import { scanReader } from '@lib/mobile-ui/src/styles/scanReader';
 
 import { IInventoryLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
+
+import { scanReader } from './scanReaderStyle';
 
 interface IProps {
   onSave: (item: IInventoryLine) => void;

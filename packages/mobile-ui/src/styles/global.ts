@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import colors from './colors';
 
-const globalstyles = StyleSheet.create({
+const globalStyles = StyleSheet.create({
   contentTop: {
     justifyContent: 'flex-start',
   },
@@ -195,4 +195,4 @@ const globalstyles = StyleSheet.create({
   },
 });
 
-export default globalstyles;
+export default globalStyles;

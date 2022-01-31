@@ -85,12 +85,16 @@ export const configureStore = (
   appMiddlewares: any[] = [],
   persistedMiddlewares: PersistedMiddleware[] = [],
 ) => {
-  const corePersistedMiddlewares = [documentMiddlewareFactory, authMiddlewareFactory,
-    referenceMiddlewareFactory, settingMiddlewareFactory];
+  const corePersistedMiddlewares = [
+    documentMiddlewareFactory,
+    authMiddlewareFactory,
+    referenceMiddlewareFactory,
+    settingMiddlewareFactory,
+  ];
 
   const middleware = [
     thunkMiddleware,
-    ...[...corePersistedMiddlewares, ...persistedMiddlewares].map(m => m(load, save)),
+    ...[...corePersistedMiddlewares, ...persistedMiddlewares].map((m) => m(load, save)),
     ...appMiddlewares,
   ];
   const middleWareEnhancer = applyMiddleware(...middleware); //logMiddleware
