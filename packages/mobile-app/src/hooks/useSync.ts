@@ -18,6 +18,7 @@ const useSync = (onSync?: () => void): (() => void) => {
 
   const cleanDocTime = (settings.cleanDocTime as ISettingsOption<number>).data || 0;
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
+  const isGetReferences = settings.getReferences?.data;
 
   const systemName = Constants.manifest?.extra?.slug;
   const consumer: INamedEntity = { id: '-1', name: systemName };
@@ -112,7 +113,7 @@ const useSync = (onSync?: () => void): (() => void) => {
         },
       };
 
-      if (settings.getReferences?.data) {
+      if (isGetReferences) {
         //Формируем запрос на получение справочников для следующего раза
         const messageGetRef: IMessage['body'] = {
           type: 'CMD',

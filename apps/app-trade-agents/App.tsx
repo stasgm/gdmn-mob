@@ -78,7 +78,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const settings = useSelector((state) => state.settings?.data);
+  const isGetReferences = useSelector((state) => state.settings?.data.getReferences);
 
   useEffect(() => {
     if (appSettings && isInit) {
@@ -86,7 +86,7 @@ const Root = () => {
       dispatch(
         settingsActions.updateOption({
           optionName: 'getReferences',
-          value: { ...settings.getReferences, data: false } as ISettingsOption,
+          value: { ...isGetReferences, data: false } as ISettingsOption,
         }),
       );
     }
