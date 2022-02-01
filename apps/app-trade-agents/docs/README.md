@@ -314,22 +314,26 @@
 
 <img src="img/6.Maps/6.NewMapPoint.jpg" alt="drawing" height="600"/> <img src="img/6.Maps/6.NewListPoint.jpg" alt="drawing" height="600"/>
 
-## 7. Настройки
+## 7. Матрицы
+
+<img src="img/7.Matrix/7.Contacts.jpg" alt="drawing" height="600"/> <img src="img/7.Matrix/7.Goods.jpg" alt="drawing" height="600"/> <img src="img/7.Matrix/7.Position.jpg" alt="drawing" height="600"/>
+
+## 8. Настройки
 
 Экран **Настройки** содержит информацию о настройках устройства: о параметрах связи с сервером и о настройках приложения. Настройки приложения доступны для изменения пользователем. По умолчанию в Настройках приложения есть следующие поля: **Перезаписывать справочники**, **Время хранения документов в архиве**. При наличии частных настроек добавляются поля **Использовать матрицы**, **Бэк-Офис. Адрес сервера**, **Бэк-Офис. Порт сервера**, **Время ожидания**, **Время поиска накладных возврата**. По нажатию на иконку меню, расположенную в правом верхнем углу, можно вернуться к начальным настройка, выбрав пункт **Установить настройки по умолчанию**.
 
-<img src="img/7.Settings/7.BaseSettings.jpg" alt="drawing" height="600"/> <img src="img/7.Settings/7.Settings.jpg" alt="drawing" height="600"/> <img src="img/7.Settings/7.SettingsMenu.jpg" alt="drawing" height="600"/>
+<img src="img/8.Settings/8.BaseSettings.jpg" alt="drawing" height="600"/> <img src="img/8.Settings/8.Settings.jpg" alt="drawing" height="600"/> <img src="img/8.Settings/8.SettingsMenu.jpg" alt="drawing" height="600"/>
 
-## 8. Профиль
+## 9. Профиль
 
 Экран **Профиль** содержит информацию о пользователе и об устройстве. Также здесь можно выйти из учетной записи пользователя. При наличии настроек пользователя, они также будут отображены в данном экране.
 
-<img src="img/8.Profile/8.Profile.jpg" alt="drawing" height="600"/> <img src="img/8.Profile/8.ProfileSettings.jpg" alt="drawing" height="600"/>
+<img src="img/9.Profile/9.Profile.jpg" alt="drawing" height="600"/> <img src="img/9.Profile/9.ProfileSettings.jpg" alt="drawing" height="600"/>
 
 Если вход был произведен в демо режиме, кнопка **Сменить пользователя** меняется на **Выйти из демо режима**
 
-<img src="img/8.Profile/8.ProfileDemo.jpg" alt="drawing" height="600"/>
+<img src="img/9.Profile/9.ProfileDemo.jpg" alt="drawing" height="600"/>
 
 Также этот экран позволяет очистить данные пользователя. Для этого необходимо нажать на иконку меню, расположенную в правом верхнем углу, и выбрать пункт **Очистить данные**.
 
-<img src="img/8.Profile/8.ClearData.jpg" alt="drawing" height="600"/>
+<img src="img/9.Profile/9.ClearData.jpg" alt="drawing" height="600"/>
