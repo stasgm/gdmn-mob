@@ -17,14 +17,6 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     position: 'relative',
   },
-  button: {
-    alignItems: 'flex-end',
-    position: 'absolute',
-    top: 5,
-    right: 7,
-    zIndex: 5,
-    // width: '100%',
-  },
 });
 
 export default styles;

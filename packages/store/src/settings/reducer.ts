@@ -36,6 +36,15 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: true,
     group: baseSettingGroup,
   },
+  getReferences: {
+    id: '4',
+    description: 'Запрашивать справочники',
+    data: true,
+    type: 'boolean',
+    sortOrder: 4,
+    visible: true,
+    group: baseSettingGroup,
+  },
 };
 
 export const initialState: Readonly<SettingsState> = {
