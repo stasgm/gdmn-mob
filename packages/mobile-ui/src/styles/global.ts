@@ -151,6 +151,10 @@ const globalstyles = StyleSheet.create({
     flexDirection: 'row',
     margin: 3,
   },
+  itemNoMargin: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   name: {
     fontSize: 14,
     fontWeight: 'bold',

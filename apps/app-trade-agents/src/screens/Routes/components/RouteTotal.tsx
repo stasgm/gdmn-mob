@@ -46,31 +46,9 @@ const RouteTotal = ({ routeId }: IItem) => {
         return round(s + round(line.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1)));
       }, 0),
   }));
-  // const totalList: IRouteTotalLine[] = firstLevelGroups.map((firstGr) => ({
-  //   group: {
-  //     id: firstGr.id,
-  //     name: firstGr.name,
-  //   },
-  //   quantity: groups
-  //     .filter((group) => group.parent?.id === firstGr.id)
-  //     .reduce(
-  //       (prev: number, item) =>
-  //         round(
-  //           prev +
-  //             orderLines
-  //               .filter((l) => goods.find((g) => g.id === l.good.id && g.goodgroup.id === item.id))
-  //               .reduce(
-  //                 (s: number, line) =>
-  //                   s + round(line.quantity * (goods.find((g) => g.id === line.good.id)?.invWeight || 1)),
-  //                 0,
-  //               ),
-  //         ),
-  //       0,
-  //     ),
-  // }));
 
   const renderTotalItem = ({ item }: { item: IRouteTotalLine }) => (
-    <View style={styles.item}>
+    <View style={styles.itemNoMargin}>
       <View style={styles.details}>
         <View style={styles.directionRow}>
           <Text style={[styles.field, { color: colors.text }]}>{item.group.name}</Text>

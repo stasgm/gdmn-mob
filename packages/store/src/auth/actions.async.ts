@@ -217,6 +217,22 @@ const getCompany = (
   };
 };
 
+const setDemoMode = (): AppThunk<
+  Promise<ActionType<typeof actions.setDemoModeAsync>>,
+  AuthState,
+  ActionType<typeof actions.setDemoModeAsync>
+> => {
+  return async (dispatch) => {
+    dispatch(actions.setDemoModeAsync.request(''));
+
+    try {
+      return dispatch(actions.setDemoModeAsync.success());
+    } catch {
+      return dispatch(actions.setDemoModeAsync.failure('Ошибка установки демо режима'));
+    }
+  };
+};
+
 export default {
   getDeviceByUid,
   activateDevice,
@@ -228,4 +244,5 @@ export default {
   useAuthThunkDispatch,
   setUserSettings,
   getCompany,
+  setDemoMode,
 };

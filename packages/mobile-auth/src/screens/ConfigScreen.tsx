@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { IApiConfig } from '@lib/client-types';
-import { AppInputScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
+import { AppScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -45,8 +45,13 @@ const ConfigScreen = (props: Props) => {
     navigation.navigate('Splash');
   };
 
+ const handleCancel = () => {
+    settings && onSetSettings({ ...settings });
+    navigation.navigate('Splash');
+  };
+
   return (
-    <AppInputScreen>
+    <AppScreen>
       <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
       <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} clearInput={true} />
       <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
@@ -61,7 +66,7 @@ const ConfigScreen = (props: Props) => {
         >
           Сохранить
         </PrimeButton>
-        <PrimeButton icon="cancel" onPress={() => navigation.navigate('Splash')} style={localStyles.button}>
+        <PrimeButton icon="cancel" onPress={handleCancel} style={localStyles.button}>
           Отмена
         </PrimeButton>
       </View>
@@ -70,7 +75,7 @@ const ConfigScreen = (props: Props) => {
           Подключиться в демо режиме
         </PrimeButton>
       </View>
-    </AppInputScreen>
+    </AppScreen>
   );
 };
 
