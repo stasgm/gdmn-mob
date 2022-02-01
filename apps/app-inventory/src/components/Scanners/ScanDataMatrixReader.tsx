@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
-import { scanStyle } from '@lib/mobile-ui/src/styles/scanStyle';
+import { scanStyle } from './scanStyle';
 
 const oneSecond = 1000;
 

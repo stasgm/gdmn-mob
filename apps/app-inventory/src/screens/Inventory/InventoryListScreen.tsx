@@ -22,7 +22,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IInventoryDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
-import { InventorysStackParamList } from '../../navigation/Root/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 
 export interface InventoryListProps {
   orders: IListItemProps[];
@@ -34,7 +34,7 @@ export interface InventoryListSectionProps {
 export type SectionDataProps = SectionListData<IListItemProps, InventoryListSectionProps>[];
 
 export const InventoryListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryList'>>();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryList'>>();
 
   const { loading } = useSelector((state) => state.documents);
 

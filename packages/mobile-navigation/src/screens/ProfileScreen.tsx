@@ -86,12 +86,11 @@ const ProfileScreen = () => {
       <Divider />
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="devices" children={undefined} />
+          <Avatar.Icon size={50} icon="devices" />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{device?.name || ''}</Text>
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.state || ''}</Text>
-          <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.uid || ''}</Text>
         </View>
       </View>
       {!!visibleList?.length && (

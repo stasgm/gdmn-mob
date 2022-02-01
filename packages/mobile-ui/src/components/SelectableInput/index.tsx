@@ -49,7 +49,6 @@ const SelectableInput: React.FC<Props> = ({
           editable={editable}
           disabled={disabled}
           children={undefined}
-          autoComplete={undefined}
         />
       </View>
     </View>

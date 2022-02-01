@@ -149,7 +149,7 @@ const AuthNavigator: React.FC = () => {
   }, [dispatch]);
 
   const CongfigWithParams = useCallback(
-    () => <ConfigScreen onSetSettings={saveConfig} onSetDemoMode={onSetDemoMode} settings={config} />,
+    () => <ConfigScreen onSetConfig={saveConfig} onSetDemoMode={onSetDemoMode} config={config} />,
     [onSetDemoMode, saveConfig, config],
   );
 

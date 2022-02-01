@@ -12,18 +12,20 @@ import { INamedEntity, ISettingsOption } from '@lib/types';
 import { BackButton } from '@lib/mobile-ui';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
-import { InventorysStackParamList } from '../../navigation/Root/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
 import { ScanBarcode } from '../../components/Scanners/ScanBarcode';
+import { ScanBarcodeReader } from '../../components/Scanners/ScanBarcodeReader';
 
 const ScanBarcodeScreen = () => {
-  const docId = useRoute<RouteProp<InventorysStackParamList, 'ScanBarcode'>>().params?.docId;
+  const docId = useRoute<RouteProp<InventoryStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation();
-  const { data: settings } = useSelector((state) => state.settings);
+  const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
+  const isScanerReader = settings.scannerUse?.data;
 
   const model = useAppInventorySelector((state) => state.appInventory.model);
 
@@ -47,10 +49,6 @@ const ScanBarcodeScreen = () => {
   const handleShowRemains = useCallback(() => {
     navigation.navigate('SelectRemainsItem', { docId });
   }, [docId, navigation]);
-
-  const handleCancel = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
 
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
@@ -120,10 +118,14 @@ const ScanBarcodeScreen = () => {
   if (!document) {
     return <Text style={styles.title}>Документ не найден</Text>;
   }
-
-  console.log('ScanBarcodeScreen');
-
-  return (
+  console.log('isScanerReader', settings.scannerUse?.data, isScanerReader);
+  return isScanerReader ? (
+    <ScanBarcodeReader
+      onSave={(item) => handleSaveScannedItem(item)}
+      onShowRemains={handleShowRemains}
+      getScannedObject={getScannedObject}
+    />
+  ) : (
     <ScanBarcode
       onSave={(item) => handleSaveScannedItem(item)}
       onShowRemains={handleShowRemains}

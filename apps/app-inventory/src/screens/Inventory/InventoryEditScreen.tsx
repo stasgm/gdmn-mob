@@ -20,12 +20,12 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { InventorysStackParamList } from '../../navigation/Root/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument, IDepartment, IInventoryFormParam } from '../../store/types';
 
 export const InventoryEditScreen = () => {
-  const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryEdit'>>();
+  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryEdit'>>();
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);

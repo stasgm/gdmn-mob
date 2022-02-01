@@ -119,7 +119,7 @@ const localStyles = StyleSheet.create({
     letterSpacing: 1,
   },
   blank: {
-    width: 20,
+    // width: 20,
   },
   indicator: {
     paddingLeft: 10,
