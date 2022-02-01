@@ -191,38 +191,38 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setConnectionStatus):
       return { ...state, error: false, connectionStatus: action.payload };
 
-    case getType(actions.setDemoMode):
+    // case getType(actions.setDemoMode):
+    //   return {
+    //     ...state,
+    //     connectionStatus: 'connected',
+    //     user: mockUser,
+    //     device: mockDevice,
+    //     company: mockCompany,
+    //     // loading: false,
+    //     isDemo: true,
+    //   };
+
+    case getType(actions.setDemoModeAsync.request):
+      return {
+        ...state,
+        loadingData: true,
+        status: '',
+        error: false,
+      };
+
+    case getType(actions.setDemoModeAsync.success):
       return {
         ...state,
         connectionStatus: 'connected',
         user: mockUser,
         device: mockDevice,
         company: mockCompany,
-        // loading: false,
+        loadingData: false,
         isDemo: true,
       };
 
-    // case getType(actions.setDemoModeAsync.request):
-    //   return {
-    //     ...state,
-    //     loading: true,
-    //     status: '',
-    //     error: false,
-    //   };
-
-    // case getType(actions.setDemoModeAsync.success):
-    //   return {
-    //     ...state,
-    //     connectionStatus: 'connected',
-    //     user: mockUser,
-    //     device: mockDevice,
-    //     // company: mockUser.company as ICompany,
-    //     loading: false,
-    //     isDemo: true,
-    //   };
-
-    // case getType(actions.setDemoModeAsync.failure):
-    //   return { ...state, loading: false, status: '', error: true };
+    case getType(actions.setDemoModeAsync.failure):
+      return { ...state, loadingData: false, status: '', error: true };
 
     default:
       return state;

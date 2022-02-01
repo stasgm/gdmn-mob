@@ -37,9 +37,7 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
 };
 
 const MobileApp = ({ store, ...props }: IApp) => {
-
-  const Router = () =>
-    (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
+  const Router = () => (authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />);
 
   return store ? (
     <Provider store={store}>

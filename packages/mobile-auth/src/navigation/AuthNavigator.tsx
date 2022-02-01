@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
@@ -34,22 +36,12 @@ const AuthNavigator: React.FC = () => {
       если устройство активировано (установлен deviceId) и не демо режим, то isInit = false
     - устанавливаем loading, чтобы окна не дергались при смене данных на useEffect
   */
-  // const [isInit, setInit] = useState(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
-
-  // useEffect(() => {
-  //   // const i = connectionStatus === 'not-connected' && (!config.deviceId || isDemo);
-  //   // if (i !== isInit) {
-  //   console.log('isInit', connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
-  //   authDispatch(authActions.setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo)));
-  //   // }
-  // }, []);
 
   useEffect(() => {
     // setInit(connectionStatus === 'not-connected' && (!config.deviceId || isDemo));
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config, debug: { ...api.config.debug, isMock: isDemo } };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [config, isDemo]);
 
   const disconnect = useCallback(async () => {
     await authDispatch(authActions.disconnect());
@@ -63,8 +55,7 @@ const AuthNavigator: React.FC = () => {
       authDispatch(authActions.setConfig(newConfig));
       api.config = { ...api.config, ...newConfig };
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [disconnect, authDispatch],
+    [config.deviceId, authDispatch, disconnect],
   );
 
   const checkDevice = useCallback(async () => {
@@ -150,18 +141,15 @@ const AuthNavigator: React.FC = () => {
     authDispatch(authActions.setInit(false));
 
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disconnect, authDispatch]);
+  }, [user, authDispatch, disconnect]);
 
   const onSetDemoMode = useCallback(async () => {
-    dispatch(authActions.setLoadingData(true));
-    dispatch(authActions.setDemoMode());
-    dispatch(authActions.setLoadingData(false));
+    await authDispatch(authActions.setDemoMode());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
   }, [dispatch]);
 
-  const ConfigWithParams = useCallback(
-    () => <ConfigScreen onSetSettings={saveConfig} onSetDemoMode={onSetDemoMode} settings={config} />,
+  const CongfigWithParams = useCallback(
+    () => <ConfigScreen onSetConfig={saveConfig} onSetDemoMode={onSetDemoMode} config={config} />,
     [onSetDemoMode, saveConfig, config],
   );
 
@@ -179,35 +167,45 @@ const AuthNavigator: React.FC = () => {
   */
 
   return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      {isInit ? (
-        <AuthStack.Screen name="Mode" component={ModeSelection} />
-      ) : connectionStatus === 'connected' ? (
-        !user ? (
-          <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
+    <SafeAreaProvider>
+      <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+        {isInit ? (
+          <AuthStack.Screen name="Mode" component={ModeSelection} />
+        ) : connectionStatus === 'connected' ? (
+          !user ? (
+            <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
+          ) : (
+            <AuthStack.Screen
+              name="LoginCompany"
+              component={AppLoadWithParams}
+              options={{ animationTypeForReplace: 'push' }}
+            />
+          )
+        ) : connectionStatus === 'not-connected' ? (
+          config.deviceId ? (
+            <>
+              <AuthStack.Screen
+                name="Splash"
+                component={SplashWithParams}
+                options={{ animationTypeForReplace: 'pop' }}
+              />
+              <AuthStack.Screen name="Config" component={CongfigWithParams} />
+            </>
+          ) : (
+            <>
+              <AuthStack.Screen name="Config" component={CongfigWithParams} />
+              <AuthStack.Screen
+                name="Splash"
+                component={SplashWithParams}
+                options={{ animationTypeForReplace: 'pop' }}
+              />
+            </>
+          )
         ) : (
-          <AuthStack.Screen
-            name="LoginCompany"
-            component={AppLoadWithParams}
-            options={{ animationTypeForReplace: 'push' }}
-          />
-        )
-      ) : connectionStatus === 'not-connected' ? (
-        config.deviceId ? (
-          <>
-            <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
-            <AuthStack.Screen name="Config" component={ConfigWithParams} />
-          </>
-        ) : (
-          <>
-            <AuthStack.Screen name="Config" component={ConfigWithParams} />
-            <AuthStack.Screen name="Splash" component={SplashWithParams} options={{ animationTypeForReplace: 'pop' }} />
-          </>
-        )
-      ) : (
-        <AuthStack.Screen name="Activation" component={ActivateWithParams} />
-      )}
-    </AuthStack.Navigator>
+          <AuthStack.Screen name="Activation" component={ActivateWithParams} />
+        )}
+      </AuthStack.Navigator>
+    </SafeAreaProvider>
   );
 };
 

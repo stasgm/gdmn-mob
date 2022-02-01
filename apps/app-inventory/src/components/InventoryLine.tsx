@@ -17,17 +17,17 @@ import { ScanDataMatrixReader } from './Scanners/ScanDataMatrixReader';
 interface IProps {
   item: IInventoryLine;
   onSetLine: (value: IInventoryLine) => void;
+  onDoScan: () => void;
 }
 
-export const InventoryLine = ({ item, onSetLine }: IProps) => {
+export const InventoryLine = ({ item, onSetLine, onDoScan }: IProps) => {
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
 
   const currRef = useRef<TextInput>(null);
 
-  const { data: settings } = useSelector((state) => state.settings);
-  const scanUsetSetting = settings.scannerUse as ISettingsOption<string>;
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data) || true;
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), 1000);
@@ -52,6 +52,8 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
 
   const handleDoScan = () => {
     setDoScanned(true);
+    //navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
+    // onDoScan();
   };
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export const InventoryLine = ({ item, onSetLine }: IProps) => {
   return (
     <>
       <Modal animationType="slide" visible={doScanned}>
-        {scanUsetSetting.data ? (
+        {isScanerReader ? (
           <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
         ) : (
           <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />

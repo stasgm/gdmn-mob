@@ -12,12 +12,12 @@ import { INamedEntity } from '@lib/types';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { InventorysStackParamList } from '../../navigation/Root/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/app/types';
 
 const Good = ({ item }: { item: INamedEntity }) => {
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'SelectGoodItem'>>();
-  const { docId } = useRoute<RouteProp<InventorysStackParamList, 'SelectGoodItem'>>().params;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectGoodItem'>>();
+  const { docId } = useRoute<RouteProp<InventoryStackParamList, 'SelectGoodItem'>>().params;
 
   return (
     <TouchableOpacity

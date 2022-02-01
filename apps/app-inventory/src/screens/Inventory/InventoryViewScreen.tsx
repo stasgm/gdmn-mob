@@ -19,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
-import { InventorysStackParamList } from '../../navigation/Root/types';
+import { InventoryStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { InventoryItem } from '../../components/InventoryItem';
@@ -27,12 +27,9 @@ import { InventoryItem } from '../../components/InventoryItem';
 export const InventoryViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventorysStackParamList, 'InventoryView'>>();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryView'>>();
 
-  const id = useRoute<RouteProp<InventorysStackParamList, 'InventoryView'>>().params?.id;
-
-  const { data: settings } = useSelector((state) => state.settings);
-  const scanUsetSetting = (settings.scannerUse as ISettingsOption<string>) || true;
+  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
 
   const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
@@ -49,8 +46,8 @@ export const InventoryViewScreen = () => {
   }, [navigation, id]);
 
   const handleDoScan = useCallback(() => {
-    navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
-  }, [navigation, id, scanUsetSetting]);
+    navigation.navigate('ScanBarcode', { docId: id });
+  }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -109,8 +106,6 @@ export const InventoryViewScreen = () => {
       <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );
-
-  console.log('ViewScreen');
 
   return (
     <View style={[styles.container]}>

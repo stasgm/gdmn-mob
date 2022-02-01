@@ -1,3 +1,4 @@
+import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
 import {
   InventoryEditScreen,
   SelectGoodScreen,
@@ -6,8 +7,7 @@ import {
   InventoryLineScreen,
   SelectRemainsScreen,
 } from '../../screens/Inventory';
-
-import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
+import { ScanBarcodeReaderScreen } from '../../screens/Inventory/ScanBarcodeReaderScreen';
 import ScanBarcodeScreen from '../../screens/Inventory/ScanBarcodeScreen';
 
 export const inventoryScreens = {

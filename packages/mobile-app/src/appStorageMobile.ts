@@ -16,7 +16,6 @@ import * as FileSystem from 'expo-file-system';
 //  */
 // export type PersistedMiddleware = (load: LoadDataFromDisk, save: SaveDataToDisk) => (action: any) => any;
 
-
 import { AppStorage, LoadDataFromDisk, SaveDataToDisk } from '@lib/store';
 
 const dbDir = `${FileSystem.documentDirectory}db/`;
