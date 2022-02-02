@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 
-import { appActions, appSelectors, authSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, appSelectors, authActions, authSelectors, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
@@ -26,7 +26,7 @@ const Root = () => {
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const authLoading = useSelector((state) => state.auth.loading);
+  const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
