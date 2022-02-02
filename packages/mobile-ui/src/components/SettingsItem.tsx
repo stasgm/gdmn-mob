@@ -51,6 +51,8 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingHorizontal: 12,
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   settingsContainer: {
     flexDirection: 'column',
