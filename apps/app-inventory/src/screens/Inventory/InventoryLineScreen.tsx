@@ -41,11 +41,7 @@ export const InventoryLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <InventoryLine
-        item={line}
-        onSetLine={setLine}
-        onDoScan={() => navigation.navigate(isScanerReader ? 'ScanBarcodeReader' : 'ScanBarcode', { docId })}
-      />
+      <InventoryLine item={line} onSetLine={setLine} />
     </View>
   );
 };

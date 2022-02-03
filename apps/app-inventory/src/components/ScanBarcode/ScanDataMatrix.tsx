@@ -5,18 +5,16 @@ import { Camera } from 'expo-camera';
 import { View, TouchableOpacity, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
-
-import { scanStyle } from './scanStyle';
-
-const oneSecond = 1000;
+import { globalStyles } from '@lib/mobile-ui';
+import styles from './styles';
+import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 interface IProps {
   onSave: (data: string) => void;
   onCancel: () => void;
 }
 
-export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
+const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
@@ -34,13 +32,13 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }, []);
 
   const handleBarCodeScanned = (data: string) => {
-    vibroMode && Vibration.vibrate(oneSecond);
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
     setScanned(true);
     setBarcode(data);
   };
 
   useEffect(() => {
-    vibroMode && Vibration.vibrate(oneSecond);
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
 
   if (hasPermission === null) {
@@ -48,11 +46,11 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }
 
   if (hasPermission === false) {
-    return <Text style={styles.title}>Нет доступа к камере</Text>;
+    return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
   }
 
   return (
-    <View style={[scanStyle.content, { backgroundColor: colors.card }]}>
+    <View style={[styles.content, { backgroundColor: colors.card }]}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
@@ -61,25 +59,25 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={scanStyle.camera}
+        style={styles.camera}
       >
-        <View style={scanStyle.header}>
-          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanStyle.transparent} onPress={onCancel} />
+        <View style={styles.header}>
+          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={styles.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
         </View>
         {!scanned ? (
-          <View style={[scanStyle.scannerContainer, { alignItems: 'center' }]}>
+          <View style={[styles.scannerContainer, { alignItems: 'center' }]}>
             <View
               style={{
                 width: '70%',
@@ -89,37 +87,37 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
               }}
             >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderLeft]} />
-                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderRight]} />
+                <View style={[styles.border, styles.borderTop, styles.borderLeft]} />
+                <View style={[styles.border, styles.borderTop, styles.borderRight]} />
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderLeft]} />
-                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderRight]} />
+                <View style={[styles.border, styles.borderBottom, styles.borderLeft]} />
+                <View style={[styles.border, styles.borderBottom, styles.borderRight]} />
               </View>
             </View>
           </View>
         ) : (
-          <View style={scanStyle.scannerContainer}>
-            <View style={scanStyle.buttonsContainer}>
+          <View style={styles.scannerContainer}>
+            <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
+                style={[styles.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
                 <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
-                <Text style={scanStyle.text}>Пересканировать</Text>
+                <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && barcode && (
-              <View style={scanStyle.buttonsContainer}>
+              <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
+                  style={[styles.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
                     onSave(barcode);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={scanStyle.goodInfo}>
-                    <Text style={scanStyle.barcode}>{barcode}</Text>
+                  <View style={styles.goodInfo}>
+                    <Text style={styles.barcode}>{barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -127,10 +125,10 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
           </View>
         )}
         {!scanned && (
-          <View style={scanStyle.footer}>
+          <View style={styles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
+              <Text style={styles.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>
         )}
@@ -138,6 +136,8 @@ export const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     </View>
   );
 };
+
+export default ScanDataMatrix;
 
 // const localStyles = StyleSheet.create({
 //   barcode: {

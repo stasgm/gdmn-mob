@@ -12,6 +12,8 @@ const globalStyles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    alignItems: 'center',
+    display: 'flex',
   },
   btnTab: {
     flex: 1,

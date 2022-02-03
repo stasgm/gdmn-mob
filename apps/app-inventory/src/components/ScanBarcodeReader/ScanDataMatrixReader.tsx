@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import { useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -13,10 +12,8 @@ import {
   Text,
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
-
-import { scanStyle } from './scanStyle';
-
-const oneSecond = 1000;
+import { ONE_SECOND_IN_MS } from '../../utils/constants';
+import styles from './styles';
 
 interface IProps {
   onSave: (data: string) => void;
@@ -33,11 +30,11 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   const [barcode, setBarcode] = useState('');
 
   useEffect(() => {
-    vibroMode && Vibration.vibrate(oneSecond);
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
 
   const handleBarCodeScanned = (data: string) => {
-    vibroMode && Vibration.vibrate(oneSecond);
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
     setScanned(true);
     setBarcode(data);
   };
@@ -52,21 +49,21 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[scanStyle.content, { backgroundColor: colors.card }]}
+      style={[styles.content, { backgroundColor: colors.card }]}
       focusable={true}
     >
-      <View style={scanStyle.camera}>
-        <View style={scanStyle.header}>
-          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanStyle.transparent} onPress={onCancel} />
+      <View style={styles.camera}>
+        <View style={styles.header}>
+          <IconButton icon="arrow-left" color={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
         </View>
         {!scanned ? (
-          <View style={[scanStyle.scannerContainer, { alignItems: 'center' }]}>
+          <View style={[styles.scannerContainer, { alignItems: 'center' }]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
                 selectionColor={'#000'}
@@ -78,27 +75,27 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
             </TouchableWithoutFeedback>
           </View>
         ) : (
-          <View style={scanStyle.scannerContainer}>
-            <View style={scanStyle.buttonsContainer}>
+          <View style={styles.scannerContainer}>
+            <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                style={[scanStyle.buttons, { backgroundColor: '#FFCA00' }]}
+                style={[styles.buttons, { backgroundColor: '#FFCA00' }]}
                 onPress={() => setScanned(false)}
               >
                 <IconButton icon={'barcode-scan'} color={'#FFF'} size={30} />
-                <Text style={scanStyle.text}>Пересканировать</Text>
+                <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && barcode && (
-              <View style={scanStyle.buttonsContainer}>
+              <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[scanStyle.buttons, { backgroundColor: '#4380D3' }]}
+                  style={[styles.buttons, { backgroundColor: '#4380D3' }]}
                   onPress={() => {
                     onSave(barcode);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={scanStyle.goodInfo}>
-                    <Text style={scanStyle.barcode}>{barcode}</Text>
+                  <View style={styles.goodInfo}>
+                    <Text style={styles.barcode}>{barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -106,10 +103,10 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
           </View>
         )}
         {!scanned && (
-          <View style={scanStyle.footer}>
+          <View style={styles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={scanStyle.text}>Отсканируйте штрихкод</Text>
+              <Text style={styles.text}>Отсканируйте штрихкод</Text>
             </>
           </View>
         )}
@@ -118,4 +115,4 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   );
 };
 
-export { ScanDataMatrixReader };
+export default ScanDataMatrixReader;

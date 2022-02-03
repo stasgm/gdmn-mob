@@ -6,5 +6,5 @@ interface IProps {
 }
 
 export const ScanButton = ({ onPress }: IProps) => {
-  return <IconButton icon="barcode-scan" size={30} onPress={onPress} />;
+  return <IconButton icon="barcode-scan" size={26} onPress={onPress} />;
 };

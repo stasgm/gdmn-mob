@@ -46,7 +46,7 @@ const Root = () => {
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IDepartment>('department')?.data;
   const remains = refSelectors.selectByName<IRemains>('remain')?.data;
-  const authLoading = useSelector((state) => state.auth.loading);
+  const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
@@ -54,14 +54,12 @@ const Root = () => {
 
   useEffect(() => {
     if (appSettings && isInit) {
-      console.log('isInit', isInit);
       dispatch(settingsActions.addSettings(appSettings));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);
 
   useEffect(() => {
-    console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,7 +67,6 @@ const Root = () => {
 
   useEffect(() => {
     if (isLogged) {
-      console.log('useEffect loadSuperDataFromDisc');
       dispatch(appActions.loadSuperDataFromDisc());
     }
   }, [dispatch, isLogged]);
