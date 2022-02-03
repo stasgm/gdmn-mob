@@ -29,9 +29,16 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               value={value === 0 ? '' : value.toString()}
               onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
               keyboardType={'numeric'}
+              clearInput={true}
             />
           ) : (
-            <Input label={label} value={value} onChangeText={(text) => onValueChange(text)} keyboardType={'default'} />
+            <Input
+              label={label}
+              value={value}
+              onChangeText={(text) => onValueChange(text)}
+              keyboardType={'default'}
+              clearInput={true}
+            />
           )}
         </View>
       )}
@@ -44,6 +51,8 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingHorizontal: 12,
+    paddingVertical: 3,
+    marginVertical: 6,
   },
   settingsContainer: {
     flexDirection: 'column',

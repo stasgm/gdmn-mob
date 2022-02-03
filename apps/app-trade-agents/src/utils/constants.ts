@@ -1,4 +1,4 @@
-import { baseGroup } from '@lib/store/src/settings';
+import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
 
 import config from '../config';
@@ -77,7 +77,7 @@ const appSettings: Settings = {
     type: 'boolean',
     sortOrder: 10,
     visible: true,
-    group: baseGroup,
+    group: baseSettingGroup,
   },
   serverName: {
     id: '6',

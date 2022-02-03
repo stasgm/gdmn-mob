@@ -17,6 +17,8 @@ import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as U
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
+import { ISettingsOption } from '@lib/types';
+
 import { appTradeActions, store, useAppTradeThunkDispatch, useSelector as useAppTradeSelector } from './src/store';
 
 import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
@@ -76,10 +78,17 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
+  const isGetReferences = useSelector((state) => state.settings?.data.getReferences);
 
   useEffect(() => {
     if (appSettings && isInit) {
       dispatch(settingsActions.addSettings(appSettings));
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'getReferences',
+          value: { ...isGetReferences, data: false } as ISettingsOption,
+        }),
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInit]);

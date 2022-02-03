@@ -5,10 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
-  useActionSheet,
   AddButton,
   DrawerButton,
-  MenuButton,
   FilterButtons,
   ItemSeparator,
   Status,
@@ -33,7 +31,6 @@ export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionP
 
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
-  const showActionSheet = useActionSheet();
 
   const { loading } = useSelector((state) => state.documents);
 
@@ -94,30 +91,16 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
-  const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить',
-        onPress: handleAddDocument,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddDocument]);
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
-          <MenuButton actionsMenu={actionsMenu} />
           <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
-  }, [actionsMenu, handleAddDocument, navigation]);
+  }, [handleAddDocument, navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);

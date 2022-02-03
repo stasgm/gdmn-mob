@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,6 @@ import { documentActions, useDispatch, useDocThunkDispatch } from '@lib/store';
 import { IDocument } from '@lib/types';
 
 import { SwipeItem } from '@lib/mobile-ui';
-import { sleep } from '@lib/client-api';
 
 interface IProps {
   children?: ReactNode;
