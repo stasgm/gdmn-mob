@@ -7,7 +7,6 @@ import {
   InventoryLineScreen,
   SelectRemainsScreen,
 } from '../../screens/Inventory';
-import { ScanBarcodeReaderScreen } from '../../screens/Inventory/ScanBarcodeReaderScreen';
 import ScanBarcodeScreen from '../../screens/Inventory/ScanBarcodeScreen';
 
 export const inventoryScreens = {

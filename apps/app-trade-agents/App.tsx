@@ -106,7 +106,6 @@ const Root = () => {
 
   useEffect(() => {
     if (isLogged) {
-      // console.log('useEffect loadSuperDataFromDisc', isLogged);
       dispatch(appActions.loadSuperDataFromDisc());
     }
   }, [dispatch, isLogged]);

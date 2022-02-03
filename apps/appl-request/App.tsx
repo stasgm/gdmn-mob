@@ -45,6 +45,7 @@ const Root = () => {
   }, [dispatch, isLogged]);
 
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     //Для отрисовки при первом подключении
     const timer = setTimeout(() => {

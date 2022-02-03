@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export const scanReader = StyleSheet.create({
+export const styles = StyleSheet.create({
   barcode: {
     color: '#fff',
     fontSize: 16,
@@ -82,3 +82,5 @@ export const scanReader = StyleSheet.create({
     backgroundColor: '#CC3C4D',
   },
 });
+
+export default styles;

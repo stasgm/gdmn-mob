@@ -22,7 +22,7 @@ export type InventoryParamList = RefParamList & {
   SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
-  ScanBarcodeReader: { docId: string; docType?: string };
+  // ScanBarcodeReader: { docId: string; docType?: string };
   InventoryLineEdit: {
     docId: string;
     prodId: string;

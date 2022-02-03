@@ -6,7 +6,6 @@ import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@r
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
 import { docSelectors, useSelector } from '@lib/store';
-import { ISettingsOption } from '@lib/types';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -59,27 +58,23 @@ const GoodRemains = ({ item }: { item: IRem }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  // const { params } = props.route;
-  // const docType = params?.docType as string;
-
   const navigation = useNavigation();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [list, setList] = useState<IRem[]>([]);
 
-  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data) || true;
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
   const model = useAppInventorySelector((state) => state.appInventory.model);
 
   const docId = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
-    // .selectByDocType<IInventoryDocument>(docType)
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
   const handleScanner = useCallback(() => {
-    navigation.navigate(isScanerReader ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: docId });
-  }, [navigation, docId, isScanerReader]);
+    navigation.navigate('ScanBarcode', { docId: docId });
+  }, [navigation, docId]);
 
   const goods = useMemo(
     () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),
@@ -124,11 +119,11 @@ export const SelectRemainsScreen = () => {
       headerRight: () => (
         <View style={styles.buttons}>
           <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />
-          <ScanButton onPress={handleScanner} />
+          {isScanerReader && <ScanButton onPress={handleScanner} />}
         </View>
       ),
     });
-  }, [navigation, filterVisible, colors.card, handleScanner]);
+  }, [navigation, filterVisible, colors.card, handleScanner, isScanerReader]);
 
   const refList = useRef<FlatList<IRem>>(null);
   useScrollToTop(refList);

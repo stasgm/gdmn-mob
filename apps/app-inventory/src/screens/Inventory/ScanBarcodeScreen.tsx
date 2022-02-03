@@ -4,18 +4,15 @@ import { v4 as uuid } from 'uuid';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
-import styles from '@lib/mobile-ui/src/styles/global';
+import { globalStyles, BackButton } from '@lib/mobile-ui';
 import { useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
-import { BackButton } from '@lib/mobile-ui';
-
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
-import { ScanBarcode } from '../../components/Scanners/ScanBarcode';
-import { ScanBarcodeReader } from '../../components/Scanners/ScanBarcodeReader';
+import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<InventoryStackParamList, 'ScanBarcode'>>().params?.docId;
@@ -116,9 +113,9 @@ const ScanBarcodeScreen = () => {
   );
 
   if (!document) {
-    return <Text style={styles.title}>Документ не найден</Text>;
+    return <Text style={globalStyles.title}>Документ не найден</Text>;
   }
-  console.log('isScanerReader', settings.scannerUse?.data, isScanerReader);
+
   return isScanerReader ? (
     <ScanBarcodeReader
       onSave={(item) => handleSaveScannedItem(item)}

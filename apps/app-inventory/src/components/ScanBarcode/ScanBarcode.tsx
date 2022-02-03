@@ -6,12 +6,11 @@ import { Camera } from 'expo-camera';
 
 import { useIsFocused, useTheme } from '@react-navigation/native';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles } from '@lib/mobile-ui';
 
 import { IInventoryLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
-
-import { scanStyle } from './scanStyle';
+import styles from './styles';
 
 interface IProps {
   onSave: (item: IInventoryLine) => void;
@@ -19,7 +18,7 @@ interface IProps {
   getScannedObject: (brc: string) => IInventoryLine | undefined;
 }
 
-export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
+const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -71,11 +70,11 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
   }
 
   if (hasPermission === false) {
-    return <Text style={styles.title}>Нет доступа к камере</Text>;
+    return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
   }
 
   return isFocused ? (
-    <View style={[scanStyle.content]}>
+    <View style={[styles.content]}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
@@ -84,70 +83,70 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={[scanStyle.camera, { backgroundColor: colors.card }]}
+        style={[styles.camera, { backgroundColor: colors.card }]}
       >
-        <View style={scanStyle.header}>
+        <View style={styles.header}>
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={styles.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
           <IconButton
             icon={'feature-search-outline'}
             color={'#FFF'}
-            style={scanStyle.transparent}
+            style={styles.transparent}
             onPress={onShowRemains}
           />
         </View>
         {!scanned ? (
-          <View style={[scanStyle.scannerContainer, scanStyle.notScannedContainer]}>
-            <View style={scanStyle.notScannedHeader}>
-              <View style={scanStyle.notScannedFrame}>
-                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderLeft]} />
-                <View style={[scanStyle.border, scanStyle.borderTop, scanStyle.borderRight]} />
+          <View style={[styles.scannerContainer, styles.notScannedContainer]}>
+            <View style={styles.notScannedHeader}>
+              <View style={styles.notScannedFrame}>
+                <View style={[styles.border, styles.borderTop, styles.borderLeft]} />
+                <View style={[styles.border, styles.borderTop, styles.borderRight]} />
               </View>
-              <View style={scanStyle.notScannedFrame}>
-                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderLeft]} />
-                <View style={[scanStyle.border, scanStyle.borderBottom, scanStyle.borderRight]} />
+              <View style={styles.notScannedFrame}>
+                <View style={[styles.border, styles.borderBottom, styles.borderLeft]} />
+                <View style={[styles.border, styles.borderBottom, styles.borderRight]} />
               </View>
             </View>
           </View>
         ) : (
-          <View style={scanStyle.scannerContainer}>
-            <View style={scanStyle.buttonsContainer}>
+          <View style={styles.scannerContainer}>
+            <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                style={[scanStyle.buttons, scanStyle.btnReScan]}
+                style={[styles.buttons, styles.btnReScan]}
                 onPress={() => {
                   setScanned(false);
                   setItemLine(undefined);
                 }}
               >
                 <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
-                <Text style={scanStyle.text}>Пересканировать</Text>
+                <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && !itemLine && (
-              <View style={scanStyle.infoContainer}>
-                <View style={[scanStyle.buttons, scanStyle.btnNotFind]}>
+              <View style={styles.infoContainer}>
+                <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
-                    <Text style={scanStyle.text}>{barcode}</Text>
-                    <Text style={scanStyle.text}>{'Товар не найден'}</Text>
+                    <Text style={styles.text}>{barcode}</Text>
+                    <Text style={styles.text}>{'Товар не найден'}</Text>
                   </View>
                 </View>
               </View>
             )}
             {scanned && itemLine && (
-              <View style={scanStyle.buttonsContainer}>
+              <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[scanStyle.buttons, itemLine.good.id === 'unknown' ? scanStyle.btnUnknown : scanStyle.btnFind]}
+                  style={[styles.buttons, itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
                   onPress={() => {
                     onSave(itemLine);
                     setScanned(false);
@@ -155,15 +154,15 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={scanStyle.goodInfo}>
-                    <Text style={scanStyle.goodName} numberOfLines={3}>
+                  <View style={styles.goodInfo}>
+                    <Text style={styles.goodName} numberOfLines={3}>
                       {itemLine?.good.name}
                     </Text>
-                    <Text style={scanStyle.barcode}>{itemLine?.barcode}</Text>
-                    <Text style={scanStyle.barcode}>
+                    <Text style={styles.barcode}>{itemLine?.barcode}</Text>
+                    <Text style={styles.barcode}>
                       цена: {itemLine?.price || 0} р., остаток: {itemLine?.remains}
                     </Text>
-                    <Text style={scanStyle.barcode}>количество: {itemLine?.quantity}</Text>
+                    <Text style={styles.barcode}>количество: {itemLine?.quantity}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -171,10 +170,10 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
           </View>
         )}
         {!scanned && (
-          <View style={scanStyle.footer}>
+          <View style={styles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={scanStyle.text}>Наведите рамку на штрихкод</Text>
+              <Text style={styles.text}>Наведите рамку на штрихкод</Text>
             </>
           </View>
         )}
@@ -184,3 +183,5 @@ export const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps)
     <></>
   );
 };
+
+export default ScanBarcode;

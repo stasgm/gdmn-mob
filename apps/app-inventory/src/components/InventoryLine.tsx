@@ -7,30 +7,28 @@ import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
 
-import { ISettingsOption } from '@lib/types';
-
 import { IInventoryLine } from '../store/types';
 
-import { ScanDataMatrix } from './Scanners/ScanDataMatrix';
-import { ScanDataMatrixReader } from './Scanners/ScanDataMatrixReader';
+import { ONE_SECOND_IN_MS } from '../utils/constants';
+
+import { ScanDataMatrix, ScanDataMatrixReader } from '.';
 
 interface IProps {
   item: IInventoryLine;
   onSetLine: (value: IInventoryLine) => void;
-  onDoScan: () => void;
 }
 
-export const InventoryLine = ({ item, onSetLine, onDoScan }: IProps) => {
+export const InventoryLine = ({ item, onSetLine }: IProps) => {
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
 
   const currRef = useRef<TextInput>(null);
 
-  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data) || true;
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
   useEffect(() => {
-    currRef?.current && setTimeout(() => currRef.current?.focus(), 1000);
+    currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
   }, []);
 
   const handleQuantityChange = useCallback((value: string) => {
@@ -52,8 +50,6 @@ export const InventoryLine = ({ item, onSetLine, onDoScan }: IProps) => {
 
   const handleDoScan = () => {
     setDoScanned(true);
-    //navigation.navigate(scanUsetSetting.data ? 'ScanBarcodeReader' : 'ScanBarcode', { docId: id });
-    // onDoScan();
   };
 
   useEffect(() => {

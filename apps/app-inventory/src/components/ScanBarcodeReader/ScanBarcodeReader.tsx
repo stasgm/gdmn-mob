@@ -19,18 +19,18 @@ import { useSelector } from '@lib/store';
 import { IInventoryLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { scanReader } from './scanReaderStyle';
+import { styles } from './styles';
 
 interface IProps {
   onSave: (item: IInventoryLine) => void;
   onShowRemains: () => void;
   getScannedObject: (brc: string) => IInventoryLine | undefined;
 }
+
 export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const settings = useSelector((state) => state.settings?.data);
-
   const weightSettingsWeightCode = (settings?.weightCode as ISettingsOption<string>) || '';
   const weightSettingsCountCode = (settings?.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings?.countWeight as ISettingsOption<number>).data || 0;
@@ -55,7 +55,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
         setTimeout(() => {
           ref.current?.focus();
           ref.current?.clear();
-        }, 500);
+        }, ONE_SECOND_IN_MS);
     }
   }, [scanned, ref]);
 
@@ -88,26 +88,26 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
   return isFocused ? (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[scanReader.content, { backgroundColor: colors.card }]}
+      style={[styles.content, { backgroundColor: colors.card }]}
     >
-      <View style={scanReader.camera}>
-        <View style={scanReader.header}>
+      <View style={styles.camera}>
+        <View style={styles.header}>
           {/* <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanReader.transparent} onPress={onGoBack} /> */}
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}
-            style={scanReader.transparent}
+            style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
           <IconButton
             icon={'feature-search-outline'}
             color={'#FFF'}
-            style={scanReader.transparent}
+            style={styles.transparent}
             onPress={onShowRemains}
           />
         </View>
         {!scanned ? (
-          <View style={[scanReader.scannerContainer, scanReader.notScannedContainer]}>
+          <View style={[styles.scannerContainer, styles.notScannedContainer]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
                 style={{ width: 0 }}
@@ -119,36 +119,36 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
             </TouchableWithoutFeedback>
           </View>
         ) : (
-          <View style={scanReader.scannerContainer}>
-            <View style={scanReader.buttonsContainer}>
+          <View style={styles.scannerContainer}>
+            <View style={styles.buttonsContainer}>
               <TouchableOpacity
-                style={[scanReader.buttons, scanReader.btnReScan]}
+                style={[styles.buttons, styles.btnReScan]}
                 onPress={() => {
                   setScanned(false);
                   setItemLine(undefined);
                 }}
               >
-                <IconButton icon="barcode-scan" size={30} />
-                <Text style={scanReader.text}>Пересканировать</Text>
+                <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
+                <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
             {scanned && !itemLine && (
-              <View style={scanReader.infoContainer}>
-                <View style={[scanReader.buttons, scanReader.btnNotFind]}>
+              <View style={styles.infoContainer}>
+                <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
-                    <Text style={scanReader.text}>{barcode}</Text>
-                    <Text style={scanReader.text}>{'Товар не найден'}</Text>
+                    <Text style={styles.text}>{barcode}</Text>
+                    <Text style={styles.text}>{'Товар не найден'}</Text>
                   </View>
                 </View>
               </View>
             )}
             {scanned && itemLine && (
-              <View style={scanReader.buttonsContainer}>
+              <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                   style={[
-                    scanReader.buttons,
-                    itemLine.good.id === 'unknown' ? scanReader.btnUnknown : scanReader.btnFind,
+                    styles.buttons,
+                    itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind,
                   ]}
                   onPress={() => {
                     onSave(itemLine);
@@ -157,15 +157,15 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={scanReader.goodInfo}>
-                    <Text style={scanReader.goodName} numberOfLines={3}>
+                  <View style={styles.goodInfo}>
+                    <Text style={styles.goodName} numberOfLines={3}>
                       {itemLine?.good.name}
                     </Text>
-                    <Text style={scanReader.barcode}>{itemLine?.barcode}</Text>
-                    <Text style={scanReader.barcode}>
+                    <Text style={styles.barcode}>{itemLine?.barcode}</Text>
+                    <Text style={styles.barcode}>
                       цена: {itemLine?.price || 0} р., остаток: {itemLine?.remains}
                     </Text>
-                    <Text style={scanReader.barcode}>количество: {itemLine?.quantity}</Text>
+                    <Text style={styles.barcode}>количество: {itemLine?.quantity}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -173,10 +173,10 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
           </View>
         )}
         {!scanned && (
-          <View style={scanReader.footer}>
+          <View style={styles.footer}>
             <>
               <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={scanReader.text}>Отсканируйте штрихкод</Text>
+              <Text style={styles.text}>Отсканируйте штрихкод</Text>
             </>
           </View>
         )}
@@ -186,3 +186,5 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
     <></>
   );
 };
+
+export default ScanBarcodeReader;
