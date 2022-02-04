@@ -6,6 +6,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.5,
   },
+  border: {
+    height: 50,
+    width: 50,
+  },
+  borderBottom: {
+    borderBottomColor: '#FF8',
+    borderBottomWidth: 2,
+  },
+  borderLeft: {
+    borderLeftColor: '#FF8',
+    borderLeftWidth: 2,
+  },
+  borderRight: {
+    borderRightColor: '#FF8',
+    borderRightWidth: 2,
+  },
+  borderTop: {
+    borderTopColor: '#FF8',
+    borderTopWidth: 2,
+  },
   buttons: {
     alignItems: 'center',
     borderRadius: 10,
@@ -55,7 +75,6 @@ const styles = StyleSheet.create({
   scannerContainer: {
     flex: 1,
     flexGrow: 1,
-    backgroundColor: '#000',
     justifyContent: 'center',
   },
   text: {
@@ -68,6 +87,16 @@ const styles = StyleSheet.create({
   },
   notScannedContainer: {
     alignItems: 'center',
+  },
+  notScannedHeader: {
+    width: '70%',
+    height: '50%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  notScannedFrame: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   btnReScan: {
     backgroundColor: '#D9B227',

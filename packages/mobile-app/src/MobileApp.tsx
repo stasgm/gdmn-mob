@@ -7,7 +7,7 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { appSelectors, authSelectors } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
-import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
+import { Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
 import { useSelector } from '@lib/store';
 
@@ -24,8 +24,8 @@ const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync);
   const config = useSelector((state) => state.auth.config);
 
-  const errorList = useSelector((state) => state.app.errorList);
-  console.log('errorList', errorList);
+  // const errorList = useSelector((state) => state.app.errorList);
+  // console.log('errorList', errorList);
 
   useEffect(() => {
     // //При запуске приложения записываем настройки в апи

@@ -17,31 +17,31 @@ import {
   ScanButton,
 } from '@lib/mobile-ui';
 
-import { IInventoryDocument, IInventoryLine } from '../../store/types';
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { IInventoryDocument, IDocLine } from '../../store/types';
+import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
-import { InventoryItem } from '../../components/InventoryItem';
+import { DocItem } from '../../components/DocItem';
 
-export const InventoryViewScreen = () => {
+export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryView'>>();
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
 
-  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
+  const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  const doc = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
 
-  const isBlocked = inventory?.status !== 'DRAFT';
+  const isBlocked = doc?.status !== 'DRAFT';
 
-  const handleAddInventoryLine = useCallback(() => {
+  const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
       docId: id,
     });
   }, [navigation, id]);
 
-  const handleEditInventoryHead = useCallback(() => {
-    navigation.navigate('InventoryEdit', { id });
+  const handleEditDocHead = useCallback(() => {
+    navigation.navigate('DocEdit', { id });
   }, [navigation, id]);
 
   const handleDoScan = useCallback(() => {
@@ -61,11 +61,11 @@ export const InventoryViewScreen = () => {
     showActionSheet([
       {
         title: 'Добавить товар',
-        onPress: handleAddInventoryLine,
+        onPress: handleAddDocLine,
       },
       {
         title: 'Редактировать данные',
-        onPress: handleEditInventoryHead,
+        onPress: handleEditDocHead,
       },
       {
         title: 'Удалить документ',
@@ -77,7 +77,7 @@ export const InventoryViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddInventoryLine, handleDelete, handleEditInventoryHead]);
+  }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -90,9 +90,9 @@ export const InventoryViewScreen = () => {
           </View>
         ),
     });
-  }, [navigation, handleAddInventoryLine, actionsMenu, handleDoScan, isBlocked]);
+  }, [navigation, handleAddDocLine, actionsMenu, handleDoScan, isBlocked]);
 
-  if (!inventory) {
+  if (!doc) {
     return (
       <View style={styles.container}>
         <SubTitle style={styles.title}>Документ не найден</SubTitle>
@@ -100,27 +100,27 @@ export const InventoryViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <SwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} copy={false} routeName="InventoryLine">
-      <InventoryItem docId={inventory.id} item={item} readonly={isBlocked} />
+  const renderItem = ({ item }: { item: IDocLine }) => (
+    <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
+      <DocItem docId={doc.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );
 
   return (
     <View style={[styles.container]}>
       <InfoBlock
-        colorLabel={getStatusColor(inventory?.status || 'DRAFT')}
-        title={inventory.head.department?.name || ''}
-        onPress={handleEditInventoryHead}
-        disabled={!['DRAFT', 'READY'].includes(inventory.status)}
+        colorLabel={getStatusColor(doc?.status || 'DRAFT')}
+        title={doc.head.department?.name || ''}
+        onPress={handleEditDocHead}
+        disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
         <View style={styles.rowCenter}>
-          <Text>{`№ ${inventory.number} от ${getDateString(inventory.documentDate)}`}</Text>
+          <Text>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
           {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
         </View>
       </InfoBlock>
       <FlatList
-        data={inventory.lines}
+        data={doc.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
