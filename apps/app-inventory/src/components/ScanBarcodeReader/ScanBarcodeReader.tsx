@@ -19,7 +19,7 @@ import { useSelector } from '@lib/store';
 import { IInventoryLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { styles } from './styles';
+import styles from './styles';
 
 interface IProps {
   onSave: (item: IInventoryLine) => void;
@@ -146,10 +146,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
             {scanned && itemLine && (
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[
-                    styles.buttons,
-                    itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind,
-                  ]}
+                  style={[styles.buttons, itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
                   onPress={() => {
                     onSave(itemLine);
                     setScanned(false);

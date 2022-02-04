@@ -6,16 +6,15 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { InventoryStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine } from '../../store/types';
-import { InventoryLine } from '../../components/InventoryLine';
+import { DocStackParamList } from '../../navigation/Root/types';
+import { IDocLine } from '../../store/types';
+import { DocLine } from '../../components/DocLine';
 
-export const InventoryLineScreen = () => {
-  const navigation =
-    useNavigation<StackNavigationProp<InventoryStackParamList | InventoryStackParamList, 'InventoryLine'>>();
+export const DocLineScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList | DocStackParamList, 'DocLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, item } = useRoute<RouteProp<InventoryStackParamList, 'InventoryLine'>>().params;
-  const [line, setLine] = useState<IInventoryLine>(item);
+  const { mode, docId, item } = useRoute<RouteProp<DocStackParamList, 'DocLine'>>().params;
+  const [line, setLine] = useState<IDocLine>(item);
 
   const handleSave = useCallback(() => {
     dispatch(
@@ -39,7 +38,7 @@ export const InventoryLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <InventoryLine item={line} onSetLine={setLine} />
+      <DocLine item={line} onSetLine={setLine} />
     </View>
   );
 };

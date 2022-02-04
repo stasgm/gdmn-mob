@@ -20,16 +20,16 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { DocStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument, IDepartment, IInventoryFormParam } from '../../store/types';
 
-export const InventoryEditScreen = () => {
-  const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryEdit'>>();
+export const DocEditScreen = () => {
+  const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocEdit'>>();
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  const doc = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'inventory');
@@ -69,15 +69,15 @@ export const InventoryEditScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    if (inventory) {
+    if (doc) {
       dispatch(
         appActions.setFormParams({
-          number: inventory.number,
-          documentType: inventory.documentType,
-          documentDate: inventory.documentDate,
-          comment: inventory.head.comment,
-          department: inventory.head.department,
-          status: inventory.status,
+          number: doc.number,
+          documentType: doc.documentType,
+          documentDate: doc.documentDate,
+          comment: doc.head.comment,
+          department: doc.head.department,
+          status: doc.status,
         }),
       );
     } else {
@@ -89,7 +89,7 @@ export const InventoryEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, inventory]);
+  }, [dispatch, doc]);
 
   const handleSave = useCallback(() => {
     if (!docType) {
@@ -103,7 +103,7 @@ export const InventoryEditScreen = () => {
     const createdDate = new Date().toISOString();
 
     if (!id) {
-      const newInventory: IInventoryDocument = {
+      const newDoc: IInventoryDocument = {
         id: docId,
         documentType: docType,
         number: '1',
@@ -118,18 +118,18 @@ export const InventoryEditScreen = () => {
         editionDate: createdDate,
       };
 
-      dispatch(documentActions.addDocument(newInventory));
+      dispatch(documentActions.addDocument(newDoc));
 
-      navigation.dispatch(StackActions.replace('InventoryView', { id: newInventory.id }));
+      navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
     } else {
-      if (!inventory) {
+      if (!doc) {
         return;
       }
 
       const updatedDate = new Date().toISOString();
 
-      const updatedInventory: IInventoryDocument = {
-        ...inventory,
+      const updatedDoc: IInventoryDocument = {
+        ...doc,
         id,
         number: docNumber as string,
         status: docStatus || 'DRAFT',
@@ -137,19 +137,19 @@ export const InventoryEditScreen = () => {
         documentType: docType,
         errorMessage: undefined,
         head: {
-          ...inventory.head,
+          ...doc.head,
           comment: docComment as string,
           department: docDepartment,
         },
-        lines: inventory.lines,
-        creationDate: inventory.creationDate || updatedDate,
+        lines: doc.lines,
+        creationDate: doc.creationDate || updatedDate,
         editionDate: updatedDate,
       };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
-      navigation.navigate('InventoryView', { id });
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+      navigation.navigate('DocView', { id });
     }
-  }, [docType, docNumber, docDepartment, docDate, id, docComment, dispatch, navigation, inventory, docStatus]);
+  }, [docType, docNumber, docDepartment, docDate, id, docComment, dispatch, navigation, doc, docStatus]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -1,5 +1,3 @@
-//TODO: это реализация записи в локальные файлы через экспо. надо переместить в папку мобильного решения
-
 import * as FileSystem from 'expo-file-system';
 
 // export interface AppStorage<T = any> {
