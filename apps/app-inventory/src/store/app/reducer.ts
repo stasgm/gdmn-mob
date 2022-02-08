@@ -10,6 +10,7 @@ export const initialState: Readonly<AppInventoryState> = {
   loading: false,
   loadingData: false,
   errorMessage: '',
+  loadingError: '',
 };
 
 const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
@@ -44,6 +45,12 @@ const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
+      };
+
+    case getType(actions.setLoadingError):
+      return {
+        ...state,
+        loadingError: action.payload,
       };
 
     default:

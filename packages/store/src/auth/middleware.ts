@@ -43,8 +43,11 @@ export const authMiddlewareFactory: PersistedMiddleware =
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(err || 'При загрузки данных с диска произошла ошибка');
-          store.dispatch(err || 'При загрузки данных с диска произошла ошибка');
+          if (err instanceof Error) {
+            store.dispatch(actions.setLoadingError(err.message));
+          } else {
+            store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+          }
         });
     }
 
@@ -53,15 +56,19 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.setConfig):
       case getType(actions.setCompany):
       case getType(actions.setDemoModeAsync.success):
-      case getType(actions.setLoadErrorList):
       case getType(actions.disconnectAsync.success):
       case getType(actions.logoutUserAsync.success):
       case getType(actions.getDeviceByUidAsync.success):
       case getType(actions.loginUserAsync.success):
       case getType(actions.setUserSettingsAsync.success): {
         const result = next(action);
-
-        save('auth', store.getState().auth);
+        save('auth', store.getState().auth).catch((err) => {
+          if (err instanceof Error) {
+            store.dispatch(actions.setLoadingError(err.message));
+          } else {
+            store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+          }
+        });
         return result;
       }
     }

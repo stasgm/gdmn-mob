@@ -14,7 +14,7 @@ const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
 // const setDemoMode = createAction('AUTH/SET_DEMOMODE')();
 const setLoadingData = createAction('AUTH/SET_LOADING_DATA')<boolean>();
-const setLoadErrorList = createAction('AUTH/SET_LOAD_ERROR_LIST')<string>();
+const setLoadingError = createAction('AUTH/SET_LOADING_ERROR')<string>();
 const setInit = createAction('AUTH/SET_IS_INIT')<boolean>();
 
 const getDeviceByUidAsync = createAsyncAction('AUTH/GET_DEVICE', 'AUTH/GET_DEVICE_SUCCESS', 'AUTH/GET_DEVICE_FAILURE')<
@@ -97,7 +97,7 @@ export const actions = {
   setDemoModeAsync,
   setLoading,
   setLoadingData,
-  setLoadErrorList,
+  setLoadingError,
   setInit,
 };
 

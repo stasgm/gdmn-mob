@@ -8,7 +8,7 @@ export const initialState: Readonly<ReferenceState> = {
   list: {},
   loading: false,
   loadingData: false,
-  loadErrorList: [],
+  loadingError: '',
   errorMessage: '',
 };
 
@@ -25,6 +25,12 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
 
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
+
+    case getType(actions.setLoadingError):
+      return {
+        ...state,
+        loadingError: action.payload,
+      };
 
     case getType(actions.setReferencesAsync.request):
       return { ...state, loading: true, errorMessage: '' };

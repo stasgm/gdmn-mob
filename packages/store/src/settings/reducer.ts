@@ -51,13 +51,12 @@ export const initialState: Readonly<SettingsState> = {
   data: baseSettings,
   loading: false,
   loadingData: false,
-  loadErrorList: [],
+  loadingError: '',
   errorMessage: '',
   isInit: true,
 };
 
 const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialState, action): SettingsState => {
-  // console.log('reducer settings', action.type);
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -70,6 +69,12 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
 
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
+
+    case getType(actions.setLoadingError):
+      return {
+        ...state,
+        loadingError: action.payload,
+      };
 
     case getType(actions.addOption):
       return {

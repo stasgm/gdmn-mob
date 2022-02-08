@@ -1,3 +1,4 @@
+export { default as AppFallback } from './AppFallback';
 export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButton, ScanButton } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';

@@ -53,4 +53,6 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
   }
 };
 
-export { extraPredicate, isNamedEntity, formatValue };
+const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
+
+export { extraPredicate, isNamedEntity, formatValue, truncate };

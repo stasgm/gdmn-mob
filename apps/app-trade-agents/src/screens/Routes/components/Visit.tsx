@@ -104,7 +104,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   //   }
 
   //   closeVisit().catch((err) => {
-  //     docDispatch(documentActions.setLoadErrorList(err || 'При закрытии визита произошла ошибка'));
+  //     docDispatch(documentActions.setLoadingError(err || 'При закрытии визита произошла ошибка'));
   //   });
 
   //   // return () => { cleanupFunction = false };

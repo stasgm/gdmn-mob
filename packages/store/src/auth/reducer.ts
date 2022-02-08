@@ -35,7 +35,7 @@ export const initialState: Readonly<AuthState> = {
   error: false,
   loading: false,
   loadingData: false,
-  loadErrorList: [],
+  loadingError: '',
   status: '',
   isDemo: useMockup,
   isInit: false,
@@ -55,10 +55,10 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
 
-    case getType(actions.setLoadErrorList):
+    case getType(actions.setLoadingError):
       return {
         ...state,
-        loadErrorList: [...state.loadErrorList, action.payload],
+        loadingError: action.payload,
       };
 
     case getType(actions.clearError):

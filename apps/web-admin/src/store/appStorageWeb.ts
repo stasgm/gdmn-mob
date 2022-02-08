@@ -4,48 +4,40 @@ const dbDir = 'db';
 
 export const appStorageWeb: AppStorage = {
   setItem: async (key: string, data: any) => {
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-    } catch (e) {
-      console.log('error setItem', e);
-    }
+    localStorage.setItem(key, JSON.stringify(data));
   },
   getItem: async (key: string) => {
-    try {
-      const result = localStorage.getItem(key);
-      return result ? JSON.parse(result) : null;
-    } catch (e) {
-      console.log('error getItem', e);
-    }
+    const result = localStorage.getItem(key);
+    return result ? JSON.parse(result) : null;
   },
-
   removeItem: async (key: string) => {
-    try {
-      localStorage.removeItem(key);
-    } catch (e) {
-      console.log('error removeItem', e);
-    }
+    localStorage.removeItem(key);
   },
 };
 
 export const loadDataFromDisk: LoadDataFromDisk = async (key: string, userId?: string) => {
+  const fileName = `${dbDir}/${userId ? userId : ''}${key}`;
   try {
-    const fileName = `${dbDir}/${userId ? userId : ''}${key}`;
     const data = await appStorageWeb.getItem(fileName);
-    console.log('loadDataFromDisk', fileName);
     return data;
   } catch (err) {
-    console.log('err', err);
-    return undefined;
+    if (err instanceof Error) {
+      throw new Error(`Ошибка при загрузке данных из диска ${fileName}: ${err.message}`);
+    } else {
+      throw err;
+    }
   }
 };
 
 export const saveDataToDisk: SaveDataToDisk = async (key: string, newData: any, userId?: string) => {
+  const fileName = `${dbDir}/${userId ? userId : ''}${key}`;
   try {
-    const fileName = `${dbDir}/${userId ? userId : ''}${key}`;
     await appStorageWeb.setItem(fileName, newData);
-    console.log('saveDataToDisk', fileName);
   } catch (err) {
-    console.log('err', err);
+    if (err instanceof Error) {
+      throw new Error(`Ошибка при сохранении данных на диск ${fileName}: ${err.message}`);
+    } else {
+      throw err;
+    }
   }
 };

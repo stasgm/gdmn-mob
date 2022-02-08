@@ -10,6 +10,7 @@ export const initialState: Readonly<AppState> = {
   loading: false,
   loadingData: false,
   errorMessage: '',
+  loadingError: '',
 };
 
 const reducer: Reducer<AppState, AppActionType> = (state = initialState, action): AppState => {
@@ -41,6 +42,12 @@ const reducer: Reducer<AppState, AppActionType> = (state = initialState, action)
         ...state,
         loading: false,
         errorMessage: action.payload || 'error',
+      };
+
+    case getType(actions.setLoadingError):
+      return {
+        ...state,
+        loadingError: action.payload,
       };
 
     default:

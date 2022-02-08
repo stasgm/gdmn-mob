@@ -31,8 +31,11 @@ export const referenceMiddlewareFactory: PersistedMiddleware =
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(err || 'При загрузке справочников с диска произошла ошибка');
-          store.dispatch(action.setLoadErrorList(err || 'При загрузке справочников с диска произошла ошибка'));
+          if (err instanceof Error) {
+            store.dispatch(actions.setLoadingError(err.message));
+          } else {
+            store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+          }
         });
     }
 
@@ -40,14 +43,20 @@ export const referenceMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.init):
         case getType(actions.deleteReference):
-        case getType(actions.setLoadErrorList):
         case getType(actions.setReferencesAsync.success):
         case getType(actions.addReferencesAsync.success):
         case getType(actions.removeReferenceAsync.success):
         case getType(actions.clearReferencesAsync.success): {
           const result = next(action);
 
-          save('references', store.getState().references, store.getState().auth.user?.id);
+          save('references', store.getState().references, store.getState().auth.user?.id).catch((err) => {
+            console.log('save references', err);
+            if (err instanceof Error) {
+              store.dispatch(actions.setLoadingError(err.message));
+            } else {
+              store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+            }
+          });
           return result;
         }
       }

@@ -45,7 +45,7 @@ const ConfigScreen = (props: Props) => {
     navigation.navigate('Splash');
   };
 
- const handleCancel = () => {
+  const handleCancel = () => {
     config && onSetConfig({ ...config });
     navigation.navigate('Splash');
   };

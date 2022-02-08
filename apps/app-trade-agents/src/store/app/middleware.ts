@@ -32,9 +32,11 @@ export const appTradeMiddlewareFactory: PersistedMiddleware =
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object' ? err : 'При загрузке данных с диска произошла ошибка',
-          );
+          if (err instanceof TypeError) {
+            store.dispatch(actions.setLoadingError(err.message));
+          } else {
+            store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+          }
         });
     }
 
@@ -43,7 +45,13 @@ export const appTradeMiddlewareFactory: PersistedMiddleware =
         case getType(actions.setGoodModelAsync.success): {
           const result = next(action);
 
-          save('appTrade', store.getState().appTrade, store.getState().auth.user?.id);
+          save('appTrade', store.getState().appTrade, store.getState().auth.user?.id).catch((err) => {
+            if (err instanceof TypeError) {
+              store.dispatch(actions.setLoadingError(err.message));
+            } else {
+              store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+            }
+          });
           return result;
         }
       }

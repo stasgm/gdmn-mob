@@ -10,7 +10,7 @@ export const initialState: Readonly<DocumentState> = {
   list: [],
   loading: false,
   loadingData: false,
-  loadErrorList: [],
+  loadingError: '',
   errorMessage: '',
 };
 
@@ -25,10 +25,10 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
 
-    case getType(actions.setLoadErrorList):
+    case getType(actions.setLoadingError):
       return {
         ...state,
-        loadErrorList: [...state.loadErrorList, action.payload],
+        loadingError: action.payload,
       };
 
     case getType(actions.loadData):

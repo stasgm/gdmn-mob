@@ -5,6 +5,7 @@ export type AppTradeState = {
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
+  readonly loadingError: string;
 };
 
 // Товары
