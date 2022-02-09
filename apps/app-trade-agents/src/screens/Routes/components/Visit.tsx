@@ -144,9 +144,8 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       .filter((doc) => doc.status === 'DRAFT')
       ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
 
-    console.log('docs', [updatedVisit, ...updatedOrders, ...updatedReturns].length);
     await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders, ...updatedReturns]));
-    // console.log('docs 2');
+
     setProcess(false);
   }, [docDispatch, visit, orderDocs, returnDocs]);
 

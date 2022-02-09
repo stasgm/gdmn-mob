@@ -32,7 +32,7 @@ export const appTradeMiddlewareFactory: PersistedMiddleware =
         })
         .catch((err) => {
           /* что, если ошибка */
-          if (err instanceof TypeError) {
+          if (err instanceof Error) {
             store.dispatch(actions.setLoadingError(err.message));
           } else {
             store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
@@ -46,7 +46,7 @@ export const appTradeMiddlewareFactory: PersistedMiddleware =
           const result = next(action);
 
           save('appTrade', store.getState().appTrade, store.getState().auth.user?.id).catch((err) => {
-            if (err instanceof TypeError) {
+            if (err instanceof Error) {
               store.dispatch(actions.setLoadingError(err.message));
             } else {
               store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));

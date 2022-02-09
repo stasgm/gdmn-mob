@@ -7,10 +7,7 @@ import ErrorBoundary from 'react-native-error-boundary';
 import {
   appActions,
   appSelectors,
-  authActions,
   authSelectors,
-  documentActions,
-  referenceActions,
   refSelectors,
   settingsActions,
   useDispatch,
@@ -22,13 +19,9 @@ import {
   Theme as defaultTheme,
   Provider as UIProvider,
   AppFallback,
-  Theme,
-  globalStyles,
 } from '@lib/mobile-ui';
 
-import { ActivityIndicator, Caption, Snackbar, useTheme } from 'react-native-paper';
-
-import { View, Text } from 'react-native';
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
@@ -37,7 +30,6 @@ import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, app
 import { IDepartment } from './src/store/types';
 import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRemains, IMGoodRemain } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
-import { truncate } from './src/utils/helpers';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -130,48 +122,8 @@ const Root = () => {
   // };
 
   const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
-  const authLoadingError = useSelector<string>((state) => state.auth.loadingError);
-  const docsLoadingError = useSelector<string>((state) => state.documents.loadingError);
-  const refsLoadingError = useSelector<string>((state) => state.references.loadingError);
-  const setsLoadingError = useSelector<string>((state) => state.settings.loadingError);
 
-  const [barVisible, setBarVisible] = useState(false);
-
-  useEffect(() => {
-    if (authLoadingError || docsLoadingError || refsLoadingError || setsLoadingError || invLoadingError) {
-      setBarVisible(true);
-    }
-  }, [authLoadingError, refsLoadingError, docsLoadingError, setsLoadingError, invLoadingError]);
-
-  const closeSnackbar = () => {
-    authLoadingError && dispatch(authActions.setLoadingError(''));
-    docsLoadingError && dispatch(documentActions.setLoadingError(''));
-    refsLoadingError && dispatch(referenceActions.setLoadingError(''));
-    setsLoadingError && dispatch(settingsActions.setLoadingError(''));
-    invLoadingError && dispatch(appInventoryActions.setLoadingError(''));
-    setBarVisible(false);
-  };
-
-  const SnackbarComponent = () => (
-    <Snackbar
-      visible={barVisible}
-      onDismiss={closeSnackbar}
-      style={{ backgroundColor: Theme.colors.error }}
-      action={{
-        icon: 'close',
-        label: '',
-        onPress: closeSnackbar,
-      }}
-    >
-      <View style={globalStyles.container}>
-        {!!authLoadingError && <Text>{truncate(authLoadingError)}</Text>}
-        {!!docsLoadingError && <Text>{truncate(docsLoadingError)}</Text>}
-        {!!refsLoadingError && <Text>{truncate(refsLoadingError)}</Text>}
-        {!!setsLoadingError && <Text>{truncate(setsLoadingError)}</Text>}
-        {!!invLoadingError && <Text>{truncate(invLoadingError)}</Text>}
-      </View>
-    </Snackbar>
-  );
+  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
@@ -187,9 +139,8 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp items={navItems} />
+        <MobileApp items={navItems} loadingErrors={[invLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
       )}
-      <SnackbarComponent />
     </ErrorBoundary>
   );
 };

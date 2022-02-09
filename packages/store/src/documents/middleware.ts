@@ -29,7 +29,6 @@ export const documentMiddlewareFactory: PersistedMiddleware =
           store.dispatch(actions.setLoadingData(false));
         })
         .catch((err) => {
-          console.log('111111');
           /* что, если ошибка */
           if (err instanceof Error) {
             store.dispatch(actions.setLoadingError(err.message));

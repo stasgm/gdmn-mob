@@ -194,6 +194,10 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
+
+  const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
+
   return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
@@ -206,7 +210,7 @@ const Root = () => {
       </Caption>
     </AppScreen>
   ) : (
-    <MobileApp items={navItems} />
+    <MobileApp items={navItems} loadingErrors={[tradeLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
   );
 };
 
