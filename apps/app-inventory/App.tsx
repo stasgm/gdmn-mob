@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
+import ErrorBoundary from 'react-native-error-boundary';
 
 import {
   appActions,
@@ -12,7 +13,13 @@ import {
   useDispatch,
   useSelector,
 } from '@lib/store';
-import { AppScreen, globalStyles as styles, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  globalStyles as styles,
+  Theme as defaultTheme,
+  Provider as UIProvider,
+  AppFallback,
+} from '@lib/mobile-ui';
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
@@ -38,8 +45,8 @@ const Root = () => {
   );
 
   const dispatch = useDispatch();
-  const appInventoryDispatch = useAppInventoryThunkDispatch();
   const { colors } = useTheme();
+  const appInventoryDispatch = useAppInventoryThunkDispatch();
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
@@ -110,19 +117,31 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  return authLoading || loading || appLoading || invLoading || appDataLoading ? (
-    <AppScreen>
-      <ActivityIndicator size="large" color={colors.primary} />
-      <Caption style={styles.title}>
-        {appDataLoading || invLoading
-          ? 'Загрузка данных...'
-          : appLoading
-          ? 'Синхронизация данных..'
-          : 'Пожалуйста, подождите..'}
-      </Caption>
-    </AppScreen>
-  ) : (
-    <MobileApp items={navItems} />
+  // const errorHandler = (error: Error, _stackTrace: string) => {
+  //   console.log('errorHandler', error.message);
+  // };
+
+  const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
+
+  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
+
+  return (
+    <ErrorBoundary FallbackComponent={AppFallback}>
+      {authLoading || loading || appLoading || invLoading || appDataLoading ? (
+        <AppScreen>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Caption style={styles.title}>
+            {appDataLoading || invLoading
+              ? 'Загрузка данных...'
+              : appLoading
+              ? 'Синхронизация данных..'
+              : 'Пожалуйста, подождите..'}
+          </Caption>
+        </AppScreen>
+      ) : (
+        <MobileApp items={navItems} loadingErrors={[invLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
+      )}
+    </ErrorBoundary>
   );
 };
 

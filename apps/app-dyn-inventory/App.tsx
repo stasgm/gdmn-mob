@@ -110,6 +110,10 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const invLoadingError = useInvSelector<string>((state) => state.appDynInventory.loadingError);
+
+  const onClearLoadingErrors = () => dispatch(appDynInvActions.setLoadingError(''));
+
   return authLoading || loading || appLoading || invLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
@@ -122,7 +126,7 @@ const Root = () => {
       </Caption>
     </AppScreen>
   ) : (
-    <MobileApp items={navItems} />
+    <MobileApp items={navItems} loadingErrors={[invLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
   );
 };
 

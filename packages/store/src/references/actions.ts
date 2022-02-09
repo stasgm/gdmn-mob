@@ -10,7 +10,7 @@ const clearError = createAction('REFERENCES/CLEAR_ERROR')();
 const loadData = createAction('REFERENCES/LOAD_DATA')<ReferenceState>();
 const setLoading = createAction('REFERENCES/SET_LOADING')<boolean>();
 const setLoadingData = createAction('REFERENCES/SET_LOADING_DATA')<boolean>();
-const setLoadErrorList = createAction('REFERENCES/SET_LOAD_ERROR_LIST')<string>();
+const setLoadingError = createAction('REFERENCES/SET_LOADING_ERROR')<string>();
 
 const setReferencesAsync = createAsyncAction(
   'REFERENCES/SET_ALL',
@@ -48,7 +48,7 @@ export const actions = {
   init,
   setLoading,
   setLoadingData,
-  setLoadErrorList,
+  setLoadingError,
 };
 
 export type ReferenceActionType = ActionType<typeof actions>;

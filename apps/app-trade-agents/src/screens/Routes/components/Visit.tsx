@@ -104,7 +104,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   //   }
 
   //   closeVisit().catch((err) => {
-  //     docDispatch(documentActions.setLoadErrorList(err || 'При закрытии визита произошла ошибка'));
+  //     docDispatch(documentActions.setLoadingError(err || 'При закрытии визита произошла ошибка'));
   //   });
 
   //   // return () => { cleanupFunction = false };
@@ -144,9 +144,8 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       .filter((doc) => doc.status === 'DRAFT')
       ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
 
-    console.log('docs', [updatedVisit, ...updatedOrders, ...updatedReturns].length);
     await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders, ...updatedReturns]));
-    // console.log('docs 2');
+
     setProcess(false);
   }, [docDispatch, visit, orderDocs, returnDocs]);
 

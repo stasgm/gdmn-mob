@@ -30,8 +30,11 @@ export const documentMiddlewareFactory: PersistedMiddleware =
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(err || 'При загрузке документов с диска произошла ошибка');
-          store.dispatch(action.setLoadErrorList(err || 'При загрузке документов с диска произошла ошибка'));
+          if (err instanceof Error) {
+            store.dispatch(actions.setLoadingError(err.message));
+          } else {
+            store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+          }
         });
     }
 
@@ -43,7 +46,6 @@ export const documentMiddlewareFactory: PersistedMiddleware =
         case getType(actions.addDocumentLine):
         case getType(actions.updateDocumentLine):
         case getType(actions.removeDocumentLine):
-        case getType(actions.setLoadErrorList):
         case getType(actions.addDocumentsAsync.success):
         case getType(actions.clearDocumentsAsync.success):
         case getType(actions.setDocumentsAsync.success):
@@ -52,7 +54,13 @@ export const documentMiddlewareFactory: PersistedMiddleware =
         case getType(actions.removeDocumentsAsync.success): {
           const result = next(action);
 
-          save('documents', store.getState().documents, store.getState().auth.user?.id);
+          save('documents', store.getState().documents, store.getState().auth.user?.id).catch((err) => {
+            if (err instanceof Error) {
+              store.dispatch(actions.setLoadingError(err.message));
+            } else {
+              store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+            }
+          });
           return result;
         }
       }

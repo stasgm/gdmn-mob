@@ -15,7 +15,7 @@ const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
 const loadData = createAction('DOCUMENTS/LOAD_DATA')<DocumentState>();
 const setLoading = createAction('DOCUMENTS/SET_LOADING')<boolean>();
 const setLoadingData = createAction('DOCUMENTS/SET_LOADING_DATA')<boolean>();
-const setLoadErrorList = createAction('DOCUMENTS/SET_LOAD_ERROR_LIST')<string>();
+const setLoadingError = createAction('DOCUMENTS/SET_LOADING_ERROR')<string>();
 
 const setDocumentsAsync = createAsyncAction(
   'DOCUMENTS/SET_ALL',
@@ -71,7 +71,7 @@ export const actions = {
   clearError,
   setLoading,
   setLoadingData,
-  setLoadErrorList,
+  setLoadingError,
 };
 
 export type DocumentActionType = ActionType<typeof actions>;

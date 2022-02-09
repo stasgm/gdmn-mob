@@ -1,6 +1,5 @@
-import { useDispatch, useDocThunkDispatch } from '@lib/store';
+import { useDispatch, useDocThunkDispatch, useSelector, documentActions, appActions } from '@lib/store';
 
-import { useSelector, documentActions, appActions } from '@lib/store';
 import { IDocument, IMessage, INamedEntity } from '@lib/types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
@@ -48,7 +47,6 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
         );
 
         if (sendMessageResponse.type === 'SEND_MESSAGE') {
-          console.log('readyDocs', readyDocs.length);
           const updateDocResponse = await docDispatch(
             documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT' }))),
           );
@@ -63,7 +61,6 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
 
       dispatch(documentActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
-      console.log('readyDocs 2', errList);
       if (errList?.length) {
         Alert.alert('Внимание!', 'Во время отправки документов произошли ошибки...', [{ text: 'OK' }]);
       }

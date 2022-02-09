@@ -32,9 +32,11 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
         })
         .catch((err) => {
           /* что, если ошибка */
-          console.error(
-            err instanceof Error || typeof err !== 'object' ? err : 'При загрузке данных с диска произошла ошибка',
-          );
+          if (err instanceof Error) {
+            store.dispatch(actions.setLoadingError(err.message));
+          } else {
+            store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+          }
         });
     }
 
@@ -42,7 +44,13 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.setModelAsync.success): {
           const result = next(action);
-          save('appDynInventory', store.getState().appDynInventory, store.getState().auth.user?.id);
+          save('appDynInventory', store.getState().appDynInventory, store.getState().auth.user?.id).catch((err) => {
+            if (err instanceof Error) {
+              store.dispatch(actions.setLoadingError(err.message));
+            } else {
+              store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
+            }
+          });
           return result;
         }
       }

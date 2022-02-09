@@ -13,7 +13,7 @@ const clearError = createAction('SETTINGS/CLEAR_ERROR')();
 const loadData = createAction('SETTINGS/LOAD_DATA')<SettingsState>();
 const setLoading = createAction('SETTINGS/SET_LOADING')<boolean>();
 const setLoadingData = createAction('SETTINGS/SET_LOADING_DATA')<boolean>();
-const setLoadErrorList = createAction('SETTINGS/SET_LOAD_ERROR_LIST')<string>();
+const setLoadingError = createAction('SETTINGS/SET_LOADING_ERROR')<string>();
 
 const addSettingsAsync = createAsyncAction('SETTINGS/ADD', 'SETTINGS/ADD_SUCCESS', 'SETTINGS/ADD_FAILURE')<
   string | undefined,
@@ -33,7 +33,7 @@ export const actions = {
   loadData,
   setLoading,
   setLoadingData,
-  setLoadErrorList,
+  setLoadingError,
 };
 
 export type SettingsActionType = ActionType<typeof actions>;
