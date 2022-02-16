@@ -1,12 +1,12 @@
 import { IEntity, INamedEntity, StatusType } from './common';
 
-type Meta<T> = {
+export type Meta<T> = {
   [P in keyof T]?: {
     visible?: boolean;
     sortOrder?: number;
     name?: string;
     required?: boolean;
-    type?: 'string' | 'date' | 'number' | 'boolean' | 'ref';
+    type?: FieldType;
     refName?: string;
   };
 };
@@ -17,14 +17,46 @@ type DocfMetadata<T, K> = {
 };
 
 export interface IHead {
-  [fieldname: string]: unknown;
+  [fieldname: string]: boolean | string | number | FieldType;
 }
 
-export interface IDocumentType extends INamedEntity {
+// export interface IDocumentType extends INamedEntity {
+//   description?: string;
+// }
+
+type FieldType = 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
+
+export type DocTypeMeta<T> = {
+  [P in keyof T]: {
+    visible?: boolean;
+    description: string;
+    type: FieldType;
+    refName?: string;
+    sortOrder?: number;
+    clearInput?: boolean;
+    disabled?: boolean;
+    onChangeText?: string;
+    required?: boolean;
+  };
+};
+
+export type DocTypeMetadata<T, K> = {
+  head?: DocTypeMeta<T>;
+  lines?: DocTypeMeta<K>;
+};
+
+interface IDynDocumentType<T = IHead, K extends IEntity = IEntity> extends IDocumentType {
+  description?: string;
+  metadata?: DocTypeMetadata<T, K>;
+  icon?: string;
+}
+
+interface IDocumentType extends INamedEntity {
   description?: string;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {
+  [fieldName: string]: string | undefined | IDocumentType | StatusType | DocfMetadata<T, K> | K[];
   number: string;
   documentDate: string;
   documentType: IDocumentType;
@@ -85,4 +117,4 @@ const c: IDocument<IHead, ILine[]> = {
   lines: [{ id: '1', name: 'Товар1', quantity: 2 }],
 };
  */
-export { IDocument, DocfMetadata as IDocfMetadata, MandateProps };
+export { IDocument, DocfMetadata, MandateProps, IDocumentType, IDynDocumentType, FieldType };

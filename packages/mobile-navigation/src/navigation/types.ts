@@ -7,7 +7,7 @@ export type RootDrawerParamList = {
   Profile: undefined;
   Messages: undefined;
   //[titleDoc?: string]: undefined;
-  [itemName: string]: undefined;
+  [itemName: string]: { title: string } | undefined;
 };
 
 export interface INavItem {
@@ -15,5 +15,5 @@ export interface INavItem {
   title: string;
   icon: keyof typeof Icon.glyphMap;
   component: any;
-  titleDoc?: string;
+  // titleDoc?: string;
 }

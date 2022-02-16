@@ -7,21 +7,18 @@ import { DocListScreens, DocScreens } from './Root/screens';
 
 const Stack = createStackNavigator<DocStackParamList>();
 
-export const RootNavigator = (props: any) => {
-  const { name } = props.route;
-  const nameDocument = name as string;
-
-  const { params } = props.route;
-  const titleDoc = params?.titleDoc as string;
+export const DocNavigator = (props: any) => {
+  const type = props.route.name;
+  const title = props.route.params?.title;
 
   return (
-    <Stack.Navigator initialRouteName="DocList" screenOptions={{ headerShown: true, title: titleDoc }}>
+    <Stack.Navigator initialRouteName="DocList" screenOptions={{ headerShown: true, title }}>
       {Object.entries({ ...DocListScreens, ...DocScreens }).map(([name, component]) => (
         <Stack.Screen
           name={name as keyof DocStackParamList}
           component={component}
           key={name}
-          initialParams={{ docType: nameDocument }}
+          initialParams={{ type }}
         />
       ))}
     </Stack.Navigator>

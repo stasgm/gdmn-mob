@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 
 import {
   globalStyles as styles,
@@ -24,22 +24,25 @@ import { IInventoryDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
 
-export interface DocListProps {
-  orders: IListItemProps[];
-}
+// export interface DocListProps {
+//   orders: IListItemProps[];
+// }
 
 export interface DocListSectionProps {
   title: string;
 }
+
 export type SectionDataProps = SectionListData<IListItemProps, DocListSectionProps>[];
 
 export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
 
+  const type = useRoute<RouteProp<DocStackParamList, 'DocList'>>().params.type;
+
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
+    .selectByDocType<IInventoryDocument>(type)
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
@@ -92,8 +95,8 @@ export const DocListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('DocEdit');
-  }, [navigation]);
+    navigation.navigate('DocEdit', { type });
+  }, [type, navigation]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -109,8 +112,8 @@ export const DocListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="InventoryView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })} />
+      <SwipeListItem renderItem={item} item={doc} routeName="DocView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id, type })} />
       </SwipeListItem>
     ) : null;
   };

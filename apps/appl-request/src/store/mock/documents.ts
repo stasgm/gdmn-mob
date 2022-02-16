@@ -1,9 +1,9 @@
-import { IDocfMetadata } from '@lib/types';
+import { DocfMetadata } from '@lib/types';
 
 import { IApplDocument, IApplHead, IApplLine } from '../types';
 
 // Метаданные для документа заявки
-export const applDocMetadata: IDocfMetadata<IApplHead, IApplLine> = {
+export const applDocMetadata: DocfMetadata<IApplHead, IApplLine> = {
   head: {
     justification: {
       name: 'Основание',

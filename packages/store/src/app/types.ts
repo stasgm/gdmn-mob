@@ -1,5 +1,5 @@
 export interface IFormParam {
-  [fieldName: string]: unknown;
+  [fieldName: string]: any;
 }
 
 export interface IAppState {
@@ -9,6 +9,6 @@ export interface IAppState {
   formParams?: IFormParam;
 }
 
-export interface IApplFormParam extends IFormParam {
-  date: Date;
-}
+// export interface IApplFormParam extends IFormParam {
+//   date: Date;
+// }

@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   MenuButton,
@@ -17,7 +17,6 @@ import {
   ScanButton,
 } from '@lib/mobile-ui';
 
-import { IInventoryDocument, IDocLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
@@ -28,9 +27,10 @@ export const DocViewScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
 
-  const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
+  const { id, type } = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params;
 
-  const doc = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  // const doc = docSelectors.selectByDocType<IInventoryDocument>(type)?.find((e) => e.id === id);
+  const doc = useSelector((state) => state.documents.list.find((e) => e.id === id));
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -41,8 +41,8 @@ export const DocViewScreen = () => {
   }, [navigation, id]);
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('DocEdit', { id });
-  }, [navigation, id]);
+    navigation.navigate('DocEdit', { id, type });
+  }, [navigation, id, type]);
 
   const handleDoScan = useCallback(() => {
     navigation.navigate('ScanBarcode', { docId: id });
@@ -100,7 +100,7 @@ export const DocViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IDocLine }) => (
+  const renderItem = ({ item }: { item: any }) => (
     <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
       <DocItem docId={doc.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
@@ -110,7 +110,7 @@ export const DocViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.head.department?.name || ''}
+        title={'abracadabra'} //{doc.head.department?.name || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >

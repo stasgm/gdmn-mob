@@ -1,3 +1,4 @@
+import { INavItem } from '@lib/mobile-navigation';
 import { INamedEntity } from '@lib/types';
 
 import { IDocLine } from '../../store/types';
@@ -8,7 +9,7 @@ export type IRefSelectParams = {
   value?: INamedEntity[];
   clause?: Record<string, string>;
   isMulti?: boolean;
-  docType?: string;
+  type?: string;
 };
 
 export type RefParamList = {
@@ -16,13 +17,13 @@ export type RefParamList = {
 };
 
 export type DocParamList = RefParamList & {
-  DocView: { id: string; docType?: string };
-  DocEdit: { id: string; docType?: string } | undefined; //itemId: string;
-  DocLine: { mode: number; docId: string; item: IDocLine; docType?: string };
-  SelectGoodItem: { docId: string; docType?: string };
-  SelectRemainsItem: { docId: string; docType?: string };
-  ScanBarcode: { docId: string; docType?: string };
-  // ScanBarcodeReader: { docId: string; docType?: string };
+  DocView: { id: string; type: string };
+  DocEdit: { id?: string; type: string }; //itemId: string;
+  DocLine: { mode: number; docId: string; item: IDocLine; type?: string };
+  SelectGoodItem: { docId: string; type?: string };
+  SelectRemainsItem: { docId: string; type?: string };
+  ScanBarcode: { docId: string; type?: string };
+  // ScanBarcodeReader: { docId: string; type?: string };
   DocLineEdit: {
     docId: string;
     prodId: string;
@@ -31,8 +32,8 @@ export type DocParamList = RefParamList & {
     price?: number;
     remains?: number;
     modeCor?: boolean;
-    docType?: string;
+    type?: string;
   };
 };
 
-export type DocStackParamList = { DocList: undefined } & DocParamList;
+export type DocStackParamList = { DocList: { type: string } } & DocParamList;

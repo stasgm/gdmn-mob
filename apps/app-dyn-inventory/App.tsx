@@ -16,24 +16,30 @@ import { AppScreen, globalStyles as styles, Theme as defaultTheme, Provider as U
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
-import { RootNavigator } from './src/navigation/RootNavigator';
+import { DocNavigator } from './src/navigation/DocNavigator';
 
 import { store, useAppThunkDispatch, useSelector as useInvSelector, appActions as appDynInvActions } from './src/store';
 
 import { IDepartment } from './src/store/types';
 import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRemains, IMGoodRemain } from './src/store/app/types';
-import { appSettings } from './src/utils/constants';
+import { appSettings, documentTypes } from './src/utils/constants';
 
 const Root = () => {
+  // const navItems: INavItem[] = useMemo(
+  //   () => [
+  //     {
+  //       name: 'DynInventory',
+  //       title: 'Инвентаризация',
+  //       icon: 'file-document-outline',
+  //       component: RootNavigator,
+  //     },
+  //   ],
+  //   [],
+  // );
+
   const navItems: INavItem[] = useMemo(
-    () => [
-      {
-        name: 'DynInventory',
-        title: 'Инвентаризация',
-        icon: 'file-document-outline',
-        component: RootNavigator,
-      },
-    ],
+    () =>
+      documentTypes.map((d: any) => ({ name: d.name, title: d.description, icon: d.icon, component: DocNavigator })),
     [],
   );
 

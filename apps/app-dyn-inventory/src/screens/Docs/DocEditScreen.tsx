@@ -7,42 +7,30 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocumentType, IReference } from '@lib/types';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
-import {
-  BackButton,
-  AppInputScreen,
-  SelectableInput,
-  Input,
-  SaveButton,
-  globalStyles as styles,
-  SubTitle,
-} from '@lib/mobile-ui';
+import { FieldType, IDocument, IDocumentType, IReference } from '@lib/types';
+import { useDispatch, documentActions, appActions, useSelector, IFormParam, refSelectors } from '@lib/store';
+import { BackButton, AppInputScreen, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
 
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IInventoryDocument, IDepartment, IInventoryFormParam } from '../../store/types';
+import { defaultHeadFields, documentTypes } from '../../utils/constants';
+import InputItem from '../../components/InputItem';
 
 export const DocEditScreen = () => {
-  const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
+  const { id, type } = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params;
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocEdit'>>();
   const dispatch = useDispatch();
 
-  const formParams = useSelector((state) => state.app.formParams as IInventoryFormParam);
-  const doc = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  const formParams = useSelector((state) => state.app.formParams);
+  const doc = useSelector((state) => state.documents.list.find((e) => e.id === id)); //docSelectors.selectByDocType<IInventoryDocument>(type)?.find((e) => e.id === id);
+
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'inventory');
+    ?.data.find((t) => t.name === type);
 
-  const {
-    department: docDepartment,
-    documentDate: docDate,
-    number: docNumber,
-    comment: docComment,
-    status: docStatus,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  //TODO: Брать из хранилища
+  const headFields = useMemo(() => documentTypes.find((t) => t.name === type)?.metadata?.head || {}, [type]);
+  //Все поля шапки документа
+  const docFields = useMemo(() => ({ ...headFields, ...defaultHeadFields }), [headFields]);
 
   useEffect(() => {
     return () => {
@@ -51,75 +39,99 @@ export const DocEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const department = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docDepartment?.id);
-
-  useEffect(() => {
-    if (!docDepartment) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['department']: department?.name,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docDepartment]);
-
   useEffect(() => {
     // Инициализируем параметры
     if (doc) {
-      dispatch(
-        appActions.setFormParams({
-          number: doc.number,
-          documentType: doc.documentType,
-          documentDate: doc.documentDate,
-          comment: doc.head.comment,
-          department: doc.head.department,
-          status: doc.status,
-        }),
-      );
+      //Поля шапки по умолчанию со значениями из документа
+      const defaultFormParam = Object.keys(defaultHeadFields).reduce((prev: IFormParam, key: string) => {
+        prev[key] = doc[key];
+        return prev;
+      }, {});
+      //Поля шапки из настроек со значениями из документа
+      const headFormParam = Object.keys(headFields).reduce((prev: IFormParam, key: string) => {
+        prev[key] = doc.head && doc.head[key];
+        return prev;
+      }, {});
+
+      dispatch(appActions.setFormParams({ ...defaultFormParam, ...headFormParam }));
     } else {
       dispatch(
         appActions.setFormParams({
           number: '1',
           documentDate: new Date().toISOString(),
+          documentType: docType,
           status: 'DRAFT',
         }),
       );
     }
-  }, [dispatch, doc]);
+  }, [dispatch, doc, docType, headFields]);
+
+  const docStatus = formParams?.status || 'DRAFT';
+
+  const isBlocked = docStatus !== 'DRAFT';
+
+  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+
+  //Для компонента выбора даты
+  const [showDate, setShowDate] = useState(false);
+  const [dateValue, setDateValue] = useState<Date | undefined>();
+  const [dateFieldName, setDateFieldName] = useState<string | undefined>();
+
+  const handleApplyDate = (_event: any, selectedDate: Date | undefined) => {
+    //Закрываем календарь и записываем выбранную дату
+    setShowDate(false);
+
+    if (selectedDate && dateFieldName) {
+      dispatch(appActions.setFormParams({ [dateFieldName]: selectedDate.toISOString().slice(0, 10) }));
+    }
+  };
 
   const handleSave = useCallback(() => {
     if (!docType) {
-      return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
+      return Alert.alert('Ошибка!', 'Тип документа не найден', [{ text: 'OK' }]);
     }
-    if (!(docNumber && docDepartment && docDate)) {
+
+    if (!formParams) {
+      return;
+    }
+
+    const isNotAllFieldsFilled =
+      Object.entries(docFields).filter(([key, field]) => field?.required && !formParams[key]).length > 0;
+
+    if (isNotAllFieldsFilled) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     const docId = !id ? uuid() : id;
     const createdDate = new Date().toISOString();
 
+    //Поля шапки по умолчанию со значениями из формы
+    const defaultFields = Object.entries(formParams).reduce((prev: any, [key, value]) => {
+      if (key in defaultHeadFields) {
+        prev[key] = value;
+      }
+      return prev;
+    }, {});
+
+    //Поля шапки из настроек со значениями из формы
+    const head = Object.entries(formParams).reduce((prev: any, [key, value]) => {
+      if (key in headFields) {
+        prev[key] = value;
+      }
+      return prev;
+    }, {});
+
     if (!id) {
-      const newDoc: IInventoryDocument = {
+      const newDoc: IDocument = {
         id: docId,
-        documentType: docType,
-        number: '1',
-        documentDate: docDate,
-        status: 'DRAFT',
-        head: {
-          comment: docComment,
-          department: docDepartment,
-        },
+        ...defaultFields,
+        head,
         lines: [],
         creationDate: createdDate,
         editionDate: createdDate,
       };
 
       dispatch(documentActions.addDocument(newDoc));
-
       navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
     } else {
       if (!doc) {
@@ -128,18 +140,14 @@ export const DocEditScreen = () => {
 
       const updatedDate = new Date().toISOString();
 
-      const updatedDoc: IInventoryDocument = {
+      const updatedDoc: IDocument = {
         ...doc,
         id,
-        number: docNumber as string,
-        status: docStatus || 'DRAFT',
-        documentDate: docDate,
-        documentType: docType,
-        errorMessage: undefined,
+        status: docStatus,
+        ...defaultFields,
         head: {
           ...doc.head,
-          comment: docComment as string,
-          department: docDepartment,
+          ...head,
         },
         lines: doc.lines,
         creationDate: doc.creationDate || updatedDate,
@@ -147,9 +155,9 @@ export const DocEditScreen = () => {
       };
 
       dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-      navigation.navigate('DocView', { id });
+      navigation.navigate('DocView', { id, type });
     }
-  }, [docType, docNumber, docDepartment, docDate, id, docComment, dispatch, navigation, doc, docStatus]);
+  }, [docType, formParams, docFields, id, headFields, dispatch, navigation, doc, docStatus, type]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -158,39 +166,48 @@ export const DocEditScreen = () => {
     });
   }, [dispatch, handleSave, navigation]);
 
-  const isBlocked = docStatus !== 'DRAFT';
-
-  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
-
-  // Окно календаря для выбора даты.
-  const [showOnDate, setShowOnDate] = useState(false);
-
-  const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату.
-    setShowOnDate(false);
-
-    if (selectedOnDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedOnDate.toISOString().slice(0, 10) }));
-    }
-  };
-
-  const handlePresentOnDate = () => {
-    if (docStatus !== 'DRAFT') {
+  const handlePresentDate = (fieldName: string, value: Date | undefined) => {
+    if (isBlocked) {
       return;
     }
 
-    setShowOnDate(true);
+    setDateFieldName(fieldName);
+    setDateValue(value);
+    setShowDate(true);
   };
 
-  const handlePresentDepartment = () => {
+  const handlePress = (refType: FieldType, fieldName: string, refName: string, value: any) => {
+    switch (refType) {
+      case 'date':
+        handlePresentDate(fieldName, value);
+        break;
+
+      case 'ref':
+        handlePresentRef(fieldName, refName, value);
+        break;
+
+      case 'boolean':
+        dispatch(
+          appActions.setFormParams({
+            [fieldName]: fieldName === 'status' ? (docStatus === 'DRAFT' ? 'READY' : 'DRAFT') : !value,
+          }),
+        );
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handlePresentRef = (fieldName: string, refName: string, value: any) => {
     if (isBlocked) {
       return;
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: 'department',
-      fieldName: 'department',
-      value: docDepartment && [docDepartment],
+      refName: refName,
+      fieldName: fieldName,
+      value: value && [value],
     });
   };
 
@@ -213,45 +230,34 @@ export const DocEditScreen = () => {
           </>
         )}
 
-        <Input
-          label="Номер документа"
-          value={docNumber}
-          onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          disabled={isBlocked}
-          clearInput={true}
-        />
-
-        <SelectableInput
-          label="Дата"
-          value={getDateString(docDate || '')}
-          onPress={handlePresentOnDate}
-          disabled={docStatus !== 'DRAFT'}
-        />
-
-        <SelectableInput
-          label="Подразделение"
-          value={docDepartment?.name}
-          onPress={handlePresentDepartment}
-          disabled={isBlocked}
-        />
-
-        <Input
-          label="Комментарий"
-          value={docComment}
-          onChangeText={(text) => {
-            dispatch(appActions.setFormParams({ comment: text.trim() || '' }));
-          }}
-          disabled={isBlocked}
-          clearInput={true}
-        />
+        {Object.entries(docFields)
+          .filter(([_key, item]) => item.visible !== false)
+          .sort((f1, f2) => (f1[1].sortOrder || 100) - (f2[1].sortOrder || 100))
+          .map(([key, item]) => {
+            const inputValue = formParams && formParams[key];
+            return (
+              <InputItem
+                key={key}
+                description={item.description}
+                value={inputValue}
+                type={item.type}
+                disabled={isBlocked}
+                clearInput={!!item.clearInput && !isBlocked}
+                onChangeText={(text: string) => {
+                  dispatch(appActions.setFormParams({ [key]: text.trim() || '' }));
+                }}
+                onPress={() => handlePress(item.type, key, item.refName || '', inputValue)}
+              />
+            );
+          })}
       </ScrollView>
-      {showOnDate && (
+      {showDate && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docDate || '')}
+          value={dateValue ? new Date(dateValue) : new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={handleApplyOnDate}
+          onChange={handleApplyDate}
         />
       )}
     </AppInputScreen>
