@@ -1,55 +1,36 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
+import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
-import {
-  BackButton,
-  MenuButton,
-  useActionSheet,
-  globalStyles as styles,
-  InfoBlock,
-  ItemSeparator,
-  SubTitle,
-  ScanButton,
-} from '@lib/mobile-ui';
+import { BackButton, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton } from '@lib/mobile-ui';
 
-import { IInventoryDocument, IInventoryLine, IMovementDocument } from '../../store/types';
+import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { MovementItem } from '../../components/MovementItem';
 
 export const MovementViewScreen = () => {
-  const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementView'>>();
 
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementView'>>().params?.id;
 
-  const inventory = docSelectors.selectByDocType<IMovementDocument>('inventory')?.find((e) => e.id === id);
+  const bcMovement = docSelectors.selectByDocType<IMovementDocument>('bcMovement')?.find((e) => e.id === id);
 
-  const isBlocked = inventory?.status !== 'DRAFT';
+  const isBlocked = bcMovement?.status !== 'DRAFT';
 
-  const handleEditInventoryHead = useCallback(() => {
+  const handleEditMovementHead = useCallback(() => {
     navigation.navigate('MovementEdit', { id });
   }, [navigation, id]);
 
   const handleDoScan = useCallback(() => {
     navigation.navigate('ScanBarcode', { docId: id });
   }, [navigation, id]);
-
-  const handleDelete = useCallback(() => {
-    if (!id) {
-      return;
-    }
-
-    dispatch(documentActions.removeDocument(id));
-    navigation.goBack();
-  }, [dispatch, id, navigation]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -63,7 +44,7 @@ export const MovementViewScreen = () => {
     });
   }, [navigation, handleDoScan, isBlocked]);
 
-  if (!inventory) {
+  if (!bcMovement) {
     return (
       <View style={styles.container}>
         <SubTitle style={styles.title}>Документ не найден</SubTitle>
@@ -71,36 +52,27 @@ export const MovementViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IInventoryLine }) => (
-    <SwipeLineItem docId={inventory.id} item={item} readonly={isBlocked} copy={false} edit={false}>
-      <MovementItem docId={inventory.id} item={item} readonly={isBlocked} />
+  const renderItem = ({ item }: { item: IMovementLine }) => (
+    <SwipeLineItem docId={bcMovement.id} item={item} readonly={isBlocked} copy={false} edit={false}>
+      <MovementItem docId={bcMovement.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );
-
-  console.log('inventory.lines', inventory.lines);
 
   return (
     <View style={[styles.container]}>
       <InfoBlock
-        colorLabel={getStatusColor(inventory?.status || 'DRAFT')}
-        title={`№ ${inventory.number} от ${getDateString(inventory.documentDate)}` || ''}
-        onPress={handleEditInventoryHead}
-        disabled={!['DRAFT', 'READY'].includes(inventory.status)}
+        colorLabel={getStatusColor(bcMovement?.status || 'DRAFT')}
+        title={`Откуда: ${bcMovement.head.fromPlace?.name} \nКуда: ${bcMovement.head.toPlace?.name}` || ''}
+        onPress={handleEditMovementHead}
+        disabled={!['DRAFT', 'READY'].includes(bcMovement.status)}
       >
-        <View style={localStyles.column}>
-          {/* {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null} */}
-          <View style={styles.rowCenter}>
-            {/* <Text>{`№ ${inventory.number} от ${getDateString(inventory.documentDate)}`}</Text> */}
-            <Text>{`Откуда: ${inventory.head.departmentFrom?.name || ''}`}</Text>
-          </View>
-          <View style={styles.rowCenter}>
-            <Text>{`Куда: ${inventory.head.departmentTo?.name || ''}`}</Text>
-          </View>
-          {/* <Text>1234</Text> */}
+        <View style={styles.rowCenter}>
+          <Text>{`№ ${bcMovement.number} от ${getDateString(bcMovement.documentDate)}`}</Text>
+          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
         </View>
       </InfoBlock>
       <FlatList
-        data={inventory.lines}
+        data={bcMovement.lines}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
@@ -109,10 +81,3 @@ export const MovementViewScreen = () => {
     </View>
   );
 };
-
-const localStyles = StyleSheet.create({
-  column: {
-    flexDirection: 'column',
-    width: '80%',
-  },
-});

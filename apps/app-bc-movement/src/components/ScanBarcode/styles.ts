@@ -6,6 +6,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.5,
   },
+  barcode1: {
+    textTransform: 'uppercase',
+    color: '#fff',
+    fontSize: 11,
+    // opacity: 0.5,
+  },
   border: {
     height: 50,
     width: 50,

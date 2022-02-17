@@ -34,7 +34,7 @@ const Root = () => {
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const appInventoryDispatch = useAppMovementThunkDispatch();
+  const appMovementDispatch = useAppMovementThunkDispatch();
 
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();

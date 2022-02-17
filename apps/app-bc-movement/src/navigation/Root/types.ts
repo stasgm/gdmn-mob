@@ -1,7 +1,5 @@
 import { INamedEntity } from '@lib/types';
 
-import { IInventoryLine } from '../../store/types';
-
 export type IRefSelectParams = {
   refName: string;
   fieldName: string;
@@ -18,7 +16,6 @@ export type RefParamList = {
 export type MovementParamList = RefParamList & {
   MovementView: { id: string; docType?: string };
   MovementEdit: { id: string; docType?: string } | undefined; //itemId: string;
-  InventoryLine: { mode: number; docId: string; item: IInventoryLine; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
   // ScanBarcodeReader: { docId: string; docType?: string };
 };

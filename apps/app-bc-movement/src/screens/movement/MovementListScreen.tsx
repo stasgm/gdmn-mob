@@ -20,7 +20,7 @@ import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IInventoryDocument, IMovementDocument } from '../../store/types';
+import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { MovementStackParamList } from '../../navigation/Root/types';
 
@@ -39,7 +39,7 @@ export const MovementListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
-    .selectByDocType<IMovementDocument>('inventory')
+    .selectByDocType<IMovementDocument>('bcMoveme')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
@@ -58,13 +58,10 @@ export const MovementListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: `№ ${i.number} на ${getDateString(i.documentDate)}`,
-          // title: i.head.department?.name,
+          title: `Откуда: ${i.head.fromPlace?.name || ''} \nКуда: ${i.head.toPlace?.name || ''}`,
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `Откуда: ${i.head.departmentFrom?.name || ''} \nКуда: ${i.head.departmentTo?.name || ''}`,
-          // i.head.department?.name,
-          // subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
+          subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
           isFromRoute: !!i.head.route,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,

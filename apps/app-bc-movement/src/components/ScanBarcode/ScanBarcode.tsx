@@ -8,7 +8,7 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 
-import { IBarcode, IInventoryLine } from '../../store/types';
+import { IBarcode } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
@@ -16,7 +16,7 @@ import styles from './styles';
 interface IProps {
   onSave: (item: IBarcode | undefined) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => IInventoryLine | undefined;
+  getScannedObject: (brc: string) => IBarcode | undefined;
 }
 
 const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
@@ -60,7 +60,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
+    const scannedObj: IBarcode | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
@@ -135,18 +135,18 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {/* {scanned && !itemLine && (
+            {scanned && itemLine?.barcode === '-1' && (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
-                    <Text style={styles.text}>{barcode}</Text>
-                    <Text style={styles.text}>{'Товар не найден'}</Text>
+                    {/* <Text style={styles.text}>{barcode}</Text> */}
+                    <Text style={styles.barcode1}>{'Данный штрихкод уже существует'}</Text>
                   </View>
                 </View>
               </View>
-            )} */}
-            {scanned && (
+            )}
+            {scanned && itemLine?.barcode !== '-1' && (
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                   style={[styles.buttons, styles.btnFind]}

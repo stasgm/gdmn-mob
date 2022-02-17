@@ -21,13 +21,7 @@ import {
 } from '@lib/mobile-ui';
 
 import { MovementStackParamList } from '../../navigation/Root/types';
-import {
-  IInventoryDocument,
-  IDepartment,
-  IInventoryFormParam,
-  IMovementFormParam,
-  IMovementDocument,
-} from '../../store/types';
+import { IDepartment, IMovementFormParam, IMovementDocument } from '../../store/types';
 
 export const MovementEditScreen = () => {
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementEdit'>>().params?.id;
@@ -36,17 +30,16 @@ export const MovementEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IMovementFormParam);
   // const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
-  const inventory = docSelectors.selectByDocType<IMovementDocument>('inventory')?.find((e) => e.id === id);
+  const bcMovement = docSelectors.selectByDocType<IMovementDocument>('bcMovement')?.find((e) => e.id === id);
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'inventory');
+    ?.data.find((t) => t.name === 'bcMovement');
 
   const {
-    departmentFrom: docDepartmentFrom,
-    departmentTo: docDepartmentTo,
+    fromPlace: docFromPlace,
+    toPlace: docToPlace,
     documentDate: docDate,
     number: docNumber,
-    comment: docComment,
     status: docStatus,
   } = useMemo(() => {
     return formParams;
@@ -59,38 +52,45 @@ export const MovementEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const departmentFrom = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docDepartmentFrom?.id);
+  const fromPlace = refSelectors.selectByName<IDepartment>('department')?.data?.find((e) => e.id === docFromPlace?.id);
 
-  const departmentTo = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docDepartmentTo?.id);
+  const toPlace = refSelectors.selectByName<IDepartment>('department')?.data?.find((e) => e.id === docToPlace?.id);
 
   useEffect(() => {
-    if (!docDepartmentFrom) {
+    if (!docFromPlace) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['department']: departmentFrom?.name,
+          ['department']: fromPlace?.name,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docDepartmentFrom]);
+  }, [dispatch, docFromPlace]);
+
+  useEffect(() => {
+    if (!docToPlace) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['department']: toPlace?.name,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docFromPlace]);
 
   useEffect(() => {
     // Инициализируем параметры
-    if (inventory) {
+    if (bcMovement) {
       dispatch(
         appActions.setFormParams({
-          number: inventory.number,
-          documentType: inventory.documentType,
-          documentDate: inventory.documentDate,
-          comment: inventory.head.comment,
-          departmentFrom: inventory.head.departmentFrom,
-          departmentTo: inventory.head.departmentTo,
-          status: inventory.status,
+          number: bcMovement.number,
+          documentType: bcMovement.documentType,
+          documentDate: bcMovement.documentDate,
+          fromPlace: bcMovement.head.fromPlace,
+          toPlace: bcMovement.head.toPlace,
+          status: bcMovement.status,
         }),
       );
     } else {
@@ -102,13 +102,13 @@ export const MovementEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, inventory]);
+  }, [dispatch, bcMovement]);
 
   const handleSave = useCallback(() => {
     if (!docType) {
       return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     }
-    if (!(docNumber && docDepartmentFrom && docDepartmentTo && docDate)) {
+    if (!(docNumber && docFromPlace && docToPlace && docDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -116,34 +116,33 @@ export const MovementEditScreen = () => {
     const createdDate = new Date().toISOString();
 
     if (!id) {
-      const newInventory: IMovementDocument = {
+      const newBcMovement: IMovementDocument = {
         id: docId,
         documentType: docType,
         number: '1',
         documentDate: docDate,
         status: 'DRAFT',
         head: {
-          comment: docComment,
-          departmentFrom: docDepartmentFrom,
-          departmentTo: docDepartmentTo,
+          fromPlace: docFromPlace,
+          toPlace: docToPlace,
         },
         lines: [],
         creationDate: createdDate,
         editionDate: createdDate,
       };
 
-      dispatch(documentActions.addDocument(newInventory));
+      dispatch(documentActions.addDocument(newBcMovement));
 
-      navigation.dispatch(StackActions.replace('MovementView', { id: newInventory.id }));
+      navigation.dispatch(StackActions.replace('MovementView', { id: newBcMovement.id }));
     } else {
-      if (!inventory) {
+      if (!bcMovement) {
         return;
       }
 
       const updatedDate = new Date().toISOString();
 
-      const updatedInventory: IMovementDocument = {
-        ...inventory,
+      const updatedBcMovement: IMovementDocument = {
+        ...bcMovement,
         id,
         number: docNumber as string,
         status: docStatus || 'DRAFT',
@@ -151,32 +150,19 @@ export const MovementEditScreen = () => {
         documentType: docType,
         errorMessage: undefined,
         head: {
-          ...inventory.head,
-          comment: docComment as string,
-          departmentFrom: docDepartmentFrom,
-          departmentTo: docDepartmentTo,
+          ...bcMovement.head,
+          fromPlace: docFromPlace,
+          toPlace: docToPlace,
         },
-        lines: inventory.lines,
-        creationDate: inventory.creationDate || updatedDate,
+        lines: bcMovement.lines,
+        creationDate: bcMovement.creationDate || updatedDate,
         editionDate: updatedDate,
       };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedBcMovement }));
       navigation.navigate('MovementView', { id });
     }
-  }, [
-    docType,
-    docNumber,
-    docDepartmentFrom,
-    docDepartmentTo,
-    docDate,
-    id,
-    docComment,
-    dispatch,
-    navigation,
-    inventory,
-    docStatus,
-  ]);
+  }, [docType, docNumber, docFromPlace, docToPlace, docDate, id, dispatch, navigation, bcMovement, docStatus]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -216,8 +202,8 @@ export const MovementEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'department',
-      fieldName: 'departmentFrom',
-      value: docDepartmentFrom && [docDepartmentFrom],
+      fieldName: 'fromPlace',
+      value: docFromPlace && [docFromPlace],
     });
   };
 
@@ -228,12 +214,12 @@ export const MovementEditScreen = () => {
 
     navigation.navigate('SelectRefItem', {
       refName: 'department',
-      fieldName: 'departmentTo',
-      value: docDepartmentTo && [docDepartmentTo],
+      fieldName: 'toPlace',
+      value: docToPlace && [docToPlace],
     });
   };
 
-  console.log('depart', departmentFrom, 'doc', docDepartmentFrom);
+  console.log('depart', fromPlace, 'doc', docFromPlace);
 
   return (
     <AppInputScreen>
@@ -271,16 +257,11 @@ export const MovementEditScreen = () => {
 
         <SelectableInput
           label="Откуда"
-          value={docDepartmentFrom?.name}
+          value={docFromPlace?.name}
           onPress={handlePresentDepartment}
           disabled={isBlocked}
         />
-        <SelectableInput
-          label="Куда"
-          value={docDepartmentTo?.name}
-          onPress={handleNextDepartment}
-          disabled={isBlocked}
-        />
+        <SelectableInput label="Куда" value={docToPlace?.name} onPress={handleNextDepartment} disabled={isBlocked} />
       </ScrollView>
       {showOnDate && (
         <DateTimePicker

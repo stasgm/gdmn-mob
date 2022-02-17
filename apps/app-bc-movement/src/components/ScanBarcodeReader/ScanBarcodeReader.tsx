@@ -16,7 +16,7 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 import { ISettingsOption } from '@lib/types';
 import { useSelector } from '@lib/store';
 
-import { IInventoryLine } from '../../store/types';
+import { IBarcode, IInventoryLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
@@ -24,7 +24,7 @@ import styles from './styles';
 interface IProps {
   onSave: (item: IInventoryLine) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => IInventoryLine | undefined;
+  getScannedObject: (brc: string) => IBarcode | undefined;
 }
 
 export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
