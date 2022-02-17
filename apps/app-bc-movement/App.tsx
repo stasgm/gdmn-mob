@@ -17,7 +17,7 @@ import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 import { MovementNavigator } from './src/navigation/MovementNavigator';
 
-import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
+import { store, useAppMovementThunkDispatch, useSelector as useInvSelector, appMovementActions } from './src/store';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -34,7 +34,7 @@ const Root = () => {
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const appInventoryDispatch = useAppInventoryThunkDispatch();
+  const appInventoryDispatch = useAppMovementThunkDispatch();
 
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
@@ -67,9 +67,9 @@ const Root = () => {
   //   console.log('errorHandler', error.message);
   // };
 
-  const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
+  const invLoadingError = useInvSelector<string>((state) => state.appMovement.loadingError);
 
-  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
+  const onClearLoadingErrors = () => dispatch(appMovementActions.setLoadingError(''));
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>

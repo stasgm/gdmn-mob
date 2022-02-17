@@ -4,18 +4,18 @@ import { ActionType } from 'typesafe-actions';
 
 import { AppThunk } from '../types';
 
-import { actions, AppInventoryActionType } from './actions';
-import { AppInventoryState, IMDGoodRemain, IModelData } from './types';
+import { actions, AppMovementActionType } from './actions';
+import { AppMovementState, IMDGoodRemain, IModelData } from './types';
 
-export type appInventoryDispatch = ThunkDispatch<AppInventoryState, any, AppInventoryActionType>;
+export type appMovementDispatch = ThunkDispatch<AppMovementState, any, AppMovementActionType>;
 
-export const useAppInventoryThunkDispatch = () => useDispatch<appInventoryDispatch>();
+export const useAppMovementThunkDispatch = () => useDispatch<appMovementDispatch>();
 
 export const setModel = (
   model: IModelData<IMDGoodRemain>,
 ): AppThunk<
   Promise<ActionType<typeof actions.setModelAsync>>,
-  AppInventoryState,
+  AppMovementState,
   ActionType<typeof actions.setModelAsync>
 > => {
   return async (dispatch) => {

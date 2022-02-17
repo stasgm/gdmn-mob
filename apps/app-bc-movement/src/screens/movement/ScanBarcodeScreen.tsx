@@ -9,20 +9,20 @@ import { useSelector, docSelectors, useDispatch, documentActions } from '@lib/st
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
-import { useSelector as useAppInventorySelector } from '../../store/index';
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { useSelector as useAppMovementSelector } from '../../store/index';
+import { MovementStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument, IBarcode, IMovementDocument } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 const ScanBarcodeScreen = () => {
   const dispatch = useDispatch();
-  const docId = useRoute<RouteProp<InventoryStackParamList, 'ScanBarcode'>>().params?.docId;
+  const docId = useRoute<RouteProp<MovementStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation();
   const settings = useSelector((state) => state.settings?.data);
 
   const isScanerReader = settings.scannerUse?.data;
 
-  const model = useAppInventorySelector((state) => state.appInventory.model);
+  const model = useAppMovementSelector((state) => state.appMovement.model);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -114,7 +114,10 @@ const ScanBarcodeScreen = () => {
       //     // const { remains, ...good } = remItem;
       if (barcodes?.find((item) => item.barcode === brc)) {
         Alert.alert('Ошибка!', 'Данный штрихкод уже в документе', [{ text: 'OK' }]);
-        return;
+        return {
+          barcode: '1',
+          id: uuid(),
+        };
       } else {
         console.log('111');
         return {

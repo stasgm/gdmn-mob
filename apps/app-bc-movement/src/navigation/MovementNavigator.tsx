@@ -2,10 +2,10 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { InventoryStackParamList } from './Root/types';
+import { MovementStackParamList } from './Root/types';
 import { movementListScreens, movementScreens } from './Root/screens';
 
-const Stack = createStackNavigator<InventoryStackParamList>();
+const Stack = createStackNavigator<MovementStackParamList>();
 
 export const MovementNavigator = (props: any) => {
   const { name } = props.route;
@@ -18,7 +18,7 @@ export const MovementNavigator = (props: any) => {
     <Stack.Navigator initialRouteName="MovementList" screenOptions={{ headerShown: true, title: titleDoc }}>
       {Object.entries({ ...movementListScreens, ...movementScreens }).map(([name, component]) => (
         <Stack.Screen
-          name={name as keyof InventoryStackParamList}
+          name={name as keyof MovementStackParamList}
           component={component}
           key={name}
           initialParams={{ docType: nameDocument }}

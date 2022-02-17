@@ -15,7 +15,7 @@ export type RefParamList = {
   SelectRefItem: IRefSelectParams;
 };
 
-export type InventoryParamList = RefParamList & {
+export type MovementParamList = RefParamList & {
   MovementView: { id: string; docType?: string };
   MovementEdit: { id: string; docType?: string } | undefined; //itemId: string;
   InventoryLine: { mode: number; docId: string; item: IInventoryLine; docType?: string };
@@ -23,4 +23,4 @@ export type InventoryParamList = RefParamList & {
   // ScanBarcodeReader: { docId: string; docType?: string };
 };
 
-export type InventoryStackParamList = { MovementList: undefined } & InventoryParamList;
+export type MovementStackParamList = { MovementList: undefined } & MovementParamList;

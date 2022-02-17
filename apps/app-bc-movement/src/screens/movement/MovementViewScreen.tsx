@@ -18,7 +18,7 @@ import {
 } from '@lib/mobile-ui';
 
 import { IInventoryDocument, IInventoryLine, IMovementDocument } from '../../store/types';
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { MovementStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { MovementItem } from '../../components/MovementItem';
@@ -26,9 +26,9 @@ import { MovementItem } from '../../components/MovementItem';
 export const MovementViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'MovementView'>>();
+  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementView'>>();
 
-  const id = useRoute<RouteProp<InventoryStackParamList, 'MovementView'>>().params?.id;
+  const id = useRoute<RouteProp<MovementStackParamList, 'MovementView'>>().params?.id;
 
   const inventory = docSelectors.selectByDocType<IMovementDocument>('inventory')?.find((e) => e.id === id);
 

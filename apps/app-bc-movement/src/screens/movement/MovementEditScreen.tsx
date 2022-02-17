@@ -20,7 +20,7 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { MovementStackParamList } from '../../navigation/Root/types';
 import {
   IInventoryDocument,
   IDepartment,
@@ -30,8 +30,8 @@ import {
 } from '../../store/types';
 
 export const MovementEditScreen = () => {
-  const id = useRoute<RouteProp<InventoryStackParamList, 'MovementEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'MovementEdit'>>();
+  const id = useRoute<RouteProp<MovementStackParamList, 'MovementEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementEdit'>>();
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IMovementFormParam);

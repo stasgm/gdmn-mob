@@ -1,11 +1,11 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { actions, AppInventoryActionType } from './actions';
+import { actions, AppMovementActionType } from './actions';
 
-import { AppInventoryState } from './types';
+import { AppMovementState } from './types';
 
-export const initialState: Readonly<AppInventoryState> = {
+export const initialState: Readonly<AppMovementState> = {
   model: {},
   loading: false,
   loadingData: false,
@@ -13,10 +13,7 @@ export const initialState: Readonly<AppInventoryState> = {
   loadingError: '',
 };
 
-const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
-  state = initialState,
-  action,
-): AppInventoryState => {
+const reducer: Reducer<AppMovementState, AppMovementActionType> = (state = initialState, action): AppMovementState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;

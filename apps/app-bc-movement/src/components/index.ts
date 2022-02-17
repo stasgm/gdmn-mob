@@ -1,2 +1,2 @@
-export { ScanBarcode, ScanDataMatrix } from './ScanBarcode';
-export { ScanBarcodeReader, ScanDataMatrixReader } from './ScanBarcodeReader';
+export { ScanBarcode } from './ScanBarcode';
+export { ScanBarcodeReader } from './ScanBarcodeReader';

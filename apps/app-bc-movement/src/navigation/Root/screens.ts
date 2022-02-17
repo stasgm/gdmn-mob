@@ -1,6 +1,6 @@
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
-import { MovementEditScreen, MovementListScreen, MovementViewScreen } from '../../screens/Inventory';
-import ScanBarcodeScreen from '../../screens/Inventory/ScanBarcodeScreen';
+import { MovementEditScreen, MovementListScreen, MovementViewScreen } from '../../screens/movement';
+import ScanBarcodeScreen from '../../screens/movement/ScanBarcodeScreen';
 
 export const movementScreens = {
   MovementEdit: MovementEditScreen,

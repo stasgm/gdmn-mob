@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-export type AppInventoryState = {
+export type AppMovementState = {
   readonly model: IModelData<IMDGoodRemain>;
   readonly loading: boolean;
   readonly loadingData: boolean;

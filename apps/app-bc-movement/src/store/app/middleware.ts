@@ -11,7 +11,7 @@ import { actions } from './actions';
 
 import { initialState } from './reducer';
 
-export const appInvMiddlewareFactory: PersistedMiddleware =
+export const appMovMiddlewareFactory: PersistedMiddleware =
   (load, save) => (store: any) => (next: any) => (action: any) => {
     /**
      *  Данные одной подсистемы кэшируются в одном или нескольких файлах.
@@ -25,7 +25,7 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
     if (action.type === getType(appActions.loadSuperDataFromDisc) && store.getState().auth.user?.id) {
       // а здесь мы грузим данные для залогиненого пользователя
       store.dispatch(actions.setLoadingData(true));
-      load('appInventory', store.getState().auth.user?.id)
+      load('appMovement', store.getState().auth.user?.id)
         .then((data: any) => store.dispatch(actions.loadData(data || initialState)))
         .finally(() => {
           store.dispatch(actions.setLoadingData(false));
@@ -44,7 +44,7 @@ export const appInvMiddlewareFactory: PersistedMiddleware =
       switch (action.type) {
         case getType(actions.setModelAsync.success): {
           const result = next(action);
-          save('appInventory', store.getState().appInventory, store.getState().auth.user?.id).catch((err) => {
+          save('appMovement', store.getState().appMovement, store.getState().auth.user?.id).catch((err) => {
             if (err instanceof Error) {
               store.dispatch(actions.setLoadingError(err.message));
             } else {
