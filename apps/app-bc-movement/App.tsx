@@ -21,10 +21,6 @@ import { store, useSelector as useInvSelector, appMovementActions } from './src/
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
-  const newDispatch = useDispatch();
-  useEffect(() => {
-    newDispatch(settingsActions.init());
-  }, [newDispatch]);
   const navItems: INavItem[] = useMemo(
     () => [
       {
