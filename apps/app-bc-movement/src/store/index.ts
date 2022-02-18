@@ -9,7 +9,6 @@ import { AppMovementActionType } from './app/actions';
 import { appMovMiddlewareFactory } from './app/middleware';
 
 export { default as appMovementActions } from './app';
-export { useAppMovementThunkDispatch } from './app/actions.async';
 
 type TActions = AppMovementActionType;
 

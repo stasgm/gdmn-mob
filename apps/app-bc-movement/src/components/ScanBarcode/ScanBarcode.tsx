@@ -8,18 +8,17 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 
-import { IBarcode } from '../../store/types';
+import { IMovementLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: IBarcode | undefined) => void;
-  onShowRemains: () => void;
-  getScannedObject: (brc: string) => IBarcode | undefined;
+  onSave: (item: IMovementLine) => void;
+  getScannedObject: (brc: string) => IMovementLine | undefined;
 }
 
-const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
+const ScanBarcode = ({ onSave, getScannedObject }: IProps) => {
   const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -29,7 +28,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const { colors } = useTheme();
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IBarcode | undefined>(undefined);
+  const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
 
   useEffect(() => {
     const permission = async () => {
@@ -60,7 +59,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: IBarcode | undefined = getScannedObject(barcode);
+    const scannedObj: IMovementLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
@@ -73,8 +72,6 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   if (hasPermission === false) {
     return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
   }
-
-  console.log('item', itemLine);
 
   return isFocused ? (
     <View style={[styles.content]}>
@@ -100,12 +97,6 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
             color={'#FFF'}
             style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
-          />
-          <IconButton
-            icon={'feature-search-outline'}
-            color={'#FFF'}
-            style={styles.transparent}
-            onPress={onShowRemains}
           />
         </View>
         {!scanned ? (
@@ -140,13 +131,12 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
                 <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
-                    {/* <Text style={styles.text}>{barcode}</Text> */}
-                    <Text style={styles.barcode1}>{'Данный штрихкод уже существует'}</Text>
+                    <Text style={styles.error}>{'Данный штрихкод уже существует'}</Text>
                   </View>
                 </View>
               </View>
             )}
-            {scanned && itemLine?.barcode !== '-1' && (
+            {scanned && itemLine && itemLine?.barcode !== '-1' && (
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                   style={[styles.buttons, styles.btnFind]}

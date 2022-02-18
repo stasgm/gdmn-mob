@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import { docSelectors } from '@lib/store';
 import { BackButton, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton } from '@lib/mobile-ui';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
@@ -15,7 +15,6 @@ import SwipeLineItem from '../../components/SwipeLineItem';
 import { MovementItem } from '../../components/MovementItem';
 
 export const MovementViewScreen = () => {
-  const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementView'>>();
 
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementView'>>().params?.id;
@@ -54,7 +53,7 @@ export const MovementViewScreen = () => {
 
   const renderItem = ({ item }: { item: IMovementLine }) => (
     <SwipeLineItem docId={bcMovement.id} item={item} readonly={isBlocked} copy={false} edit={false}>
-      <MovementItem docId={bcMovement.id} item={item} readonly={isBlocked} />
+      <MovementItem item={item} />
     </SwipeLineItem>
   );
 

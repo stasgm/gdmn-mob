@@ -29,7 +29,6 @@ export const MovementEditScreen = () => {
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IMovementFormParam);
-  // const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
   const bcMovement = docSelectors.selectByDocType<IMovementDocument>('bcMovement')?.find((e) => e.id === id);
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -218,8 +217,6 @@ export const MovementEditScreen = () => {
       value: docToPlace && [docToPlace],
     });
   };
-
-  console.log('depart', fromPlace, 'doc', docFromPlace);
 
   return (
     <AppInputScreen>

@@ -40,21 +40,5 @@ export const appMovMiddlewareFactory: PersistedMiddleware =
         });
     }
 
-    if (store.getState().auth.user?.id) {
-      switch (action.type) {
-        case getType(actions.setModelAsync.success): {
-          const result = next(action);
-          save('appMovement', store.getState().appMovement, store.getState().auth.user?.id).catch((err) => {
-            if (err instanceof Error) {
-              store.dispatch(actions.setLoadingError(err.message));
-            } else {
-              store.dispatch(actions.setLoadingError(`Неизвестная ошибка: ${err}`));
-            }
-          });
-          return result;
-        }
-      }
-    }
-
     return next(action);
   };

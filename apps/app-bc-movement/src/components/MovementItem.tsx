@@ -8,12 +8,10 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { IBarcode } from '../store/types';
 
 interface IProps {
-  docId: string;
   item: IBarcode;
-  readonly?: boolean;
 }
 
-export const MovementItem = ({ docId, item, readonly = false }: IProps) => {
+export const MovementItem = ({ item }: IProps) => {
   const { colors } = useTheme();
 
   return (

@@ -39,7 +39,7 @@ export const MovementListScreen = () => {
   const { loading } = useSelector((state) => state.documents);
 
   const list = docSelectors
-    .selectByDocType<IMovementDocument>('bcMoveme')
+    .selectByDocType<IMovementDocument>('bcMovement')
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');

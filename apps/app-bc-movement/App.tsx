@@ -4,7 +4,7 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
 
-import { appActions, appSelectors, authSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, appSelectors, authSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
 import {
   AppScreen,
   globalStyles as styles,
@@ -17,9 +17,14 @@ import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 import { MovementNavigator } from './src/navigation/MovementNavigator';
 
-import { store, useAppMovementThunkDispatch, useSelector as useInvSelector, appMovementActions } from './src/store';
+import { store, useSelector as useInvSelector, appMovementActions } from './src/store';
+import { appSettings } from './src/utils/constants';
 
 const Root = () => {
+  const newDispatch = useDispatch();
+  useEffect(() => {
+    newDispatch(settingsActions.init());
+  }, [newDispatch]);
   const navItems: INavItem[] = useMemo(
     () => [
       {
@@ -34,12 +39,19 @@ const Root = () => {
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const appMovementDispatch = useAppMovementThunkDispatch();
 
+  const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
+
+  useEffect(() => {
+    if (appSettings && isInit) {
+      dispatch(settingsActions.addSettings(appSettings));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInit]);
 
   useEffect(() => {
     // dispatch(authActions.init());
@@ -62,10 +74,6 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  // const errorHandler = (error: Error, _stackTrace: string) => {
-  //   console.log('errorHandler', error.message);
-  // };
 
   const invLoadingError = useInvSelector<string>((state) => state.appMovement.loadingError);
 

@@ -6,7 +6,6 @@ import { actions, AppMovementActionType } from './actions';
 import { AppMovementState } from './types';
 
 export const initialState: Readonly<AppMovementState> = {
-  model: {},
   loading: false,
   loadingData: false,
   errorMessage: '',
@@ -26,23 +25,6 @@ const reducer: Reducer<AppMovementState, AppMovementActionType> = (state = initi
 
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
-
-    case getType(actions.setModelAsync.request):
-      return { ...state, loading: true, errorMessage: '' };
-
-    case getType(actions.setModelAsync.success):
-      return {
-        ...state,
-        loading: false,
-        model: action.payload,
-      };
-
-    case getType(actions.setModelAsync.failure):
-      return {
-        ...state,
-        loading: false,
-        errorMessage: action.payload || 'error',
-      };
 
     case getType(actions.setLoadingError):
       return {

@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.5,
   },
-  barcode1: {
+  error: {
     textTransform: 'uppercase',
     color: '#fff',
     fontSize: 11,
@@ -55,15 +55,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#0008',
     height: 100,
     justifyContent: 'center',
-  },
-  goodInfo: {
-    flexShrink: 1,
-    paddingRight: 10,
-  },
-  goodName: {
-    color: '#fff',
-    fontSize: 18,
-    textTransform: 'uppercase',
   },
   header: {
     alignItems: 'center',
