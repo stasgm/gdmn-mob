@@ -2465,3 +2465,224 @@ export const messageInventory: IMessage<MessageType>[] = [
     },
   },
 ];
+
+export const messageBcMovement: IMessage<MessageType>[] = [
+  {
+    id: '147293383',
+    status: 'READY',
+    head: {
+      appSystem: 'gdmn-bc-movement',
+      company: companies[2] as INamedEntity,
+      consumer: user2,
+      producer: user1,
+      dateTime: '2021-12-01',
+    },
+    body: {
+      type: 'REFS',
+      version: 1,
+      payload: {
+        documentType: {
+          id: '187037521',
+          name: 'documentType',
+          visible: true,
+          description: 'Типы документов',
+          data: [
+            {
+              id: '187034601',
+              name: 'bcMovement',
+              description: 'Перемещение штрих-кодов',
+            },
+          ],
+        },
+        department: {
+          id: '187037527',
+          name: 'department',
+          visible: true,
+          description: 'Подразделение',
+          data: [
+            {
+              id: '176424776',
+              name: 'Отдел №1',
+            },
+            {
+              id: '147030694',
+              name: 'Отдел №2',
+            },
+            {
+              id: '147016473',
+              name: 'Отдел №3',
+            },
+            {
+              id: '147030695',
+              name: 'Отдел №4',
+            },
+            {
+              id: '147030696',
+              name: 'Отдел №5',
+            },
+            {
+              id: '126424776',
+              name: 'Отдел №6',
+            },
+            {
+              id: '127030694',
+              name: 'Отдел №7',
+            },
+            {
+              id: '127016473',
+              name: 'Отдел №8',
+            },
+            {
+              id: '127030695',
+              name: 'Отдел №9',
+            },
+            {
+              id: '127030696',
+              name: 'Отдел №10',
+            },
+          ],
+        },
+      },
+    },
+  },
+  {
+    id: '1cb40f00-8f2f-11ec-a110-b590af73b0mn',
+    head: {
+      appSystem: 'gdmn-bc-movement',
+      company: companies[2] as INamedEntity,
+      consumer: user2,
+      producer: user1,
+      dateTime: '2022-02-16T13:48:24.945Z',
+    },
+    status: 'READY',
+    body: {
+      type: 'DOCS',
+      version: 1,
+      payload: [
+        {
+          id: 'b926d211-c4ba-4f48-bd1a-e4ff50077f22',
+          documentType: {
+            id: '187034601',
+            name: 'bcMovement',
+            description: 'Перемещение штрих-кодов',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            fromPlace: {
+              id: '147030695',
+              name: 'Отдел №4',
+            },
+            toPlace: {
+              id: '147030694',
+              name: 'Отдел №2',
+            },
+          },
+          lines: [
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e81',
+              barcode: '3830145253200',
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e82',
+              barcode: '3329681072200',
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e83',
+              barcode: '3345682853200',
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e84',
+              barcode: '3971237853200',
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
+        },
+        {
+          id: 'b926d211-c4ba-4f48-bd1a-e4ff50077f24',
+          documentType: {
+            id: '187034601',
+            name: 'bcMovement',
+            description: 'Перемещение штрих-кодов',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            fromPlace: {
+              id: '147016473',
+              name: 'Отдел №3',
+            },
+            toPlace: {
+              id: '126424776',
+              name: 'Отдел №6',
+            },
+          },
+          lines: [
+            {
+              id: 'ab0d8342-1d64-4dc8-bd42-f030af280e81',
+              barcode: '3380145253200',
+            },
+            {
+              id: 'ab0d83431-1d64-4dc8-bd42-f030af280e82',
+              barcode: '9725241212200',
+            },
+            {
+              id: 'ab0d8344-1d64-4dc8-bd42-f030af280e83',
+              barcode: '4568682853200',
+            },
+            {
+              id: 'ab0d8345-1d64-4dc8-bd42-f030af280e84',
+              barcode: '8742633853200',
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
+        },
+        {
+          id: 'b926d211-c4ba-4f48-bd1a-e4ff50077f23',
+          documentType: {
+            id: '187034601',
+            name: 'bcMovement',
+            description: 'Перемещение штрих-кодов',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            fromPlace: {
+              id: '127030695',
+              name: 'Отдел №9',
+            },
+            toPlace: {
+              id: '127030694',
+              name: 'Отдел №27',
+            },
+          },
+          lines: [
+            {
+              id: 'ab0d8341-1d64-4dc8-bd82-f030af280e81',
+              barcode: '2874145253200',
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd82-f030af280e82',
+              barcode: '7563011072200',
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd82-f030af280e83',
+              barcode: '3978501653200',
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd82-f030af280e84',
+              barcode: '4258737853200',
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
+        },
+      ] as any[],
+    },
+  },
+];
