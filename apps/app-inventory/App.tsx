@@ -25,6 +25,8 @@ import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
+import { DocNavigator } from './src/navigation/DocNavigator';
+
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
 import { IDepartment } from './src/store/types';
@@ -39,6 +41,12 @@ const Root = () => {
         title: 'Инвентаризация',
         icon: 'file-document-outline',
         component: InventoryNavigator,
+      },
+      {
+        name: 'Doc',
+        title: 'Приход',
+        icon: 'file-document-outline',
+        component: DocNavigator,
       },
     ],
     [],
