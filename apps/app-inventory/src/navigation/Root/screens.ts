@@ -7,7 +7,7 @@ import {
   InventoryLineScreen,
   SelectRemainsScreen,
 } from '../../screens/Inventory';
-import { DocListScreen, DocEditScreen, DocViewScreen } from '../../screens/Doc';
+
 import ScanBarcodeScreen from '../../screens/Inventory/ScanBarcodeScreen';
 
 export const inventoryScreens = {
@@ -23,20 +23,4 @@ export const inventoryScreens = {
 
 export const inventoryListScreens = {
   InventoryList: InventoryListScreen,
-};
-
-export const docScreens = {
-  DocEdit: DocEditScreen,
-  DocView: DocViewScreen,
-  // InventoryLine: InventoryLineScreen,
-  SelectRefItem: SelectRefItemScreen,
-  // SelectGoodItem: SelectGoodScreen,
-  // SelectRemainsItem: SelectRemainsScreen,
-  // ScanBarcode: ScanBarcodeScreen,
-  //
-  // ScanBarcodeReader: ScanBarcodeReaderScreen,
-};
-
-export const docListScreens = {
-  DocList: DocListScreen,
 };

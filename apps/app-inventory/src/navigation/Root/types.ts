@@ -37,25 +37,3 @@ export type InventoryParamList = RefParamList & {
 };
 
 export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;
-
-export type DocParamList = RefParamList & {
-  DocView: { id: string; docType?: string };
-  DocEdit: { id: string; docType?: string } | undefined; //itemId: string;
-  // InventoryLine: { mode: number; docId: string; item: IInventoryLine; docType?: string };
-  // SelectGoodItem: { docId: string; docType?: string };
-  // SelectRemainsItem: { docId: string; docType?: string };
-  // ScanBarcode: { docId: string; docType?: string };
-  // // ScanBarcodeReader: { docId: string; docType?: string };
-  // InventoryLineEdit: {
-  //   docId: string;
-  //   prodId: string;
-  //   quantity?: number;
-  //   lineId?: number;
-  //   price?: number;
-  //   remains?: number;
-  //   modeCor?: boolean;
-  //   docType?: string;
-  // };
-};
-
-export type DocStackParamList = { DocList: undefined } & DocParamList;
