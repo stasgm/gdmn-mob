@@ -7,7 +7,7 @@ export interface IEntity {
 
 export interface INamedEntity extends IEntity {
   name: string;
-  [fieldName: string]: any;
+  // [fieldName: string]: any;
 }
 export interface ISortEntity extends INamedEntity {
   sortOrder: number;
