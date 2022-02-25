@@ -27,7 +27,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { IListItem } from '@lib/mobile-types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IInventoryDocument, IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
+import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
 import { getNextDocNumber } from '../../utils/constants';
 
 export const DocEditScreen = () => {
@@ -57,11 +57,8 @@ export const DocEditScreen = () => {
   const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
   // const inventory = docSelectors.selectByDocType<IDocDocument>('inventory')?.find((e) => e.id === id);
   const documents = useSelector((state) => state.documents.list) as IDocDocument[];
-  console.log('1234', documents);
 
   const newNumber = getNextDocNumber(documents);
-
-  console.log('number', newNumber);
 
   const inventory = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
   // const docType = refSelectors
@@ -340,7 +337,9 @@ export const DocEditScreen = () => {
     return newCurrentList;
   }, []);
 
-  const [selectedTD, setSelectedTD] = useState(currentListTD[0]);
+  const [selectedTD, setSelectedTD] = useState(
+    currentListTD.find((item) => item.id === documentType) || currentListTD[0],
+  );
   const [newSelectedTD, setNewSelectedTD] = useState(selectedTD);
 
   const handleDismissTD = () => {
@@ -362,8 +361,8 @@ export const DocEditScreen = () => {
       <ScrollView>
         {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
           <>
-            <View style={localStyles.container /*[styles.directionRow, localStyles.switchContainer]*/}>
-              <Text style={localStyles.subHeading}>Черновик:</Text>
+            <View style={[styles.directionRow, localStyles.switchContainer]}>
+              <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
                 onValueChange={() => {
@@ -373,7 +372,6 @@ export const DocEditScreen = () => {
             </View>
           </>
         )}
-
         <Input
           label="Номер документа"
           value={docNumber}
@@ -397,13 +395,16 @@ export const DocEditScreen = () => {
         />
 
         <View style={[localStyles.border, { borderColor: colors.primary }]}>
-          <View style={[localStyles.container1]}>
-            <TouchableOpacity onPress={handlePresentFD} /*disabled={loading}*/>
-              <Text style={localStyles.subHeading}>{selectedFD?.value}</Text>
-            </TouchableOpacity>
-            <IconButton icon={chevronFD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentFD} />
+          <View style={localStyles.container}>
+            <View style={localStyles.subHeadingDepartment}>
+              <TouchableOpacity onPress={handlePresentFD} /*disabled={loading}*/>
+                <Text style={localStyles.subHeading}>{selectedFD?.value}</Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <IconButton icon={chevronFD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentFD} />
+            </View>
           </View>
-
           <SelectableInput
             label="Откуда"
             value={docFromDepartment?.name}
@@ -413,11 +414,15 @@ export const DocEditScreen = () => {
         </View>
 
         <View style={[localStyles.border, { borderColor: colors.primary }]}>
-          <View style={localStyles.container1}>
-            <TouchableOpacity onPress={handlePresentTD} /* disabled={loading}*/>
-              <Text style={localStyles.subHeading}>{selectedTD?.value}</Text>
-            </TouchableOpacity>
-            <IconButton icon={chevronTD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentTD} />
+          <View style={localStyles.container}>
+            <View style={localStyles.subHeadingDepartment}>
+              <TouchableOpacity onPress={handlePresentTD} /*disabled={loading}*/>
+                <Text style={localStyles.subHeading}>{selectedTD?.value}</Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <IconButton icon={chevronTD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentTD} />
+            </View>
           </View>
           <SelectableInput
             label="Куда"
@@ -443,13 +448,11 @@ export const DocEditScreen = () => {
         onDismiss={handleDismissFD}
         onApply={handleApplyFD}
       >
-        {/* <View style={localStyles.sheet}> */}
         <RadioGroup
           options={currentListFD}
           onChange={(option) => setNewSelectedFD(option)}
           activeButtonId={newSelectedFD?.id}
         />
-        {/* </View> */}
         <View style={localStyles.sheet} />
       </BottomSheet>
       <BottomSheet
@@ -459,13 +462,11 @@ export const DocEditScreen = () => {
         onDismiss={handleDismissTD}
         onApply={handleApplyTD}
       >
-        {/* <View style={localStyles.sheet}> */}
         <RadioGroup
           options={currentListTD}
           onChange={(option) => setNewSelectedTD(option)}
           activeButtonId={newSelectedTD?.id}
         />
-        {/* </View> */}
         <View style={localStyles.sheet} />
       </BottomSheet>
       {showOnDate && (
@@ -487,7 +488,8 @@ export const localStyles = StyleSheet.create({
     paddingLeft: 5,
   },
   border: {
-    margin: 2,
+    marginHorizontal: 10,
+    marginVertical: 2,
     marginBottom: 15,
     borderWidth: 1,
     borderRadius: 2,
@@ -498,18 +500,15 @@ export const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flexDirection: 'row',
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    marginVertical: 6,
-  },
-  container1: {
-    // alignItems: 'center',
-    flexDirection: 'row',
-    // paddingHorizontal: 12,
+    paddingLeft: 12,
     // paddingVertical: 3,
     // marginVertical: 6,
+    // width: '100%',
   },
   subHeading: {
+    fontSize: 14,
+  },
+  subHeadingDepartment: {
     width: '85%',
     // fontSize: 14,
   },

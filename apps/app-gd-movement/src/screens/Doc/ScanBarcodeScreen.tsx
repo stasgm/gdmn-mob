@@ -10,8 +10,8 @@ import { useSelector, docSelectors } from '@lib/store';
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
-import { DocStackParamList, InventoryStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument, IDocDocument, IDocLine } from '../../store/types';
+import { DocStackParamList } from '../../navigation/Root/types';
+import { IDocDocument, IDocLine } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 const ScanBarcodeScreen = () => {
