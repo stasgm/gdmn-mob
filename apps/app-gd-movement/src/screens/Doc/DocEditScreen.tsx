@@ -73,9 +73,64 @@ export const DocEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
+    selectFD: docSelectFD,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
+
+  const currentListFD: IListItem[] = useMemo(() => {
+    // const newCurrentList = routeList.map((item) => ({
+    //   id: item.id,
+    //   value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
+    // }));
+    // return newCurrentList;
+    const newCurrentList = [
+      { id: 'department', value: 'Подразделение' },
+      { id: 'contact', value: 'Организация' },
+      { id: 'employee', value: 'Сотрудник' },
+    ];
+    return newCurrentList;
+  }, []);
+
+  const [selectedFD, setSelectedFD] = useState(docSelectFD || currentListFD[0]);
+  const [newSelectedFD, setNewSelectedFD] = useState(selectedFD);
+
+  const handleDismissFD = () => {
+    fromDepartmentRef.current?.dismiss();
+    setNewSelectedFD(selectedFD);
+    setChevronFD(false);
+  };
+
+  const handleApplyFD = () => {
+    fromDepartmentRef.current?.dismiss();
+    setSelectedFD(newSelectedFD);
+    setChevronFD(false);
+    dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
+  };
+
+  const currentListTD: IListItem[] = useMemo(() => {
+    const newCurrentList = [
+      { id: 'department', value: 'Подразделение' },
+      { id: 'contact', value: 'Организация' },
+      { id: 'employee', value: 'Сотрудник' },
+    ];
+    return newCurrentList;
+  }, []);
+
+  const [selectedTD, setSelectedTD] = useState(currentListTD[0]);
+  const [newSelectedTD, setNewSelectedTD] = useState(selectedTD);
+
+  const handleDismissTD = () => {
+    toDepartmentRef.current?.dismiss();
+    setNewSelectedTD(selectedTD);
+    setChevronTD(false);
+  };
+
+  const handleApplyTD = () => {
+    toDepartmentRef.current?.dismiss();
+    setSelectedTD(newSelectedTD);
+    setChevronTD(false);
+  };
 
   useEffect(() => {
     return () => {
@@ -133,6 +188,18 @@ export const DocEditScreen = () => {
   }, [dispatch, docDocumentType]);
 
   useEffect(() => {
+    if (!docSelectFD) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['selectFD']: selectedFD?.value,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docSelectFD]);
+
+  useEffect(() => {
     // Инициализируем параметры
     if (inventory) {
       dispatch(
@@ -144,6 +211,7 @@ export const DocEditScreen = () => {
           fromDepartment: inventory.head.fromDepartment,
           toDepartment: inventory.head.toDepartment,
           status: inventory.status,
+          selectFD: selectedFD,
         }),
       );
     } else {
@@ -155,7 +223,7 @@ export const DocEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, inventory, newNumber]);
+  }, [dispatch, inventory, newNumber, newSelectedFD, selectedFD]);
 
   const handleSave = useCallback(() => {
     // if (!docType) {
@@ -217,6 +285,7 @@ export const DocEditScreen = () => {
       dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
       navigation.navigate('DocView', { id });
     }
+    dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
   }, [
     docNumber,
     docToDepartment,
@@ -230,6 +299,7 @@ export const DocEditScreen = () => {
     navigation,
     inventory,
     docStatus,
+    newSelectedFD,
   ]);
 
   useLayoutEffect(() => {
@@ -299,60 +369,7 @@ export const DocEditScreen = () => {
     });
   };
 
-  const currentListFD: IListItem[] = useMemo(() => {
-    // const newCurrentList = routeList.map((item) => ({
-    //   id: item.id,
-    //   value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
-    // }));
-    // return newCurrentList;
-    const newCurrentList = [
-      { id: 'department', value: 'Подразделение' },
-      { id: 'contact', value: 'Организация' },
-      { id: 'employee', value: 'Сотрудник' },
-    ];
-    return newCurrentList;
-  }, []);
-
-  const [selectedFD, setSelectedFD] = useState(currentListFD[0]);
-  const [newSelectedFD, setNewSelectedFD] = useState(selectedFD);
-
-  const handleDismissFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setNewSelectedFD(selectedFD);
-    setChevronFD(false);
-  };
-
-  const handleApplyFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setSelectedFD(newSelectedFD);
-    setChevronFD(false);
-  };
-
-  const currentListTD: IListItem[] = useMemo(() => {
-    const newCurrentList = [
-      { id: 'department', value: 'Подразделение' },
-      { id: 'contact', value: 'Организация' },
-      { id: 'employee', value: 'Сотрудник' },
-    ];
-    return newCurrentList;
-  }, []);
-
-  const [selectedTD, setSelectedTD] = useState(
-    currentListTD.find((item) => item.id === documentType) || currentListTD[0],
-  );
-  const [newSelectedTD, setNewSelectedTD] = useState(selectedTD);
-
-  const handleDismissTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setNewSelectedTD(selectedTD);
-    setChevronTD(false);
-  };
-
-  const handleApplyTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setSelectedTD(newSelectedTD);
-    setChevronTD(false);
-  };
+  console.log('form', formParams);
 
   return (
     <AppInputScreen>
@@ -398,7 +415,7 @@ export const DocEditScreen = () => {
           <View style={localStyles.container}>
             <View style={localStyles.subHeadingDepartment}>
               <TouchableOpacity onPress={handlePresentFD} /*disabled={loading}*/>
-                <Text style={localStyles.subHeading}>{selectedFD?.value}</Text>
+                <Text style={localStyles.subHeading}>{docSelectFD?.value || selectedFD?.value}</Text>
               </TouchableOpacity>
             </View>
             <View>
@@ -450,7 +467,10 @@ export const DocEditScreen = () => {
       >
         <RadioGroup
           options={currentListFD}
-          onChange={(option) => setNewSelectedFD(option)}
+          onChange={(option) => {
+            setNewSelectedFD(option);
+            dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
+          }}
           activeButtonId={newSelectedFD?.id}
         />
         <View style={localStyles.sheet} />
