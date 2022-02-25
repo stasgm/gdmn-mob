@@ -58,7 +58,7 @@ export const DocEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: '1',
-          documentDate: new Date().toISOString(),
+          documentDate: new Date().toISOString().slice(0, 10),
           documentType: docType,
           status: 'DRAFT',
         }),
@@ -194,6 +194,14 @@ export const DocEditScreen = () => {
         );
         break;
 
+      case 'string':
+        dispatch(
+          appActions.setFormParams({
+            [fieldName]: value,
+          }),
+        );
+        break;
+
       default:
         break;
     }
@@ -229,27 +237,27 @@ export const DocEditScreen = () => {
             </View>
           </>
         )}
-
-        {Object.entries(docFields)
-          .filter(([_key, item]) => item.visible !== false)
-          .sort((f1, f2) => (f1[1].sortOrder || 100) - (f2[1].sortOrder || 100))
-          .map(([key, item]) => {
-            const inputValue = formParams && formParams[key];
-            return (
-              <InputItem
-                key={key}
-                description={item.description}
-                value={inputValue}
-                type={item.type}
-                disabled={isBlocked}
-                clearInput={!!item.clearInput && !isBlocked}
-                onChangeText={(text: string) => {
-                  dispatch(appActions.setFormParams({ [key]: text.trim() || '' }));
-                }}
-                onPress={() => handlePress(item.type, key, item.refName || '', inputValue)}
-              />
-            );
-          })}
+        {formParams &&
+          Object.entries(docFields)
+            .filter(([_key, item]) => item.visible !== false)
+            .sort((f1, f2) => (f1[1].sortOrder || 100) - (f2[1].sortOrder || 100))
+            .map(([key, item]) => {
+              const inputValue = formParams[key];
+              return (
+                <InputItem
+                  key={key}
+                  description={item.description}
+                  value={inputValue}
+                  type={item.type}
+                  disabled={isBlocked}
+                  clearInput={!!item.clearInput && !isBlocked}
+                  // onChangeText={(text: string) => {
+                  //   dispatch(appActions.setFormParams({ [key]: text.trim() }));
+                  // }}
+                  onPress={(text?: string) => handlePress(item.type, key, item.refName || '', text || inputValue)}
+                />
+              );
+            })}
       </ScrollView>
       {showDate && (
         <DateTimePicker
