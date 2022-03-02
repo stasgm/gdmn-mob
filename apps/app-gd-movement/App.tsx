@@ -102,12 +102,12 @@ const Root = () => {
         {},
       );
 
-      console.log(
-        'model',
-        Object.entries(model).find(
-          (item) => item[1].contactName === '"ПАЧАСТУНАК З ВАУКАВЫСКА" (г.Брест,ул.Пушкинская,1-63а)',
-        ),
-      );
+      // console.log(
+      //   'model',
+      //   Object.entries(model).find(
+      //     (item) => item[1].contactName === '"ПАЧАСТУНАК З ВАУКАВЫСКА" (г.Брест,ул.Пушкинская,1-63а)',
+      //   ),
+      // );
       await appInventoryDispatch(appInventoryActions.setModel(model));
     };
 

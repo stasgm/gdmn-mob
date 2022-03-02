@@ -24,35 +24,17 @@ import {
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { IListItem } from '@lib/mobile-types';
+// import { IListItem } from '@lib/mobile-types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
-import { getNextDocNumber } from '../../utils/constants';
+import { contactTypes, getNextDocNumber } from '../../utils/constants';
 
 export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocEdit'>>();
   const dispatch = useDispatch();
   const { colors } = useTheme();
-
-  const [chevronFD, setChevronFD] = useState(false);
-
-  const fromDepartmentRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentFD = useCallback(() => {
-    fromDepartmentRef.current?.present();
-    setChevronFD(true);
-  }, [fromDepartmentRef]);
-
-  const [chevronTD, setChevronTD] = useState(false);
-
-  const toDepartmentRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentTD = useCallback(() => {
-    toDepartmentRef.current?.present();
-    setChevronTD(true);
-  }, [toDepartmentRef]);
 
   const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
   // const inventory = docSelectors.selectByDocType<IDocDocument>('inventory')?.find((e) => e.id === id);
@@ -73,64 +55,14 @@ export const DocEditScreen = () => {
     number: docNumber,
     comment: docComment,
     status: docStatus,
-    selectFD: docSelectFD,
+    fromDepartmentType: docFromDepartmentType,
+    toDepartmentType: docToDepartmentType,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
 
-  const currentListFD: IListItem[] = useMemo(() => {
-    // const newCurrentList = routeList.map((item) => ({
-    //   id: item.id,
-    //   value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
-    // }));
-    // return newCurrentList;
-    const newCurrentList = [
-      { id: 'department', value: 'Подразделение' },
-      { id: 'contact', value: 'Организация' },
-      { id: 'employee', value: 'Сотрудник' },
-    ];
-    return newCurrentList;
-  }, []);
-
-  const [selectedFD, setSelectedFD] = useState(docSelectFD || currentListFD[0]);
-  const [newSelectedFD, setNewSelectedFD] = useState(selectedFD);
-
-  const handleDismissFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setNewSelectedFD(selectedFD);
-    setChevronFD(false);
-  };
-
-  const handleApplyFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setSelectedFD(newSelectedFD);
-    setChevronFD(false);
-    dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
-  };
-
-  const currentListTD: IListItem[] = useMemo(() => {
-    const newCurrentList = [
-      { id: 'department', value: 'Подразделение' },
-      { id: 'contact', value: 'Организация' },
-      { id: 'employee', value: 'Сотрудник' },
-    ];
-    return newCurrentList;
-  }, []);
-
-  const [selectedTD, setSelectedTD] = useState(currentListTD[0]);
-  const [newSelectedTD, setNewSelectedTD] = useState(selectedTD);
-
-  const handleDismissTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setNewSelectedTD(selectedTD);
-    setChevronTD(false);
-  };
-
-  const handleApplyTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setSelectedTD(newSelectedTD);
-    setChevronTD(false);
-  };
+  const [selectedFD, setSelectedFD] = useState(docFromDepartmentType);
+  const [selectedTD, setSelectedTD] = useState(docToDepartmentType);
 
   useEffect(() => {
     return () => {
@@ -180,24 +112,40 @@ export const DocEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['documentType']: documentType?.description,
+          ['documentType']: documentType,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docDocumentType]);
+  }, [dispatch, docDocumentType, documentType]);
+
+  const fromDepartmentType = contactTypes.find((e) => e.id === docFromDepartmentType?.id);
 
   useEffect(() => {
-    if (!docSelectFD) {
+    if (!docFromDepartmentType) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['selectFD']: selectedFD?.value,
+          ['fromDepartmentType']: fromDepartmentType,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docSelectFD]);
+  }, [dispatch, docFromDepartmentType, fromDepartmentType]);
+
+  const toDepartmentType = contactTypes.find((e) => e.id === docToDepartmentType?.id);
+
+  useEffect(() => {
+    if (!docToDepartmentType) {
+      dispatch(
+        appActions.setFormParams({
+          ...formParams,
+          ['toDepartmentType']: toDepartmentType,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docToDepartmentType, toDepartmentType]);
 
   useEffect(() => {
     // Инициализируем параметры
@@ -211,7 +159,8 @@ export const DocEditScreen = () => {
           fromDepartment: inventory.head.fromDepartment,
           toDepartment: inventory.head.toDepartment,
           status: inventory.status,
-          selectFD: selectedFD,
+          fromDepartmentType: inventory.head.fromDepartmentType,
+          toDepartmentType: inventory.head.toDepartmentType,
         }),
       );
     } else {
@@ -220,10 +169,12 @@ export const DocEditScreen = () => {
           number: newNumber, //'1',
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
+          fromDepartmentType: contactTypes[0],
+          toDepartmentType: contactTypes[0],
         }),
       );
     }
-  }, [dispatch, inventory, newNumber, newSelectedFD, selectedFD]);
+  }, [dispatch, inventory, newNumber]);
 
   const handleSave = useCallback(() => {
     // if (!docType) {
@@ -247,6 +198,8 @@ export const DocEditScreen = () => {
           comment: docComment,
           fromDepartment: docFromDepartment,
           toDepartment: docToDepartment,
+          fromDepartmentType: docFromDepartmentType,
+          toDepartmentType: docToDepartmentType,
         },
         lines: [],
         creationDate: createdDate,
@@ -276,6 +229,8 @@ export const DocEditScreen = () => {
           comment: docComment as string,
           fromDepartment: docFromDepartment,
           toDepartment: docToDepartment,
+          fromDepartmentType: docFromDepartmentType,
+          toDepartmentType: docToDepartmentType,
         },
         lines: inventory.lines,
         creationDate: inventory.creationDate || updatedDate,
@@ -285,7 +240,7 @@ export const DocEditScreen = () => {
       dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
       navigation.navigate('DocView', { id });
     }
-    dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
+    // dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
   }, [
     docNumber,
     docToDepartment,
@@ -295,11 +250,12 @@ export const DocEditScreen = () => {
     newNumber,
     docComment,
     docFromDepartment,
+    docFromDepartmentType,
+    docToDepartmentType,
     dispatch,
     navigation,
     inventory,
     docStatus,
-    newSelectedFD,
   ]);
 
   useLayoutEffect(() => {
@@ -339,7 +295,7 @@ export const DocEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedFD.id),
+      refName: String(selectedFD?.id),
       fieldName: 'fromDepartment',
       value: docFromDepartment && [docFromDepartment],
     });
@@ -351,7 +307,7 @@ export const DocEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedTD.id),
+      refName: String(selectedTD?.id),
       fieldName: 'toDepartment',
       value: docToDepartment && [docToDepartment],
     });
@@ -369,7 +325,47 @@ export const DocEditScreen = () => {
     });
   };
 
-  console.log('form', formParams);
+  const [chevronFD, setChevronFD] = useState(false);
+
+  const fromDepartmentRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentFD = useCallback(() => {
+    setSelectedFD(fromDepartmentType || contactTypes[0]);
+    fromDepartmentRef.current?.present();
+    setChevronFD(true);
+  }, [fromDepartmentType]);
+
+  const handleDismissFD = () => {
+    fromDepartmentRef.current?.dismiss();
+    setChevronFD(false);
+  };
+
+  const handleApplyFD = () => {
+    fromDepartmentRef.current?.dismiss();
+    setChevronFD(false);
+    dispatch(appActions.setFormParams({ fromDepartmentType: selectedFD }));
+  };
+
+  const [chevronTD, setChevronTD] = useState(false);
+
+  const toDepartmentRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentTD = useCallback(() => {
+    setSelectedTD(toDepartmentType || contactTypes[0]);
+    toDepartmentRef.current?.present();
+    setChevronTD(true);
+  }, [toDepartmentType]);
+
+  const handleDismissTD = () => {
+    toDepartmentRef.current?.dismiss();
+    setChevronTD(false);
+  };
+
+  const handleApplyTD = () => {
+    toDepartmentRef.current?.dismiss();
+    setChevronTD(false);
+    dispatch(appActions.setFormParams({ toDepartmentType: selectedTD }));
+  };
 
   return (
     <AppInputScreen>
@@ -415,7 +411,7 @@ export const DocEditScreen = () => {
           <View style={localStyles.container}>
             <View style={localStyles.subHeadingDepartment}>
               <TouchableOpacity onPress={handlePresentFD} /*disabled={loading}*/>
-                <Text style={localStyles.subHeading}>{docSelectFD?.value || selectedFD?.value}</Text>
+                <Text style={localStyles.subHeading}>{docFromDepartmentType?.value}</Text>
               </TouchableOpacity>
             </View>
             <View>
@@ -434,7 +430,7 @@ export const DocEditScreen = () => {
           <View style={localStyles.container}>
             <View style={localStyles.subHeadingDepartment}>
               <TouchableOpacity onPress={handlePresentTD} /*disabled={loading}*/>
-                <Text style={localStyles.subHeading}>{selectedTD?.value}</Text>
+                <Text style={localStyles.subHeading}>{docToDepartmentType?.value}</Text>
               </TouchableOpacity>
             </View>
             <View>
@@ -466,12 +462,9 @@ export const DocEditScreen = () => {
         onApply={handleApplyFD}
       >
         <RadioGroup
-          options={currentListFD}
-          onChange={(option) => {
-            setNewSelectedFD(option);
-            dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
-          }}
-          activeButtonId={newSelectedFD?.id}
+          options={contactTypes}
+          onChange={(option) => setSelectedFD(option)}
+          activeButtonId={selectedFD?.id}
         />
         <View style={localStyles.sheet} />
       </BottomSheet>
@@ -483,9 +476,9 @@ export const DocEditScreen = () => {
         onApply={handleApplyTD}
       >
         <RadioGroup
-          options={currentListTD}
-          onChange={(option) => setNewSelectedTD(option)}
-          activeButtonId={newSelectedTD?.id}
+          options={contactTypes}
+          onChange={(option) => setSelectedTD(option)}
+          activeButtonId={selectedTD?.id}
         />
         <View style={localStyles.sheet} />
       </BottomSheet>

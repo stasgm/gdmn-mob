@@ -11,6 +11,7 @@ import {
   IReferenceData,
   IDocumentType,
 } from '@lib/types';
+import { IListItem } from '@lib/mobile-types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -36,10 +37,13 @@ export interface IDocFormParam extends IFormParam {
   toDepartment?: IDepartment;
   contact?: IContact;
   comment?: string;
+  fromDepartmentType?: INamedEntity;
+  toDepartmentType?: INamedEntity;
 }
 
 //Подразделения-склады
 export type IDepartment = INamedEntity;
+export type IDepartmentType = INamedEntity;
 
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
