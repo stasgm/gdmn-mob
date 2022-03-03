@@ -7,9 +7,9 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocument, IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, IReference } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
+import { useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -24,8 +24,6 @@ import {
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-// import { IListItem } from '@lib/mobile-types';
-
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
 import { contactTypes, getNextDocNumber } from '../../utils/constants';
@@ -37,15 +35,12 @@ export const DocEditScreen = () => {
   const { colors } = useTheme();
 
   const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
-  // const inventory = docSelectors.selectByDocType<IDocDocument>('inventory')?.find((e) => e.id === id);
+
   const documents = useSelector((state) => state.documents.list) as IDocDocument[];
 
   const newNumber = getNextDocNumber(documents);
 
-  const inventory = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
-  // const docType = refSelectors
-  //   .selectByName<IReference<IDocumentType>>('documentType')
-  //   ?.data.filter((t) => t.name !== 'inventory');
+  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
 
   const {
     documentType: docDocumentType,
@@ -149,18 +144,18 @@ export const DocEditScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    if (inventory) {
+    if (doc) {
       dispatch(
         appActions.setFormParams({
-          number: inventory.number,
-          documentType: inventory.documentType,
-          documentDate: inventory.documentDate,
-          comment: inventory.head.comment,
-          fromDepartment: inventory.head.fromDepartment,
-          toDepartment: inventory.head.toDepartment,
-          status: inventory.status,
-          fromDepartmentType: inventory.head.fromDepartmentType,
-          toDepartmentType: inventory.head.toDepartmentType,
+          number: doc.number,
+          documentType: doc.documentType,
+          documentDate: doc.documentDate,
+          comment: doc.head.comment,
+          fromDepartment: doc.head.fromDepartment,
+          toDepartment: doc.head.toDepartment,
+          status: doc.status,
+          fromDepartmentType: doc.head.fromDepartmentType,
+          toDepartmentType: doc.head.toDepartmentType,
         }),
       );
     } else {
@@ -174,7 +169,7 @@ export const DocEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, inventory, newNumber]);
+  }, [dispatch, doc, newNumber]);
 
   const handleSave = useCallback(() => {
     // if (!docType) {
@@ -188,7 +183,7 @@ export const DocEditScreen = () => {
     const createdDate = new Date().toISOString();
 
     if (!id) {
-      const newInventory: IDocDocument = {
+      const newDoc: IDocDocument = {
         id: docId,
         documentType: docDocumentType,
         number: newNumber,
@@ -206,18 +201,18 @@ export const DocEditScreen = () => {
         editionDate: createdDate,
       };
 
-      dispatch(documentActions.addDocument(newInventory));
+      dispatch(documentActions.addDocument(newDoc));
 
-      navigation.dispatch(StackActions.replace('DocView', { id: newInventory.id }));
+      navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
     } else {
-      if (!inventory) {
+      if (!doc) {
         return;
       }
 
       const updatedDate = new Date().toISOString();
 
-      const updatedInventory: IDocDocument = {
-        ...inventory,
+      const updatedDoc: IDocDocument = {
+        ...doc,
         id,
         number: docNumber as string,
         status: docStatus || 'DRAFT',
@@ -225,19 +220,19 @@ export const DocEditScreen = () => {
         documentType: docDocumentType,
         errorMessage: undefined,
         head: {
-          ...inventory.head,
+          ...doc.head,
           comment: docComment as string,
           fromDepartment: docFromDepartment,
           toDepartment: docToDepartment,
           fromDepartmentType: docFromDepartmentType,
           toDepartmentType: docToDepartmentType,
         },
-        lines: inventory.lines,
-        creationDate: inventory.creationDate || updatedDate,
+        lines: doc.lines,
+        creationDate: doc.creationDate || updatedDate,
         editionDate: updatedDate,
       };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
       navigation.navigate('DocView', { id });
     }
     // dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
@@ -254,7 +249,7 @@ export const DocEditScreen = () => {
     docToDepartmentType,
     dispatch,
     navigation,
-    inventory,
+    doc,
     docStatus,
   ]);
 

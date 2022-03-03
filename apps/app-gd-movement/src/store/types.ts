@@ -37,8 +37,8 @@ export interface IDocFormParam extends IFormParam {
   toDepartment?: IDepartment;
   contact?: IContact;
   comment?: string;
-  fromDepartmentType?: INamedEntity;
-  toDepartmentType?: INamedEntity;
+  fromDepartmentType?: IListItem;
+  toDepartmentType?: IListItem;
 }
 
 //Подразделения-склады
