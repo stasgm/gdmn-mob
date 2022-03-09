@@ -73,6 +73,8 @@ export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInvento
 export interface IDocHead extends IHead {
   fromContact?: IDepartment;
   toContact?: IDepartment; //Подразделение
+  fromContactType?: IListItem;
+  toContactType?: IListItem;
   contact?: IContact;
   comment?: string; // Комvентарий
 }

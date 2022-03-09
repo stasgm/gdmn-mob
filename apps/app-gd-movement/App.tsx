@@ -28,7 +28,7 @@ import { DocNavigator } from './src/navigation/DocNavigator';
 import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
 import { IDepartment } from './src/store/types';
-import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRemains, IMGoodRemain } from './src/store/app/types';
+import { IGood, IRemains } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
@@ -78,41 +78,41 @@ const Root = () => {
     }
   }, [dispatch, isLogged]);
 
-  useEffect(() => {
-    const getRemainsModel = async () => {
-      if (!goods?.length || !departments?.length || !isLogged) {
-        return;
-      }
-      const model: IModelData<IMDGoodRemain> = departments?.reduce(
-        (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-            goodsprev[g.id] = {
-              ...g,
-              remains:
-                remains
-                  ?.find((r) => r.contactId === c.id)
-                  ?.data?.filter((i) => i.goodId === g.id)
-                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
-            };
-            return goodsprev;
-          }, {});
-          contsprev[c.id] = { contactName: c.name, goods: remGoods };
-          return contsprev;
-        },
-        {},
-      );
+  // useEffect(() => {
+  //   const getRemainsModel = async () => {
+  //     if (!goods?.length || !departments?.length || !isLogged) {
+  //       return;
+  //     }
+  //     const model: IModelData<IMDGoodRemain> = departments?.reduce(
+  //       (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
+  //         const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
+  //           goodsprev[g.id] = {
+  //             ...g,
+  //             remains:
+  //               remains
+  //                 ?.find((r) => r.contactId === c.id)
+  //                 ?.data?.filter((i) => i.goodId === g.id)
+  //                 ?.map((r) => ({ price: r.price, q: r.q })) || [],
+  //           };
+  //           return goodsprev;
+  //         }, {});
+  //         contsprev[c.id] = { contactName: c.name, goods: remGoods };
+  //         return contsprev;
+  //       },
+  //       {},
+  //     );
 
-      // console.log(
-      //   'model',
-      //   Object.entries(model).find(
-      //     (item) => item[1].contactName === '"ПАЧАСТУНАК З ВАУКАВЫСКА" (г.Брест,ул.Пушкинская,1-63а)',
-      //   ),
-      // );
-      await appInventoryDispatch(appInventoryActions.setModel(model));
-    };
+  //     // console.log(
+  //     //   'model',
+  //     //   Object.entries(model).find(
+  //     //     (item) => item[1].contactName === '"ПАЧАСТУНАК З ВАУКАВЫСКА" (г.Брест,ул.Пушкинская,1-63а)',
+  //     //   ),
+  //     // );
+  //     await appInventoryDispatch(appInventoryActions.setModel(model));
+  //   };
 
-    getRemainsModel();
-  }, [appInventoryDispatch, departments, goods, remains, isLogged]);
+  //   getRemainsModel();
+  // }, [appInventoryDispatch, departments, goods, remains, isLogged]);
 
   const [loading, setLoading] = useState(true);
 

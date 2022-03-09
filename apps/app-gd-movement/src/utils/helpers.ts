@@ -1,5 +1,8 @@
 import { INamedEntity } from '@lib/types';
 
+import { IGood, IMGoodData, IMGoodRemain, IRemainsData, IRemainsNew } from '../store/app/types';
+import { IContact } from '../store/types';
+
 const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   let matched = 0;
 
@@ -54,3 +57,47 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
 };
 
 export { extraPredicate, isNamedEntity, formatValue };
+
+export const getRemGoodByContact = (contacts: IContact[], goods: IGood[], remains: IRemainsNew, contactId: string) => {
+  console.log('getRemGoodByContact', `Начало построения модели товаров по баркоду по подразделению ${contactId}`);
+
+  const remGoods: IMGoodData<IMGoodRemain> = {};
+  const contact = contacts.find((con) => con.id === contactId);
+
+  if (contact && goods.length) {
+    console.log('getRemGoodByContact', `подразделение: ${contact.name}`);
+
+    if (remains && remains[contactId]) {
+      //Формируем объект остатков тмц
+      const remainsByGoodId = remains[contactId].reduce((p: any, { goodId, price, q }: IRemainsData) => {
+        const x = p[goodId];
+        if (!x) {
+          p[goodId] = [{ price, q }];
+        } else {
+          x.push({ price, q });
+        }
+        return p;
+      }, {});
+
+      //Заполняем объект товаров по штрихкоду, если есть шк
+      for (const good of goods) {
+        if (good.barcode) {
+          remGoods[good.barcode] = {
+            good,
+            remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
+          };
+        }
+      }
+    } else {
+      //Если по товару нет остатков, добавляем объект товара без remains
+      for (const good of goods) {
+        if (good.barcode) {
+          remGoods[good.barcode] = { good };
+        }
+      }
+    }
+  }
+
+  console.log('getRemGoodByContact', `Окончание построения модели товаров по баркоду по подразделению ${contactId}`);
+  return remGoods;
+};
