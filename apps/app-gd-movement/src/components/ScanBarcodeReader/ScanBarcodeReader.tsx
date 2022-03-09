@@ -16,15 +16,15 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 import { ISettingsOption } from '@lib/types';
 import { useSelector } from '@lib/store';
 
-import { IInventoryLine } from '../../store/types';
+import { IDocLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: IInventoryLine) => void;
+  onSave: (item: IDocLine) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => IInventoryLine | undefined;
+  getScannedObject: (brc: string) => IDocLine | undefined;
 }
 
 export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
@@ -40,7 +40,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
   const { colors } = useTheme();
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IInventoryLine>();
+  const [itemLine, setItemLine] = useState<IDocLine>();
 
   const isFocused = useIsFocused();
 
@@ -71,7 +71,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: IInventoryLine | undefined = getScannedObject(barcode);
+    const scannedObj: IDocLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }

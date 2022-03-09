@@ -33,12 +33,12 @@ export interface IDocFormParam extends IFormParam {
   docType?: IDocument;
   documentType: IDocumentType;
   department?: IDepartment;
-  fromDepartment?: IDepartment;
-  toDepartment?: IDepartment;
+  fromContact?: IDepartment;
+  toContact?: IDepartment;
   contact?: IContact;
   comment?: string;
-  fromDepartmentType?: IListItem;
-  toDepartmentType?: IListItem;
+  fromContactType?: IListItem;
+  toContactType?: IListItem;
 }
 
 //Подразделения-склады
@@ -71,8 +71,8 @@ export interface IInventoryLine extends IEntity {
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
 
 export interface IDocHead extends IHead {
-  fromDepartment?: IDepartment;
-  toDepartment?: IDepartment; //Подразделение
+  fromContact?: IDepartment;
+  toContact?: IDepartment; //Подразделение
   contact?: IContact;
   comment?: string; // Комvентарий
 }

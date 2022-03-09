@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
 import { globalStyles, BackButton } from '@lib/mobile-ui';
-import { useSelector, docSelectors } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
@@ -54,8 +54,8 @@ const ScanBarcodeScreen = () => {
 
   console.log('documents', document);
   const goods = useMemo(
-    () => (document?.head?.toDepartment?.id ? model[document.head.toDepartment.id].goods : {}),
-    [document?.head?.toDepartment?.id, model],
+    () => (document?.head?.toContact?.id ? model[document.head.toContact.id].goods : {}),
+    [document?.head.toContact?.id, model],
   );
 
   const getScannedObject = useCallback(

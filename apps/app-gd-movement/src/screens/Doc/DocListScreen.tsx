@@ -15,7 +15,7 @@ import {
   IListItemProps,
 } from '@lib/mobile-ui';
 
-import { docSelectors, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -67,7 +67,7 @@ export const DocListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.head.toDepartment?.name,
+          title: i.head.toContact?.name,
           documentDate: getDateString(i.documentDate),
           status: i.status,
           subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,

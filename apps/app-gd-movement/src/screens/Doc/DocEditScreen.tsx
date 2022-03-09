@@ -44,20 +44,20 @@ export const DocEditScreen = () => {
 
   const {
     documentType: docDocumentType,
-    fromDepartment: docFromDepartment,
-    toDepartment: docToDepartment,
+    fromContact: docFromContact,
+    toContact: docToContact,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
-    fromDepartmentType: docFromDepartmentType,
-    toDepartmentType: docToDepartmentType,
+    fromContactType: docFromContactType,
+    toContactType: docToContactType,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
 
-  const [selectedFD, setSelectedFD] = useState(docFromDepartmentType);
-  const [selectedTD, setSelectedTD] = useState(docToDepartmentType);
+  const [selectedFromContact, setSelectedFromContact] = useState(docFromContactType);
+  const [selectedToContact, setSelectedToContact] = useState(docToContactType);
 
   useEffect(() => {
     return () => {
@@ -66,37 +66,35 @@ export const DocEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fromDepartment = refSelectors
+  const fromContact = refSelectors
     .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docFromDepartment?.id);
+    ?.data?.find((e) => e.id === docFromContact?.id);
 
   useEffect(() => {
-    if (!docFromDepartment) {
+    if (!docFromContact) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['department']: fromDepartment?.name,
+          ['fromContact']: fromContact?.name,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docFromDepartment]);
+  }, [dispatch, docFromContact]);
 
-  const toDepartment = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docToDepartment?.id);
+  const toContact = refSelectors.selectByName<IDepartment>('department')?.data?.find((e) => e.id === docToContact?.id);
 
   useEffect(() => {
-    if (!docToDepartment) {
+    if (!docToContact) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['department']: toDepartment?.name,
+          ['toContact']: toContact?.name,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docToDepartment]);
+  }, [dispatch, docToContact]);
 
   const documentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -114,33 +112,33 @@ export const DocEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, docDocumentType, documentType]);
 
-  const fromDepartmentType = contactTypes.find((e) => e.id === docFromDepartmentType?.id);
+  const fromContactType = contactTypes.find((e) => e.id === docFromContactType?.id);
 
   useEffect(() => {
-    if (!docFromDepartmentType) {
+    if (!docFromContactType) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['fromDepartmentType']: fromDepartmentType,
+          ['fromContactType']: fromContactType,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docFromDepartmentType, fromDepartmentType]);
+  }, [dispatch, docFromContactType, fromContactType]);
 
-  const toDepartmentType = contactTypes.find((e) => e.id === docToDepartmentType?.id);
+  const toContactType = contactTypes.find((e) => e.id === docToContactType?.id);
 
   useEffect(() => {
-    if (!docToDepartmentType) {
+    if (!docToContactType) {
       dispatch(
         appActions.setFormParams({
           ...formParams,
-          ['toDepartmentType']: toDepartmentType,
+          ['toContactType']: toContactType,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docToDepartmentType, toDepartmentType]);
+  }, [dispatch, docToContactType, toContactType]);
 
   useEffect(() => {
     // Инициализируем параметры
@@ -151,11 +149,11 @@ export const DocEditScreen = () => {
           documentType: doc.documentType,
           documentDate: doc.documentDate,
           comment: doc.head.comment,
-          fromDepartment: doc.head.fromDepartment,
-          toDepartment: doc.head.toDepartment,
+          fromContact: doc.head.fromContact,
+          toContact: doc.head.toContact,
           status: doc.status,
-          fromDepartmentType: doc.head.fromDepartmentType,
-          toDepartmentType: doc.head.toDepartmentType,
+          fromContactType: doc.head.fromContactType,
+          toContactType: doc.head.toContactType,
         }),
       );
     } else {
@@ -164,8 +162,8 @@ export const DocEditScreen = () => {
           number: newNumber, //'1',
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepartmentType: contactTypes[0],
-          toDepartmentType: contactTypes[0],
+          fromContactType: contactTypes[0],
+          toContactType: contactTypes[0],
         }),
       );
     }
@@ -175,7 +173,7 @@ export const DocEditScreen = () => {
     // if (!docType) {
     //   return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
     // }
-    if (!(docNumber && docToDepartment && docDate && docDocumentType)) {
+    if (!(docNumber && docToContact && docDate && docDocumentType)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -191,10 +189,10 @@ export const DocEditScreen = () => {
         status: 'DRAFT',
         head: {
           comment: docComment,
-          fromDepartment: docFromDepartment,
-          toDepartment: docToDepartment,
-          fromDepartmentType: docFromDepartmentType,
-          toDepartmentType: docToDepartmentType,
+          fromContact: docFromContact,
+          toContact: docToContact,
+          fromContactType: docFromContactType,
+          toContactType: docToContactType,
         },
         lines: [],
         creationDate: createdDate,
@@ -222,10 +220,10 @@ export const DocEditScreen = () => {
         head: {
           ...doc.head,
           comment: docComment as string,
-          fromDepartment: docFromDepartment,
-          toDepartment: docToDepartment,
-          fromDepartmentType: docFromDepartmentType,
-          toDepartmentType: docToDepartmentType,
+          fromContact: docFromContact,
+          toContact: docToContact,
+          fromContactType: docFromContactType,
+          toContactType: docToContactType,
         },
         lines: doc.lines,
         creationDate: doc.creationDate || updatedDate,
@@ -235,18 +233,17 @@ export const DocEditScreen = () => {
       dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
       navigation.navigate('DocView', { id });
     }
-    // dispatch(appActions.setFormParams({ selectFD: newSelectedFD }));
   }, [
     docNumber,
-    docToDepartment,
+    docToContact,
     docDate,
     docDocumentType,
     id,
     newNumber,
     docComment,
-    docFromDepartment,
-    docFromDepartmentType,
-    docToDepartmentType,
+    docFromContact,
+    docFromContactType,
+    docToContactType,
     dispatch,
     navigation,
     doc,
@@ -284,27 +281,27 @@ export const DocEditScreen = () => {
     setShowOnDate(true);
   };
 
-  const handlePresentDepartment = () => {
+  const handlePresentContact = () => {
     if (isBlocked) {
       return;
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedFD?.id),
-      fieldName: 'fromDepartment',
-      value: docFromDepartment && [docFromDepartment],
+      refName: String(selectedFromContact?.id || fromContactType?.id),
+      fieldName: 'fromContact',
+      value: docFromContact && [docFromContact],
     });
   };
 
-  const handleNextDepartment = () => {
+  const handleNextContact = () => {
     if (isBlocked) {
       return;
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedTD?.id),
-      fieldName: 'toDepartment',
-      value: docToDepartment && [docToDepartment],
+      refName: String(selectedToContact?.id || toContactType?.id),
+      fieldName: 'toContact',
+      value: docToContact && [docToContact],
     });
   };
 
@@ -320,46 +317,46 @@ export const DocEditScreen = () => {
     });
   };
 
-  const [chevronFD, setChevronFD] = useState(false);
+  const [chevronFromContact, setChevronFromContact] = useState(false);
 
-  const fromDepartmentRef = useRef<BottomSheetModal>(null);
+  const fromContactRef = useRef<BottomSheetModal>(null);
 
-  const handlePresentFD = useCallback(() => {
-    setSelectedFD(fromDepartmentType || contactTypes[0]);
-    fromDepartmentRef.current?.present();
-    setChevronFD(true);
-  }, [fromDepartmentType]);
+  const handlePresentFromContact = useCallback(() => {
+    setSelectedFromContact(fromContactType || contactTypes[0]);
+    fromContactRef.current?.present();
+    setChevronFromContact(true);
+  }, [fromContactType]);
 
-  const handleDismissFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setChevronFD(false);
+  const handleDismissFromContact = () => {
+    fromContactRef.current?.dismiss();
+    setChevronFromContact(false);
   };
 
-  const handleApplyFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setChevronFD(false);
-    dispatch(appActions.setFormParams({ fromDepartmentType: selectedFD }));
+  const handleApplyFromContact = () => {
+    fromContactRef.current?.dismiss();
+    setChevronFromContact(false);
+    dispatch(appActions.setFormParams({ fromContactType: selectedFromContact }));
   };
 
-  const [chevronTD, setChevronTD] = useState(false);
+  const [chevronToContact, setChevronToContact] = useState(false);
 
-  const toDepartmentRef = useRef<BottomSheetModal>(null);
+  const toContactRef = useRef<BottomSheetModal>(null);
 
-  const handlePresentTD = useCallback(() => {
-    setSelectedTD(toDepartmentType || contactTypes[0]);
-    toDepartmentRef.current?.present();
-    setChevronTD(true);
-  }, [toDepartmentType]);
+  const handlePresentToContact = useCallback(() => {
+    setSelectedToContact(toContactType || contactTypes[0]);
+    toContactRef.current?.present();
+    setChevronToContact(true);
+  }, [toContactType]);
 
-  const handleDismissTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setChevronTD(false);
+  const handleDismissToContact = () => {
+    toContactRef.current?.dismiss();
+    setChevronToContact(false);
   };
 
-  const handleApplyTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setChevronTD(false);
-    dispatch(appActions.setFormParams({ toDepartmentType: selectedTD }));
+  const handleApplyToContact = () => {
+    toContactRef.current?.dismiss();
+    setChevronToContact(false);
+    dispatch(appActions.setFormParams({ toContactType: selectedToContact }));
   };
 
   return (
@@ -405,18 +402,22 @@ export const DocEditScreen = () => {
         <View style={[localStyles.border, { borderColor: colors.primary }]}>
           <View style={localStyles.container}>
             <View style={localStyles.subHeadingDepartment}>
-              <TouchableOpacity onPress={handlePresentFD} /*disabled={loading}*/>
-                <Text style={localStyles.subHeading}>{docFromDepartmentType?.value}</Text>
+              <TouchableOpacity onPress={handlePresentFromContact} /*disabled={loading}*/>
+                <Text style={localStyles.subHeading}>{docFromContactType?.value}</Text>
               </TouchableOpacity>
             </View>
             <View>
-              <IconButton icon={chevronFD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentFD} />
+              <IconButton
+                icon={chevronFromContact ? 'chevron-up' : 'chevron-down'}
+                size={25}
+                onPress={handlePresentFromContact}
+              />
             </View>
           </View>
           <SelectableInput
             label="Откуда"
-            value={docFromDepartment?.name}
-            onPress={handlePresentDepartment}
+            value={docFromContact?.name}
+            onPress={handlePresentContact}
             disabled={isBlocked}
           />
         </View>
@@ -424,20 +425,19 @@ export const DocEditScreen = () => {
         <View style={[localStyles.border, { borderColor: colors.primary }]}>
           <View style={localStyles.container}>
             <View style={localStyles.subHeadingDepartment}>
-              <TouchableOpacity onPress={handlePresentTD} /*disabled={loading}*/>
-                <Text style={localStyles.subHeading}>{docToDepartmentType?.value}</Text>
+              <TouchableOpacity onPress={handlePresentToContact} /*disabled={loading}*/>
+                <Text style={localStyles.subHeading}>{docToContactType?.value}</Text>
               </TouchableOpacity>
             </View>
             <View>
-              <IconButton icon={chevronTD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentTD} />
+              <IconButton
+                icon={chevronToContact ? 'chevron-up' : 'chevron-down'}
+                size={25}
+                onPress={handlePresentToContact}
+              />
             </View>
           </View>
-          <SelectableInput
-            label="Куда"
-            value={docToDepartment?.name}
-            onPress={handleNextDepartment}
-            disabled={isBlocked}
-          />
+          <SelectableInput label="Куда" value={docToContact?.name} onPress={handleNextContact} disabled={isBlocked} />
         </View>
         <Input
           label="Комментарий"
@@ -450,30 +450,30 @@ export const DocEditScreen = () => {
         />
       </ScrollView>
       <BottomSheet
-        sheetRef={fromDepartmentRef}
+        sheetRef={fromContactRef}
         title={'Тип контакта'}
         snapPoints={['20%', '90%']}
-        onDismiss={handleDismissFD}
-        onApply={handleApplyFD}
+        onDismiss={handleDismissFromContact}
+        onApply={handleApplyFromContact}
       >
         <RadioGroup
           options={contactTypes}
-          onChange={(option) => setSelectedFD(option)}
-          activeButtonId={selectedFD?.id}
+          onChange={(option) => setSelectedFromContact(option)}
+          activeButtonId={selectedFromContact?.id}
         />
         <View style={localStyles.sheet} />
       </BottomSheet>
       <BottomSheet
-        sheetRef={toDepartmentRef}
+        sheetRef={toContactRef}
         title={'Тип контакта'}
         snapPoints={['20%', '90%']}
-        onDismiss={handleDismissTD}
-        onApply={handleApplyTD}
+        onDismiss={handleDismissToContact}
+        onApply={handleApplyToContact}
       >
         <RadioGroup
           options={contactTypes}
-          onChange={(option) => setSelectedTD(option)}
-          activeButtonId={selectedTD?.id}
+          onChange={(option) => setSelectedToContact(option)}
+          activeButtonId={selectedToContact?.id}
         />
         <View style={localStyles.sheet} />
       </BottomSheet>
