@@ -22,6 +22,8 @@ export interface IHead {
 
 export interface IDocumentType extends INamedEntity {
   description?: string;
+  fromContactType?: string;
+  toContactType?: string;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {

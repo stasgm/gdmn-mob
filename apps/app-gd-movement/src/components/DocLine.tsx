@@ -59,6 +59,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   const price = item?.price || 0;
   const remains = item?.remains || 0;
+  const buyingPrice = item?.buyingPrice || 0;
 
   return (
     <>
@@ -82,6 +83,13 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
               <Text style={[styles.number, styles.field]}>{price.toString()}</Text>
+            </View>
+          </View>
+          <ItemSeparator />
+          <View style={styles.item}>
+            <View style={styles.details}>
+              <Text style={styles.name}>Покупная цена</Text>
+              <Text style={[styles.number, styles.field]}>{buyingPrice.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />

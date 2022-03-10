@@ -84,6 +84,7 @@ export interface IDocLine extends IEntity {
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
   price?: number;
+  buyingPrice?: number;
   remains?: number;
   barcode?: string;
   EID?: string;

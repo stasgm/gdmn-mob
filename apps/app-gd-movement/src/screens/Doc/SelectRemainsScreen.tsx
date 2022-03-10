@@ -5,21 +5,21 @@ import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
-import { docSelectors, useSelector } from '@lib/store';
+import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { formatValue } from '../../utils/helpers';
+import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IDocDocument } from '../../store/types';
-import { IRem } from '../../store/app/types';
+import { IDepartment, IDocDocument } from '../../store/types';
+import { IGood, IRem, IRemainsNew, IRemGood } from '../../store/app/types';
 
-const GoodRemains = ({ item }: { item: IRem }) => {
+const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
-  const barcode = !!item.barcode;
+  const barcode = !!item.good.barcode;
 
   return (
     <TouchableOpacity
@@ -29,10 +29,11 @@ const GoodRemains = ({ item }: { item: IRem }) => {
           docId,
           item: {
             id: uuid(),
-            good: { id: item.id, name: item.name },
+            good: { id: item.good.id, name: item.good.name },
             quantity: 0,
             remains: item.remains,
             price: item.price,
+            buyingPrice: item.buyingPrice,
           },
         });
       }}
@@ -42,13 +43,14 @@ const GoodRemains = ({ item }: { item: IRem }) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
-              {item.remains} {item.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+              {item.remains} {item.good.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
+              руб.
             </Text>
             {barcode && (
-              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.barcode}</Text>
+              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.good.barcode}</Text>
             )}
           </View>
         </View>
@@ -62,7 +64,7 @@ export const SelectRemainsScreen = () => {
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [list, setList] = useState<IRem[]>([]);
+  const [list, setList] = useState<IRemGood[]>([]);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
   const model = useAppInventorySelector((state) => state.appInventory.model);
@@ -78,26 +80,40 @@ export const SelectRemainsScreen = () => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
 
-  const goods = useMemo(
-    () => (document?.head?.toDepartment?.id ? model[document.head.toDepartment.id].goods : {}),
-    [document?.head?.toDepartment?.id, model],
+  // const goods = useMemo(
+  //   () => (document?.head?.toDepartment?.id ? model[document.head.toDepartment.id].goods : {}),
+  //   [document?.head?.toDepartment?.id, model],
+  // );
+
+  const remainss = refSelectors.selectByName<IRemainsNew>('remain').data;
+  const goodss = refSelectors.selectByName<IGood>('good').data;
+  console.log('newg', goodss);
+  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
+
+  const [goodRemains] = useState<IRemGood[]>(() =>
+    document?.head?.fromContact?.id
+      ? getRemGoodListByContact(contacts, goodss, remainss, document?.head?.fromContact.id)
+      : [],
   );
 
-  const goodRemains: IRem[] = useMemo(() => {
-    return Object.keys(goods)
-      ?.reduce((r: IRem[], e) => {
-        const { remains, ...goodInfo } = goods[e];
-        const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
+  // const goodRemains: IRem[] = useMemo(() => {
+  //   return Object.keys(goods)
+  //     ?.reduce((r: IRem[], e) => {
+  //       const { remains, ...goodInfo } = goods[e];
+  //       const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
 
-        remains && remains.length > 0
-          ? remains.forEach((re) => {
-              r.push({ ...goodPos, price: re.price, remains: re.q });
-            })
-          : r.push(goodPos);
-        return r;
-      }, [])
-      .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
-  }, [goods]);
+  //       remains && remains.length > 0
+  //         ? remains.forEach((re) => {
+  //             console.log('re1', re);
+  //             r.push({ ...goodPos, price: re.price, remains: re.q });
+  //           })
+  //         : r.push(goodPos);
+  //       return r;
+  //     }, [])
+  //     .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
+  // }, [goods]);
+
+  // console.log('gooodrem', goodRemains);
 
   useEffect(() => {
     if (!filterVisible && searchText) {
@@ -107,14 +123,16 @@ export const SelectRemainsScreen = () => {
 
   useEffect(() => {
     setList(
+      // goodRemains,
       goodRemains?.filter(
         (item) =>
-          item.barcode?.toLowerCase().includes(searchText.toLowerCase()) ||
-          item.name?.toLowerCase().includes(searchText.toLowerCase()),
+          item.good.barcode?.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.good.name?.toLowerCase().includes(searchText.toLowerCase()),
       ),
     );
   }, [goodRemains, searchText]);
 
+  // console.log('rems', goodRemains);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
@@ -127,10 +145,10 @@ export const SelectRemainsScreen = () => {
     });
   }, [navigation, filterVisible, colors.card, handleScanner, isScanerReader]);
 
-  const refList = useRef<FlatList<IRem>>(null);
+  const refList = useRef<FlatList<IRemGood>>(null);
   useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: IRem }) => <GoodRemains item={item} />;
+  const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
 
   return (
     <AppScreen>

@@ -35,12 +35,14 @@ export interface IMGoodRemains extends IGood {
 
 export interface IModelRem {
   price: number;
+  buyingPrice?: number;
   q: number;
 }
 
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
+  buyingPrice?: number;
 }
 
 export interface IRemains {
@@ -53,6 +55,7 @@ export interface IRemainsData {
   goodId: string;
   q?: number;
   price?: number;
+  buyingPrice?: number;
 }
 
 // Товары
@@ -65,8 +68,16 @@ export interface IGood extends INamedEntity {
   valuename?: string; // Наименование ед. изм.
   invWeight?: number; // Вес единицы товара
   price?: number; //Цена
+  buyingPrice?: number;
   scale?: number; //количество единиц в месте
 }
 export interface IRemainsNew {
   [id: string]: IRemainsData[];
+}
+
+export interface IRemGood {
+  good: IGood;
+  price: number;
+  buyingPrice?: number;
+  remains: number;
 }

@@ -49,7 +49,7 @@ const ScanBarcodeScreen = () => {
   const document = useSelector((state) => state.documents.list).find((e) => e.id === docId) as IDocDocument | undefined;
 
   const goodss = refSelectors.selectByName<IGood>('good').data;
-  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id).data;
+  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
   const remains = refSelectors.selectByName<IRemainsNew>('remain').data;
 
   const goods: IMGoodData<IMGoodRemain> = useMemo(() => {
@@ -66,8 +66,6 @@ const ScanBarcodeScreen = () => {
 
     return goodRem;
   }, [document?.head?.fromContact, contacts, goodss, remains]);
-
-  console.log('1111', goods.length);
 
   const getScannedObject = useCallback(
     (brc: string): IDocLine | undefined => {
@@ -88,6 +86,7 @@ const ScanBarcodeScreen = () => {
           id: uuid(),
           quantity: 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
+          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.id === 'unknown' ? brc : remItem.good.barcode,
         };
@@ -113,6 +112,7 @@ const ScanBarcodeScreen = () => {
         id: uuid(),
         quantity: qty,
         price: remItem.remains?.length ? remItem.remains[0].price : 0,
+        buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
         remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
         barcode: remItem.good.barcode,
       };
