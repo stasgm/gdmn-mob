@@ -3,6 +3,7 @@ import path from 'path';
 import os from 'os';
 
 import Collection from './Collection';
+import CollectionMessage from './MessageCollection';
 
 import { CollectionItem } from './CollectionItem';
 
@@ -35,6 +36,11 @@ class Database {
   collection<T extends CollectionItem>(name: string) {
     const collectionPath = path.join(this.dbPath, `${name}.json`);
     return new Collection<T>(collectionPath);
+  }
+
+  messageCollection<T extends CollectionItem>(name: string) {
+    const collectionPath = this.dbPath;
+    return new CollectionMessage<T>(collectionPath, name);
   }
 }
 

@@ -11,13 +11,13 @@ import {
 
 import { v4 as uuid } from 'uuid';
 
-import { Collection, Database } from '../../utils/json-db';
+import { Collection, Database, CollectionMessage } from '../../utils/json-db';
 
 export type dbtype = {
   users: Collection<IDBUser>;
   codes: Collection<IDBActivationCode>;
   companies: Collection<IDBCompany>;
-  messages: Collection<IDBMessage>;
+  messages: CollectionMessage<IDBMessage>;
   devices: Collection<IDBDevice>;
   deviceBindings: Collection<IDBDeviceBinding>;
   dbid: Collection<IDBid>;
@@ -32,9 +32,9 @@ export const createDb = async (dir: string, name: string) => {
   const devices = db.collection<IDBDevice>('devices');
   const companies = db.collection<IDBCompany>('companies');
   const codes = db.collection<IDBActivationCode>('activation-codes');
-  const messages = db.collection<IDBMessage>('messages');
   const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
   const dbid = db.collection<IDBid>('dbid');
+  const messages = db.messageCollection<IDBMessage>('messages');
 
   database = { users, codes, companies, messages, devices, deviceBindings, dbid };
   const dbArr = await dbid.read();
