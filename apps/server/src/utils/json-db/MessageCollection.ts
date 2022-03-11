@@ -53,16 +53,19 @@ class CollectionMessage<T extends CollectionItem> {
     const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir();
     if (!filesInfoArr) return [];
     const fileInfo = typeof predicate === 'undefined' ? filesInfoArr : filesInfoArr.filter(predicate);
-    const arr = [];
-    for await (const item of fileInfo) {
+    //  const arr: T[] | PromiseLike<T[]> = [];
+    /*  for await (const item of fileInfo) {
       try {
         const newItem = await this._get(this._Obj2FileName(item));
         if (newItem) arr.push(newItem);
       } catch (err) {
         throw new DataNotFoundException(err as string);
       }
-    }
-    return arr;
+    } */
+    const pr = fileInfo.map(async (item) => {
+      return await this._get(this._Obj2FileName(item));
+    });
+    return Promise.all(pr);
   }
 
   /**
@@ -114,30 +117,14 @@ class CollectionMessage<T extends CollectionItem> {
     } catch (err) {
       throw new DataNotFoundException(err as string);
     }
-
-    /*  const predicate = typeof id === 'function' ? R.pipe(id, R.not) : (item: T) => item.id !== id;
-
-    const db = await this._get();
-
-    const deleted = db.filter(predicate);
-
-    return this._save(deleted);*/
   }
 
-  public async deleteAll(): Promise<void> {
-    try {
-      const filesInfoArr = await this._readDir();
-      for await (const item of filesInfoArr) {
-        try {
-          await this._delete(this._Obj2FileName(item));
-        } catch (err) {
-          throw new DataNotFoundException(err as string);
-        }
-      }
-    } catch (err) {
-      throw new DataNotFoundException(err as string);
-    }
-    // return this._save();
+  public async deleteAll(): Promise<void[]> {
+    const filesInfoArr = await this._readDir();
+    const pr = filesInfoArr.map(async (item) => {
+      await this._delete(this._Obj2FileName(item));
+    });
+    return Promise.all(pr);
   }
 
   private async _ensureStorage() {

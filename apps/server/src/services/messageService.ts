@@ -62,10 +62,10 @@ const FindMany = async ({
   //   userId = 'gdmn';
   // }
 
-  const messageList = (await messages.read()).filter(
+  /*  const messageList = (await messages.read()).filter(
     (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === consumerId,
-  );
-
+  ); */
+  const messageList = await messages.read((item) => item.consumer === consumerId);
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);
