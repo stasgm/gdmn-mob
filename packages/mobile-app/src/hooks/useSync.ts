@@ -1,6 +1,15 @@
-import { useDispatch, useDocThunkDispatch, useRefThunkDispatch, useAuthThunkDispatch } from '@lib/store';
+import {
+  useDispatch,
+  useDocThunkDispatch,
+  useRefThunkDispatch,
+  useAuthThunkDispatch,
+  useSelector,
+  documentActions,
+  referenceActions,
+  appActions,
+  authActions,
+} from '@lib/store';
 
-import { useSelector, documentActions, referenceActions, appActions, authActions } from '@lib/store';
 import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
@@ -74,10 +83,10 @@ const useSync = (onSync?: () => void): (() => void) => {
           );
 
           if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
-            errList.push(updateDocResponse.payload);
+            errList.push('Документы отправлены, но статус не обновлен');
           }
         } else {
-          errList.push(sendMessageResponse.message);
+          errList.push(`Документы не отправлены: ${sendMessageResponse.message}`);
         }
       }
       //2. Получаем все сообщения для мобильного
@@ -92,7 +101,7 @@ const useSync = (onSync?: () => void): (() => void) => {
       if (getMessagesResponse.type === 'GET_MESSAGES') {
         await Promise.all(getMessagesResponse.messageList?.map((message) => processMessage(message, errList)));
       } else {
-        errList.push(getMessagesResponse.message);
+        errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
       }
 
       //Формируем запрос на получение документов для следующего раза
@@ -124,10 +133,10 @@ const useSync = (onSync?: () => void): (() => void) => {
         };
 
         //3. Отправляем запрос на получение справочнико
-        const sendMesRefResponse  = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetRef);
+        const sendMesRefResponse = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetRef);
 
         if (sendMesRefResponse?.type === 'ERROR') {
-          errList.push(sendMesRefResponse.message);
+          errList.push(`Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`);
         }
       }
 
@@ -135,7 +144,7 @@ const useSync = (onSync?: () => void): (() => void) => {
       const sendMesDocRespone = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetDoc);
 
       if (sendMesDocRespone.type === 'ERROR') {
-        errList.push(sendMesDocRespone.message);
+        errList.push(`Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`);
       }
 
       if (cleanDocTime > 0) {
@@ -143,13 +152,22 @@ const useSync = (onSync?: () => void): (() => void) => {
         const maxDocDate = new Date();
         maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
 
-        const delPromises = documents
-          .filter((d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE') && new Date(d.documentDate) <= maxDocDate)
-          .map(async (d) => {
-            docDispatch(documentActions.removeDocument(d.id));
-          });
+        // const delPromises = documents
+        //   .filter((d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE')
+        // && new Date(d.documentDate) <= maxDocDate)
+        //   .map(async (d) => {
+        //     docDispatch(documentActions.removeDocument(d.id));
+        //   });
 
-        await Promise.all(delPromises);
+        // await Promise.all(delPromises);
+        const delDocs = documents
+          .filter((d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE') && new Date(d.documentDate) <= maxDocDate)
+          .map((d) => d.id);
+
+        const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+        if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+          errList.push('Старые обработанные документы не удалены');
+        }
       }
 
       //7. Отправляем запрос на получение склада для юзера
@@ -161,14 +179,14 @@ const useSync = (onSync?: () => void): (() => void) => {
       );
 
       if (sendMesDepartResponse.type === 'ERROR') {
-        errList.push(sendMesDepartResponse.message);
+        errList.push(`Запрос на получение склада не отправлен: ${sendMesDepartResponse.message}`);
       }
 
       dispatch(appActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
 
       if (errList?.length) {
-        Alert.alert('Внимание!', 'Во время синхронизации произошли ошибки...', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', `Во время синхронизации произошли ошибки:\n${errList.join('\n')}`, [{ text: 'OK' }]);
       }
     };
 
@@ -200,26 +218,25 @@ const useSync = (onSync?: () => void): (() => void) => {
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-            await api.message.removeMessage(msg.id);
+            const removeMess = await api.message.removeMessage(msg.id);
+            if (removeMess.type === 'ERROR') {
+              errList.push(`Справочники загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
+            }
           } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
-            errList.push(setRefResponse.payload);
+            errList.push('Справочники не загружены в хранилище');
           }
-          // //Удаляем старые справочники из хранилища
-          // const clearRefResponse = await refDispatch(referenceActions.clearReferences());
-
-          // if (clearRefResponse.type === 'REFERENCES/CLEAR_REFERENCES_FAILURE') {
-          //   errList.push(clearRefResponse.payload);
-          //   break;
-          // }
         } else {
           //Записываем новые справочники из сообщения
           const addRefResponse = await refDispatch(referenceActions.addReferences(msg.body.payload as IReferences));
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-            await api.message.removeMessage(msg.id);
+            const removeMess = await api.message.removeMessage(msg.id);
+            if (removeMess.type === 'ERROR') {
+              errList.push(`Справочники добавлены, но сообщение на сервере не удалено: ${removeMess.message}`);
+            }
           } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
-            errList.push(addRefResponse.payload);
+            errList.push('Справочники не добавлены в хранилище');
           }
         }
 
@@ -238,9 +255,12 @@ const useSync = (onSync?: () => void): (() => void) => {
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          await api.message.removeMessage(msg.id);
+          const removeMess = await api.message.removeMessage(msg.id);
+          if (removeMess.type === 'ERROR') {
+            errList.push(`Документы загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
+          }
         } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
-          errList.push(setDocResponse.payload);
+          errList.push('Документы не загружены в хранилище');
         }
 
         break;
@@ -261,9 +281,12 @@ const useSync = (onSync?: () => void): (() => void) => {
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-          await api.message.removeMessage(msg.id);
+          const removeMess = await api.message.removeMessage(msg.id);
+          if (removeMess.type === 'ERROR') {
+            errList.push(`Настройки пользователя загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
+          }
         } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
-          errList.push('Неудачная загрузка дополнительных настроек пользователя');
+          errList.push('Настройки пользователя не загружены в хранилище');
         }
         break;
       }
