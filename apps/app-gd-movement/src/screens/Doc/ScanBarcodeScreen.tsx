@@ -50,7 +50,9 @@ const ScanBarcodeScreen = () => {
 
   const goodss = refSelectors.selectByName<IGood>('good').data;
   const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
-  const remains = refSelectors.selectByName<IRemainsNew>('remain').data;
+  const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
+
+  console.log('remains', remains);
 
   const goods: IMGoodData<IMGoodRemain> = useMemo(() => {
     if (!document?.head?.fromContact) {

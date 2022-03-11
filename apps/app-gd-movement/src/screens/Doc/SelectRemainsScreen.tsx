@@ -85,7 +85,7 @@ export const SelectRemainsScreen = () => {
   //   [document?.head?.toDepartment?.id, model],
   // );
 
-  const remainss = refSelectors.selectByName<IRemainsNew>('remain').data;
+  const remainss = refSelectors.selectByName<IRemainsNew>('remains').data[0];
   const goodss = refSelectors.selectByName<IGood>('good').data;
   console.log('newg', goodss);
   const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;

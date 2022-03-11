@@ -57,7 +57,7 @@ const Input: React.FC<Props> = ({
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={value}
+          value={value || ''}
           onChangeText={onChangeText}
           onEndEditing={onEndEditing}
           theme={{
@@ -77,7 +77,8 @@ const Input: React.FC<Props> = ({
           placeholderTextColor={colors.text}
           right={
             !!value &&
-            !!clearInput && (
+            !!clearInput &&
+            !disabled && (
               <TextInput.Icon
                 name="close"
                 size={20}
