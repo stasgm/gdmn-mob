@@ -36,18 +36,15 @@ export interface IRem extends IGood {
   price?: number;
 }
 
-// export interface IRemains {
-//   contactId: string;
-//   date: Date;
-//   data: IRemainsData[];
-// }
-
 export interface IRemainsData {
   goodId: string;
   q?: number;
   price?: number;
 }
 
+export interface IRemains {
+  [id: string]: IRemainsData[];
+}
 // Товары
 export interface IGood extends INamedEntity {
   alias: string;
@@ -59,10 +56,6 @@ export interface IGood extends INamedEntity {
   invWeight?: number; // Вес единицы товара
   price?: number; //Цена
   scale?: number; //количество единиц в месте
-}
-
-export interface IRemains {
-  [id: string]: IRemainsData[];
 }
 
 export interface IRemGood {
