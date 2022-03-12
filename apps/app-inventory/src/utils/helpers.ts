@@ -56,6 +56,12 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
   }
 };
 
+/**Возвращает модель товаров с информацией по остаткам в виде:
+  { "123456789" : { good: { id: '1', name: 'Товар 1', value: 'шт.', ...}, remains: [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]},
+    "987654321" : { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, remains: [{ price: 1.3, q: 1 }, { price: 1.4, q: 2 }]},
+    "111111111" : { good: { id: '3', name: 'Товар 3', value: 'шт.', ...}},
+  }
+*/
 const getRemGoodByContact = (
   contacts: IDepartment[],
   goods: IGood[],
@@ -73,15 +79,7 @@ const getRemGoodByContact = (
 
     if (remains && remains[contactId]) {
       //Формируем объект остатков тмц
-      const remainsByGoodId = remains[contactId].reduce((p: any, { goodId, price, q }: IRemainsData) => {
-        const x = p[goodId];
-        if (!x) {
-          p[goodId] = [{ price, q }];
-        } else {
-          x.push({ price, q });
-        }
-        return p;
-      }, {});
+      const remainsByGoodId = getRemainsByGoodId(remains, contactId);
 
       //Заполняем объект товаров по штрихкоду, если есть шк и (выбор не из остатков или есть остатки по товару)
       for (const good of goods) {
@@ -106,6 +104,13 @@ const getRemGoodByContact = (
   return remGoods;
 };
 
+/**Возвращает модель товаров с информацией по остаткам в виде:
+  [
+    { good: { id: '1', name: 'Товар 1', value: 'шт.', ...}, price: 1.2, remains: 1},
+    { good: { id: '1', name: 'Товар 1', value: 'шт.', ...}, price: 1.3, remains: 3},
+    { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, price: 0, remains: 0}
+  ]
+*/
 const getRemGoodListByContact = (
   contacts: IDepartment[],
   goods: IGood[],
@@ -119,23 +124,14 @@ const getRemGoodListByContact = (
   const c = contacts.find((con) => con.id === contactId);
   if (c && goods.length) {
     log('getRemGoodListByContact', `подразделение: ${c.name}`);
-
+    //Если есть остатки, то формируем модель остатков по ид товара
     if (remains && remains[contactId]) {
       //Формируем объект остатков тмц
-      const remainsByGoodId = remains[contactId].reduce(
-        (p: IMGoodData<IModelRem[]>, { goodId, price = 0, q = 0 }: IRemainsData) => {
-          const x = p[goodId];
-          if (!x) {
-            p[goodId] = [{ price, q }];
-          } else {
-            x.push({ price, q });
-          }
-          return p;
-        },
-        {},
-      );
+      const remainsByGoodId = getRemainsByGoodId(remains, contactId);
 
       //Формируем массив товаров, добавив свойство цены и остатка
+      //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
+      //то добавляем запись с нулевыми значениями цены и остатка
       for (const good of goods) {
         if (remainsByGoodId && remainsByGoodId[good.id]) {
           for (const r of remainsByGoodId[good.id]) {
@@ -163,6 +159,19 @@ const getRemGoodListByContact = (
 
   log('getRemGoodListByContact', `Окончание построения массива товаров по подразделению ${contactId}`);
   return remGoods;
+};
+
+//Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
+const getRemainsByGoodId = (remains: IRemains, contactId: string) => {
+  return remains[contactId].reduce((p: IMGoodData<IModelRem[]>, { goodId, price = 0, q = 0 }: IRemainsData) => {
+    const x = p[goodId];
+    if (!x) {
+      p[goodId] = [{ price, q }];
+    } else {
+      x.push({ price, q });
+    }
+    return p;
+  }, {});
 };
 
 export { extraPredicate, isNamedEntity, formatValue, getRemGoodByContact, getRemGoodListByContact };
