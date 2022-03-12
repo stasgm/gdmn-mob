@@ -297,22 +297,30 @@ export const DocEditScreen = () => {
 
   const handleFromContactType = useCallback(
     (option) => {
+      if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
+        Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
+        return setVisibleFrom(false);
+      }
       if (!(option.id === docFromContactType?.id)) {
         dispatch(appActions.setFormParams({ fromContactType: option, fromContact: undefined }));
       }
       setVisibleFrom(false);
     },
-    [dispatch, docFromContactType],
+    [dispatch, doc?.lines.length, docFromContactType?.id, documentType?.remainsField],
   );
 
   const handleToContactType = useCallback(
     (option) => {
+      if (doc?.lines.length && documentType?.remainsField === 'toContact') {
+        Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
+        return setVisibleTo(false);
+      }
       if (!(option.id === docToContactType?.id)) {
         dispatch(appActions.setFormParams({ toContactType: option, toContact: undefined }));
       }
       setVisibleTo(false);
     },
-    [dispatch, docToContactType],
+    [dispatch, doc?.lines.length, docToContactType?.id, documentType?.remainsField],
   );
   // useEffect(() => {
   //   return;
