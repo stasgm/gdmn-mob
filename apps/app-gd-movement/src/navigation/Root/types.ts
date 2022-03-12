@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-import { IInventoryLine } from '../../store/types';
+import { IDocLine, IInventoryLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -37,3 +37,25 @@ export type InventoryParamList = RefParamList & {
 };
 
 export type InventoryStackParamList = { InventoryList: undefined } & InventoryParamList;
+
+export type DocParamList = RefParamList & {
+  DocView: { id: string; docType?: string };
+  DocEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  DocLine: { mode: number; docId: string; item: IDocLine; docType?: string };
+  SelectGoodItem: { docId: string; docType?: string };
+  SelectRemainsItem: { docId: string; docType?: string };
+  ScanBarcode: { docId: string; docType?: string };
+  // // ScanBarcodeReader: { docId: string; docType?: string };
+  DocLineEdit: {
+    docId: string;
+    prodId: string;
+    quantity?: number;
+    lineId?: number;
+    price?: number;
+    remains?: number;
+    modeCor?: boolean;
+    docType?: string;
+  };
+};
+
+export type DocStackParamList = { DocList: undefined } & DocParamList;
