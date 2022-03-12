@@ -1,3 +1,4 @@
+import { IListItem } from '@lib/mobile-types';
 import { IDocument, Settings, StatusType } from '@lib/types';
 
 import { IDocDocument } from '../store/types';
@@ -5,6 +6,12 @@ import { IDocDocument } from '../store/types';
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
 export const ONE_SECOND_IN_MS = 1000;
+
+export const contactTypes: IListItem[] = [
+  { id: 'department', value: 'Подразделение' },
+  { id: 'contact', value: 'Организация' },
+  { id: 'employee', value: 'Сотрудник' },
+];
 
 export const getStatusColor = (status: StatusType) => {
   let statusColor: typeof statusColors[number];

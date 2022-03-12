@@ -22,6 +22,14 @@ export interface IHead {
 
 export interface IDocumentType extends INamedEntity {
   description?: string;
+  isRemains?: boolean;
+  remainsField?: string;
+  fromDescription?: string;
+  fromType?: string;
+  fromRequired?: boolean;
+  toDescription?: string;
+  toType?: string;
+  toRequired?: boolean;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {

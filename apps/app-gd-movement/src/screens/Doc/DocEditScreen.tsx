@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
-import { Divider, IconButton, useTheme } from 'react-native-paper';
+import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity, TextInput } from 'react-native';
+import { Divider, IconButton, useTheme, List, Menu, Provider, Button } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocument, IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, IReference } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { docSelectors, useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
+import { useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
   BackButton,
   AppInputScreen,
@@ -24,11 +24,9 @@ import {
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { IListItem } from '@lib/mobile-types';
-
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IInventoryDocument, IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
-import { getNextDocNumber } from '../../utils/constants';
+import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
+import { contactTypes, getNextDocNumber } from '../../utils/constants';
 
 export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
@@ -36,49 +34,30 @@ export const DocEditScreen = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
 
-  const [chevronFD, setChevronFD] = useState(false);
-
-  const fromDepartmentRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentFD = useCallback(() => {
-    fromDepartmentRef.current?.present();
-    setChevronFD(true);
-  }, [fromDepartmentRef]);
-
-  const [chevronTD, setChevronTD] = useState(false);
-
-  const toDepartmentRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentTD = useCallback(() => {
-    toDepartmentRef.current?.present();
-    setChevronTD(true);
-  }, [toDepartmentRef]);
-
   const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
-  // const inventory = docSelectors.selectByDocType<IDocDocument>('inventory')?.find((e) => e.id === id);
+
   const documents = useSelector((state) => state.documents.list) as IDocDocument[];
-  console.log('1234', documents);
 
   const newNumber = getNextDocNumber(documents);
 
-  console.log('number', newNumber);
-
-  const inventory = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
-  // const docType = refSelectors
-  //   .selectByName<IReference<IDocumentType>>('documentType')
-  //   ?.data.filter((t) => t.name !== 'inventory');
+  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
 
   const {
     documentType: docDocumentType,
-    fromDepartment: docFromDepartment,
-    toDepartment: docToDepartment,
+    fromContact: docFromContact,
+    toContact: docToContact,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
     status: docStatus,
+    fromContactType: docFromContactType,
+    toContactType: docToContactType,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
+
+  const [selectedFromContact, setSelectedFromContact] = useState(docFromContactType);
+  const [selectedToContact, setSelectedToContact] = useState(docToContactType);
 
   useEffect(() => {
     return () => {
@@ -87,66 +66,37 @@ export const DocEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fromDepartment = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docFromDepartment?.id);
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(() => {
+    return documentTypes?.find((e) => e.id === docDocumentType?.id);
+  }, [docDocumentType?.id, documentTypes]);
+  // const documentType = refSelectors
+  //   .selectByName<IDocumentType>('documentType')
+  //   ?.data?.find((e) => e.id === docDocumentType?.id);
 
-  useEffect(() => {
-    if (!docFromDepartment) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['department']: fromDepartment?.name,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docFromDepartment]);
+  // useEffect(() => {
+  //   if (!docDocumentType) {
+  //     dispatch(appActions.setFormParams({ documentType: documentType }));
+  //   }
+  // }, [dispatch, docDocumentType, documentType]);
 
-  const toDepartment = refSelectors
-    .selectByName<IDepartment>('department')
-    ?.data?.find((e) => e.id === docToDepartment?.id);
-
-  useEffect(() => {
-    if (!docToDepartment) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['department']: toDepartment?.name,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docToDepartment]);
-
-  const documentType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data?.find((e) => e.id === docDocumentType?.id);
-
-  useEffect(() => {
-    if (!docDocumentType) {
-      dispatch(
-        appActions.setFormParams({
-          ...formParams,
-          ['documentType']: documentType?.description,
-        }),
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docDocumentType]);
+  const fromContactType = contactTypes.find((e) => e.id === docFromContactType?.id);
+  const toContactType = contactTypes.find((e) => e.id === docToContactType?.id);
 
   useEffect(() => {
     // Инициализируем параметры
-    if (inventory) {
+    if (doc) {
       dispatch(
         appActions.setFormParams({
-          number: inventory.number,
-          documentType: inventory.documentType,
-          documentDate: inventory.documentDate,
-          comment: inventory.head.comment,
-          fromDepartment: inventory.head.fromDepartment,
-          toDepartment: inventory.head.toDepartment,
-          status: inventory.status,
+          number: doc.number,
+          documentType: doc.documentType,
+          documentDate: doc.documentDate,
+          comment: doc.head.comment,
+          fromContact: doc.head.fromContact,
+          toContact: doc.head.toContact,
+          status: doc.status,
+          fromContactType: doc.head.fromContactType,
+          toContactType: doc.head.toContactType,
         }),
       );
     } else {
@@ -155,24 +105,37 @@ export const DocEditScreen = () => {
           number: newNumber, //'1',
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
+          // fromContactType: contactTypes[0],
+          fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
+          toContactType: contactTypes.find((item) => item.id === documentType?.toType),
+          // toContactType: contactTypes[0],
         }),
       );
     }
-  }, [dispatch, inventory, newNumber]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, doc, newNumber]);
 
   const handleSave = useCallback(() => {
-    // if (!docType) {
-    //   return Alert.alert('Ошибка!', 'Тип документа "Инвентаризация" не найден', [{ text: 'OK' }]);
-    // }
-    if (!(docNumber && docToDepartment && docDate && docDocumentType)) {
+    if (documentType?.fromRequired && !(docNumber && docDate && docDocumentType && docFromContact)) {
+      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+    }
+    if (documentType?.toRequired && !(docNumber && docDate && docDocumentType && docToContact)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
+    if (
+      documentType?.isRemains &&
+      docDate &&
+      new Date(docDate).toLocaleDateString() < new Date().toLocaleDateString()
+    ) {
+      Alert.alert('Ошибка!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
+      return;
+    }
     const docId = !id ? uuid() : id;
     const createdDate = new Date().toISOString();
 
     if (!id) {
-      const newInventory: IDocDocument = {
+      const newDoc: IDocDocument = {
         id: docId,
         documentType: docDocumentType,
         number: newNumber,
@@ -180,26 +143,28 @@ export const DocEditScreen = () => {
         status: 'DRAFT',
         head: {
           comment: docComment,
-          fromDepartment: docFromDepartment,
-          toDepartment: docToDepartment,
+          fromContact: docFromContact,
+          toContact: docToContact,
+          fromContactType: docFromContactType,
+          toContactType: docToContactType,
         },
         lines: [],
         creationDate: createdDate,
         editionDate: createdDate,
       };
 
-      dispatch(documentActions.addDocument(newInventory));
+      dispatch(documentActions.addDocument(newDoc));
 
-      navigation.dispatch(StackActions.replace('DocView', { id: newInventory.id }));
+      navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
     } else {
-      if (!inventory) {
+      if (!doc) {
         return;
       }
 
       const updatedDate = new Date().toISOString();
 
-      const updatedInventory: IDocDocument = {
-        ...inventory,
+      const updatedDoc: IDocDocument = {
+        ...doc,
         id,
         number: docNumber as string,
         status: docStatus || 'DRAFT',
@@ -207,31 +172,38 @@ export const DocEditScreen = () => {
         documentType: docDocumentType,
         errorMessage: undefined,
         head: {
-          ...inventory.head,
+          ...doc.head,
           comment: docComment as string,
-          fromDepartment: docFromDepartment,
-          toDepartment: docToDepartment,
+          fromContact: docFromContact,
+          toContact: docToContact,
+          fromContactType: docFromContactType,
+          toContactType: docToContactType,
         },
-        lines: inventory.lines,
-        creationDate: inventory.creationDate || updatedDate,
+        lines: doc.lines,
+        creationDate: doc.creationDate || updatedDate,
         editionDate: updatedDate,
       };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedInventory }));
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
       navigation.navigate('DocView', { id });
     }
   }, [
+    documentType?.fromRequired,
+    documentType?.toRequired,
+    documentType?.isRemains,
     docNumber,
-    docToDepartment,
     docDate,
     docDocumentType,
+    docFromContact,
+    docToContact,
     id,
     newNumber,
     docComment,
-    docFromDepartment,
+    docFromContactType,
+    docToContactType,
     dispatch,
     navigation,
-    inventory,
+    doc,
     docStatus,
   ]);
 
@@ -266,34 +238,53 @@ export const DocEditScreen = () => {
     setShowOnDate(true);
   };
 
-  const handlePresentDepartment = () => {
+  const handleFromContact = () => {
     if (isBlocked) {
       return;
     }
 
-    navigation.navigate('SelectRefItem', {
-      refName: String(selectedFD.id),
-      fieldName: 'fromDepartment',
-      value: docFromDepartment && [docFromDepartment],
-    });
-  };
-
-  const handleNextDepartment = () => {
-    if (isBlocked) {
+    if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
+      Alert.alert('Ошибка!', 'Нельзя изменить контакт при наличии позиций.', [{ text: 'OK' }]);
       return;
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedTD.id),
-      fieldName: 'toDepartment',
-      value: docToDepartment && [docToDepartment],
+      refName: String(selectedFromContact?.id || fromContactType?.id),
+      fieldName: 'fromContact',
+      value: docFromContact && [docFromContact],
     });
   };
+
+  const handleToContact = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    if (doc?.lines.length && documentType?.remainsField === 'toContact') {
+      Alert.alert('Ошибка!', 'Нельзя изменить контакт при наличии позиций.', [{ text: 'OK' }]);
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: String(selectedToContact?.id || toContactType?.id),
+      fieldName: 'toContact',
+      value: docToContact && [docToContact],
+    });
+  };
+
+  useEffect(() => {
+    dispatch(appActions.setFormParams({ fromContact: undefined, toContact: undefined }));
+  }, [dispatch, docDocumentType]);
 
   const handlePresentType = () => {
     if (isBlocked) {
       return;
     }
+    if (doc?.lines.length) {
+      Alert.alert('Ошибка!', 'Нельзя изменить тип документа при наличии позиций.', [{ text: 'OK' }]);
+      return;
+    }
+
     navigation.navigate('SelectRefItem', {
       refName: 'documentType',
       fieldName: 'documentType',
@@ -302,58 +293,62 @@ export const DocEditScreen = () => {
     });
   };
 
-  const currentListFD: IListItem[] = useMemo(() => {
-    // const newCurrentList = routeList.map((item) => ({
-    //   id: item.id,
-    //   value: `Маршрут №${item.number} на ${getDateString(item.documentDate)}`,
-    // }));
-    // return newCurrentList;
-    const newCurrentList = [
-      { id: 'department', value: 'Подразделение' },
-      { id: 'contact', value: 'Организация' },
-      { id: 'employee', value: 'Сотрудник' },
-    ];
-    return newCurrentList;
-  }, []);
+  const [chevronFromContact, setChevronFromContact] = useState(false);
 
-  const [selectedFD, setSelectedFD] = useState(currentListFD[0]);
-  const [newSelectedFD, setNewSelectedFD] = useState(selectedFD);
+  const fromContactRef = useRef<BottomSheetModal>(null);
 
-  const handleDismissFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setNewSelectedFD(selectedFD);
-    setChevronFD(false);
+  const handlePresentFromContact = useCallback(() => {
+    if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
+      Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
+      return;
+    }
+    setSelectedFromContact(fromContactType || contactTypes[0]);
+    fromContactRef.current?.present();
+    setChevronFromContact(true);
+  }, [doc?.lines.length, documentType?.remainsField, fromContactType]);
+
+  const handleDismissFromContact = () => {
+    fromContactRef.current?.dismiss();
+    setChevronFromContact(false);
   };
 
-  const handleApplyFD = () => {
-    fromDepartmentRef.current?.dismiss();
-    setSelectedFD(newSelectedFD);
-    setChevronFD(false);
+  const handleApplyFromContact = () => {
+    fromContactRef.current?.dismiss();
+    setChevronFromContact(false);
+    dispatch(appActions.setFormParams({ fromContactType: selectedFromContact, fromContact: undefined }));
   };
 
-  const currentListTD: IListItem[] = useMemo(() => {
-    const newCurrentList = [
-      { id: 'department', value: 'Подразделение' },
-      { id: 'contact', value: 'Организация' },
-      { id: 'employee', value: 'Сотрудник' },
-    ];
-    return newCurrentList;
-  }, []);
+  const [chevronToContact, setChevronToContact] = useState(false);
 
-  const [selectedTD, setSelectedTD] = useState(currentListTD[0]);
-  const [newSelectedTD, setNewSelectedTD] = useState(selectedTD);
+  const toContactRef = useRef<BottomSheetModal>(null);
 
-  const handleDismissTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setNewSelectedTD(selectedTD);
-    setChevronTD(false);
+  const handlePresentToContact = useCallback(() => {
+    if (doc?.lines.length && documentType?.remainsField === 'toContact') {
+      Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
+      return;
+    }
+    setSelectedToContact(toContactType || contactTypes[0]);
+    toContactRef.current?.present();
+    setChevronToContact(true);
+  }, [doc?.lines.length, documentType?.remainsField, toContactType]);
+
+  const handleDismissToContact = () => {
+    toContactRef.current?.dismiss();
+    setChevronToContact(false);
   };
 
-  const handleApplyTD = () => {
-    toDepartmentRef.current?.dismiss();
-    setSelectedTD(newSelectedTD);
-    setChevronTD(false);
+  const handleApplyToContact = () => {
+    toContactRef.current?.dismiss();
+    setChevronToContact(false);
+    dispatch(appActions.setFormParams({ toContactType: selectedToContact, toContact: undefined }));
   };
+
+  const [expanded, setExpanded] = React.useState(true);
+  const handlePress = () => setExpanded(!expanded);
+
+  const [visible, setVisible] = React.useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
 
   return (
     <AppInputScreen>
@@ -362,8 +357,8 @@ export const DocEditScreen = () => {
       <ScrollView>
         {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
           <>
-            <View style={localStyles.container /*[styles.directionRow, localStyles.switchContainer]*/}>
-              <Text style={localStyles.subHeading}>Черновик:</Text>
+            <View style={[styles.directionRow, localStyles.switchContainer]}>
+              <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
                 onValueChange={() => {
@@ -373,7 +368,6 @@ export const DocEditScreen = () => {
             </View>
           </>
         )}
-
         <Input
           label="Номер документа"
           value={docNumber}
@@ -389,43 +383,98 @@ export const DocEditScreen = () => {
           disabled={docStatus !== 'DRAFT'}
         />
 
+        <View
+          style={{
+            paddingTop: 50,
+            flexDirection: 'row',
+            justifyContent: 'center',
+          }}
+        >
+          <Menu visible={visible} onDismiss={closeMenu} anchor={<Button onPress={openMenu}>Show menu</Button>}>
+            <Menu.Item onPress={() => {}} title="Item 1" />
+            <Menu.Item onPress={() => {}} title="Item 2" />
+            <Divider />
+            <Menu.Item onPress={() => {}} title="Item 3" />
+          </Menu>
+        </View>
+
+        <List.Section title="Accordions">
+          <List.Accordion title="Uncontrolled Accordion" left={(props) => <List.Icon {...props} icon="folder" />}>
+            <List.Item title="First item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+
+          <List.Accordion
+            title="Controlled Accordion"
+            left={(props) => <List.Icon {...props} icon="folder" />}
+            expanded={expanded}
+            onPress={handlePress}
+          >
+            <List.Item title="First item" />
+            <List.Item title="Second item" />
+          </List.Accordion>
+        </List.Section>
+
         <SelectableInput
           label="Тип документа"
           value={docDocumentType?.description}
           onPress={handlePresentType}
           disabled={isBlocked}
         />
-
-        <View style={[localStyles.border, { borderColor: colors.primary }]}>
-          <View style={[localStyles.container1]}>
-            <TouchableOpacity onPress={handlePresentFD} /*disabled={loading}*/>
-              <Text style={localStyles.subHeading}>{selectedFD?.value}</Text>
-            </TouchableOpacity>
-            <IconButton icon={chevronFD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentFD} />
+        {documentType?.fromType ? (
+          <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
+            <View style={localStyles.container}>
+              <View style={localStyles.subHeadingDepartment}>
+                <TouchableOpacity onPress={handlePresentFromContact} disabled={isBlocked}>
+                  <Text style={isBlocked ? localStyles.subHeadingBlocked : localStyles.subHeading}>
+                    {docFromContactType?.value}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <IconButton
+                  icon={chevronFromContact ? 'chevron-up' : 'chevron-down'}
+                  size={25}
+                  onPress={handlePresentFromContact}
+                  disabled={isBlocked}
+                />
+              </View>
+            </View>
+            <SelectableInput
+              label={documentType.fromDescription}
+              value={docFromContact?.name}
+              onPress={handleFromContact}
+              disabled={isBlocked}
+            />
           </View>
-
-          <SelectableInput
-            label="Откуда"
-            value={docFromDepartment?.name}
-            onPress={handlePresentDepartment}
-            disabled={isBlocked}
-          />
-        </View>
-
-        <View style={[localStyles.border, { borderColor: colors.primary }]}>
-          <View style={localStyles.container1}>
-            <TouchableOpacity onPress={handlePresentTD} /* disabled={loading}*/>
-              <Text style={localStyles.subHeading}>{selectedTD?.value}</Text>
-            </TouchableOpacity>
-            <IconButton icon={chevronTD ? 'chevron-up' : 'chevron-down'} size={25} onPress={handlePresentTD} />
+        ) : null}
+        {documentType?.toType ? (
+          <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
+            <View style={localStyles.container}>
+              <View style={localStyles.subHeadingDepartment}>
+                <TouchableOpacity onPress={handlePresentToContact} disabled={isBlocked}>
+                  <Text style={isBlocked ? localStyles.subHeadingBlocked : localStyles.subHeading}>
+                    {docToContactType?.value}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <IconButton
+                  icon={chevronToContact ? 'chevron-up' : 'chevron-down'}
+                  size={25}
+                  onPress={handlePresentToContact}
+                  disabled={isBlocked}
+                />
+              </View>
+            </View>
+            <SelectableInput
+              label={documentType.toDescription}
+              value={docToContact?.name}
+              onPress={handleToContact}
+              disabled={isBlocked}
+            />
           </View>
-          <SelectableInput
-            label="Куда"
-            value={docToDepartment?.name}
-            onPress={handleNextDepartment}
-            disabled={isBlocked}
-          />
-        </View>
+        ) : null}
         <Input
           label="Комментарий"
           value={docComment}
@@ -437,35 +486,31 @@ export const DocEditScreen = () => {
         />
       </ScrollView>
       <BottomSheet
-        sheetRef={fromDepartmentRef}
+        sheetRef={fromContactRef}
         title={'Тип контакта'}
         snapPoints={['20%', '90%']}
-        onDismiss={handleDismissFD}
-        onApply={handleApplyFD}
+        onDismiss={handleDismissFromContact}
+        onApply={handleApplyFromContact}
       >
-        {/* <View style={localStyles.sheet}> */}
         <RadioGroup
-          options={currentListFD}
-          onChange={(option) => setNewSelectedFD(option)}
-          activeButtonId={newSelectedFD?.id}
+          options={contactTypes}
+          onChange={(option) => setSelectedFromContact(option)}
+          activeButtonId={selectedFromContact?.id}
         />
-        {/* </View> */}
         <View style={localStyles.sheet} />
       </BottomSheet>
       <BottomSheet
-        sheetRef={toDepartmentRef}
+        sheetRef={toContactRef}
         title={'Тип контакта'}
         snapPoints={['20%', '90%']}
-        onDismiss={handleDismissTD}
-        onApply={handleApplyTD}
+        onDismiss={handleDismissToContact}
+        onApply={handleApplyToContact}
       >
-        {/* <View style={localStyles.sheet}> */}
         <RadioGroup
-          options={currentListTD}
-          onChange={(option) => setNewSelectedTD(option)}
-          activeButtonId={newSelectedTD?.id}
+          options={contactTypes}
+          onChange={(option) => setSelectedToContact(option)}
+          activeButtonId={selectedToContact?.id}
         />
-        {/* </View> */}
         <View style={localStyles.sheet} />
       </BottomSheet>
       {showOnDate && (
@@ -487,7 +532,8 @@ export const localStyles = StyleSheet.create({
     paddingLeft: 5,
   },
   border: {
-    margin: 2,
+    marginHorizontal: 10,
+    marginVertical: 2,
     marginBottom: 15,
     borderWidth: 1,
     borderRadius: 2,
@@ -498,18 +544,19 @@ export const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     flexDirection: 'row',
-    paddingHorizontal: 12,
-    paddingVertical: 3,
-    marginVertical: 6,
-  },
-  container1: {
-    // alignItems: 'center',
-    flexDirection: 'row',
-    // paddingHorizontal: 12,
+    paddingLeft: 12,
     // paddingVertical: 3,
     // marginVertical: 6,
+    // width: '100%',
   },
   subHeading: {
+    fontSize: 14,
+  },
+  subHeadingBlocked: {
+    fontSize: 14,
+    color: '#a0a0a0',
+  },
+  subHeadingDepartment: {
     width: '85%',
     // fontSize: 14,
   },

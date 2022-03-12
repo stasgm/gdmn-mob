@@ -5,14 +5,15 @@ import { v4 as uuid } from 'uuid';
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
 import { globalStyles, BackButton } from '@lib/mobile-ui';
-import { useSelector, docSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 
-import { INamedEntity, ISettingsOption } from '@lib/types';
+import { IDepartment, INamedEntity, ISettingsOption } from '@lib/types';
 
-import { useSelector as useAppInventorySelector } from '../../store/index';
-import { DocStackParamList, InventoryStackParamList } from '../../navigation/Root/types';
-import { IInventoryLine, IInventoryDocument, IDocDocument, IDocLine } from '../../store/types';
+import { DocStackParamList } from '../../navigation/Root/types';
+import { IDocDocument, IDocLine } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
+import { IGood, IMGoodData, IMGoodRemain, IRemainsNew } from '../../store/app/types';
+import { getRemGoodByContact } from '../../utils/helpers';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;
@@ -23,8 +24,6 @@ const ScanBarcodeScreen = () => {
   const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
   const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
   const isScanerReader = settings.scannerUse?.data;
-
-  const model = useAppInventorySelector((state) => state.appInventory.model);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,15 +47,27 @@ const ScanBarcodeScreen = () => {
   }, [docId, navigation]);
 
   const document = useSelector((state) => state.documents.list).find((e) => e.id === docId) as IDocDocument | undefined;
-  // const document = docSelectors
-  //   .selectByDocType<IInventoryDocument>('inventory')
-  //   ?.find((e) => e.id === docId) as IDocDocument;
 
-  console.log('documents', document);
-  const goods = useMemo(
-    () => (document?.head?.toDepartment?.id ? model[document.head.toDepartment.id].goods : {}),
-    [document?.head?.toDepartment?.id, model],
-  );
+  const goodss = refSelectors.selectByName<IGood>('good').data;
+  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
+  const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
+
+  console.log('remains', remains);
+
+  const goods: IMGoodData<IMGoodRemain> = useMemo(() => {
+    if (!document?.head?.fromContact) {
+      return {};
+    }
+
+    const goodRem: IMGoodData<IMGoodRemain> = getRemGoodByContact(
+      contacts,
+      goodss,
+      remains,
+      document.head.fromContact?.id,
+    );
+
+    return goodRem;
+  }, [document?.head?.fromContact, contacts, goodss, remains]);
 
   const getScannedObject = useCallback(
     (brc: string): IDocLine | undefined => {
@@ -64,8 +75,7 @@ const ScanBarcodeScreen = () => {
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem =
-          goods?.[Object.keys(goods).find((item) => goods[item].barcode === brc || goods[item].id === 'unknown') || ''];
+        const remItem = goods[brc] || goods.unknown;
         // Находим товар из модели остатков по баркоду, если баркод не найден, ищем товар с id равным unknown и добавляем в позицию документа
         // Если таких товаров нет, то товар не найден
 
@@ -73,15 +83,14 @@ const ScanBarcodeScreen = () => {
           return;
         }
 
-        const { remains, ...good } = remItem;
-
         return {
-          good: { id: good.id, name: good.name } as INamedEntity,
+          good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
           id: uuid(),
           quantity: 1,
-          price: remains?.length ? remains[0].price : 0,
-          remains: remains?.length ? remains?.[0].q : 0,
-          barcode: good.id === 'unknown' ? brc : good.barcode,
+          price: remItem.remains?.length ? remItem.remains[0].price : 0,
+          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
+          remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
+          barcode: remItem.good.id === 'unknown' ? brc : remItem.good.barcode,
         };
       }
 
@@ -94,21 +103,20 @@ const ScanBarcodeScreen = () => {
 
       const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
-      const remItem = goods?.[Object.keys(goods).find((item) => goods[item].weightCode === code) || ''];
+      const remItem = Object.values(goods)?.find((item: IMGoodRemain) => item.good.weightCode === code);
 
       if (!remItem) {
         return;
       }
 
-      const { remains, ...good } = remItem;
-
       return {
-        good: { id: good.id, name: good.name } as INamedEntity,
+        good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
         id: uuid(),
         quantity: qty,
-        price: remains?.length ? remains[0].price : 0,
-        remains: remains?.length ? remains?.[0].q : 0,
-        barcode: good.barcode,
+        price: remItem.remains?.length ? remItem.remains[0].price : 0,
+        buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
+        remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
+        barcode: remItem.good.barcode,
       };
     },
     [goods, weightSettingsCountCode, weightSettingsCountWeight, weightSettingsWeightCode.data],

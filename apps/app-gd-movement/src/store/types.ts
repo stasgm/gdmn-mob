@@ -11,6 +11,7 @@ import {
   IReferenceData,
   IDocumentType,
 } from '@lib/types';
+import { IListItem } from '@lib/mobile-types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -32,14 +33,17 @@ export interface IDocFormParam extends IFormParam {
   docType?: IDocument;
   documentType: IDocumentType;
   department?: IDepartment;
-  fromDepartment?: IDepartment;
-  toDepartment?: IDepartment;
+  fromContact?: IDepartment;
+  toContact?: IDepartment;
   contact?: IContact;
   comment?: string;
+  fromContactType?: IListItem;
+  toContactType?: IListItem;
 }
 
 //Подразделения-склады
 export type IDepartment = INamedEntity;
+export type IDepartmentType = INamedEntity;
 
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
@@ -67,8 +71,10 @@ export interface IInventoryLine extends IEntity {
 export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
 
 export interface IDocHead extends IHead {
-  fromDepartment?: IDepartment;
-  toDepartment?: IDepartment; //Подразделение
+  fromContact?: IDepartment;
+  toContact?: IDepartment; //Подразделение
+  fromContactType?: IListItem;
+  toContactType?: IListItem;
   contact?: IContact;
   comment?: string; // Комvентарий
 }
@@ -78,6 +84,7 @@ export interface IDocLine extends IEntity {
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
   price?: number;
+  buyingPrice?: number;
   remains?: number;
   barcode?: string;
   EID?: string;

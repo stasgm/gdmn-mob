@@ -1,5 +1,17 @@
 import { INamedEntity } from '@lib/types';
 
+import {
+  IGood,
+  IMGoodData,
+  IMGoodRemain,
+  IModelRem,
+  IRemains,
+  IRemainsData,
+  IRemainsNew,
+  IRemGood,
+} from '../store/app/types';
+import { IContact } from '../store/types';
+
 const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   let matched = 0;
 
@@ -54,3 +66,118 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
 };
 
 export { extraPredicate, isNamedEntity, formatValue };
+
+export const getRemGoodByContact = (contacts: IContact[], goods: IGood[], remains: IRemainsNew, contactId: string) => {
+  console.log('getRemGoodByContact', `Начало построения модели товаров по баркоду по подразделению ${contactId}`);
+
+  const remGoods: IMGoodData<IMGoodRemain> = {};
+  const contact = contacts.find((con) => con.id === contactId);
+
+  if (contact && goods.length) {
+    console.log('getRemGoodByContact', `подразделение: ${contact.name}`);
+
+    if (remains && remains[contactId]) {
+      //Формируем объект остатков тмц
+      const remainsByGoodId = remains[contactId].reduce((p: any, { goodId, price, buyingPrice, q }: IRemainsData) => {
+        const x = p[goodId];
+        if (!x) {
+          p[goodId] = [{ price, buyingPrice, q }];
+        } else {
+          x.push({ price, buyingPrice, q });
+        }
+        return p;
+      }, {});
+
+      //Заполняем объект товаров по штрихкоду, если есть шк
+      for (const good of goods) {
+        if (good.barcode) {
+          remGoods[good.barcode] = {
+            good,
+            remains: remainsByGoodId ? remainsByGoodId[good.id] : [],
+          };
+        }
+      }
+    } else {
+      //Если по товару нет остатков, добавляем объект товара без remains
+      for (const good of goods) {
+        if (good.barcode) {
+          remGoods[good.barcode] = { good };
+        }
+      }
+    }
+  }
+
+  console.log('getRemGoodByContact', `Окончание построения модели товаров по баркоду по подразделению ${contactId}`);
+  return remGoods;
+};
+
+export const getRemGoodListByContact = (
+  contacts: IContact[],
+  goods: IGood[],
+  remains: IRemainsNew, //IRemains[],
+  contactId: string,
+) => {
+  console.log('getRemGoodListByContact', `Начало построения массива товаров по подразделению ${contactId}`);
+
+  const remGoods: IRemGood[] = [];
+  const c = contacts.find((con) => con.id === contactId);
+  if (c && goods.length) {
+    console.log('getRemGoodListByContact', `подразделение: ${c.name}`);
+
+    //Формируем объект остатков тмц
+    const remainsByGoodId = remains[contactId].reduce(
+      (p: IMGoodData<IModelRem[]>, { goodId, price = 0, buyingPrice = 0, q = 0 }: IRemainsData) => {
+        const x = p[goodId];
+        if (!x) {
+          p[goodId] = [{ price, buyingPrice, q }];
+        } else {
+          x.push({ price, buyingPrice, q });
+        }
+        return p;
+      },
+      {},
+    );
+
+    //Формируем массив товаров, добавив свойство цены и остатка
+    // goods.reduce((remGoods: IRemGood[], good: IGood) => {
+    //   if (remainsByGoodId && remainsByGoodId[good.id]) {
+    //     for (const r of remainsByGoodId[good.id]) {
+    //       remGoods.push({
+    //         good,
+    //         price: r.price,
+    //         remains: r.q,
+    //       });
+    //     }
+    //   } else {
+    //     remGoods.push({
+    //       good,
+    //       price: 0,
+    //       remains: 0,
+    //     });
+    //   }
+    //   return remGoods;
+    // }, remGoods);
+    for (const good of goods) {
+      if (remainsByGoodId && remainsByGoodId[good.id]) {
+        for (const r of remainsByGoodId[good.id]) {
+          remGoods.push({
+            good,
+            price: r.price,
+            buyingPrice: r.buyingPrice,
+            remains: r.q,
+          });
+        }
+      } else {
+        remGoods.push({
+          good,
+          price: 0,
+          buyingPrice: 0,
+          remains: 0,
+        });
+      }
+    }
+  }
+
+  console.log('getRemGoodListByContact', `Окончание построения массива товаров по подразделению ${contactId}`);
+  return remGoods;
+};
