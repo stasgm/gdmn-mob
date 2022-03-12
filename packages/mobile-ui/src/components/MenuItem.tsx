@@ -1,22 +1,10 @@
-import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 import { IListItem } from '@lib/mobile-types';
 import React, { ReactNode, useCallback } from 'react';
 import { StyleSheet, View, Text, LogBox } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { IconButton, Menu, useTheme } from 'react-native-paper';
 
-import colors from '../styles/colors';
-
-interface IProps {
-  sheetRef?: React.RefObject<BottomSheetModalMethods>;
-  children?: ReactNode;
-  title?: string;
-  snapPoints?: string[];
-  onDismiss?: () => void;
-  onApply?: () => void;
-}
-
-type Props = {
+interface Props {
   options: IListItem[];
   activeOptionId?: string;
   visible?: any;
@@ -25,18 +13,17 @@ type Props = {
   onDismiss?: () => void;
   title?: string;
   disabled?: boolean;
-};
+}
 
 LogBox.ignoreAllLogs();
 
-// const Menu = ({ sheetRef, children, title, snapPoints = ['40%', '90%'], onDismiss, onApply }: IProps) => {
 const MenuItem = ({ options, activeOptionId, onChange, visible, onPress, onDismiss, title, disabled }: Props) => {
   const { colors } = useTheme();
   return (
     <View style={localStyles.container}>
       <Menu
         visible={visible}
-        onDismiss={onDismiss}
+        onDismiss={() => onDismiss}
         anchor={
           <View style={localStyles.menu}>
             <TouchableOpacity onPress={onPress} disabled={disabled}>

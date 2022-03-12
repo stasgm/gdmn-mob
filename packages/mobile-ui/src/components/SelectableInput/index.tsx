@@ -14,16 +14,7 @@ interface Props {
   required?: boolean;
 }
 
-const SelectableInput: React.FC<Props> = ({
-  value,
-  onPress,
-  label,
-  placeholder,
-  editable = false,
-  disabled,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
-  required,
-}) => {
+const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled, required }: Props) => {
   const { colors } = useTheme();
 
   return (

@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   MenuButton,
@@ -16,6 +16,8 @@ import {
   SubTitle,
   ScanButton,
 } from '@lib/mobile-ui';
+
+import { IDocumentType } from '@lib/types';
 
 import { IDocDocument, IDocLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -33,6 +35,10 @@ export const DocViewScreen = () => {
   // const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?
 
   const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
+
+  const docType = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data.find((e) => e.id === doc?.documentType.id);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -112,7 +118,7 @@ export const DocViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.head.toContact?.name || ''}
+        title={(docType?.remainsField === 'fromContact' ? doc.head.fromContact?.name : doc.head.toContact?.name) || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >

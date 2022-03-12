@@ -48,26 +48,26 @@ const ScanBarcodeScreen = () => {
 
   const document = useSelector((state) => state.documents.list).find((e) => e.id === docId) as IDocDocument | undefined;
 
-  const goodss = refSelectors.selectByName<IGood>('good').data;
+  const goods = refSelectors.selectByName<IGood>('good').data;
   const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
   const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
 
   console.log('remains', remains);
 
-  const goods: IMGoodData<IMGoodRemain> = useMemo(() => {
+  const goodModel: IMGoodData<IMGoodRemain> = useMemo(() => {
     if (!document?.head?.fromContact) {
       return {};
     }
 
     const goodRem: IMGoodData<IMGoodRemain> = getRemGoodByContact(
       contacts,
-      goodss,
+      goods,
       remains,
       document.head.fromContact?.id,
     );
 
     return goodRem;
-  }, [document?.head?.fromContact, contacts, goodss, remains]);
+  }, [document?.head?.fromContact, contacts, goods, remains]);
 
   const getScannedObject = useCallback(
     (brc: string): IDocLine | undefined => {
@@ -75,7 +75,7 @@ const ScanBarcodeScreen = () => {
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goods[brc] || goods.unknown;
+        const remItem = goodModel[brc] || goodModel.unknown;
         // Находим товар из модели остатков по баркоду, если баркод не найден, ищем товар с id равным unknown и добавляем в позицию документа
         // Если таких товаров нет, то товар не найден
 
@@ -103,7 +103,7 @@ const ScanBarcodeScreen = () => {
 
       const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
-      const remItem = Object.values(goods)?.find((item: IMGoodRemain) => item.good.weightCode === code);
+      const remItem = Object.values(goodModel)?.find((item: IMGoodRemain) => item.good.weightCode === code);
 
       if (!remItem) {
         return;
@@ -119,7 +119,7 @@ const ScanBarcodeScreen = () => {
         barcode: remItem.good.barcode,
       };
     },
-    [goods, weightSettingsCountCode, weightSettingsCountWeight, weightSettingsWeightCode.data],
+    [goodModel, weightSettingsCountCode, weightSettingsCountWeight, weightSettingsWeightCode.data],
   );
 
   if (!document) {

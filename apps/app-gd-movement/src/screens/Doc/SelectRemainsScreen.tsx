@@ -67,7 +67,6 @@ export const SelectRemainsScreen = () => {
   const [list, setList] = useState<IRemGood[]>([]);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
-  const model = useAppInventorySelector((state) => state.appInventory.model);
 
   const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
   // const document = docSelectors
@@ -85,14 +84,13 @@ export const SelectRemainsScreen = () => {
   //   [document?.head?.toDepartment?.id, model],
   // );
 
-  const remainss = refSelectors.selectByName<IRemainsNew>('remains').data[0];
-  const goodss = refSelectors.selectByName<IGood>('good').data;
-  console.log('newg', goodss);
+  const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
+  const goods = refSelectors.selectByName<IGood>('good').data;
   const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
 
   const [goodRemains] = useState<IRemGood[]>(() =>
     document?.head?.fromContact?.id
-      ? getRemGoodListByContact(contacts, goodss, remainss, document?.head?.fromContact.id)
+      ? getRemGoodListByContact(contacts, goods, remains, document?.head?.fromContact.id)
       : [],
   );
 
