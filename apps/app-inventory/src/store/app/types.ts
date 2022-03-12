@@ -21,24 +21,19 @@ export interface IMGoodData<T = unknown> {
   [id: string]: T;
 }
 
-export interface IMGoodRemain extends IGood {
+export interface IMGoodRemain {
+  good: IGood;
   remains?: IModelRem[];
 }
 
 export interface IModelRem {
-  price?: number;
-  q?: number;
+  price: number;
+  q: number;
 }
 
 export interface IRem extends IGood {
   remains?: number;
   price?: number;
-}
-
-export interface IRemains {
-  contactId: string;
-  date: Date;
-  data: IRemainsData[];
 }
 
 export interface IRemainsData {
@@ -47,6 +42,9 @@ export interface IRemainsData {
   price?: number;
 }
 
+export interface IRemains {
+  [id: string]: IRemainsData[];
+}
 // Товары
 export interface IGood extends INamedEntity {
   alias: string;
@@ -58,4 +56,10 @@ export interface IGood extends INamedEntity {
   invWeight?: number; // Вес единицы товара
   price?: number; //Цена
   scale?: number; //количество единиц в месте
+}
+
+export interface IRemGood {
+  good: IGood;
+  price: number;
+  remains: number;
 }

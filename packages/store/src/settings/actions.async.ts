@@ -29,7 +29,7 @@ const addSettings = (
       return dispatch(actions.addSettingsAsync.success(settings));
     }
 
-    return dispatch(actions.addSettingsAsync.failure('something wrong'));
+    return dispatch(actions.addSettingsAsync.failure('Ошибка записи настроек пользователя'));
   };
 };
 

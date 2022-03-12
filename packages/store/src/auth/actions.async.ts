@@ -38,7 +38,7 @@ const getDeviceByUid = (
       return dispatch(actions.getDeviceByUidAsync.failure(response.message));
     }
 
-    return dispatch(actions.getDeviceByUidAsync.failure('something wrong'));
+    return dispatch(actions.getDeviceByUidAsync.failure('Ошибка получения устройства по UId'));
   };
 };
 
@@ -62,7 +62,7 @@ const activateDevice = (
       return dispatch(actions.activateDeviceAsync.failure(response.message));
     }
 
-    return dispatch(actions.activateDeviceAsync.failure('something wrong'));
+    return dispatch(actions.activateDeviceAsync.failure('Ошибка активации устройства'));
   };
 };
 
@@ -82,7 +82,7 @@ const signup = (
       return dispatch(actions.signupAsync.failure(response.message));
     }
 
-    return dispatch(actions.signupAsync.failure('something wrong'));
+    return dispatch(actions.signupAsync.failure('Ошибка регистрации пользователя'));
   };
 };
 
@@ -106,7 +106,7 @@ const login = (
       return dispatch(actions.loginUserAsync.failure(response.message));
     }
 
-    return dispatch(actions.loginUserAsync.failure('something wrong'));
+    return dispatch(actions.loginUserAsync.failure('Ошибка входа пользователя'));
   };
 };
 

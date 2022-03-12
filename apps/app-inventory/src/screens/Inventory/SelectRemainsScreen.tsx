@@ -1,25 +1,33 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, Text } from 'react-native';
+import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
-import { docSelectors, useSelector } from '@lib/store';
+import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { formatValue } from '../../utils/helpers';
-import { useSelector as useAppInventorySelector } from '../../store/index';
+import { IDepartment } from '@lib/types';
+
+import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument } from '../../store/types';
-import { IRem } from '../../store/app/types';
+import { IGood, IRemains, IRemGood } from '../../store/app/types';
 
-const GoodRemains = ({ item }: { item: IRem }) => {
+interface IFilteredList {
+  searchQuery: string;
+  goodRemains: IRemGood[];
+}
+
+const keyExtractor = (item: IRemGood) => String(item.good.id);
+
+const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params;
-  const barcode = !!item.barcode;
+  const barcode = !!item.good.barcode;
 
   return (
     <TouchableOpacity
@@ -29,7 +37,7 @@ const GoodRemains = ({ item }: { item: IRem }) => {
           docId,
           item: {
             id: uuid(),
-            good: { id: item.id, name: item.name },
+            good: { id: item.good.id, name: item.good.name },
             quantity: 0,
             remains: item.remains,
             price: item.price,
@@ -42,13 +50,14 @@ const GoodRemains = ({ item }: { item: IRem }) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
-              {item.remains} {item.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+              {item.remains} {item.good.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
+              руб.
             </Text>
             {barcode && (
-              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.barcode}</Text>
+              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.good.barcode}</Text>
             )}
           </View>
         </View>
@@ -60,58 +69,67 @@ const GoodRemains = ({ item }: { item: IRem }) => {
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
-  const [searchText, setSearchText] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [list, setList] = useState<IRem[]>([]);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
-  const model = useAppInventorySelector((state) => state.appInventory.model);
+  const goods = refSelectors.selectByName<IGood>('good').data;
+  const contacts = refSelectors.selectByName<IDepartment>('department').data;
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const docId = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = docSelectors
     .selectByDocType<IInventoryDocument>('inventory')
     ?.find((item) => item.id === docId) as IInventoryDocument;
 
+  const [goodRemains] = useState<IRemGood[]>(() =>
+    document?.head?.department?.id
+      ? getRemGoodListByContact(contacts, goods, remains, document?.head?.department.id, true)
+      : [],
+  );
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    goodRemains,
+  });
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          goodRemains,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = isNaN(Number(lower))
+          ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
+          : ({ good }: IRemGood) => good.barcode?.includes(searchQuery) || good.name?.toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          gr = filteredList.goodRemains.filter(fn);
+        } else {
+          gr = goodRemains.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          goodRemains: gr,
+        });
+      }
+    }
+  }, [goodRemains, filteredList, searchQuery]);
+
   const handleScanner = useCallback(() => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
-
-  const goods = useMemo(
-    () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),
-    [document?.head?.department?.id, model],
-  );
-
-  const goodRemains: IRem[] = useMemo(() => {
-    return Object.keys(goods)
-      ?.reduce((r: IRem[], e) => {
-        const { remains, ...goodInfo } = goods[e];
-        const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
-
-        remains && remains.length > 0
-          ? remains.forEach((re) => {
-              r.push({ ...goodPos, price: re.price, remains: re.q });
-            })
-          : r.push(goodPos);
-        return r;
-      }, [])
-      .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
-  }, [goods]);
-
-  useEffect(() => {
-    if (!filterVisible && searchText) {
-      setSearchText('');
-    }
-  }, [filterVisible, searchText]);
-
-  useEffect(() => {
-    setList(
-      goodRemains?.filter(
-        (item) =>
-          item.barcode?.toLowerCase().includes(searchText.toLowerCase()) ||
-          item.name?.toLowerCase().includes(searchText.toLowerCase()),
-      ),
-    );
-  }, [goodRemains, searchText]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -125,10 +143,13 @@ export const SelectRemainsScreen = () => {
     });
   }, [navigation, filterVisible, colors.card, handleScanner, isScanerReader]);
 
-  const refList = useRef<FlatList<IRem>>(null);
+  const refList = useRef<FlatList<IRemGood>>(null);
   useScrollToTop(refList);
 
-  const renderItem = ({ item }: { item: IRem }) => <GoodRemains item={item} />;
+  const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
+
+  const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
+  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
 
   return (
     <AppScreen>
@@ -138,8 +159,8 @@ export const SelectRemainsScreen = () => {
           <View style={styles.flexDirectionRow}>
             <Searchbar
               placeholder="Поиск (штрихкод, наименование)"
-              onChangeText={setSearchText}
-              value={searchText}
+              onChangeText={setSearchQuery}
+              value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
             />
           </View>
@@ -148,10 +169,17 @@ export const SelectRemainsScreen = () => {
       )}
       <FlatList
         ref={refList}
-        data={list}
-        keyExtractor={(_, i) => String(i)}
+        data={filteredList.goodRemains}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        refreshControl={RC}
+        ListEmptyComponent={EC}
+        removeClippedSubviews={true} // Unmount compsonents when outside of window
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
       />
     </AppScreen>
   );
