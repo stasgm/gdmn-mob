@@ -3,6 +3,7 @@ export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButt
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';
 export { RadioGroup } from './RadioGroup';
+export { MenuItem } from './MenuItem';
 export { default as ScreenTitle } from './ScreenTitle';
 export { default as Input } from './Input';
 export { default as SelectableInput } from './SelectableInput';

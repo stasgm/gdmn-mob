@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity, TextInput } from 'react-native';
-import { Divider, IconButton, useTheme, List, Menu, Provider, Button } from 'react-native-paper';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Divider, useTheme } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -20,9 +20,10 @@ import {
   SubTitle,
   BottomSheet,
   RadioGroup,
+  MenuItem,
 } from '@lib/mobile-ui';
 
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { IListItem } from '@lib/mobile-types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
@@ -55,9 +56,6 @@ export const DocEditScreen = () => {
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
-
-  const [selectedFromContact, setSelectedFromContact] = useState(docFromContactType);
-  const [selectedToContact, setSelectedToContact] = useState(docToContactType);
 
   useEffect(() => {
     return () => {
@@ -249,7 +247,7 @@ export const DocEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedFromContact?.id || fromContactType?.id),
+      refName: String(fromContactType?.id),
       fieldName: 'fromContact',
       value: docFromContact && [docFromContact],
     });
@@ -266,15 +264,16 @@ export const DocEditScreen = () => {
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedToContact?.id || toContactType?.id),
+      refName: String(toContactType?.id),
       fieldName: 'toContact',
       value: docToContact && [docToContact],
     });
   };
 
-  useEffect(() => {
-    dispatch(appActions.setFormParams({ fromContact: undefined, toContact: undefined }));
-  }, [dispatch, docDocumentType]);
+  ///////////////////////////////////
+  // useEffect(() => {
+  //   dispatch(appActions.setFormParams({ fromContact: undefined, toContact: undefined }));
+  // }, [dispatch, docDocumentType]);
 
   const handlePresentType = () => {
     if (isBlocked) {
@@ -293,62 +292,31 @@ export const DocEditScreen = () => {
     });
   };
 
-  const [chevronFromContact, setChevronFromContact] = useState(false);
+  const [visibleFrom, setVisibleFrom] = useState(false);
+  const [visibleTo, setVisibleTo] = useState(false);
 
-  const fromContactRef = useRef<BottomSheetModal>(null);
+  const handleFromContactType = useCallback(
+    (option) => {
+      if (!(option.id === docFromContactType?.id)) {
+        dispatch(appActions.setFormParams({ fromContactType: option, fromContact: undefined }));
+      }
+      setVisibleFrom(false);
+    },
+    [dispatch, docFromContactType],
+  );
 
-  const handlePresentFromContact = useCallback(() => {
-    if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
-      Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
-      return;
-    }
-    setSelectedFromContact(fromContactType || contactTypes[0]);
-    fromContactRef.current?.present();
-    setChevronFromContact(true);
-  }, [doc?.lines.length, documentType?.remainsField, fromContactType]);
-
-  const handleDismissFromContact = () => {
-    fromContactRef.current?.dismiss();
-    setChevronFromContact(false);
-  };
-
-  const handleApplyFromContact = () => {
-    fromContactRef.current?.dismiss();
-    setChevronFromContact(false);
-    dispatch(appActions.setFormParams({ fromContactType: selectedFromContact, fromContact: undefined }));
-  };
-
-  const [chevronToContact, setChevronToContact] = useState(false);
-
-  const toContactRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentToContact = useCallback(() => {
-    if (doc?.lines.length && documentType?.remainsField === 'toContact') {
-      Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
-      return;
-    }
-    setSelectedToContact(toContactType || contactTypes[0]);
-    toContactRef.current?.present();
-    setChevronToContact(true);
-  }, [doc?.lines.length, documentType?.remainsField, toContactType]);
-
-  const handleDismissToContact = () => {
-    toContactRef.current?.dismiss();
-    setChevronToContact(false);
-  };
-
-  const handleApplyToContact = () => {
-    toContactRef.current?.dismiss();
-    setChevronToContact(false);
-    dispatch(appActions.setFormParams({ toContactType: selectedToContact, toContact: undefined }));
-  };
-
-  const [expanded, setExpanded] = React.useState(true);
-  const handlePress = () => setExpanded(!expanded);
-
-  const [visible, setVisible] = React.useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
+  const handleToContactType = useCallback(
+    (option) => {
+      if (!(option.id === docToContactType?.id)) {
+        dispatch(appActions.setFormParams({ toContactType: option, toContact: undefined }));
+      }
+      setVisibleTo(false);
+    },
+    [dispatch, docToContactType],
+  );
+  // useEffect(() => {
+  //   return;
+  // }, [docFromContactType]);
 
   return (
     <AppInputScreen>
@@ -383,38 +351,6 @@ export const DocEditScreen = () => {
           disabled={docStatus !== 'DRAFT'}
         />
 
-        <View
-          style={{
-            paddingTop: 50,
-            flexDirection: 'row',
-            justifyContent: 'center',
-          }}
-        >
-          <Menu visible={visible} onDismiss={closeMenu} anchor={<Button onPress={openMenu}>Show menu</Button>}>
-            <Menu.Item onPress={() => {}} title="Item 1" />
-            <Menu.Item onPress={() => {}} title="Item 2" />
-            <Divider />
-            <Menu.Item onPress={() => {}} title="Item 3" />
-          </Menu>
-        </View>
-
-        <List.Section title="Accordions">
-          <List.Accordion title="Uncontrolled Accordion" left={(props) => <List.Icon {...props} icon="folder" />}>
-            <List.Item title="First item" />
-            <List.Item title="Second item" />
-          </List.Accordion>
-
-          <List.Accordion
-            title="Controlled Accordion"
-            left={(props) => <List.Icon {...props} icon="folder" />}
-            expanded={expanded}
-            onPress={handlePress}
-          >
-            <List.Item title="First item" />
-            <List.Item title="Second item" />
-          </List.Accordion>
-        </List.Section>
-
         <SelectableInput
           label="Тип документа"
           value={docDocumentType?.description}
@@ -423,23 +359,21 @@ export const DocEditScreen = () => {
         />
         {documentType?.fromType ? (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.container}>
-              <View style={localStyles.subHeadingDepartment}>
-                <TouchableOpacity onPress={handlePresentFromContact} disabled={isBlocked}>
-                  <Text style={isBlocked ? localStyles.subHeadingBlocked : localStyles.subHeading}>
-                    {docFromContactType?.value}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View>
-                <IconButton
-                  icon={chevronFromContact ? 'chevron-up' : 'chevron-down'}
-                  size={25}
-                  onPress={handlePresentFromContact}
-                  disabled={isBlocked}
-                />
-              </View>
-            </View>
+            <MenuItem
+              options={contactTypes}
+              onChange={(option) => {
+                handleFromContactType(option);
+              }}
+              onPress={() => {
+                setVisibleFrom(true);
+              }}
+              onDismiss={() => setVisibleFrom(false)}
+              title={docFromContactType?.value}
+              visible={visibleFrom}
+              activeOptionId={docFromContact?.id}
+              disabled={isBlocked}
+            />
+
             <SelectableInput
               label={documentType.fromDescription}
               value={docFromContact?.name}
@@ -450,23 +384,20 @@ export const DocEditScreen = () => {
         ) : null}
         {documentType?.toType ? (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.container}>
-              <View style={localStyles.subHeadingDepartment}>
-                <TouchableOpacity onPress={handlePresentToContact} disabled={isBlocked}>
-                  <Text style={isBlocked ? localStyles.subHeadingBlocked : localStyles.subHeading}>
-                    {docToContactType?.value}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View>
-                <IconButton
-                  icon={chevronToContact ? 'chevron-up' : 'chevron-down'}
-                  size={25}
-                  onPress={handlePresentToContact}
-                  disabled={isBlocked}
-                />
-              </View>
-            </View>
+            <MenuItem
+              options={contactTypes}
+              onChange={(option) => {
+                handleToContactType(option);
+              }}
+              onPress={() => {
+                setVisibleTo(true);
+              }}
+              onDismiss={() => setVisibleTo(false)}
+              title={docToContactType?.value}
+              visible={visibleTo}
+              activeOptionId={docToContact?.id}
+              disabled={isBlocked}
+            />
             <SelectableInput
               label={documentType.toDescription}
               value={docToContact?.name}
@@ -485,34 +416,6 @@ export const DocEditScreen = () => {
           clearInput={true}
         />
       </ScrollView>
-      <BottomSheet
-        sheetRef={fromContactRef}
-        title={'Тип контакта'}
-        snapPoints={['20%', '90%']}
-        onDismiss={handleDismissFromContact}
-        onApply={handleApplyFromContact}
-      >
-        <RadioGroup
-          options={contactTypes}
-          onChange={(option) => setSelectedFromContact(option)}
-          activeButtonId={selectedFromContact?.id}
-        />
-        <View style={localStyles.sheet} />
-      </BottomSheet>
-      <BottomSheet
-        sheetRef={toContactRef}
-        title={'Тип контакта'}
-        snapPoints={['20%', '90%']}
-        onDismiss={handleDismissToContact}
-        onApply={handleApplyToContact}
-      >
-        <RadioGroup
-          options={contactTypes}
-          onChange={(option) => setSelectedToContact(option)}
-          activeButtonId={selectedToContact?.id}
-        />
-        <View style={localStyles.sheet} />
-      </BottomSheet>
       {showOnDate && (
         <DateTimePicker
           testID="dateTimePicker"
@@ -537,27 +440,5 @@ export const localStyles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderRadius: 2,
-  },
-  sheet: {
-    // marginTop: 100,
-  },
-  container: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 12,
-    // paddingVertical: 3,
-    // marginVertical: 6,
-    // width: '100%',
-  },
-  subHeading: {
-    fontSize: 14,
-  },
-  subHeadingBlocked: {
-    fontSize: 14,
-    color: '#a0a0a0',
-  },
-  subHeadingDepartment: {
-    width: '85%',
-    // fontSize: 14,
   },
 });
