@@ -8,7 +8,10 @@ import {
   SelectGoodScreen,
   SelectRemainsScreen,
 } from '../../screens/Doc';
+
 import ScanBarcodeScreen from '../../screens/Doc/ScanBarcodeScreen';
+
+import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens/Remains';
 
 export const docScreens = {
   DocEdit: DocEditScreen,
@@ -24,4 +27,13 @@ export const docScreens = {
 
 export const docListScreens = {
   DocList: DocListScreen,
+};
+
+export const remainsListScreens = {
+  ContactList: ContactListScreen,
+};
+
+export const remainsScreens = {
+  GoodList: GoodListScreen,
+  GoodLine: GoodLineScreen,
 };

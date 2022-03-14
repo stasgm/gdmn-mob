@@ -59,3 +59,10 @@ export type DocParamList = RefParamList & {
 };
 
 export type DocStackParamList = { DocList: undefined } & DocParamList;
+
+export type RemainsParamList = RefParamList & {
+  GoodList: { id: string };
+  GoodLine: { item: any /*IMatrixDataNamed*/ };
+};
+
+export type RemainsStackParamList = { ContactList: undefined } & RemainsParamList;
