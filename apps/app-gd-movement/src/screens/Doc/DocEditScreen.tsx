@@ -348,18 +348,20 @@ export const DocEditScreen = () => {
         />
         {documentType?.fromType ? (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <MenuItem
-              options={contactTypes}
-              onChange={(option) => {
-                handleFromContactType(option);
-              }}
-              onPress={() => setVisibleFrom(true)}
-              onDismiss={() => setVisibleFrom(false)}
-              title={docFromContactType?.value || ''}
-              visible={visibleFrom}
-              activeOptionId={docFromContactType?.id}
-              disabled={isBlocked}
-            />
+            <View style={localStyles.contact}>
+              <MenuItem
+                options={contactTypes}
+                onChange={(option) => {
+                  handleFromContactType(option);
+                }}
+                onPress={() => setVisibleFrom(true)}
+                onDismiss={() => setVisibleFrom(false)}
+                title={docFromContactType?.value || ''}
+                visible={visibleFrom}
+                activeOptionId={docFromContactType?.id}
+                disabled={isBlocked}
+              />
+            </View>
 
             <SelectableInput
               label={documentType.fromDescription}
@@ -371,18 +373,20 @@ export const DocEditScreen = () => {
         ) : null}
         {documentType?.toType ? (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <MenuItem
-              options={contactTypes}
-              onChange={(option) => {
-                handleToContactType(option);
-              }}
-              onPress={() => setVisibleTo(true)}
-              onDismiss={() => setVisibleTo(false)}
-              title={docToContactType?.value || ''}
-              visible={visibleTo}
-              activeOptionId={docToContactType?.id}
-              disabled={isBlocked}
-            />
+            <View style={localStyles.contact}>
+              <MenuItem
+                options={contactTypes}
+                onChange={(option) => {
+                  handleToContactType(option);
+                }}
+                onPress={() => setVisibleTo(true)}
+                onDismiss={() => setVisibleTo(false)}
+                title={docToContactType?.value || ''}
+                visible={visibleTo}
+                activeOptionId={docToContactType?.id}
+                disabled={isBlocked}
+              />
+            </View>
             <SelectableInput
               label={documentType.toDescription}
               value={docToContact?.name}
@@ -425,5 +429,9 @@ export const localStyles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderRadius: 2,
+  },
+  contact: {
+    marginTop: -5,
+    marginBottom: -10,
   },
 });
