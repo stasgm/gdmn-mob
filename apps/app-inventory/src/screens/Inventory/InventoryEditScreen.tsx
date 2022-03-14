@@ -8,7 +8,6 @@ import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigat
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IDocumentType, IReference } from '@lib/types';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { docSelectors, useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
   BackButton,
@@ -19,6 +18,8 @@ import {
   globalStyles as styles,
   SubTitle,
 } from '@lib/mobile-ui';
+
+import { getDateString } from '@lib/mobile-app';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument, IDepartment, IInventoryFormParam } from '../../store/types';

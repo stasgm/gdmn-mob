@@ -30,7 +30,7 @@ const SelectableInput: React.FC<Props> = ({
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={value}
+          value={value || ''}
           theme={{
             colors: {
               primary: colors.primary,

@@ -4,8 +4,8 @@ export interface IField {
 }
 
 export interface IListItem {
-  id?: string;
-  value?: string;
+  id: string;
+  value: string;
   [key: string]: unknown;
 }
 
