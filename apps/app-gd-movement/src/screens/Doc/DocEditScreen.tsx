@@ -86,8 +86,8 @@ export const DocEditScreen = () => {
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           documentType: documentTypes[0],
-          fromContactType: contactTypes.find((item) => item.id === docDocumentType?.fromType) || contactTypes[0],
-          toContactType: contactTypes.find((item) => item.id === docDocumentType?.toType) || contactTypes[0],
+          fromContactType: contactTypes.find((item) => item.id === documentTypes?.[0].fromType) || contactTypes[0],
+          toContactType: contactTypes.find((item) => item.id === documentTypes?.[0].toType) || contactTypes[0],
         }),
       );
     }
@@ -331,6 +331,26 @@ export const DocEditScreen = () => {
     [dispatch, doc?.lines.length, docDocumentType?.remainsField, docDocumentType?.toDescription, docToContactType?.id],
   );
 
+  const handlePressFromContact = () => {
+    if (doc?.lines.length && docDocumentType?.remainsField === 'fromContact') {
+      Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.fromDescription} при наличии позиций.`, [
+        { text: 'OK' },
+      ]);
+    } else {
+      setVisibleFrom(true);
+    }
+  };
+
+  const handlePressToContact = () => {
+    if (doc?.lines.length && docDocumentType?.remainsField === 'toContact') {
+      Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.toDescription} при наличии позиций.`, [
+        { text: 'OK' },
+      ]);
+    } else {
+      setVisibleTo(true);
+    }
+  };
+
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
@@ -375,7 +395,7 @@ export const DocEditScreen = () => {
                 key={'fromType'}
                 options={contactTypes}
                 onChange={handleFromContactType}
-                onPress={() => setVisibleFrom(true)}
+                onPress={handlePressFromContact}
                 onDismiss={() => setVisibleFrom(false)}
                 title={docFromContactType?.value || ''}
                 visible={visibleFrom}
@@ -398,7 +418,7 @@ export const DocEditScreen = () => {
                 key={'toType'}
                 options={contactTypes}
                 onChange={handleToContactType}
-                onPress={() => setVisibleTo(true)}
+                onPress={handlePressToContact}
                 onDismiss={() => setVisibleTo(false)}
                 title={docToContactType?.value || ''}
                 visible={visibleTo}
