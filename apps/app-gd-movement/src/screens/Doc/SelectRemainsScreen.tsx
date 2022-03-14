@@ -1,19 +1,20 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
-import { docSelectors, refSelectors, useSelector } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { IDocumentType } from '@lib/types';
+
 import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
-import { useSelector as useAppInventorySelector } from '../../store/index';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDepartment, IDocDocument } from '../../store/types';
-import { IGood, IRem, IRemainsNew, IRemGood } from '../../store/app/types';
+import { IGood, IRemainsNew, IRemGood } from '../../store/app/types';
 
 const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
@@ -69,9 +70,6 @@ export const SelectRemainsScreen = () => {
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
   const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
-  // const document = docSelectors
-  //   .selectByDocType<IDocDocument>('inventory')
-  //   ?.find((item) => item.id === docId) as IDocDocument;
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IDocDocument;
 
@@ -79,19 +77,20 @@ export const SelectRemainsScreen = () => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
 
-  // const goods = useMemo(
-  //   () => (document?.head?.toDepartment?.id ? model[document.head.toDepartment.id].goods : {}),
-  //   [document?.head?.toDepartment?.id, model],
-  // );
+  const docType = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data.find((e) => e.id === document?.documentType.id);
+
+  const contactId =
+    docType?.remainsField === 'fromContact' ? document?.head?.fromContactType?.id : document?.head?.toContactType?.id;
+  const contact = docType?.remainsField === 'fromContact' ? document?.head?.fromContact : document?.head?.toContact;
 
   const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
   const goods = refSelectors.selectByName<IGood>('good').data;
-  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
+  const contacts = refSelectors.selectByName<IDepartment>(contactId || 'department').data;
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    document?.head?.fromContact?.id
-      ? getRemGoodListByContact(contacts, goods, remains, document?.head?.fromContact.id)
-      : [],
+    contact?.id ? getRemGoodListByContact(contacts, goods, remains, contact.id) : [],
   );
 
   // const goodRemains: IRem[] = useMemo(() => {

@@ -7,7 +7,7 @@ import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { globalStyles, BackButton } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 
-import { IDepartment, INamedEntity, ISettingsOption } from '@lib/types';
+import { IDepartment, IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocDocument, IDocLine } from '../../store/types';
@@ -48,26 +48,27 @@ const ScanBarcodeScreen = () => {
 
   const document = useSelector((state) => state.documents.list).find((e) => e.id === docId) as IDocDocument | undefined;
 
+  const docType = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data.find((e) => e.id === document?.documentType.id);
+
+  const contactId =
+    docType?.remainsField === 'fromContact' ? document?.head?.fromContactType?.id : document?.head?.toContactType?.id;
+  const contact = docType?.remainsField === 'fromContact' ? document?.head?.fromContact : document?.head?.toContact;
+
   const goods = refSelectors.selectByName<IGood>('good').data;
-  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
+  const contacts = refSelectors.selectByName<IDepartment>(contactId || 'department').data;
   const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
 
-  console.log('remains', remains);
-
   const goodModel: IMGoodData<IMGoodRemain> = useMemo(() => {
-    if (!document?.head?.fromContact) {
+    if (!contact) {
       return {};
     }
 
-    const goodRem: IMGoodData<IMGoodRemain> = getRemGoodByContact(
-      contacts,
-      goods,
-      remains,
-      document.head.fromContact?.id,
-    );
+    const goodRem: IMGoodData<IMGoodRemain> = getRemGoodByContact(contacts, goods, remains, contact?.id);
 
     return goodRem;
-  }, [document?.head?.fromContact, contacts, goods, remains]);
+  }, [contact, contacts, goods, remains]);
 
   const getScannedObject = useCallback(
     (brc: string): IDocLine | undefined => {
