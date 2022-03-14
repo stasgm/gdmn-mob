@@ -10,8 +10,10 @@ import { getDb } from './dao/db';
 const findOne = async (id: string) => {
   const db = getDb();
   const { messages } = db;
+  const mess = await messages.find(id);
 
-  return makeMessage(await messages.find(id));
+  if (!mess) return undefined;
+  return makeMessage(mess);
 };
 
 const findAll = async () => {
@@ -60,10 +62,10 @@ const FindMany = async ({
   //   userId = 'gdmn';
   // }
 
-  const messageList = (await messages.read()).filter(
+  /*  const messageList = (await messages.read()).filter(
     (i) => i.head.appSystem === appSystem && i.head.companyId === companyId && i.head.consumerId === consumerId,
-  );
-
+  ); */
+  const messageList = await messages.read((item) => item.consumer === consumerId);
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);
@@ -86,7 +88,13 @@ const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; produc
 
   const newMessage = await makeDBNewMessage(msgObject, producerId);
 
-  const messageId = await messages.insert(newMessage);
+  const fileInfo = {
+    id: newMessage.id,
+    producer: newMessage.head.producerId,
+    consumer: newMessage.head.consumerId,
+  };
+
+  const messageId = await messages.insert(newMessage, fileInfo);
 
   return messageId;
 };
@@ -96,7 +104,7 @@ const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; produc
  * @param {IMessage} message - сообщение
  * @return id, идентификатор сообщения
  * */
-const updateOne = async (message: IMessage): Promise<string> => {
+/*const updateOne = async (message: IMessage): Promise<string> => {
   const db = getDb();
   const { messages } = db;
 
@@ -123,13 +131,17 @@ const deleteOne = async (messageId: string): Promise<string> => {
   const db = getDb();
   const { messages } = db;
 
-  if (!(await messages.find(messageId))) {
+  /*  if (!(await messages.find(messageId))) {
     throw new DataNotFoundException('Сообщение не найдено');
+  } */
+
+  try {
+    await messages.delete(messageId);
+    return 'Сообщение удалено';
+  } catch (err) {
+    throw new DataNotFoundException(err as string);
   }
 
-  await messages.delete(messageId);
-
-  return 'Сообщение удалено';
   //TODO ответ возвращать
 };
 
@@ -223,4 +235,4 @@ export const makeDBNewMessage = async (message: NewMessage, producerId: string):
   };
 };
 
-export { findOne, findAll, addOne, deleteOne, updateOne, FindMany, deleteAll };
+export { findOne, findAll, addOne, deleteOne, FindMany, deleteAll };
