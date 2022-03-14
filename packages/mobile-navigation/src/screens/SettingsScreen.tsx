@@ -4,7 +4,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
-import { globalStyles as styles, DrawerButton, MenuButton, useActionSheet, SettingsGroup } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  DrawerButton,
+  MenuButton,
+  useActionSheet,
+  SettingsGroup,
+  AppScreen,
+} from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
 
 const SettingsSceen = () => {
@@ -78,31 +85,33 @@ const SettingsSceen = () => {
   const serverPath = `${config?.protocol}${config?.server}:${config?.port}/${config?.apiPath}`;
 
   return (
-    <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
-      <View>
-        <Text style={[styles.title]}>Параметры связи с сервером</Text>
-        <Divider />
-        <View style={styles.details}>
-          <Text style={styles.name}>Путь к серверу</Text>
-          <Text style={[styles.number, styles.field]}>{serverPath}</Text>
-        </View>
-      </View>
-      <View>
+    <AppScreen>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5 }]}>
         <View>
-          {parents.map((group, groupKey) => {
-            const list = Object.entries(settsData)
-              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
-              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
-            return (
-              <View key={groupKey}>
-                <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
-                <Divider />
-              </View>
-            );
-          })}
+          <Text style={[styles.title]}>Параметры связи с сервером</Text>
+          <Divider />
+          <View style={styles.details}>
+            <Text style={styles.name}>Путь к серверу</Text>
+            <Text style={[styles.number, styles.field]}>{serverPath}</Text>
+          </View>
         </View>
-      </View>
-    </KeyboardAwareScrollView>
+        <View>
+          <View>
+            {parents.map((group, groupKey) => {
+              const list = Object.entries(settsData)
+                .filter(([_, item]) => item?.visible && item.group?.id === group.id)
+                .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+              return (
+                <View key={groupKey}>
+                  <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
+                  <Divider />
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
+    </AppScreen>
   );
 };
 

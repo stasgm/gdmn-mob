@@ -4,7 +4,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
   MenuButton,
@@ -17,6 +17,8 @@ import {
 } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
+
+import { IDocumentType } from '@lib/types';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -32,6 +34,10 @@ export const DocViewScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
   const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
+
+  const docType = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data.find((e) => e.id === doc?.documentType.id);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -111,7 +117,7 @@ export const DocViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.head.toContact?.name || ''}
+        title={(docType?.remainsField === 'fromContact' ? doc.head.fromContact?.name : doc.head.toContact?.name) || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >

@@ -14,15 +14,7 @@ interface Props {
   required?: boolean;
 }
 
-const SelectableInput: React.FC<Props> = ({
-  value,
-  onPress,
-  label,
-  placeholder,
-  editable = false,
-  disabled,
-  // required,
-}) => {
+const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled }: Props) => {
   const { colors } = useTheme();
 
   return (

@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
 import { globalStyles, BackButton } from '@lib/mobile-ui';
-import { useSelector, docSelectors, refSelectors } from '@lib/store';
+import { useSelector, refSelectors } from '@lib/store';
 
 import { IDepartment, INamedEntity, ISettingsOption } from '@lib/types';
 
