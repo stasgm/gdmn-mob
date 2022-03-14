@@ -7,15 +7,15 @@ import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
 
-import { IDocLine } from '../store/types';
+import { IMovementLine } from '../store/types';
 
 import { ONE_SECOND_IN_MS } from '../utils/constants';
 
 import { ScanDataMatrix, ScanDataMatrixReader } from '.';
 
 interface IProps {
-  item: IDocLine;
-  onSetLine: (value: IDocLine) => void;
+  item: IMovementLine;
+  onSetLine: (value: IMovementLine) => void;
 }
 
 export const DocLine = ({ item, onSetLine }: IProps) => {

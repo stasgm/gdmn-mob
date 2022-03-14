@@ -11,39 +11,24 @@ import {
   IReferenceData,
   IDocumentType,
 } from '@lib/types';
+import { IFormParam } from '@lib/store';
 import { IListItem } from '@lib/mobile-types';
-
-export interface IFormParam {
-  [fieldName: string]: unknown;
-}
-export interface IInventoryFormParam extends IFormParam {
-  number?: string;
-  documentDate?: string;
-  onDate?: string;
-  status?: StatusType;
-  department?: IDepartment;
-  comment?: string;
-}
 
 export interface IDocFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
-  onDate?: string;
+  documentType?: IDocumentType;
   status?: StatusType;
-  docType?: IDocument;
-  documentType: IDocumentType;
-  department?: IDepartment;
-  fromContact?: IDepartment;
-  toContact?: IDepartment;
-  contact?: IContact;
-  comment?: string;
   fromContactType?: IListItem;
+  fromContact?: Department;
   toContactType?: IListItem;
+  toContact?: Department;
+  comment?: string;
 }
 
 //Подразделения-склады
-export type IDepartment = INamedEntity;
-export type IDepartmentType = INamedEntity;
+export type Department = INamedEntity;
+export type DepartmentType = INamedEntity;
 
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
@@ -52,37 +37,36 @@ export interface IContact extends INamedEntity, IReferenceData {
   phoneNumber: string; // Номер телефона
 }
 
-export interface IInventoryHead extends IHead {
-  department?: IDepartment; //Подразделение
-  comment?: string; // Комvентарий
-}
+// export interface IInventoryHead extends IHead {
+//   department?: IDepartment; //Подразделение
+//   comment?: string; // Комvентарий
+// }
 
-export interface IInventoryLine extends IEntity {
-  good: INamedEntity;
-  quantity: number;
-  packagekey?: INamedEntity; // Вид упаковки
-  price?: number;
-  remains?: number;
-  barcode?: string;
-  EID?: string;
-  docType?: string;
-}
+// export interface IInventoryLine extends IEntity {
+//   good: INamedEntity;
+//   quantity: number;
+//   packagekey?: INamedEntity; // Вид упаковки
+//   price?: number;
+//   remains?: number;
+//   barcode?: string;
+//   EID?: string;
+//   docType?: string;
+// }
 
-export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
+// export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
 
-export interface IDocHead extends IHead {
-  fromContact?: IDepartment;
-  toContact?: IDepartment; //Подразделение
+export interface IMovementHead extends IHead {
+  fromContact?: Department;
+  toContact?: Department; //Подразделение
   fromContactType?: IListItem;
   toContactType?: IListItem;
-  contact?: IContact;
   comment?: string; // Комvентарий
 }
 
-export interface IDocLine extends IEntity {
+export interface IMovementLine extends IEntity {
   good: INamedEntity;
   quantity: number;
-  packagekey?: INamedEntity; // Вид упаковки
+  // packagekey?: INamedEntity; // Вид упаковки
   price?: number;
   buyingPrice?: number;
   remains?: number;
@@ -91,7 +75,7 @@ export interface IDocLine extends IEntity {
   docType?: string;
 }
 
-export type IDocDocument = MandateProps<IDocument<IDocHead, IDocLine>, 'head' | 'lines'>;
+export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
   ReturnType,

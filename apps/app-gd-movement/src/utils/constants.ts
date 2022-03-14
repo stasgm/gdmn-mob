@@ -1,7 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
-import { IDocument, Settings, StatusType } from '@lib/types';
+import { IDocument, INamedEntity, Settings, StatusType } from '@lib/types';
 
-import { IDocDocument } from '../store/types';
+import { IMovementDocument } from '../store/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
@@ -80,7 +80,7 @@ export const appSettings: Settings = {
   },
 };
 
-export const getNextDocNumber = (documents: IDocDocument[]) => {
+export const getNextDocNumber = (documents: IMovementDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))

@@ -4,7 +4,6 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
   BackButton,
@@ -17,7 +16,9 @@ import {
   ScanButton,
 } from '@lib/mobile-ui';
 
-import { IDocDocument, IDocLine } from '../../store/types';
+import { getDateString } from '@lib/mobile-app';
+
+import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
@@ -30,9 +31,7 @@ export const DocViewScreen = () => {
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
-  // const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?
-
-  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
+  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -102,7 +101,7 @@ export const DocViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IDocLine }) => (
+  const renderItem = ({ item }: { item: IMovementLine }) => (
     <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
       <DocItem docId={doc.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>

@@ -46,9 +46,7 @@ export interface IRem extends IGood {
 }
 
 export interface IRemains {
-  contactId: string;
-  date: Date;
-  data: IRemainsData[];
+  [id: string]: IRemainsData[];
 }
 
 export interface IRemainsData {
@@ -70,9 +68,6 @@ export interface IGood extends INamedEntity {
   price?: number; //Цена
   buyingPrice?: number;
   scale?: number; //количество единиц в месте
-}
-export interface IRemainsNew {
-  [id: string]: IRemainsData[];
 }
 
 export interface IRemGood {

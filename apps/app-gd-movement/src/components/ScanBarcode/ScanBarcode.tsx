@@ -8,15 +8,15 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 
-import { IDocLine } from '../../store/types';
+import { IMovementLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: IDocLine) => void;
+  onSave: (item: IMovementLine) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => IDocLine | undefined;
+  getScannedObject: (brc: string) => IMovementLine | undefined;
 }
 
 const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
@@ -29,7 +29,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const { colors } = useTheme();
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IDocLine | undefined>(undefined);
+  const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
 
   useEffect(() => {
     const permission = async () => {
@@ -60,7 +60,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: IDocLine | undefined = getScannedObject(barcode);
+    const scannedObj: IMovementLine | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }

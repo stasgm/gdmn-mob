@@ -1,16 +1,14 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity, TextInput } from 'react-native';
-import { Divider, IconButton, useTheme, List, Menu, Provider, Button } from 'react-native-paper';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Divider, useTheme } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocumentType, IReference } from '@lib/types';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
-import { useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
+  Menu,
   BackButton,
   AppInputScreen,
   SelectableInput,
@@ -18,14 +16,15 @@ import {
   SaveButton,
   globalStyles as styles,
   SubTitle,
-  BottomSheet,
-  RadioGroup,
 } from '@lib/mobile-ui';
+import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { getDateString } from '@lib/mobile-app';
+
+import { IDocumentType } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
+import { IDocFormParam, IMovementDocument } from '../../store/types';
 import { contactTypes, getNextDocNumber } from '../../utils/constants';
 
 export const DocEditScreen = () => {
@@ -36,12 +35,12 @@ export const DocEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
 
-  const documents = useSelector((state) => state.documents.list) as IDocDocument[];
+  const documents = useSelector((state) => state.documents.list) as IMovementDocument[];
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
 
-  const newNumber = getNextDocNumber(documents);
+  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
 
-  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
-
+  //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
     documentType: docDocumentType,
     fromContact: docFromContact,
@@ -56,32 +55,12 @@ export const DocEditScreen = () => {
     return formParams;
   }, [formParams]);
 
-  const [selectedFromContact, setSelectedFromContact] = useState(docFromContactType);
-  const [selectedToContact, setSelectedToContact] = useState(docToContactType);
-
   useEffect(() => {
     return () => {
       dispatch(appActions.clearFormParams());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-  const documentType = useMemo(() => {
-    return documentTypes?.find((e) => e.id === docDocumentType?.id);
-  }, [docDocumentType?.id, documentTypes]);
-  // const documentType = refSelectors
-  //   .selectByName<IDocumentType>('documentType')
-  //   ?.data?.find((e) => e.id === docDocumentType?.id);
-
-  // useEffect(() => {
-  //   if (!docDocumentType) {
-  //     dispatch(appActions.setFormParams({ documentType: documentType }));
-  //   }
-  // }, [dispatch, docDocumentType, documentType]);
-
-  const fromContactType = contactTypes.find((e) => e.id === docFromContactType?.id);
-  const toContactType = contactTypes.find((e) => e.id === docToContactType?.id);
 
   useEffect(() => {
     // Инициализируем параметры
@@ -91,54 +70,58 @@ export const DocEditScreen = () => {
           number: doc.number,
           documentType: doc.documentType,
           documentDate: doc.documentDate,
+          status: doc.status,
           comment: doc.head.comment,
           fromContact: doc.head.fromContact,
           toContact: doc.head.toContact,
-          status: doc.status,
           fromContactType: doc.head.fromContactType,
           toContactType: doc.head.toContactType,
         }),
       );
     } else {
+      const newNumber = getNextDocNumber(documents);
       dispatch(
         appActions.setFormParams({
-          number: newNumber, //'1',
+          number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          // fromContactType: contactTypes[0],
-          fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
-          toContactType: contactTypes.find((item) => item.id === documentType?.toType),
-          // toContactType: contactTypes[0],
+          documentType: documentTypes[0],
+          fromContactType: contactTypes.find((item) => item.id === docDocumentType?.fromType) || contactTypes[0],
+          toContactType: contactTypes.find((item) => item.id === docDocumentType?.toType) || contactTypes[0],
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, newNumber]);
+  }, [dispatch, doc, documents]);
 
   const handleSave = useCallback(() => {
-    if (documentType?.fromRequired && !(docNumber && docDate && docDocumentType && docFromContact)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
-    if (documentType?.toRequired && !(docNumber && docDate && docDocumentType && docToContact)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+    if (
+      !docDocumentType ||
+      !docNumber ||
+      !docDate ||
+      (docDocumentType.fromRequired && !docFromContact) ||
+      (docDocumentType.toRequired && !docToContact)
+    ) {
+      return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
     if (
-      documentType?.isRemains &&
+      docDocumentType.isRemains &&
       docDate &&
-      new Date(docDate).toLocaleDateString() < new Date().toLocaleDateString()
+      new Date(docDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
     ) {
-      Alert.alert('Ошибка!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
+      Alert.alert('Внимание!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
       return;
     }
+
     const docId = !id ? uuid() : id;
     const createdDate = new Date().toISOString();
 
     if (!id) {
-      const newDoc: IDocDocument = {
+      const newDoc: IMovementDocument = {
         id: docId,
         documentType: docDocumentType,
-        number: newNumber,
+        number: docNumber,
         documentDate: docDate,
         status: 'DRAFT',
         head: {
@@ -163,10 +146,10 @@ export const DocEditScreen = () => {
 
       const updatedDate = new Date().toISOString();
 
-      const updatedDoc: IDocDocument = {
+      const updatedDoc: IMovementDocument = {
         ...doc,
         id,
-        number: docNumber as string,
+        number: docNumber,
         status: docStatus || 'DRAFT',
         documentDate: docDate,
         documentType: docDocumentType,
@@ -188,16 +171,12 @@ export const DocEditScreen = () => {
       navigation.navigate('DocView', { id });
     }
   }, [
-    documentType?.fromRequired,
-    documentType?.toRequired,
-    documentType?.isRemains,
+    docDocumentType,
     docNumber,
     docDate,
-    docDocumentType,
     docFromContact,
     docToContact,
     id,
-    newNumber,
     docComment,
     docFromContactType,
     docToContactType,
@@ -218,62 +197,80 @@ export const DocEditScreen = () => {
 
   const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 
-  // Окно календаря для выбора даты.
-  const [showOnDate, setShowOnDate] = useState(false);
+  // Окно календаря для выбора даты
+  const [showDate, setShowDate] = useState(false);
 
-  const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату.
-    setShowOnDate(false);
+  const handleApplyDate = (_event: any, selectedDate: Date | undefined) => {
+    //Закрываем календарь и записываем выбранную дату
+    setShowDate(false);
 
-    if (selectedOnDate) {
-      dispatch(appActions.setFormParams({ documentDate: selectedOnDate.toISOString().slice(0, 10) }));
+    if (selectedDate) {
+      dispatch(appActions.setFormParams({ documentDate: selectedDate.toISOString().slice(0, 10) }));
     }
   };
 
-  const handlePresentOnDate = () => {
+  const handlePresentDate = () => {
     if (docStatus !== 'DRAFT') {
       return;
     }
 
-    setShowOnDate(true);
+    setShowDate(true);
   };
 
   const handleFromContact = () => {
-    if (isBlocked) {
+    if (isBlocked || !docDocumentType || !docFromContactType) {
       return;
     }
 
-    if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
-      Alert.alert('Ошибка!', 'Нельзя изменить контакт при наличии позиций.', [{ text: 'OK' }]);
+    if (doc?.lines.length && docDocumentType.remainsField === 'fromContact') {
+      Alert.alert('Внимание!', `Нельзя изменить поле ${docDocumentType.fromDescription} при наличии позиций.`, [
+        { text: 'OK' },
+      ]);
       return;
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedFromContact?.id || fromContactType?.id),
+      refName: docFromContactType.id,
       fieldName: 'fromContact',
       value: docFromContact && [docFromContact],
     });
   };
 
   const handleToContact = () => {
-    if (isBlocked) {
+    if (isBlocked || !docDocumentType || !docToContactType) {
       return;
     }
 
-    if (doc?.lines.length && documentType?.remainsField === 'toContact') {
-      Alert.alert('Ошибка!', 'Нельзя изменить контакт при наличии позиций.', [{ text: 'OK' }]);
+    if (doc?.lines.length && docDocumentType.remainsField === 'toContact') {
+      Alert.alert('Внимание!', `Нельзя изменить поле ${docDocumentType.toDescription} при наличии позиций.`, [
+        { text: 'OK' },
+      ]);
       return;
     }
 
     navigation.navigate('SelectRefItem', {
-      refName: String(selectedToContact?.id || toContactType?.id),
+      refName: docToContactType.id,
       fieldName: 'toContact',
       value: docToContact && [docToContact],
     });
   };
 
+  const [oldDocTypeId, setOldDocTypeId] = useState<string | undefined>(docDocumentType?.id);
+
   useEffect(() => {
-    dispatch(appActions.setFormParams({ fromContact: undefined, toContact: undefined }));
+    //Если меняем тип документа и он не такой, какой был, надо обнулить контакты и подставить соответствующие типы контактов
+    if (oldDocTypeId && docDocumentType && docDocumentType.id !== oldDocTypeId) {
+      setOldDocTypeId(docDocumentType.id);
+      dispatch(
+        appActions.setFormParams({
+          fromContact: undefined,
+          fromContactType: contactTypes.find((item) => item.id === docDocumentType?.fromType),
+          toContact: undefined,
+          toContactType: contactTypes.find((item) => item.id === docDocumentType?.toType),
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, docDocumentType]);
 
   const handlePresentType = () => {
@@ -281,10 +278,10 @@ export const DocEditScreen = () => {
       return;
     }
     if (doc?.lines.length) {
-      Alert.alert('Ошибка!', 'Нельзя изменить тип документа при наличии позиций.', [{ text: 'OK' }]);
+      Alert.alert('Внимание!', 'Нельзя изменить тип документа при наличии позиций.', [{ text: 'OK' }]);
       return;
     }
-
+    setOldDocTypeId(docDocumentType?.id);
     navigation.navigate('SelectRefItem', {
       refName: 'documentType',
       fieldName: 'documentType',
@@ -293,62 +290,46 @@ export const DocEditScreen = () => {
     });
   };
 
-  const [chevronFromContact, setChevronFromContact] = useState(false);
+  const [visibleFrom, setVisibleFrom] = useState(false);
+  const [visibleTo, setVisibleTo] = useState(false);
 
-  const fromContactRef = useRef<BottomSheetModal>(null);
+  const handleFromContactType = useCallback(
+    (option) => {
+      if (doc?.lines.length && docDocumentType?.remainsField === 'fromContact') {
+        Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.fromDescription} при наличии позиций.`, [
+          { text: 'OK' },
+        ]);
+        return setVisibleFrom(false);
+      }
+      if (!(option.id === docFromContactType?.id)) {
+        dispatch(appActions.setFormParams({ fromContactType: option, fromContact: undefined }));
+      }
+      setVisibleFrom(false);
+    },
+    [
+      dispatch,
+      doc?.lines.length,
+      docDocumentType?.fromDescription,
+      docDocumentType?.remainsField,
+      docFromContactType?.id,
+    ],
+  );
 
-  const handlePresentFromContact = useCallback(() => {
-    if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
-      Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
-      return;
-    }
-    setSelectedFromContact(fromContactType || contactTypes[0]);
-    fromContactRef.current?.present();
-    setChevronFromContact(true);
-  }, [doc?.lines.length, documentType?.remainsField, fromContactType]);
-
-  const handleDismissFromContact = () => {
-    fromContactRef.current?.dismiss();
-    setChevronFromContact(false);
-  };
-
-  const handleApplyFromContact = () => {
-    fromContactRef.current?.dismiss();
-    setChevronFromContact(false);
-    dispatch(appActions.setFormParams({ fromContactType: selectedFromContact, fromContact: undefined }));
-  };
-
-  const [chevronToContact, setChevronToContact] = useState(false);
-
-  const toContactRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentToContact = useCallback(() => {
-    if (doc?.lines.length && documentType?.remainsField === 'toContact') {
-      Alert.alert('Ошибка!', 'Нельзя изменить тип контакта при наличии позиций.', [{ text: 'OK' }]);
-      return;
-    }
-    setSelectedToContact(toContactType || contactTypes[0]);
-    toContactRef.current?.present();
-    setChevronToContact(true);
-  }, [doc?.lines.length, documentType?.remainsField, toContactType]);
-
-  const handleDismissToContact = () => {
-    toContactRef.current?.dismiss();
-    setChevronToContact(false);
-  };
-
-  const handleApplyToContact = () => {
-    toContactRef.current?.dismiss();
-    setChevronToContact(false);
-    dispatch(appActions.setFormParams({ toContactType: selectedToContact, toContact: undefined }));
-  };
-
-  const [expanded, setExpanded] = React.useState(true);
-  const handlePress = () => setExpanded(!expanded);
-
-  const [visible, setVisible] = React.useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
+  const handleToContactType = useCallback(
+    (option) => {
+      if (doc?.lines.length && docDocumentType?.remainsField === 'toContact') {
+        Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.toDescription} при наличии позиций.`, [
+          { text: 'OK' },
+        ]);
+        return setVisibleTo(false);
+      }
+      if (!(option.id === docToContactType?.id)) {
+        dispatch(appActions.setFormParams({ toContactType: option, toContact: undefined }));
+      }
+      setVisibleTo(false);
+    },
+    [dispatch, doc?.lines.length, docDocumentType?.remainsField, docDocumentType?.toDescription, docToContactType?.id],
+  );
 
   return (
     <AppInputScreen>
@@ -375,106 +356,61 @@ export const DocEditScreen = () => {
           disabled={isBlocked}
           clearInput={true}
         />
-
         <SelectableInput
           label="Дата"
           value={getDateString(docDate || '')}
-          onPress={handlePresentOnDate}
+          onPress={handlePresentDate}
           disabled={docStatus !== 'DRAFT'}
         />
-
-        <View
-          style={{
-            paddingTop: 50,
-            flexDirection: 'row',
-            justifyContent: 'center',
-          }}
-        >
-          <Menu visible={visible} onDismiss={closeMenu} anchor={<Button onPress={openMenu}>Show menu</Button>}>
-            <Menu.Item onPress={() => {}} title="Item 1" />
-            <Menu.Item onPress={() => {}} title="Item 2" />
-            <Divider />
-            <Menu.Item onPress={() => {}} title="Item 3" />
-          </Menu>
-        </View>
-
-        <List.Section title="Accordions">
-          <List.Accordion title="Uncontrolled Accordion" left={(props) => <List.Icon {...props} icon="folder" />}>
-            <List.Item title="First item" />
-            <List.Item title="Second item" />
-          </List.Accordion>
-
-          <List.Accordion
-            title="Controlled Accordion"
-            left={(props) => <List.Icon {...props} icon="folder" />}
-            expanded={expanded}
-            onPress={handlePress}
-          >
-            <List.Item title="First item" />
-            <List.Item title="Second item" />
-          </List.Accordion>
-        </List.Section>
-
         <SelectableInput
           label="Тип документа"
           value={docDocumentType?.description}
           onPress={handlePresentType}
           disabled={isBlocked}
         />
-        {documentType?.fromType ? (
+        {!!docDocumentType?.fromType && docFromContactType && (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.container}>
-              <View style={localStyles.subHeadingDepartment}>
-                <TouchableOpacity onPress={handlePresentFromContact} disabled={isBlocked}>
-                  <Text style={isBlocked ? localStyles.subHeadingBlocked : localStyles.subHeading}>
-                    {docFromContactType?.value}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View>
-                <IconButton
-                  icon={chevronFromContact ? 'chevron-up' : 'chevron-down'}
-                  size={25}
-                  onPress={handlePresentFromContact}
-                  disabled={isBlocked}
-                />
-              </View>
-            </View>
+            <Menu
+              key={'fromType'}
+              options={contactTypes}
+              onChange={handleFromContactType}
+              onPress={() => setVisibleFrom(true)}
+              onDismiss={() => setVisibleFrom(false)}
+              title={docFromContactType?.value || ''}
+              visible={visibleFrom}
+              activeOptionId={docFromContactType?.id}
+              disabled={isBlocked}
+            />
+
             <SelectableInput
-              label={documentType.fromDescription}
+              label={docDocumentType.fromDescription}
               value={docFromContact?.name}
               onPress={handleFromContact}
               disabled={isBlocked}
             />
           </View>
-        ) : null}
-        {documentType?.toType ? (
+        )}
+        {!!docDocumentType?.toType && docToContactType && (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.container}>
-              <View style={localStyles.subHeadingDepartment}>
-                <TouchableOpacity onPress={handlePresentToContact} disabled={isBlocked}>
-                  <Text style={isBlocked ? localStyles.subHeadingBlocked : localStyles.subHeading}>
-                    {docToContactType?.value}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View>
-                <IconButton
-                  icon={chevronToContact ? 'chevron-up' : 'chevron-down'}
-                  size={25}
-                  onPress={handlePresentToContact}
-                  disabled={isBlocked}
-                />
-              </View>
-            </View>
+            <Menu
+              key={'toType'}
+              options={contactTypes}
+              onChange={handleToContactType}
+              onPress={() => setVisibleTo(true)}
+              onDismiss={() => setVisibleTo(false)}
+              title={docToContactType?.value || ''}
+              visible={visibleTo}
+              activeOptionId={docToContactType?.id}
+              disabled={isBlocked}
+            />
             <SelectableInput
-              label={documentType.toDescription}
+              label={docDocumentType.toDescription}
               value={docToContact?.name}
               onPress={handleToContact}
               disabled={isBlocked}
             />
           </View>
-        ) : null}
+        )}
         <Input
           label="Комментарий"
           value={docComment}
@@ -485,41 +421,13 @@ export const DocEditScreen = () => {
           clearInput={true}
         />
       </ScrollView>
-      <BottomSheet
-        sheetRef={fromContactRef}
-        title={'Тип контакта'}
-        snapPoints={['20%', '90%']}
-        onDismiss={handleDismissFromContact}
-        onApply={handleApplyFromContact}
-      >
-        <RadioGroup
-          options={contactTypes}
-          onChange={(option) => setSelectedFromContact(option)}
-          activeButtonId={selectedFromContact?.id}
-        />
-        <View style={localStyles.sheet} />
-      </BottomSheet>
-      <BottomSheet
-        sheetRef={toContactRef}
-        title={'Тип контакта'}
-        snapPoints={['20%', '90%']}
-        onDismiss={handleDismissToContact}
-        onApply={handleApplyToContact}
-      >
-        <RadioGroup
-          options={contactTypes}
-          onChange={(option) => setSelectedToContact(option)}
-          activeButtonId={selectedToContact?.id}
-        />
-        <View style={localStyles.sheet} />
-      </BottomSheet>
-      {showOnDate && (
+      {showDate && (
         <DateTimePicker
           testID="dateTimePicker"
           value={new Date(docDate || '')}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={handleApplyOnDate}
+          onChange={handleApplyDate}
         />
       )}
     </AppInputScreen>
@@ -534,30 +442,8 @@ export const localStyles = StyleSheet.create({
   border: {
     marginHorizontal: 10,
     marginVertical: 2,
-    marginBottom: 15,
+    marginBottom: 12,
     borderWidth: 1,
     borderRadius: 2,
-  },
-  sheet: {
-    // marginTop: 100,
-  },
-  container: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 12,
-    // paddingVertical: 3,
-    // marginVertical: 6,
-    // width: '100%',
-  },
-  subHeading: {
-    fontSize: 14,
-  },
-  subHeadingBlocked: {
-    fontSize: 14,
-    color: '#a0a0a0',
-  },
-  subHeadingDepartment: {
-    width: '85%',
-    // fontSize: 14,
   },
 });

@@ -1,11 +1,11 @@
-import { INamedEntity } from '@lib/types';
+import { IReferenceData } from '@lib/types';
 
-import { IDocLine, IInventoryLine } from '../../store/types';
+import { IMovementLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
   fieldName: string;
-  value?: INamedEntity[];
+  value?: IReferenceData[];
   clause?: Record<string, string>;
   isMulti?: boolean;
   docType?: string;
@@ -19,7 +19,7 @@ export type RefParamList = {
 export type InventoryParamList = RefParamList & {
   InventoryView: { id: string; docType?: string };
   InventoryEdit: { id: string; docType?: string } | undefined; //itemId: string;
-  InventoryLine: { mode: number; docId: string; item: IInventoryLine; docType?: string };
+  InventoryLine: { mode: number; docId: string; item: IMovementLine; docType?: string };
   SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
@@ -41,7 +41,7 @@ export type InventoryStackParamList = { InventoryList: undefined } & InventoryPa
 export type DocParamList = RefParamList & {
   DocView: { id: string; docType?: string };
   DocEdit: { id: string; docType?: string } | undefined; //itemId: string;
-  DocLine: { mode: number; docId: string; item: IDocLine; docType?: string };
+  DocLine: { mode: number; docId: string; item: IMovementLine; docType?: string };
   SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };

@@ -1,4 +1,4 @@
-import { IDocument, Settings, StatusType } from '@lib/types';
+import { Settings, StatusType } from '@lib/types';
 
 import { IDocDocument } from '../store/types';
 

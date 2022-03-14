@@ -1,18 +1,18 @@
-import React, { useMemo, useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Text } from 'react-native';
 import { v4 as uuid } from 'uuid';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
 import { globalStyles, BackButton } from '@lib/mobile-ui';
-import { refSelectors, useSelector } from '@lib/store';
+import { useSelector, docSelectors, refSelectors } from '@lib/store';
 
 import { IDepartment, INamedEntity, ISettingsOption } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IDocDocument, IDocLine } from '../../store/types';
+import { IMovementLine, IMovementDocument } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
-import { IGood, IMGoodData, IMGoodRemain, IRemainsNew } from '../../store/app/types';
+import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 import { getRemGoodByContact } from '../../utils/helpers';
 
 const ScanBarcodeScreen = () => {
@@ -32,7 +32,7 @@ const ScanBarcodeScreen = () => {
   }, [navigation]);
 
   const handleSaveScannedItem = useCallback(
-    (item: IDocLine) => {
+    (item: IMovementLine) => {
       navigation.navigate('DocLine', {
         mode: 0,
         docId,
@@ -46,36 +46,33 @@ const ScanBarcodeScreen = () => {
     navigation.navigate('SelectRemainsItem', { docId });
   }, [docId, navigation]);
 
-  const document = useSelector((state) => state.documents.list).find((e) => e.id === docId) as IDocDocument | undefined;
+  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
-  const goodss = refSelectors.selectByName<IGood>('good').data;
-  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
-  const remains = refSelectors.selectByName<IRemainsNew>('remains').data[0];
+  const contactTypeId =
+    document?.documentType.remainsField === 'fromContact'
+      ? document?.head?.fromContactType?.id
+      : document?.head?.toContactType?.id;
 
-  console.log('remains', remains);
+  const goods = refSelectors.selectByName<IGood>('good').data;
+  const contacts = refSelectors.selectByName<IDepartment>(contactTypeId || 'department').data;
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
-  const goods: IMGoodData<IMGoodRemain> = useMemo(() => {
-    if (!document?.head?.fromContact) {
-      return {};
-    }
+  const contactId =
+    document?.documentType?.remainsField === 'fromContact'
+      ? document?.head?.fromContact?.id
+      : document?.head?.toContact?.id;
 
-    const goodRem: IMGoodData<IMGoodRemain> = getRemGoodByContact(
-      contacts,
-      goodss,
-      remains,
-      document.head.fromContact?.id,
-    );
-
-    return goodRem;
-  }, [document?.head?.fromContact, contacts, goodss, remains]);
+  const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() =>
+    contactId ? getRemGoodByContact(contacts, goods, remains, contactId, document.documentType.isRemains) : {},
+  );
 
   const getScannedObject = useCallback(
-    (brc: string): IDocLine | undefined => {
+    (brc: string): IMovementLine | undefined => {
       let charFrom = 0;
       let charTo = weightSettingsWeightCode.data.length;
 
       if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goods[brc] || goods.unknown;
+        const remItem = goodRemains[brc] || goodRemains.unknown;
         // Находим товар из модели остатков по баркоду, если баркод не найден, ищем товар с id равным unknown и добавляем в позицию документа
         // Если таких товаров нет, то товар не найден
 
@@ -88,9 +85,8 @@ const ScanBarcodeScreen = () => {
           id: uuid(),
           quantity: 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
-          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
-          barcode: remItem.good.id === 'unknown' ? brc : remItem.good.barcode,
+          barcode: remItem.good.barcode === 'unknown' ? brc : remItem.good.barcode,
         };
       }
 
@@ -103,7 +99,7 @@ const ScanBarcodeScreen = () => {
 
       const qty = Number(brc.substring(charFrom, charTo)) / 1000;
 
-      const remItem = Object.values(goods)?.find((item: IMGoodRemain) => item.good.weightCode === code);
+      const remItem = Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code);
 
       if (!remItem) {
         return;
@@ -114,12 +110,11 @@ const ScanBarcodeScreen = () => {
         id: uuid(),
         quantity: qty,
         price: remItem.remains?.length ? remItem.remains[0].price : 0,
-        buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
         remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
         barcode: remItem.good.barcode,
       };
     },
-    [goods, weightSettingsCountCode, weightSettingsCountWeight, weightSettingsWeightCode.data],
+    [goodRemains, weightSettingsCountCode, weightSettingsCountWeight, weightSettingsWeightCode.data],
   );
 
   if (!document) {

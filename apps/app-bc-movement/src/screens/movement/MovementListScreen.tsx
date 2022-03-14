@@ -16,9 +16,10 @@ import {
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { getDateString } from '@lib/mobile-app';
 
 import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';

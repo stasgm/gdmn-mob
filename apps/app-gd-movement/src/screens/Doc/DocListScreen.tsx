@@ -15,12 +15,15 @@ import {
   IListItemProps,
 } from '@lib/mobile-ui';
 
-import { useSelector } from '@lib/store';
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
+import { refSelectors, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocDocument } from '../../store/types';
+import { getDateString } from '@lib/mobile-app';
+
+import { IDocumentType } from '@lib/types';
+
+import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
 
@@ -38,18 +41,11 @@ export const DocListScreen = () => {
 
   const { loading } = useSelector((state) => state.documents);
 
-  // const docs = useSelector((state) => state.documents);
-  // console.log('docs', docs);
-
   const list = useSelector((state) => state.documents.list).sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
-  ) as IDocDocument[];
+  ) as IMovementDocument[];
 
-  // console.log('docs', docs);
-
-  // const list = docSelectors
-  //   .selectByDocType<IDocDocument>('inventory')
-  //   .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+  const docTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -63,20 +59,20 @@ export const DocListScreen = () => {
         ? list?.filter((e) => e.status === 'PROCESSED')
         : [];
 
-    return res?.map(
-      (i) =>
-        ({
-          id: i.id,
-          title: i.head.toContact?.name,
-          documentDate: getDateString(i.documentDate),
-          status: i.status,
-          subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
-          isFromRoute: !!i.head.route,
-          lineCount: i.lines.length,
-          errorMessage: i.errorMessage,
-        } as IListItemProps),
-    );
-  }, [status, list]);
+    return res?.map((i) => {
+      const docType = docTypes.find((e) => e.id === i?.documentType.id);
+      return {
+        id: i.id,
+        title: (docType?.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',
+        documentDate: getDateString(i.documentDate),
+        status: i.status,
+        subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
+        isFromRoute: !!i.head.route,
+        lineCount: i.lines.length,
+        errorMessage: i.errorMessage,
+      } as IListItemProps;
+    });
+  }, [status, list, docTypes]);
 
   const sections = useMemo(
     () =>

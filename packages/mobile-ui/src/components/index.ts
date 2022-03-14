@@ -16,3 +16,4 @@ export { default as SettingsItem } from './SettingsItem';
 export { default as DescriptionItem } from './DescriptionItem';
 export { default as SwipeItem } from './Swipe';
 export { default as ScreenListItem, IListItemProps } from './ScreenListItem';
+export { default as Menu } from './Menu';

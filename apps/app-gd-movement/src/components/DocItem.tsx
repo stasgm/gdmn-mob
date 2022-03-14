@@ -7,12 +7,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
-import { IDocLine } from '../store/types';
+import { IMovementLine } from '../store/types';
 import { IGood } from '../store/app/types';
 
 interface IProps {
   docId: string;
-  item: IDocLine;
+  item: IMovementLine;
   readonly?: boolean;
 }
 

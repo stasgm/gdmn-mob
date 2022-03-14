@@ -4,7 +4,6 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
   BackButton,
@@ -16,6 +15,8 @@ import {
   SubTitle,
   ScanButton,
 } from '@lib/mobile-ui';
+
+import { getDateString } from '@lib/mobile-app';
 
 import { IInventoryDocument, IInventoryLine } from '../../store/types';
 import { InventoryStackParamList } from '../../navigation/Root/types';

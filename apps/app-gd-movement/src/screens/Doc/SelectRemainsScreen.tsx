@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
-import { View, FlatList, TouchableOpacity, Text } from 'react-native';
+import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
@@ -9,11 +9,19 @@ import { docSelectors, refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { IDepartment } from '@lib/types';
+
 import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
-import { useSelector as useAppInventorySelector } from '../../store/index';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IDepartment, IDocDocument } from '../../store/types';
-import { IGood, IRem, IRemainsNew, IRemGood } from '../../store/app/types';
+import { IMovementDocument } from '../../store/types';
+import { IGood, IRemains, IRemGood } from '../../store/app/types';
+
+interface IFilteredList {
+  searchQuery: string;
+  goodRemains: IRemGood[];
+}
+
+const keyExtractor = (item: IRemGood) => String(item.good.id);
 
 const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
@@ -33,7 +41,6 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
             quantity: 0,
             remains: item.remains,
             price: item.price,
-            buyingPrice: item.buyingPrice,
           },
         });
       }}
@@ -62,77 +69,75 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation();
   const { colors } = useTheme();
-  const [searchText, setSearchText] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [list, setList] = useState<IRemGood[]>([]);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
-  const model = useAppInventorySelector((state) => state.appInventory.model);
 
   const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
-  // const document = docSelectors
-  //   .selectByDocType<IDocDocument>('inventory')
-  //   ?.find((item) => item.id === docId) as IDocDocument;
+  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
-  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IDocDocument;
+  const contactTypeId =
+    document?.documentType.remainsField === 'fromContact'
+      ? document?.head?.fromContactType?.id
+      : document?.head?.toContactType?.id;
+
+  const goods = refSelectors.selectByName<IGood>('good').data;
+  const contacts = refSelectors.selectByName<IDepartment>(contactTypeId || 'department').data;
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const contactId =
+    document?.documentType?.remainsField === 'fromContact'
+      ? document?.head?.fromContact?.id
+      : document?.head?.toContact?.id;
+
+  const [goodRemains] = useState<IRemGood[]>(() =>
+    contactId ? getRemGoodListByContact(contacts, goods, remains, contactId, document?.documentType.isRemains) : [],
+  );
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    goodRemains,
+  });
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          goodRemains,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = isNaN(Number(lower))
+          ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
+          : ({ good }: IRemGood) => good.barcode?.includes(searchQuery) || good.name?.toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          gr = filteredList.goodRemains.filter(fn);
+        } else {
+          gr = goodRemains.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          goodRemains: gr,
+        });
+      }
+    }
+  }, [goodRemains, filteredList, searchQuery]);
 
   const handleScanner = useCallback(() => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
 
-  // const goods = useMemo(
-  //   () => (document?.head?.toDepartment?.id ? model[document.head.toDepartment.id].goods : {}),
-  //   [document?.head?.toDepartment?.id, model],
-  // );
-
-  const remainss = refSelectors.selectByName<IRemainsNew>('remains').data[0];
-  const goodss = refSelectors.selectByName<IGood>('good').data;
-  console.log('newg', goodss);
-  const contacts = refSelectors.selectByName<IDepartment>(document?.head?.fromContactType?.id || 'department').data;
-
-  const [goodRemains] = useState<IRemGood[]>(() =>
-    document?.head?.fromContact?.id
-      ? getRemGoodListByContact(contacts, goodss, remainss, document?.head?.fromContact.id)
-      : [],
-  );
-
-  // const goodRemains: IRem[] = useMemo(() => {
-  //   return Object.keys(goods)
-  //     ?.reduce((r: IRem[], e) => {
-  //       const { remains, ...goodInfo } = goods[e];
-  //       const goodPos = { goodkey: e, ...goodInfo, price: 0, remains: 0 };
-
-  //       remains && remains.length > 0
-  //         ? remains.forEach((re) => {
-  //             console.log('re1', re);
-  //             r.push({ ...goodPos, price: re.price, remains: re.q });
-  //           })
-  //         : r.push(goodPos);
-  //       return r;
-  //     }, [])
-  //     .sort((a: IRem, b: IRem) => (a.name < b.name ? -1 : 1));
-  // }, [goods]);
-
-  // console.log('gooodrem', goodRemains);
-
-  useEffect(() => {
-    if (!filterVisible && searchText) {
-      setSearchText('');
-    }
-  }, [filterVisible, searchText]);
-
-  useEffect(() => {
-    setList(
-      // goodRemains,
-      goodRemains?.filter(
-        (item) =>
-          item.good.barcode?.toLowerCase().includes(searchText.toLowerCase()) ||
-          item.good.name?.toLowerCase().includes(searchText.toLowerCase()),
-      ),
-    );
-  }, [goodRemains, searchText]);
-
-  // console.log('rems', goodRemains);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
@@ -150,6 +155,9 @@ export const SelectRemainsScreen = () => {
 
   const renderItem = ({ item }: { item: IRemGood }) => <GoodRemains item={item} />;
 
+  const RC = useMemo(() => <RefreshControl refreshing={!goodRemains} title="загрузка данных..." />, [goodRemains]);
+  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
+
   return (
     <AppScreen>
       <Divider />
@@ -158,8 +166,8 @@ export const SelectRemainsScreen = () => {
           <View style={styles.flexDirectionRow}>
             <Searchbar
               placeholder="Поиск (штрихкод, наименование)"
-              onChangeText={setSearchText}
-              value={searchText}
+              onChangeText={setSearchQuery}
+              value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
             />
           </View>
@@ -168,10 +176,17 @@ export const SelectRemainsScreen = () => {
       )}
       <FlatList
         ref={refList}
-        data={list}
-        keyExtractor={(_, i) => String(i)}
+        data={filteredList.goodRemains}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        refreshControl={RC}
+        ListEmptyComponent={EC}
+        removeClippedSubviews={true} // Unmount compsonents when outside of window
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
       />
     </AppScreen>
   );

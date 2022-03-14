@@ -2139,7 +2139,7 @@ export const messageInventory: IMessage<MessageType>[] = [
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user1,
-      dateTime: '2021-12-01',
+      dateTime: new Date().toISOString(),
     },
     body: {
       type: 'REFS',
@@ -2158,10 +2158,6 @@ export const messageInventory: IMessage<MessageType>[] = [
             {
               id: '147059282',
               name: 'Полукопченые колбасные изделия',
-            },
-            {
-              id: '147059306',
-              name: 'Нефондовые',
             },
             {
               id: '147059315',
@@ -2194,10 +2190,6 @@ export const messageInventory: IMessage<MessageType>[] = [
             {
               id: '147059439',
               name: 'Сырокопченые колбасные изделия',
-            },
-            {
-              id: '147059461',
-              name: 'ДЛЯ НАС',
             },
           ],
         },
@@ -2417,9 +2409,9 @@ export const messageInventory: IMessage<MessageType>[] = [
             },
           ],
         },
-        remain: {
+        remains: {
           id: '187037529',
-          name: 'remain',
+          name: 'remains',
           visible: true,
           description: 'Остатки ТМЦ',
           data: [
@@ -2683,6 +2675,380 @@ export const messageBcMovement: IMessage<MessageType>[] = [
           editionDate: new Date().toISOString(),
         },
       ] as any[],
+    },
+  },
+];
+
+export const messageGdMovement: IMessage<MessageType>[] = [
+  {
+    id: '147293377',
+    status: 'READY',
+    head: {
+      appSystem: 'gdmn-gd-movement',
+      company: companies[2] as INamedEntity,
+      consumer: user2,
+      producer: user1,
+      dateTime: new Date().toISOString(),
+    },
+    body: {
+      type: 'REFS',
+      version: 1,
+      payload: {
+        goodGroup: {
+          id: '187037519',
+          name: 'goodGroup',
+          visible: true,
+          description: 'Группы ТМЦ',
+          data: [
+            {
+              id: '147059221',
+              name: 'КОЛБАСНЫЕ ИЗДЕЛИЯ',
+            },
+            {
+              id: '147059282',
+              name: 'Полукопченые колбасные изделия',
+            },
+            {
+              id: '147059315',
+              name: 'Варено-копченые колбасные изделия',
+            },
+            {
+              id: '147059335',
+              name: 'Сосиски',
+            },
+            {
+              id: '147059375',
+              name: 'Сардельки',
+            },
+            {
+              id: '147059386',
+              name: 'Копчености',
+            },
+            {
+              id: '147059405',
+              name: 'Вареные колбасные изделия',
+            },
+            {
+              id: '147059415',
+              name: 'Сыровяленые колбасные изделия',
+            },
+            {
+              id: '147059436',
+              name: 'Шпик',
+            },
+            {
+              id: '147059439',
+              name: 'Сырокопченые колбасные изделия',
+            },
+          ],
+        },
+        documentType: {
+          id: '187037521',
+          name: 'documentType',
+          visible: true,
+          description: 'Типы документов',
+          data: [
+            {
+              id: '147037014',
+              name: 'prihod',
+              description: 'Приход',
+              isRemains: false,
+              remainsField: 'toContact',
+              fromDescription: 'Откуда',
+              fromType: 'contact',
+              fromRequired: true,
+              toDescription: 'Куда',
+              toType: 'department',
+              toRequired: true,
+            },
+            {
+              id: '187034606',
+              name: 'inventory',
+              description: 'Инвентаризация',
+              isRemains: true,
+              remainsField: 'toContact',
+              fromDescription: '',
+              fromType: '',
+              fromRequired: false,
+              toDescription: 'Место',
+              toType: 'department',
+              toRequired: true,
+            },
+          ],
+        },
+        good: {
+          id: '187037523',
+          name: 'good',
+          visible: true,
+          description: 'Справочник ТМЦ',
+          metadata: {
+            id: {
+              sortOrder: 0,
+              name: 'Идентификатор',
+            },
+            name: {
+              sortOrder: 0,
+              name: 'Наименование',
+            },
+            alias: {
+              sortOrder: 0,
+              name: 'Алиас',
+            },
+            barcode: {
+              sortOrder: 0,
+              name: 'Баркод',
+            },
+            valuename: {
+              sortOrder: 0,
+              name: 'Ед изм',
+            },
+            inFrac: {
+              sortOrder: 0,
+              name: 'Вес единицы',
+            },
+            weightCode: {
+              sortOrder: 0,
+              name: 'Весовой товар',
+            },
+          },
+          data: [
+            {
+              id: 'unknown',
+              name: 'Неизвестный товар',
+              alias: '',
+              barcode: 'unknown',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+            },
+            {
+              id: '153359486',
+              name: 'Книга',
+              alias: '',
+              barcode: '9789854480947',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+            },
+            {
+              id: '111159486',
+              name: 'Тетрадь',
+              alias: '',
+              barcode: '3329687853219',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+            },
+            {
+              id: '153359485',
+              alias: '',
+              barcode: '',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Изделие колбасное "Рулет Европейский с грибами и шпинатом"',
+            },
+            {
+              id: '153367898',
+              alias: '',
+              barcode: '9913000005221',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Рулет "Европейский с грибами и шпинатом"',
+            },
+            {
+              id: '157381934',
+              alias: '',
+              barcode: '9913000005047',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Рулет ИСПАНСКИЙ С ОЛИВКАМИ',
+            },
+            {
+              id: '172067346',
+              alias: '',
+              barcode: '4811219038625',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаса ЯРМОРОЧНАЯАРОМАТНАЯ НОВАЯ п/к 2с(газовая среда) РБ',
+            },
+            {
+              id: '185970902',
+              alias: '3540029',
+              barcode: '',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаса ЯРМАРОЧНАЯ ароматная новая п/к 2с кг',
+            },
+            {
+              id: '147066836',
+              alias: '',
+              barcode: '00757',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаса КУРОРТНАЯ ПЛЮС п/к 2с 1кг РБ',
+            },
+            {
+              id: '147066837',
+              alias: '',
+              barcode: '02816',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаски К ПИВУ НОВЫЕ п/к 2с (газ. среда) 1кг РБ',
+            },
+            {
+              id: '147066838',
+              alias: '',
+              barcode: '02706',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаса ДЛЯ ГРИЛЯ МИКС п/к 2с 1кг РБ',
+            },
+            {
+              id: '147066839',
+              alias: '',
+              barcode: '02711',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаса КРЕСТЬЯНСКАЯ МИКС п/к 2с (газ. среда) 1кг РБ',
+            },
+            {
+              id: '147066840',
+              alias: '',
+              barcode: '03067',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Колбаса ЯРМАРОЧНАЯ п/к 2с 1кг (газ.среда) РБ',
+            },
+            {
+              id: '147067755',
+              alias: '',
+              barcode: '2000100029466',
+              valuename: 'кг',
+              isFrac: 1,
+              weightCode: '',
+              name: 'Фарш  ОСОБЫЙ ГРАНД  зам.1кгфас. Беларусь',
+            },
+          ],
+        },
+        department: {
+          id: '187037527',
+          name: 'department',
+          visible: true,
+          description: 'Подразделение',
+          data: [
+            {
+              id: '176424776',
+              name: 'Подразделение №1',
+            },
+            {
+              id: '147030694',
+              name: 'Подразделение №2',
+            },
+            {
+              id: '147016473',
+              name: 'Подразделение №3',
+            },
+            {
+              id: '147030695',
+              name: 'Подразделение №4',
+            },
+            {
+              id: '147030696',
+              name: 'Подразделение №5',
+            },
+          ],
+        },
+        contact: {
+          id: '147023423',
+          name: 'contact',
+          visible: true,
+          description: 'Контакты',
+          data: [
+            {
+              id: '147016471',
+              name: 'ОАО "МаркетКомпани"',
+              contractNumber: '11/20',
+              contractDate: new Date().toISOString(),
+              paycond: 'отсрочка 15 к/д_поручение',
+              phoneNumber: '8-017-000-00-00, 000-00-00',
+            },
+            {
+              id: '147016507',
+              name: 'ООО "ЕдаЭксперт"',
+              contractNumber: '1/2001',
+              contractDate: new Date().toISOString(),
+              paycond: 'отсрочка 15 б/д_требование',
+              phoneNumber: '8-017-101-01-01',
+            },
+            {
+              id: '147016513',
+              name: 'ООО "ПродуктМаг"',
+              contractNumber: '20/20',
+              contractDate: new Date().toISOString(),
+              paycond: 'отсрочка 14 к/д_поручение',
+            },
+          ],
+        },
+        remains: {
+          id: '187037529',
+          name: 'remains',
+          visible: false,
+          description: 'Остатки ТМЦ',
+          data: [
+            {
+              '176424776': [
+                {
+                  goodId: '153359486',
+                  price: 21.01,
+                  buyingPrice: 22.28,
+                  q: 2.567,
+                },
+                {
+                  goodId: '153359485',
+                  price: 11.11,
+
+                  buyingPrice: 12.28,
+                  q: 10.988,
+                },
+                {
+                  goodId: '111159486',
+                  price: 13.13,
+                  buyingPrice: 13,
+                  q: 13.666,
+                },
+                {
+                  goodId: '153367898',
+                  price: 9.82,
+                  buyingPrice: 9.28,
+                  q: 2,
+                },
+                {
+                  goodId: '157381934',
+                  price: 1.77,
+                  buyingPrice: 1.28,
+                  q: 11,
+                },
+                {
+                  goodId: '172067346',
+                  price: 13.5,
+                  buyingPrice: 12.28,
+                  q: 2,
+                },
+              ],
+            },
+          ],
+        },
+      },
     },
   },
 ];

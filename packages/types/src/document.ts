@@ -17,7 +17,7 @@ type DocfMetadata<T, K> = {
 };
 
 export interface IHead {
-  [fieldname: string]: unknown;
+  [fieldname: string]: any;
 }
 
 export interface IDocumentType extends INamedEntity {

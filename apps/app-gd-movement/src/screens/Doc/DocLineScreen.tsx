@@ -8,13 +8,13 @@ import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { DocLine } from '../../components/DocLine';
-import { IDocLine } from '../../store/types';
+import { IMovementLine } from '../../store/types';
 
 export const DocLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList | DocStackParamList, 'DocLine'>>();
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<DocStackParamList, 'DocLine'>>().params;
-  const [line, setLine] = useState<IDocLine>(item);
+  const [line, setLine] = useState<IMovementLine>(item);
 
   const handleSave = useCallback(() => {
     dispatch(

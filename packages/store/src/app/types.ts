@@ -8,7 +8,3 @@ export interface IAppState {
   errorList: string[];
   formParams?: IFormParam;
 }
-
-export interface IApplFormParam extends IFormParam {
-  date: Date;
-}
