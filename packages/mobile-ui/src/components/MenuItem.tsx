@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import React, { ReactNode, useCallback } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 import { StyleSheet, View, Text, LogBox } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { IconButton, Menu, useTheme } from 'react-native-paper';
@@ -9,9 +9,9 @@ interface Props {
   activeOptionId?: string;
   visible?: any;
   onChange: (option: IListItem) => void;
-  onPress?: () => void;
-  onDismiss?: () => void;
-  title?: string;
+  onPress: () => void;
+  onDismiss: () => void;
+  title: string;
   disabled?: boolean;
 }
 
@@ -23,7 +23,7 @@ const MenuItem = ({ options, activeOptionId, onChange, visible, onPress, onDismi
     <View style={localStyles.container}>
       <Menu
         visible={visible}
-        onDismiss={() => onDismiss}
+        onDismiss={onDismiss}
         anchor={
           <View style={localStyles.menu}>
             <TouchableOpacity onPress={onPress} disabled={disabled}>
@@ -35,7 +35,13 @@ const MenuItem = ({ options, activeOptionId, onChange, visible, onPress, onDismi
       >
         {options.map((option) => {
           return (
-            <View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <IconButton
+                icon={activeOptionId === option.id ? 'check' : ''}
+                size={20}
+                onPress={onPress}
+                disabled={disabled}
+              />
               <Menu.Item onPress={() => onChange(option)} title={option.value} key={option.id} />
             </View>
           );

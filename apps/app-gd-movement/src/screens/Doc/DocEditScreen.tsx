@@ -7,7 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType } from '@lib/types';
 import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
@@ -18,15 +18,11 @@ import {
   SaveButton,
   globalStyles as styles,
   SubTitle,
-  BottomSheet,
-  RadioGroup,
   MenuItem,
 } from '@lib/mobile-ui';
 
-import { IListItem } from '@lib/mobile-types';
-
 import { DocStackParamList } from '../../navigation/Root/types';
-import { IDepartment, IDocFormParam, IDocDocument } from '../../store/types';
+import { IDocFormParam, IDocDocument } from '../../store/types';
 import { contactTypes, getNextDocNumber } from '../../utils/constants';
 
 export const DocEditScreen = () => {
@@ -68,15 +64,6 @@ export const DocEditScreen = () => {
   const documentType = useMemo(() => {
     return documentTypes?.find((e) => e.id === docDocumentType?.id);
   }, [docDocumentType?.id, documentTypes]);
-  // const documentType = refSelectors
-  //   .selectByName<IDocumentType>('documentType')
-  //   ?.data?.find((e) => e.id === docDocumentType?.id);
-
-  // useEffect(() => {
-  //   if (!docDocumentType) {
-  //     dispatch(appActions.setFormParams({ documentType: documentType }));
-  //   }
-  // }, [dispatch, docDocumentType, documentType]);
 
   const fromContactType = contactTypes.find((e) => e.id === docFromContactType?.id);
   const toContactType = contactTypes.find((e) => e.id === docToContactType?.id);
@@ -103,10 +90,8 @@ export const DocEditScreen = () => {
           number: newNumber, //'1',
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          // fromContactType: contactTypes[0],
           fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
           toContactType: contactTypes.find((item) => item.id === documentType?.toType),
-          // toContactType: contactTypes[0],
         }),
       );
     }
@@ -114,6 +99,9 @@ export const DocEditScreen = () => {
   }, [dispatch, doc, newNumber]);
 
   const handleSave = useCallback(() => {
+    if (!docDocumentType) {
+      return Alert.alert('Ошибка!', 'Не выбран тип документа', [{ text: 'OK' }]);
+    }
     if (documentType?.fromRequired && !(docNumber && docDate && docDocumentType && docFromContact)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
@@ -124,11 +112,12 @@ export const DocEditScreen = () => {
     if (
       documentType?.isRemains &&
       docDate &&
-      new Date(docDate).toLocaleDateString() < new Date().toLocaleDateString()
+      new Date(docDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
     ) {
       Alert.alert('Ошибка!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
       return;
     }
+
     const docId = !id ? uuid() : id;
     const createdDate = new Date().toISOString();
 
@@ -270,11 +259,6 @@ export const DocEditScreen = () => {
     });
   };
 
-  ///////////////////////////////////
-  // useEffect(() => {
-  //   dispatch(appActions.setFormParams({ fromContact: undefined, toContact: undefined }));
-  // }, [dispatch, docDocumentType]);
-
   const handlePresentType = () => {
     if (isBlocked) {
       return;
@@ -322,9 +306,6 @@ export const DocEditScreen = () => {
     },
     [dispatch, doc?.lines.length, docToContactType?.id, documentType?.remainsField],
   );
-  // useEffect(() => {
-  //   return;
-  // }, [docFromContactType]);
 
   return (
     <AppInputScreen>
@@ -372,13 +353,11 @@ export const DocEditScreen = () => {
               onChange={(option) => {
                 handleFromContactType(option);
               }}
-              onPress={() => {
-                setVisibleFrom(true);
-              }}
+              onPress={() => setVisibleFrom(true)}
               onDismiss={() => setVisibleFrom(false)}
-              title={docFromContactType?.value}
+              title={docFromContactType?.value || ''}
               visible={visibleFrom}
-              activeOptionId={docFromContact?.id}
+              activeOptionId={docFromContactType?.id}
               disabled={isBlocked}
             />
 
@@ -397,13 +376,11 @@ export const DocEditScreen = () => {
               onChange={(option) => {
                 handleToContactType(option);
               }}
-              onPress={() => {
-                setVisibleTo(true);
-              }}
+              onPress={() => setVisibleTo(true)}
               onDismiss={() => setVisibleTo(false)}
-              title={docToContactType?.value}
+              title={docToContactType?.value || ''}
               visible={visibleTo}
-              activeOptionId={docToContact?.id}
+              activeOptionId={docToContactType?.id}
               disabled={isBlocked}
             />
             <SelectableInput

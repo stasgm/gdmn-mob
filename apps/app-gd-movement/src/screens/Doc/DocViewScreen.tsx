@@ -32,8 +32,6 @@ export const DocViewScreen = () => {
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
-  // const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?
-
   const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IDocDocument | undefined;
 
   const docType = refSelectors
