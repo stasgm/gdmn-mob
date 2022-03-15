@@ -41,6 +41,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
             quantity: 0,
             remains: item.remains,
             price: item.price,
+            buyingPrice: item.buyingPrice,
           },
         });
       }}
