@@ -63,7 +63,7 @@ export interface IGood extends INamedEntity {
   vat?: string; //НДС
   weightCode?: string;
   goodGroup: INamedEntity; // группа товаров
-  valuename?: string; // Наименование ед. изм.
+  valueName?: string; // Наименование ед. изм.
   invWeight?: number; // Вес единицы товара
   price?: number; //Цена
   buyingPrice?: number;

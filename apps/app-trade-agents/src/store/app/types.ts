@@ -14,7 +14,7 @@ export interface IGood extends INamedEntity {
   barcode: string;
   vat: string; //НДС
   goodgroup: INamedEntity; // группа товаров
-  valuename: string; // Наименование ед. изм.
+  valueName: string; // Наименование ед. изм.
   invWeight: number; // Вес единицы товара
   priceFso: number; // цена ФСО
   priceFsn: number; // цена ФСН
