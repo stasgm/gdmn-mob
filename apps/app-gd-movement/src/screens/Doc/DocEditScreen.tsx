@@ -86,8 +86,8 @@ export const DocEditScreen = () => {
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           documentType: documentTypes[0],
-          fromContactType: contactTypes.find((item) => item.id === docDocumentType?.fromType) || contactTypes[0],
-          toContactType: contactTypes.find((item) => item.id === docDocumentType?.toType) || contactTypes[0],
+          fromContactType: contactTypes.find((item) => item.id === documentTypes[0]?.fromType) || contactTypes[0],
+          toContactType: contactTypes.find((item) => item.id === documentTypes[0]?.toType) || contactTypes[0],
         }),
       );
     }
