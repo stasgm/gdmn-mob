@@ -5,46 +5,52 @@ import { IconButton, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 
-import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IContact, IGood, IGoodMatrix, IMatrixDataNamed } from '../../store/types';
+import { IDepartment, IReferences } from '@lib/types';
+
+import { RemainsStackParamList } from '../../navigation/Root/types';
+
+import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
+import { getRemGoodListByContact } from '../../utils/helpers';
 
 import GoodItem from './components/GoodItem';
 
 const GoodListScreen = () => {
-  const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodList'>>().params;
-  const contact = refSelectors.selectByName<IContact>('contact')?.data.find((e) => e.id === id);
+  const { id } = useRoute<RouteProp<RemainsStackParamList, 'GoodList'>>().params;
+  const references = useSelector((state) => state.references.list) as IReferences;
 
-  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data.find((item) => item.contactId === id);
+  const contacts = Object.entries(references).find((item) => item[1].data.find((i) => i.id === id))?.[1].data as
+    | IDepartment[]
+    | IEmployee[];
+  const contact = contacts?.find((i) => i.id === id);
+
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const [goodRemains] = useState<IRemGood[]>(() =>
+    contact?.id ? getRemGoodListByContact(contacts, goods, remains, contact.id, true) : [],
+  );
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
-
   const filteredList = useMemo(() => {
-    const res = goodMatrix?.data;
+    const res = goodRemains;
     return (
       res
-        ?.map((item) => {
-          const name = goods.find((i) => i.id === item.goodId)?.name;
-          return {
-            ...item,
-            goodName: name,
-          } as IMatrixDataNamed;
-        })
         ?.filter((i) =>
-          i.goodName || i.priceFsn
-            ? String(i.goodName).toUpperCase().includes(searchQuery.toUpperCase()) ||
-              String(i.priceFsn).toUpperCase().includes(searchQuery.toUpperCase())
+          i.good.name || i.good.barcode || i.good.alias
+            ? String(i.good.name).toUpperCase().includes(searchQuery.toUpperCase()) ||
+              String(i.good.barcode).toUpperCase().includes(searchQuery.toUpperCase()) ||
+              String(i.good.alias).toUpperCase().includes(searchQuery.toUpperCase())
             : true,
         )
-        ?.sort((a, b) => (a.goodName < b.goodName ? -1 : 1)) || []
+        ?.sort((a, b) => (a.good.name < b.good.name ? -1 : 1)) || []
     );
-  }, [goodMatrix?.data, goods, searchQuery]);
+  }, [goodRemains, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -66,7 +72,7 @@ const GoodListScreen = () => {
     });
   }, [navigation, filterVisible, colors.card]);
 
-  const renderItem = ({ item }: { item: IMatrixDataNamed }) => <GoodItem item={item} />;
+  const renderItem = ({ item }: { item: IRemGood }) => <GoodItem item={item} />;
 
   return (
     <AppScreen>
@@ -90,7 +96,7 @@ const GoodListScreen = () => {
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={!goods || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={!goods || !goodRemains ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>
   );

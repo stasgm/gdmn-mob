@@ -1,7 +1,7 @@
 import { getDateString } from '@lib/mobile-app';
 import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors, useSelector } from '@lib/store';
-import { IReference } from '@lib/types';
+import { refSelectors } from '@lib/store';
+import { IDepartment, IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
@@ -9,8 +9,7 @@ import { SectionList, SectionListData, View, Text } from 'react-native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
-import { IRemains } from '../../store/app/types';
-import { IContact /*, IGoodMatrix*/ } from '../../store/types';
+import { IEmployee, IRemains } from '../../store/app/types';
 
 import ContactItem from './components/ContactItem';
 
@@ -20,7 +19,7 @@ export interface ContactListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IContact, ContactListSectionProps>[];
+export type SectionDataProps = SectionListData<IDepartment | IEmployee, ContactListSectionProps>[];
 
 const ContactListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RemainsStackParamList, 'ContactList'>>();
@@ -28,21 +27,10 @@ const ContactListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
-  // const contactss = refSelectors.selectByName<any>('contact' || 'department' || 'employee')?.data; //.filter((i) => i.id === goodMatrix?.find((item) => item.contactId === i.id)?.contactId);
-
-  const cont = refSelectors.selectByName<any>('contact')?.data;
-  const dep = refSelectors.selectByName<any>('department')?.data;
-  // const emp = refSelectors.selectByName<any>('employee')?.data;
-  // const a = cont.concat(dep.concat(emp));
-  const a = cont.concat(dep);
-
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
-  const contacts = a.filter((i) => remains[i.id]);
-
-  // console.log('contt', contt);
-  // const contacts = refSelectors
-  //   .selectByName<IContact>('contact')
-  //   ?.data.filter((i) => i.id === goodMatrix?.find((item) => item.contactId === i.id)?.contactId);
+  const department = refSelectors.selectByName<IDepartment>('department')?.data || [];
+  const employee = refSelectors.selectByName<IEmployee>('employee')?.data || [];
+  const contacts = department.concat(employee).filter((i) => remains[i.id]);
 
   const filteredList = useMemo(() => {
     return (
@@ -55,8 +43,8 @@ const ContactListScreen = () => {
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const matrixDate = new Date();
-        const sectionTitle = matrixDate ? getDateString(matrixDate) : '';
+        const remainsDate = new Date();
+        const sectionTitle = remainsDate ? getDateString(remainsDate) : '';
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>
@@ -95,7 +83,7 @@ const ContactListScreen = () => {
     });
   }, [colors.card, filterVisible, navigation]);
 
-  const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
+  const renderItem = ({ item }: { item: IDepartment | IEmployee }) => <ContactItem item={item} />;
 
   return (
     <AppScreen>

@@ -76,3 +76,10 @@ export interface IRemGood {
   buyingPrice?: number;
   remains: number;
 }
+
+export interface IEmployee extends INamedEntity {
+  firstName?: string;
+  lastName?: string;
+  middleName?: string;
+  position: INamedEntity;
+}

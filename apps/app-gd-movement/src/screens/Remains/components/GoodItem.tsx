@@ -6,16 +6,18 @@ import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { GoodMatrixParamList } from '../../../navigation/Root/types';
-import { IMatrixDataNamed } from '../../../store/types';
+import { RemainsParamList } from '../../../navigation/Root/types';
+import { IRemGood } from '../../../store/app/types';
 
 interface IProps {
-  item: IMatrixDataNamed;
+  item: IRemGood;
 }
 
 const GoodItem = ({ item }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'GoodList'>>();
+  const navigation = useNavigation<StackNavigationProp<RemainsParamList, 'GoodList'>>();
+
+  const barcode = !!item.good.barcode;
 
   return (
     <TouchableOpacity
@@ -28,8 +30,15 @@ const GoodItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item?.goodName}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>{(item?.priceFsn || 0).toString()} р.</Text>
+          <Text style={[styles.name, { color: colors.text }]}>{item?.good.name}</Text>
+          <View style={[styles.directionRow]}>
+            <Text style={[styles.field, { color: colors.text }]}>
+              {item.remains} {item.good.valuename} - {(item?.price || 0).toString()} р.
+            </Text>
+            {barcode && (
+              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.good.barcode}</Text>
+            )}
+          </View>
         </View>
       </View>
     </TouchableOpacity>

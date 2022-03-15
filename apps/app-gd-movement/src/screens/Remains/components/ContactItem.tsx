@@ -6,15 +6,17 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IContact } from '../../../store/types';
-import { GoodMatrixStackParamList } from '../../../navigation/Root/types';
+import { IDepartment } from '@lib/types';
+
+import { RemainsStackParamList } from '../../../navigation/Root/types';
+import { IEmployee } from '../../../store/app/types';
 
 export interface IContactItem {
-  item: IContact;
+  item: IDepartment | IEmployee;
 }
 
 const ContactItem = ({ item }: IContactItem) => {
-  const navigation = useNavigation<StackNavigationProp<GoodMatrixStackParamList, 'ContactList'>>();
+  const navigation = useNavigation<StackNavigationProp<RemainsStackParamList, 'ContactList'>>();
 
   return (
     <TouchableOpacity
