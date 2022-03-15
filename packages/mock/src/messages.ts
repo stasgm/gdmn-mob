@@ -2795,7 +2795,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               id: '111852486',
               name: 'Ручка шариковая',
               alias: '',
-              barcode: '3329687853219',
+              barcode: '3329687853210',
               valuename: 'кг',
               isFrac: 1,
               weightCode: '',
@@ -2812,7 +2812,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             {
               id: '147067788',
               alias: '',
-              barcode: '2000100029466',
+              barcode: '2000100029906',
               valuename: 'кг',
               isFrac: 1,
               weightCode: '',

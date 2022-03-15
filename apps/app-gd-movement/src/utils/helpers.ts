@@ -138,6 +138,7 @@ const getRemGoodListByContact = (
             remGoods.push({
               good,
               price: r.price,
+              buyingPrice: r.buyingPrice,
               remains: r.q,
             });
           }
@@ -145,6 +146,7 @@ const getRemGoodListByContact = (
           remGoods.push({
             good,
             price: 0,
+            buyingPrice: 0,
             remains: 0,
           });
         }
@@ -152,7 +154,7 @@ const getRemGoodListByContact = (
     } else if (!isRemains) {
       //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара c 0
       for (const good of goods) {
-        remGoods.push({ good, price: 0, remains: 0 });
+        remGoods.push({ good, price: 0, buyingPrice: 0, remains: 0 });
       }
     }
   }
@@ -163,15 +165,18 @@ const getRemGoodListByContact = (
 
 //Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
 const getRemainsByGoodId = (remains: IRemains, contactId: string) => {
-  return remains[contactId].reduce((p: IMGoodData<IModelRem[]>, { goodId, price = 0, q = 0 }: IRemainsData) => {
-    const x = p[goodId];
-    if (!x) {
-      p[goodId] = [{ price, q }];
-    } else {
-      x.push({ price, q });
-    }
-    return p;
-  }, {});
+  return remains[contactId].reduce(
+    (p: IMGoodData<IModelRem[]>, { goodId, price = 0, buyingPrice = 0, q = 0 }: IRemainsData) => {
+      const x = p[goodId];
+      if (!x) {
+        p[goodId] = [{ price, buyingPrice, q }];
+      } else {
+        x.push({ price, buyingPrice, q });
+      }
+      return p;
+    },
+    {},
+  );
 };
 
 export { extraPredicate, isNamedEntity, formatValue, getRemGoodByContact, getRemGoodListByContact };
