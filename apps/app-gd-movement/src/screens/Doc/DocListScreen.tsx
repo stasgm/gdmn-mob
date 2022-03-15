@@ -15,13 +15,11 @@ import {
   IListItemProps,
 } from '@lib/mobile-ui';
 
-import { refSelectors, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
-
-import { IDocumentType } from '@lib/types';
 
 import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
@@ -45,8 +43,6 @@ export const DocListScreen = () => {
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
   ) as IMovementDocument[];
 
-  const docTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-
   const [status, setStatus] = useState<Status>('all');
 
   const filteredList: IListItemProps[] = useMemo(() => {
@@ -60,10 +56,10 @@ export const DocListScreen = () => {
         : [];
 
     return res?.map((i) => {
-      const docType = docTypes.find((e) => e.id === i?.documentType.id);
       return {
         id: i.id,
-        title: (docType?.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',
+        title:
+          (i.documentType.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',
         documentDate: getDateString(i.documentDate),
         status: i.status,
         subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
@@ -72,7 +68,7 @@ export const DocListScreen = () => {
         errorMessage: i.errorMessage,
       } as IListItemProps;
     });
-  }, [status, list, docTypes]);
+  }, [status, list]);
 
   const sections = useMemo(
     () =>
