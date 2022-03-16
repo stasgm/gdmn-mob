@@ -1,6 +1,6 @@
 import { getDateString } from '@lib/mobile-app';
 import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,7 +30,9 @@ const ContactListScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const department = refSelectors.selectByName<IDepartment>('department')?.data || [];
   const employee = refSelectors.selectByName<IEmployee>('employee')?.data || [];
-  const contacts = department.concat(employee).filter((i) => remains[i.id]);
+  const contacts = department?.concat(employee)?.filter((i) => remains?.[i.id]);
+
+  const syncDate = useSelector((state) => state.app.syncDate);
 
   const filteredList = useMemo(() => {
     return (
@@ -43,8 +45,7 @@ const ContactListScreen = () => {
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const remainsDate = new Date();
-        const sectionTitle = remainsDate ? getDateString(remainsDate) : '';
+        const sectionTitle = syncDate ? getDateString(syncDate) : '';
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>
@@ -60,7 +61,7 @@ const ContactListScreen = () => {
           },
         ];
       }, []),
-    [filteredList],
+    [filteredList, syncDate],
   );
 
   useEffect(() => {

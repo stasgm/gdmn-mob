@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
@@ -15,6 +15,11 @@ import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { getRemGoodListByContact } from '../../utils/helpers';
 
 import GoodItem from './components/GoodItem';
+
+interface IFilteredList {
+  searchQuery: string;
+  goodRemains: IRemGood[];
+}
 
 const GoodListScreen = () => {
   const { id } = useRoute<RouteProp<RemainsStackParamList, 'GoodList'>>().params;
@@ -37,20 +42,44 @@ const GoodListScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
-  const filteredList = useMemo(() => {
-    const res = goodRemains;
-    return (
-      res
-        ?.filter((i) =>
-          i.good.name || i.good.barcode || i.good.alias
-            ? String(i.good.name).toUpperCase().includes(searchQuery.toUpperCase()) ||
-              String(i.good.barcode).toUpperCase().includes(searchQuery.toUpperCase()) ||
-              String(i.good.alias).toUpperCase().includes(searchQuery.toUpperCase())
-            : true,
-        )
-        ?.sort((a, b) => (a.good.name < b.good.name ? -1 : 1)) || []
-    );
-  }, [goodRemains, searchQuery]);
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    goodRemains,
+  });
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          goodRemains,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = isNaN(Number(lower))
+          ? ({ good }: IRemGood) => good.name?.toLowerCase().includes(lower)
+          : ({ good }: IRemGood) => good.barcode?.includes(searchQuery) || good.name?.toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          gr = filteredList.goodRemains.filter(fn);
+        } else {
+          gr = goodRemains.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          goodRemains: gr,
+        });
+      }
+    }
+  }, [goodRemains, filteredList, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -91,7 +120,7 @@ const GoodListScreen = () => {
         </>
       )}
       <FlatList
-        data={filteredList}
+        data={filteredList.goodRemains}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}

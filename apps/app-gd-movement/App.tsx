@@ -34,7 +34,7 @@ const Root = () => {
       {
         name: 'Remains',
         title: 'Остатки',
-        icon: 'file-document-outline',
+        icon: 'dolly',
         component: RemainsNavigator,
       },
     ],

@@ -8,8 +8,9 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
-import Constants from 'expo-constants';
 import { useSelector } from '@lib/store';
+
+import { getDateString } from '../../../mobile-app/src/utils/helpers';
 
 interface ICutsomProps {
   onSync?: () => void;
@@ -28,6 +29,8 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
     outputRange: [-100, -85, -70, -45, 0],
   });
+
+  const syncDate = useSelector((state) => state.app.syncDate) as Date;
 
   return (
     <>
@@ -65,11 +68,14 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
         <TouchableOpacity onPress={onSync}>
           <Avatar.Icon size={50} icon="cloud-refresh" children={undefined} />
         </TouchableOpacity>
-        <View style={styles.updateSection}>
-          <Caption style={styles.caption}>
-            Версия программы: {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
-          </Caption>
-        </View>
+        {syncDate ? (
+          <View style={styles.updateSection}>
+            <Caption style={styles.caption}>Дата синхронизации:</Caption>
+            <Caption style={styles.caption}>
+              {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
+            </Caption>
+          </View>
+        ) : null}
       </View>
     </>
   );
@@ -108,14 +114,13 @@ const styles = StyleSheet.create({
     lineHeight: 14,
   },
   updateSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingLeft: 6,
+    alignItems: 'flex-end',
   },
   systemInfo: {
     alignItems: 'flex-end',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     flexDirection: 'row',
+    paddingLeft: 20,
     paddingHorizontal: 20,
     paddingVertical: 15,
   },

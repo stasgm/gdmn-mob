@@ -2972,7 +2972,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               name: 'Масло подсолнечное',
             },
             {
-              id: '147067755',
+              id: '147067756',
               alias: '',
               barcode: '2000100029466',
               valuename: 'кг',
@@ -3144,7 +3144,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
                   q: 9.2,
                 },
                 {
-                  goodId: '147067755',
+                  goodId: '147067756',
                   price: 10.57,
                   buyingPrice: 10.28,
                   q: 7.652,
@@ -3282,7 +3282,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
                   q: 2.567,
                 },
                 {
-                  goodId: '147067755',
+                  goodId: '147067756',
                   price: 21.01,
                   buyingPrice: 22.26,
                   q: 7.5,
@@ -3340,7 +3340,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               ],
               '147527919': [
                 {
-                  goodId: '153359485',
+                  goodId: '147066838',
                   price: 21.01,
                   buyingPrice: 22.28,
                   q: 2.567,
@@ -3352,13 +3352,13 @@ export const messageGdMovement: IMessage<MessageType>[] = [
                   q: 7.91,
                 },
                 {
-                  goodId: '153359486',
+                  goodId: '147066840',
                   price: 14.74,
                   buyingPrice: 13.56,
                   q: 7.82,
                 },
                 {
-                  goodId: '153359486',
+                  goodId: '185970902',
                   price: 25.01,
                   buyingPrice: 24.28,
                   q: 10.56,

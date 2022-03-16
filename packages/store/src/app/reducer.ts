@@ -4,11 +4,13 @@ import { getType } from 'typesafe-actions';
 import { appActions, AppActionType } from './actions';
 import { IAppState } from './types';
 
-const initialState: Readonly<IAppState> = {
+export const initialState: Readonly<IAppState> = {
   loading: false,
   errorMessage: '',
   formParams: {},
   errorList: [],
+  loadingData: false,
+  loadingError: '',
 };
 
 const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action): IAppState => {
@@ -38,6 +40,24 @@ const reducer: Reducer<IAppState, AppActionType> = (state = initialState, action
       return {
         ...state,
         errorList: action.payload,
+      };
+
+    case getType(appActions.setSyncDate):
+      return {
+        ...state,
+        syncDate: action.payload,
+      };
+
+    case getType(appActions.loadData):
+      return { ...action.payload, loading: false, errorMessage: '' };
+
+    case getType(appActions.setLoadingData):
+      return { ...state, loadingData: action.payload };
+
+    case getType(appActions.setLoadingError):
+      return {
+        ...state,
+        loadingError: action.payload,
       };
 
     default:
