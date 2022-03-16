@@ -20,6 +20,7 @@ export interface IHead {
   [fieldname: string]: any;
 }
 
+//TODO: Расширили тип для инвентаризации, надо разделить */
 export interface IDocumentType extends INamedEntity {
   description?: string;
   isRemains?: boolean;
@@ -30,6 +31,7 @@ export interface IDocumentType extends INamedEntity {
   toDescription?: string;
   toType?: string;
   toRequired?: boolean;
+  sortOrder?: boolean;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {

@@ -9,7 +9,7 @@ import { refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { IDepartment } from '@lib/types';
+import { IDepartment, IDocumentType } from '@lib/types';
 
 import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -76,22 +76,21 @@ export const SelectRemainsScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
-  const contactTypeId =
-    document?.documentType.remainsField === 'fromContact'
-      ? document?.head?.fromContactType?.id
-      : document?.head?.toContactType?.id;
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentType = useMemo(
+    () => documentTypes.find((d) => d.id === document.documentType.id),
+    [document.documentType.id, documentTypes],
+  );
 
   const goods = refSelectors.selectByName<IGood>('good').data;
-  const contacts = refSelectors.selectByName<IDepartment>(contactTypeId || 'department').data;
+
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const contactId =
-    document?.documentType?.remainsField === 'fromContact'
-      ? document?.head?.fromContact?.id
-      : document?.head?.toContact?.id;
+    documentType?.remainsField === 'fromContact' ? document?.head?.fromContact?.id : document?.head?.toContact?.id;
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    contactId ? getRemGoodListByContact(contacts, goods, remains, contactId, document?.documentType.isRemains) : [],
+    contactId ? getRemGoodListByContact(goods, remains[contactId], documentType?.isRemains) : [],
   );
 
   const [searchQuery, setSearchQuery] = useState('');

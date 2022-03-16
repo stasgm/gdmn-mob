@@ -36,7 +36,9 @@ export const DocEditScreen = () => {
   const formParams = useSelector((state) => state.app.formParams as IDocFormParam);
 
   const documents = useSelector((state) => state.documents.list) as IMovementDocument[];
-  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentTypes = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data?.sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1));
 
   const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
 
@@ -55,6 +57,11 @@ export const DocEditScreen = () => {
     return formParams;
   }, [formParams]);
 
+  // const documentType = useMemo(
+  //   () => documentTypes.find((d) => d.id === docDocumentType?.id),
+  //   [docDocumentType, documentTypes],
+  // );
+
   useEffect(() => {
     return () => {
       dispatch(appActions.clearFormParams());
@@ -68,7 +75,7 @@ export const DocEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: doc.number,
-          documentType: doc.documentType,
+          documentType: documentTypes.find((d) => d.id === doc.documentType.id),
           documentDate: doc.documentDate,
           status: doc.status,
           comment: doc.head.comment,
@@ -79,20 +86,21 @@ export const DocEditScreen = () => {
         }),
       );
     } else {
+      const dt = documentTypes[0];
       const newNumber = getNextDocNumber(documents);
       dispatch(
         appActions.setFormParams({
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          documentType: documentTypes[0],
-          fromContactType: contactTypes.find((item) => item.id === documentTypes[0]?.fromType) || contactTypes[0],
-          toContactType: contactTypes.find((item) => item.id === documentTypes[0]?.toType) || contactTypes[0],
+          documentType: dt,
+          fromContactType: contactTypes.find((item) => item.id === dt?.fromType),
+          toContactType: contactTypes.find((item) => item.id === dt?.toType),
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, documents]);
+  }, [dispatch, doc, documents, documentTypes]);
 
   const handleSave = useCallback(() => {
     if (
@@ -120,7 +128,7 @@ export const DocEditScreen = () => {
     if (!id) {
       const newDoc: IMovementDocument = {
         id: docId,
-        documentType: docDocumentType,
+        documentType: { id: docDocumentType.id, name: docDocumentType.name, description: docDocumentType.description },
         number: docNumber,
         documentDate: docDate,
         status: 'DRAFT',
@@ -152,7 +160,7 @@ export const DocEditScreen = () => {
         number: docNumber,
         status: docStatus || 'DRAFT',
         documentDate: docDate,
-        documentType: docDocumentType,
+        documentType: { id: docDocumentType.id, name: docDocumentType.name, description: docDocumentType.description },
         errorMessage: undefined,
         head: {
           ...doc.head,
