@@ -3,7 +3,7 @@ import { Alert, View, Text, StyleSheet } from 'react-native';
 import { Avatar, Divider, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { authActions, useSelector, useDispatch, documentActions, referenceActions } from '@lib/store';
+import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
 
 import { DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
 import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
@@ -33,6 +33,7 @@ const ProfileScreen = () => {
         onPress: async () => {
           dispatch(documentActions.init());
           dispatch(referenceActions.init());
+          dispatch(appActions.init());
         },
       },
       {
