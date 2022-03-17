@@ -25,7 +25,8 @@ import { IDocumentType } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocFormParam, IMovementDocument } from '../../store/types';
-import { contactTypes, getNextDocNumber } from '../../utils/constants';
+import { contactTypes } from '../../utils/constants';
+import { getNextDocNumber } from '../../utils/helpers';
 
 export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
@@ -38,7 +39,7 @@ export const DocEditScreen = () => {
   const documents = useSelector((state) => state.documents.list) as IMovementDocument[];
   const documentTypes = refSelectors
     .selectByName<IDocumentType>('documentType')
-    ?.data?.sort((a, b) => (a.sortOrder < b.sortOrder ? -1 : 1));
+    ?.data?.sort((a, b) => ((a.sortOrder || 1) < (b.sortOrder || 1) ? -1 : 1));
 
   const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
 
@@ -57,10 +58,10 @@ export const DocEditScreen = () => {
     return formParams;
   }, [formParams]);
 
-  // const documentType = useMemo(
-  //   () => documentTypes.find((d) => d.id === docDocumentType?.id),
-  //   [docDocumentType, documentTypes],
-  // );
+  const documentType = useMemo(
+    () => documentTypes.find((d) => d.id === docDocumentType?.id),
+    [docDocumentType, documentTypes],
+  );
 
   useEffect(() => {
     return () => {
@@ -75,7 +76,7 @@ export const DocEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: doc.number,
-          documentType: documentTypes.find((d) => d.id === doc.documentType.id),
+          documentType: doc.documentType,
           documentDate: doc.documentDate,
           status: doc.status,
           comment: doc.head.comment,
@@ -104,20 +105,17 @@ export const DocEditScreen = () => {
 
   const handleSave = useCallback(() => {
     if (
+      !documentType ||
       !docDocumentType ||
       !docNumber ||
       !docDate ||
-      (docDocumentType.fromRequired && !docFromContact) ||
-      (docDocumentType.toRequired && !docToContact)
+      (documentType.fromRequired && !docFromContact) ||
+      (documentType.toRequired && !docToContact)
     ) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
-    if (
-      docDocumentType.isRemains &&
-      docDate &&
-      new Date(docDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)
-    ) {
+    if (documentType.isRemains && docDate && new Date(docDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)) {
       Alert.alert('Внимание!', 'Нельзя выбрать дату меньше текущей.', [{ text: 'OK' }]);
       return;
     }
@@ -128,7 +126,7 @@ export const DocEditScreen = () => {
     if (!id) {
       const newDoc: IMovementDocument = {
         id: docId,
-        documentType: { id: docDocumentType.id, name: docDocumentType.name, description: docDocumentType.description },
+        documentType: docDocumentType,
         number: docNumber,
         documentDate: docDate,
         status: 'DRAFT',
@@ -160,11 +158,11 @@ export const DocEditScreen = () => {
         number: docNumber,
         status: docStatus || 'DRAFT',
         documentDate: docDate,
-        documentType: { id: docDocumentType.id, name: docDocumentType.name, description: docDocumentType.description },
+        documentType: docDocumentType,
         errorMessage: undefined,
         head: {
           ...doc.head,
-          comment: docComment as string,
+          comment: docComment,
           fromContact: docFromContact,
           toContact: docToContact,
           fromContactType: docFromContactType,
@@ -179,12 +177,13 @@ export const DocEditScreen = () => {
       navigation.navigate('DocView', { id });
     }
   }, [
-    docDocumentType,
+    documentType,
     docNumber,
     docDate,
     docFromContact,
     docToContact,
     id,
+    docDocumentType,
     docComment,
     docFromContactType,
     docToContactType,
@@ -226,12 +225,12 @@ export const DocEditScreen = () => {
   };
 
   const handleFromContact = () => {
-    if (isBlocked || !docDocumentType || !docFromContactType) {
+    if (isBlocked || !documentType || !docFromContactType) {
       return;
     }
 
-    if (doc?.lines.length && docDocumentType.remainsField === 'fromContact') {
-      Alert.alert('Внимание!', `Нельзя изменить поле ${docDocumentType.fromDescription} при наличии позиций.`, [
+    if (doc?.lines.length && documentType.remainsField === 'fromContact') {
+      Alert.alert('Внимание!', `Нельзя изменить поле ${documentType.fromDescription} при наличии позиций.`, [
         { text: 'OK' },
       ]);
       return;
@@ -245,12 +244,12 @@ export const DocEditScreen = () => {
   };
 
   const handleToContact = () => {
-    if (isBlocked || !docDocumentType || !docToContactType) {
+    if (isBlocked || !documentType || !docToContactType) {
       return;
     }
 
-    if (doc?.lines.length && docDocumentType.remainsField === 'toContact') {
-      Alert.alert('Внимание!', `Нельзя изменить поле ${docDocumentType.toDescription} при наличии позиций.`, [
+    if (doc?.lines.length && documentType.remainsField === 'toContact') {
+      Alert.alert('Внимание!', `Нельзя изменить поле ${documentType.toDescription} при наличии позиций.`, [
         { text: 'OK' },
       ]);
       return;
@@ -272,9 +271,9 @@ export const DocEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           fromContact: undefined,
-          fromContactType: contactTypes.find((item) => item.id === docDocumentType?.fromType),
+          fromContactType: contactTypes.find((item) => item.id === documentType?.fromType),
           toContact: undefined,
-          toContactType: contactTypes.find((item) => item.id === docDocumentType?.toType),
+          toContactType: contactTypes.find((item) => item.id === documentType?.toType),
         }),
       );
     }
@@ -303,8 +302,8 @@ export const DocEditScreen = () => {
 
   const handleFromContactType = useCallback(
     (option) => {
-      if (doc?.lines.length && docDocumentType?.remainsField === 'fromContact') {
-        Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.fromDescription} при наличии позиций.`, [
+      if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
+        Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.fromDescription} при наличии позиций.`, [
           { text: 'OK' },
         ]);
         return setVisibleFrom(false);
@@ -314,19 +313,13 @@ export const DocEditScreen = () => {
       }
       setVisibleFrom(false);
     },
-    [
-      dispatch,
-      doc?.lines.length,
-      docDocumentType?.fromDescription,
-      docDocumentType?.remainsField,
-      docFromContactType?.id,
-    ],
+    [dispatch, doc?.lines.length, documentType?.fromDescription, documentType?.remainsField, docFromContactType?.id],
   );
 
   const handleToContactType = useCallback(
     (option) => {
-      if (doc?.lines.length && docDocumentType?.remainsField === 'toContact') {
-        Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.toDescription} при наличии позиций.`, [
+      if (doc?.lines.length && documentType?.remainsField === 'toContact') {
+        Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.toDescription} при наличии позиций.`, [
           { text: 'OK' },
         ]);
         return setVisibleTo(false);
@@ -336,12 +329,12 @@ export const DocEditScreen = () => {
       }
       setVisibleTo(false);
     },
-    [dispatch, doc?.lines.length, docDocumentType?.remainsField, docDocumentType?.toDescription, docToContactType?.id],
+    [dispatch, doc?.lines.length, documentType?.remainsField, documentType?.toDescription, docToContactType?.id],
   );
 
   const handlePressFromContact = () => {
-    if (doc?.lines.length && docDocumentType?.remainsField === 'fromContact') {
-      Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.fromDescription} при наличии позиций.`, [
+    if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
+      Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.fromDescription} при наличии позиций.`, [
         { text: 'OK' },
       ]);
     } else {
@@ -350,8 +343,8 @@ export const DocEditScreen = () => {
   };
 
   const handlePressToContact = () => {
-    if (doc?.lines.length && docDocumentType?.remainsField === 'toContact') {
-      Alert.alert('Внимание!', `Нельзя изменить тип поля ${docDocumentType.toDescription} при наличии позиций.`, [
+    if (doc?.lines.length && documentType?.remainsField === 'toContact') {
+      Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.toDescription} при наличии позиций.`, [
         { text: 'OK' },
       ]);
     } else {
@@ -392,11 +385,11 @@ export const DocEditScreen = () => {
         />
         <SelectableInput
           label="Тип документа"
-          value={docDocumentType?.description}
+          value={documentType?.description}
           onPress={handlePresentType}
           disabled={isBlocked}
         />
-        {!!docDocumentType?.fromType && docFromContactType && (
+        {!!documentType?.fromType && docFromContactType && (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
             <View style={localStyles.contact}>
               <Menu
@@ -412,14 +405,14 @@ export const DocEditScreen = () => {
               />
             </View>
             <SelectableInput
-              label={docDocumentType.fromDescription}
+              label={documentType.fromDescription}
               value={docFromContact?.name}
               onPress={handleFromContact}
               disabled={isBlocked}
             />
           </View>
         )}
-        {!!docDocumentType?.toType && docToContactType && (
+        {!!documentType?.toType && docToContactType && (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
             <View style={localStyles.contact}>
               <Menu
@@ -435,7 +428,7 @@ export const DocEditScreen = () => {
               />
             </View>
             <SelectableInput
-              label={docDocumentType.toDescription}
+              label={documentType.toDescription}
               value={docToContact?.name}
               onPress={handleToContact}
               disabled={isBlocked}

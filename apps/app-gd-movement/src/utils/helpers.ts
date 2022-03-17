@@ -1,7 +1,8 @@
 import { log } from '@lib/mobile-app';
-import { IDepartment, INamedEntity } from '@lib/types';
+import { INamedEntity } from '@lib/types';
 
-import { IGood, IMGoodData, IMGoodRemain, IModelRem, IRemains, IRemainsData, IRemGood } from '../store/app/types';
+import { IGood, IMGoodData, IMGoodRemain, IModelRem, IRemainsData, IRemGood } from '../store/app/types';
+import { IMovementDocument } from '../store/types';
 
 const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   let matched = 0;
@@ -56,27 +57,26 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
   }
 };
 
+export const getNextDocNumber = (documents: IMovementDocument[]) => {
+  return (
+    documents
+      ?.map((item) => parseInt(item.number, 10))
+      .reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
+  ).toString();
+};
+
 /**Возвращает модель товаров с информацией по остаткам в виде:
   { "123456789" : { good: { id: '1', name: 'Товар 1', value: 'шт.', ...}, remains: [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]},
     "987654321" : { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, remains: [{ price: 1.3, q: 1 }, { price: 1.4, q: 2 }]},
     "111111111" : { good: { id: '3', name: 'Товар 3', value: 'шт.', ...}},
   }
 */
-const getRemGoodByContact = (
-  contacts: IDepartment[],
-  goods: IGood[],
-  remains: IRemainsData[],
-  // contactId: string,
-  isRemains: boolean | undefined = false,
-) => {
-  log('getRemGoodByContact', 'Начало построения модели товаров по баркоду по подразделению');
+const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
+  log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
 
   const remGoods: IMGoodData<IMGoodRemain> = {};
-  // const contact = contacts.find((con) => con.id === contactId);
 
   if (goods.length) {
-    // log('getRemGoodByContact', `подразделение: ${contact.name}`);
-
     if (remains.length) {
       //Формируем объект остатков тмц
       const remainsByGoodId = getRemainsByGoodId(remains);
@@ -100,7 +100,7 @@ const getRemGoodByContact = (
     }
   }
 
-  log('getRemGoodByContact', 'Окончание построения модели товаров по баркоду по подразделению');
+  log('getRemGoodByContact', 'Окончание построения модели товаров по подразделению в разрезе штрихкодов');
   return remGoods;
 };
 
@@ -111,24 +111,15 @@ const getRemGoodByContact = (
     { good: { id: '2', name: 'Товар 2', value: 'шт.', ...}, price: 0, remains: 0}
   ]
 */
-const getRemGoodListByContact = (
-  // contacts: IDepartment[],
-  goods: IGood[],
-  remains: IRemainsData[],
-  // contactId: string,
-  isRemains: boolean | undefined = false,
-) => {
+const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRemains: boolean | undefined = false) => {
   log('getRemGoodListByContact', 'Начало построения массива товаров по подразделению');
 
   const remGoods: IRemGood[] = [];
-  // const c = contacts.find((con) => con.id === contactId);
   if (goods.length) {
-    // log('getRemGoodListByContact', `подразделение: ${c.name}`);
     //Если есть остатки, то формируем модель остатков по ид товара
     if (remains.length) {
       //Формируем объект остатков тмц
       const remainsByGoodId = getRemainsByGoodId(remains);
-      console.log('remainsByGoodId', remainsByGoodId);
 
       //Формируем массив товаров, добавив свойство цены и остатка
       //Если по товару нет остатков и если модель не для выбора из справочника тмц, (не из остатков)
@@ -143,7 +134,6 @@ const getRemGoodListByContact = (
             });
           }
         } else if (!isRemains) {
-          console.log('111111');
           remGoods.push({
             good,
             price: 0,
@@ -152,7 +142,6 @@ const getRemGoodListByContact = (
         }
       }
     } else if (!isRemains) {
-      console.log('22222');
       //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара c 0
       for (const good of goods) {
         remGoods.push({ good, price: 0, remains: 0 });
@@ -161,7 +150,6 @@ const getRemGoodListByContact = (
   }
 
   log('getRemGoodListByContact', 'Окончание построения массива товаров по подразделению');
-  console.log('remGoods11111', remains.length, remGoods.length);
   return remGoods;
 };
 
