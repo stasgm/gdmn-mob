@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import styles from '../../styles/global';
 
 import { getStatusColor } from './constants';
 export interface IListItemProps {
+  children?: ReactNode;
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -20,6 +21,7 @@ export interface IListItemProps {
 }
 
 const ScreenListItem = ({
+  children,
   title,
   subtitle,
   status,
@@ -41,7 +43,7 @@ const ScreenListItem = ({
             <Text style={styles.name}>{title}</Text>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{subtitle}</Text>
+            <Text style={[styles.field, { color: colors.text }]}>{subtitle ? subtitle : children}</Text>
             <View style={styles.rowCenter}>
               <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
