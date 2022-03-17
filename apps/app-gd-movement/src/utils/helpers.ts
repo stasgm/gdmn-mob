@@ -91,7 +91,7 @@ const getRemGoodByContact = (goods: IGood[], remains: IRemainsData[], isRemains:
         }
       }
     } else if (!isRemains) {
-      //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара без remains
+      //Если по контакту нет остатков и  выбор не из остатков, добавляем объект товара без remains
       for (const good of goods) {
         if (good.barcode) {
           remGoods[good.barcode] = { good };
