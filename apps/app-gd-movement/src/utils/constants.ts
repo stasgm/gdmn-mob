@@ -1,5 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
-import { IDocument, INamedEntity, Settings, StatusType } from '@lib/types';
+import { Settings, StatusType } from '@lib/types';
 
 import { IMovementDocument } from '../store/types';
 
