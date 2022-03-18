@@ -88,6 +88,7 @@ const ScanBarcodeScreen = () => {
           id: uuid(),
           quantity: 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
+          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
           barcode: remItem.good.barcode,
         };
@@ -115,6 +116,7 @@ const ScanBarcodeScreen = () => {
         id: uuid(),
         quantity: qty,
         price: remItem.remains?.length ? remItem.remains[0].price : 0,
+        buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
         remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
         barcode: remItem.good.barcode,
       };

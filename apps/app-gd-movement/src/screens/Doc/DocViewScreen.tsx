@@ -118,10 +118,14 @@ export const DocViewScreen = () => {
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
-        <View style={styles.rowCenter}>
-          <Text>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
-          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
-        </View>
+        <>
+          <Text style={styles.rowCenter}>{doc.documentType.description}</Text>
+          <View style={styles.rowCenter}>
+            <Text>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+
+            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+          </View>
+        </>
       </InfoBlock>
       <FlatList
         data={doc.lines}

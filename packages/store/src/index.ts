@@ -15,6 +15,7 @@ import { LoadDataFromDisk, PersistedMiddleware, SaveDataToDisk, TActions } from 
 import { authMiddlewareFactory } from './auth/middleware';
 import { documentMiddlewareFactory } from './documents/middleware';
 import { referenceMiddlewareFactory } from './references/middleware';
+import { appMiddlewareFactory } from './app/middleware';
 import { settingMiddlewareFactory } from './settings/middleware';
 // import { logMiddleware } from './logMiddleware';
 
@@ -90,6 +91,7 @@ export const configureStore = (
     authMiddlewareFactory,
     referenceMiddlewareFactory,
     settingMiddlewareFactory,
+    appMiddlewareFactory,
   ];
 
   const middleware = [

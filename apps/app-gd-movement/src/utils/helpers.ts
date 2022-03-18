@@ -130,6 +130,7 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRema
             remGoods.push({
               good,
               price: r.price,
+              buyingPrice: r.buyingPrice,
               remains: r.q,
             });
           }
@@ -137,6 +138,7 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRema
           remGoods.push({
             good,
             price: 0,
+            buyingPrice: 0,
             remains: 0,
           });
         }
@@ -144,7 +146,7 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRema
     } else if (!isRemains) {
       //Если по контакту нет остатков и выбор не из остатков, добавляем объект товара c 0
       for (const good of goods) {
-        remGoods.push({ good, price: 0, remains: 0 });
+        remGoods.push({ good, price: 0, buyingPrice: 0, remains: 0 });
       }
     }
   }

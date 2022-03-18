@@ -28,6 +28,7 @@ import { DocNavigator } from './src/navigation/DocNavigator';
 import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
 import { appSettings } from './src/utils/constants';
+import RemainsNavigator from './src/navigation/RemainsNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -37,6 +38,12 @@ const Root = () => {
         title: 'Документы',
         icon: 'file-document-outline',
         component: DocNavigator,
+      },
+      {
+        name: 'Remains',
+        title: 'Остатки',
+        icon: 'dolly',
+        component: RemainsNavigator,
       },
     ],
     [],

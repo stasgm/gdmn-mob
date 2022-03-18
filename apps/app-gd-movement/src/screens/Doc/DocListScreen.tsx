@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -38,6 +39,7 @@ export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
 
   const { loading } = useSelector((state) => state.documents);
+  const { colors } = useTheme();
 
   const list = useSelector((state) => state.documents.list).sort(
     (a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime(),
@@ -58,11 +60,11 @@ export const DocListScreen = () => {
     return res?.map((i) => {
       return {
         id: i.id,
-        title:
-          (i.documentType.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',
+        title: i.documentType.description,
+        // (i.documentType.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',
         documentDate: getDateString(i.documentDate),
         status: i.status,
-        subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
+        // subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
         isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
@@ -111,7 +113,21 @@ export const DocListScreen = () => {
     const doc = list?.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="DocView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })} />
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })}>
+          <View>
+            <Text style={[styles.field, { color: colors.text }]}>
+              {
+                (doc.documentType.remainsField === 'fromContact'
+                  ? doc.head.fromContact?.name
+                  : doc.head.toContact?.name) || ''
+                // doc.documentType.description
+              }
+            </Text>
+            <Text style={[styles.field, { color: colors.text }]}>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </Text>
+          </View>
+        </ScreenListItem>
       </SwipeListItem>
     ) : null;
   };
