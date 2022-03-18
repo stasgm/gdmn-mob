@@ -18,6 +18,7 @@ export interface IListItemProps {
   errorMessage?: string;
   id: string;
   onSelectItem?: () => void;
+  documentType?: string;
 }
 
 const ScreenListItem = ({

@@ -37,7 +37,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Покупная цена</Text>
-          <Text style={[styles.number, styles.field]}>{item?.buyingPrice}</Text>
+          <Text style={[styles.number, styles.field]}>{item?.buyingPrice || '0'}</Text>
         </View>
       </View>
       <ItemSeparator />

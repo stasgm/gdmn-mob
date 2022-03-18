@@ -1,4 +1,5 @@
 import { IListItem } from '@lib/mobile-types';
+import { Status } from '@lib/mobile-ui';
 import { Settings, StatusType } from '@lib/types';
 
 import { IMovementDocument } from '../store/types';
@@ -11,6 +12,25 @@ export const contactTypes: IListItem[] = [
   { id: 'department', value: 'Подразделение' },
   { id: 'contact', value: 'Организация' },
   { id: 'employee', value: 'Сотрудник' },
+];
+
+interface StatusTypes {
+  name: string;
+  status: Status;
+}
+export const statusTypes: IListItem[] = [
+  {
+    id: 'all',
+    value: 'Все',
+  },
+  {
+    id: 'active',
+    value: 'Активные',
+  },
+  {
+    id: 'archive',
+    value: 'Архив',
+  },
 ];
 
 export const getStatusColor = (status: StatusType) => {

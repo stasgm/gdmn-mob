@@ -111,15 +111,16 @@ export const DocViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={
-          (doc.documentType.remainsField === 'fromContact' ? doc.head.fromContact?.name : doc.head.toContact?.name) ||
-          ''
-        }
+        title={doc.documentType.description || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
         <>
-          <Text style={styles.rowCenter}>{doc.documentType.description}</Text>
+          <Text style={styles.rowCenter}>
+            {(doc.documentType.remainsField === 'fromContact'
+              ? doc.head.fromContact?.name
+              : doc.head.toContact?.name) || ''}
+          </Text>
           <View style={styles.rowCenter}>
             <Text>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
 
