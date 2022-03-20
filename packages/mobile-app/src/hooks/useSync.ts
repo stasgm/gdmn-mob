@@ -188,7 +188,7 @@ const useSync = (onSync?: () => void): (() => void) => {
       if (errList?.length) {
         Alert.alert('Внимание!', `Во время синхронизации произошли ошибки:\n${errList.join('\n')}`, [{ text: 'OK' }]);
       } else {
-        Alert.alert('', 'Синхронизация прошла успешно', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Синхронизация прошла успешно!', [{ text: 'OK' }]);
         dispatch(appActions.setSyncDate(new Date()));
       }
     };

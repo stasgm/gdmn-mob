@@ -285,50 +285,6 @@ export const DocListScreen = () => {
           style={[localStyles.btnTab, localStyles.lastBtnTab]}
         />
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={[localStyles.menu, { width: '33%' }]}>
-          <TouchableOpacity>
-            <Text /*style={[{ color: textColor ? textColor : disabled ? colors.disabled : colors.primary }]}*/>
-              Тип
-            </Text>
-          </TouchableOpacity>
-          <IconButton
-            icon={'chevron-down'}
-            size={25}
-            // color={textColor ? textColor : disabled ? colors.disabled : colors.primary}
-          />
-        </View>
-        <View style={localStyles.menu}>
-          <TouchableOpacity>
-            <Text /*style={[{ color: textColor ? textColor : disabled ? colors.disabled : colors.primary }]}*/>
-              Тип
-            </Text>
-          </TouchableOpacity>
-          <IconButton
-            icon={'chevron-down'}
-            size={25}
-            // color={textColor ? textColor : disabled ? colors.disabled : colors.primary}
-          />
-        </View>
-        <View style={localStyles.menu}>
-          <TouchableOpacity>
-            <Text /*style={[{ color: textColor ? textColor : disabled ? colors.disabled : colors.primary }]}*/>
-              Тип
-            </Text>
-          </TouchableOpacity>
-          <IconButton
-            icon={'chevron-down'}
-            size={25}
-            // color={textColor ? textColor : disabled ? colors.disabled : colors.primary}
-          />
-        </View>
-      </View>
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
