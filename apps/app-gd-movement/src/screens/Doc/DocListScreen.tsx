@@ -39,7 +39,7 @@ import { IDocumentType } from '@lib/types';
 import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { statusTypes } from '../../utils/constants';
+import { statusTypes, dataTypes } from '../../utils/constants';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -60,6 +60,8 @@ export const DocListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
+  const [date, setDate] = useState(dataTypes[0]);
+
   const list = useSelector((state) => state.documents.list)
     ?.filter((i) =>
       i?.head?.fromContact?.name || i?.head?.toContact?.name || i.documentType.description || i.number || i.documentDate
@@ -71,7 +73,11 @@ export const DocListScreen = () => {
           getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
         : true,
     )
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IMovementDocument[];
+    .sort((a, b) =>
+      date.id === 'new'
+        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    ) as IMovementDocument[];
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -91,10 +97,7 @@ export const DocListScreen = () => {
     );
   }, [documentTypes]);
 
-  const statuss = statusTypes;
-
   const [type, setType] = useState(docTypes[0]);
-  const [date, setDate] = useState(docTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     if (!list.length) {
@@ -183,19 +186,17 @@ export const DocListScreen = () => {
   const [visibleStatus, setVisibleStatus] = useState(false);
   const [visibleDate, setVisibleDate] = useState(false);
 
-  console.log('dt', docTypes);
-  console.log('st', statuss);
-
-  const handleType = () => {
+  const handleSelectType = () => {
     return setVisibleType(true);
   };
-  const handleStatus = () => {
+  const handleSelectStatus = () => {
     return setVisibleStatus(true);
   };
 
-  const handleDate = () => {
+  const handleSelectDate = () => {
     return setVisibleDate(true);
   };
+
   const handleDismissType = () => {
     return setVisibleType(false);
   };
@@ -206,18 +207,18 @@ export const DocListScreen = () => {
     return setVisibleDate(false);
   };
 
-  const handleT = useCallback((option) => {
+  const handleApplyType = useCallback((option) => {
     setVisibleType(false);
     setType(option);
   }, []);
 
-  const handleS = useCallback((option) => {
+  const handleApplyStatus = useCallback((option) => {
     setVisibleStatus(false);
     setStatus(option.id);
   }, []);
-  const handleD = useCallback((option) => {
+  const handleApplyDate = useCallback((option) => {
     setVisibleDate(false);
-    setDate(option.id);
+    setDate(option);
   }, []);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
@@ -250,9 +251,9 @@ export const DocListScreen = () => {
         <Menu
           title="Тип"
           visible={visibleType}
-          onChange={handleT}
+          onChange={handleApplyType}
           onDismiss={handleDismissType}
-          onPress={handleType}
+          onPress={handleSelectType}
           options={docTypes}
           activeOptionId={type?.id}
           style={[
@@ -266,10 +267,10 @@ export const DocListScreen = () => {
         <Menu
           title="Статус"
           visible={visibleStatus}
-          onChange={handleS}
+          onChange={handleApplyStatus}
           onDismiss={handleDismissStatus}
-          onPress={handleStatus}
-          options={statuss}
+          onPress={handleSelectStatus}
+          options={statusTypes}
           activeOptionId={status}
           style={[localStyles.btnTab, status !== 'all' && { backgroundColor: notSearchColors.primary }]}
           textColor={status === 'all' ? notSearchColors.primary : notSearchColors.background}
@@ -277,12 +278,17 @@ export const DocListScreen = () => {
         <Menu
           title="Дата"
           visible={visibleDate}
-          onChange={handleD}
+          onChange={handleApplyDate}
           onDismiss={handleDismissDate}
-          onPress={handleDate}
-          options={statuss}
+          onPress={handleSelectDate}
+          options={dataTypes}
           activeOptionId={date.id}
-          style={[localStyles.btnTab, localStyles.lastBtnTab]}
+          style={[
+            localStyles.btnTab,
+            localStyles.lastBtnTab,
+            date.id === 'old' && { backgroundColor: notSearchColors.primary },
+          ]}
+          textColor={date.id === 'new' ? notSearchColors.primary : notSearchColors.background}
         />
       </View>
       {filterVisible && (
