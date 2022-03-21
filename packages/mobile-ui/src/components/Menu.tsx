@@ -1,7 +1,6 @@
 import { IListItem } from '@lib/mobile-types';
 import React from 'react';
-import { StyleSheet, View, Text, LogBox, StyleProp, ViewStyle, ColorValue } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from 'react-native';
 import { IconButton, Menu as PaperMenu, useTheme } from 'react-native-paper';
 
 interface Props {
@@ -15,10 +14,8 @@ interface Props {
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   menuStyle?: StyleProp<ViewStyle>;
-  textColor?: /*ColorValue*/ string;
+  isActive?: boolean;
 }
-
-LogBox.ignoreAllLogs();
 
 const Menu = ({
   options,
@@ -31,41 +28,47 @@ const Menu = ({
   disabled,
   style,
   menuStyle,
-  textColor,
+  isActive = false,
 }: Props) => {
   const { colors } = useTheme();
+
   return (
-    <View style={style ? style : localStyles.container}>
+    <View style={[style, isActive && { backgroundColor: colors.primary }]}>
       <PaperMenu
         visible={visible}
         onDismiss={onDismiss}
         anchor={
-          <View style={menuStyle ? menuStyle : localStyles.menu}>
-            <TouchableOpacity onPress={onPress} disabled={disabled}>
-              <Text style={[{ color: textColor ? textColor : disabled ? colors.disabled : colors.primary }]}>
-                {title}
-              </Text>
-            </TouchableOpacity>
+          <View style={[localStyles.menu, menuStyle]}>
+            <Text
+              style={{
+                color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
+              }}
+            >
+              {title}
+            </Text>
             <IconButton
               icon={'chevron-down'}
-              size={25}
+              size={20}
               onPress={onPress}
               disabled={disabled}
-              color={textColor ? textColor : disabled ? colors.disabled : colors.primary}
+              color={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
             />
           </View>
         }
       >
-        {options.map((option: any) => (
-          <View key={option?.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <IconButton
-              icon={activeOptionId === option?.id ? 'check' : ''}
-              size={20}
-              onPress={onPress}
-              disabled={disabled}
-            />
-            <PaperMenu.Item onPress={() => onChange(option)} title={option?.value} key={option?.id} />
-          </View>
+        {options.map((option: IListItem) => (
+          <TouchableHighlight
+            activeOpacity={0.7}
+            underlayColor="#DDDDDD"
+            key={option.id}
+            onPress={() => onChange(option)}
+            disabled={disabled}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <IconButton icon={activeOptionId === option.id ? 'check' : ''} size={20} />
+              <PaperMenu.Item title={option.value} />
+            </View>
+          </TouchableHighlight>
         ))}
       </PaperMenu>
     </View>
@@ -76,11 +79,11 @@ const localStyles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    // paddingLeft: 10,
   },
   menu: {
-    alignItems: 'center',
     flexDirection: 'row',
+    alignItems: 'center',
+    display: 'flex',
   },
 });
 

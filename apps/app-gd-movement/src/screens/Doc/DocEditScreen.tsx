@@ -390,7 +390,7 @@ export const DocEditScreen = () => {
         />
         {!!docDocumentType?.fromType && docFromContactType && (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.contact}>
+            <View style={localStyles.contactType}>
               <Menu
                 key={'fromType'}
                 options={contactTypes}
@@ -401,6 +401,8 @@ export const DocEditScreen = () => {
                 visible={visibleFrom}
                 activeOptionId={docFromContactType?.id}
                 disabled={isBlocked}
+                // menuStyle={localStyles.contactType}
+                style={localStyles.btnTab}
               />
             </View>
             <SelectableInput
@@ -413,7 +415,7 @@ export const DocEditScreen = () => {
         )}
         {!!docDocumentType?.toType && docToContactType && (
           <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.contact}>
+            <View style={[localStyles.contactType]}>
               <Menu
                 key={'toType'}
                 options={contactTypes}
@@ -424,6 +426,8 @@ export const DocEditScreen = () => {
                 visible={visibleTo}
                 activeOptionId={docToContactType?.id}
                 disabled={isBlocked}
+                // menuStyle={localStyles.contactType}
+                style={localStyles.btnTab}
               />
             </View>
             <SelectableInput
@@ -469,8 +473,11 @@ export const localStyles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
   },
-  contact: {
-    marginTop: -5,
-    marginBottom: -10,
+  contactType: {
+    marginTop: -1,
+    marginBottom: -4,
+  },
+  btnTab: {
+    alignItems: 'flex-end',
   },
 });

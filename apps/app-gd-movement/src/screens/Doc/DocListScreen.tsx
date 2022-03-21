@@ -1,16 +1,7 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import {
-  StyleSheet,
-  SectionList,
-  ListRenderItem,
-  SectionListData,
-  View,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import { useNavigation, useTheme as useSearchTheme } from '@react-navigation/native';
-import { IconButton, Searchbar, useTheme } from 'react-native-paper';
+import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { IconButton, Searchbar } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -20,7 +11,6 @@ import {
   DrawerButton,
   SubTitle,
   AddButton,
-  FilterButtons,
   ScreenListItem,
   IListItemProps,
   Menu,
@@ -54,8 +44,7 @@ export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
 
   const { loading } = useSelector((state) => state.documents);
-  const notSearchColors = useTheme().colors;
-  const { colors } = useSearchTheme();
+  const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -77,19 +66,19 @@ export const DocListScreen = () => {
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
 
-  const docTypes: IListItem[] = useMemo(() => {
-    const res = [{ id: 'all', value: 'Все' }];
-
-    return res.concat(
-      documentTypes?.map((i) => {
-        return {
-          id: i.name,
-          value: i.description,
-          // (i.documentType.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',,
-        } as IListItem;
-      }),
-    );
-  }, [documentTypes]);
+  const docTypes: IListItem[] = useMemo(
+    () =>
+      [{ id: 'all', value: 'Все' }].concat(
+        documentTypes?.map(
+          (i) =>
+            ({
+              id: i.name,
+              value: i.description || '',
+            } as IListItem),
+        ),
+      ),
+    [documentTypes],
+  );
 
   const statuss = statusTypes;
 
@@ -183,9 +172,6 @@ export const DocListScreen = () => {
   const [visibleStatus, setVisibleStatus] = useState(false);
   const [visibleDate, setVisibleDate] = useState(false);
 
-  console.log('dt', docTypes);
-  console.log('st', statuss);
-
   const handleType = () => {
     return setVisibleType(true);
   };
@@ -246,24 +232,22 @@ export const DocListScreen = () => {
   return (
     <AppScreen>
       {/* <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} /> */}
-      <View style={[localStyles.container, styles.marginBottom5]}>
+      <View style={[styles.containerCenter, localStyles.container]}>
         <Menu
+          key={'MenuType'}
           title="Тип"
           visible={visibleType}
           onChange={handleT}
           onDismiss={handleDismissType}
           onPress={handleType}
           options={docTypes}
-          activeOptionId={type?.id}
-          style={[
-            localStyles.btnTab,
-            localStyles.firstBtnTab,
-            type.id !== 'all' && { backgroundColor: notSearchColors.primary },
-          ]}
-          textColor={type.id === 'all' ? notSearchColors.primary : notSearchColors.background}
+          activeOptionId={type.id}
+          style={[styles.btnTab, styles.firstBtnTab]}
           menuStyle={localStyles.menu}
+          isActive={type.id !== 'all'}
         />
         <Menu
+          key={'MenuStatus'}
           title="Статус"
           visible={visibleStatus}
           onChange={handleS}
@@ -271,10 +255,12 @@ export const DocListScreen = () => {
           onPress={handleStatus}
           options={statuss}
           activeOptionId={status}
-          style={[localStyles.btnTab, status !== 'all' && { backgroundColor: notSearchColors.primary }]}
-          textColor={status === 'all' ? notSearchColors.primary : notSearchColors.background}
+          style={[styles.btnTab]}
+          menuStyle={localStyles.menu}
+          isActive={status !== 'all'}
         />
         <Menu
+          key={'MenuDataSort'}
           title="Дата"
           visible={visibleDate}
           onChange={handleD}
@@ -282,7 +268,9 @@ export const DocListScreen = () => {
           onPress={handleDate}
           options={statuss}
           activeOptionId={date.id}
-          style={[localStyles.btnTab, localStyles.lastBtnTab]}
+          style={[styles.btnTab, styles.lastBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={date.id !== 'all'}
         />
       </View>
       {filterVisible && (
@@ -315,37 +303,11 @@ export const DocListScreen = () => {
 
 const localStyles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    // marginHorizontal: 5,
-    // paddingLeft: 10,
+    marginBottom: 5,
   },
   menu: {
-    // flex: 1,
-    // display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-  },
-  btnTab: {
-    flex: 1,
-    flexDirection: 'row',
-    borderWidth: 0.5,
-    // padding: 10,
-    marginHorizontal: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    height: 40,
-
-    width: '30%',
-  },
-  firstBtnTab: {
-    borderTopLeftRadius: 3,
-    borderBottomLeftRadius: 3,
-  },
-  lastBtnTab: {
-    borderTopRightRadius: 3,
-    borderBottomRightRadius: 3,
+    marginLeft: 6,
+    width: '100%',
   },
 });
