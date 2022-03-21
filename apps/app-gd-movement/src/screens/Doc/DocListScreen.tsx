@@ -105,11 +105,9 @@ export const DocListScreen = () => {
       return {
         id: i.id,
         title: i.documentType.description || '',
-        // (i.documentType.remainsField === 'fromContact' ? i.head.fromContact?.name : i.head.toContact?.name) || '',
         documentDate: getDateString(i.documentDate),
         status: i.status,
         documentType: i.documentType.name,
-        // subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}`,
         isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
@@ -217,12 +215,9 @@ export const DocListScreen = () => {
         <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })}>
           <View>
             <Text style={[styles.field, { color: colors.text }]}>
-              {
-                (doc.documentType.remainsField === 'fromContact'
-                  ? doc.head.fromContact?.name
-                  : doc.head.toContact?.name) || ''
-                // doc.documentType.description
-              }
+              {(doc.documentType.remainsField === 'fromContact'
+                ? doc.head.fromContact?.name
+                : doc.head.toContact?.name) || ''}
             </Text>
             <Text style={[styles.field, { color: colors.text }]}>
               № {doc.number} на {getDateString(doc.documentDate)}
@@ -235,7 +230,6 @@ export const DocListScreen = () => {
 
   return (
     <AppScreen>
-      {/* <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} /> */}
       <View style={[styles.containerCenter, localStyles.container]}>
         <Menu
           key={'MenuType'}

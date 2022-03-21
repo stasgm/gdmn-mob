@@ -100,7 +100,6 @@ export const DocEditScreen = () => {
         }),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, doc, documents, documentTypes]);
 
   const handleSave = useCallback(() => {

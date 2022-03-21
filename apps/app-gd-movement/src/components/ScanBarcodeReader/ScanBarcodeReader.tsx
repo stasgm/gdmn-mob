@@ -92,7 +92,6 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
     >
       <View style={styles.camera}>
         <View style={styles.header}>
-          {/* <IconButton icon="arrow-left" color={'#FFF'} size={30} style={scanReader.transparent} onPress={onGoBack} /> */}
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             color={'#FFF'}

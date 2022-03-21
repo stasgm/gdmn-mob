@@ -3,7 +3,7 @@ import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { IReferenceData } from '@lib/types';
-import { appActions, IFormParam, refSelectors, useSelector } from '@lib/store';
+import { appActions, refSelectors, useSelector } from '@lib/store';
 import {
   AppScreen,
   BackButton,
