@@ -82,23 +82,18 @@ export const SelectRefItemScreen = () => {
 
   const handleSelectItem = useCallback(
     (item: IReferenceData) => {
-      // const returnItem = { id: item.id, [refFieldName]: item[refFieldName] };
-      // item.description;
-      // ? { id: item.id, name: item.name, description: item.description }
-      // : { id: item.id, name: item.name };
       if (isMulti) {
         setCheckedItem((prev) => [...(prev as IReferenceData[]), item]);
       } else {
         dispatch(
           appActions.setFormParams({
-            ...formParams,
             [fieldName]: item,
           }),
         );
         navigation.goBack();
       }
     },
-    [isMulti, dispatch, formParams, fieldName, navigation],
+    [isMulti, dispatch, fieldName, navigation],
   );
 
   const renderItem = useCallback(
@@ -122,11 +117,11 @@ export const SelectRefItemScreen = () => {
                   Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
                   return;
                 }
-                const newFormParams: IFormParam = {
-                  ...formParams,
-                  [fieldName]: checkedItem,
-                };
-                dispatch(appActions.setFormParams(newFormParams));
+                // const newFormParams: IFormParam = {
+                //   ...formParams,
+                //   [fieldName]: checkedItem,
+                // };
+                dispatch(appActions.setFormParams({ [fieldName]: checkedItem }));
                 navigation.goBack();
               }}
             />

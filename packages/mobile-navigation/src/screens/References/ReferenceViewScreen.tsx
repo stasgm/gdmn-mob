@@ -60,8 +60,6 @@ const ReferenceViewScreen = () => {
   return (
     <AppScreen>
       <SubTitle style={[styles.title]}>{list?.description || list.name}</SubTitle>
-      {/* <ItemSeparator /> */}
-      {/* <ScreenTitle line={false}>{list?.name}</ScreenTitle> */}
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
