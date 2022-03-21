@@ -33,8 +33,9 @@ const GoodListScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
+
   const [goodRemains] = useState<IRemGood[]>(() =>
-    contact?.id ? getRemGoodListByContact(contacts, goods, remains, contact.id, true) : [],
+    contact?.id ? getRemGoodListByContact(goods, remains[contact.id], true) : [],
   );
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -125,7 +126,7 @@ const GoodListScreen = () => {
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={!goods || !goodRemains ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={!goods || !goodRemains.length ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>
   );
