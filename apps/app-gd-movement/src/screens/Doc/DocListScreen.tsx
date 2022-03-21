@@ -108,8 +108,8 @@ export const DocListScreen = () => {
         ? list
         : status === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        : status !== 'archive' && status !== 'all'
+        ? list.filter((e) => e.status === status)
         : [];
 
     return res.map((i) => {

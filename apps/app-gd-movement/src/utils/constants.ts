@@ -30,8 +30,20 @@ export const statusTypes: IListItem[] = [
     value: 'Активные',
   },
   {
-    id: 'archive',
-    value: 'Архив',
+    id: 'DRAFT',
+    value: 'Черновик',
+  },
+  {
+    id: 'READY',
+    value: 'Готово',
+  },
+  {
+    id: 'SENT',
+    value: 'Отправлено',
+  },
+  {
+    id: 'PROCESSED',
+    value: 'Обработано',
   },
 ];
 
