@@ -23,6 +23,8 @@ const globalStyles = StyleSheet.create({
     marginHorizontal: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    borderTopLeftRadius: 1,
+    borderBottomLeftRadius: 1,
   },
   firstBtnTab: {
     borderTopLeftRadius: 3,

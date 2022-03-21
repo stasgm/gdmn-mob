@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from
 import { IconButton, Menu as PaperMenu, useTheme } from 'react-native-paper';
 
 interface Props {
-  options: any;
+  options: IListItem[];
   activeOptionId?: string;
   visible?: any;
   onChange: (option: IListItem) => void;
@@ -42,6 +42,7 @@ const Menu = ({
             <Text
               style={{
                 color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
+                fontSize: 15,
               }}
             >
               {title}
@@ -56,17 +57,17 @@ const Menu = ({
           </View>
         }
       >
-        {options.map((option: IListItem) => (
+        {options?.map((option) => (
           <TouchableHighlight
             activeOpacity={0.7}
             underlayColor="#DDDDDD"
-            key={option.id}
+            key={`${title}${option?.id}`}
             onPress={() => onChange(option)}
             disabled={disabled}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <IconButton icon={activeOptionId === option.id ? 'check' : ''} size={20} />
-              <PaperMenu.Item title={option.value} />
+              <IconButton icon={activeOptionId === option?.id ? 'check' : ''} size={20} />
+              <PaperMenu.Item title={option?.value} />
             </View>
           </TouchableHighlight>
         ))}

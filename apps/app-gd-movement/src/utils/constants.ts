@@ -1,10 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
-import { Status } from '@lib/mobile-ui';
 import { Settings, StatusType } from '@lib/types';
 
 import { IGood } from '../store/app/types';
-
-import { IMovementDocument } from '../store/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
@@ -16,10 +13,6 @@ export const contactTypes: IListItem[] = [
   { id: 'employee', value: 'Сотрудник' },
 ];
 
-interface StatusTypes {
-  name: string;
-  status: Status;
-}
 export const statusTypes: IListItem[] = [
   {
     id: 'all',
