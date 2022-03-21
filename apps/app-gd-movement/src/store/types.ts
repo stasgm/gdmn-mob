@@ -30,30 +30,16 @@ export interface IDocFormParam extends IFormParam {
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
 
+// export interface IDocumentType extends INamedEntity {
+//   description?: string;
+// }
+
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
   contractDate: string; // Дата договора
   paycond: string; // Условие оплаты
   phoneNumber: string; // Номер телефона
 }
-
-// export interface IInventoryHead extends IHead {
-//   department?: IDepartment; //Подразделение
-//   comment?: string; // Комvентарий
-// }
-
-// export interface IInventoryLine extends IEntity {
-//   good: INamedEntity;
-//   quantity: number;
-//   packagekey?: INamedEntity; // Вид упаковки
-//   price?: number;
-//   remains?: number;
-//   barcode?: string;
-//   EID?: string;
-//   docType?: string;
-// }
-
-// export type IInventoryDocument = MandateProps<IDocument<IInventoryHead, IInventoryLine>, 'head' | 'lines'>;
 
 export interface IMovementHead extends IHead {
   fromContact?: Department;
@@ -66,7 +52,6 @@ export interface IMovementHead extends IHead {
 export interface IMovementLine extends IEntity {
   good: INamedEntity;
   quantity: number;
-  // packagekey?: INamedEntity; // Вид упаковки
   price?: number;
   buyingPrice?: number;
   remains?: number;

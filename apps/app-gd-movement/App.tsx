@@ -4,7 +4,15 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
 
-import { appActions, appSelectors, authSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
+import {
+  appActions,
+  appSelectors,
+  authActions,
+  authSelectors,
+  settingsActions,
+  useDispatch,
+  useSelector,
+} from '@lib/store';
 import {
   AppScreen,
   globalStyles as styles,

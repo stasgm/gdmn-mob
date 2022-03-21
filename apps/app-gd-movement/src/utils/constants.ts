@@ -2,6 +2,8 @@ import { IListItem } from '@lib/mobile-types';
 import { Status } from '@lib/mobile-ui';
 import { Settings, StatusType } from '@lib/types';
 
+import { IGood } from '../store/app/types';
+
 import { IMovementDocument } from '../store/types';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
@@ -28,8 +30,31 @@ export const statusTypes: IListItem[] = [
     value: 'Активные',
   },
   {
-    id: 'archive',
-    value: 'Архив',
+    id: 'DRAFT',
+    value: 'Черновик',
+  },
+  {
+    id: 'READY',
+    value: 'Готово',
+  },
+  {
+    id: 'SENT',
+    value: 'Отправлено',
+  },
+  {
+    id: 'PROCESSED',
+    value: 'Обработано',
+  },
+];
+
+export const dataTypes: IListItem[] = [
+  {
+    id: 'new',
+    value: 'Сначала новые',
+  },
+  {
+    id: 'old',
+    value: 'Сначала старые',
   },
 ];
 
@@ -100,10 +125,9 @@ export const appSettings: Settings = {
   },
 };
 
-export const getNextDocNumber = (documents: IMovementDocument[]) => {
-  return (
-    documents
-      ?.map((item) => parseInt(item.number, 10))
-      .reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
-  ).toString();
+export const unknownGood: IGood = {
+  id: 'unknown',
+  alias: 'unknown',
+  name: 'Неизвестный товар',
+  goodGroup: { id: 'unknown', name: 'Неизвестная группа' },
 };

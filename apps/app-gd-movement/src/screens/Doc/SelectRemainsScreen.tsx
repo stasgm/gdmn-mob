@@ -9,7 +9,7 @@ import { refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { IDepartment } from '@lib/types';
+import { IDocumentType } from '@lib/types';
 
 import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -54,7 +54,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
           <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
-              {item.remains} {item.good.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
+              {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
               руб.
             </Text>
             {barcode && (
@@ -77,22 +77,23 @@ export const SelectRemainsScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
-  const contactTypeId =
-    document?.documentType.remainsField === 'fromContact'
-      ? document?.head?.fromContactType?.id
-      : document?.head?.toContactType?.id;
-
   const goods = refSelectors.selectByName<IGood>('good').data;
-  const contacts = refSelectors.selectByName<IDepartment>(contactTypeId || 'department').data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
+  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
 
-  const contactId =
-    document?.documentType?.remainsField === 'fromContact'
-      ? document?.head?.fromContact?.id
-      : document?.head?.toContact?.id;
+  const documentType = useMemo(
+    () => documentTypes.find((d) => d.id === document.documentType.id),
+    [document.documentType.id, documentTypes],
+  );
+
+  const contactId = useMemo(
+    () =>
+      documentType?.remainsField === 'fromContact' ? document?.head?.fromContact?.id : document?.head?.toContact?.id,
+    [document?.head?.fromContact?.id, document?.head?.toContact?.id, documentType?.remainsField],
+  );
 
   const [goodRemains] = useState<IRemGood[]>(() =>
-    contactId ? getRemGoodListByContact(contacts, goods, remains, contactId, document?.documentType.isRemains) : [],
+    contactId ? getRemGoodListByContact(goods, remains[contactId], documentType?.isRemains) : [],
   );
 
   const [searchQuery, setSearchQuery] = useState('');
