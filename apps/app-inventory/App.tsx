@@ -4,15 +4,7 @@ import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 import ErrorBoundary from 'react-native-error-boundary';
 
-import {
-  appActions,
-  appSelectors,
-  authSelectors,
-  refSelectors,
-  settingsActions,
-  useDispatch,
-  useSelector,
-} from '@lib/store';
+import { appActions, appSelectors, authSelectors, settingsActions, useDispatch, useSelector } from '@lib/store';
 import {
   AppScreen,
   globalStyles as styles,
@@ -25,10 +17,8 @@ import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
 import { InventoryNavigator } from './src/navigation/InventoryNavigator';
 
-import { store, useAppInventoryThunkDispatch, useSelector as useInvSelector, appInventoryActions } from './src/store';
+import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
-import { IDepartment } from './src/store/types';
-import { IMDGoodRemain, IMGoodData, IModelData, IGood, IRemains, IMGoodRemain } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
 
 const Root = () => {
@@ -46,13 +36,9 @@ const Root = () => {
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const appInventoryDispatch = useAppInventoryThunkDispatch();
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
-  const departments = refSelectors.selectByName<IDepartment>('department')?.data;
-  const remains = refSelectors.selectByName<IRemains>('remain')?.data;
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
@@ -77,35 +63,6 @@ const Root = () => {
       dispatch(appActions.loadSuperDataFromDisc());
     }
   }, [dispatch, isLogged]);
-
-  useEffect(() => {
-    const getRemainsModel = async () => {
-      if (!goods?.length || !departments?.length || !isLogged) {
-        return;
-      }
-      const model: IModelData<IMDGoodRemain> = departments?.reduce(
-        (contsprev: IModelData<IMDGoodRemain>, c: IDepartment) => {
-          const remGoods = goods?.reduce((goodsprev: IMGoodData<IMGoodRemain>, g: IGood) => {
-            goodsprev[g.id] = {
-              ...g,
-              remains:
-                remains
-                  ?.find((r) => r.contactId === c.id)
-                  ?.data?.filter((i) => i.goodId === g.id)
-                  ?.map((r) => ({ price: r.price, q: r.q })) || [],
-            };
-            return goodsprev;
-          }, {});
-          contsprev[c.id] = { contactName: c.name, goods: remGoods };
-          return contsprev;
-        },
-        {},
-      );
-      await appInventoryDispatch(appInventoryActions.setModel(model));
-    };
-
-    getRemainsModel();
-  }, [appInventoryDispatch, departments, goods, remains, isLogged]);
 
   const [loading, setLoading] = useState(true);
 
