@@ -93,10 +93,8 @@ export type IDepartment = INamedEntity;
 //   priceFsnSklad?: number; // цена ФСН склад
 // }
 
-export interface IGoodMatrix extends IEntity {
-  contactId: string;
-  onDate: string;
-  data: IMatrixData[];
+export interface IGoodMatrix {
+  [id: string]: IMatrixData[];
 }
 
 export interface IMatrixData {

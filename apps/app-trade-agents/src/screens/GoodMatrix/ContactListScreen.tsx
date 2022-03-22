@@ -29,17 +29,27 @@ const ContactListScreen = () => {
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
 
+  const matrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data[0];
+
+  console.log('matrix', matrix);
+
   const contacts = refSelectors
     .selectByName<IContact>('contact')
     ?.data.filter((i) => i.id === goodMatrix?.find((item) => item.contactId === i.id)?.contactId);
 
+  const contacts1 = refSelectors.selectByName<IContact>('contact')?.data;
+
+  const contacts2 = contacts1?.filter((i) => matrix?.[i.id]);
+
+  console.log('contatcts', contacts2);
+
   const filteredList = useMemo(() => {
     return (
-      contacts
+      contacts2
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, [contacts, searchQuery]);
+  }, [contacts2, searchQuery]);
 
   const sections = useMemo(
     () =>
