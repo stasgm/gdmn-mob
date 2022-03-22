@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { IApiConfig } from '@lib/client-types';
 import { AppScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -51,32 +52,38 @@ const ConfigScreen = (props: Props) => {
   };
 
   return (
-    <AppScreen>
-      <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
-      <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} clearInput={true} />
-      <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
-      {/* <Input label="Время ожидания, м\с" value={timeout} onChangeText={setTimeout} /> */}
-      <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} />
-      <View style={localStyles.buttonsView}>
-        <PrimeButton
-          icon="check"
-          onPress={handleSaveConfig}
-          style={localStyles.button}
-          disabled={!serverName || !serverPort || !timeout}
-        >
-          Сохранить
-        </PrimeButton>
-        <PrimeButton icon="cancel" onPress={handleCancel} style={localStyles.button}>
-          Отмена
-        </PrimeButton>
-      </View>
-      <View style={localStyles.buttonsView}>
-        <PrimeButton outlined icon="presentation-play" onPress={onSetDemoMode} style={localStyles.button}>
-          Демо режим
-        </PrimeButton>
-      </View>
+    <AppScreen style={configStyles.screen}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={configStyles.keybord}>
+        <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
+        <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} clearInput={true} />
+        <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
+        <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} />
+        <View style={localStyles.buttonsView}>
+          <PrimeButton
+            icon="check"
+            onPress={handleSaveConfig}
+            style={localStyles.button}
+            disabled={!serverName || !serverPort || !timeout}
+          >
+            Сохранить
+          </PrimeButton>
+          <PrimeButton icon="cancel" onPress={handleCancel} style={localStyles.button}>
+            Отмена
+          </PrimeButton>
+        </View>
+        <View style={localStyles.buttonsView}>
+          <PrimeButton outlined icon="presentation-play" onPress={onSetDemoMode} style={localStyles.button}>
+            Демо режим
+          </PrimeButton>
+        </View>
+      </KeyboardAwareScrollView>
     </AppScreen>
   );
 };
 
 export default ConfigScreen;
+
+const configStyles = StyleSheet.create({
+  screen: { alignItems: 'center', flexDirection: 'row', flex: 1 },
+  keybord: { paddingVertical: 20, flexDirection: 'column' },
+});
