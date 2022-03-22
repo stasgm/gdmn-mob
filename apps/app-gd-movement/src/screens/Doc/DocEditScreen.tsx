@@ -41,7 +41,7 @@ export const DocEditScreen = () => {
     .selectByName<IDocumentType>('documentType')
     ?.data?.sort((a, b) => ((a.sortOrder || 1) < (b.sortOrder || 1) ? -1 : 1));
 
-  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
+  const doc = useSelector((state) => state.documents.list)?.find((e) => e.id === id) as IMovementDocument | undefined;
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -59,7 +59,7 @@ export const DocEditScreen = () => {
   }, [formParams]);
 
   const documentType = useMemo(
-    () => documentTypes.find((d) => d.id === docDocumentType?.id),
+    () => documentTypes?.find((d) => d.id === docDocumentType?.id),
     [docDocumentType, documentTypes],
   );
 
@@ -87,7 +87,7 @@ export const DocEditScreen = () => {
         }),
       );
     } else {
-      const dt = documentTypes[0];
+      const dt = documentTypes?.[0];
       const newNumber = getNextDocNumber(documents);
       dispatch(
         appActions.setFormParams({

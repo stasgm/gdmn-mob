@@ -29,7 +29,7 @@ import { IDocumentType } from '@lib/types';
 import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
-import { statusTypes, dataTypes } from '../../utils/constants';
+import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -74,15 +74,17 @@ export const DocListScreen = () => {
 
   const docTypes: IListItem[] = useMemo(
     () =>
-      [{ id: 'all', value: 'Все' }].concat(
-        documentTypes?.map(
-          (i) =>
-            ({
-              id: i.name,
-              value: i.description || '',
-            } as IListItem),
-        ),
-      ),
+      documentTypes
+        ? docContactTypes.concat(
+            documentTypes?.map(
+              (i) =>
+                ({
+                  id: i.name,
+                  value: i.description || '',
+                } as IListItem),
+            ),
+          )
+        : docContactTypes,
     [documentTypes],
   );
 

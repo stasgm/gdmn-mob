@@ -13,6 +13,8 @@ export const contactTypes: IListItem[] = [
   { id: 'employee', value: 'Сотрудник' },
 ];
 
+export const docContactTypes: IListItem[] = [{ id: 'all', value: 'Все' }];
+
 export const statusTypes: IListItem[] = [
   {
     id: 'all',
