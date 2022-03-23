@@ -48,7 +48,7 @@ const GoodLineScreen = () => {
               name: key,
               title: value?.name,
               visible: value?.visible !== false,
-              value: matrixItem[key],
+              value: (matrixItem[key] = 'goodId' ? matrixItem.id : matrixItem[key]),
             } as IProperty),
         )
         .filter((i) => i.visible && i.name !== 'goodName')
@@ -68,7 +68,7 @@ const GoodLineScreen = () => {
 
   return (
     <>
-      <SubTitle style={[styles.title]}>{matrixItem?.goodName}</SubTitle>
+      <SubTitle style={[styles.title]}>{matrixItem?.name}</SubTitle>
       <View style={[styles.content]}>
         <FlatList
           data={refData}

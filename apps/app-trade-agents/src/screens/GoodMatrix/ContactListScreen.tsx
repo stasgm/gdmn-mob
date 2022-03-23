@@ -1,5 +1,5 @@
 import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -33,29 +33,22 @@ const ContactListScreen = () => {
 
   console.log('matrix', matrix);
 
-  const contacts = refSelectors
-    .selectByName<IContact>('contact')
-    ?.data.filter((i) => i.id === goodMatrix?.find((item) => item.contactId === i.id)?.contactId);
-
-  const contacts1 = refSelectors.selectByName<IContact>('contact')?.data;
-
-  const contacts2 = contacts1?.filter((i) => matrix?.[i.id]);
-
-  console.log('contatcts', contacts2);
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 
   const filteredList = useMemo(() => {
     return (
-      contacts2
+      contacts
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, [contacts2, searchQuery]);
+  }, [contacts, searchQuery]);
+
+  const syncDate = useSelector((state) => state.app.syncDate);
 
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const matrixDate = goodMatrix.find((i) => i.contactId === item.id)?.onDate;
-        const sectionTitle = matrixDate ? getDateString(matrixDate) : '';
+        const sectionTitle = syncDate ? getDateString(syncDate) : '';
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>
@@ -71,7 +64,7 @@ const ContactListScreen = () => {
           },
         ];
       }, []),
-    [filteredList, goodMatrix],
+    [filteredList, syncDate],
   );
 
   useEffect(() => {

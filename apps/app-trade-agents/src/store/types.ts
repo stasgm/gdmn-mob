@@ -99,10 +99,10 @@ export interface IGoodMatrix {
 
 export interface IMatrixData {
   goodId: string;
-  priceFso?: number; // цена ФСО
-  priceFsn?: number; // цена ФСН
-  priceFsoSklad?: number; // цена ФСО склад
-  priceFsnSklad?: number; // цена ФСН склад
+  priceFso: number; // цена ФСО
+  priceFsn: number; // цена ФСН
+  priceFsoSklad: number; // цена ФСО склад
+  priceFsnSklad: number; // цена ФСН склад
 }
 
 export interface IMatrixDataNamed extends IMatrixData {
