@@ -23,6 +23,7 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private collectionPath: string;
+  private _fileEndTransfer: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
     return R.assoc('id', uuid(), obj);
@@ -31,6 +32,8 @@ class CollectionMessage<T extends CollectionItem> {
   constructor(pathDb: string, name: string) {
     this.collectionPath = path.join(pathDb, `/${name}/`);
     this._ensureStorage();
+    this._fileEndTransfer = path.join(pathDb, '/endTransfer.txt');
+    this._setEndTransafer();
   }
 
   /**
@@ -127,9 +130,27 @@ class CollectionMessage<T extends CollectionItem> {
     return Promise.all(pr);
   }
 
+  public async insertTransfer(): Promise<void> {
+    await this._setEndTransafer();
+  }
+
+  public async deleteTransfer(): Promise<void> {
+    const check: boolean = await this._checkFileExists(this._fileEndTransfer);
+    if (check) await this._delete(this._fileEndTransfer);
+  }
+
+  public async checkTransfer(): Promise<boolean> {
+    return await this._checkFileExists(this._fileEndTransfer);
+  }
+
   private async _ensureStorage() {
     const check: boolean = await this._checkFileExists(this.collectionPath);
     if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
+  }
+
+  private async _setEndTransafer() {
+    const check: boolean = await this._checkFileExists(this._fileEndTransfer);
+    if (!check) await this._saveEndTransafer(this._fileEndTransfer);
   }
 
   private _Obj2FileName(fileInfo: IFileMessageInfo): string {
@@ -171,7 +192,7 @@ class CollectionMessage<T extends CollectionItem> {
     try {
       return fs.unlink(fileName);
     } catch (err) {
-      throw new DataNotFoundException(`Ошибка записи в файл ${err}`);
+      throw new DataNotFoundException(`Ошибка удаления файла ${err}`);
     }
   }
 
@@ -190,6 +211,14 @@ class CollectionMessage<T extends CollectionItem> {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  private async _saveEndTransafer(path: string): Promise<void> {
+    try {
+      return fs.writeFile(path, JSON.stringify(''));
+    } catch (err) {
+      throw new DataNotFoundException(`Ошибка записи в файл ${err}`);
     }
   }
 }

@@ -102,3 +102,7 @@ export interface IFileMessageInfo {
   producer: string;
   consumer: string;
 }
+
+export interface ICheckTransafer {
+  state: boolean;
+}
