@@ -31,8 +31,6 @@ const ContactListScreen = () => {
 
   const matrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data[0];
 
-  console.log('matrix', matrix);
-
   const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 
   const filteredList = useMemo(() => {

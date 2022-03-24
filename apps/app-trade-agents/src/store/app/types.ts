@@ -32,6 +32,9 @@ export interface IGoodModel {
   goods: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>;
 }
 
+export interface IGoodModelNew {
+  [parentGroupId: string]: IMGroupData<number>;
+}
 export interface IMParentGroupData<T = unknown> {
   [id: string]: T;
 }

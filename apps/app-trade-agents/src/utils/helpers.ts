@@ -160,8 +160,6 @@ const getGoodMatrixGoodByContact = (
       priceFsoSklad: matrix.priceFsoSklad,
     } as IGood;
 
-    console.log('12345', newGood);
-    // a?.push('100');
     matrixGoods?.push(newGood);
   }
   return matrixGoods;

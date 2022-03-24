@@ -35,8 +35,6 @@ const GoodListScreen = () => {
     contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id]) : [],
   );
 
-  console.log('rem', goodRemains);
-
   const filteredList = useMemo(() => {
     return (
       goodRemains
