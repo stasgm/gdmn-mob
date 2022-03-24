@@ -149,7 +149,7 @@ const getGoodMatrixGoodByContact = (
   goodMatrix: IMatrixData[] /*, isRemains: boolean | undefined = false*/,
   groupId?: string,
 ): IGood[] => {
-  log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+  // log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
 
   const matrixGoods: IGood[] = [];
   for (const matrix of goodMatrix) {
@@ -175,7 +175,7 @@ const getGroupModelByContact = (
   goods: IGood[],
   goodMatrix: IMatrixData[] /*, isRemains: boolean | undefined = false*/,
 ) => {
-  log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+  // log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
 
   const parents: IMGroupModel = {};
   for (const matrix of goodMatrix) {

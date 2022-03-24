@@ -9,8 +9,10 @@ import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles 
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
+import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
 import { useSelector as useAppTradeSelector } from '../../store/';
+import { getGroupModelByContact } from '../../utils/helpers';
+import { IMGroup } from '../../store/app/types';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -19,7 +21,7 @@ const Group = ({
   expendGroup,
   setExpend,
 }: {
-  item: IGoodGroup;
+  item: IGoodGroup | IMGroup;
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
 }) => {
@@ -34,29 +36,50 @@ const Group = ({
   const contactId =
     docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
-  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
+  // const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const onDate = goodModel[contactId].onDate;
+  // const onDate = goodModel[contactId].onDate;
 
-  const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
+  // const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
 
-  const groupsModel = goods[item.parent?.id || item.id];
+  // const groupsModel = goods[item.parent?.id || item.id];
 
-  const goodsObj = groupsModel[item.id];
+  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
-  const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
+  const newGoods = refSelectors.selectByName<IGood>('good').data;
 
-  const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id && groupsModel[group.id]);
+  const newGroups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
 
-  const isExpand = expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
+  const model = getGroupModelByContact(newGroups, newGoods, newGoodMatrix[contactId]);
+  // console.log('model', model);
 
-  const icon = (nextLevelGroups.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
+  // const goodsObj = groupsModel[item.id];
 
-  const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
+  // const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
+
+  // const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id && groupsModel[group.id]);
+
+  const nextLevelGroups11 = Object.values(model).filter((i) => i.parent.id === item?.id);
+  //.filter((i) => i[1].parent.id === item?.id);
+
+  console.log('nextLevelGroups11', nextLevelGroups11);
+
+  const nextLevelGroups1 = nextLevelGroups11.map((i) => {
+    return i.children;
+  })[0];
+
+  console.log('nextLevelGroups', nextLevelGroups1);
+
+  const isExpand =
+    expendGroup === (item.id || item.group.id) || !!nextLevelGroups1?.find((group) => group?.group.id === expendGroup);
+
+  const icon = (nextLevelGroups1?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
+
+  const refListGroups = React.useRef<FlatList<IMGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ group }: { group: IGoodGroup }) => (
-    <Group key={group.id} item={group} expendGroup={expendGroup} setExpend={setExpend} />
+  const renderGroup = ({ group }: { group: IGoodGroup | IMGroup }) => (
+    <Group key={group?.id} item={group} expendGroup={expendGroup} setExpend={setExpend} />
   );
 
   return (
@@ -64,20 +87,20 @@ const Group = ({
       <TouchableOpacity
         style={styles.item}
         onPress={() =>
-          nextLevelGroups.length > 0
+          nextLevelGroups1?.length && nextLevelGroups1?.length > 0
             ? setExpend(!isExpand ? item : undefined)
             : navigation.navigate('SelectGoodItem', {
                 docId,
-                groupId: item.id,
+                groupId: item.group.id,
               })
         }
       >
         <View style={styles.details}>
-          <Text style={styles.name}>{item.name}</Text>
-          {nextLevelGroups.length === 0 && (
+          <Text style={styles.name}>{item.name || item.group.name}</Text>
+          {nextLevelGroups1?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
-              <Text style={styles.field}>{goodCount}</Text>
+              <Text style={styles.field}>{item.goodCount}</Text>
             </View>
           )}
         </View>
@@ -85,10 +108,10 @@ const Group = ({
       </TouchableOpacity>
       {isExpand && (
         <View style={localStyles.marginLeft}>
-          {nextLevelGroups.length > 0 && (
+          {nextLevelGroups1 && nextLevelGroups1?.length > 0 && (
             <FlatList
               ref={refListGroups}
-              data={nextLevelGroups}
+              data={nextLevelGroups1}
               keyExtractor={(_, i) => String(i)}
               renderItem={({ item: group }) => renderGroup({ group })}
               ItemSeparatorComponent={ItemSeparator}
@@ -110,17 +133,32 @@ const SelectGroupScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
+  // const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
 
-  const onDate = goodModel[contactId].onDate;
+  // const onDate = goodModel[contactId].onDate;
 
-  const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
+  // const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
+  // const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
+  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
-  const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
+  const newGoods = refSelectors.selectByName<IGood>('good').data;
+
+  const newGroups1 = refSelectors.selectByName<IGoodGroup>('goodGroup');
+  const newGroups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
+
+  const model = getGroupModelByContact(newGroups, newGoods, newGoodMatrix[contactId]);
+  console.log('model', model);
+
+  // const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
+  const firstLevelGroups1 = Object.entries(model).map((item) => {
+    return item[1].parent;
+  });
+
+  console.log('firstLevelGroups', firstLevelGroups1);
+
+  const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups1[0]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -128,7 +166,7 @@ const SelectGroupScreen = () => {
     });
 
     if (formParams?.groupId) {
-      const expandGroup = groups.data.find((group) => group.id === formParams.groupId);
+      const expandGroup = newGroups1.data.find((group) => group.id === formParams.groupId);
       setExpend(expandGroup);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,17 +185,17 @@ const SelectGroupScreen = () => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
-  );
-
+  const renderGroup = ({ item }: { item: IGoodGroup }) => {
+    console.log('123', item);
+    return <Group item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />;
+  };
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{groups.description || groups.name}</SubTitle>
+      <SubTitle style={styles.title}>{newGroups1.description || newGroups1.name}</SubTitle>
       <Divider />
       <FlatList
         ref={refListGroups}
-        data={firstLevelGroups}
+        data={firstLevelGroups1}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderGroup}
         ItemSeparatorComponent={ItemSeparator}

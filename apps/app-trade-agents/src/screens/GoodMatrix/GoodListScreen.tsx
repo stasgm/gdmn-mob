@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
@@ -8,7 +8,7 @@ import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IContact, IGood, IGoodMatrix, IMatrixData, IMatrixDataNamed } from '../../store/types';
+import { IContact, IGood, IGoodMatrix } from '../../store/types';
 
 import { getGoodMatrixGoodByContact } from '../../utils/helpers';
 

@@ -105,9 +105,9 @@ const Root = () => {
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const isLogged = authSelectors.isLoggedWithCompany();
 
-  const model = goodMatrix && getGroupModelByContact(groups, goods, goodMatrix['1788296478']);
+  // const model = goodMatrix && getGroupModelByContact(groups, goods, goodMatrix['1788296478']);
 
-  console.log('model', model);
+  // console.log('model', model);
 
   useEffect(() => {
     if (isLogged) {
