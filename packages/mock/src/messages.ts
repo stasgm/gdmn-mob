@@ -1571,9 +1571,7 @@ export const messageAgent: IMessage<MessageType>[] = [
           },
           data: [
             {
-              contactId: '147042924',
-              onDate: new Date().toISOString(),
-              data: [
+              '147042924': [
                 {
                   goodId: '955211845',
                   priceFsn: 18.78,
@@ -1589,11 +1587,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                   priceFsoSklad: 18.56,
                 },
               ],
-            },
-            {
-              contactId: '1788296478',
-              onDate: new Date().toISOString(),
-              data: [
+              '1788296478': [
                 {
                   goodId: '955211846',
                   priceFsn: 18.56,

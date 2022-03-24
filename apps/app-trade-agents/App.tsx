@@ -30,6 +30,7 @@ import GoodMatrixNavigator from './src/navigation/Root/GoodMatrixNavigator';
 import { IContact, IGood, IGoodMatrix, IGoodGroup, IMatrixData } from './src/store/types';
 import { IGoodModel, IMGoodData, IMGroupData, IModelData, IMParentGroupData } from './src/store/app/types';
 import { appSettings } from './src/utils/constants';
+import { getGroupModelByContact } from './src/utils/helpers';
 
 const Root = () => {
   const navItems: INavItem[] = [
@@ -97,12 +98,16 @@ const Root = () => {
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const contacts = refSelectors.selectByName<IContact>('contact')?.data;
-  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const isLogged = authSelectors.isLoggedWithCompany();
+
+  const model = goodMatrix && getGroupModelByContact(groups, goods, goodMatrix['1788296478']);
+
+  console.log('model', model);
 
   useEffect(() => {
     if (isLogged) {
