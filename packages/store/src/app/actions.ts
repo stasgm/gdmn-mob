@@ -1,6 +1,6 @@
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { IFormParam } from './types';
+import { IFormParam, IAppState } from './types';
 
 const init = createAction('APP/INIT')();
 
@@ -8,6 +8,10 @@ const setFormParams = createAction('APP/SET_FORM_PARAMS')<IFormParam>();
 const clearFormParams = createAction('APP/CLEAR_FORM_PARAMS')();
 const setLoading = createAction('APP/SET_LOADING')<boolean>();
 const setErrorList = createAction('APP/SET_ERROR_LIST')<string[]>();
+const setSyncDate = createAction('APP/SET_SYNC_DATE')<Date>();
+const loadData = createAction('APP/LOAD_DATA')<IAppState>();
+const setLoadingData = createAction('APP/SET_LOADING_DATA')<boolean>();
+const setLoadingError = createAction('APP/SET_LOADING_ERROR')<string>();
 
 /**
  * Для ускорения работы программы мы кэшируем часть данных
@@ -39,8 +43,12 @@ export const appActions = {
   clearFormParams,
   setLoading,
   setErrorList,
+  setSyncDate,
   loadGlobalDataFromDisc,
   loadSuperDataFromDisc,
+  loadData,
+  setLoadingData,
+  setLoadingError,
 };
 
 export type AppActionType = ActionType<typeof appActions>;

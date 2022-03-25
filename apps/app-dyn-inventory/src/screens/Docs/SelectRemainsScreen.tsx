@@ -45,7 +45,7 @@ const GoodRemains = ({ item }: { item: IRem }) => {
           <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
-              {item.remains} {item.valuename} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
+              {item.remains} {item.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)} руб.
             </Text>
             {barcode && (
               <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.barcode}</Text>

@@ -22,7 +22,8 @@ import { RefParamList } from '../navigation/Root/types';
 export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { refName, isMulti, fieldName, value, clause } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
+  const { refName, isMulti, fieldName, value, clause, refFieldName } =
+    useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<any>(refName);
 
@@ -76,13 +77,16 @@ export const SelectRefItemScreen = () => {
 
   const handleSelectItem = useCallback(
     (item: INamedEntity) => {
+      const returnItem = item.description
+        ? { id: item.id, name: item.name, description: item.description }
+        : { id: item.id, name: item.name };
       if (isMulti) {
-        setCheckedItem((prev) => [...(prev as INamedEntity[]), { id: item.id, name: item.name }]);
+        setCheckedItem((prev) => [...(prev as INamedEntity[]), returnItem]);
       } else {
         dispatch(
           appActions.setFormParams({
             ...formParams,
-            [fieldName]: { id: item.id, name: item.name },
+            [fieldName]: returnItem,
           }),
         );
         navigation.goBack();
@@ -94,9 +98,9 @@ export const SelectRefItemScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: INamedEntity }) => {
       const isChecked = !!checkedItem?.find((i) => i.id === item.id);
-      return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
+      return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} refFieldName={refFieldName} />;
     },
-    [checkedItem, handleSelectItem],
+    [checkedItem, handleSelectItem, refFieldName],
   );
 
   useLayoutEffect(() => {
@@ -155,7 +159,17 @@ export const SelectRefItemScreen = () => {
 };
 
 const LineItem = React.memo(
-  ({ item, isChecked, onCheck }: { item: INamedEntity; isChecked: boolean; onCheck: (id: INamedEntity) => void }) => {
+  ({
+    item,
+    isChecked,
+    onCheck,
+    refFieldName,
+  }: {
+    item: INamedEntity;
+    isChecked: boolean;
+    onCheck: (id: INamedEntity) => void;
+    refFieldName?: string;
+  }) => {
     const { colors } = useTheme();
 
     return (
@@ -164,7 +178,10 @@ const LineItem = React.memo(
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
+              <Text style={[styles.name, { color: colors.text }]}>
+                {item.description ? item.description : item.name || item.id}
+                {/* {item.name || item.id} */}
+              </Text>
             </View>
           </View>
         </View>

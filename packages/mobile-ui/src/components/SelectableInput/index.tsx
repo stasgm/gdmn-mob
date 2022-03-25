@@ -14,15 +14,7 @@ interface Props {
   required?: boolean;
 }
 
-const SelectableInput: React.FC<Props> = ({
-  value,
-  onPress,
-  label,
-  placeholder,
-  editable = false,
-  disabled,
-  // required,
-}) => {
+const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled }: Props) => {
   const { colors } = useTheme();
 
   return (
@@ -30,7 +22,7 @@ const SelectableInput: React.FC<Props> = ({
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={value}
+          value={value || ''}
           theme={{
             colors: {
               primary: colors.primary,

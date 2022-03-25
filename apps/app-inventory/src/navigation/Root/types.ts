@@ -9,6 +9,7 @@ export type IRefSelectParams = {
   clause?: Record<string, string>;
   isMulti?: boolean;
   docType?: string;
+  refFieldName?: string;
 };
 
 export type RefParamList = {

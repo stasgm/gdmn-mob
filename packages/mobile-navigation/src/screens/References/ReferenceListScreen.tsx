@@ -26,31 +26,10 @@ const ReferenceListScreen = () => {
   }, [list]);
 
   const navigation = useNavigation<ViewScreenProp>();
-  // const showActionSheet = useActionSheet();
-  // const dispatch = useDispatch();
-
-  // const handleReset = () => {
-  //   dispatch(referenceActions.init());
-  // };
-
-  // const actionsMenu = useCallback(() => {
-  //   showActionSheet([
-  //     {
-  //       title: 'Удалить все справочники',
-  //       type: 'destructive',
-  //       onPress: handleReset,
-  //     },
-  //     {
-  //       title: 'Отмена',
-  //       type: 'cancel',
-  //     },
-  //   ]);
-  // }, [handleReset, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
-      // headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);
 

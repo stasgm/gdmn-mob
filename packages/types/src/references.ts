@@ -1,7 +1,7 @@
 import { IEntity } from './common';
 
 interface IReferenceData extends IEntity {
-  [fieldName: string]: unknown;
+  [fieldName: string]: any;
 }
 
 type IRefMetadata<T> = {
