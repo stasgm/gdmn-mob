@@ -370,7 +370,7 @@ export const DocEditScreen = () => {
           </>
         )}
         <Input
-          label="Номер документа"
+          label="Номер"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
           disabled={isBlocked}
@@ -383,7 +383,7 @@ export const DocEditScreen = () => {
           disabled={docStatus !== 'DRAFT'}
         />
         <SelectableInput
-          label="Тип документа"
+          label="Тип"
           value={documentType?.description}
           onPress={handlePresentType}
           disabled={isBlocked}
