@@ -19,9 +19,12 @@ const globalStyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     borderWidth: 0.5,
-    padding: 10,
+    height: 40,
     marginHorizontal: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius: 1,
+    borderBottomLeftRadius: 1,
   },
   firstBtnTab: {
     borderTopLeftRadius: 3,

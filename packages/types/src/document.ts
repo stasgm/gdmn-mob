@@ -17,11 +17,21 @@ type DocfMetadata<T, K> = {
 };
 
 export interface IHead {
-  [fieldname: string]: unknown;
+  [fieldname: string]: any;
 }
 
+//TODO: Расширили тип для инвентаризации, надо разделить */
 export interface IDocumentType extends INamedEntity {
   description?: string;
+  isRemains?: boolean;
+  remainsField?: string;
+  fromDescription?: string;
+  fromType?: string;
+  fromRequired?: boolean;
+  toDescription?: string;
+  toType?: string;
+  toRequired?: boolean;
+  sortOrder?: number;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {

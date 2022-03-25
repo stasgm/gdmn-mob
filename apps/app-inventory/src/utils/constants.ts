@@ -1,5 +1,7 @@
 import { Settings, StatusType } from '@lib/types';
 
+import { IDocDocument } from '../store/types';
+
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
 export const ONE_SECOND_IN_MS = 1000;
@@ -69,4 +71,12 @@ export const appSettings: Settings = {
     visible: true,
     group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
   },
+};
+
+export const getNextDocNumber = (documents: IDocDocument[]) => {
+  return (
+    documents
+      ?.map((item) => parseInt(item.number, 10))
+      .reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
+  ).toString();
 };

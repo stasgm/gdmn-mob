@@ -14,6 +14,7 @@
     "expo:app": "lerna run --scope=@apps/app start --stream",
     "expo:inventory": "lerna run --scope=@apps/inventory start --stream",
     "expo:bc-movement": "lerna run --scope=@apps/bc-movement start --stream",
+    "expo:gd-movement": "lerna run --scope=@apps/gd-movement start --stream",
     "expo:sales-representative": "lerna run --scope=@apps/sales-representative start --stream",
     "lint": "lerna run --scope=@lib/* --scope=@apps/* lint --stream",
     "lint:fix": "lerna run --scope=@lib/* --scope=@apps/* lint:fix --stream",

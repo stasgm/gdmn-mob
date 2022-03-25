@@ -4,9 +4,10 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { getDateString } from '@lib/mobile-ui/src/components/Datapicker/index';
 import { docSelectors } from '@lib/store';
 import { BackButton, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton } from '@lib/mobile-ui';
+
+import { getDateString } from '@lib/mobile-app';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';

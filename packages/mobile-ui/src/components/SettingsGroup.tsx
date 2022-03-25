@@ -41,6 +41,7 @@ const localStyles = StyleSheet.create({
   border: {
     borderWidth: 1,
     borderRadius: 2,
+    marginHorizontal: 5,
   },
   title: {
     margin: 3,

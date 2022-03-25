@@ -127,7 +127,7 @@ function SellBillScreen() {
   const [sellBills, setSellBills] = useState<ISellBill[] | undefined>(undefined);
 
   const bills = useMemo(() => {
-    const valueName = goods.find((item) => item.id === docGood?.id)?.valuename || '';
+    const valueName = goods.find((item) => item.id === docGood?.id)?.valueName || '';
     return sellBills?.map((i) => {
       return {
         docId: returnDoc?.id,

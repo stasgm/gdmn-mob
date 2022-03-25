@@ -45,7 +45,7 @@ const Root = () => {
   const isInit = useSelector((state) => state.settings.isInit);
   const goods = refSelectors.selectByName<IGood>('good')?.data;
   const departments = refSelectors.selectByName<IDepartment>('department')?.data;
-  const remains = refSelectors.selectByName<IRemains>('remain')?.data;
+  const remains = refSelectors.selectByName<IRemains>('remains')?.data;
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);

@@ -1,0 +1,145 @@
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import { Provider } from 'react-redux';
+import { MobileApp } from '@lib/mobile-app';
+import { INavItem } from '@lib/mobile-navigation';
+import ErrorBoundary from 'react-native-error-boundary';
+
+import {
+  appActions,
+  appSelectors,
+  authSelectors,
+  referenceActions,
+  settingsActions,
+  useDispatch,
+  useRefThunkDispatch,
+  useSelector,
+} from '@lib/store';
+import {
+  AppScreen,
+  globalStyles as styles,
+  Theme as defaultTheme,
+  Provider as UIProvider,
+  AppFallback,
+} from '@lib/mobile-ui';
+
+import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+
+import { IReferences } from '@lib/types';
+
+import { sleep } from '@lib/client-api';
+
+import { DocNavigator } from './src/navigation/DocNavigator';
+
+import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
+
+import { appSettings, messageGdMovement, ONE_SECOND_IN_MS } from './src/utils/constants';
+import RemainsNavigator from './src/navigation/RemainsNavigator';
+
+const Root = () => {
+  const navItems: INavItem[] = useMemo(
+    () => [
+      {
+        name: 'Doc',
+        title: 'Документы',
+        icon: 'file-document-outline',
+        component: DocNavigator,
+      },
+      {
+        name: 'Remains',
+        title: 'Остатки',
+        icon: 'dolly',
+        component: RemainsNavigator,
+      },
+    ],
+    [],
+  );
+
+  const dispatch = useDispatch();
+  const { colors } = useTheme();
+
+  //Загружаем в стор дополнительные настройки приложения
+  const isInit = useSelector((state) => state.settings.isInit);
+  const authLoading = useSelector((state) => state.auth.loadingData);
+  const appDataLoading = appSelectors.selectLoading();
+  const appLoading = useSelector((state) => state.app.loading);
+  const isLogged = authSelectors.isLoggedWithCompany();
+  const invLoading = useInvSelector((state) => state.appInventory.loading);
+  const isDemo = useSelector((state) => state.auth.isDemo);
+
+  const refDispatch = useRefThunkDispatch();
+
+  const getMessages = useCallback(async () => {
+    await sleep(ONE_SECOND_IN_MS);
+    await refDispatch(
+      referenceActions.setReferences(
+        messageGdMovement.find((m) => m.body.type === 'REFS')?.body.payload as IReferences,
+      ),
+    );
+  }, [refDispatch]);
+
+  useEffect(() => {
+    if (appSettings && isInit) {
+      dispatch(settingsActions.addSettings(appSettings));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInit]);
+
+  useEffect(() => {
+    dispatch(appActions.loadGlobalDataFromDisc());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (isLogged) {
+      dispatch(appActions.loadSuperDataFromDisc());
+    }
+  }, [dispatch, isLogged]);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    //Для отрисовки при первом подключении
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
+
+  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
+
+  return (
+    <ErrorBoundary FallbackComponent={AppFallback}>
+      {authLoading || loading || appLoading || invLoading || appDataLoading ? (
+        <AppScreen>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Caption style={styles.title}>
+            {appDataLoading || invLoading
+              ? 'Загрузка данных...'
+              : appLoading
+              ? 'Синхронизация данных..'
+              : 'Пожалуйста, подождите..'}
+          </Caption>
+        </AppScreen>
+      ) : (
+        <MobileApp
+          items={navItems}
+          loadingErrors={[invLoadingError]}
+          onClearLoadingErrors={onClearLoadingErrors}
+          onGetMessages={isDemo ? getMessages : undefined}
+        />
+      )}
+    </ErrorBoundary>
+  );
+};
+
+const App = () => (
+  <Provider store={store}>
+    <UIProvider theme={defaultTheme}>
+      <Root />
+    </UIProvider>
+  </Provider>
+);
+
+export default App;

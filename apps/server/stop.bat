@@ -1,0 +1,1 @@
+yarn pm2:stop
