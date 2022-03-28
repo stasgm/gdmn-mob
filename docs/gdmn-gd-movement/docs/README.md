@@ -86,7 +86,7 @@
 
 Открыть боковое меню можно нажатием на иконку меню **≡**, находящуюся в верхнем углу приложения слева, или смахнув пальцем вправо с левого края устройства.
 
-<img src="img/1.Connection/1.Routes.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.Sidebar.jpg" alt="drawing" height="400"/>
+<img src="img/1.Connection/1.Docs.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.Sidebar.jpg" alt="drawing" height="400"/> <img src="img/1.Connection/1.SyncSuccess.jpg" alt="drawing" height="400"/>
 
 После загрузки данных в приложении должны появится справочники и все необходимые документы.
 
@@ -110,7 +110,7 @@
 
 Пример справочника магазинов:
 
-<img src="img/2.References/2.Outlets.jpg" alt="drawing" height="400"/> <img src="img/2.References/2.OutletPosition.jpg" alt="drawing" height="400"/>
+<img src="img/2.References/2.Contacts.jpg" alt="drawing" height="400"/> <img src="img/2.References/2.ContactPosition.jpg" alt="drawing" height="400"/>
 
 Чтобы найти справочник по наименованию можно воспользоваться окном для поиска в правом верхнем углу экрана.
 
@@ -118,7 +118,7 @@
 
 На экране **Остатки** можно просмотреть информацию об остатках товаров.
 
-<img src="img/7.Matrix/7.Contacts.jpg" alt="drawing" height="400"/>
+<img src="img/7.Remains/7.Contacts.jpg" alt="drawing" height="400"/>
 
 "Остатки" представляют собой список товаров с ценами и количеством остатка в разрезе подразделения/организации/сотрудника на текущую дату.
 
@@ -126,11 +126,11 @@
 
 Выберем подразделение.
 
-<img src="img/7.Matrix/7.Goods.jpg" alt="drawing" height="400"/>
+<img src="img/7.Remains/7.Goods.jpg" alt="drawing" height="400"/>
 
 На экране отображены остатки товаров для данного подразделения. По нажатию на конкретный товар можно просмотреть его цены и остаток.
 
-<img src="img/7.Matrix/7.Position.jpg" alt="drawing" height="400"/>
+<img src="img/7.Remainstrix/7.Position.jpg" alt="drawing" height="400"/>
 
 ## 6. Документы
 
@@ -167,18 +167,58 @@
 
 Например, для документа прихода это поля **Откуда**, **Куда**. Для документа инвентаризации - поле **Место**.
 
-<img src="img/3.Orders/3.OrderAdd.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodAdd.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.InventoryAdd.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.AddDocTypes.jpg" alt="drawing" height="400"/> 
 
 Для сохранения документа необходимо нажать на иконку **✓** в правом верхнем углу.
 
-<img src="img/3.Orders/3.OrderNew.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.DocTypes.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.From.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.To.jpg" alt="drawing" height="400"/>
+
+
+<img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/>
 
 После сохранения попадаем в экран просмотра документа. По нажатию на кнопку меню, расположенную в правом верхнем углу доступны следующие операции: **Добавить товар**, **Редактировать данные**, **Удалить заявку**.
 Редактировать данные документа можно нажав на иконку редактирования.
 
-<img src="img/3.Orders/3.OrderView.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.ViewMenu.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodView.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodViewMenu.jpg" alt="drawing" height="400"/>
 
 Чтобы добавить новую позицию нажимаем на иконку штрихкода в верхнем правом углу и переходим на экран сканирования товара:
+
+
+<img src="img/3.Docs/3.PrihodRemains.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodRemainsSearch.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.ScanReader.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.Scan.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.ScanOne.jpg" alt="drawing" height="400"/>
+
+
+<img src="img/3.Docs/3.PrihodGoodLineOne.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.ScanEID.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanDataMatrix.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodGoodLineOneNew.jpg" alt="drawing" height="400"/>
+
+
+<img src="img/3.Docs/3.ScanTwo.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodGoodLineTwo.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.ScanUnknown.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodGoodLineUnknown.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.PrihodViewGoods.jpg" alt="drawing" height="400"/>
+
+
+<img src="img/3.Docs/3.InventoryAddNew.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.InventoryView.jpg" alt="drawing" height="400"/>
+
+
+<img src="img/3.Docs/3.ScanNotFound.jpg" alt="drawing" height="400"/>
+
+
+
+
 
 <img src="img/3.Orders/3.GroupOne.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.GroupTwo.jpg" alt="drawing" height="400"/>
 
@@ -290,96 +330,6 @@
 <img src="img/4.Returns/4.Swipe.jpg" alt="drawing" height="400"/>
 
 Данное меню позволяет редактировать возврат (если он является доступным для редактирования), копировать возврат и удалить.
-
-## 8. Маршруты
-
-Перейдем на экран **Маршруты**.
-
-Документы сгруппированы следующим образом:
-
-| Группа | Описание                                                                                                                                                                    |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Все             | Все документы|
-| Активные        | Документы, дата которых не менее текущей даты |
-| Архив           | Документы, дата которых меньше текущей даты |
-
-<img src="img/5.Routes/5.Routes.jpg" alt="drawing" height="400"/>
-
-При выборе (нажатием на строку) необходимого маршрута откроется экран с торговыми точками, запланированными для посещения.
-
-<img src="img/5.Routes/5.Route.jpg" alt="drawing" height="400"/>
-
-После нажатия на торговую точку откроется экран с визитом выбранного объекта.
-
-<img src="img/5.Routes/5.Visit.jpg" alt="drawing" height="400"/>
-
-Нажимаем на кнопку **Начать визит** (в этот момент один раз телефон попросит разрешение на получение геокоординаты, которая будет записана в визит данной точки).
-
-<img src="img/5.Routes/5.VisitStart.jpg" alt="drawing" height="400"/>
-
-Из экрана визита пользователь имеет возможность создать доступные в визите документы - заявку и возврат). Для создания заявки нажимаем на кнопку **Добавить документ** и выбираем тип документа **Заявка**.
-
-<img src="img/5.Routes/5.TypeOrder.jpg" alt="drawing" height="400"/>
-
-После добавления заявки откроется экран просмотра документа.
-
-<img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
-
-Добавим товар.
-
-<img src="img/5.Routes/5.Group.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderGood.jpg" alt="drawing" height="400"/>
-
-Аналогично создаем документ возврата. Для создания нажимаем на кнопку **Добавить документ** и выбираем тип документа **Возврат**.
-
-<img src="img/5.Routes/5.TypeReturn.jpg" alt="drawing" height="400"/>
-
-После добавления возврата откроется экран просмотра документа.
-
-<img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
-
-Добавим товар из накладной.
-
-<img src="img/5.Routes/5.SellBillSearch.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.SellBills.jpg" alt="drawing" height="400"/>
-
-<img src="img/5.Routes/5.SellBillPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ReturnSellBill.jpg" alt="drawing" height="400"/>
-
-После создания необходимых документов завершаем визит нажатием на кнопку **Завершить визит**.
-
-<img src="img/5.Routes/5.VisitOrderReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitEnd.jpg" alt="drawing" height="400"/>
-
-Отправим данные визита нажатием на кнопку **Отправить**.
-
-<img src="img/5.Routes/5.VisitSent.jpg" alt="drawing" height="400"/>
-
-Данный визит в окне просмотра визитов отобразится как завершенный (кружок с галочкой). Активный визит обозначается кружком с треугольником.
-
-<img src="img/5.Routes/5.RouteVisit.jpg" alt="drawing" height="400"/>
-
-Заявки и возвраты из визитов отображаются в окнах **Заявки** и **Возвраты**.
-
-<img src="img/5.Routes/5.OrdersVisit.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ReturnsVisit.jpg" alt="drawing" height="400"/>
-
-## 9. Карта
-
-На экране **Карта** представлены две вкладки, содержащие информацию по выбранному маршруту.
-
-<img src="img/6.Maps/6.Map.jpg" alt="drawing" height="400"/> <img src="img/6.Maps/6.List.jpg" alt="drawing" height="400"/>
-
-Во вкладке **Список** показаны все точки маршрута в виде списка.
-
-Во кладке **Карта** отображены все точки маршрута на карте. Кнопками < и > можно, приближаясь к точкам, перемещаться между объектами. Так же кнопками можно получить свою текущую координату и отобразить все объекты на экране.
-
-В верхней части экрана указано название маршрута, который в данный момент отображается на карте. Для смены маршрута необходимо нажать на иконку смены маршрута (справа от названия маршрута), после чего в нижней части экрана появится окно с выбором маршрута. Выберем второй маршрут.
-
-<img src="img/6.Maps/6.MapRoutes.jpg" alt="drawing" height="400"/> <img src="img/6.Maps/6.NewRoute.jpg" alt="drawing" height="400"/>
-
-При нажатии на точку маршрута изменится цвет данной точки, появится название возле точки и в верхней части экрана. Также во вкладке **Список** отбразится, что данная точка выбрана.
-
-<img src="img/6.Maps/6.MapPoint.jpg" alt="drawing" height="400"/> <img src="img/6.Maps/6.ListPoint.jpg" alt="drawing" height="400"/>
-
-Выберем во вкладке **Список** другую точку и посмотрим ее отображение на карте.
-
-<img src="img/6.Maps/6.NewMapPoint.jpg" alt="drawing" height="400"/> <img src="img/6.Maps/6.NewListPoint.jpg" alt="drawing" height="400"/>
 
 ## 10. Профиль
 
