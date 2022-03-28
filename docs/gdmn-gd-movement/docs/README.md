@@ -209,11 +209,30 @@
 
 
 <img src="img/3.Docs/3.InventoryAddNew.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ErrorDate.jpg" alt="drawing" height="400"/>
+
 
 <img src="img/3.Docs/3.InventoryView.jpg" alt="drawing" height="400"/>
 
+<img src="img/3.Docs/3.InventoryRemains.jpg" alt="drawing" height="400"/>
+
 
 <img src="img/3.Docs/3.ScanNotFound.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.ScanInvOne.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.InvGoodLine.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.InventoryViewGoods.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.DocsList.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.ErrorDocType.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ErrorTypeTo.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ErrorTo.jpg" alt="drawing" height="400"/>
+
+
+
 
 
 
@@ -254,72 +273,6 @@
 <img src="img/3.Orders/3.Swipe.jpg" alt="drawing" height="400"/>
 
 Данное меню позволяет редактировать заявку (если она является доступной для редактирования), копировать заявку или удалить.
-
-## 7. Возвраты
-
-Перейдем на экран возвратов:
-
-<img src="img/4.Returns/4.Returns.jpg" alt="drawing" height="400"/>
-
-По нажатию на иконку **+** в верхнем правом углу переходим в окно добавления возврата. Обязательные поля для заполнения: Номер документа, Организация и Магазин.
-
-<img src="img/4.Returns/4.ReturnAdd.jpg" alt="drawing" height="400"/>
-
-При выборе **Организации** и **Магазина** попадаем в экран выбора организаций и магазина. Поле **Магазин** следует заполнять только после выбора организации.
-
-<img src="img/4.Returns/4.Contacts.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.Outlets.jpg" alt="drawing" height="400"/>
-
-Для сохранения документа возврата необходимо нажать на иконку **✓** в правом верхнем углу.
-
-После сохранения сразу попадаем в экран просмотра возврата. По нажатию на кнопку меню, расположенную в правом верхнем углу становятся доступны следующие функции: **Добавить товар из накладной**, **Редактировать данные**, **Удалить возврат**. Редактировать данные возврата можно нажав на сам возврат, доступный для редактирования (полоса малинового или зеленого цвета), открывается экран редактирования.
-
-<img src="img/4.Returns/4.ReturnView.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ViewMenu.jpg" alt="drawing" height="400"/>
-
-В отличии от заявок, в возврат есть возможность добавить товар только из накладной.
-
-По нажатию на иконку **+** в верхнем правом углу переходим в экран поиска товаров из накладной. Указываем даты начала и окончания, и выбираем необходимый товар.
-
-<img src="img/4.Returns/4.ReturnSellBill.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReturnSellBillAdd.jpg" alt="drawing" height="400"/>
-
-После завершения поиска отобразится список накладных.
-
-<img src="img/4.Returns/4.SellBills.jpg" alt="drawing" height="400"/>
-
-Если накладные не были найдены, на экран выведется надпись **Накладные не найдены**.
-
-Если произошла ошибка подключения к серверу с данными, в нижней части экрана отобразится ошибка.
-
-<img src="img/4.Returns/4.Error.png" alt="drawing" height="40"/>
-
-Выбраем необходимую накладную и попадаем на экран со списком позиций. Для редактирования доступно поле **Количество**. Нельзя указать количество, больше чем из накладной. Указываем нужное количество и добавляем.
-
-<img src="img/4.Returns/4.Position.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.PositionError.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.PositionGood.jpg" alt="drawing" height="400"/>
-
-После добавления попадаем в экран просмотра накладной.
-
-<img src="img/4.Returns/4.ReturnViewSellBill.jpg" alt="drawing" height="400"/>
-
-По умолчанию у документа статус **Черновик**. Изменить статус можно в экране редактирования. Для этого нужно выбрать документ возврата. При изменении статуса возврат переходит в состояние **Готов к отправке**, цвет полосы становится зеленым.
-
-<img src="img/4.Returns/4.ReturnEditDraft.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReturnEditReady.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReturnViewReady.jpg" alt="drawing" height="400"/>
-
-Пока возврат не отправлен, он доступен для редактирования. Для этого нужно зайти в него и временно вернуть статус **Черновик**. После отправления возврата редактирование невозможно, цвет полосы становится желтым.
-
-Вернемся на экран просмотра всех заявок:
-
-<img src="img/4.Returns/4.ReturnsReady.jpg" alt="drawing" height="400"/>
-
-Для отправления заявки необходимо нажать на кнопку синхронизации, расположенную в боковом меню.
-
-<img src="img/4.Returns/4.ReturnsSent.jpg" alt="drawing" height="400"/>
-
-При получении подтверждения возврат переходит в архив, цвет полосы становится синим. При наличии ошибки в возврате появится надпись **Отказано** и вид ошибки.
-
-Если смахнуть возврат влево, то появится меню в дополнительными иконками.
-
-<img src="img/4.Returns/4.Swipe.jpg" alt="drawing" height="400"/>
-
-Данное меню позволяет редактировать возврат (если он является доступным для редактирования), копировать возврат и удалить.
 
 ## 10. Профиль
 
