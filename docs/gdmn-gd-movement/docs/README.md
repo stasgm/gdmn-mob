@@ -232,6 +232,33 @@
 <img src="img/3.Docs/3.ErrorTypeTo.jpg" alt="drawing" height="400"/>
 <img src="img/3.Docs/3.ErrorTo.jpg" alt="drawing" height="400"/>
 
+<img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.Sort.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.SortDocTypes.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.SortDocTypePrihod.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.SortDocTypeInventory.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.SortStatus.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.SortStatusDraft.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.SortStatusReady.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.SortStatusNotActive.jpg" alt="drawing" height="400"/>
+
+<img src="img/3.Docs/3.SortDate.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.SortDateOld.jpg" alt="drawing" height="400"/>
+
+
+
+<img src="img/3.Docs/3.InventoryEditDraft.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.InventoryEditReady.jpg" alt="drawing" height="400"/>
+
+
+<img src="img/3.Docs/3.DocsSentSync.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.DocsSent.jpg" alt="drawing" height="400"/>
+
+
 
 
 
