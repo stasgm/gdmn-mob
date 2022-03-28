@@ -162,6 +162,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               toDescription: 'Куда',
               toType: 'department',
               toRequired: true,
+              sortOrder: 1,
             },
             {
               id: '187034606',
@@ -175,6 +176,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               toDescription: 'Место',
               toType: 'department',
               toRequired: true,
+              sortOrder: 2,
             },
           ],
         },
