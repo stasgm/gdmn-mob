@@ -184,7 +184,7 @@
 Экран сканирования на ТСД:
 
 <img src="img/3.Docs/3.ScanReader.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.ScanReaderOne.png" alt="drawing" height="400"  width="200"/>
+<img src="img/3.Docs/3.ScanReaderOne.png" alt="drawing" height="400"/>
 
 Экран сканирования на мобильном устройстве:
 
