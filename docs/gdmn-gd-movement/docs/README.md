@@ -207,7 +207,7 @@
 <img src="img/3.Docs/3.PrihodGoodLineUnknown.jpg" alt="drawing" height="400"/>
 
 <img src="img/3.Docs/3.PrihodViewGoods.jpg" alt="drawing" height="400"/>
-
+<img src="img/3.Docs/3.SwipeGood.jpg" alt="drawing" height="400"/>
 
 <img src="img/3.Docs/3.InventoryAddNew.jpg" alt="drawing" height="400"/>
 <img src="img/3.Docs/3.ErrorDate.jpg" alt="drawing" height="400"/>
@@ -227,6 +227,13 @@
 <img src="img/3.Docs/3.InventoryViewGoods.jpg" alt="drawing" height="400"/>
 
 <img src="img/3.Docs/3.DocsList.jpg" alt="drawing" height="400"/>
+
+Если смахнуть заявку влево, то появится меню с дополнительными иконками.
+
+<img src="img/3.Docs/3.Swipe.jpg" alt="drawing" height="400"/>
+
+Данное меню позволяет редактировать заявку (если она является доступной для редактирования), копировать заявку или удалить.
+
 
 <img src="img/3.Docs/3.ErrorDocType.jpg" alt="drawing" height="400"/>
 <img src="img/3.Docs/3.ErrorTypeTo.jpg" alt="drawing" height="400"/>
@@ -307,7 +314,7 @@
 
 Если смахнуть заявку влево, то появится меню с дополнительными иконками.
 
-<img src="img/3.Orders/3.Swipe.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.Swipe.jpg" alt="drawing" height="400"/>
 
 Данное меню позволяет редактировать заявку (если она является доступной для редактирования), копировать заявку или удалить.
 
