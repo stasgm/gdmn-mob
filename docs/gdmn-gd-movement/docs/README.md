@@ -232,7 +232,7 @@
 
 Документ перейдет в состояние **Готов к отправке** (зеленый цвет) - редактировать данные нельзя.
 
-<img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.Sort.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/>
 
 Пока документ не отправлен, его можно вернуть из статуса **Готов к отправке** в статус **Черновик** и отредактировать данные.
 
