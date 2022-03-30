@@ -8,9 +8,11 @@ import path from 'path';
 import R from 'ramda';
 import { v1 as uuid } from 'uuid';
 
-import { IFileMessageInfo } from '@lib/types';
+import { IFileMessageInfo, Transfer, ITransfer } from '@lib/types';
 
 import { DataNotFoundException } from '../../exceptions/datanotfound.exception';
+
+import { getTransferFlag, setTransferFlag } from './flag';
 
 import { CollectionItem } from './CollectionItem';
 
@@ -23,7 +25,8 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private collectionPath: string;
-  private _fileEndTransfer: string;
+  private _maxTimeOfTransfer = 20 * 60 * 1000;
+  //private _fileEndTransfer: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
     return R.assoc('id', uuid(), obj);
@@ -32,8 +35,9 @@ class CollectionMessage<T extends CollectionItem> {
   constructor(pathDb: string, name: string) {
     this.collectionPath = path.join(pathDb, `/${name}/`);
     this._ensureStorage();
-    this._fileEndTransfer = path.join(pathDb, '/endTransfer.txt');
-    this._setEndTransafer();
+    this.initTransfer();
+    //this._fileEndTransfer = path.join(pathDb, '/endTransfer.txt');
+    //this._setEndTransafer();
   }
 
   /**
@@ -130,8 +134,42 @@ class CollectionMessage<T extends CollectionItem> {
     return Promise.all(pr);
   }
 
-  public async insertTransfer(): Promise<void> {
-    await this._setEndTransafer();
+  private async _ensureStorage() {
+    const check: boolean = await this._checkFileExists(this.collectionPath);
+    if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
+  }
+
+  public initTransfer(): Transfer {
+    setTransferFlag(undefined);
+    return getTransferFlag();
+  }
+
+  public getTransfer(): Transfer {
+    const __transfer = getTransferFlag();
+    if (!__transfer) return undefined;
+    const transferDate = new Date(__transfer.uDate);
+    const nowDate = new Date();
+    const delta = nowDate.getTime() - transferDate.getTime();
+    if (delta >= this._maxTimeOfTransfer) this.initTransfer();
+    return getTransferFlag();
+  }
+
+  public setTransfer(): Transfer {
+    const __transfer: ITransfer = {
+      uid: uuid(),
+      uDate: new Date().toISOString(),
+    };
+    setTransferFlag(__transfer);
+    return getTransferFlag();
+  }
+
+  public deleteTransfer(uid: string): void {
+    const check = this.getTransfer();
+    if (check?.uid === uid) this.initTransfer();
+  }
+
+  /*public insertTransfer(): void {
+    this._setEndTransafer();
   }
 
   public async deleteTransfer(): Promise<void> {
@@ -141,17 +179,12 @@ class CollectionMessage<T extends CollectionItem> {
 
   public async checkTransfer(): Promise<boolean> {
     return await this._checkFileExists(this._fileEndTransfer);
-  }
+  }*/
 
-  private async _ensureStorage() {
-    const check: boolean = await this._checkFileExists(this.collectionPath);
-    if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
-  }
-
-  private async _setEndTransafer() {
+  /*private _setEndTransafer() {
     const check: boolean = await this._checkFileExists(this._fileEndTransfer);
     if (!check) await this._saveEndTransafer(this._fileEndTransfer);
-  }
+  }*/
 
   private _Obj2FileName(fileInfo: IFileMessageInfo): string {
     const { id, producer, consumer } = fileInfo;
@@ -214,13 +247,13 @@ class CollectionMessage<T extends CollectionItem> {
     }
   }
 
-  private async _saveEndTransafer(path: string): Promise<void> {
+  /*private async _saveEndTransafer(path: string): Promise<void> {
     try {
       return fs.writeFile(path, JSON.stringify(''));
     } catch (err) {
       throw new DataNotFoundException(`Ошибка записи в файл ${err}`);
     }
-  }
+  }*/
 }
 
 export default CollectionMessage;
