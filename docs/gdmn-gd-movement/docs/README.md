@@ -171,13 +171,11 @@
 
 Экран сканирования на ТСД:
 
-<img src="img/3.Docs/3.ScanReader.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.ScanReaderOne.png" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanReader.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanReaderOne.png" alt="drawing" height="400"/>
 
 Экран сканирования на мобильном устройстве:
 
-<img src="img/3.Docs/3.Scan.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.ScanOne.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.Scan.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanOne.jpg" alt="drawing" height="400"/>
 
 Сканируем штрихкод и переходим на экран позиции документа для ввода количества:
 
@@ -187,8 +185,7 @@
 
 Если отсканированный штрихкод не найден в справочнике, и если документ работает не только с остатками товаров (например, документ прихода), то в позицию подставится неизвестный товар:
 
-<img src="img/3.Docs/3.ScanUnknown.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.PrihodGoodLineUnknown.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanUnknown.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineUnknown.jpg" alt="drawing" height="400"/>
 
 Но если документ работает только с остатками (например, документ инвентаризации), то товар с неизвестным штрихкодом добавить нельзя.
 
@@ -199,17 +196,13 @@
 В меню, расположенном в правом верхнем углу, нажимаем на пункт **Добавить товар**.
 Выбираем товар из списка, воспользовавшись строкой поиска (по названию или штрихкоду). Далее вводим количество и сохраняем позицию.
 
-<img src="img/3.Docs/3.PrihodViewMenu.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.PrihodRemains.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.PrihodRemainsSearch.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodViewMenu.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodRemains.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodRemainsSearch.jpg" alt="drawing" height="400"/>
 
 Кроме количества в позиции документа можно заполнить поле EID, которое используется для хранения DataMatrix кода прослеживаемого товара.
 
 Для этого необходимо нажать на кнопку **Сканировать EID** и просканировать DataMatrix код.
 
-<img src="img/3.Docs/3.ScanEID.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.ScanDataMatrix.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.PrihodGoodLineOneNew.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ScanEID.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ScanDataMatrix.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodGoodLineOneNew.jpg" alt="drawing" height="400"/>
 
 #### Удаление позиции
 
@@ -217,8 +210,7 @@
 
 Нажав на иконку удаления, позиция будет удалена.
 
-<img src="img/3.Docs/3.PrihodViewGoods.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.SwipeGood.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.PrihodViewGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.SwipeGood.jpg" alt="drawing" height="400"/>
 
 ### Статус документа
 
