@@ -2,7 +2,7 @@
 
 ## 1. Подключение
 
-Чтобы запустить приложение находим иконку <img src="img/1.Connection/1.Icon.png" alt="drawing" height="50"/> на рабочем экране мобильного устройства и нажимаем на нее.
+Чтобы запустить приложение, находим иконку <img src="img/1.Connection/1.Icon.png" alt="drawing" height="50"/> на рабочем экране мобильного устройства и нажимаем на нее.
 
 При первом запуске приложения откроется стартовый экран, в котором будет предложено выбрать режим подключения:
 - Демо режим
@@ -135,7 +135,7 @@
 
 <img src="img/3.Docs/3.AddDocTypes.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodAdd.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.InventoryAdd.jpg" alt="drawing" height="400"/>
 
-Поля контактов могут быть 3 типов, которые при необходимости можно изменять:
+Поля контактов могут быть 3 типов, которые при необходимости можно менять:
 - Подразделение
 - Организация
 - Сотрудник
@@ -144,20 +144,16 @@
 
 После заполнения данных документ сохраняем, нажав на иконку **✓** в правом верхнем углу.
 
-Переходим на экран просмотра документа.
-
-<img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodView.jpg" alt="drawing" height="400"/>
-
 Отредактировать введенные данные можно, нажав на шапку документа.
+
+<img src="img/3.Docs/3.PrihodView.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodNew.jpg" alt="drawing" height="400"/>
 
 Но есть исключения:
 - Нельзя выбрать дату меньше текущей, если выбранный тип документа работает только с остатками (например, документ инвентаризации)
 - Нельзя изменить тип документа, если в документ уже добавлены товары
 - Нельзя изменить тип и значение контакта, по которому выбираются остатки, если в документ уже добавлены товары
 
-<img src="img/3.Docs/3.ErrorDate.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.ErrorDocType.jpg" alt="drawing" height="400"/>
-<img src="img/3.Docs/3.ErrorTo.jpg" alt="drawing" height="400"/>
+<img src="img/3.Docs/3.ErrorDate.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ErrorDocType.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.ErrorTo.jpg" alt="drawing" height="400"/>
 
 ### Добавление товара
 
