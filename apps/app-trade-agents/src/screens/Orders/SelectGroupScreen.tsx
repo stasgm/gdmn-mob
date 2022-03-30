@@ -28,6 +28,8 @@ const Group = ({
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data);
+
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
@@ -59,21 +61,25 @@ const Group = ({
 
   // const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id && groupsModel[group.id]);
 
-  const nextLevelGroups11 = Object.values(model).filter((i) => i.parent.id === item?.id);
-  //.filter((i) => i[1].parent.id === item?.id);
+  const nextLevelGroups111 = model[item.id]?.children;
 
-  console.log('nextLevelGroups11', nextLevelGroups11);
+  console.log('11', nextLevelGroups111);
+  // const nextLevelGroups11 = Object.values(model).filter((i) => i.parent.id === item?.id);
+  // //.filter((i) => i[1].parent.id === item?.id);
 
-  const nextLevelGroups1 = nextLevelGroups11.map((i) => {
-    return i.children;
-  })[0];
+  // console.log('nextLevelGroups11', nextLevelGroups11);
 
-  console.log('nextLevelGroups', nextLevelGroups1);
+  // const nextLevelGroups1 = nextLevelGroups11?.map((i) => {
+  //   return i.children;
+  // })[0];
+
+  console.log('nextLevelGroups', nextLevelGroups111);
 
   const isExpand =
-    expendGroup === (item.id || item.group.id) || !!nextLevelGroups1?.find((group) => group?.group.id === expendGroup);
+    expendGroup === (item.id || item.group.id) ||
+    !!nextLevelGroups111?.find((group) => group?.group.id === expendGroup);
 
-  const icon = (nextLevelGroups1?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
+  const icon = (nextLevelGroups111?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
 
   const refListGroups = React.useRef<FlatList<IMGroup>>(null);
   useScrollToTop(refListGroups);
@@ -87,7 +93,7 @@ const Group = ({
       <TouchableOpacity
         style={styles.item}
         onPress={() =>
-          nextLevelGroups1?.length && nextLevelGroups1?.length > 0
+          nextLevelGroups111?.length && nextLevelGroups111?.length > 0
             ? setExpend(!isExpand ? item : undefined)
             : navigation.navigate('SelectGoodItem', {
                 docId,
@@ -97,7 +103,7 @@ const Group = ({
       >
         <View style={styles.details}>
           <Text style={styles.name}>{item.name || item.group.name}</Text>
-          {nextLevelGroups1?.length === 0 && (
+          {nextLevelGroups111?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
               <Text style={styles.field}>{item.goodCount}</Text>
@@ -108,10 +114,10 @@ const Group = ({
       </TouchableOpacity>
       {isExpand && (
         <View style={localStyles.marginLeft}>
-          {nextLevelGroups1 && nextLevelGroups1?.length > 0 && (
+          {nextLevelGroups111 && nextLevelGroups111?.length > 0 && (
             <FlatList
               ref={refListGroups}
-              data={nextLevelGroups1}
+              data={nextLevelGroups111}
               keyExtractor={(_, i) => String(i)}
               renderItem={({ item: group }) => renderGroup({ group })}
               ItemSeparatorComponent={ItemSeparator}
@@ -152,8 +158,8 @@ const SelectGroupScreen = () => {
   console.log('model', model);
 
   // const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
-  const firstLevelGroups1 = Object.entries(model).map((item) => {
-    return item[1].parent;
+  const firstLevelGroups1 = Object.values(model).map((item) => {
+    return item.parent;
   });
 
   console.log('firstLevelGroups', firstLevelGroups1);
