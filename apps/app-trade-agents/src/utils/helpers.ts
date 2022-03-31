@@ -4,7 +4,7 @@ import { INamedEntity } from '@lib/types';
 import { log } from '@lib/mobile-app';
 
 import { IGood, IGoodGroup, IMatrixData } from '../store/types';
-import { IMGroup, IMGroupModel } from '../store/app/types';
+import { IMGroup, IMGroupData, IMGroupModel } from '../store/app/types';
 
 const getDateString = (_date: string | Date) => {
   if (!_date) {
@@ -48,12 +48,8 @@ const twoDigits = (value: number) => {
   return value >= 10 ? value : `0${value}`;
 };
 
-const getGoodMatrixGoodByContact = (
-  goods: IGood[],
-  goodMatrix: IMatrixData[] /*, isRemains: boolean | undefined = false*/,
-  groupId?: string,
-): IGood[] => {
-  // log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+const getGoodMatrixGoodByContact = (goods: IGood[], goodMatrix: IMatrixData[], groupId?: string): IGood[] => {
+  log('getGoodMatrixGoodByContact', 'Начало построения модели матрицы товаров');
 
   const matrixGoods: IGood[] = [];
   for (const matrix of goodMatrix) {
@@ -70,53 +66,85 @@ const getGoodMatrixGoodByContact = (
       matrixGoods?.push(newGood);
     }
   }
+  log('getGoodMatrixGoodByContact', 'Окончание построения модели матрицы товаров');
   return matrixGoods;
-  // log('getRemGoodByContact', 'Окончание построения модели товаров по подразделению в разрезе штрихкодов');
 };
 
-const getGroupModelByContact = (
-  groups: IGoodGroup[],
-  goods: IGood[],
-  goodMatrix: IMatrixData[] /*, isRemains: boolean | undefined = false*/,
-) => {
-  // log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+// const getGroupModelByContact = (
+//   groups: IGoodGroup[],
+//   goods: IGood[],
+//   goodMatrix: IMatrixData[] /*, isRemains: boolean | undefined = false*/,
+// ) => {
+//   // log('getRemGoodByContact', 'Начало построения модели товаров по подразделению в разрезе штрихкодов');
+
+//   const parents: IMGroupModel = {};
+//   for (const matrix of goodMatrix) {
+//     const groupId = goods?.find((g) => g.id === matrix.goodId)?.goodgroup.id;
+//     const parent = groups.find((gr) => gr.id === groupId)?.parent;
+//     if (parent) {
+//       if (!parents[parent.id]) {
+//         const ch: IMGroup[] = [];
+//         groups
+//           .filter((gr) => gr.parent?.id === parent.id)
+//           .forEach((gr) => {
+//             const goodCount = getGoodMatrixGoodByContact(goods, goodMatrix, gr.id).length;
+//             if (goodCount) {
+//               ch.push({
+//                 group: gr,
+//                 goodCount: goodCount,
+//               });
+//             }
+//           });
+//         parents[parent.id] = {
+//           parent,
+//           children: ch,
+//         };
+//       }
+//     }
+//   }
+//   return parents;
+// };
+
+// const getGoodMatrixGood = (good: IGood, goodMatrix: IMatrixData) => {
+//   return {
+//     ...good,
+//     priceFsn: goodMatrix.priceFsn,
+//     priceFso: goodMatrix.priceFso,
+//     priceFsnSklad: goodMatrix.priceFsnSklad,
+//     priceFsoSklad: goodMatrix.priceFsoSklad,
+//   } as IGood;
+// };
+
+const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix: IMatrixData[]) => {
+  log('getGroupModelByContact', 'Начало построения модели матрицы');
+
+  const matrixByGroup = goodMatrix.reduce(
+    (p: IMGroupData<IMGroup>, { goodId, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }) => {
+      const good = goods?.find((g) => g.id === goodId);
+      const group = groups?.find((gr) => gr.id === good?.goodgroup.id);
+      if (good && group) {
+        if (!p[group.id]) {
+          p[group.id] = { group, goods: [{ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }] };
+        } else {
+          p[group.id].goods?.push({ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad });
+        }
+      }
+      return p;
+    },
+    {},
+  );
 
   const parents: IMGroupModel = {};
-  for (const matrix of goodMatrix) {
-    const good = goods?.find((g) => g.id === matrix.goodId);
-    const parent = groups.find((gr) => gr.id === good?.goodgroup.id)?.parent;
-    if (parent) {
-      if (!parents[parent.id]) {
-        const ch: IMGroup[] = [];
-        groups
-          .filter((gr) => gr.parent?.id === parent.id)
-          .forEach((gr) => {
-            const goodCount = getGoodMatrixGoodByContact(goods, goodMatrix, gr.id).length;
-            if (goodCount) {
-              ch.push({
-                group: gr,
-                goodCount: goodCount,
-              });
-            }
-          });
-        parents[parent.id] = {
-          parent,
-          children: ch,
-        };
-      }
+  const mGroups = Object.values(matrixByGroup);
+
+  for (const parent of groups.filter((gr) => !gr.parent?.id)) {
+    const grps = mGroups.filter((gr) => gr.group.parent?.id === parent.id);
+    if (grps.length) {
+      parents[parent.id] = { parent, children: grps };
     }
   }
+  log('getGroupModelByContact', 'Окончания построения модели матрицы');
   return parents;
-};
-
-const getGoodMatrixGood = (good: IGood, goodMatrix: IMatrixData) => {
-  return {
-    ...good,
-    priceFsn: goodMatrix.priceFsn,
-    priceFso: goodMatrix.priceFso,
-    priceFsnSklad: goodMatrix.priceFsnSklad,
-    priceFsoSklad: goodMatrix.priceFsoSklad,
-  } as IGood;
 };
 
 export {
@@ -125,9 +153,6 @@ export {
   isNamedEntity,
   getTimeProcess,
   twoDigits,
-  // getGoodMatrixGoodListByContact,
-  // getGoodMatrixByGoodId,
   getGoodMatrixGoodByContact,
-  getGoodMatrixGood,
   getGroupModelByContact,
 };

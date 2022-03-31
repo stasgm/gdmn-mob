@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -10,21 +10,19 @@ import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
-import { useSelector as useAppTradeSelector } from '../../store/';
 import { getGroupModelByContact } from '../../utils/helpers';
-import { IMGroup } from '../../store/app/types';
+import { IMGroupModel } from '../../store/app/types';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
-const Group = ({
-  item,
-  expendGroup,
-  setExpend,
-}: {
-  item: IGoodGroup | IMGroup;
+interface IProp {
+  model: IMGroupModel;
+  item: IGoodGroup;
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
-}) => {
+}
+
+const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
@@ -33,59 +31,17 @@ const Group = ({
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
+  const nextLevelGroups = model[item.id]?.children?.map((gr) => gr.group) || [];
 
-  const contactId =
-    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
+  const isExpand = expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup);
 
-  // const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
+  const icon = (nextLevelGroups?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
 
-  // const onDate = goodModel[contactId].onDate;
-
-  // const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
-
-  // const groupsModel = goods[item.parent?.id || item.id];
-
-  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
-
-  const newGoods = refSelectors.selectByName<IGood>('good').data;
-
-  const newGroups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
-
-  const model = getGroupModelByContact(newGroups, newGoods, newGoodMatrix[contactId]);
-  // console.log('model', model);
-
-  // const goodsObj = groupsModel[item.id];
-
-  // const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
-
-  // const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id && groupsModel[group.id]);
-
-  const nextLevelGroups111 = model[item.id]?.children;
-
-  console.log('11', nextLevelGroups111);
-  // const nextLevelGroups11 = Object.values(model).filter((i) => i.parent.id === item?.id);
-  // //.filter((i) => i[1].parent.id === item?.id);
-
-  // console.log('nextLevelGroups11', nextLevelGroups11);
-
-  // const nextLevelGroups1 = nextLevelGroups11?.map((i) => {
-  //   return i.children;
-  // })[0];
-
-  console.log('nextLevelGroups', nextLevelGroups111);
-
-  const isExpand =
-    expendGroup === (item.id || item.group.id) ||
-    !!nextLevelGroups111?.find((group) => group?.group.id === expendGroup);
-
-  const icon = (nextLevelGroups111?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
-
-  const refListGroups = React.useRef<FlatList<IMGroup>>(null);
+  const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ group }: { group: IGoodGroup | IMGroup }) => (
-    <Group key={group?.id} item={group} expendGroup={expendGroup} setExpend={setExpend} />
+  const renderGroup = ({ item }: { item: IGoodGroup }) => (
+    <Group model={model} key={item.id} item={item} expendGroup={expendGroup} setExpend={setExpend} />
   );
 
   return (
@@ -93,20 +49,22 @@ const Group = ({
       <TouchableOpacity
         style={styles.item}
         onPress={() =>
-          nextLevelGroups111?.length && nextLevelGroups111?.length > 0
+          nextLevelGroups?.length && nextLevelGroups?.length > 0
             ? setExpend(!isExpand ? item : undefined)
             : navigation.navigate('SelectGoodItem', {
                 docId,
-                groupId: item.group.id,
+                groupId: item.id,
               })
         }
       >
         <View style={styles.details}>
-          <Text style={styles.name}>{item.name || item.group.name}</Text>
-          {nextLevelGroups111?.length === 0 && (
+          <Text style={styles.name}>{item.name || item.name}</Text>
+          {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
-              <Text style={styles.field}>{item.goodCount}</Text>
+              <Text style={styles.field}>
+                {model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length}
+              </Text>
             </View>
           )}
         </View>
@@ -114,12 +72,12 @@ const Group = ({
       </TouchableOpacity>
       {isExpand && (
         <View style={localStyles.marginLeft}>
-          {nextLevelGroups111 && nextLevelGroups111?.length > 0 && (
+          {nextLevelGroups && nextLevelGroups?.length > 0 && (
             <FlatList
               ref={refListGroups}
-              data={nextLevelGroups111}
+              data={nextLevelGroups}
               keyExtractor={(_, i) => String(i)}
-              renderItem={({ item: group }) => renderGroup({ group })}
+              renderItem={renderGroup}
               ItemSeparatorComponent={ItemSeparator}
               ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
             />
@@ -139,32 +97,20 @@ const SelectGroupScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  // const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
-
-  // const onDate = goodModel[contactId].onDate;
-
-  // const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
-
-  // const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
-
   const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
-  const newGoods = refSelectors.selectByName<IGood>('good').data;
+  const goods = refSelectors.selectByName<IGood>('good').data;
 
-  const newGroups1 = refSelectors.selectByName<IGoodGroup>('goodGroup');
-  const newGroups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const model = getGroupModelByContact(newGroups, newGoods, newGoodMatrix[contactId]);
-  console.log('model', model);
+  const model = useMemo(
+    () => getGroupModelByContact(groups.data, goods, newGoodMatrix[contactId]),
+    [contactId, newGoodMatrix, goods, groups.data],
+  );
 
-  // const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
-  const firstLevelGroups1 = Object.values(model).map((item) => {
-    return item.parent;
-  });
+  const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
-  console.log('firstLevelGroups', firstLevelGroups1);
-
-  const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups1[0]);
+  const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -172,7 +118,7 @@ const SelectGroupScreen = () => {
     });
 
     if (formParams?.groupId) {
-      const expandGroup = newGroups1.data.find((group) => group.id === formParams.groupId);
+      const expandGroup = groups.data.find((group) => group.id === formParams.groupId);
       setExpend(expandGroup);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -191,17 +137,17 @@ const SelectGroupScreen = () => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ item }: { item: IGoodGroup }) => {
-    console.log('123', item);
-    return <Group item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />;
-  };
+  const renderGroup = ({ item }: { item: IGoodGroup }) => (
+    <Group model={model} item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
+  );
+
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{newGroups1.description || newGroups1.name}</SubTitle>
+      <SubTitle style={styles.title}>{groups.description || groups.name}</SubTitle>
       <Divider />
       <FlatList
         ref={refListGroups}
-        data={firstLevelGroups1}
+        data={firstLevelGroups}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderGroup}
         ItemSeparatorComponent={ItemSeparator}

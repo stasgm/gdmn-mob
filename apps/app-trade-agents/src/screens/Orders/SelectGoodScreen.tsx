@@ -11,9 +11,8 @@ import { Searchbar, IconButton, Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
-import { useSelector as useAppTradeSelector } from '../../store/';
-import { getGoodMatrixGoodByContact, getGroupModelByContact } from '../../utils/helpers';
+import { IGood, IGoodMatrix, IOrderDocument } from '../../store/types';
+import { getGoodMatrixGoodByContact } from '../../utils/helpers';
 
 const Good = ({ item }: { item: IGood }) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();
@@ -79,43 +78,23 @@ const SelectGoodScreen = () => {
   const contactId =
     docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
-  // const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
-
-  // const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
-
-  // const onDate = goodModel[contactId].onDate;
-
-  // const allGoods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
-
-  // const parentGroup = groups.find((gr) => gr.id === groupId)?.parent?.id;
-
-  // const groupsModel = parentGroup ? allGoods[parentGroup] : {};
-
-  // const goods = refSelectors.selectByName<IGood>('good');
-
-  //////
-
   const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
   const newGoods = refSelectors.selectByName<IGood>('good').data;
   const newGoods1 = refSelectors.selectByName<IGood>('good');
 
-  const model = getGoodMatrixGoodByContact(newGoods, newGoodMatrix[contactId], groupId);
-
-  //////
-
-  // const list = Object.entries(groupsModel[groupId]).map(([_, good]) => good);
+  const model = useMemo(
+    () => getGoodMatrixGoodByContact(newGoods, newGoodMatrix[contactId], groupId),
+    [contactId, groupId, newGoodMatrix, newGoods],
+  );
 
   const filteredList = useMemo(() => {
     return (
-      // list
       model
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
   }, [model, searchQuery]);
-
-  console.log('list', filteredList);
 
   return (
     <AppScreen>

@@ -55,7 +55,8 @@ export interface IModelData<T = unknown> {
 
 export interface IMGroup {
   group: IGoodGroup;
-  goodCount: number;
+  goodCount?: number;
+  goods?: IGood[];
 }
 
 export interface IMGroupParent {

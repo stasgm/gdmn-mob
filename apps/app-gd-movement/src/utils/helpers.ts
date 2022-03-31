@@ -157,12 +157,14 @@ const getRemGoodListByContact = (goods: IGood[], remains: IRemainsData[], isRema
 
 //Возвращает объект остатков тмц, пример: {"1": [{ price: 1.2, q: 1 }, { price: 1.3, q: 2 }]}
 const getRemainsByGoodId = (remains: IRemainsData[]) => {
-  return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, price = 0, q = 0 }: IRemainsData) => {
+  return remains.reduce((p: IMGoodData<IModelRem[]>, { goodId, price = 0, buyingPrice = 0, q = 0 }: IRemainsData) => {
     const x = p[goodId];
     if (!x) {
-      p[goodId] = [{ price, q }];
+      p[goodId] = [{ price, buyingPrice, q }];
     } else {
-      x.push({ price, q });
+      x.push({ price, buyingPrice, q });
+      //!!!!!
+      p[goodId] = x;
     }
     return p;
   }, {});
