@@ -1,13 +1,57 @@
-import { ICheckTransafer } from '@lib/types';
+import { Transfer } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
 import { getDb } from './dao/db';
 
 /**
+ * Проверяет глобальную переменную обмена сообщений
+ * */
+const getTransfer = (): Transfer => {
+  const db = getDb();
+  const { messages } = db;
+
+  try {
+    return messages.getTransfer();
+  } catch (err) {
+    throw new DataNotFoundException(err as string);
+  }
+};
+
+/**
+ * Устанавливает глобальную переменную обмена сообщений с переданным uid
+ * */
+const setTransfer = (): Transfer => {
+  const db = getDb();
+  const { messages } = db;
+
+  try {
+    return messages.setTransfer();
+  } catch (err) {
+    throw new DataNotFoundException(err as string);
+  }
+};
+
+/**
+ *  Завершает процесс с заданным uid ( устанавливает в глобалной переменной
+ *  обмена сообщений  uid = '0'
+ * */
+const deleteTransfer = (uid: string): string => {
+  const db = getDb();
+  const { messages } = db;
+
+  try {
+    messages.deleteTransfer(uid);
+    return `Процесс ${uid} завершен`;
+  } catch (err) {
+    throw new DataNotFoundException(err as string);
+  }
+};
+
+/**
  * Удаляет файл-маркер окончания обмена сообщений
  * */
-const deleteEndTransfer = async (): Promise<string> => {
+/* const deleteEndTransfer = async (): Promise<string> => {
   const db = getDb();
   const { messages } = db;
 
@@ -17,12 +61,12 @@ const deleteEndTransfer = async (): Promise<string> => {
   } catch (err) {
     throw new DataNotFoundException(err as string);
   }
-};
+}; */
 
 /**
  * Добавляет файл-маркер окончания обмена сообщений
  * */
-const insertEndTransfer = async (): Promise<string> => {
+/* const insertEndTransfer = async (): Promise<string> => {
   const db = getDb();
   const { messages } = db;
 
@@ -32,12 +76,12 @@ const insertEndTransfer = async (): Promise<string> => {
   } catch (err) {
     throw new DataNotFoundException(err as string);
   }
-};
+}; */
 
 /**
  * Проверяет наличие файла-маркера окончания обмена сообщений
  * */
-const checkEndTransfer = async (): Promise<ICheckTransafer> => {
+/* const checkEndTransfer = async (): Promise<ICheckTransafer> => {
   const db = getDb();
   const { messages } = db;
 
@@ -49,6 +93,6 @@ const checkEndTransfer = async (): Promise<ICheckTransafer> => {
   } catch (err) {
     throw new DataNotFoundException(err as string);
   }
-};
+}; */
 
-export { deleteEndTransfer, insertEndTransfer, checkEndTransfer };
+export { deleteTransfer, setTransfer, getTransfer };
