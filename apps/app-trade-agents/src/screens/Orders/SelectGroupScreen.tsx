@@ -92,6 +92,9 @@ const SelectGroupScreen = () => {
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+  const syncDate = useSelector((state) => state.app.syncDate);
+
   const contactId =
     docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;
 
@@ -104,8 +107,8 @@ const SelectGroupScreen = () => {
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
   const model = useMemo(
-    () => getGroupModelByContact(groups.data, goods, newGoodMatrix[contactId]),
-    [contactId, newGoodMatrix, goods, groups.data],
+    () => getGroupModelByContact(groups.data, goods, newGoodMatrix[contactId], isUseNetPrice),
+    [groups.data, goods, newGoodMatrix, contactId, isUseNetPrice],
   );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);

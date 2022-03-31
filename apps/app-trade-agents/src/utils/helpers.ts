@@ -1,5 +1,3 @@
-import { addAbortSignal } from 'stream';
-
 import { INamedEntity } from '@lib/types';
 import { log } from '@lib/mobile-app';
 
@@ -48,22 +46,35 @@ const twoDigits = (value: number) => {
   return value >= 10 ? value : `0${value}`;
 };
 
-const getGoodMatrixGoodByContact = (goods: IGood[], goodMatrix: IMatrixData[], groupId?: string): IGood[] => {
+const getGoodMatrixGoodByContact = (
+  goods: IGood[],
+  goodMatrix: IMatrixData[],
+  isRemains: boolean,
+  groupId?: string,
+): IGood[] => {
   log('getGoodMatrixGoodByContact', 'Начало построения модели матрицы товаров');
 
   const matrixGoods: IGood[] = [];
-  for (const matrix of goodMatrix) {
-    const good = goods?.find((g) => g.id === matrix.goodId);
-    if ((groupId && good?.goodgroup.id === groupId) || !groupId) {
-      const newGood: IGood = {
-        ...good,
-        priceFsn: matrix.priceFsn,
-        priceFso: matrix.priceFso,
-        priceFsnSklad: matrix.priceFsnSklad,
-        priceFsoSklad: matrix.priceFsoSklad,
-      } as IGood;
+  if (isRemains) {
+    for (const matrix of goodMatrix) {
+      const good = goods?.find((g) => g.id === matrix.goodId);
+      if ((groupId && good?.goodgroup.id === groupId) || !groupId) {
+        const newGood: IGood = {
+          ...good,
+          priceFsn: matrix.priceFsn,
+          priceFso: matrix.priceFso,
+          priceFsnSklad: matrix.priceFsnSklad,
+          priceFsoSklad: matrix.priceFsoSklad,
+        } as IGood;
 
-      matrixGoods?.push(newGood);
+        matrixGoods?.push(newGood);
+      }
+    }
+  } else {
+    for (const good of goods) {
+      if ((groupId && good?.goodgroup.id === groupId) || !groupId) {
+        matrixGoods?.push(good);
+      }
     }
   }
   log('getGoodMatrixGoodByContact', 'Окончание построения модели матрицы товаров');
@@ -115,7 +126,12 @@ const getGoodMatrixGoodByContact = (goods: IGood[], goodMatrix: IMatrixData[], g
 //   } as IGood;
 // };
 
-const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix: IMatrixData[]) => {
+const getGroupModelByContact = (
+  groups: IGoodGroup[],
+  goods: IGood[],
+  goodMatrix: IMatrixData[],
+  isRemains: boolean,
+) => {
   log('getGroupModelByContact', 'Начало построения модели матрицы');
 
   const matrixByGroup = goodMatrix.reduce(

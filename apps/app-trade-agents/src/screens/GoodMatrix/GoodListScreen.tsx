@@ -32,7 +32,7 @@ const GoodListScreen = () => {
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
   const [goodRemains] = useState<IGood[]>(() =>
-    contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id]) : [],
+    contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id], true) : [],
   );
 
   const filteredList = useMemo(() => {

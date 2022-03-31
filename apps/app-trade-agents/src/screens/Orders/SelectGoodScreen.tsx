@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { docSelectors, refSelectors } from '@lib/store';
+import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
@@ -49,6 +49,7 @@ const SelectGoodScreen = () => {
   const { groupId, docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -84,8 +85,8 @@ const SelectGoodScreen = () => {
   const newGoods1 = refSelectors.selectByName<IGood>('good');
 
   const model = useMemo(
-    () => getGoodMatrixGoodByContact(newGoods, newGoodMatrix[contactId], groupId),
-    [contactId, groupId, newGoodMatrix, newGoods],
+    () => getGoodMatrixGoodByContact(newGoods, newGoodMatrix[contactId], isUseNetPrice, groupId),
+    [contactId, groupId, isUseNetPrice, newGoodMatrix, newGoods],
   );
 
   const filteredList = useMemo(() => {
