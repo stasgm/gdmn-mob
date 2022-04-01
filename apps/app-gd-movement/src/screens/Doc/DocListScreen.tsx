@@ -117,14 +117,14 @@ export const DocListScreen = () => {
     });
   }, [status, list]);
 
-  const f1: IListItemProps[] = useMemo(() => {
+  const newFilteredList: IListItemProps[] = useMemo(() => {
     const res = type?.id === 'all' ? filteredList : filteredList?.filter((i) => i?.documentType === type?.id);
     return res;
   }, [filteredList, type?.id]);
 
   const sections = useMemo(
     () =>
-      f1?.reduce<SectionDataProps>((prev, item) => {
+      newFilteredList?.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
@@ -141,7 +141,7 @@ export const DocListScreen = () => {
           },
         ];
       }, []),
-    [f1],
+    [newFilteredList],
   );
 
   const handleAddDocument = useCallback(() => {
