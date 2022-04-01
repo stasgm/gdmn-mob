@@ -19,10 +19,10 @@ import {
 
 import { IResponse, ISettingsOption } from '@lib/types';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IGood, IReturnDocument, ISellBill, IToken, ISellBillFormParam } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
-
 import config from '../../config';
 
 import { mockSellBills } from '../../utils/constants';

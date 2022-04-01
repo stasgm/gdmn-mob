@@ -34,39 +34,6 @@ const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-// const navItems: INavItem[] = [
-//   /*   {
-//     name: 'Dashboard',
-//     title: 'Дашборд',
-//     icon: 'view-dashboard-outline',
-//     component: DashboardNavigator,
-//   }, */
-//   {
-//     name: 'Routes',
-//     title: 'Маршруты',
-//     icon: 'routes',
-//     component: RoutesNavigator,
-//   },
-//   {
-//     name: 'Orders',
-//     title: 'Заявки',
-//     icon: 'clipboard-list-outline',
-//     component: OrdersNavigator,
-//   },
-//   {
-//     name: 'Returns',
-//     title: 'Возвраты',
-//     icon: 'file-restore',
-//     component: ReturnsNavigator,
-//   },
-//   {
-//     name: 'Map',
-//     title: 'Карта',
-//     icon: 'map-outline',
-//     component: MapNavigator,
-//   },
-// ];
-
 const backGroup = { id: '3', name: 'Настройки бэк-офиса', sortOrder: 3 };
 
 const appSettings: Settings = {

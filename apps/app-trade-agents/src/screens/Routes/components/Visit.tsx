@@ -16,14 +16,14 @@ import {
   ScreenListItem,
   IListItemProps,
 } from '@lib/mobile-ui';
-import { useSendDocs } from '@lib/mobile-app';
+import { useSendDocs, getDateString } from '@lib/mobile-app';
 
 import { useTheme } from 'react-native-paper';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
-import { getDateString, getTimeProcess, twoDigits } from '../../../utils/helpers';
+import { getTimeProcess, twoDigits } from '../../../utils/helpers';
 import SwipeListItem from '../../../components/SwipeListItem';
 
 interface IVisitProps {

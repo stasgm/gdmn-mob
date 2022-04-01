@@ -18,8 +18,9 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IOrderDocument } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 

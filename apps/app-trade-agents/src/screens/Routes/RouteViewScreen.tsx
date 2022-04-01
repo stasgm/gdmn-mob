@@ -15,7 +15,7 @@ import {
 } from '@lib/mobile-ui';
 import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
-import { getDateString } from '../../utils/helpers';
+import { getDateString } from '@lib/mobile-app';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';

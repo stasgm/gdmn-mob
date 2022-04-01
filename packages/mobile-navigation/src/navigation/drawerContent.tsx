@@ -10,7 +10,7 @@ import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
 
-import { getDateString } from '../../../mobile-app/src/utils/helpers';
+import { getDateString } from '@lib/mobile-app';
 
 interface ICutsomProps {
   onSync?: () => void;

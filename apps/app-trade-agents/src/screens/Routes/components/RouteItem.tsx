@@ -7,9 +7,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
-import { getDateString } from '../../../utils/helpers';
 
 export interface IItem {
   routeId: string;

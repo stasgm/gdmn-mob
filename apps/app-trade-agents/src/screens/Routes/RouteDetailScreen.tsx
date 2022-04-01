@@ -10,10 +10,11 @@ import { useTheme } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
-import { getDateString } from '../../utils/helpers';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';

@@ -18,9 +18,10 @@ import {
 } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;

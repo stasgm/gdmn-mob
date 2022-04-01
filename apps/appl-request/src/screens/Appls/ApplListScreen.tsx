@@ -15,10 +15,9 @@ import {
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { shortenString } from '@lib/mobile-app';
+import { getDateString, shortenString } from '@lib/mobile-app';
 
 import { IApplDocument } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
 
 import ApplListItem, { ApplListRenderItemProps } from './components/ApplListItem';
 
