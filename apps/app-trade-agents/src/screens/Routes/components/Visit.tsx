@@ -52,13 +52,13 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
-    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
+    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet?.id === outlet.id);
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
   const returnDocs = docSelectors
     .selectByDocType<IReturnDocument>('return')
-    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
+    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet?.id === outlet.id);
 
   const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 
