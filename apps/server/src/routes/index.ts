@@ -8,6 +8,7 @@ import Message from './message.router';
 import DeviceBinding from './devicebinding.router';
 import ActivationCode from './activationCode.router';
 import TestServer from './test.router';
+import TransferServer from './transfer.router';
 
 const rootRouter = new Router();
 
@@ -29,6 +30,7 @@ rootRouter
   .use(ActivationCode.middleware())
   .use(Message.middleware())
   .use(DeviceBinding.middleware())
-  .use(TestServer.middleware());
+  .use(TestServer.middleware())
+  .use(TransferServer.middleware());
 
 export default rootRouter;

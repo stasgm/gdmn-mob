@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
@@ -7,8 +7,10 @@ import {
   appSelectors,
   // authActions,
   authSelectors,
+  referenceActions,
   settingsActions,
   useDispatch,
+  useRefThunkDispatch,
   useSelector,
 } from '@lib/store';
 
@@ -16,7 +18,9 @@ import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as U
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
-import { ISettingsOption } from '@lib/types';
+import { IReferences, ISettingsOption } from '@lib/types';
+
+import { sleep } from '@lib/client-api';
 
 import { appTradeActions, store, useSelector as useAppTradeSelector } from './src/store';
 
@@ -28,7 +32,7 @@ import {
   GoodMatrixNavigator,
 } from './src/navigation';
 
-import { appSettings } from './src/utils/constants';
+import { appSettings, messageAgent, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -79,6 +83,16 @@ const Root = () => {
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
   const isGetReferences = useSelector((state) => state.settings?.data.getReferences);
+  const isDemo = useSelector((state) => state.auth.isDemo);
+
+  const refDispatch = useRefThunkDispatch();
+
+  const getMessages = useCallback(async () => {
+    await sleep(ONE_SECOND_IN_MS);
+    await refDispatch(
+      referenceActions.setReferences(messageAgent.find((m) => m.body.type === 'REFS')?.body.payload as IReferences),
+    );
+  }, [refDispatch]);
 
   useEffect(() => {
     if (appSettings && isInit) {
@@ -130,7 +144,12 @@ const Root = () => {
       </Caption>
     </AppScreen>
   ) : (
-    <MobileApp items={navItems} loadingErrors={[tradeLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
+    <MobileApp
+      items={navItems}
+      loadingErrors={[tradeLoadingError]}
+      onClearLoadingErrors={onClearLoadingErrors}
+      onGetMessages={isDemo ? getMessages : undefined}
+    />
   );
 };
 

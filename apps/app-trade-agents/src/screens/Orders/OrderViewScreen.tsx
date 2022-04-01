@@ -106,8 +106,8 @@ const OrderViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
-            <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddOrderLine} />
+            <MenuButton actionsMenu={actionsMenu} />
           </View>
         ),
     });

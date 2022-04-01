@@ -33,7 +33,7 @@ const GoodItem = ({ item }: IProps) => {
           <Text style={[styles.name, { color: colors.text }]}>{item?.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
-              {item.remains} {item.good.valuename} - {(item?.price || 0).toString()} р.
+              {item.remains} {item.good.valueName} - {(item?.price || 0).toString()} р.
             </Text>
             {barcode && (
               <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.good.barcode}</Text>
