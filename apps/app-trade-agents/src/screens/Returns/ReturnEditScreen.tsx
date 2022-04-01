@@ -244,7 +244,7 @@ const ReturnEditScreen = () => {
           </>
         )}
         <Input
-          label="Номер документа"
+          label="Номер"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
           disabled={isBlocked}
