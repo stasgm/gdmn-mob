@@ -12,6 +12,7 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
 import { getGroupModelByContact } from '../../utils/helpers';
 import { IMGroupModel } from '../../store/app/types';
+import { unknownGroup } from '../../utils/constants';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -104,11 +105,13 @@ const SelectGroupScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
+  const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
+
+  const groups = refGroup.data.concat(unknownGroup);
 
   const model = useMemo(
-    () => getGroupModelByContact(groups.data, goods, newGoodMatrix[contactId], isUseNetPrice),
-    [groups.data, goods, newGoodMatrix, contactId, isUseNetPrice],
+    () => getGroupModelByContact(groups, goods, newGoodMatrix[contactId], isUseNetPrice),
+    [groups, goods, newGoodMatrix, contactId, isUseNetPrice],
   );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
@@ -121,7 +124,7 @@ const SelectGroupScreen = () => {
     });
 
     if (formParams?.groupId) {
-      const expandGroup = groups.data.find((group) => group.id === formParams.groupId);
+      const expandGroup = groups.find((group) => group.id === formParams.groupId);
       setExpend(expandGroup);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,7 +149,7 @@ const SelectGroupScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{groups.description || groups.name}</SubTitle>
+      <SubTitle style={styles.title}>{refGroup.description || refGroup.name}</SubTitle>
       <Divider />
       <FlatList
         ref={refListGroups}

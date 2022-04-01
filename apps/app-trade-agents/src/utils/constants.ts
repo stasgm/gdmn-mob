@@ -69,6 +69,8 @@ const getStatusColor = (status: StatusType) => {
 
 const backGroup = { id: '3', name: 'Настройки бэк-офиса', sortOrder: 3 };
 
+const unknownGroup = { id: 'unknown', name: 'Другое' };
+
 const appSettings: Settings = {
   isUseNetPrice: {
     id: '5',
@@ -155,4 +157,4 @@ const mockSellBills: ISellBill[] = [
   },
 ] as any;
 
-export { getStatusColor, appSettings, mockSellBills };
+export { getStatusColor, appSettings, mockSellBills, unknownGroup };
