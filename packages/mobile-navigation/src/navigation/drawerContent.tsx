@@ -23,7 +23,6 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
   const user = useSelector((state) => state.auth.user);
   const company = useSelector((state) => state.auth.company);
-  // const loading = useSelector((state) => state.app.loading);
 
   const translateX = Animated.interpolateNode(props.progress, {
     inputRange: [0, 0.5, 0.7, 0.8, 1],
@@ -68,14 +67,14 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
         <TouchableOpacity onPress={onSync}>
           <Avatar.Icon size={50} icon="cloud-refresh" children={undefined} />
         </TouchableOpacity>
-        {syncDate ? (
+        {!!syncDate && (
           <View style={styles.updateSection}>
             <Caption style={styles.caption}>Дата синхронизации:</Caption>
             <Caption style={styles.caption}>
               {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
             </Caption>
           </View>
-        ) : null}
+        )}
       </View>
     </>
   );
@@ -120,7 +119,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    paddingLeft: 20,
     paddingHorizontal: 20,
     paddingVertical: 15,
   },

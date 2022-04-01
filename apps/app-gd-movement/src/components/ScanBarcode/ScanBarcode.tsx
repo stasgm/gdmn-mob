@@ -89,18 +89,21 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
         <View style={styles.header}>
           <IconButton
             icon={flashMode ? 'flash' : 'flash-off'}
+            size={30}
             color={'#FFF'}
             style={styles.transparent}
             onPress={() => setFlashMode(!flashMode)}
           />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
+            size={30}
             color={'#FFF'}
             style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
           <IconButton
             icon={'feature-search-outline'}
+            size={30}
             color={'#FFF'}
             style={styles.transparent}
             onPress={onShowRemains}

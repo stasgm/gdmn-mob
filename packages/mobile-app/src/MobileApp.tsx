@@ -28,13 +28,14 @@ import { truncate } from './utils/helpers';
 export interface IApp {
   items?: INavItem[];
   store?: Store<any, any>;
-  onSync?: () => void;
+  onSync?: () => Promise<any>;
+  onGetMessages?: () => Promise<any>;
   loadingErrors?: string[];
   onClearLoadingErrors?: () => void;
 }
 
-const AppRoot = ({ items, onSync }: Omit<IApp, 'store'>) => {
-  const handleSyncData = useSync(onSync);
+const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
+  const handleSyncData = useSync(onSync, onGetMessages);
   const config = useSelector((state) => state.auth.config);
 
   useEffect(() => {

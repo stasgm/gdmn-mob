@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0008',
     height: 100,
     justifyContent: 'center',
+    paddingBottom: 10,
   },
   goodInfo: {
     flexShrink: 1,
@@ -66,7 +67,6 @@ const styles = StyleSheet.create({
     height: 70,
     justifyContent: 'space-around',
     paddingHorizontal: 10,
-    paddingTop: 30,
   },
   infoContainer: {
     height: 100,

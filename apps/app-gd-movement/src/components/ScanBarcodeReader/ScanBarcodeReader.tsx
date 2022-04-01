@@ -96,12 +96,14 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
         <View style={styles.header}>
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
+            size={30}
             color={'#FFF'}
             style={styles.transparent}
             onPress={() => setVibroMode(!vibroMode)}
           />
           <IconButton
             icon={'feature-search-outline'}
+            size={30}
             color={'#FFF'}
             style={styles.transparent}
             onPress={onShowRemains}
@@ -172,10 +174,8 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
         )}
         {!scanned && (
           <View style={styles.footer}>
-            <>
-              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={styles.text}>Отсканируйте штрихкод</Text>
-            </>
+            <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+            <Text style={styles.text}>Отсканируйте штрихкод</Text>
           </View>
         )}
       </View>

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
@@ -7,10 +7,11 @@ import ErrorBoundary from 'react-native-error-boundary';
 import {
   appActions,
   appSelectors,
-  authActions,
   authSelectors,
+  referenceActions,
   settingsActions,
   useDispatch,
+  useRefThunkDispatch,
   useSelector,
 } from '@lib/store';
 import {
@@ -23,11 +24,15 @@ import {
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
+import { IReferences } from '@lib/types';
+
+import { sleep } from '@lib/client-api';
+
 import { DocNavigator } from './src/navigation/DocNavigator';
 
 import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
-import { appSettings } from './src/utils/constants';
+import { appSettings, messageGdMovement, ONE_SECOND_IN_MS } from './src/utils/constants';
 import RemainsNavigator from './src/navigation/RemainsNavigator';
 
 const Root = () => {
@@ -59,6 +64,18 @@ const Root = () => {
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const invLoading = useInvSelector((state) => state.appInventory.loading);
+  const isDemo = useSelector((state) => state.auth.isDemo);
+
+  const refDispatch = useRefThunkDispatch();
+
+  const getMessages = useCallback(async () => {
+    await sleep(ONE_SECOND_IN_MS);
+    await refDispatch(
+      referenceActions.setReferences(
+        messageGdMovement.find((m) => m.body.type === 'REFS')?.body.payload as IReferences,
+      ),
+    );
+  }, [refDispatch]);
 
   useEffect(() => {
     if (appSettings && isInit) {
@@ -68,7 +85,6 @@ const Root = () => {
   }, [isInit]);
 
   useEffect(() => {
-    // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -107,7 +123,12 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp items={navItems} loadingErrors={[invLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
+        <MobileApp
+          items={navItems}
+          loadingErrors={[invLoadingError]}
+          onClearLoadingErrors={onClearLoadingErrors}
+          onGetMessages={isDemo ? getMessages : undefined}
+        />
       )}
     </ErrorBoundary>
   );

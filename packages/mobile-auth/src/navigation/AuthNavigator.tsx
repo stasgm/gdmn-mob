@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { authActions, useSelector, useAuthThunkDispatch, useDispatch } from '@lib/store';
+import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 import api from '@lib/client-api';
@@ -28,7 +28,6 @@ const AuthNavigator: React.FC = () => {
   const user = useSelector((state) => state.auth.user);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
-  const dispatch = useDispatch();
 
   /*
     При запуске приложения
