@@ -14,6 +14,8 @@ interface Props {
   required?: boolean;
 }
 
+const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
+
 const SelectableInput = ({ value, onPress, label, placeholder, editable = false, disabled }: Props) => {
   const { colors } = useTheme();
 
@@ -22,7 +24,7 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
       <View style={styles.containerInput}>
         <TextInput
           label={label}
-          value={value || ''}
+          value={truncate(value || '', 35)}
           theme={{
             colors: {
               primary: colors.primary,
@@ -31,7 +33,6 @@ const SelectableInput = ({ value, onPress, label, placeholder, editable = false,
               background: colors.surface,
             },
           }}
-          maxLength={35}
           mode="outlined"
           style={styles.input}
           placeholderTextColor={colors.text}

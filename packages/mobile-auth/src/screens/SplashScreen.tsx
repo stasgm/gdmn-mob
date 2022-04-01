@@ -31,11 +31,12 @@ const SplashScreen = (props: Props) => {
           Подключение к серверу
         </ScreenTitle>
         <View style={localStyles.container}>
-          {/* <Text style={localStyles.serverName}>
-            {settings ? `${settings.protocol}${settings.server}:${settings.port}` : 'сервер не указан'}
-          </Text> */}
-          <PrimeButton icon={!loading ? 'apps' : 'block-helper'} onPress={!loading ? onCheckDevice : onBreakConnection}>
-            {!loading ? 'Подключиться' : 'Прервать'}
+          <PrimeButton
+            icon={!loading ? 'apps' : 'block-helper'}
+            onPress={!loading ? onCheckDevice : onBreakConnection}
+            disabled={loading}
+          >
+            {'Подключиться'}
           </PrimeButton>
         </View>
       </AppScreen>
