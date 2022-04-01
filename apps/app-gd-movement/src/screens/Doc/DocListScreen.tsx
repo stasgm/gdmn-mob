@@ -205,6 +205,7 @@ export const DocListScreen = () => {
     setVisibleStatus(false);
     setStatus(option.id);
   }, []);
+
   const handleApplyDate = useCallback((option) => {
     setVisibleDate(false);
     setDate(option);
