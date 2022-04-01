@@ -81,30 +81,6 @@ const PrimeButton = ({
   );
 };
 
-/* const CustomButton = ({
-  outlined = true,
-  onPress,
-  children,
-  disabled = false,
-  style,
-}: {
-  onPress?: () => void;
-  disabled?: boolean;
-  outlined: boolean;
-  children: React.ReactNode;
-  style?: StyleProp<ViewStyle>;
-}) => {
-  return outlined ? (
-    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPress} disabled={disabled} style={style}>
-      {children}
-    </TouchableHighlight>
-  ) : (
-    <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={style} disabled={disabled}>
-      {children}
-    </TouchableOpacity>
-  );
-}; */
-
 export default PrimeButton;
 
 const localStyles = StyleSheet.create({
