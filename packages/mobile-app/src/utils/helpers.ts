@@ -17,4 +17,8 @@ const getDateString = (_date: string | Date) => {
   )}.${date.getFullYear()}`;
 };
 
-export { truncate, log, getDateString };
+const shortenString = (word: string, maxLenght: number) => {
+  return word.length > maxLenght ? word.substring(0, maxLenght - 3) + '...' : word;
+};
+
+export { truncate, log, getDateString, shortenString };

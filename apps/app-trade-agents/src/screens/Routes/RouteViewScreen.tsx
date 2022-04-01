@@ -34,11 +34,10 @@ const RouteViewScreen = () => {
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
   const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
+  const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
-
-  const routeLineList = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id)?.lines;
 
   const visitList = docSelectors
     .selectByDocType<IVisitDocument>('visit')
@@ -116,7 +115,7 @@ const RouteViewScreen = () => {
       <Divider />
       <FlatList
         ref={ref}
-        data={route.lines.sort((a, b) => a.ordNumber - b.ordNumber)}
+        data={routeLineList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
