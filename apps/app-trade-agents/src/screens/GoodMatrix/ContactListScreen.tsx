@@ -1,3 +1,4 @@
+import { getDateString } from '@lib/mobile-app';
 import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
@@ -9,7 +10,6 @@ import { IconButton, Searchbar } from 'react-native-paper';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
 
 import ContactItem from './components/ContactItem';
 

@@ -6,9 +6,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IRouteDocument } from '../../../store/types';
 import { getStatusColor } from '../../../utils/constants';
-import { getDateString } from '../../../utils/helpers';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 const RouteListItem = ({ item }: { item: IRouteDocument }) => {

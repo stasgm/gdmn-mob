@@ -33,15 +33,7 @@ const findAll = async () => {
  * @param {string} userId - идентификатор пользователя
  * @return массив сообщений
  * */
-const FindMany = async ({
-  appSystem,
-  companyId,
-  consumerId,
-}: {
-  appSystem: string;
-  companyId: string;
-  consumerId: string;
-}) => {
+const FindMany = async ({ companyId, consumerId }: { appSystem: string; companyId: string; consumerId: string }) => {
   const db = getDb();
   const { messages, companies, users } = db;
 

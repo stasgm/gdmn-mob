@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
@@ -24,53 +24,57 @@ import { sleep } from '@lib/client-api';
 
 import { appTradeActions, store, useSelector as useAppTradeSelector } from './src/store';
 
-import RoutesNavigator from './src/navigation/Root/RoutesNavigator';
-import OrdersNavigator from './src/navigation/Root/OrdersNavigator';
-import ReturnsNavigator from './src/navigation/Root/ReturnsNavigator';
-import MapNavigator from './src/navigation/Root/Maps/MapNavigator';
-import GoodMatrixNavigator from './src/navigation/Root/GoodMatrixNavigator';
+import {
+  RoutesNavigator,
+  OrdersNavigator,
+  ReturnsNavigator,
+  MapNavigator,
+  GoodMatrixNavigator,
+} from './src/navigation';
 
 import { appSettings, messageAgent, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 const Root = () => {
-  const navItems: INavItem[] = [
-    {
-      name: 'RoutesNav',
-      title: 'Маршруты',
-      icon: 'routes',
-      component: RoutesNavigator,
-    },
-    {
-      name: 'OrdersNav',
-      title: 'Заявки',
-      icon: 'clipboard-list-outline',
-      component: OrdersNavigator,
-    },
-    {
-      name: 'ReturnsNav',
-      title: 'Возвраты',
-      icon: 'file-restore',
-      component: ReturnsNavigator,
-    },
-    {
-      name: 'MapNav',
-      title: 'Карта',
-      icon: 'map-outline',
-      component: MapNavigator,
-    },
-    {
-      name: 'GoodMatrixNav',
-      title: 'Матрицы',
-      icon: 'tag-text-outline',
-      component: GoodMatrixNavigator,
-    },
-  ];
+  const navItems: INavItem[] = useMemo(
+    () => [
+      {
+        name: 'RoutesNav',
+        title: 'Маршруты',
+        icon: 'routes',
+        component: RoutesNavigator,
+      },
+      {
+        name: 'OrdersNav',
+        title: 'Заявки',
+        icon: 'clipboard-list-outline',
+        component: OrdersNavigator,
+      },
+      {
+        name: 'ReturnsNav',
+        title: 'Возвраты',
+        icon: 'file-restore',
+        component: ReturnsNavigator,
+      },
+      {
+        name: 'MapNav',
+        title: 'Карта',
+        icon: 'map-outline',
+        component: MapNavigator,
+      },
+      {
+        name: 'GoodMatrixNav',
+        title: 'Матрицы',
+        icon: 'tag-text-outline',
+        component: GoodMatrixNavigator,
+      },
+    ],
+    [],
+  );
 
   const dispatch = useDispatch();
   const { colors } = useTheme();
 
   useEffect(() => {
-    // console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,6 +112,7 @@ const Root = () => {
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const isLogged = authSelectors.isLoggedWithCompany();
+  const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
 
   useEffect(() => {
     if (isLogged) {
@@ -124,8 +129,6 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  const tradeLoadingError = useAppTradeSelector<string>((state) => state.appTrade.loadingError);
 
   const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
 

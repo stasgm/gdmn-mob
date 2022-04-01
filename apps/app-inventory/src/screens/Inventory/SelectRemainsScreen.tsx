@@ -11,7 +11,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IDepartment } from '@lib/types';
 
-import { formatValue, getRemGoodListByContact } from '../../utils/helpers';
+import { formatValue } from '@lib/mobile-app';
+
+import { getRemGoodListByContact } from '../../utils/helpers';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';

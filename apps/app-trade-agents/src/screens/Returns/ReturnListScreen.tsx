@@ -18,9 +18,10 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { getDateString } from '../../utils/helpers';
 import SwipeListItem from '../../components/SwipeListItem';
 
 export interface ReturnListSectionProps {

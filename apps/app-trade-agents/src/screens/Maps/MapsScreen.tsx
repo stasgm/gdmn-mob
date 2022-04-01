@@ -11,14 +11,14 @@ import { docSelectors, refSelectors } from '@lib/store';
 
 import { IListItem } from '@lib/mobile-types';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
 import { ILocation } from '../../store/geo/types';
 import { IOutlet, IRouteDocument } from '../../store/types';
 
 import { getCurrentPosition } from '../../utils/expoFunctions';
-
-import { getDateString } from '../../utils/helpers';
 
 import localStyles from './styles';
 

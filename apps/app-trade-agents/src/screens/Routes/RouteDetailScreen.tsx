@@ -10,10 +10,11 @@ import { useTheme } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
-import { getDateString } from '../../utils/helpers';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 
 import Visit from './components/Visit';
@@ -46,11 +47,18 @@ const RouteDetailScreen = () => {
       </View>
     );
   }
-
   //TODO получить адрес item.outlet.id
   const outlet = point
     ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
     : undefined;
+
+  if (!outlet) {
+    return (
+      <View style={styles.content}>
+        <SubTitle style={styles.title}>{`Магазин ${point.outlet.name} не найден в справочниках`}</SubTitle>
+      </View>
+    );
+  }
 
   const contact = outlet
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
@@ -75,33 +83,32 @@ const RouteDetailScreen = () => {
 
     try {
       coords = await getCurrentPosition();
+
+      const date = new Date().toISOString();
+
+      const visitId = uuid();
+
+      const newVisit: IVisitDocument = {
+        id: visitId,
+        documentType: visitDocumentType,
+        number: visitId,
+        documentDate: date,
+        status: 'DRAFT',
+        head: {
+          routeLineId: id,
+          dateBegin: date,
+          beginGeoPoint: coords,
+          takenType: 'ON_PLACE',
+        },
+        creationDate: date,
+        editionDate: date,
+      };
+      dispatch(documentActions.addDocument(newVisit));
     } catch (e) {
       // setMessage(e.message);
       // setBarVisible(true);
+      console.log('err', e);
     }
-
-    const date = new Date().toISOString();
-
-    const visitId = uuid();
-
-    const newVisit: IVisitDocument = {
-      id: visitId,
-      documentType: visitDocumentType,
-      number: visitId,
-      documentDate: date,
-      status: 'DRAFT',
-      head: {
-        routeLineId: id,
-        dateBegin: date,
-        beginGeoPoint: coords,
-        takenType: 'ON_PLACE',
-      },
-      creationDate: date,
-      editionDate: date,
-    };
-
-    dispatch(documentActions.addDocument(newVisit));
-
     setProcess(false);
   };
 
@@ -130,7 +137,7 @@ const RouteDetailScreen = () => {
           )}
         </>
       </InfoBlock>
-      {visits.length > 0 ? (
+      {visits.length > 0 && !process ? (
         <>
           {visits.map((visit) => (
             <Visit
@@ -143,7 +150,7 @@ const RouteDetailScreen = () => {
           ))}
         </>
       ) : (
-        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit}>
+        <PrimeButton icon="play-circle-outline" onPress={handleNewVisit} disabled={process}>
           Начать визит
         </PrimeButton>
       )}

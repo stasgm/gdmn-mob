@@ -10,7 +10,16 @@ import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
 
-import { getDateString } from '../../../mobile-app/src/utils/helpers';
+const getDateString = (_date: string | Date) => {
+  if (!_date) {
+    return '-';
+  }
+  const date = new Date(_date);
+  return `${('0' + date.getDate()).toString().slice(-2, 3)}.${('0' + (date.getMonth() + 1).toString()).slice(
+    -2,
+    3,
+  )}.${date.getFullYear()}`;
+};
 
 interface ICutsomProps {
   onSync?: () => void;

@@ -9,7 +9,8 @@ import { docSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { formatValue } from '../../utils/helpers';
+import { formatValue } from '@lib/mobile-app';
+
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument } from '../../store/types';

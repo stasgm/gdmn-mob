@@ -20,9 +20,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { sleep } from '@lib/client-api';
 
-import { IReturnDocument, IReturnLine } from '../../store/types';
+import { getDateString } from '@lib/mobile-app';
 
-import { getDateString } from '../../utils/helpers';
+import { IReturnDocument, IReturnLine } from '../../store/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 

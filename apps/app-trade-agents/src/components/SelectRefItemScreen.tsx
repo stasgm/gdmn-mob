@@ -14,8 +14,9 @@ import {
   globalStyles as styles,
 } from '@lib/mobile-ui';
 
+import { extraPredicate } from '@lib/mobile-app';
+
 import { useDispatch } from '../store';
-import { extraPredicate } from '../utils/helpers';
 
 import { RefParamList } from '../navigation/Root/types';
 import { IOutlet } from '../store/types';
