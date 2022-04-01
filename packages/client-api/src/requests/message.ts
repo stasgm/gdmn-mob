@@ -1,5 +1,4 @@
 import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
-import { messageRequest, messageAgent, messageInventory, messageBcMovement, messageGdMovement } from '@lib/mock';
 
 import { error, message as types } from '../types';
 import { sleep } from '../utils';
@@ -61,33 +60,9 @@ class Message extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      let msg: IMessage[] = [];
-      switch (systemName) {
-        case 'gdmn-appl-request': {
-          msg = messageRequest;
-          break;
-        }
-        case 'gdmn-sales-representative': {
-          msg = messageAgent;
-          break;
-        }
-        case 'gdmn-inventory': {
-          msg = messageInventory;
-          break;
-        }
-        case 'gdmn-gd-movement': {
-          msg = messageGdMovement;
-          break;
-        }
-        case 'gdmn-bc-movement': {
-          msg = messageBcMovement;
-          break;
-        }
-      }
-
       return {
         type: 'GET_MESSAGES',
-        messageList: msg,
+        messageList: [],
       } as types.IGetMessagesResponse;
     }
 

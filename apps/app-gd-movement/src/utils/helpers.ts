@@ -163,8 +163,6 @@ const getRemainsByGoodId = (remains: IRemainsData[]) => {
       p[goodId] = [{ price, buyingPrice, q }];
     } else {
       x.push({ price, buyingPrice, q });
-      //!!!!!
-      p[goodId] = x;
     }
     return p;
   }, {});

@@ -29,7 +29,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Цена</Text>
-          <Text style={[styles.number, styles.field]}>{item?.price}</Text>
+          <Text style={[styles.number, styles.field]}>{item?.price} р</Text>
         </View>
       </View>
       <ItemSeparator />
@@ -37,7 +37,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Покупная цена</Text>
-          <Text style={[styles.number, styles.field]}>{item?.buyingPrice || '0'}</Text>
+          <Text style={[styles.number, styles.field]}>{item?.buyingPrice || '0'} р</Text>
         </View>
       </View>
       <ItemSeparator />
@@ -45,7 +45,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Остаток</Text>
-          <Text style={[styles.number, styles.field]}>{item?.remains}</Text>
+          <Text style={[styles.number, styles.field]}>{`${item?.remains}  ${item.good.valueName}`}</Text>
         </View>
       </View>
     </View>

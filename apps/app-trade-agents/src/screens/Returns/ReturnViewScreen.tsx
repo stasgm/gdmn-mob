@@ -103,8 +103,8 @@ const ReturnViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
-            <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddSellBill} />
+            <MenuButton actionsMenu={actionsMenu} />
           </View>
         ),
     });

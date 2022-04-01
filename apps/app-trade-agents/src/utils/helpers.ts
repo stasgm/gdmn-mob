@@ -1,7 +1,7 @@
 import { INamedEntity } from '@lib/types';
 import { log } from '@lib/mobile-app';
 
-import { IGood, IGoodGroup, IMatrixData } from '../store/types';
+import { IGood, IGoodGroup, IMatrixData, IOrderDocument, IReturnDocument } from '../store/types';
 import { IMGroup, IMGroupData, IMGroupModel } from '../store/app/types';
 
 import { unknownGroup } from './constants';
@@ -46,6 +46,14 @@ const getTimeProcess = (db: string, de?: string) => {
 
 const twoDigits = (value: number) => {
   return value >= 10 ? value : `0${value}`;
+};
+
+export const getNextDocNumber = (documents: IOrderDocument[] | IReturnDocument[]) => {
+  return (
+    documents
+      ?.map((item) => parseInt(item.number, 10))
+      .reduce((newId, currId) => (newId > currId ? newId : currId), 0) + 1 || 1
+  ).toString();
 };
 
 const getGoodMatrixGoodByContact = (

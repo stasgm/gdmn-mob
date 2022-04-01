@@ -102,3 +102,18 @@ export interface IFileMessageInfo {
   producer: string;
   consumer: string;
 }
+
+export interface ICheckTransafer {
+  state: boolean;
+}
+
+export interface ITransfer {
+  uid: string;
+  uDate: string;
+}
+
+export type Transfer = ITransfer | undefined;
+
+export type ITransferReq = {
+  uid: string;
+};

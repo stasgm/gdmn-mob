@@ -39,11 +39,11 @@ export const appMiddlewareFactory: PersistedMiddleware =
 
     if (store.getState().auth.user?.id) {
       switch (action.type) {
+        case getType(appActions.init):
         case getType(appActions.setSyncDate): {
           const result = next(action);
 
           save('app', store.getState().app, store.getState().auth.user?.id).catch((err) => {
-            console.log('app', err);
             if (err instanceof Error) {
               store.dispatch(appActions.setLoadingError(err.message));
             } else {

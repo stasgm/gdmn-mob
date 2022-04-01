@@ -20,14 +20,15 @@ import { IDocumentType, IReference } from '@lib/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
+import { getDateString, getNextDocNumber } from '../../utils/helpers';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
 
-  const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
+  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+  const order = orders?.find((e) => e.id === id);
 
   const orderType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -37,6 +38,8 @@ const OrderEditScreen = () => {
 
   // Подразделение по умолчанию
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+
+  const newNumber = getNextDocNumber(orders);
 
   const {
     contact: docContact,
@@ -102,7 +105,7 @@ const OrderEditScreen = () => {
     } else {
       dispatch(
         appActions.setFormParams({
-          number: '1',
+          number: newNumber,
           onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
@@ -110,7 +113,7 @@ const OrderEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, order, defaultDepart]);
+  }, [dispatch, order, defaultDepart, newNumber]);
 
   const handleSave = useCallback(() => {
     if (!orderType) {

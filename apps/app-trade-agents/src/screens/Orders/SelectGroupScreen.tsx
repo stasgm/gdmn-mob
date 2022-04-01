@@ -1,5 +1,5 @@
-import React, { useState, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
@@ -10,7 +10,7 @@ import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
-import { getGroupModelByContact } from '../../utils/helpers';
+import { getDateString, getGroupModelByContact } from '../../utils/helpers';
 import { IMGroupModel } from '../../store/app/types';
 import { unknownGroup } from '../../utils/constants';
 
@@ -26,8 +26,6 @@ interface IProp {
 const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
-
-  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data);
 
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
@@ -93,8 +91,16 @@ const SelectGroupScreen = () => {
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
+
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+
   const syncDate = useSelector((state) => state.app.syncDate);
+
+  useEffect(() => {
+    if (syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+      return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
+    }
+  }, [syncDate]);
 
   const contactId =
     docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;

@@ -50,7 +50,6 @@ export const referenceMiddlewareFactory: PersistedMiddleware =
           const result = next(action);
 
           save('references', store.getState().references, store.getState().auth.user?.id).catch((err) => {
-            console.log('save references', err);
             if (err instanceof Error) {
               store.dispatch(actions.setLoadingError(err.message));
             } else {

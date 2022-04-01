@@ -30,7 +30,7 @@ const ProfileScreen = () => {
     Alert.alert('Вы уверены, что хотите удалить все данные?', '', [
       {
         text: 'Да',
-        onPress: async () => {
+        onPress: () => {
           dispatch(documentActions.init());
           dispatch(referenceActions.init());
           dispatch(appActions.init());
