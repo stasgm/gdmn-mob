@@ -16,14 +16,14 @@ import {
   ScreenListItem,
   IListItemProps,
 } from '@lib/mobile-ui';
-import { useSendDocs } from '@lib/mobile-app';
+import { useSendDocs, getDateString } from '@lib/mobile-app';
 
 import { useTheme } from 'react-native-paper';
 
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
-import { getDateString, getTimeProcess, twoDigits } from '../../../utils/helpers';
+import { getTimeProcess, twoDigits } from '../../../utils/helpers';
 import SwipeListItem from '../../../components/SwipeListItem';
 
 interface IVisitProps {
@@ -52,13 +52,13 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
-    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
+    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet?.id === outlet.id);
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
   const returnDocs = docSelectors
     .selectByDocType<IReturnDocument>('return')
-    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet.id === outlet.id);
+    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet?.id === outlet.id);
 
   const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 

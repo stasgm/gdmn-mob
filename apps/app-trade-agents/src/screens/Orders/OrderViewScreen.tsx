@@ -20,9 +20,9 @@ import { sleep } from '@lib/client-api';
 
 import { useTheme } from 'react-native-paper';
 
-import { IOrderDocument, IOrderLine } from '../../store/types';
+import { getDateString } from '@lib/mobile-app';
 
-import { getDateString } from '../../utils/helpers';
+import { IOrderDocument, IOrderLine } from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -106,8 +106,8 @@ const OrderViewScreen = () => {
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>
-            <MenuButton actionsMenu={actionsMenu} />
             <AddButton onPress={handleAddOrderLine} />
+            <MenuButton actionsMenu={actionsMenu} />
           </View>
         ),
     });

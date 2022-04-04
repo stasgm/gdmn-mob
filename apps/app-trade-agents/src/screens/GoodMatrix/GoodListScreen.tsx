@@ -8,7 +8,9 @@ import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
-import { IContact, IGood, IGoodMatrix, IMatrixDataNamed } from '../../store/types';
+import { IContact, IGood, IGoodMatrix } from '../../store/types';
+
+import { getGoodMatrixGoodByContact } from '../../utils/helpers';
 
 import GoodItem from './components/GoodItem';
 
@@ -16,7 +18,11 @@ const GoodListScreen = () => {
   const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodList'>>().params;
   const contact = refSelectors.selectByName<IContact>('contact')?.data.find((e) => e.id === id);
 
-  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data.find((item) => item.contactId === id);
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
+
+  // const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() =>
+  //   contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id]) : {},
+  // );
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -25,26 +31,22 @@ const GoodListScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
+  const [goodRemains] = useState<IGood[]>(() =>
+    contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id], true) : [],
+  );
+
   const filteredList = useMemo(() => {
-    const res = goodMatrix?.data;
     return (
-      res
-        ?.map((item) => {
-          const name = goods.find((i) => i.id === item.goodId)?.name;
-          return {
-            ...item,
-            goodName: name,
-          } as IMatrixDataNamed;
-        })
+      goodRemains
         ?.filter((i) =>
-          i.goodName || i.priceFsn
-            ? String(i.goodName).toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i.name || i.priceFsn
+            ? String(i.name).toUpperCase().includes(searchQuery.toUpperCase()) ||
               String(i.priceFsn).toUpperCase().includes(searchQuery.toUpperCase())
             : true,
         )
-        ?.sort((a, b) => (a.goodName < b.goodName ? -1 : 1)) || []
+        ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, [goodMatrix?.data, goods, searchQuery]);
+  }, [goodRemains, searchQuery]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -66,7 +68,7 @@ const GoodListScreen = () => {
     });
   }, [navigation, filterVisible, colors.card]);
 
-  const renderItem = ({ item }: { item: IMatrixDataNamed }) => <GoodItem item={item} />;
+  const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
 
   return (
     <AppScreen>

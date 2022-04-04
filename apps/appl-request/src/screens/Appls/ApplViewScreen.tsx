@@ -16,9 +16,9 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { IApplDocument, IApplLine } from '../../store/types';
+import { getDateString } from '@lib/mobile-app';
 
-import { getDateString } from '../../utils/helpers';
+import { IApplDocument, IApplLine } from '../../store/types';
 
 import { ApplsStackParamList } from '../../navigation/Root/types';
 

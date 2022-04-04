@@ -1,15 +1,15 @@
+import { getDateString } from '@lib/mobile-app';
 import { AppScreen, DrawerButton, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
+import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionList, SectionListData, View, Text } from 'react-native';
+import { SectionList, SectionListData, View, Text, Alert } from 'react-native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
 
 import ContactItem from './components/ContactItem';
 
@@ -27,11 +27,19 @@ const ContactListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
+  const syncDate = useSelector((state) => state.app.syncDate);
+
+  useEffect(() => {
+    if (syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+      return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
+    }
+  }, [syncDate]);
+
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
 
-  const contacts = refSelectors
-    .selectByName<IContact>('contact')
-    ?.data.filter((i) => i.id === goodMatrix?.find((item) => item.contactId === i.id)?.contactId);
+  const matrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data[0];
+
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 
   const filteredList = useMemo(() => {
     return (
@@ -44,8 +52,7 @@ const ContactListScreen = () => {
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const matrixDate = goodMatrix.find((i) => i.contactId === item.id)?.onDate;
-        const sectionTitle = matrixDate ? getDateString(matrixDate) : '';
+        const sectionTitle = syncDate ? getDateString(syncDate) : '';
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>
@@ -61,7 +68,7 @@ const ContactListScreen = () => {
           },
         ];
       }, []),
-    [filteredList, goodMatrix],
+    [filteredList, syncDate],
   );
 
   useEffect(() => {

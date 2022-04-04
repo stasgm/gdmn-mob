@@ -27,6 +27,7 @@ import { IDocumentType } from '@lib/types';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
+import { getNextDocNumber } from '../../utils/helpers';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
@@ -34,11 +35,14 @@ const ReturnEditScreen = () => {
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
 
-  const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
+  const returns = docSelectors.selectByDocType<IReturnDocument>('return');
+  const returnDoc = returns?.find((e) => e.id === id);
 
   const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 
   const formParams = useSelector((state) => state.app.formParams);
+
+  const newNumber = getNextDocNumber(returns);
 
   const {
     contact: docContact,
@@ -100,14 +104,14 @@ const ReturnEditScreen = () => {
     } else {
       dispatch(
         appActions.setFormParams({
-          number: '1',
+          number: newNumber,
           onDate: new Date().toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
         }),
       );
     }
-  }, [dispatch, returnDoc]);
+  }, [dispatch, newNumber, returnDoc]);
 
   const handleSave = useCallback(() => {
     if (!(docNumber && docContact && docOutlet && docDocumentDate)) {
@@ -244,7 +248,7 @@ const ReturnEditScreen = () => {
           </>
         )}
         <Input
-          label="Номер документа"
+          label="Номер"
           value={docNumber}
           onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
           disabled={isBlocked}

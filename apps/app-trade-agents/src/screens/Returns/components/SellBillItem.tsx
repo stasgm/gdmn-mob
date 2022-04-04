@@ -8,8 +8,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { INamedEntity } from '@lib/types';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
-import { getDateString } from '../../../utils/helpers';
 
 interface IProps {
   item: ISellBillListRenderItemProps;

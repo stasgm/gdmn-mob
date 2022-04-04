@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
-import { docSelectors, refSelectors } from '@lib/store';
+import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
@@ -11,8 +11,8 @@ import { Searchbar, IconButton, Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
-import { useSelector as useAppTradeSelector } from '../../store/';
+import { IGood, IGoodMatrix, IOrderDocument } from '../../store/types';
+import { getGoodMatrixGoodByContact } from '../../utils/helpers';
 
 const Good = ({ item }: { item: IGood }) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();
@@ -49,6 +49,7 @@ const SelectGoodScreen = () => {
   const { groupId, docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -78,33 +79,27 @@ const SelectGoodScreen = () => {
   const contactId =
     docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
 
-  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
+  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
+  const newGoods = refSelectors.selectByName<IGood>('good').data;
+  const newGoods1 = refSelectors.selectByName<IGood>('good');
 
-  const onDate = goodModel[contactId].onDate;
-
-  const allGoods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
-
-  const parentGroup = groups.find((gr) => gr.id === groupId)?.parent?.id;
-
-  const groupsModel = parentGroup ? allGoods[parentGroup] : {};
-
-  const goods = refSelectors.selectByName<IGood>('good');
-
-  const list = Object.entries(groupsModel[groupId]).map(([_, good]) => good);
+  const model = useMemo(
+    () => getGoodMatrixGoodByContact(newGoods, newGoodMatrix[contactId], isUseNetPrice, groupId),
+    [contactId, groupId, isUseNetPrice, newGoodMatrix, newGoods],
+  );
 
   const filteredList = useMemo(() => {
     return (
-      list
+      model
         ?.filter((i) => (i.name ? i.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
         ?.sort((a, b) => (a.name < b.name ? -1 : 1)) || []
     );
-  }, [list, searchQuery]);
+  }, [model, searchQuery]);
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{goods.description || goods.name}</SubTitle>
+      <SubTitle style={styles.title}>{newGoods1.description || newGoods1.name}</SubTitle>
       <Divider />
       {filterVisible && (
         <>

@@ -1,5 +1,7 @@
 import { INamedEntity } from '@lib/types';
 
+import { IGoodGroup } from '../types';
+
 export type AppTradeState = {
   readonly goodModel: IModelData<IGoodModel>;
   readonly loading: boolean;
@@ -32,6 +34,9 @@ export interface IGoodModel {
   goods: IMParentGroupData<IMGroupData<IMGoodData<IGood>>>;
 }
 
+export interface IGoodModelNew {
+  [parentGroupId: string]: IMGroupData<number>;
+}
 export interface IMParentGroupData<T = unknown> {
   [id: string]: T;
 }
@@ -46,4 +51,19 @@ export interface IMGoodData<T = unknown> {
 
 export interface IModelData<T = unknown> {
   [contactId: string]: T;
+}
+
+export interface IMGroup {
+  group: IGoodGroup;
+  goodCount?: number;
+  goods?: IGood[];
+}
+
+export interface IMGroupParent {
+  parent: IGoodGroup;
+  children?: IMGroup[];
+}
+
+export interface IMGroupModel {
+  [parentId: string]: IMGroupParent;
 }

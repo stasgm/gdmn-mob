@@ -7,10 +7,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { GoodMatrixParamList } from '../../../navigation/Root/types';
-import { IMatrixDataNamed } from '../../../store/types';
+import { IGood, IMatrixDataNamed } from '../../../store/types';
 
 interface IProps {
-  item: IMatrixDataNamed;
+  item: IGood;
 }
 
 const GoodItem = ({ item }: IProps) => {
@@ -28,7 +28,7 @@ const GoodItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item?.goodName}</Text>
+          <Text style={[styles.name, { color: colors.text }]}>{item?.name}</Text>
           <Text style={[styles.field, { color: colors.text }]}>{(item?.priceFsn || 0).toString()} р.</Text>
         </View>
       </View>

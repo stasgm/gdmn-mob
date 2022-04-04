@@ -104,9 +104,9 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               color="black"
             />
           </TouchableOpacity>
-          {isVisiblePackages && (
+          {packages.length > 0 ? (
             <View>
-              {packages.length > 0 ? (
+              {isVisiblePackages && (
                 <View style={localStyles.packages}>
                   {packages.map((elem) => (
                     <Checkbox
@@ -117,10 +117,10 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                     />
                   ))}
                 </View>
-              ) : (
-                <Text style={localStyles.text}>Для данного товара нет</Text>
               )}
             </View>
+          ) : (
+            <Text style={localStyles.text}>Для данного товара нет упаковки</Text>
           )}
           <ItemSeparator />
         </View>

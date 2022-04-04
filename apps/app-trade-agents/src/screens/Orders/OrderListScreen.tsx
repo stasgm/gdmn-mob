@@ -1,6 +1,6 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
 import {
@@ -18,8 +18,9 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IOrderDocument } from '../../store/types';
-import { getDateString } from '../../utils/helpers';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -33,9 +34,22 @@ const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
   const { loading } = useSelector((state) => state.documents);
+  const { colors } = useTheme();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
 
   const list = docSelectors
     .selectByDocType<IOrderDocument>('order')
+    ?.filter((i) =>
+      i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate || i.head.onDate
+        ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
+          getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase())
+        : true,
+    )
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
@@ -91,16 +105,28 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
+          <IconButton
+            icon="card-search-outline"
+            style={filterVisible && { backgroundColor: colors.card }}
+            size={26}
+            onPress={() => setFilterVisible((prev) => !prev)}
+          />
           <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
-  }, [handleAddDocument, navigation]);
+  }, [colors.card, filterVisible, handleAddDocument, navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
@@ -114,6 +140,19 @@ const OrderListScreen = () => {
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <SectionList
         sections={sections}
         renderItem={renderItem}

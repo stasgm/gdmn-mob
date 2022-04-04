@@ -1,7 +1,8 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { IconButton, Searchbar } from 'react-native-paper';
 
 import { docSelectors, useSelector } from '@lib/store';
 import {
@@ -17,23 +18,38 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import { getDateString } from '../../utils/helpers';
 import SwipeListItem from '../../components/SwipeListItem';
 
-export interface OrderListSectionProps {
+export interface ReturnListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, ReturnListSectionProps>[];
 
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
 
   const { loading } = useSelector((state) => state.documents);
+
+  const { colors } = useTheme();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+
   const list = docSelectors
     .selectByDocType<IReturnDocument>('return')
+    ?.filter((i) =>
+      i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
+        ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+        : true,
+    )
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
@@ -89,16 +105,28 @@ const ReturnListScreen = () => {
     navigation.navigate('ReturnEdit');
   }, [navigation]);
 
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <DrawerButton />,
       headerRight: () => (
         <View style={styles.buttons}>
+          <IconButton
+            icon="card-search-outline"
+            style={filterVisible && { backgroundColor: colors.card }}
+            size={26}
+            onPress={() => setFilterVisible((prev) => !prev)}
+          />
           <AddButton onPress={handleAddDocument} />
         </View>
       ),
     });
-  }, [handleAddDocument, navigation]);
+  }, [colors.card, filterVisible, handleAddDocument, navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
@@ -112,6 +140,19 @@ const ReturnListScreen = () => {
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <SectionList
         sections={sections}
         keyExtractor={({ id }) => id}

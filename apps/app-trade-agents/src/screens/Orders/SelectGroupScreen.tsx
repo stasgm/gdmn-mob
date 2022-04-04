@@ -1,5 +1,5 @@
-import React, { useState, useLayoutEffect } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
@@ -9,54 +9,38 @@ import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles 
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup, IOrderDocument } from '../../store/types';
-import { useSelector as useAppTradeSelector } from '../../store/';
+import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
+import { getDateString, getGroupModelByContact } from '../../utils/helpers';
+import { IMGroupModel } from '../../store/app/types';
+import { unknownGroup } from '../../utils/constants';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
-const Group = ({
-  item,
-  expendGroup,
-  setExpend,
-}: {
+interface IProp {
+  model: IMGroupModel;
   item: IGoodGroup;
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
-}) => {
+}
+
+const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
+  const nextLevelGroups = model[item.id]?.children?.map((gr) => gr.group) || [];
 
-  const contactId =
-    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
+  const isExpand = expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup);
 
-  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
-
-  const onDate = goodModel[contactId].onDate;
-
-  const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
-
-  const groupsModel = goods[item.parent?.id || item.id];
-
-  const goodsObj = groupsModel[item.id];
-
-  const goodCount = goodsObj ? Object.values(goodsObj).length : 0;
-
-  const nextLevelGroups = groups.data.filter((group) => group.parent?.id === item.id && groupsModel[group.id]);
-
-  const isExpand = expendGroup === item.id || !!nextLevelGroups.find((group) => group.id === expendGroup);
-
-  const icon = (nextLevelGroups.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
+  const icon = (nextLevelGroups?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ group }: { group: IGoodGroup }) => (
-    <Group key={group.id} item={group} expendGroup={expendGroup} setExpend={setExpend} />
+  const renderGroup = ({ item }: { item: IGoodGroup }) => (
+    <Group model={model} key={item.id} item={item} expendGroup={expendGroup} setExpend={setExpend} />
   );
 
   return (
@@ -64,7 +48,7 @@ const Group = ({
       <TouchableOpacity
         style={styles.item}
         onPress={() =>
-          nextLevelGroups.length > 0
+          nextLevelGroups?.length && nextLevelGroups?.length > 0
             ? setExpend(!isExpand ? item : undefined)
             : navigation.navigate('SelectGoodItem', {
                 docId,
@@ -73,11 +57,13 @@ const Group = ({
         }
       >
         <View style={styles.details}>
-          <Text style={styles.name}>{item.name}</Text>
-          {nextLevelGroups.length === 0 && (
+          <Text style={styles.name}>{item.name || item.name}</Text>
+          {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={15} />
-              <Text style={styles.field}>{goodCount}</Text>
+              <Text style={styles.field}>
+                {model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length}
+              </Text>
             </View>
           )}
         </View>
@@ -85,12 +71,12 @@ const Group = ({
       </TouchableOpacity>
       {isExpand && (
         <View style={localStyles.marginLeft}>
-          {nextLevelGroups.length > 0 && (
+          {nextLevelGroups && nextLevelGroups?.length > 0 && (
             <FlatList
               ref={refListGroups}
               data={nextLevelGroups}
               keyExtractor={(_, i) => String(i)}
-              renderItem={({ item: group }) => renderGroup({ group })}
+              renderItem={renderGroup}
               ItemSeparatorComponent={ItemSeparator}
               ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
             />
@@ -105,20 +91,36 @@ const SelectGroupScreen = () => {
   const navigation = useNavigation();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
+
+  const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
+
+  const syncDate = useSelector((state) => state.app.syncDate);
+
+  useEffect(() => {
+    if (syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+      return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
+    }
+  }, [syncDate]);
+
   const contactId =
     docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  const goodModel = useAppTradeSelector((state) => state.appTrade.goodModel);
+  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
-  const onDate = goodModel[contactId].onDate;
+  const goods = refSelectors.selectByName<IGood>('good').data;
 
-  const goods = new Date(onDate).toDateString() === new Date().toDateString() ? goodModel[contactId].goods : {};
+  const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup');
+  const groups = refGroup.data.concat(unknownGroup);
 
-  const firstLevelGroups = groups.data?.filter((item) => !item.parent && Object.keys(goods[item.id] || []).length > 0);
+  const model = useMemo(
+    () => getGroupModelByContact(groups, goods, newGoodMatrix[contactId], isUseNetPrice),
+    [groups, goods, newGoodMatrix, contactId, isUseNetPrice],
+  );
+
+  const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
@@ -128,7 +130,7 @@ const SelectGroupScreen = () => {
     });
 
     if (formParams?.groupId) {
-      const expandGroup = groups.data.find((group) => group.id === formParams.groupId);
+      const expandGroup = groups.find((group) => group.id === formParams.groupId);
       setExpend(expandGroup);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,12 +150,12 @@ const SelectGroupScreen = () => {
   useScrollToTop(refListGroups);
 
   const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
+    <Group model={model} item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
   );
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{groups.description || groups.name}</SubTitle>
+      <SubTitle style={styles.title}>{refGroup.description || refGroup.name}</SubTitle>
       <Divider />
       <FlatList
         ref={refListGroups}
