@@ -2,6 +2,8 @@ import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } fro
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
+import { IconButton, Searchbar } from 'react-native-paper';
+
 import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,

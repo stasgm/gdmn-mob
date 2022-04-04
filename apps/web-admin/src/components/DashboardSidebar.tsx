@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
@@ -9,11 +9,9 @@ import {
   Users as UsersIcon,
 } from 'react-feather';
 
-import { useSelector, useDispatch } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
-
-import actions from '../store/user';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
@@ -22,7 +20,7 @@ const avatar1 = require('../../assets/images/avatar1.svg');
 
 const userInfo = {
   avatar: avatar1,
-  jobTitle: 'Senior Developer',
+  jobTitle: 'User',
   name: 'Katarina Smith',
 };
 

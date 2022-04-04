@@ -8,9 +8,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
-import { getDateString, getGroupModelByContact } from '../../utils/helpers';
+import { getGroupModelByContact } from '../../utils/helpers';
 import { IMGroupModel } from '../../store/app/types';
 import { unknownGroup } from '../../utils/constants';
 

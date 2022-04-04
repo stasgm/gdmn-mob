@@ -8,9 +8,11 @@ import {
   // authActions,
   authSelectors,
   referenceActions,
+  documentActions,
   settingsActions,
   useDispatch,
   useRefThunkDispatch,
+  useDocThunkDispatch,
   useSelector,
 } from '@lib/store';
 
@@ -18,7 +20,7 @@ import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as U
 
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
-import { IReferences, ISettingsOption } from '@lib/types';
+import { IDocument, IReferences, ISettingsOption } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -86,13 +88,17 @@ const Root = () => {
   const isDemo = useSelector((state) => state.auth.isDemo);
 
   const refDispatch = useRefThunkDispatch();
+  const docDispatch = useDocThunkDispatch();
 
   const getMessages = useCallback(async () => {
     await sleep(ONE_SECOND_IN_MS);
     await refDispatch(
       referenceActions.setReferences(messageAgent.find((m) => m.body.type === 'REFS')?.body.payload as IReferences),
     );
-  }, [refDispatch]);
+    await docDispatch(
+      documentActions.setDocuments(messageAgent.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
+    );
+  }, [docDispatch, refDispatch]);
 
   useEffect(() => {
     if (appSettings && isInit) {

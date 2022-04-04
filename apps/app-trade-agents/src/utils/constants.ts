@@ -47,7 +47,7 @@ const appSettings: Settings = {
     description: 'Использовать матрицы',
     data: true,
     type: 'boolean',
-    sortOrder: 10,
+    sortOrder: 3,
     visible: true,
     group: baseSettingGroup,
   },
