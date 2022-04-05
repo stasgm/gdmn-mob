@@ -27,20 +27,19 @@ const ContactListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
-  const syncDate = useSelector((state) => state.app.syncDate);
-
-  useEffect(() => {
-    if (syncDate && getDateString(syncDate) !== getDateString(new Date())) {
-      return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
-    }
-  }, [syncDate]);
-
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
 
   const matrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data[0];
 
   const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 
+  const syncDate = useSelector((state) => state.app.syncDate);
+
+  useEffect(() => {
+    if (matrix && contacts && syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+      return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
+    }
+  }, [contacts, matrix, syncDate]);
   const filteredList = useMemo(() => {
     return (
       contacts
