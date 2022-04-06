@@ -105,7 +105,7 @@ const SelectGroupScreen = () => {
   }, [syncDate]);
 
   const contactId =
-    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || -1;
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || '-1';
 
   const formParams = useSelector((state) => state.app.formParams);
 
@@ -122,6 +122,7 @@ const SelectGroupScreen = () => {
     [groups, goods, newGoodMatrix, contactId, isUseNetPrice],
   );
 
+  console.log('model', model);
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);

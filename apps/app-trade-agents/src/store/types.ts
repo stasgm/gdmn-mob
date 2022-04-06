@@ -99,7 +99,6 @@ export interface IGoodMatrix {
 
 export interface IMatrixData {
   goodId: string;
-  groupId: string;
   priceFso: number; // цена ФСО
   priceFsn: number; // цена ФСН
   priceFsoSklad: number; // цена ФСО склад

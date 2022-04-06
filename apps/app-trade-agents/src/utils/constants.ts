@@ -1078,7 +1078,6 @@ const messageAgent: IMessage<MessageType>[] = [
               '147042924': [
                 {
                   goodId: '955211845',
-                  groupId: '955211845',
                   priceFsn: 18.78,
                   priceFso: 18.31,
                   priceFsnSklad: 18.78,
@@ -1086,7 +1085,6 @@ const messageAgent: IMessage<MessageType>[] = [
                 },
                 {
                   goodId: '955211846',
-                  groupId: '955211845',
                   priceFsn: 18.56,
                   priceFso: 18.12,
                   priceFsnSklad: 18.56,
@@ -1096,7 +1094,6 @@ const messageAgent: IMessage<MessageType>[] = [
               '1788296478': [
                 {
                   goodId: '955211846',
-                  groupId: '955211845',
                   priceFsn: 18.56,
                   priceFso: 18.12,
                   priceFsnSklad: 18.56,
@@ -1104,7 +1101,6 @@ const messageAgent: IMessage<MessageType>[] = [
                 },
                 {
                   goodId: '807686297',
-                  groupId: '690457771',
                   priceFsn: 5.45,
                   priceFso: 5.45,
                   priceFsnSklad: 5.45,
@@ -1112,7 +1108,6 @@ const messageAgent: IMessage<MessageType>[] = [
                 },
                 {
                   goodId: '147035338',
-                  groupId: '690457778',
                   priceFsn: 20.42,
                   priceFso: 18.02,
                   priceFsnSklad: 20.42,
@@ -1120,7 +1115,6 @@ const messageAgent: IMessage<MessageType>[] = [
                 },
                 {
                   goodId: '807686299',
-                  groupId: '690457771',
                   priceFsn: 5.85,
                   priceFso: 5.85,
                   priceFsnSklad: 5.85,
@@ -1128,7 +1122,6 @@ const messageAgent: IMessage<MessageType>[] = [
                 },
                 {
                   goodId: '955211847',
-                  groupId: '955211845',
                   priceFsn: 18.32,
                   priceFso: 18.02,
                   priceFsnSklad: 18.32,
