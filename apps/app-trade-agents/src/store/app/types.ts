@@ -1,7 +1,5 @@
 import { INamedEntity } from '@lib/types';
 
-import { IGoodGroup } from '../types';
-
 export type AppTradeState = {
   readonly goodModel: IModelData<IGoodModel>;
   readonly loading: boolean;
@@ -23,6 +21,11 @@ export interface IGood extends INamedEntity {
   priceFsoSklad: number; // цена ФСО склад
   priceFsnSklad: number; // цена ФСН склад
   scale: number; //количество единиц в месте
+}
+
+//Группы товаров
+export interface IGoodGroup extends INamedEntity {
+  parent?: INamedEntity;
 }
 
 //* Model *//

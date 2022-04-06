@@ -1,6 +1,6 @@
 import { INamedEntity } from '@lib/types';
 
-import { IGood, IMatrixDataNamed, IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
+import { IGood, IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;

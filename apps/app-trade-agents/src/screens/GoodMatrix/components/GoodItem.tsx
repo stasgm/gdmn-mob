@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { GoodMatrixParamList } from '../../../navigation/Root/types';
-import { IGood, IMatrixDataNamed } from '../../../store/types';
+import { IGood } from '../../../store/types';
 
 interface IProps {
   item: IGood;

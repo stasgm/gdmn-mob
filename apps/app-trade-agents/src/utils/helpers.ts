@@ -1,7 +1,15 @@
 import { log } from '@lib/mobile-app';
 
-import { IGood, IGoodGroup, IMatrixData, IOrderDocument, IReturnDocument } from '../store/types';
-import { IMGroup, IMGroupData, IMGroupModel } from '../store/app/types';
+import {
+  IGood,
+  IGoodGroup,
+  IMatrixData,
+  IOrderDocument,
+  IReturnDocument,
+  IMGroup,
+  IMGroupData,
+  IMGroupModel,
+} from '../store/types';
 
 import { unknownGroup } from './constants';
 
@@ -26,13 +34,13 @@ export const getNextDocNumber = (documents: IOrderDocument[] | IReturnDocument[]
 const getGoodMatrixGoodByContact = (
   goods: IGood[],
   goodMatrix: IMatrixData[],
-  isRemains: boolean,
+  isMatrix: boolean,
   groupId?: string,
 ): IGood[] => {
   log('getGoodMatrixGoodByContact', 'Начало построения модели матрицы товаров');
 
   const matrixGoods: IGood[] = [];
-  if (isRemains) {
+  if (isMatrix && goodMatrix) {
     for (const matrix of goodMatrix) {
       const good = goods?.find((g) => g.id === matrix.goodId);
       if ((groupId && good?.goodgroup.id === groupId) || !groupId) {
@@ -66,36 +74,37 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
   // Если группа не имеет роидтеля, подставляем фиктивную группу 'Другое'
   // Пример {'groupId1':{ group: {id: '11', name: 'Группа1', parent: {id: '1', name: 'Группа родительская1'}},goods: []}},
   //         'groupId2':{ group: {id: '22', name: 'Группа2', parent: {id: '2', name: 'Группа родительская2'}}, goods: []}}}
-  const matrixByGroup = isMatrix
-    ? goodMatrix.reduce((p: IMGroupData<IMGroup>, { goodId, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }) => {
-        const good = goods?.find((g) => g.id === goodId);
-        const group = groups?.find((gr) => gr.id === good?.goodgroup.id);
-        if (good && group) {
-          if (!p[group.id]) {
-            p[group.id] = {
-              group: group.parent?.id ? group : ({ ...group, parent: unknownGroup } as IGoodGroup),
-              goods: [{ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }],
-            };
+  const matrixByGroup =
+    isMatrix && goodMatrix
+      ? goodMatrix.reduce((p: IMGroupData<IMGroup>, { goodId, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }) => {
+          const good = goods?.find((g) => g.id === goodId);
+          const group = groups?.find((gr) => gr.id === good?.goodgroup.id);
+          if (good && group) {
+            if (!p[group.id]) {
+              p[group.id] = {
+                group: group.parent?.id ? group : ({ ...group, parent: unknownGroup } as IGoodGroup),
+                goods: [{ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }],
+              };
+            } else {
+              p[group.id].goods?.push({ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad });
+            }
+          }
+          return p;
+        }, {})
+      : goods.reduce((p: IMGroupData<IMGroup>, good: IGood) => {
+          if (!p[good.goodgroup.id]) {
+            const group = groups.find((gr) => gr.id === good.goodgroup.id);
+            if (group) {
+              p[good.goodgroup.id] = {
+                group: group.parent?.id ? group : ({ ...group, parent: unknownGroup } as IGoodGroup),
+                goods: [good],
+              };
+            }
           } else {
-            p[group.id].goods?.push({ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad });
+            p[good.goodgroup.id].goods?.push(good);
           }
-        }
-        return p;
-      }, {})
-    : goods.reduce((p: IMGroupData<IMGroup>, good: IGood) => {
-        if (!p[good.goodgroup.id]) {
-          const group = groups.find((gr) => gr.id === good.goodgroup.id);
-          if (group) {
-            p[good.goodgroup.id] = {
-              group: group.parent?.id ? group : ({ ...group, parent: unknownGroup } as IGoodGroup),
-              goods: [good],
-            };
-          }
-        } else {
-          p[good.goodgroup.id].goods?.push(good);
-        }
-        return p;
-      }, {});
+          return p;
+        }, {});
 
   const parents: IMGroupModel = {};
   const mGroups = Object.values(matrixByGroup);

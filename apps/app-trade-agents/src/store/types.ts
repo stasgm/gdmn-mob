@@ -13,10 +13,11 @@ import {
 } from '@lib/types';
 
 import { ICoords } from './geo/types';
-
 import { IGood } from './app/types';
 
-export { IGood };
+// import { IGood } from './app/types';
+
+export * from './app/types';
 
 export interface IFormParam {
   [fieldName: string]: unknown;
@@ -50,9 +51,6 @@ export interface ISellBillFormParam extends IFormParam {
   good?: INamedEntity;
 }
 
-// export type typeTakeOrder = 'ONPLACE' | 'BYPHONE' | 'BYEMAIL';
-
-// export type typeVisit = 'ORDER' | 'REFUSE' | 'RETURN';
 //Организации
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
@@ -76,22 +74,9 @@ export interface IDebt extends IEntity {
   saldo: number; //Задолженность
   saldoDebt: number; //Просроченная задолженность
 }
-//Группы товаров
-export interface IGoodGroup extends INamedEntity {
-  parent?: INamedEntity;
-}
 
 //Подразделения-склады
 export type IDepartment = INamedEntity;
-// Интерфейс для матрицы номенклатур для организаций
-// export interface INetPrice extends IEntity {
-//   contactId: string; // организация
-//   goodId: string; // ID товара
-//   pricefso?: number; // цена ФСО
-//   pricefsn?: number; // цена ФСН
-//   priceFsoSklad?: number; // цена ФСО склад
-//   priceFsnSklad?: number; // цена ФСН склад
-// }
 
 export interface IGoodMatrix {
   [id: string]: IMatrixData[];

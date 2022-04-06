@@ -77,16 +77,16 @@ const SelectGoodScreen = () => {
   const renderItem = ({ item }: { item: IGood }) => <Good item={item} />;
 
   const contactId =
-    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || -1;
+    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || '-1';
 
   const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
-  const newGoods = refSelectors.selectByName<IGood>('good').data;
-  const newGoods1 = refSelectors.selectByName<IGood>('good');
+  const goodRef = refSelectors.selectByName<IGood>('good');
+  const goods = goodRef.data;
 
   const model = useMemo(
-    () => getGoodMatrixGoodByContact(newGoods, newGoodMatrix[contactId], isUseNetPrice, groupId),
-    [contactId, groupId, isUseNetPrice, newGoodMatrix, newGoods],
+    () => getGoodMatrixGoodByContact(goods, newGoodMatrix[contactId], isUseNetPrice, groupId),
+    [contactId, groupId, isUseNetPrice, newGoodMatrix, goods],
   );
 
   const filteredList = useMemo(() => {
@@ -99,7 +99,7 @@ const SelectGoodScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{newGoods1.description || newGoods1.name}</SubTitle>
+      <SubTitle style={styles.title}>{goodRef.description || goodRef.name}</SubTitle>
       <Divider />
       {filterVisible && (
         <>

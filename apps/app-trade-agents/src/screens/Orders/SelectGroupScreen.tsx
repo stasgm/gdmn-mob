@@ -11,9 +11,8 @@ import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from
 import { getDateString } from '@lib/mobile-app';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodGroup, IGoodMatrix, IOrderDocument } from '../../store/types';
+import { IGood, IGoodMatrix, IOrderDocument, IGoodGroup, IMGroupModel } from '../../store/types';
 import { getGroupModelByContact } from '../../utils/helpers';
-import { IMGroupModel } from '../../store/app/types';
 import { unknownGroup } from '../../utils/constants';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
@@ -41,8 +40,8 @@ const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group model={model} key={item.id} item={item} expendGroup={expendGroup} setExpend={setExpend} />
+  const renderGroup = ({ item: grItem }: { item: IGoodGroup }) => (
+    <Group model={model} key={grItem.id} item={grItem} expendGroup={expendGroup} setExpend={setExpend} />
   );
 
   return (
@@ -122,7 +121,6 @@ const SelectGroupScreen = () => {
     [groups, goods, newGoodMatrix, contactId, isUseNetPrice],
   );
 
-  console.log('model', model);
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
