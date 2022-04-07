@@ -17,9 +17,9 @@ const RouteTotal = ({ routeId }: IItem) => {
     return Math.round((num + Number.EPSILON) * 100) / 100;
   };
 
-  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup').data;
-  const goods = refSelectors.selectByName<IGood>('good').data;
-  const firstLevelGroups = groups.filter((item) => !item.parent);
+  const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
+  const firstLevelGroups = groups?.filter((item) => !item.parent);
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order')?.filter((e) => e.head.route?.id === routeId);
 
@@ -27,7 +27,7 @@ const RouteTotal = ({ routeId }: IItem) => {
     return [...prev, ...order.lines];
   }, []);
 
-  const totalList: IRouteTotalLine[] = firstLevelGroups.map((firstGr) => ({
+  const totalList: IRouteTotalLine[] = firstLevelGroups?.map((firstGr) => ({
     group: {
       id: firstGr.id,
       name: firstGr.name,
@@ -68,7 +68,7 @@ const RouteTotal = ({ routeId }: IItem) => {
       <Divider />
       <View style={styles.bottomTotal}>
         <Text style={[styles.textTotal, styles.colorRed]}>
-          {totalList.reduce((prev, item) => prev + item.quantity, 0)}
+          {totalList?.reduce((prev, item) => prev + item.quantity, 0)}
         </Text>
       </View>
     </View>

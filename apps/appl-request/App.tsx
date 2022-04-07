@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { MobileApp } from '@lib/mobile-app';
 import { INavItem } from '@lib/mobile-navigation';
 
-import { appActions, appSelectors, authActions, authSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, appSelectors, authSelectors, useDispatch, useSelector } from '@lib/store';
 import { globalStyles as styles, Theme as defaultTheme, Provider as UIProvider, AppScreen } from '@lib/mobile-ui';
 import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
 
