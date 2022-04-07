@@ -132,7 +132,7 @@ const RouteDetailScreen = () => {
           {contact && (
             <>
               <Text>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text>{`Задолженность: ${debt.saldo}`}</Text>
+              <Text>{debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}</Text>
             </>
           )}
         </>
