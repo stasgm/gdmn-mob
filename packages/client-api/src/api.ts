@@ -13,6 +13,7 @@ import DeviceBinding from './requests/deviceBinding';
 import ActivationCode from './requests/activationCode';
 import Message from './requests/message';
 import User from './requests/user';
+import CTransfer from './requests/transfer';
 
 class Api extends BaseApi {
   protected _config: IApiConfig = {} as IApiConfig;
@@ -26,6 +27,7 @@ class Api extends BaseApi {
   public activationCode: ActivationCode;
   public message: Message;
   public user: User;
+  public transfer: CTransfer;
 
   constructor(config: IApiConfig) {
     super();
@@ -37,6 +39,7 @@ class Api extends BaseApi {
     this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
+    this.transfer = new CTransfer(this);
     this.setAxios(config);
   }
 
