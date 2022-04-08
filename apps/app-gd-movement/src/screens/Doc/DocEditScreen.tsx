@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider, useTheme } from 'react-native-paper';
 import { v4 as uuid } from 'uuid';
 
@@ -10,12 +11,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import {
   Menu,
   BackButton,
-  AppInputScreen,
   SelectableInput,
   Input,
   SaveButton,
   globalStyles as styles,
   SubTitle,
+  AppScreen,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
@@ -352,112 +353,114 @@ export const DocEditScreen = () => {
   };
 
   return (
-    <AppInputScreen>
-      <SubTitle>{statusName}</SubTitle>
-      <Divider />
-      <ScrollView>
-        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
-          <>
-            <View style={[styles.directionRow, localStyles.switchContainer]}>
-              <Text>Черновик:</Text>
-              <Switch
-                value={docStatus === 'DRAFT' || !docStatus}
-                onValueChange={() => {
-                  dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-                }}
-              />
-            </View>
-          </>
-        )}
-        <Input
-          label="Номер"
-          value={docNumber}
-          onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          disabled={isBlocked}
-          clearInput={true}
-        />
-        <SelectableInput
-          label="Дата"
-          value={getDateString(docDate || '')}
-          onPress={handlePresentDate}
-          disabled={docStatus !== 'DRAFT'}
-        />
-        <SelectableInput
-          label="Тип"
-          value={documentType?.description}
-          onPress={handlePresentType}
-          disabled={isBlocked}
-        />
-        {!!documentType?.fromType && docFromContactType && (
-          <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={localStyles.contactType}>
-              <Menu
-                key={'fromType'}
-                options={contactTypes}
-                onChange={handleFromContactType}
-                onPress={handlePressFromContact}
-                onDismiss={() => setVisibleFrom(false)}
-                title={docFromContactType?.value || ''}
-                visible={visibleFrom}
-                activeOptionId={docFromContactType?.id}
+    <AppScreen>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
+        <SubTitle>{statusName}</SubTitle>
+        <Divider />
+        <ScrollView>
+          {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
+            <>
+              <View style={[styles.directionRow, localStyles.switchContainer]}>
+                <Text>Черновик:</Text>
+                <Switch
+                  value={docStatus === 'DRAFT' || !docStatus}
+                  onValueChange={() => {
+                    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+                  }}
+                />
+              </View>
+            </>
+          )}
+          <Input
+            label="Номер"
+            value={docNumber}
+            onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
+            disabled={isBlocked}
+            clearInput={true}
+          />
+          <SelectableInput
+            label="Дата"
+            value={getDateString(docDate || '')}
+            onPress={handlePresentDate}
+            disabled={docStatus !== 'DRAFT'}
+          />
+          <SelectableInput
+            label="Тип"
+            value={documentType?.description}
+            onPress={handlePresentType}
+            disabled={isBlocked}
+          />
+          {!!documentType?.fromType && docFromContactType && (
+            <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
+              <View style={localStyles.contactType}>
+                <Menu
+                  key={'fromType'}
+                  options={contactTypes}
+                  onChange={handleFromContactType}
+                  onPress={handlePressFromContact}
+                  onDismiss={() => setVisibleFrom(false)}
+                  title={docFromContactType?.value || ''}
+                  visible={visibleFrom}
+                  activeOptionId={docFromContactType?.id}
+                  disabled={isBlocked}
+                  // menuStyle={localStyles.contactType}
+                  style={localStyles.btnTab}
+                />
+              </View>
+              <SelectableInput
+                label={documentType.fromDescription}
+                value={docFromContact?.name}
+                onPress={handleFromContact}
                 disabled={isBlocked}
-                // menuStyle={localStyles.contactType}
-                style={localStyles.btnTab}
               />
             </View>
-            <SelectableInput
-              label={documentType.fromDescription}
-              value={docFromContact?.name}
-              onPress={handleFromContact}
-              disabled={isBlocked}
-            />
-          </View>
-        )}
-        {!!documentType?.toType && docToContactType && (
-          <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
-            <View style={[localStyles.contactType]}>
-              <Menu
-                key={'toType'}
-                options={contactTypes}
-                onChange={handleToContactType}
-                onPress={handlePressToContact}
-                onDismiss={() => setVisibleTo(false)}
-                title={docToContactType?.value || ''}
-                visible={visibleTo}
-                activeOptionId={docToContactType?.id}
+          )}
+          {!!documentType?.toType && docToContactType && (
+            <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
+              <View style={[localStyles.contactType]}>
+                <Menu
+                  key={'toType'}
+                  options={contactTypes}
+                  onChange={handleToContactType}
+                  onPress={handlePressToContact}
+                  onDismiss={() => setVisibleTo(false)}
+                  title={docToContactType?.value || ''}
+                  visible={visibleTo}
+                  activeOptionId={docToContactType?.id}
+                  disabled={isBlocked}
+                  // menuStyle={localStyles.contactType}
+                  style={localStyles.btnTab}
+                />
+              </View>
+              <SelectableInput
+                label={documentType.toDescription}
+                value={docToContact?.name}
+                onPress={handleToContact}
                 disabled={isBlocked}
-                // menuStyle={localStyles.contactType}
-                style={localStyles.btnTab}
               />
             </View>
-            <SelectableInput
-              label={documentType.toDescription}
-              value={docToContact?.name}
-              onPress={handleToContact}
-              disabled={isBlocked}
-            />
-          </View>
+          )}
+          <Input
+            label="Комментарий"
+            value={docComment}
+            onChangeText={(text) => {
+              dispatch(appActions.setFormParams({ comment: text || '' }));
+            }}
+            disabled={isBlocked}
+            clearInput={true}
+          />
+        </ScrollView>
+        {showDate && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={new Date(docDate || '')}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'inline' : 'default'}
+            onChange={handleApplyDate}
+          />
         )}
-        <Input
-          label="Комментарий"
-          value={docComment}
-          onChangeText={(text) => {
-            dispatch(appActions.setFormParams({ comment: text.trim() || '' }));
-          }}
-          disabled={isBlocked}
-          clearInput={true}
-        />
-      </ScrollView>
-      {showDate && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={new Date(docDate || '')}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={handleApplyDate}
-        />
-      )}
-    </AppInputScreen>
+      </KeyboardAwareScrollView>
+    </AppScreen>
   );
 };
 
