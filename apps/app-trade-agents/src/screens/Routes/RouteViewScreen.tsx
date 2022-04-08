@@ -1,7 +1,7 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { RouteProp, useRoute, useScrollToTop } from '@react-navigation/native';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, Alert } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import {
@@ -32,9 +32,16 @@ const RouteViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
 
+  const { colors } = useTheme();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
   const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
-  const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
+  const routeLineList = route?.lines
+    .filter((i) => (i.outlet.name ? i?.outlet.name.toUpperCase().includes(searchQuery.toUpperCase()) : true))
+    .sort((a, b) => a.ordNumber - b.ordNumber);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
@@ -92,12 +99,28 @@ const RouteViewScreen = () => {
     ]);
   }, [handleDelete, showActionSheet]);
 
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <IconButton
+            icon="card-search-outline"
+            style={filterVisible && { backgroundColor: colors.card }}
+            size={26}
+            onPress={() => setFilterVisible((prev) => !prev)}
+          />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
     });
-  }, [actionsMenu, navigation]);
+  }, [actionsMenu, colors.card, filterVisible, navigation]);
 
   if (!route) {
     return (
@@ -113,6 +136,19 @@ const RouteViewScreen = () => {
     <AppScreen>
       <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
       <Divider />
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <FlatList
         ref={ref}
         data={routeLineList}

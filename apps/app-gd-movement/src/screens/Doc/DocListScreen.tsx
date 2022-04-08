@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import {
@@ -35,6 +35,11 @@ export interface DocListProps {
   orders: IListItemProps[];
 }
 
+interface IFilteredList {
+  searchQuery: string;
+  list: IMovementDocument[];
+}
+
 export interface DocListSectionProps {
   title: string;
 }
@@ -51,22 +56,85 @@ export const DocListScreen = () => {
 
   const [date, setDate] = useState(dataTypes[0]);
 
-  const list = useSelector((state) => state.documents.list)
-    ?.filter((i) =>
-      i?.head?.fromContact?.name || i?.head?.toContact?.name || i.documentType.description || i.number || i.documentDate
-        ? (i.documentType.remainsField === 'fromContact'
-            ? i?.head?.fromContact?.name.toUpperCase().includes(searchQuery.toUpperCase())
-            : i?.head?.toContact?.name.toUpperCase().includes(searchQuery.toUpperCase())) ||
-          i?.documentType?.description?.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-        : true,
-    )
-    .sort((a, b) =>
-      date.id === 'new'
-        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-    ) as IMovementDocument[];
+  // const list1 = useSelector((state) => state.documents.list);
+  // // ?.filter((i) =>
+  // //   i?.head?.fromContact?.name || i?.head?.toContact?.name || i.documentType.description || i.number || i.documentDate
+  // //     ? (i.documentType.remainsField === 'fromContact'
+  // //         ? i?.head?.fromContact?.name.toUpperCase().includes(searchQuery.toUpperCase())
+  // //         : i?.head?.toContact?.name.toUpperCase().includes(searchQuery.toUpperCase())) ||
+  // //       i?.documentType?.description?.toUpperCase().includes(searchQuery.toUpperCase()) ||
+  // //       i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+  // //       getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+  // //     : true,
+  // // )
+  // const list = useMemo(
+  //   () =>
+  //     list1.sort((a, b) =>
+  //       date.id === 'new'
+  //         ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+  //         : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+  //     ) as IMovementDocument[],
+  //   [date.id, list1],
+  // );
+
+  const list = useSelector((state) => state.documents.list).sort((a, b) =>
+    date.id === 'new'
+      ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+      : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+  ) as IMovementDocument[];
+
+  console.log('list', list.length);
+
+  const [filteredList11, setFilteredList11] = useState<IFilteredList>({
+    searchQuery: '',
+    list,
+  });
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log(123, list.length, searchQuery);
+      if (!searchQuery) {
+        setFilteredList11({ searchQuery, list });
+      }
+    }, [list, searchQuery]),
+  );
+  useEffect(() => {
+    if (searchQuery !== filteredList11.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList11({
+          searchQuery,
+          list,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = ({ head, documentDate, number, documentType }: IMovementDocument) =>
+          (documentType.remainsField === 'fromContact'
+            ? head.fromContact?.name?.toLowerCase().includes(lower)
+            : head.toContact?.name?.toLowerCase().includes(lower)) ||
+          documentType?.description?.toLowerCase().includes(lower) ||
+          number.toLowerCase().includes(lower) ||
+          getDateString(documentDate).toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList11.searchQuery &&
+          searchQuery.length > filteredList11.searchQuery.length &&
+          searchQuery.startsWith(filteredList11.searchQuery)
+        ) {
+          gr = filteredList11.list.filter(fn);
+        } else {
+          gr = list.filter(fn);
+        }
+
+        setFilteredList11({
+          searchQuery,
+          list: gr,
+        });
+      }
+    }
+  }, [filteredList11, searchQuery, list]);
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -91,16 +159,28 @@ export const DocListScreen = () => {
   const [type, setType] = useState(docTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
-    if (!list.length) {
+    // if (!list.length) {
+    //   return [];
+    // }
+    // const res =
+    //   status === 'all'
+    //     ? list
+    //     : status === 'active'
+    //     ? list.filter((e) => e.status !== 'PROCESSED')
+    //     : status !== 'archive' && status !== 'all'
+    //     ? list.filter((e) => e.status === status)
+    //     : [];
+
+    if (!filteredList11.list.length) {
       return [];
     }
     const res =
       status === 'all'
-        ? list
+        ? filteredList11.list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
+        ? filteredList11.list.filter((e) => e.status !== 'PROCESSED')
         : status !== 'archive' && status !== 'all'
-        ? list.filter((e) => e.status === status)
+        ? filteredList11.list.filter((e) => e.status === status)
         : [];
 
     return res.map((i) => {
@@ -115,12 +195,16 @@ export const DocListScreen = () => {
         errorMessage: i.errorMessage,
       };
     });
-  }, [status, list]);
+  }, [status, filteredList11]);
+
+  console.log('filteredList', filteredList.length);
 
   const newFilteredList: IListItemProps[] = useMemo(() => {
     const res = type?.id === 'all' ? filteredList : filteredList?.filter((i) => i?.documentType === type?.id);
     return res;
   }, [filteredList, type?.id]);
+
+  console.log('newFilteredList', newFilteredList.length);
 
   const sections = useMemo(
     () =>
