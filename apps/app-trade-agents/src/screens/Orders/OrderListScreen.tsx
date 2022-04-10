@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -26,6 +26,10 @@ import { IOrderDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
+interface IFilteredList {
+  searchQuery: string;
+  list: IOrderDocument[];
+}
 export interface OrderListSectionProps {
   title: string;
 }
@@ -43,27 +47,76 @@ const OrderListScreen = () => {
 
   const list = docSelectors
     .selectByDocType<IOrderDocument>('order')
-    ?.filter((i) =>
-      i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate || i.head.onDate
-        ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
-          getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase())
-        : true,
-    )
+    // ?.filter((i) =>
+    //   i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate || i.head.onDate
+    //     ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //       i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //       i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //       getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //       getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase())
+    //     : true,
+    // )
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    list,
+  });
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!searchQuery) {
+        setFilteredList({ searchQuery, list });
+      }
+    }, [list, searchQuery]),
+  );
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          list,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = ({ head, documentDate, number }: IOrderDocument) =>
+          head.contact.name?.toLowerCase().includes(lower) ||
+          head.outlet?.name?.toLowerCase().includes(lower) ||
+          number.toLowerCase().includes(lower) ||
+          getDateString(documentDate).toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          gr = filteredList.list.filter(fn);
+        } else {
+          gr = list.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          list: gr,
+        });
+      }
+    }
+  }, [filteredList, searchQuery, list]);
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: IListItemProps[] = useMemo(() => {
+  const newFilteredList: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
-        ? list
+        ? filteredList.list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
+        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
         : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        ? filteredList.list.filter((e) => e.status === 'PROCESSED')
         : [];
 
     return res.map(
@@ -79,11 +132,11 @@ const OrderListScreen = () => {
           errorMessage: i.errorMessage,
         } as IListItemProps),
     );
-  }, [status, list]);
+  }, [status, filteredList.list]);
 
   const sections = useMemo(
     () =>
-      filteredList.reduce<SectionDataProps>((prev, item) => {
+      newFilteredList.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
@@ -100,7 +153,7 @@ const OrderListScreen = () => {
           },
         ];
       }, []),
-    [filteredList],
+    [newFilteredList],
   );
 
   const handleAddDocument = useCallback(() => {

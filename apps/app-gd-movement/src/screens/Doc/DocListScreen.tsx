@@ -56,52 +56,29 @@ export const DocListScreen = () => {
 
   const [date, setDate] = useState(dataTypes[0]);
 
-  // const list1 = useSelector((state) => state.documents.list);
-  // // ?.filter((i) =>
-  // //   i?.head?.fromContact?.name || i?.head?.toContact?.name || i.documentType.description || i.number || i.documentDate
-  // //     ? (i.documentType.remainsField === 'fromContact'
-  // //         ? i?.head?.fromContact?.name.toUpperCase().includes(searchQuery.toUpperCase())
-  // //         : i?.head?.toContact?.name.toUpperCase().includes(searchQuery.toUpperCase())) ||
-  // //       i?.documentType?.description?.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  // //       i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  // //       getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-  // //     : true,
-  // // )
-  // const list = useMemo(
-  //   () =>
-  //     list1.sort((a, b) =>
-  //       date.id === 'new'
-  //         ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-  //         : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-  //     ) as IMovementDocument[],
-  //   [date.id, list1],
-  // );
-
   const list = useSelector((state) => state.documents.list).sort((a, b) =>
     date.id === 'new'
       ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
       : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
   ) as IMovementDocument[];
 
-  console.log('list', list.length);
-
-  const [filteredList11, setFilteredList11] = useState<IFilteredList>({
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
     list,
   });
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log(123, list.length, searchQuery);
       if (!searchQuery) {
-        setFilteredList11({ searchQuery, list });
+        setFilteredList({ searchQuery, list });
       }
     }, [list, searchQuery]),
   );
+
   useEffect(() => {
-    if (searchQuery !== filteredList11.searchQuery) {
+    if (searchQuery !== filteredList.searchQuery) {
       if (!searchQuery) {
-        setFilteredList11({
+        setFilteredList({
           searchQuery,
           list,
         });
@@ -119,22 +96,22 @@ export const DocListScreen = () => {
         let gr;
 
         if (
-          filteredList11.searchQuery &&
-          searchQuery.length > filteredList11.searchQuery.length &&
-          searchQuery.startsWith(filteredList11.searchQuery)
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
         ) {
-          gr = filteredList11.list.filter(fn);
+          gr = filteredList.list.filter(fn);
         } else {
           gr = list.filter(fn);
         }
 
-        setFilteredList11({
+        setFilteredList({
           searchQuery,
           list: gr,
         });
       }
     }
-  }, [filteredList11, searchQuery, list]);
+  }, [filteredList, searchQuery, list]);
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -158,32 +135,22 @@ export const DocListScreen = () => {
 
   const [type, setType] = useState(docTypes[0]);
 
-  const filteredList: IListItemProps[] = useMemo(() => {
-    // if (!list.length) {
-    //   return [];
-    // }
-    // const res =
-    //   status === 'all'
-    //     ? list
-    //     : status === 'active'
-    //     ? list.filter((e) => e.status !== 'PROCESSED')
-    //     : status !== 'archive' && status !== 'all'
-    //     ? list.filter((e) => e.status === status)
-    //     : [];
-
-    if (!filteredList11.list.length) {
+  const newFilteredList: IListItemProps[] = useMemo(() => {
+    if (!filteredList.list.length) {
       return [];
     }
     const res =
       status === 'all'
-        ? filteredList11.list
+        ? filteredList.list
         : status === 'active'
-        ? filteredList11.list.filter((e) => e.status !== 'PROCESSED')
+        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
         : status !== 'archive' && status !== 'all'
-        ? filteredList11.list.filter((e) => e.status === status)
+        ? filteredList.list.filter((e) => e.status === status)
         : [];
 
-    return res.map((i) => {
+    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
+
+    return newRes.map((i) => {
       return {
         id: i.id,
         title: i.documentType.description || '',
@@ -195,16 +162,7 @@ export const DocListScreen = () => {
         errorMessage: i.errorMessage,
       };
     });
-  }, [status, filteredList11]);
-
-  console.log('filteredList', filteredList.length);
-
-  const newFilteredList: IListItemProps[] = useMemo(() => {
-    const res = type?.id === 'all' ? filteredList : filteredList?.filter((i) => i?.documentType === type?.id);
-    return res;
-  }, [filteredList, type?.id]);
-
-  console.log('newFilteredList', newFilteredList.length);
+  }, [filteredList.list, status, type?.id]);
 
   const sections = useMemo(
     () =>
