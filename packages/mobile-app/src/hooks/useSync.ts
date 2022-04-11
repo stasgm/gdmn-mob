@@ -52,16 +52,24 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     const syncData = async () => {
       const getTransfer = await api.transfer.getTransfer();
 
-      if (getTransfer?.type === 'ERROR') {
-        errList.push(`Невозможно: ${getTransfer.message}`);
+      if (getTransfer.type === 'ERROR') {
+        errList.push(`Запрос на состояние учетной ситсемы не отправлен: ${getTransfer.message}`);
       } else {
-        if (getTransfer) {
-          errList.push('\nПроизведите повторную сихронизацию через');
+        if (getTransfer.transferStatus) {
+          const MS_PER_MINUTE = 60000;
+          const durationInMinutes = 10;
+          const startDate = new Date('04-11-2022 16:40:00');
+          startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
+          console.log('myStartDate', startDate);
+          const now = new Date('04-11-2022 16:46:00');
+          console.log('now', now);
+          const remTime = Math.floor((startDate.getTime() - now.getTime()) / MS_PER_MINUTE);
+          console.log('remTime', remTime);
+          errList.push(`\nПроизведите повторную сихронизацию через ${remTime} минут`);
         }
       }
       // Загрузка данных
       if (!onSync && !getTransfer) {
-        // if () {
         const messageCompany = { id: company.id, name: company.name };
         const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -199,9 +207,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           errList.push(`Запрос на получение склада не отправлен: ${sendMesDepartResponse.message}`);
         }
       } else {
-        console.log('onSync');
         // Если передан внешний обработчик то вызываем
-
         if (onSync) {
           await onSync();
         }

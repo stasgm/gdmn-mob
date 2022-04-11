@@ -14,12 +14,6 @@ router.prefix('/devices');
 router.post('/', deviceValidation.addDevice, authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, addDevice);
 router.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getDevices);
 router.get('/:id', deviceValidation.getDevice, deviceMiddleware, roleBasedParamsMiddlware, getDevice);
-//TODO - без доп проверки даёт возможность получить доступ по любому  устройству
-// router.get('/:id/user/:name', getDeviceByUser);
-// router.get('/:id/user/', getDeviceByUser);
-// router.get('/:id/currentuser', compose([deviceMiddleware, authMiddleware]), getDeviceByCurrentUser);
-//getUsersByDevice - поиск пользователей по таблице устройств
-// router.get('/:id/users', deviceValidation.getUsersByDevice, deviceMiddleware, authMiddleware, getUsersByDevice);
 router.patch(
   '/:id',
   deviceValidation.updateDevice,

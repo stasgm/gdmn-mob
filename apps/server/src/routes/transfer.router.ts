@@ -8,9 +8,8 @@ import { transferValidation } from '../validations';
 const router = Router();
 
 router.prefix('/transfer');
-//endTransafer
-router.post('/insert', authMiddleware, deviceMiddleware, setTransfer);
-router.get('/check', authMiddleware, deviceMiddleware, getTransfer);
-router.delete('/delete/:uid', transferValidation.deleteValid, authMiddleware, deviceMiddleware, deleteTransfer);
+router.post('/', authMiddleware, deviceMiddleware, setTransfer);
+router.get('/', authMiddleware, deviceMiddleware, getTransfer);
+router.delete('/:uid', transferValidation.deleteValid, authMiddleware, deviceMiddleware, deleteTransfer);
 
 export default router;
