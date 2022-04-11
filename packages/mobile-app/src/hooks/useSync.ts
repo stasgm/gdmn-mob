@@ -50,8 +50,18 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       - обработка сообщение
     */
     const syncData = async () => {
+      const getTransfer = await api.transfer.getTransfer();
+
+      if (getTransfer?.type === 'ERROR') {
+        errList.push(`Невозможно: ${getTransfer.message}`);
+      } else {
+        if (getTransfer) {
+          errList.push('\nПроизведите повторную сихронизацию через');
+        }
+      }
       // Загрузка данных
-      if (!onSync) {
+      if (!onSync && !getTransfer) {
+        // if () {
         const messageCompany = { id: company.id, name: company.name };
         const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -191,7 +201,10 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       } else {
         console.log('onSync');
         // Если передан внешний обработчик то вызываем
-        await onSync();
+
+        if (onSync) {
+          await onSync();
+        }
       }
 
       dispatch(appActions.setLoading(false));
