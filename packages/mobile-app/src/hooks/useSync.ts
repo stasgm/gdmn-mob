@@ -53,7 +53,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       const getTransfer = await api.transfer.getTransfer();
 
       if (getTransfer.type === 'ERROR') {
-        errList.push(`Запрос на состояние учетной ситсемы не отправлен: ${getTransfer.message}`);
+        errList.push(`Запрос на состояние учетной системы не отправлен: ${getTransfer.message}`);
       } else {
         if (getTransfer.status) {
           const MS_PER_MINUTE = 60000;

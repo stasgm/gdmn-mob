@@ -11,7 +11,7 @@ class CTransfer extends BaseRequest {
 
   setTransfer = async () => {
     try {
-      const res = await this.api.axios.post<IResponse<Transfer>>('/');
+      const res = await this.api.axios.post<IResponse<Transfer>>('/transfer');
       const resData = res.data;
 
       if (resData.result) {
@@ -35,7 +35,7 @@ class CTransfer extends BaseRequest {
 
   getTransfer = async () => {
     try {
-      const res = await this.api.axios.get<IResponse<Transfer>>('/');
+      const res = await this.api.axios.get<IResponse<Transfer>>('/transfer');
       const resData = res.data;
 
       if (resData.result) {
@@ -59,7 +59,7 @@ class CTransfer extends BaseRequest {
 
   removeMessage = async (uid: string) => {
     try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/${uid}`);
+      const res = await this.api.axios.delete<IResponse<void>>(`/transfer/${uid}`);
       const resData = res.data;
 
       if (resData.result) {
