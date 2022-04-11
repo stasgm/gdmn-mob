@@ -55,13 +55,13 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       if (getTransfer.type === 'ERROR') {
         errList.push(`Запрос на состояние учетной ситсемы не отправлен: ${getTransfer.message}`);
       } else {
-        if (getTransfer.transferStatus) {
+        if (getTransfer.status) {
           const MS_PER_MINUTE = 60000;
           const durationInMinutes = 10;
-          const startDate = new Date('04-11-2022 16:40:00');
+          const startDate = new Date(getTransfer.status.uDate);
           startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
           console.log('myStartDate', startDate);
-          const now = new Date('04-11-2022 16:46:00');
+          const now = new Date();
           console.log('now', now);
           const remTime = Math.floor((startDate.getTime() - now.getTime()) / MS_PER_MINUTE);
           console.log('remTime', remTime);

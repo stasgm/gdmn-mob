@@ -11,7 +11,7 @@ export interface IGetTransferResponse extends ITransferQueryResponse {
 
 export interface ISetTransferResponse extends ITransferQueryResponse {
   type: 'SET_TRANSFER';
-  transferStatus: Transfer;
+  status: Transfer;
 }
 
 export interface IRemoveTransferResponse extends ITransferQueryResponse {

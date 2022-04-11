@@ -17,7 +17,7 @@ class CTransfer extends BaseRequest {
       if (resData.result) {
         return {
           type: 'SET_TRANSFER',
-          transferStatus: resData?.data,
+          status: resData?.data,
         } as types.ISetTransferResponse;
       }
 
@@ -41,7 +41,7 @@ class CTransfer extends BaseRequest {
       if (resData.result) {
         return {
           type: 'GET_TRANSFER',
-          transferStatus: resData?.data,
+          status: resData?.data,
         } as types.IGetTransferResponse;
       }
 
