@@ -127,11 +127,11 @@ export const DocEditScreen = () => {
       const newDoc: IMovementDocument = {
         id: docId,
         documentType: docDocumentType,
-        number: docNumber,
+        number: docNumber && docNumber.trim(),
         documentDate: docDate,
         status: 'DRAFT',
         head: {
-          comment: docComment,
+          comment: docComment && docComment.trim(),
           fromContact: docFromContact,
           toContact: docToContact,
           fromContactType: docFromContactType,
@@ -155,14 +155,14 @@ export const DocEditScreen = () => {
       const updatedDoc: IMovementDocument = {
         ...doc,
         id,
-        number: docNumber,
+        number: docNumber && docNumber.trim(),
         status: docStatus || 'DRAFT',
         documentDate: docDate,
         documentType: docDocumentType,
         errorMessage: undefined,
         head: {
           ...doc.head,
-          comment: docComment,
+          comment: docComment && docComment.trim(),
           fromContact: docFromContact,
           toContact: docToContact,
           fromContactType: docFromContactType,
@@ -374,7 +374,7 @@ export const DocEditScreen = () => {
           <Input
             label="Номер"
             value={docNumber}
-            onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
+            onChangeText={(text) => dispatch(appActions.setFormParams({ number: text }))}
             disabled={isBlocked}
             clearInput={true}
           />
@@ -403,7 +403,6 @@ export const DocEditScreen = () => {
                   visible={visibleFrom}
                   activeOptionId={docFromContactType?.id}
                   disabled={isBlocked}
-                  // menuStyle={localStyles.contactType}
                   style={localStyles.btnTab}
                 />
               </View>
@@ -428,7 +427,6 @@ export const DocEditScreen = () => {
                   visible={visibleTo}
                   activeOptionId={docToContactType?.id}
                   disabled={isBlocked}
-                  // menuStyle={localStyles.contactType}
                   style={localStyles.btnTab}
                 />
               </View>
