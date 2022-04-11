@@ -56,11 +56,7 @@ export const DocListScreen = () => {
 
   const [date, setDate] = useState(dataTypes[0]);
 
-  const list = useSelector((state) => state.documents.list).sort((a, b) =>
-    date.id === 'new'
-      ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-      : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-  ) as IMovementDocument[];
+  const list = useSelector((state) => state.documents.list) as IMovementDocument[];
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -150,6 +146,12 @@ export const DocListScreen = () => {
 
     const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
 
+    newRes.sort((a, b) =>
+      date.id === 'new'
+        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    );
+
     return newRes.map((i) => {
       return {
         id: i.id,
@@ -162,7 +164,7 @@ export const DocListScreen = () => {
         errorMessage: i.errorMessage,
       };
     });
-  }, [filteredList.list, status, type?.id]);
+  }, [date.id, filteredList.list, status, type?.id]);
 
   const sections = useMemo(
     () =>
