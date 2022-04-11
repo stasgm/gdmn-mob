@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import {
@@ -35,6 +35,11 @@ export interface DocListProps {
   orders: IListItemProps[];
 }
 
+interface IFilteredList {
+  searchQuery: string;
+  list: IMovementDocument[];
+}
+
 export interface DocListSectionProps {
   title: string;
 }
@@ -51,22 +56,58 @@ export const DocListScreen = () => {
 
   const [date, setDate] = useState(dataTypes[0]);
 
-  const list = useSelector((state) => state.documents.list)
-    ?.filter((i) =>
-      i?.head?.fromContact?.name || i?.head?.toContact?.name || i.documentType.description || i.number || i.documentDate
-        ? (i.documentType.remainsField === 'fromContact'
-            ? i?.head?.fromContact?.name.toUpperCase().includes(searchQuery.toUpperCase())
-            : i?.head?.toContact?.name.toUpperCase().includes(searchQuery.toUpperCase())) ||
-          i?.documentType?.description?.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-        : true,
-    )
-    .sort((a, b) =>
-      date.id === 'new'
-        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-    ) as IMovementDocument[];
+  const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    list,
+  });
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!searchQuery) {
+        setFilteredList({ searchQuery, list });
+      }
+    }, [list, searchQuery]),
+  );
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          list,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = ({ head, documentDate, number, documentType }: IMovementDocument) =>
+          (documentType.remainsField === 'fromContact'
+            ? head.fromContact?.name?.toLowerCase().includes(lower)
+            : head.toContact?.name?.toLowerCase().includes(lower)) ||
+          documentType?.description?.toLowerCase().includes(lower) ||
+          number.toLowerCase().includes(lower) ||
+          getDateString(documentDate).toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          gr = filteredList.list.filter(fn);
+        } else {
+          gr = list.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          list: gr,
+        });
+      }
+    }
+  }, [filteredList, searchQuery, list]);
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -90,20 +131,28 @@ export const DocListScreen = () => {
 
   const [type, setType] = useState(docTypes[0]);
 
-  const filteredList: IListItemProps[] = useMemo(() => {
-    if (!list.length) {
+  const newFilteredList: IListItemProps[] = useMemo(() => {
+    if (!filteredList.list.length) {
       return [];
     }
     const res =
       status === 'all'
-        ? list
+        ? filteredList.list
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
+        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
         : status !== 'archive' && status !== 'all'
-        ? list.filter((e) => e.status === status)
+        ? filteredList.list.filter((e) => e.status === status)
         : [];
 
-    return res.map((i) => {
+    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
+
+    newRes.sort((a, b) =>
+      date.id === 'new'
+        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    );
+
+    return newRes.map((i) => {
       return {
         id: i.id,
         title: i.documentType.description || '',
@@ -115,12 +164,7 @@ export const DocListScreen = () => {
         errorMessage: i.errorMessage,
       };
     });
-  }, [status, list]);
-
-  const newFilteredList: IListItemProps[] = useMemo(() => {
-    const res = type?.id === 'all' ? filteredList : filteredList?.filter((i) => i?.documentType === type?.id);
-    return res;
-  }, [filteredList, type?.id]);
+  }, [date.id, filteredList.list, status, type?.id]);
 
   const sections = useMemo(
     () =>

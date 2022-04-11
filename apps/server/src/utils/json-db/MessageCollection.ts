@@ -25,7 +25,7 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private collectionPath: string;
-  private _maxTimeOfTransfer = 20 * 60 * 1000;
+  private _maxTimeOfTransfer = 10 * 60 * 1000;
   //private _fileEndTransfer: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {

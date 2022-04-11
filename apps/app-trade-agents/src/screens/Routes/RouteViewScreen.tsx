@@ -1,7 +1,7 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
-import { RouteProp, useRoute, useScrollToTop } from '@react-navigation/native';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, Alert } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import {
@@ -26,15 +26,62 @@ import { useDispatch, useSelector } from '../../store';
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';
 
+interface IFilteredList {
+  searchQuery: string;
+  routeLineList: IRouteLine[] | undefined;
+}
+
 const RouteViewScreen = () => {
   const navigation = useNavigation();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
 
+  const { colors } = useTheme();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
   const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
   const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
+
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    routeLineList,
+  });
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          routeLineList,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = ({ outlet }: IRouteLine) => outlet?.name?.toLowerCase().includes(lower);
+
+        let gr;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          gr = filteredList.routeLineList?.filter(fn);
+        } else {
+          gr = routeLineList?.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          routeLineList: gr,
+        });
+      }
+    }
+  }, [filteredList, searchQuery, routeLineList]);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
@@ -92,12 +139,28 @@ const RouteViewScreen = () => {
     ]);
   }, [handleDelete, showActionSheet]);
 
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerRight: () => (
+        <View style={styles.buttons}>
+          <IconButton
+            icon="card-search-outline"
+            style={filterVisible && { backgroundColor: colors.card }}
+            size={26}
+            onPress={() => setFilterVisible((prev) => !prev)}
+          />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
     });
-  }, [actionsMenu, navigation]);
+  }, [actionsMenu, colors.card, filterVisible, navigation]);
 
   if (!route) {
     return (
@@ -113,9 +176,22 @@ const RouteViewScreen = () => {
     <AppScreen>
       <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
       <Divider />
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <FlatList
         ref={ref}
-        data={routeLineList}
+        data={filteredList.routeLineList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
