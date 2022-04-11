@@ -6,7 +6,7 @@ export interface ITransferQueryResponse {
 
 export interface IGetTransferResponse extends ITransferQueryResponse {
   type: 'GET_TRANSFER';
-  transferStatus: Transfer;
+  status: Transfer;
 }
 
 export interface ISetTransferResponse extends ITransferQueryResponse {
