@@ -144,16 +144,23 @@ class CollectionMessage<T extends CollectionItem> {
     return getTransferFlag();
   }
 
-  public getTransfer(): Transfer {
+  public async getTransfer(): Promise<Transfer> {
     const __transfer = getTransferFlag();
     if (!__transfer) return undefined;
     const transferDate = new Date(__transfer.uDate);
     const nowDate = new Date();
     const delta = nowDate.getTime() - transferDate.getTime();
     if (delta >= this._maxTimeOfTransfer) this.initTransfer();
-    return getTransferFlag();
-  }
 
+    return new Promise((resolve, reject) => {
+      try {
+        const f = getTransferFlag();
+        resolve(f);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
   public setTransfer(): Transfer {
     const __transfer: ITransfer = {
       uid: uuid(),
@@ -163,8 +170,8 @@ class CollectionMessage<T extends CollectionItem> {
     return getTransferFlag();
   }
 
-  public deleteTransfer(uid: string): void {
-    const check = this.getTransfer();
+  public async deleteTransfer(uid: string): Promise<void> {
+    const check = await this.getTransfer();
     if (check?.uid === uid) this.initTransfer();
   }
 
