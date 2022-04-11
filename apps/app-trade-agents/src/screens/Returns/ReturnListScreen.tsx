@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { docSelectors, useSelector } from '@lib/store';
@@ -28,11 +28,6 @@ export interface ReturnListSectionProps {
   title: string;
 }
 
-interface IFilteredList {
-  searchQuery: string;
-  list: IReturnDocument[];
-}
-
 export type SectionDataProps = SectionListData<IListItemProps, ReturnListSectionProps>[];
 
 const ReturnListScreen = () => {
@@ -47,68 +42,19 @@ const ReturnListScreen = () => {
 
   const list = docSelectors
     .selectByDocType<IReturnDocument>('return')
-    // ?.filter((i) =>
-    //   i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
-    //     ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-    //       i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-    //       i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-    //       getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-    //     : true,
-    // )
+    ?.filter((i) =>
+      i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
+        ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+        : true,
+    )
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-
-  const [filteredList, setFilteredList] = useState<IFilteredList>({
-    searchQuery: '',
-    list,
-  });
 
   const [status, setStatus] = useState<Status>('all');
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (!searchQuery) {
-        setFilteredList({ searchQuery, list });
-      }
-    }, [list, searchQuery]),
-  );
-
-  useEffect(() => {
-    if (searchQuery !== filteredList.searchQuery) {
-      if (!searchQuery) {
-        setFilteredList({
-          searchQuery,
-          list,
-        });
-      } else {
-        const lower = searchQuery.toLowerCase();
-
-        const fn = ({ head, documentDate, number }: IReturnDocument) =>
-          head.contact.name?.toLowerCase().includes(lower) ||
-          head.outlet?.name?.toLowerCase().includes(lower) ||
-          number.toLowerCase().includes(lower) ||
-          getDateString(documentDate).toLowerCase().includes(lower);
-
-        let gr;
-
-        if (
-          filteredList.searchQuery &&
-          searchQuery.length > filteredList.searchQuery.length &&
-          searchQuery.startsWith(filteredList.searchQuery)
-        ) {
-          gr = filteredList.list.filter(fn);
-        } else {
-          gr = list.filter(fn);
-        }
-
-        setFilteredList({
-          searchQuery,
-          list: gr,
-        });
-      }
-    }
-  }, [filteredList, searchQuery, list]);
-
-  const newFilteredList = useMemo(() => {
+  const filteredList = useMemo(() => {
     const res =
       status === 'all'
         ? list
@@ -135,7 +81,7 @@ const ReturnListScreen = () => {
 
   const sections = useMemo(
     () =>
-      newFilteredList.reduce<SectionDataProps>((prev, item) => {
+      filteredList.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
@@ -152,7 +98,7 @@ const ReturnListScreen = () => {
           },
         ];
       }, []),
-    [newFilteredList],
+    [filteredList],
   );
 
   const handleAddDocument = useCallback(() => {
