@@ -7,7 +7,7 @@ import { getDb } from './dao/db';
 /**
  * Проверяет глобальную переменную обмена сообщений
  * */
-const getTransfer = (): Transfer => {
+const getTransfer = async (): Promise<Transfer> => {
   const db = getDb();
   const { messages } = db;
 

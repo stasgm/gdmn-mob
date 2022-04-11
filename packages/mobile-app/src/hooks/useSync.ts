@@ -50,26 +50,18 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       - обработка сообщение
     */
     const syncData = async () => {
+      console.log(1111);
       const getTransfer = await api.transfer.getTransfer();
+      console.log(2222);
 
       if (getTransfer.type === 'ERROR') {
+        console.log(3333);
         errList.push(`Запрос на состояние учетной системы не отправлен: ${getTransfer.message}`);
-      } else {
-        if (getTransfer.status) {
-          const MS_PER_MINUTE = 60000;
-          const durationInMinutes = 10;
-          const startDate = new Date(getTransfer.status.uDate);
-          startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
-          console.log('myStartDate', startDate);
-          const now = new Date();
-          console.log('now', now);
-          const remTime = Math.floor((startDate.getTime() - now.getTime()) / MS_PER_MINUTE);
-          console.log('remTime', remTime);
-          errList.push(`\nПроизведите повторную сихронизацию через ${remTime} минут`);
-        }
       }
+
       // Загрузка данных
       if (!onSync && !getTransfer) {
+        console.log(4444);
         const messageCompany = { id: company.id, name: company.name };
         const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -216,7 +208,23 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       dispatch(appActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
 
-      if (errList?.length) {
+      if (getTransfer.type === 'GET_TRANSFER' && getTransfer.status) {
+        const MS_PER_MINUTE = 60000;
+        const durationInMinutes = 11;
+        const startDate = new Date(getTransfer.status.uDate);
+        startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
+        console.log('myStartDate', startDate);
+        const now = new Date();
+        console.log('now', now);
+        const remTime = Math.floor((startDate.getTime() - now.getTime()) / MS_PER_MINUTE);
+        console.log('remTime', remTime);
+        // errList.push(`\nПроцесс синхронизации занят. Повторите, пожалуйста, сихронизацию через ${remTime} минут!`);
+
+        Alert.alert(
+          'Внимание!',
+          `\nСервер занят другим процессом.\nПовторите, пожалуйста, сихронизацию через ${remTime} минут!`,
+        );
+      } else if (errList?.length) {
         Alert.alert('Внимание!', `Во время синхронизации произошли ошибки:\n${errList.join('\n')}`, [{ text: 'OK' }]);
       } else {
         Alert.alert('Внимание!', 'Синхронизация прошла успешно!', [{ text: 'OK' }]);

@@ -13,8 +13,8 @@ const setTransfer = (ctx: ParameterizedContext): void => {
   log.info(`Процесс ${setInfo?.uid} начат в ${setInfo?.uDate}`);
 };
 
-const getTransfer = (ctx: ParameterizedContext): void => {
-  const getInfo = transferService.getTransfer();
+const getTransfer = async (ctx: ParameterizedContext): Promise<void> => {
+  const getInfo = await transferService.getTransfer();
 
   ok(ctx as Context, getInfo);
 
