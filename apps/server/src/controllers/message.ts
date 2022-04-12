@@ -48,24 +48,11 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: messageId } = ctx.params;
 
-  //const userId = ctx.state.user.id;
-
-  // const user = await userService.findOne(userId);
-
-  // if (!user) {
-  //   ctx.throw(400, 'Пользователь не найден');
-  // }
-
-  // if (user.name === 'gdmn') {
-  //   // TODO переделать
-  //   userId = 'gdmn';
-  // }
-
   await messageService.deleteOne(messageId);
 
   ok(ctx as Context);
 
-  log.info('removeDevice: message is successfully removed');
+  log.info('removeMessage: message is successfully removed');
 };
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {
