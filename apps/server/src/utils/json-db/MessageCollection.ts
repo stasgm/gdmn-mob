@@ -145,34 +145,58 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   public async getTransfer(): Promise<Transfer> {
-    const __transfer = getTransferFlag();
-    if (!__transfer) return undefined;
-    const transferDate = new Date(__transfer.uDate);
-    const nowDate = new Date();
-    const delta = nowDate.getTime() - transferDate.getTime();
-    if (delta >= this._maxTimeOfTransfer) this.initTransfer();
-
-    return new Promise((resolve, reject) => {
-      try {
-        const f = getTransferFlag();
-        resolve(f);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-  public setTransfer(): Transfer {
-    const __transfer: ITransfer = {
-      uid: uuid(),
-      uDate: new Date().toISOString(),
+    const getFunc = async () => {
+      const __transfer = getTransferFlag();
+      if (!__transfer) return undefined;
+      const transferDate = new Date(__transfer.uDate);
+      const nowDate = new Date();
+      const delta = nowDate.getTime() - transferDate.getTime();
+      if (delta >= this._maxTimeOfTransfer) this.initTransfer();
+      return getTransferFlag();
     };
-    setTransferFlag(__transfer);
-    return getTransferFlag();
+    return getFunc();
+
+    // return new Promise((resolve, reject) => {
+    //   try {
+    //     const f = getTransferFlag();
+    //     resolve(f);
+    //   } catch (err) {
+    //     reject(err);
+    //   }
+    // });
+  }
+
+  public setTransfer(): Promise<Transfer> {
+    const setFunc = async () => {
+      const __transfer: ITransfer = {
+        uid: uuid(),
+        uDate: new Date().toISOString(),
+      };
+      setTransferFlag(__transfer);
+      return getTransferFlag();
+    };
+    return setFunc();
   }
 
   public async deleteTransfer(uid: string): Promise<void> {
-    const check = await this.getTransfer();
-    if (check?.uid === uid) this.initTransfer();
+    const delFunc = async () => {
+      try {
+        const check = await this.getTransfer();
+        if (check?.uid === uid) {
+          this.initTransfer();
+          return;
+        } else {
+          return new Error('Ошибка при удалении трансфера: uid не совпадает с текущем');
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          return new Error(err.message);
+        } else {
+          return new Error(`Ошибка при удалении трансфера: ${err}`);
+        }
+      }
+    };
+    delFunc();
   }
 
   /*public insertTransfer(): void {

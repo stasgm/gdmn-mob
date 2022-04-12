@@ -12,7 +12,7 @@ const getTransfer = async (): Promise<Transfer> => {
   const { messages } = db;
 
   try {
-    return messages.getTransfer();
+    return await messages.getTransfer();
   } catch (err) {
     throw new DataNotFoundException(err as string);
   }
@@ -21,12 +21,12 @@ const getTransfer = async (): Promise<Transfer> => {
 /**
  * Устанавливает глобальную переменную обмена сообщений с переданным uid
  * */
-const setTransfer = (): Transfer => {
+const setTransfer = async (): Promise<Transfer> => {
   const db = getDb();
   const { messages } = db;
 
   try {
-    return messages.setTransfer();
+    return await messages.setTransfer();
   } catch (err) {
     throw new DataNotFoundException(err as string);
   }
@@ -36,12 +36,12 @@ const setTransfer = (): Transfer => {
  *  Завершает процесс с заданным uid ( устанавливает в глобалной переменной
  *  обмена сообщений  uid = '0'
  * */
-const deleteTransfer = (uid: string): string => {
+const deleteTransfer = async (uid: string): Promise<string> => {
   const db = getDb();
   const { messages } = db;
 
   try {
-    messages.deleteTransfer(uid);
+    await messages.deleteTransfer(uid);
     return `Процесс ${uid} завершен`;
   } catch (err) {
     throw new DataNotFoundException(err as string);

@@ -5,8 +5,8 @@ import { transferService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
-const setTransfer = (ctx: ParameterizedContext): void => {
-  const setInfo = transferService.setTransfer();
+const setTransfer = async (ctx: ParameterizedContext): Promise<void> => {
+  const setInfo = await transferService.setTransfer();
 
   created(ctx as Context, setInfo);
 
@@ -23,7 +23,7 @@ const getTransfer = async (ctx: ParameterizedContext): Promise<void> => {
 
 const deleteTransfer = async (ctx: ParameterizedContext): Promise<void> => {
   const { uid: uid } = ctx.params;
-  transferService.deleteTransfer(uid);
+  await transferService.deleteTransfer(uid);
 
   ok(ctx as Context);
 
