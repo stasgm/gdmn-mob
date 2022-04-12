@@ -28,4 +28,13 @@ const created = <T>(ctx: Context, dto?: T) => {
   ctx.body = resp;
 };
 
-export { ok, created };
+const notOk = <T>(ctx: Context) => {
+  const resp: IResponse<T> = {
+    result: false,
+  };
+
+  ctx.status = 200;
+  ctx.body = resp;
+};
+
+export { ok, created, notOk };

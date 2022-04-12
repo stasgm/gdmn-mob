@@ -8,11 +8,9 @@ import path from 'path';
 import R from 'ramda';
 import { v1 as uuid } from 'uuid';
 
-import { IFileMessageInfo, Transfer, ITransfer } from '@lib/types';
+import { IFileMessageInfo } from '@lib/types';
 
 import { DataNotFoundException } from '../../exceptions/datanotfound.exception';
-
-import { getTransferFlag, setTransferFlag } from './flag';
 
 import { CollectionItem } from './CollectionItem';
 
@@ -35,7 +33,7 @@ class CollectionMessage<T extends CollectionItem> {
   constructor(pathDb: string, name: string) {
     this.collectionPath = path.join(pathDb, `/${name}/`);
     this._ensureStorage();
-    this.initTransfer();
+    // this.initTransfer();
     //this._fileEndTransfer = path.join(pathDb, '/endTransfer.txt');
     //this._setEndTransafer();
   }
@@ -139,51 +137,51 @@ class CollectionMessage<T extends CollectionItem> {
     if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
   }
 
-  public initTransfer(): Promise<Transfer> {
-    const initFunc = async () => {
-      setTransferFlag(undefined);
-      return getTransferFlag();
-    };
-    return initFunc();
-  }
+  // public initTransfer(): Promise<Transfer> {
+  //   const initFunc = async () => {
+  //     setTransferFlag(undefined);
+  //     return getTransferFlag();
+  //   };
+  //   return initFunc();
+  // }
 
-  public async getTransfer(): Promise<Transfer> {
-    const getFunc = async () => {
-      const __transfer = getTransferFlag();
-      if (!__transfer) return undefined;
-      const transferDate = new Date(__transfer.uDate);
-      const nowDate = new Date();
-      const delta = nowDate.getTime() - transferDate.getTime();
-      if (delta >= this._maxTimeOfTransfer) {
-        await this.initTransfer();
-      }
-      return getTransferFlag();
-    };
-    return getFunc();
-  }
+  // public async getTransfer(): Promise<Transfer> {
+  //   const getFunc = async () => {
+  //     const __transfer = getTransferFlag();
+  //     if (!__transfer) return undefined;
+  //     const transferDate = new Date(__transfer.uDate);
+  //     const nowDate = new Date();
+  //     const delta = nowDate.getTime() - transferDate.getTime();
+  //     if (delta >= this._maxTimeOfTransfer) {
+  //       await this.initTransfer();
+  //     }
+  //     return getTransferFlag();
+  //   };
+  //   return getFunc();
+  // }
 
-  public setTransfer(): Promise<Transfer> {
-    const setFunc = async () => {
-      const __transfer: ITransfer = {
-        uid: uuid(),
-        uDate: new Date().toISOString(),
-      };
-      setTransferFlag(__transfer);
-      return getTransferFlag();
-    };
-    return setFunc();
-  }
+  // public setTransfer(): Promise<Transfer> {
+  //   const setFunc = async () => {
+  //     const __transfer: ITransfer = {
+  //       uid: uuid(),
+  //       uDate: new Date().toISOString(),
+  //     };
+  //     setTransferFlag(__transfer);
+  //     return getTransferFlag();
+  //   };
+  //   return setFunc();
+  // }
 
-  public async deleteTransfer(uid: string): Promise<void> {
-    const delFunc = async () => {
-      const check = await this.getTransfer();
-      if (check?.uid === uid) {
-        await this.initTransfer();
-      }
-      return;
-    };
-    delFunc();
-  }
+  // public async deleteTransfer(uid: string): Promise<void> {
+  //   const delFunc = async () => {
+  //     const check = await this.getTransfer();
+  //     if (check?.uid === uid) {
+  //       await this.initTransfer();
+  //     }
+  //     return;
+  //   };
+  //   delFunc();
+  // }
 
   /*public insertTransfer(): void {
     this._setEndTransafer();

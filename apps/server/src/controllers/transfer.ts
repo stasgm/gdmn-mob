@@ -1,33 +1,42 @@
 import { Context, ParameterizedContext } from 'koa';
 
 import log from '../utils/logger';
-import { transferService } from '../services';
-
-import { created, ok } from '../utils/apiHelpers';
+import { created, notOk, ok } from '../utils/apiHelpers';
+import { clearTransferFlag, getTransferFlag, setTransferFlag } from '../services/transferService';
 
 const setTransfer = async (ctx: ParameterizedContext): Promise<void> => {
-  const setInfo = await transferService.setTransfer();
+  let currentProcess = getTransferFlag();
 
-  created(ctx as Context, setInfo);
-
-  log.info(`Процесс ${setInfo?.uid} начат в ${setInfo?.uDate}`);
+  if (currentProcess) {
+    // вернем на сервер сообщение, что сервер занят
+    notOk(ctx as Context);
+    log.info(`Server is busy processing ${currentProcess.uid}, started: ${currentProcess.uDate}`);
+  } else {
+    currentProcess = setTransferFlag();
+    created(ctx as Context, currentProcess);
+    log.info(`Процесс ${currentProcess.uid} начат в ${currentProcess.uDate}`);
+  }
 };
 
 const getTransfer = async (ctx: ParameterizedContext): Promise<void> => {
-  const getInfo = await transferService.getTransfer();
-
-  ok(ctx as Context, getInfo);
-
+  ok(ctx as Context, getTransferFlag());
   log.info('Процесс успешно проверен ');
 };
 
 const deleteTransfer = async (ctx: ParameterizedContext): Promise<void> => {
-  const { uid: uid } = ctx.params;
-  await transferService.deleteTransfer(uid);
+  //на будущее, когда будет массив параллельных процессов
+  //const { uid: uid } = ctx.params;
 
-  ok(ctx as Context);
+  const currentProcess = getTransferFlag();
 
-  log.info(`Процесс ${uid} завершен`);
+  if (!currentProcess) {
+    log.error('Это какая-то ошибка в логике. Пришел запрос очистить процесс, а его нет...');
+    ok(ctx as Context);
+  } else {
+    clearTransferFlag();
+    ok(ctx as Context);
+    log.info(`Процесс ${currentProcess.uid} завершен`);
+  }
 };
 
 /* const insertTransfer = async (ctx: ParameterizedContext): Promise<void> => {

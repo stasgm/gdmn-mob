@@ -52,11 +52,14 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     */
     const syncData = async () => {
       let transferMessage = '';
+      console.log(111);
       const getTransfer = await api.transfer.getTransfer();
+      console.log(222, getTransfer);
 
       if (getTransfer.type === 'ERROR') {
         errList.push(`Запрос на состояние учетной системы не отправлен: ${getTransfer.message}`);
       } else if (getTransfer.type === 'GET_TRANSFER' && getTransfer.status) {
+        console.log(333);
         const MS_PER_MINUTE = 60000;
         const durationInMinutes = 11;
         const startDate = new Date(getTransfer.status.uDate);
@@ -68,6 +71,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       // Загрузка данных
       // Если нет функции из пропсов и сервер не занят другим процессом (status = undefined)
       if (!onSync && getTransfer.type === 'GET_TRANSFER' && !getTransfer.status) {
+        console.log(444);
         const messageCompany = { id: company.id, name: company.name };
         const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
