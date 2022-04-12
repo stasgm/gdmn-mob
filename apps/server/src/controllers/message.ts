@@ -28,12 +28,6 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, appSystem } = ctx.params;
   const userId = ctx.state.user.id;
 
-  //const params: Record<string, string> = {};
-
-  // if (typeof companyName === 'string') {
-  //   params.name = companyName;
-  // }
-
   const messageList = await messageService.FindMany({
     appSystem,
     companyId,
