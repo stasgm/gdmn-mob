@@ -60,12 +60,8 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         errList.push(`Запрос на состояние учетной системы не отправлен: ${getTransfer.message}`);
       } else if (getTransfer.type === 'GET_TRANSFER' && getTransfer.status) {
         console.log(333);
-        const MS_PER_MINUTE = 60000;
-        const durationInMinutes = 11;
-        const startDate = new Date(getTransfer.status.uDate);
-        startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
-        const remTime = Math.floor((startDate.getTime() - new Date().getTime()) / MS_PER_MINUTE);
-        transferMessage = `\nСервер занят другим процессом.\nПовторите, пожалуйста, сихронизацию через ${remTime} минут!`;
+        transferMessage =
+          '\nСервер занят другим процессом.\nПовторите, пожалуйста, сихронизацию через несколько минут!';
       }
 
       // Загрузка данных
