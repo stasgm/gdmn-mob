@@ -33,7 +33,7 @@ const notOk = <T>(ctx: Context) => {
     result: false,
   };
 
-  ctx.status = 200;
+  ctx.status = 201;
   ctx.body = resp;
 };
 
