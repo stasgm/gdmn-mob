@@ -139,9 +139,12 @@ class CollectionMessage<T extends CollectionItem> {
     if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
   }
 
-  public initTransfer(): Transfer {
-    setTransferFlag(undefined);
-    return getTransferFlag();
+  public initTransfer(): Promise<Transfer> {
+    const initFunc = async () => {
+      setTransferFlag(undefined);
+      return getTransferFlag();
+    };
+    return initFunc();
   }
 
   public async getTransfer(): Promise<Transfer> {
@@ -151,19 +154,12 @@ class CollectionMessage<T extends CollectionItem> {
       const transferDate = new Date(__transfer.uDate);
       const nowDate = new Date();
       const delta = nowDate.getTime() - transferDate.getTime();
-      if (delta >= this._maxTimeOfTransfer) this.initTransfer();
+      if (delta >= this._maxTimeOfTransfer) {
+        await this.initTransfer();
+      }
       return getTransferFlag();
     };
     return getFunc();
-
-    // return new Promise((resolve, reject) => {
-    //   try {
-    //     const f = getTransferFlag();
-    //     resolve(f);
-    //   } catch (err) {
-    //     reject(err);
-    //   }
-    // });
   }
 
   public setTransfer(): Promise<Transfer> {
@@ -180,21 +176,11 @@ class CollectionMessage<T extends CollectionItem> {
 
   public async deleteTransfer(uid: string): Promise<void> {
     const delFunc = async () => {
-      try {
-        const check = await this.getTransfer();
-        if (check?.uid === uid) {
-          this.initTransfer();
-          return;
-        } else {
-          return new Error('Ошибка при удалении трансфера: uid не совпадает с текущем');
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          return new Error(err.message);
-        } else {
-          return new Error(`Ошибка при удалении трансфера: ${err}`);
-        }
+      const check = await this.getTransfer();
+      if (check?.uid === uid) {
+        await this.initTransfer();
       }
+      return;
     };
     delFunc();
   }

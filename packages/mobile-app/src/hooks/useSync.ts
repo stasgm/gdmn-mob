@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import {
   useDispatch,
   useDocThunkDispatch,
@@ -50,18 +51,23 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       - обработка сообщение
     */
     const syncData = async () => {
-      console.log(1111);
+      let transferMessage = '';
       const getTransfer = await api.transfer.getTransfer();
-      console.log(2222);
 
       if (getTransfer.type === 'ERROR') {
-        console.log(3333);
         errList.push(`Запрос на состояние учетной системы не отправлен: ${getTransfer.message}`);
+      } else if (getTransfer.type === 'GET_TRANSFER' && getTransfer.status) {
+        const MS_PER_MINUTE = 60000;
+        const durationInMinutes = 11;
+        const startDate = new Date(getTransfer.status.uDate);
+        startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
+        const remTime = Math.floor((startDate.getTime() - new Date().getTime()) / MS_PER_MINUTE);
+        transferMessage = `\nСервер занят другим процессом.\nПовторите, пожалуйста, сихронизацию через ${remTime} минут!`;
       }
 
       // Загрузка данных
-      if (!onSync && !getTransfer) {
-        console.log(4444);
+      // Если нет функции из пропсов и сервер не занят другим процессом (status = undefined)
+      if (!onSync && getTransfer.type === 'GET_TRANSFER' && !getTransfer.status) {
         const messageCompany = { id: company.id, name: company.name };
         const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -198,32 +204,16 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         if (sendMesDepartResponse.type === 'ERROR') {
           errList.push(`Запрос на получение склада не отправлен: ${sendMesDepartResponse.message}`);
         }
-      } else {
+      } else if (onSync) {
         // Если передан внешний обработчик то вызываем
-        if (onSync) {
-          await onSync();
-        }
+        await onSync();
       }
 
       dispatch(appActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
 
-      if (getTransfer.type === 'GET_TRANSFER' && getTransfer.status) {
-        const MS_PER_MINUTE = 60000;
-        const durationInMinutes = 11;
-        const startDate = new Date(getTransfer.status.uDate);
-        startDate.setMinutes(startDate.getMinutes() + durationInMinutes);
-        console.log('myStartDate', startDate);
-        const now = new Date();
-        console.log('now', now);
-        const remTime = Math.floor((startDate.getTime() - now.getTime()) / MS_PER_MINUTE);
-        console.log('remTime', remTime);
-        // errList.push(`\nПроцесс синхронизации занят. Повторите, пожалуйста, сихронизацию через ${remTime} минут!`);
-
-        Alert.alert(
-          'Внимание!',
-          `\nСервер занят другим процессом.\nПовторите, пожалуйста, сихронизацию через ${remTime} минут!`,
-        );
+      if (transferMessage) {
+        Alert.alert('Внимание!', transferMessage, [{ text: 'OK' }]);
       } else if (errList?.length) {
         Alert.alert('Внимание!', `Во время синхронизации произошли ошибки:\n${errList.join('\n')}`, [{ text: 'OK' }]);
       } else {
