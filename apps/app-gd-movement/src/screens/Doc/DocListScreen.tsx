@@ -290,6 +290,7 @@ export const DocListScreen = () => {
           style={[styles.btnTab, styles.firstBtnTab]}
           menuStyle={localStyles.menu}
           isActive={type.id !== 'all'}
+          iconName={'chevron-down'}
         />
         <Menu
           key={'MenuStatus'}
@@ -303,6 +304,7 @@ export const DocListScreen = () => {
           style={[styles.btnTab]}
           menuStyle={localStyles.menu}
           isActive={status !== 'all'}
+          iconName={'chevron-down'}
         />
         <Menu
           key={'MenuDataSort'}
@@ -316,6 +318,7 @@ export const DocListScreen = () => {
           style={[styles.btnTab, styles.lastBtnTab]}
           menuStyle={localStyles.menu}
           isActive={date.id !== 'new'}
+          iconName={'chevron-down'}
         />
       </View>
       {filterVisible && (

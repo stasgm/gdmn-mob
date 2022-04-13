@@ -2,6 +2,7 @@ import { IListItem } from '@lib/mobile-types';
 import React from 'react';
 import { StyleSheet, View, Text, StyleProp, ViewStyle, TouchableHighlight } from 'react-native';
 import { IconButton, Menu as PaperMenu, useTheme } from 'react-native-paper';
+import { IconSource } from 'react-native-paper/lib/typescript/components/Icon';
 
 interface Props {
   options: IListItem[];
@@ -10,11 +11,13 @@ interface Props {
   onChange: (option: IListItem) => void;
   onPress: () => void;
   onDismiss: () => void;
-  title: string;
+  title?: string;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   menuStyle?: StyleProp<ViewStyle>;
   isActive?: boolean;
+  iconName?: IconSource;
+  iconSize?: number;
 }
 
 const Menu = ({
@@ -29,6 +32,8 @@ const Menu = ({
   style,
   menuStyle,
   isActive = false,
+  iconSize,
+  iconName,
 }: Props) => {
   const { colors } = useTheme();
 
@@ -39,21 +44,25 @@ const Menu = ({
         onDismiss={onDismiss}
         anchor={
           <View style={[localStyles.menu, menuStyle]}>
-            <Text
-              style={{
-                color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
-                fontSize: 15,
-              }}
-            >
-              {title}
-            </Text>
-            <IconButton
-              icon={'chevron-down'}
-              size={20}
-              onPress={onPress}
-              disabled={disabled}
-              color={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
-            />
+            {title && (
+              <Text
+                style={{
+                  color: isActive ? colors.background : disabled ? colors.disabled : colors.primary,
+                  fontSize: 15,
+                }}
+              >
+                {title}
+              </Text>
+            )}
+            {iconName && (
+              <IconButton
+                icon={iconName}
+                size={iconSize || 20}
+                onPress={onPress}
+                disabled={disabled}
+                color={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
+              />
+            )}
           </View>
         }
       >

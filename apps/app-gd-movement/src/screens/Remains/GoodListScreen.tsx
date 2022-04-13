@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, View, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { IconButton, Searchbar, Menu } from 'react-native-paper';
+import { IconButton, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles } from '@lib/mobile-ui';
+import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles, Menu } from '@lib/mobile-ui';
 
 import { refSelectors, useSelector } from '@lib/store';
 
@@ -133,33 +133,16 @@ const GoodListScreen = () => {
             onPress={() => setFilterVisible((prev) => !prev)}
           />
           <Menu
+            key={'MenuType'}
             visible={visibleMenu}
+            onChange={handleApply}
             onDismiss={() => setVisibleMenu(false)}
-            anchor={
-              <View style={localStyles.menu}>
-                <IconButton
-                  icon="filter-outline"
-                  style={filterVisible && { backgroundColor: colors.card }}
-                  size={26}
-                  onPress={() => setVisibleMenu(true)}
-                />
-              </View>
-            }
-          >
-            {remainsList?.map((option) => (
-              <TouchableHighlight
-                activeOpacity={0.7}
-                underlayColor="#DDDDDD"
-                key={`${option?.id}`}
-                onPress={() => handleApply(option)}
-              >
-                <View style={localStyles.container}>
-                  <IconButton icon={rem.id === option?.id ? 'check' : ''} size={20} />
-                  <Menu.Item title={option?.value} />
-                </View>
-              </TouchableHighlight>
-            ))}
-          </Menu>
+            onPress={() => setVisibleMenu(true)}
+            options={remainsList}
+            activeOptionId={rem.id}
+            iconName="filter-outline"
+            iconSize={25}
+          />
         </View>
       ),
     });
@@ -202,14 +185,5 @@ const localStyles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     padding: 5,
-  },
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  menu: {
-    justifyContent: 'center',
-    marginLeft: 6,
-    width: '100%',
   },
 });
