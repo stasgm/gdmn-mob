@@ -1,13 +1,15 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { FlatList, View, Text, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { FlatList, View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { IconButton, Searchbar } from 'react-native-paper';
+import { IconButton, Searchbar, Menu } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles } from '@lib/mobile-ui';
 
 import { refSelectors, useSelector } from '@lib/store';
 
 import { IDepartment, IReferences } from '@lib/types';
+
+import { IListItem } from '@lib/mobile-types';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 
@@ -43,10 +45,41 @@ const GoodListScreen = () => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
+  const [visibleMenu, setVisibleMenu] = useState(false);
+
+  const remainsList: IListItem[] = useMemo(
+    () => [
+      {
+        id: 'all',
+        value: 'Все',
+      },
+      {
+        id: 'notNull',
+        value: 'Ненулевые',
+      },
+    ],
+    [],
+  );
+
+  const [rem, setRem] = useState(remainsList[0]);
+
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
     goodRemains,
   });
+
+  const handleApply = useCallback(
+    (option) => {
+      setVisibleMenu(false);
+      setFilteredList({
+        searchQuery,
+        goodRemains: option.id === 'all' ? goodRemains : goodRemains.filter((item) => item.remains > 0),
+      });
+
+      setRem(option);
+    },
+    [goodRemains, searchQuery],
+  );
 
   useEffect(() => {
     if (searchQuery !== filteredList.searchQuery) {
@@ -92,15 +125,45 @@ const GoodListScreen = () => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
       headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
+        <View style={globalStyles.buttons}>
+          <IconButton
+            icon="card-search-outline"
+            style={filterVisible && { backgroundColor: colors.card }}
+            size={26}
+            onPress={() => setFilterVisible((prev) => !prev)}
+          />
+          <Menu
+            visible={visibleMenu}
+            onDismiss={() => setVisibleMenu(false)}
+            anchor={
+              <View style={localStyles.menu}>
+                <IconButton
+                  icon="filter-outline"
+                  style={filterVisible && { backgroundColor: colors.card }}
+                  size={26}
+                  onPress={() => setVisibleMenu(true)}
+                />
+              </View>
+            }
+          >
+            {remainsList?.map((option) => (
+              <TouchableHighlight
+                activeOpacity={0.7}
+                underlayColor="#DDDDDD"
+                key={`${option?.id}`}
+                onPress={() => handleApply(option)}
+              >
+                <View style={localStyles.container}>
+                  <IconButton icon={rem.id === option?.id ? 'check' : ''} size={20} />
+                  <Menu.Item title={option?.value} />
+                </View>
+              </TouchableHighlight>
+            ))}
+          </Menu>
+        </View>
       ),
     });
-  }, [navigation, filterVisible, colors.card]);
+  }, [navigation, filterVisible, colors.card, visibleMenu, remainsList, rem.id, handleApply]);
 
   const renderItem = ({ item }: { item: IRemGood }) => <GoodItem item={item} />;
 
@@ -139,5 +202,14 @@ const localStyles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     padding: 5,
+  },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menu: {
+    justifyContent: 'center',
+    marginLeft: 6,
+    width: '100%',
   },
 });
