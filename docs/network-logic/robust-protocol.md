@@ -116,6 +116,19 @@
 
 В ситуации, когда процесс остается в состоянии `READY_TO_COMMIT` или `FAILED` системного администратора следует проинформировать как можно быстрее. Для этого необходимо реализовать механизм рассылки email или sms на адрес системнго администратора.
 
+### Диаграма состояний процесса
+
+```mermaid
+  flowchart LR;
+    STARTED-->CANCELLED[Timed out. Deleted.];
+    STARTED-->ERROR[Error during processing. Deleted.];
+    STARTED-->READY_TO_COMMIT;
+    READY_TO_COMMIT-->CLEANUP;
+    READY_TO_COMMIT-->STALLED[Stalled in READY_TO_COMMIT state.\nFiles moved to UNKNOWN folder.\nDeleted.];
+    CLEANUP-->FAILED;
+    CLEANUP-->DONE[Done. Deleted.]
+```
+
 ### Особое напоминание
 
 Не забываем, что функция, предусматривающее _атомарное_ выполнение операций (в т.ч. включающее операции ввода-вывода) не должна содержать внутри _await_ вызовов. Хотя сама по себе может быть и _async_ функцией.
