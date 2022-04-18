@@ -79,9 +79,7 @@ export const SelectRemainsScreen = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const docId = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params?.docId;
-  const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
-    ?.find((item) => item.id === docId) as IInventoryDocument;
+  const document = docSelectors.selectByDocId<IInventoryDocument>(docId);
 
   const [goodRemains] = useState<IRemGood[]>(() =>
     document?.head?.department?.id

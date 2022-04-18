@@ -31,7 +31,7 @@ export const InventoryViewScreen = () => {
 
   const id = useRoute<RouteProp<InventoryStackParamList, 'InventoryView'>>().params?.id;
 
-  const inventory = docSelectors.selectByDocType<IInventoryDocument>('inventory')?.find((e) => e.id === id);
+  const inventory = docSelectors.selectByDocId<IInventoryDocument>(id);
 
   const isBlocked = inventory?.status !== 'DRAFT';
 

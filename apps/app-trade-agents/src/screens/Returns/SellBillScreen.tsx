@@ -37,7 +37,7 @@ function SellBillScreen() {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SellBill'>>();
   const dispatch = useDispatch();
 
-  const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
+  const returnDoc = id ? docSelectors.selectByDocId<IReturnDocument>(id) : undefined;
   const outletId = returnDoc?.head.outlet.id;
 
   const [barVisible, setBarVisible] = useState(false);

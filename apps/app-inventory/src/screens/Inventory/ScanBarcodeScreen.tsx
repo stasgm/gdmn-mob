@@ -46,9 +46,7 @@ const ScanBarcodeScreen = () => {
     navigation.navigate('SelectRemainsItem', { docId });
   }, [docId, navigation]);
 
-  const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
-    ?.find((e) => e.id === docId) as IInventoryDocument;
+  const document = docSelectors.selectByDocId<IInventoryDocument>(docId);
 
   const goods = refSelectors.selectByName<IGood>('good').data;
   const contacts = refSelectors.selectByName<IDepartment>('department').data;

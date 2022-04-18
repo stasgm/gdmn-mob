@@ -35,10 +35,7 @@ const RouteDetailScreen = () => {
     });
   }, [navigation]);
 
-  const point = docSelectors
-    .selectByDocType<IRouteDocument>('route')
-    ?.find((e) => e.id === routeId)
-    ?.lines.find((i) => i.id === id);
+  const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
 
   if (!point) {
     return (

@@ -13,7 +13,7 @@ import {
   BackButton,
   AppScreen,
 } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
+import { documentActions, docSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { getDateString } from '@lib/mobile-app';
 
@@ -23,7 +23,7 @@ import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
 
-import { useDispatch, useSelector } from '../../store';
+import { useDispatch, useSelector as useAppSelector } from '../../store';
 
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';
@@ -48,7 +48,7 @@ const RouteViewScreen = () => {
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
-  const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
+  const route = docSelectors.selectByDocId<IRouteDocument>(id);
   const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
@@ -91,22 +91,21 @@ const RouteViewScreen = () => {
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
 
-  const visitList = docSelectors
-    .selectByDocType<IVisitDocument>('visit')
-    ?.filter((e) => routeLineList?.find((line) => line.id === e.head.routeLineId))
+  const docs = useSelector((state) => state.documents.list);
+
+  const visitList = (docs as IVisitDocument[])
+    ?.filter((e) => e.documentType.name === 'visit' && routeLineList?.find((line) => line.id === e.head.routeLineId))
     .map((doc) => doc.id);
 
-  const orderList = docSelectors
-    .selectByDocType<IOrderDocument>('order')
-    ?.filter((e) => e.head.route?.id === id)
+  const orderList = (docs as IOrderDocument[])
+    ?.filter((e) => e.documentType.name === 'order' && e.head.route?.id === id)
     .map((doc) => doc.id);
 
-  const returnList = docSelectors
-    .selectByDocType<IReturnDocument>('return')
-    ?.filter((e) => e.head.route?.id === id)
+  const returnList = (docs as IReturnDocument[])
+    ?.filter((e) => e.documentType.name === 'return' && e.head.route?.id === id)
     .map((doc) => doc.id);
 
-  const geoList = useSelector((state) => state.geo?.list?.filter((g) => g.routeId === id));
+  const geoList = useAppSelector((state) => state.geo?.list?.filter((g) => g.routeId === id));
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {

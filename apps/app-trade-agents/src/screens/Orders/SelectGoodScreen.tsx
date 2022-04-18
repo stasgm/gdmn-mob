@@ -76,8 +76,7 @@ const SelectGoodScreen = () => {
 
   const renderItem = ({ item }: { item: IGood }) => <Good item={item} />;
 
-  const contactId = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head
-    .contact?.id;
+  const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact?.id;
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 

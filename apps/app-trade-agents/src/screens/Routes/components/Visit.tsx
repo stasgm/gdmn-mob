@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from '
 import { View, Text, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { v4 as uuid } from 'uuid';
-import { docSelectors, documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -50,15 +50,17 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   // Подразделение по умолчанию
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
-  const orderDocs = docSelectors
-    .selectByDocType<IOrderDocument>('order')
-    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet?.id === outlet.id);
+  const docs = useSelector((state) => state.documents.list);
+
+  const orderDocs = (docs as IOrderDocument[])?.filter(
+    (e) => e.documentType.name === 'order' && e.head.route?.id === route.id && e.head.outlet?.id === outlet.id,
+  );
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
-  const returnDocs = docSelectors
-    .selectByDocType<IReturnDocument>('return')
-    ?.filter((e) => e.head.route?.id === route.id && e.head.outlet?.id === outlet.id);
+  const returnDocs = (docs as IReturnDocument[])?.filter(
+    (e) => e.documentType.name === 'return' && e.head.route?.id === route.id && e.head.outlet?.id === outlet.id,
+  );
 
   const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
 
