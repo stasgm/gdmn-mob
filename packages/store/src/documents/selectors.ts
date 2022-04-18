@@ -6,4 +6,8 @@ const selectByDocType = <T extends IDocument>(docType: string) => {
   return useSelector((state) => state.documents.list.filter((i) => i.documentType?.name === docType)) as T[];
 };
 
-export default { selectByDocType };
+const selectByDocId = <T extends IDocument>(docId: string) => {
+  return useSelector((state) => state.documents.list.find((i) => i.id === docId)) as T;
+};
+
+export default { selectByDocType, selectByDocId };

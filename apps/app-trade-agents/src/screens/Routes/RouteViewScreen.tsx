@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import { View, FlatList, Alert } from 'react-native';
+import { View, FlatList, Alert, RefreshControl, Text } from 'react-native';
 import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
@@ -17,6 +17,8 @@ import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
 import { getDateString } from '@lib/mobile-app';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
@@ -31,8 +33,10 @@ interface IFilteredList {
   routeLineList: IRouteLine[] | undefined;
 }
 
+const keyExtractor = (item: IRouteLine) => String(item.id);
+
 const RouteViewScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
@@ -43,6 +47,7 @@ const RouteViewScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
+
   const route = docSelectors.selectByDocType<IRouteDocument>('route')?.find((e) => e.id === id);
   const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
 
@@ -101,7 +106,7 @@ const RouteViewScreen = () => {
     ?.filter((e) => e.head.route?.id === id)
     .map((doc) => doc.id);
 
-  const geoList = useSelector((state) => state.geo)?.list?.filter((g) => g.routeId === id);
+  const geoList = useSelector((state) => state.geo?.list?.filter((g) => g.routeId === id));
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
@@ -162,6 +167,13 @@ const RouteViewScreen = () => {
     });
   }, [actionsMenu, colors.card, filterVisible, navigation]);
 
+  const RC = useMemo(
+    () => <RefreshControl refreshing={!filteredList.routeLineList} title="загрузка данных..." />,
+    [filteredList.routeLineList],
+  );
+
+  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
+
   if (!route) {
     return (
       <View style={styles.container}>
@@ -192,10 +204,17 @@ const RouteViewScreen = () => {
       <FlatList
         ref={ref}
         data={filteredList.routeLineList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+        refreshControl={RC}
+        ListEmptyComponent={EC}
+        removeClippedSubviews={true} // Unmount compsonents when outside of window
+        initialNumToRender={13}
+        maxToRenderPerBatch={13} // Reduce number in each render batch
+        updateCellsBatchingPeriod={50} // Increase time between renders
+        windowSize={11} // Reduce the window size
       />
       <RouteTotal routeId={id} />
     </AppScreen>

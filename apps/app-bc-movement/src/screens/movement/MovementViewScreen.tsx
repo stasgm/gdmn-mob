@@ -20,7 +20,7 @@ export const MovementViewScreen = () => {
 
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementView'>>().params?.id;
 
-  const bcMovement = docSelectors.selectByDocType<IMovementDocument>('bcMovement')?.find((e) => e.id === id);
+  const bcMovement = docSelectors.selectByDocId<IMovementDocument>(id);
 
   const isBlocked = bcMovement?.status !== 'DRAFT';
 

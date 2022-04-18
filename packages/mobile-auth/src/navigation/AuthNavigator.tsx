@@ -60,12 +60,12 @@ const AuthNavigator: React.FC = () => {
   const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
-    await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+    const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
     //Получим устройство по uid
-    if (config?.deviceId && user) {
+    if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
       authDispatch(authActions.getDeviceByUid(config.deviceId));
     }
-  }, [authDispatch, config?.deviceId, user]);
+  }, [authDispatch, config.deviceId, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
@@ -73,7 +73,6 @@ const AuthNavigator: React.FC = () => {
       if (res.type === 'AUTH/ACTIVATE_DEVICE_SUCCESS') {
         //Если устройство прошло активацию по коду,
         //то запишем uId в конфиг api и в настройки
-        // authDispatch(authActions.setSettings({ ...config, deviceId: res.payload }));
         authDispatch(authActions.setConfig({ ...config, deviceId: res.payload }));
         api.config.deviceId = res.payload;
       }

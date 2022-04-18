@@ -30,7 +30,7 @@ export const MovementEditScreen = () => {
   const dispatch = useDispatch();
 
   const formParams = useSelector((state) => state.app.formParams as IMovementFormParam);
-  const bcMovement = docSelectors.selectByDocType<IMovementDocument>('bcMovement')?.find((e) => e.id === id);
+  const bcMovement = id ? docSelectors.selectByDocId<IMovementDocument>(id) : undefined;
   const docType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'bcMovement');

@@ -41,8 +41,6 @@ const OrderEditScreen = () => {
   // Подразделение по умолчанию
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
 
-  const newNumber = getNextDocNumber(orders);
-
   const {
     contact: docContact,
     outlet: docOutlet,
@@ -105,6 +103,7 @@ const OrderEditScreen = () => {
         }),
       );
     } else {
+      const newNumber = getNextDocNumber(orders);
       dispatch(
         appActions.setFormParams({
           number: newNumber,
@@ -115,7 +114,8 @@ const OrderEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, order, defaultDepart, newNumber]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, order, defaultDepart]);
 
   const handleSave = useCallback(() => {
     if (!orderType) {
@@ -295,7 +295,6 @@ const OrderEditScreen = () => {
               <Text>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
-                // disabled={isBlocked}
                 onValueChange={() => {
                   dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
                 }}
