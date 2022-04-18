@@ -404,6 +404,7 @@ export const DocEditScreen = () => {
                   activeOptionId={docFromContactType?.id}
                   disabled={isBlocked}
                   style={localStyles.btnTab}
+                  iconName={'chevron-down'}
                 />
               </View>
               <SelectableInput
@@ -428,6 +429,7 @@ export const DocEditScreen = () => {
                   activeOptionId={docToContactType?.id}
                   disabled={isBlocked}
                   style={localStyles.btnTab}
+                  iconName={'chevron-down'}
                 />
               </View>
               <SelectableInput
