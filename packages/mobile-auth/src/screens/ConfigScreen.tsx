@@ -58,7 +58,7 @@ const ConfigScreen = (props: Props) => {
 
   const [err, setErr] = useState(false);
 
-  const hasErrors = () => {
+  const handleProtocolError = () => {
     if (!(serverName.includes('http://') || serverName.includes('https://'))) {
       setErr(true);
     } else {
@@ -76,11 +76,11 @@ const ConfigScreen = (props: Props) => {
           value={serverName}
           onChangeText={setServerName}
           clearInput={true}
-          onEndEditing={hasErrors}
+          onEndEditing={handleProtocolError}
         />
         {err && (
           <HelperText type="error" style={configStyles.error}>
-            {'Адрес сервера введен некорректно \nПример адреса: http://localhost'}
+            {'Неверный протокол, пример: http://localhost'}
           </HelperText>
         )}
         <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
