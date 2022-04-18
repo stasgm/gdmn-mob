@@ -69,9 +69,7 @@ export const SelectRemainsScreen = () => {
   const model = useAppInventorySelector((state) => state.appDynInventory.model);
 
   const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
-  const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
-    ?.find((item) => item.id === docId) as IInventoryDocument;
+  const document = docSelectors.selectByDocId<IInventoryDocument>(docId);
 
   const handleScanner = useCallback(() => {
     navigation.navigate('ScanBarcode', { docId: docId });

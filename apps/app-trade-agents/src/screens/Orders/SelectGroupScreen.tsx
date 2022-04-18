@@ -103,12 +103,11 @@ const SelectGroupScreen = () => {
     }
   }, [syncDate]);
 
-  const contactId =
-    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact.id || '-1';
+  const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact.id;
 
   const formParams = useSelector((state) => state.app.formParams);
 
-  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
@@ -117,8 +116,8 @@ const SelectGroupScreen = () => {
   const groups = refGroup.data.concat(unknownGroup);
 
   const model = useMemo(
-    () => getGroupModelByContact(groups, goods, newGoodMatrix[contactId], isUseNetPrice),
-    [groups, goods, newGoodMatrix, contactId, isUseNetPrice],
+    () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice),
+    [groups, goods, goodMatrix, contactId, isUseNetPrice],
   );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);

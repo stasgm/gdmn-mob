@@ -41,7 +41,7 @@ const OrderViewScreen = () => {
 
   const [del, setDel] = useState(false);
 
-  const order = docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === id);
+  const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
   const isBlocked = order?.status !== 'DRAFT';
 

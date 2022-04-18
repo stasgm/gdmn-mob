@@ -31,13 +31,13 @@ export const getNextDocNumber = (documents: IOrderDocument[] | IReturnDocument[]
   ).toString();
 };
 
-const getGoodMatrixGoodByContact = (
+const getGoodMatrixByContact = (
   goods: IGood[],
   goodMatrix: IMatrixData[],
   isMatrix: boolean,
   groupId?: string,
 ): IGood[] => {
-  log('getGoodMatrixGoodByContact', 'Начало построения модели матрицы товаров');
+  log('getGoodMatrixByContact', 'Начало построения модели матрицы товаров');
 
   const matrixGoods: IGood[] = [];
   if (isMatrix && goodMatrix) {
@@ -62,7 +62,7 @@ const getGoodMatrixGoodByContact = (
       }
     }
   }
-  log('getGoodMatrixGoodByContact', 'Окончание построения модели матрицы товаров');
+  log('getGoodMatrixByContact', 'Окончание построения модели матрицы товаров');
   return matrixGoods;
 };
 /**Формирует модель товаров в разрезе родительских групп*/
@@ -129,4 +129,4 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
   return parents;
 };
 
-export { getTimeProcess, twoDigits, getGoodMatrixGoodByContact, getGroupModelByContact };
+export { getTimeProcess, twoDigits, getGoodMatrixByContact, getGroupModelByContact };

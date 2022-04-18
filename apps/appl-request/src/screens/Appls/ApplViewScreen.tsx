@@ -33,7 +33,7 @@ const ApplViewScreen = () => {
   const [visibleDialog, setVisibleDialog] = React.useState(false);
   const [refuseReason, setRefuseReason] = React.useState('');
 
-  const appl = docSelectors.selectByDocType<IApplDocument>('request').find((e) => e.id === id);
+  const appl = docSelectors.selectByDocId<IApplDocument>(id);
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {

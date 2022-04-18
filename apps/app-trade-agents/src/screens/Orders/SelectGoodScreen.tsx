@@ -12,7 +12,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IOrderDocument } from '../../store/types';
-import { getGoodMatrixGoodByContact } from '../../utils/helpers';
+import { getGoodMatrixByContact } from '../../utils/helpers';
 
 const Good = ({ item }: { item: IGood }) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();
@@ -76,17 +76,16 @@ const SelectGoodScreen = () => {
 
   const renderItem = ({ item }: { item: IGood }) => <Good item={item} />;
 
-  const contactId =
-    docSelectors.selectByDocType<IOrderDocument>('order')?.find((e) => e.id === docId)?.head.contact?.id || '-1';
+  const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact?.id;
 
-  const newGoodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
 
   const goodRef = refSelectors.selectByName<IGood>('good');
   const goods = goodRef.data;
 
   const model = useMemo(
-    () => getGoodMatrixGoodByContact(goods, newGoodMatrix[contactId], isUseNetPrice, groupId),
-    [contactId, groupId, isUseNetPrice, newGoodMatrix, goods],
+    () => (contactId ? getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, groupId) : []),
+    [contactId, groupId, isUseNetPrice, goodMatrix, goods],
   );
 
   const filteredList = useMemo(() => {

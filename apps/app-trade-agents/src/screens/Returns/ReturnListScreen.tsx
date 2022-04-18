@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { docSelectors, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -33,24 +33,26 @@ export type SectionDataProps = SectionListData<IListItemProps, ReturnListSection
 const ReturnListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnList'>>();
 
-  const { loading } = useSelector((state) => state.documents);
+  const loading = useSelector((state) => state.documents.loading);
+  const returns = useSelector((state) => state.documents.list);
 
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = docSelectors
-    .selectByDocType<IReturnDocument>('return')
+  const list = returns
     ?.filter((i) =>
-      i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
-        ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-          getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-        : true,
+      i.documentType.name === 'return'
+        ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
+          ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+          : true
+        : false,
     )
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()) as IReturnDocument[];
 
   const [status, setStatus] = useState<Status>('all');
 

@@ -44,6 +44,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     dispatch(appActions.setErrorList([]));
 
     const errList: string[] = [];
+    const okList: string[] = [];
 
     /*
       Поддержка платформы:
@@ -51,173 +52,170 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       - обработка сообщение
     */
     const syncData = async () => {
-      let transferMessage = '';
-      console.log(111);
-      const getTransfer = await api.transfer.getTransfer();
-      console.log(222, getTransfer);
-
-      if (getTransfer.type === 'ERROR') {
-        errList.push(`Запрос на состояние учетной системы не отправлен: ${getTransfer.message}`);
-      } else if (getTransfer.type === 'GET_TRANSFER' && getTransfer.status) {
-        console.log(333);
-        transferMessage =
-          '\nСервер занят другим процессом.\nПовторите, пожалуйста, сихронизацию через несколько минут!';
-      }
-
       // Загрузка данных
-      // Если нет функции из пропсов и сервер не занят другим процессом (status = undefined)
-      if (!onSync && getTransfer.type === 'GET_TRANSFER' && !getTransfer.status) {
-        console.log(444);
-        const messageCompany = { id: company.id, name: company.name };
-        const readyDocs = documents.filter((doc) => doc.status === 'READY');
+      try {
+        // Если нет функции из пропсов
+        if (!onSync) {
+          const messageCompany = { id: company.id, name: company.name };
+          const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
-        // 1. Если есть документы, готовые для отправки (status = 'READY'),
-        //    a. Формируем сообщение
-        //    b. Отправляем сообщение с готовыми документами
-        //    c. Если документы отправлены успешно, то меняем статус документов на 'SENT'
-        if (readyDocs.length) {
-          const sendingDocsMessage: IMessage['body'] = {
-            type: 'DOCS',
-            version: docVersion,
-            payload: readyDocs,
-          };
+          // 1. Если есть документы, готовые для отправки (status = 'READY'),
+          //    a. Формируем сообщение
+          //    b. Отправляем сообщение с готовыми документами
+          //    c. Если документы отправлены успешно, то меняем статус документов на 'SENT'
+          if (readyDocs.length) {
+            const sendingDocsMessage: IMessage['body'] = {
+              type: 'DOCS',
+              version: docVersion,
+              payload: readyDocs,
+            };
 
-          const sendMessageResponse = await api.message.sendMessages(
-            systemName,
-            messageCompany,
-            consumer,
-            sendingDocsMessage,
-          );
-
-          if (sendMessageResponse.type === 'SEND_MESSAGE') {
-            const updateDocResponse = await docDispatch(
-              documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT' }))),
+            const sendMessageResponse = await api.message.sendMessages(
+              systemName,
+              messageCompany,
+              consumer,
+              sendingDocsMessage,
             );
 
-            if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
-              errList.push('Документы отправлены, но статус не обновлен');
+            if (sendMessageResponse.type === 'SEND_MESSAGE') {
+              const updateDocResponse = await docDispatch(
+                documentActions.updateDocuments(readyDocs.map((d) => ({ ...d, status: 'SENT' }))),
+              );
+
+              if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_FAILURE') {
+                errList.push('Документы отправлены, но статус не обновлен');
+              } else if (updateDocResponse.type === 'DOCUMENTS/UPDATE_MANY_SUCCESS') {
+                okList.push(`Отправлены документы (${readyDocs.length})`);
+              }
+            } else {
+              errList.push(`Документы не отправлены: ${sendMessageResponse.message}`);
             }
-          } else {
-            errList.push(`Документы не отправлены: ${sendMessageResponse.message}`);
           }
-        }
-        if (onGetMessages) {
-          await onGetMessages();
-        } else {
-          //2. Получаем все сообщения для мобильного
-          const getMessagesResponse = await api.message.getMessages({
-            systemName,
-            companyId: company.id,
-          });
-
-          //Если сообщения получены успешно, то
-          //  справочники: очищаем старые и записываем в хранилище новые данные
-          //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
-          if (getMessagesResponse.type === 'GET_MESSAGES') {
-            await Promise.all(getMessagesResponse.messageList?.map((message) => processMessage(message, errList)));
+          //Для загрузки демо данных
+          if (onGetMessages) {
+            await onGetMessages();
           } else {
-            errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
+            //2. Получаем все сообщения для мобильного
+            const getMessagesResponse = await api.message.getMessages({
+              systemName,
+              companyId: company.id,
+            });
+
+            //Если сообщения получены успешно, то
+            //  справочники: очищаем старые и записываем в хранилище новые данные
+            //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+            if (getMessagesResponse.type === 'GET_MESSAGES') {
+              await Promise.all(
+                getMessagesResponse.messageList?.map((message) => processMessage(message, errList, okList)),
+              );
+            } else {
+              errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
+            }
           }
-        }
 
-        //Формируем запрос на получение документов для следующего раза
-        const messageGetDoc: IMessage['body'] = {
-          type: 'CMD',
-          version: docVersion,
-          payload: {
-            name: 'GET_DOCUMENTS',
-          },
-        };
-
-        //Формируем запрос на получение склада для юзера
-        const messageGetDepart: IMessage['body'] = {
-          type: 'CMD',
-          version: docVersion,
-          payload: {
-            name: 'GET_USER_SETTINGS',
-          },
-        };
-
-        if (isGetReferences) {
-          //Формируем запрос на получение справочников для следующего раза
-          const messageGetRef: IMessage['body'] = {
+          //Формируем запрос на получение документов для следующего раза
+          const messageGetDoc: IMessage['body'] = {
             type: 'CMD',
-            version: refVersion,
+            version: docVersion,
             payload: {
-              name: 'GET_REF',
+              name: 'GET_DOCUMENTS',
             },
           };
 
-          //3. Отправляем запрос на получение справочнико
-          const sendMesRefResponse = await api.message.sendMessages(
+          //Формируем запрос на получение настроек для юзера
+          const messageGetDepart: IMessage['body'] = {
+            type: 'CMD',
+            version: docVersion,
+            payload: {
+              name: 'GET_USER_SETTINGS',
+            },
+          };
+
+          if (isGetReferences) {
+            //Формируем запрос на получение справочников для следующего раза
+            const messageGetRef: IMessage['body'] = {
+              type: 'CMD',
+              version: refVersion,
+              payload: {
+                name: 'GET_REF',
+              },
+            };
+
+            //3. Отправляем запрос на получение справочников
+            const sendMesRefResponse = await api.message.sendMessages(
+              systemName,
+              messageCompany,
+              consumer,
+              messageGetRef,
+            );
+
+            if (sendMesRefResponse?.type === 'ERROR') {
+              errList.push(`Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`);
+            } else if (sendMesRefResponse.type === 'SEND_MESSAGE') {
+              //okList.push('Отправлен запрос на получение справочников');
+            }
+          }
+
+          //4. Отправляем запрос на получение документов
+          const sendMesDocRespone = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetDoc);
+
+          if (sendMesDocRespone.type === 'ERROR') {
+            errList.push(`Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`);
+          } else if (sendMesDocRespone.type === 'SEND_MESSAGE') {
+            //okList.push('Отправлен запрос на получение документов');
+          }
+
+          if (cleanDocTime > 0) {
+            //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
+            const maxDocDate = new Date();
+            maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
+
+            const delDocs = documents
+              .filter(
+                (d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE') && new Date(d.documentDate) <= maxDocDate,
+              )
+              .map((d) => d.id);
+
+            if (delDocs.length) {
+              const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
+              if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
+                errList.push('Старые обработанные документы не удалены');
+              } else if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
+                okList.push(`Удалены старые обработанные документы (${delDocs.length})`);
+              }
+            }
+          }
+
+          //7. Отправляем запрос на получение склада для юзера
+          const sendMesDepartResponse = await api.message.sendMessages(
             systemName,
             messageCompany,
             consumer,
-            messageGetRef,
+            messageGetDepart,
           );
 
-          if (sendMesRefResponse?.type === 'ERROR') {
-            errList.push(`Запрос на получение справочников не отправлен: ${sendMesRefResponse.message}`);
+          if (sendMesDepartResponse.type === 'ERROR') {
+            errList.push(`Запрос на получение склада не отправлен: ${sendMesDepartResponse.message}`);
           }
+        } else if (onSync) {
+          // Если передан внешний обработчик то вызываем
+          await onSync();
         }
-
-        //4. Отправляем запрос на получение документов
-        const sendMesDocRespone = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetDoc);
-
-        if (sendMesDocRespone.type === 'ERROR') {
-          errList.push(`Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`);
-        }
-
-        if (cleanDocTime > 0) {
-          //5. Удаляем обработанные документы, которые хранятся больше времени, которое указано в настройках
-          const maxDocDate = new Date();
-          maxDocDate.setDate(maxDocDate.getDate() - cleanDocTime);
-
-          // const delPromises = documents
-          //   .filter((d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE')
-          // && new Date(d.documentDate) <= maxDocDate)
-          //   .map(async (d) => {
-          //     docDispatch(documentActions.removeDocument(d.id));
-          //   });
-
-          // await Promise.all(delPromises);
-          const delDocs = documents
-            .filter(
-              (d) => (d.status === 'PROCESSED' || d.status === 'ARCHIVE') && new Date(d.documentDate) <= maxDocDate,
-            )
-            .map((d) => d.id);
-
-          const delDocResponse = await docDispatch(documentActions.removeDocuments(delDocs));
-          if (delDocResponse.type === 'DOCUMENTS/REMOVE_MANY_FAILURE') {
-            errList.push('Старые обработанные документы не удалены');
-          }
-        }
-
-        //7. Отправляем запрос на получение склада для юзера
-        const sendMesDepartResponse = await api.message.sendMessages(
-          systemName,
-          messageCompany,
-          consumer,
-          messageGetDepart,
-        );
-
-        if (sendMesDepartResponse.type === 'ERROR') {
-          errList.push(`Запрос на получение склада не отправлен: ${sendMesDepartResponse.message}`);
-        }
-      } else if (onSync) {
-        // Если передан внешний обработчик то вызываем
-        await onSync();
+      } catch (err) {
+        errList.push(err instanceof Error ? err.message : 'Проблемы с передачей данных');
       }
 
       dispatch(appActions.setLoading(false));
       dispatch(appActions.setErrorList(errList));
 
-      if (transferMessage) {
-        Alert.alert('Внимание!', transferMessage, [{ text: 'OK' }]);
-      } else if (errList?.length) {
-        Alert.alert('Внимание!', `Во время синхронизации произошли ошибки:\n${errList.join('\n')}`, [{ text: 'OK' }]);
+      if (errList?.length) {
+        Alert.alert('Внимание!', `Во время синхронизации произошли ошибки:\n${errList.join('.\n')}.`, [{ text: 'OK' }]);
       } else {
-        Alert.alert('Внимание!', 'Синхронизация прошла успешно!', [{ text: 'OK' }]);
+        Alert.alert(
+          'Внимание!',
+          `${okList.length ? `${okList.join('.\n')}.` : 'Отправлен запрос на получение данных.'}`,
+          [{ text: 'OK' }],
+        );
         dispatch(appActions.setSyncDate(new Date()));
       }
     };
@@ -225,7 +223,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     syncData();
   };
 
-  const processMessage = async (msg: IMessage, errList: string[]) => {
+  const processMessage = async (msg: IMessage, errList: string[], okList: string[]) => {
     if (!msg) {
       return;
     }
@@ -244,9 +242,10 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           break;
         }
 
+        const loadRefs = msg.body.payload as IReferences;
         if (refLoadType) {
           //Записываем новые справочники из сообщения
-          const setRefResponse = await refDispatch(referenceActions.setReferences(msg.body.payload as IReferences));
+          const setRefResponse = await refDispatch(referenceActions.setReferences(loadRefs));
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
@@ -254,12 +253,13 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
+            okList.push('Обновлены справочники');
           } else if (setRefResponse.type === 'REFERENCES/SET_ALL_FAILURE') {
             errList.push('Справочники не загружены в хранилище');
           }
         } else {
           //Записываем новые справочники из сообщения
-          const addRefResponse = await refDispatch(referenceActions.addReferences(msg.body.payload as IReferences));
+          const addRefResponse = await refDispatch(referenceActions.addReferences(loadRefs));
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
@@ -267,6 +267,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники добавлены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
+            okList.push('Добавлены справочники');
           } else if (addRefResponse.type === 'REFERENCES/ADD_FAILURE') {
             errList.push('Справочники не добавлены в хранилище');
           }
@@ -283,13 +284,18 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           break;
         }
 
-        const setDocResponse = await docDispatch(documentActions.setDocuments(msg.body.payload as IDocument[]));
+        const loadDocs = msg.body.payload as IDocument[];
+
+        const setDocResponse = await docDispatch(documentActions.setDocuments(loadDocs));
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
           const removeMess = await api.message.removeMessage(msg.id);
           if (removeMess.type === 'ERROR') {
             errList.push(`Документы загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
+          }
+          if (loadDocs.length) {
+            okList.push(`Обновлены документы (${loadDocs.length})`);
           }
         } else if (setDocResponse.type === 'DOCUMENTS/SET_ALL_FAILURE') {
           errList.push('Документы не загружены в хранилище');
@@ -317,6 +323,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           if (removeMess.type === 'ERROR') {
             errList.push(`Настройки пользователя загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }
+          okList.push('Обновлены настройки пользователя');
         } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
           errList.push('Настройки пользователя не загружены в хранилище');
         }

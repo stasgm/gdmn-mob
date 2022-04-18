@@ -33,15 +33,8 @@ const LineItem = React.memo(({ item }: { item: IProperty }) => {
 const GoodLineScreen = () => {
   const navigation = useNavigation();
   const matrixItem = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodLine'>>().params?.item;
-
-  console.log('matrixItem', matrixItem);
   const metadata = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.metadata as IRefMetadata<IMatrixData>;
 
-  console.log('metadata', metadata);
-  console.log('asdfg');
-  Object.entries(metadata).map(([key, value]) => {
-    console.log('1', key, value);
-  });
   const refData = useMemo(
     () =>
       matrixItem &&
