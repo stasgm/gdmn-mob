@@ -34,7 +34,6 @@ const ConfigScreen = (props: Props) => {
       return;
     }
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
-    console.log('match', match);
     const protocol: string = match?.[1] || '';
     const server: string = match?.[2] || '';
 
@@ -65,10 +64,8 @@ const ConfigScreen = (props: Props) => {
     } else {
       setErr(false);
     }
-    console.log('err1', err);
     return;
   };
-  console.log('err2', err);
 
   return (
     <AppScreen style={configStyles.screen}>
@@ -83,7 +80,7 @@ const ConfigScreen = (props: Props) => {
         />
         {err && (
           <HelperText type="error" style={configStyles.error}>
-            {'Адрес сервера введен некорректно \nПример адреса: http://111.111.111.111'}
+            {'Адрес сервера введен некорректно \nПример адреса: http://localhost'}
           </HelperText>
         )}
         <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
