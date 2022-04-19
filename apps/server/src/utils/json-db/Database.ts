@@ -24,7 +24,7 @@ class Database {
       try {
         fs.mkdirSync(this.dbPath);
       } catch (err) {
-        console.log(err.name, err.message);
+        console.log(err instanceof Error ? err.message : 'Ошибка ensureStorage');
       }
     }
   }

@@ -7,6 +7,7 @@ import {
   INamedEntity,
   IDBDeviceBinding,
   IDBid,
+  IDBProcess,
 } from '@lib/types';
 
 import { v4 as uuid } from 'uuid';
@@ -21,6 +22,7 @@ export type dbtype = {
   devices: Collection<IDBDevice>;
   deviceBindings: Collection<IDBDeviceBinding>;
   dbid: Collection<IDBid>;
+  processes: Collection<IDBProcess>;
 };
 
 let database: dbtype | null = null;
@@ -35,8 +37,9 @@ export const createDb = async (dir: string, name: string) => {
   const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
   const dbid = db.collection<IDBid>('dbid');
   const messages = db.messageCollection<IDBMessage>('messages');
+  const processes = db.collection<IDBProcess>('process');
 
-  database = { users, codes, companies, messages, devices, deviceBindings, dbid };
+  database = { users, codes, companies, messages, devices, deviceBindings, dbid, processes: processes };
   const dbArr = await dbid.read();
   if (dbArr.length === 0) await dbid.insert({ id: uuid() });
 

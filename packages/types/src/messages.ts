@@ -26,25 +26,6 @@ export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdPa
 
 export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings;
 
-/* const cmd1: ICmd<ICmdParams[]> = {
-  name: 'GET_DOCUMENTS',
-  params: [
-    {
-      dateBegin: '2021-07-06',
-      dateEnd: '2021-07-07',
-      documentType: {
-        id: '168063006',
-        name: 'Заявки на закупку ТМЦ',
-      },
-    },
-  ],
-};
-
-const cmd2: ICmd<Pick<ICmdParams, 'data'>> = {
-  name: 'GET_REF',
-  params: { data: 'ddgdhfghf' },
-};
- */
 export interface IMessage<
   T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings,
 > {
@@ -62,15 +43,6 @@ export interface IMessage<
 export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
-
-// export type NewMessage<T = any> = {
-//   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-//   status: StatusType;
-//   body: {
-//     type: BodyType;
-//     payload: T;
-//   };
-// };
 
 export interface IDataMessage<T = any> {
   id: string;
@@ -117,3 +89,19 @@ export type Transfer = ITransfer | undefined;
 export type ITransferReq = {
   uid: string;
 };
+
+//robust-protocol
+
+export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
+
+export interface IProcess {
+  id: string;
+  idDb: string;
+  dateBegin: Date;
+  messages: any[];
+  processedMessages: any[];
+  status: ProcessType;
+  dateReadyToCommit?: Date;
+}
+
+export type IDBProcess = IProcess;
