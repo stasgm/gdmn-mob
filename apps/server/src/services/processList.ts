@@ -55,15 +55,15 @@ export const getProcessById = (processId: string) => {
   return process;
 };
 
-export const processCleanup = (processId: string) => {
-  const process = processList.find((p) => p.id === processId);
+// export const processCleanup = (processId: string) => {
+//   const process = processList.find((p) => p.id === processId);
 
-  const pf = [...process!.preparedFiles];
+//   const pf = [...process!.preparedFiles];
 
-  // перемещение файлов
-  for (; process!.preparedFiles.length; ) {
-    const fn = process!.preparedFiles.shift();
-    renameSync('/prepared/' + fn, '/messages/' + fn);
-    saveProcessList();
-  }
-};
+//   // перемещение файлов
+//   for (; process!.preparedFiles.length; ) {
+//     const fn = process!.preparedFiles.shift();
+//     renameSync('/prepared/' + fn, '/messages/' + fn);
+//     saveProcessList();
+//   }
+// };
