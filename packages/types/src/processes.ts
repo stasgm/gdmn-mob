@@ -18,11 +18,6 @@ export type IDBProcess = IProcess;
 export interface IFiles {
   [name: string]: IMessage;
 }
-
-export interface IMessageReturn {
-  fileNames: string[];
-  messages: IMessage[];
-}
 export interface IGetProcessResponse {
   status: 'BUSY' | 'OK';
   processId?: string;
