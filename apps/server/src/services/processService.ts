@@ -31,17 +31,17 @@ export const getProcess = (companyId: string, appSystem: string, consumerId: str
   const files = getFiles(companyId, appSystem, consumerId);
 
   //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
-  if (!files.names.length) {
-    return { status: 'OK', messages: [] };
+  if (!files) {
+    return { status: 'OK', files: [] };
   }
 
   //Если нет процесса и есть сообщения, создаем процесс
-  const newProcess = startProcess(companyId, appSystem, files.names);
+  const newProcess = startProcess(companyId, appSystem, files);
 
   return {
     status: 'OK',
     processId: newProcess.id,
-    messages: files.messages,
+    files,
   };
 };
 

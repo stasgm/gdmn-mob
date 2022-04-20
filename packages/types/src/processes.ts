@@ -15,10 +15,14 @@ export interface IProcess {
 
 export type IDBProcess = IProcess;
 
+export interface IFiles {
+  [name: string]: IMessage;
+}
+
 export interface IGetProcessResponse {
   status: 'BUSY' | 'OK';
   processId?: string;
-  messages?: IMessage[];
+  files?: IFiles[];
 }
 
 export interface IUpdateProcessResponse {

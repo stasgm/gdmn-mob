@@ -1,16 +1,11 @@
 import { readFileSync, writeFileSync, renameSync } from 'fs';
 
-import { IMessage, IProcess } from '@lib/types';
+import { IFiles, IMessage, IProcess } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
 
 export let processList: IProcess[];
 
 const basePath = 'DB/.DB';
-
-export interface IFiles {
-  names: string[];
-  messages: IMessage[];
-}
 
 export const loadProcessList = () => {
   const rawData = readFileSync(basePath).toString();
@@ -29,18 +24,18 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
-  return { names: [], messages: [] };
+export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles | undefined => {
+  return;
 };
 
-export const startProcess = (companyId: string, appSystem: string, preparedFiles: string[]) => {
+export const startProcess = (companyId: string, appSystem: string, files: IFiles) => {
   const newProcess: IProcess = {
     id: uidv1(),
     dateBegin: new Date(),
     companyId,
     appSystem,
     status: 'STARTED',
-    preparedFiles,
+    preparedFiles: Object.keys(files),
     processedFiles: [],
     dateReadyToCommit: undefined,
   };
@@ -58,7 +53,7 @@ export const getProcessById = (processId: string) => {
   return process;
 };
 
-export const updateProcess = (processId: string, preparedFiles: IMessage[]) => {
+export const updateProcess = (processId: string, preparedFiles: IFiles) => {
   const process = processList.find((p) => p.id === processId);
 
   const updatedProcess = {
