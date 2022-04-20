@@ -1,11 +1,16 @@
 import { readFileSync, writeFileSync, renameSync } from 'fs';
 
-import { IProcess } from '@lib/types';
+import { IMessage, IProcess } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
 
 export let processList: IProcess[];
 
 const basePath = 'DB/.DB';
+
+export interface IGetFiles {
+  fileNames: string[];
+  messages: IMessage[];
+}
 
 export const loadProcessList = () => {
   const rawData = readFileSync(basePath).toString();
