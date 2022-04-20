@@ -6,7 +6,7 @@ import { DataNotFoundException } from '../exceptions';
 import log from '../utils/logger';
 
 import { getDb } from './dao/db';
-import { checkProcess } from './processList';
+import { checkProcess, getFiles, startProcess } from './processList';
 
 /**
  * 1. Если есть процесс для данной базы, то возвращает status 'BUSY'
@@ -33,32 +33,14 @@ export const getProcess = async (
     return { status: 'BUSY' };
   }
 
-  const listByConsumer = messages.read((item) => item.consumer === consumerId);
-
-  const listByAppSystem = listByConsumer.filter((m) => m.head.appSystem === appSystem);
+  const prepearedFiles: string[] = getFiles(companyId, appSystem);
 
   //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
-  if (!listByAppSystem.length) {
+  if (!prepearedFiles.length) {
     return { status: 'OK', messages: [] };
   }
   //Если нет процесса и есть сообщения
-  const pr = listByAppSystem.map(async (i) => await makeMessage(i));
-
-  const messageList: IMessage[] = await Promise.all(pr);
-
-  const newProcess: IProcess = {
-    id: uuidv1(),
-    dateBegin: new Date(),
-    companyId,
-    appSystem,
-    status: 'STARTED',
-    prepearedFiles: messageList,
-    processedFiles: [],
-    dateReadyToCommit: undefined,
-  };
-
-  //Записываем объект процесса на диск
-  const processId = await processes.insert(newProcess);
+  const processId = startProcess(companyId, appSystem, prepearedFiles);
 
   return {
     status: 'OK',

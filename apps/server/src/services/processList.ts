@@ -28,16 +28,14 @@ export const getFiles = (companyId: string, appSystem: string) => {
   return [];
 };
 
-export const startProcess = (companyId: string, appSystem: string) => {
-  const prepearedFiles: string[] = getFiles(companyId, appSystem);
-
+export const startProcess = (companyId: string, appSystem: string, prepearedFiles: string[]) => {
   const newProcess: IProcess = {
     id: uidv1(),
     dateBegin: new Date(),
     companyId,
     appSystem,
     status: 'STARTED',
-    prepearedFiles: prepearedFiles,
+    prepearedFiles,
     processedFiles: [],
     dateReadyToCommit: undefined,
   };
