@@ -28,8 +28,9 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const readFileByAppSystem = (fileName: string, appSystem: string): IMessage | undefined => {
-  const data: IMessage = JSON.parse(readFileSync(fileName, { encoding: 'utf8' }));
+export const readFileByAppSystem = (pathDb: string, fileName: string, appSystem: string): IMessage | undefined => {
+  const fullName = path.join(pathDb, fileName);
+  const data: IMessage = JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
   return data.head.appSystem === appSystem ? data : undefined;
 };
 
@@ -43,7 +44,7 @@ export const getFiles = (companyId: string, appSystem: string, consumerId: strin
   for (; consumerFiles.length; ) {
     const fn = consumerFiles.shift();
     if (fn) {
-      const message = readFileByAppSystem(fn, appSystem);
+      const message = readFileByAppSystem(pathDb, fn, appSystem);
       if (message) {
         resObj.fileNames.push(fn);
         resObj.messages.push(message);
