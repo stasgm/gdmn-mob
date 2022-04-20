@@ -7,7 +7,7 @@ import log from '../utils/logger';
 
 import { getDb } from './dao/db';
 import { FindMany } from './messageService';
-import { checkProcess, getFiles, startProcess } from './processList';
+import { checkProcess, getFiles, IGetFiles, startProcess } from './processList';
 
 /**
  * 1. Если есть процесс для данной базы, то возвращает status 'BUSY'
@@ -31,7 +31,7 @@ export const getProcess = async (
     return { status: 'BUSY' };
   }
 
-  const prepearedFiles: string[] = getFiles(companyId, appSystem, consumerId);
+  const prepearedFiles = getFiles(companyId, appSystem, consumerId);
 
   //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
   if (!prepearedFiles.length) {

@@ -29,7 +29,7 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const getFiles: IGetFiles = (companyId: string, appSystem: string, consumerId: string) => {
+export const getFiles = (companyId: string, appSystem: string, consumerId: string): IGetFiles => {
   return { fileNames: [], messages: [] };
 };
 
