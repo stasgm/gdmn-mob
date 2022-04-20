@@ -29,8 +29,8 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const getFiles = (companyId: string, appSystem: string, consumerId: string) => {
-  return [];
+export const getFiles: IGetFiles = (companyId: string, appSystem: string, consumerId: string) => {
+  return { fileNames: [], messages: [] };
 };
 
 export const startProcess = (companyId: string, appSystem: string, prepearedFiles: string[]) => {
