@@ -7,9 +7,10 @@ export interface IProcess {
   companyId: string;
   appSystem: string;
   dateBegin: Date;
-  preparedFiles: string[];
-  processedFiles: string[];
+  fileNames: string[];
+  processedFileNames: string[];
   status: ProcessType;
+  processedFiles?: IFiles;
   dateReadyToCommit?: Date;
 }
 
@@ -20,9 +21,9 @@ export interface IFiles {
 }
 
 export interface IGetProcessResponse {
-  status: 'BUSY' | 'OK';
+  status: 'BUSY' | 'IDLE' | 'OK';
   processId?: string;
-  files?: IFiles[];
+  files?: IFiles;
 }
 
 export interface IUpdateProcessResponse {
