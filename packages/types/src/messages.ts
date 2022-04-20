@@ -26,9 +26,7 @@ export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdPa
 
 export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings;
 
-export interface IMessage<
-  T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings,
-> {
+export interface IMessage<T = MessageType> {
   id: string;
   status: StatusType;
   version?: number;
@@ -65,7 +63,7 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
   // dateTime: string;
 }
 
-export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
+export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
 }
 
@@ -89,19 +87,3 @@ export type Transfer = ITransfer | undefined;
 export type ITransferReq = {
   uid: string;
 };
-
-//robust-protocol
-
-export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
-
-export interface IProcess {
-  id: string;
-  idDb: string;
-  dateBegin: Date;
-  messages: any[];
-  processedMessages: any[];
-  status: ProcessType;
-  dateReadyToCommit?: Date;
-}
-
-export type IDBProcess = IProcess;
