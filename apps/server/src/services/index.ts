@@ -6,7 +6,7 @@ import * as activationCodeService from './activationCodeService';
 import * as messageService from './messageService';
 import * as deviceBindingService from './deviceBindingService';
 import * as transferService from './transferService';
-import * as processService from './processService';
+import * as processService from './processService2';
 
 export {
   authService,
