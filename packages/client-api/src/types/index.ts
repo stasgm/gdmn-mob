@@ -7,5 +7,6 @@ import * as deviceBinding from './deviceBinding';
 import * as message from './message';
 import * as transfer from './transfer';
 import * as error from './error';
+import * as process from './process';
 
-export { auth, user, message, company, device, activationCode, deviceBinding, error, transfer };
+export { auth, user, message, company, device, activationCode, deviceBinding, error, transfer, process };
