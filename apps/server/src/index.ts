@@ -2,9 +2,9 @@ import config from '../config';
 
 import { createServer, KoaApp, startServer } from './server';
 
-import { IItemDatabase, databaseMenu } from './utils/databaseMenu';
+import { IItemDatabase } from './utils/databaseMenu';
 
-import { readFile } from './utils/workWithFile';
+//import { readFile } from './utils/workWithFile';
 
 const defaultDatabase: IItemDatabase = {
   name: 'DB',
@@ -14,16 +14,15 @@ const defaultDatabase: IItemDatabase = {
 
 const run = async (dbase?: IItemDatabase): Promise<KoaApp> => {
   // TODO
-  let db: IItemDatabase;
-
-  if (dbase) {
+  /* if (dbase) {
     db = dbase;
   } else {
     const templateName: IItemDatabase[] | undefined = await readFile(config.TEMPLATE_CONFIG_NAME);
     const chosenDatabase = !templateName || templateName.length === 0 ? undefined : await databaseMenu(templateName);
 
     db = chosenDatabase ? JSON.parse(chosenDatabase) : defaultDatabase;
-  }
+  } */
+  const db: IItemDatabase = dbase ?? defaultDatabase;
 
   const app = await createServer({ name: 'WS-Server', dbName: db.name, dbPath: db.path, port: db.port });
 
