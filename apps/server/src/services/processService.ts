@@ -7,7 +7,7 @@ import log from '../utils/logger';
 
 import { getDb } from './dao/db';
 import { FindMany } from './messageService';
-import { checkProcess, getFiles, IGetFiles, startProcess } from './processList';
+import { checkProcess, getFiles, getProcessById, IFiles, startProcess } from './processList';
 
 /**
  * 1. Если есть процесс для данной базы, то возвращает status 'BUSY'
@@ -18,11 +18,7 @@ import { checkProcess, getFiles, IGetFiles, startProcess } from './processList';
  * @param consumerId
  * @returns { status, processId, messages }
  */
-export const getProcess = async (
-  companyId: string,
-  appSystem: string,
-  consumerId: string,
-): Promise<IGetProcessResponse> => {
+export const getProcess = (companyId: string, appSystem: string, consumerId: string): IGetProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = checkProcess(companyId);
 
@@ -31,28 +27,27 @@ export const getProcess = async (
     return { status: 'BUSY' };
   }
 
-  const prepearedFiles = getFiles(companyId, appSystem, consumerId);
+  //Находим список наименований файлов и список сообщений
+  const files = getFiles(companyId, appSystem, consumerId);
 
   //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
-  if (!prepearedFiles.length) {
+  if (!files.names.length) {
     return { status: 'OK', messages: [] };
   }
-  //Если нет процесса и есть сообщения
-  const newProcess = startProcess(companyId, appSystem, prepearedFiles);
 
-  const messageList = FindMany({ appSystem, companyId, consumerId });
+  //Если нет процесса и есть сообщения, создаем процесс
+  const newProcess = startProcess(companyId, appSystem, files.names);
 
   return {
     status: 'OK',
     processId: newProcess.id,
-    messages: messageList,
+    messages: files.messages,
   };
 };
 
 export const updateProcess = (processId: string, messages: IMessage[]): IUpdateProcessResponse => {
-  const db = getDb();
-  const processes = db.processes;
-  const process = await processes.find(processId);
+  //Находим процесс для конкеретной базы
+  const process = getProcessById(processId);
 
   //Если в списке нет процесса с переданным ИД или его состояние не STARTED, то возвращается статус CANCELLED
   if (!process || process.status !== 'STARTED') {

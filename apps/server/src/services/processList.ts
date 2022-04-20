@@ -7,8 +7,8 @@ export let processList: IProcess[];
 
 const basePath = 'DB/.DB';
 
-export interface IGetFiles {
-  fileNames: string[];
+export interface IFiles {
+  names: string[];
   messages: IMessage[];
 }
 
@@ -29,18 +29,18 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const getFiles = (companyId: string, appSystem: string, consumerId: string): IGetFiles => {
-  return { fileNames: [], messages: [] };
+export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
+  return { names: [], messages: [] };
 };
 
-export const startProcess = (companyId: string, appSystem: string, prepearedFiles: string[]) => {
+export const startProcess = (companyId: string, appSystem: string, preparedFiles: string[]) => {
   const newProcess: IProcess = {
     id: uidv1(),
     dateBegin: new Date(),
     companyId,
     appSystem,
     status: 'STARTED',
-    prepearedFiles,
+    preparedFiles,
     processedFiles: [],
     dateReadyToCommit: undefined,
   };
@@ -58,15 +58,32 @@ export const getProcessById = (processId: string) => {
   return process;
 };
 
-// export const processCleanup = (processId: string) => {
-//   const process = processList.find((p) => p.id === processId);
+export const updateProcess = (processId: string, preparedFiles: IMessage[]) => {
+  const process = processList.find((p) => p.id === processId);
 
-//   const pf = [...process!.preparedFiles];
+  const updatedProcess = {
+    ...process,
+    status: 'READY_TO_COMMIT',
+    preparedFiles,
+  };
 
-//   // перемещение файлов
-//   for (; process!.preparedFiles.length; ) {
-//     const fn = process!.preparedFiles.shift();
-//     renameSync('/prepared/' + fn, '/messages/' + fn);
-//     saveProcessList();
-//   }
-// };
+  // перемещение файлов
+  for (; process!.preparedFiles.length; ) {
+    const fn = process!.preparedFiles.shift();
+    renameSync('/prepared/' + fn, '/messages/' + fn);
+    saveProcessList();
+  }
+};
+
+export const cleanUpProcess = (processId: string) => {
+  const process = processList.find((p) => p.id === processId);
+
+  // const pf = [...process!.preparedFiles];
+
+  // перемещение файлов
+  for (; process!.preparedFiles.length; ) {
+    const fn = process!.preparedFiles.shift();
+    renameSync('/prepared/' + fn, '/messages/' + fn);
+    saveProcessList();
+  }
+};

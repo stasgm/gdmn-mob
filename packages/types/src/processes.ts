@@ -7,7 +7,7 @@ export interface IProcess {
   companyId: string;
   appSystem: string;
   dateBegin: Date;
-  prepearedFiles: string[];
+  preparedFiles: string[];
   processedFiles: string[];
   status: ProcessType;
   dateReadyToCommit?: Date;
