@@ -86,4 +86,4 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
   deviceId: string;
 }
 
-export type IDBid = IEntity;
+export type SessionId = IEntity;

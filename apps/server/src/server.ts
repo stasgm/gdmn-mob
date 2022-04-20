@@ -45,7 +45,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.port = server.port;
   app.context.name = server.name;
 
-  const dbArr = await (app.context.db as dbtype).dbid.read();
+  const dbArr = await (app.context.db as dbtype).sessionId.read();
   const dbid = dbArr.length === 1 ? dbArr[0].id : '';
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
 
