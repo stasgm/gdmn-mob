@@ -1,11 +1,15 @@
-import { readFileSync, writeFileSync, renameSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync, readdirSync } from 'fs';
 
-import { IFiles, IMessage, IProcess } from '@lib/types';
+import path from 'path';
+
+import { IFiles, IMessage, IProcess, IMessageReturn } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
+
+import config from '../../config';
 
 export let processList: IProcess[];
 
-const basePath = 'DB/.DB';
+const basePath = path.join(config.FILES_PATH, '/.DB');
 
 export const loadProcessList = () => {
   const rawData = readFileSync(basePath).toString();
@@ -24,8 +28,29 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles | undefined => {
-  return;
+export const readFileByAppSystem = (fileName: string, appSystem: string): IMessage | undefined => {
+  const data: IMessage = JSON.parse(readFileSync(fileName, { encoding: 'utf8' }));
+  return data.head.appSystem === appSystem ? data : undefined;
+};
+
+export const getFiles = (companyId: string, appSystem: string, consumerId: string): IMessageReturn | undefined => {
+  const resObj: IMessageReturn = {
+    fileNames: [],
+    messages: [],
+  };
+  const pathDb = path.join(basePath, `DB_${companyId}/messages/`);
+  const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
+  for (; consumerFiles.length; ) {
+    const fn = consumerFiles.shift();
+    if (fn) {
+      const message = readFileByAppSystem(fn, appSystem);
+      if (message) {
+        resObj.fileNames.push(fn);
+        resObj.messages.push(message);
+      }
+    }
+  }
+  return resObj;
 };
 
 export const startProcess = (companyId: string, appSystem: string, files: IFiles) => {
