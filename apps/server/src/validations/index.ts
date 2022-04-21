@@ -4,7 +4,7 @@ import * as deviceValidation from './device';
 import * as userValidation from './user';
 import * as messageValidation from './message';
 import * as deviceBindingValidation from './deviceBinding';
-import * as transferValidation from './transfer';
+import * as processValidation from './process';
 
 export {
   authValidation,
@@ -13,5 +13,5 @@ export {
   userValidation,
   messageValidation,
   deviceBindingValidation,
-  transferValidation,
+  processValidation,
 };

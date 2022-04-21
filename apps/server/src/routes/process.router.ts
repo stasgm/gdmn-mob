@@ -1,17 +1,18 @@
 import Router from 'koa-joi-router';
 
-import { api1, api2, api3, api4, api5, api6 } from '../controllers/process';
+import { addProcess, updateProcess, removeProcess, cancelProcess, breakProcess } from '../controllers/process';
 import { authMiddleware } from '../middleware/authRequired';
-import { messageValidation } from '../validations';
+import { deviceMiddleware } from '../middleware/deviceRequired';
+import { processValidation } from '../validations';
 
 const router = Router();
 
 router.prefix('/process');
-router.get('/:idDb', messageValidation.getMessage, authMiddleware, api1);
-router.get('/:idDb', messageValidation.getMessage, authMiddleware, api2);
-router.get('/:idDb', messageValidation.getMessage, authMiddleware, api3);
-router.get('/:idDb', messageValidation.getMessage, authMiddleware, api4);
-router.get('/:idDb', messageValidation.getMessage, authMiddleware, api5);
-router.get('/:idDb', messageValidation.getMessage, authMiddleware, api6);
+router.post('/', processValidation.addProcess, authMiddleware, deviceMiddleware, addProcess);
+// router.get('/:id', messageValidation.getMessage, authMiddleware, api2);
+router.patch('/:id', processValidation.updateProcess, authMiddleware, deviceMiddleware, updateProcess);
+router.delete('/:id', processValidation.removeProcess, authMiddleware, deviceMiddleware, removeProcess);
+router.delete('/:id', processValidation.cancelProcess, authMiddleware, deviceMiddleware, cancelProcess);
+router.delete('/:id', processValidation.breakProcess, authMiddleware, deviceMiddleware, breakProcess);
 
 export default router;

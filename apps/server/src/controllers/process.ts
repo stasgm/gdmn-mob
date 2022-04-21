@@ -1,73 +1,65 @@
 import { Context, ParameterizedContext } from 'koa';
 
 import log from '../utils/logger';
-import { messageService, processService } from '../services';
+import { processService } from '../services';
 
 import { ok } from '../utils/apiHelpers';
 
-const api1 = async (ctx: ParameterizedContext): Promise<void> => {
+const addProcess = (ctx: ParameterizedContext) => {
   const { companyId, appSystem } = ctx.params;
+  //companyId можем узнать из user.json по userId
   const userId = ctx.state.user.id;
 
-  const messageList = await messageService.FindMany({
-    appSystem,
-    companyId,
-    consumerId: userId,
-  });
+  const response = processService.addProcess(appSystem, companyId, userId);
 
-  ok(ctx as Context, messageList);
+  ok(ctx as Context, response);
 
-  log.info('getMessage: message is successfully received');
+  log.info('AddProcess');
 };
 
 const api2 = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: processId } = ctx.params;
+  // const { id: processId } = ctx.params;
+  // await processService.apiTwo(processId);
+  // ok(ctx as Context);
+  // log.info('Commit transaction is successful');
+};
 
-  await processService.apiTwo(processId);
+const updateProcess = (ctx: ParameterizedContext) => {
+  const { id: processId, processedFiles } = ctx.params;
+
+  processService.updateProcessById(processId, processedFiles);
 
   ok(ctx as Context);
 
-  log.info('Commit transaction is successful');
+  log.info('UpdateProcess');
 };
 
-const api3 = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: processId } = ctx.params;
-
-  await processService.apiThree(processId);
+const removeProcess = (ctx: ParameterizedContext) => {
+  processService.removeProcessById(ctx.params.processId);
 
   ok(ctx as Context);
 
-  log.info('Commit transaction is successful');
+  log.info('RemoveProcess');
 };
 
-const api4 = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: processId } = ctx.params;
+const cancelProcess = (ctx: ParameterizedContext) => {
+  const { id: processId, errorMessage } = ctx.params;
 
-  await processService.apiFour(processId);
+  processService.cancelProcessById(processId, errorMessage);
 
   ok(ctx as Context);
 
-  log.info('Commit transaction is successful');
+  log.info('CancelProcess');
 };
 
-const api5 = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: processId } = ctx.params;
+const breakProcess = (ctx: ParameterizedContext) => {
+  const { id: processId, errorMessage } = ctx.params;
 
-  await processService.apiFive(processId);
+  processService.breakProcessById(processId, errorMessage);
 
   ok(ctx as Context);
 
-  log.info('Commit transaction is unsuccessful');
+  log.info('BreakProcess');
 };
 
-const api6 = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: processId } = ctx.params;
-
-  await processService.apiSix(processId);
-
-  ok(ctx as Context);
-
-  log.info('removeProcess: process is successfully removed');
-};
-
-export { api1, api2, api3, api4, api5, api6 };
+export { addProcess, api2, updateProcess, removeProcess, cancelProcess, breakProcess };

@@ -23,7 +23,7 @@ import {
  * @param consumerId
  * @returns { status, processId, messages }
  */
-export const getProcess = (companyId: string, appSystem: string, consumerId: string): IGetProcessResponse => {
+export const addProcess = (companyId: string, appSystem: string, consumerId: string): IGetProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = checkProcess(companyId);
 
@@ -35,10 +35,10 @@ export const getProcess = (companyId: string, appSystem: string, consumerId: str
   //Находим список наименований файлов и список сообщений
   const files = getFiles(companyId, appSystem, consumerId);
 
-  //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
-  if (!files) {
-    return { status: 'IDLE' };
-  }
+  // //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
+  // if (!files) {
+  //   return { status: 'IDLE' };
+  // }
 
   //Если нет процесса и есть сообщения, создаем процесс
   const newProcess = startProcess(companyId, appSystem, files);

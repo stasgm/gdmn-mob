@@ -56,11 +56,13 @@ export const readFileByAppSystem = (pathDb: string, fileName: string): IMessage 
 };
 
 export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
-  const resObj: IFiles = {};
   const pathDb = path.join(basePath, `DB_${companyId}/${appSystem}/messages/`);
   const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
-  consumerFiles.map((fn) => ({ ...resObj, [fn]: readFileByAppSystem(pathDb, fn) }));
-  return resObj;
+
+  return consumerFiles?.reduce((prev: IFiles, cur) => {
+    prev[cur] = readFileByAppSystem(pathDb, cur);
+    return prev;
+  }, {});
 };
 
 export const startProcess = (companyId: string, appSystem: string, files: IFiles) => {
