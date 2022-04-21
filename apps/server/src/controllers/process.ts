@@ -1,20 +1,20 @@
 import { Context, ParameterizedContext } from 'koa';
 
+import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess } from '@lib/types';
+
 import log from '../utils/logger';
 import { processService } from '../services';
 
 import { ok } from '../utils/apiHelpers';
 
 const addProcess = (ctx: ParameterizedContext) => {
-  const { companyId, appSystem } = ctx.params;
+  const body = ctx.request.body as AddProcess;
   //companyId можем узнать из user.json по userId
-  const userId = ctx.state.user.id;
 
-  const response = processService.addProcess(appSystem, companyId, userId);
-
+  const response = processService.addProcess(body);
   ok(ctx as Context, response);
 
-  log.info('AddProcess');
+  log.info('addProcess', response);
 };
 
 const api2 = async (ctx: ParameterizedContext): Promise<void> => {
@@ -25,41 +25,41 @@ const api2 = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const updateProcess = (ctx: ParameterizedContext) => {
-  const { id: processId, processedFiles } = ctx.params;
+  const { processedFiles } = ctx.request.body as UpdateProcess;
 
-  processService.updateProcessById(processId, processedFiles);
+  const response = processService.updateProcessById(ctx.params.id, processedFiles);
 
-  ok(ctx as Context);
+  ok(ctx as Context, response);
 
-  log.info('UpdateProcess');
+  log.info('updateProcess', response);
 };
 
 const removeProcess = (ctx: ParameterizedContext) => {
-  processService.removeProcessById(ctx.params.processId);
+  const response = processService.removeProcessById(ctx.params.id);
 
-  ok(ctx as Context);
+  ok(ctx as Context, response);
 
-  log.info('RemoveProcess');
+  log.info('removeProcess', response);
 };
 
 const cancelProcess = (ctx: ParameterizedContext) => {
-  const { id: processId, errorMessage } = ctx.params;
+  const { errorMessage } = ctx.request.body as CancelProcess;
 
-  processService.cancelProcessById(processId, errorMessage);
+  const response = processService.cancelProcessById(ctx.params.id, errorMessage);
 
-  ok(ctx as Context);
+  ok(ctx as Context, response);
 
-  log.info('CancelProcess');
+  log.info('cancelProcess', response);
 };
 
-const breakProcess = (ctx: ParameterizedContext) => {
-  const { id: processId, errorMessage } = ctx.params;
+const interruptProcess = (ctx: ParameterizedContext) => {
+  const { errorMessage } = ctx.request.body as InterruptProcess;
 
-  processService.breakProcessById(processId, errorMessage);
+  const response = processService.interruptProcessById(ctx.params.id, errorMessage);
 
-  ok(ctx as Context);
+  ok(ctx as Context, response);
 
-  log.info('BreakProcess');
+  log.info('interruptProcess', response);
 };
 
-export { addProcess, api2, updateProcess, removeProcess, cancelProcess, breakProcess };
+export { addProcess, api2, updateProcess, removeProcess, cancelProcess, interruptProcess };

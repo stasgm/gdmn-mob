@@ -13,7 +13,5 @@ router.post('/', messageValidation.newMessage, authMiddleware, deviceMiddleware,
 router.get('/:companyId/:appSystem', messageValidation.getMessage, authMiddleware, deviceMiddleware, getMessage);
 router.delete('/:id', messageValidation.removeMessage, authMiddleware, deviceMiddleware, removeMessage);
 router.delete('/', authMiddleware, deviceMiddleware, clear);
-// router.get('/subscribe/:companyId/:appSystem', authMiddleware, deviceMiddleware, subscribe);
-// router.post('/publish/:companyId', messageValidation.publish, authMiddleware, deviceMiddleware, publish);
 
 export default router;
