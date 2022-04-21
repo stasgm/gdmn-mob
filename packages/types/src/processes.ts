@@ -19,12 +19,33 @@ export type IDBProcess = IProcess;
 export interface IFiles {
   [name: string]: IMessage;
 }
-export interface IGetProcessResponse {
-  status: 'BUSY' | 'IDLE' | 'OK';
+
+export type AddProcess = {
+  companyId: string;
+  appSystem: string;
+  consumerId: string;
+};
+
+export type AddProcessRequest = Omit<AddProcess, 'consumerId'>;
+
+export interface IAddProcessResponse {
+  status: 'BUSY' | 'OK';
   processId?: string;
   files?: IFiles;
 }
 
+export type UpdateProcess = {
+  processedFiles: IFiles;
+};
+
 export interface IUpdateProcessResponse {
   status: 'OK' | 'CANCELLED';
 }
+
+export type CancelProcess = {
+  errorMessage: string;
+};
+
+export type InterruptProcess = {
+  errorMessage: string;
+};

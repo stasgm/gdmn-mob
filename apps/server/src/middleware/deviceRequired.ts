@@ -13,7 +13,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   }
 
   if (user?.role === 'User') {
-    const { deviceId } = ctx.query;
+    const deviceId = ctx.query.deviceId;
 
     if (!deviceId) {
       throw new InvalidParameterException('Не указан идентификатор устройства');
@@ -22,6 +22,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     const { devices, deviceBindings } = getDb();
 
     const device = await devices.find((el) => el.uid === deviceId);
+
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
     }

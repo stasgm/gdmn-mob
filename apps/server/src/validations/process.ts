@@ -22,27 +22,29 @@ const updateProcess: Config = {
     }),
     type: 'json',
     body: Joi.object({
-      head: Joi.object({
-        company: Joi.object({
-          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+      processedFiles: Joi.object({
+        head: Joi.object({
+          company: Joi.object({
+            id: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+            name: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+          }),
+          appSystem: Joi.string().optional(),
+          producer: Joi.object().optional(),
+          consumer: Joi.object().optional(),
+          version: Joi.number().optional(),
+          dateTime: Joi.string().optional(),
         }),
-        appSystem: Joi.string().optional(),
-        producer: Joi.object().optional(),
-        consumer: Joi.object().optional(),
-        version: Joi.number().optional(),
-        dateTime: Joi.string().optional(),
+        body: Joi.object({
+          type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+          version: Joi.number().optional(),
+          payload: Joi.alternatives()
+            .try(Joi.object(), Joi.array())
+            .required()
+            .error(new InvalidParameterException('Некорректный формат сообщения')),
+        }),
+        id: Joi.string().optional(),
+        status: Joi.string().optional(),
       }),
-      body: Joi.object({
-        type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-        version: Joi.number().optional(),
-        payload: Joi.alternatives()
-          .try(Joi.object(), Joi.array())
-          .required()
-          .error(new InvalidParameterException('Некорректный формат сообщения')),
-      }),
-      id: Joi.string().optional(),
-      status: Joi.string().optional(),
     }),
   },
 };
@@ -51,7 +53,7 @@ const removeProcess: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор процесса')),
     }),
   },
 };
@@ -60,20 +62,20 @@ const cancelProcess: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор процесса')),
     }),
     type: 'json',
     body: Joi.object({
-      errorMessage: Joi.string().required().error(new InvalidParameterException('Не указана причина отмены')),
+      errorMessage: Joi.string().required().error(new InvalidParameterException('Не указана причина отмены процесса')),
     }),
   },
 };
 
-const breakProcess: Config = {
+const interruptProcess: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор устройства')),
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор процесса')),
     }),
     type: 'json',
     body: Joi.object({
@@ -84,4 +86,4 @@ const breakProcess: Config = {
   },
 };
 
-export { addProcess, updateProcess, removeProcess, cancelProcess, breakProcess };
+export { addProcess, updateProcess, removeProcess, cancelProcess, interruptProcess };

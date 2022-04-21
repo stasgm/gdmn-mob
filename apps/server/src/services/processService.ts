@@ -1,4 +1,4 @@
-import { IFiles, IGetProcessResponse, IUpdateProcessResponse } from '@lib/types';
+import { IFiles, IAddProcessResponse, IUpdateProcessResponse, AddProcess } from '@lib/types';
 
 import log from '../utils/logger';
 
@@ -23,13 +23,14 @@ import {
  * @param consumerId
  * @returns { status, processId, messages }
  */
-export const addProcess = (companyId: string, appSystem: string, consumerId: string): IGetProcessResponse => {
+export const addProcess = ({ companyId, appSystem, consumerId }: AddProcess): IAddProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = checkProcess(companyId);
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
-    return { status: 'BUSY' };
+    log.warn(`Robust-protocol.updateProcess: процесс ${process.id} занят`);
+    return { status: 'BUSY', processId: process.id };
   }
 
   //Находим список наименований файлов и список сообщений
@@ -58,7 +59,10 @@ export const updateProcessById = (processId: string, processedFiles: IFiles): IU
   if (!process || process.status !== 'STARTED') {
     if (!process) {
       log.warn(`Robust-protocol.updateProcess: процесс ${processId} не найден`);
+    } else {
+      log.warn(`Robust-protocol.updateProcess: нельзя изменить процесс ${processId}, его состояние ${process.status}`);
     }
+
     return {
       status: 'CANCELLED',
     };
@@ -86,12 +90,15 @@ export const removeProcessById = (processId: string): IUpdateProcessResponse => 
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
-  //Если в списке нет процесса с переданным ИД или его состояние не READY_TO_COMMIT,
+  //Если в списке нет процесса с переданным ИД или его состояние не STARTED,
   //то возвращается статус CANCELLED
-  if (!process || process.status !== 'READY_TO_COMMIT') {
+  if (!process || (process.status !== 'STARTED' && process.status !== 'READY_TO_COMMIT')) {
     if (!process) {
       log.warn(`Robust-protocol.removeProcess: процесс ${processId} не найден`);
+    } else {
+      log.warn(`Robust-protocol.removeProcess: нельзя удалить процесс ${processId}, его состояние ${process.status}`);
     }
+
     return {
       status: 'CANCELLED',
     };
@@ -126,12 +133,15 @@ export const cancelProcessById = (processId: string, errorMessage: string): IUpd
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
-  //Если в списке нет процесса с переданным ИД или его состояние не READY_TO_COMMIT,
+  //Если в списке нет процесса с переданным ИД или его состояние не 'STARTED',
   //то возвращается статус CANCELLED
-  if (!process || process.status !== 'READY_TO_COMMIT') {
+  if (!process || (process.status !== 'STARTED' && process.status !== 'READY_TO_COMMIT')) {
     if (!process) {
-      log.warn(`Robust-protocol.removeProcess: процесс ${processId} не найден`);
+      log.warn(`Robust-protocol.cancelProcess: процесс ${processId} не найден`);
+    } else {
+      log.warn(`Robust-protocol.cancelProcess: нельзя удалить процесс ${processId}, его состояние ${process.status}`);
     }
+
     return {
       status: 'CANCELLED',
     };
@@ -139,25 +149,28 @@ export const cancelProcessById = (processId: string, errorMessage: string): IUpd
   //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
   cancelProcess(processId);
 
-  if (!process) {
-    log.error(`Robust-protocol.cancelProcess: процесс ${processId} отменен, ${errorMessage}`);
-  }
+  log.warn(`Robust-protocol.cancelProcess: процесс ${processId} отменен, ${errorMessage}`);
 
   return {
     status: 'OK',
   };
 };
 
-export const breakProcessById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
+export const interruptProcessById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
-  //Если в списке нет процесса с переданным ИД или его состояние не READY_TO_COMMIT,
+  //Если в списке нет процесса с переданным ИД или его состояние не 'STARTED',
   //то возвращается статус CANCELLED
-  if (!process || process.status !== 'READY_TO_COMMIT') {
+  if (!process || process.status !== 'STARTED') {
     if (!process) {
-      log.warn(`Robust-protocol.breakProcess: процесс ${processId} не найден`);
+      log.warn(`Robust-protocol.interruptProcess: процесс ${processId} не найден`);
+    } else {
+      log.warn(
+        `Robust-protocol.interruptProcess: нельзя удалить процесс ${processId}, его состояние ${process.status}`,
+      );
     }
+
     return {
       status: 'CANCELLED',
     };
@@ -165,9 +178,7 @@ export const breakProcessById = (processId: string, errorMessage: string): IUpda
   //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
   removeProcessFromList(processId);
 
-  if (!process) {
-    log.error(`Robust-protocol.breakProcess: процесс ${processId} прерван, ${errorMessage}`);
-  }
+  log.warn(`Robust-protocol.interruptProcess: процесс ${processId} прерван, ${errorMessage}`);
 
   return {
     status: 'OK',
