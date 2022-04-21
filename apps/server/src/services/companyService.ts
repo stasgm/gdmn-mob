@@ -1,12 +1,16 @@
+import path from 'path';
+
 import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
+import { messageFolders } from '../utils/constants';
+
 import { updateOne as updateUserCompany } from './userService';
 
-import { getDb } from './dao/db';
+import { getDb, createFolders } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
 
@@ -22,7 +26,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies } = getDb();
+  const { companies, dbPath } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
@@ -38,8 +42,8 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   } as IDBCompany;
 
   const newCompany = await companies.insert(newCompanyObj);
-
   const createdCompany = await companies.find(newCompany);
+  await createFolders(dbPath, createdCompany);
 
   // Добавляем к текущему
   //await addCompanyToUser(createdCompany.adminId, createdCompany.id);

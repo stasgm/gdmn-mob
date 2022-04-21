@@ -7,4 +7,6 @@ const deviceStates = {
 
 const adminPath = '/admin';
 
-export { deviceStates, adminPath };
+const messageFolders = ['messages', 'error', 'prepared', 'log', 'unknown'];
+
+export { deviceStates, adminPath, messageFolders };

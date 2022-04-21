@@ -42,6 +42,10 @@ class Database {
     const collectionPath = this.dbPath;
     return new CollectionMessage<T>(collectionPath, name);
   }
+
+  getDbPath() {
+    return this.dbPath;
+  }
 }
 
 export default Database;
