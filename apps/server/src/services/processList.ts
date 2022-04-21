@@ -62,7 +62,8 @@ export const getFiles = (companyId: string, appSystem: string, consumerId: strin
   const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
 
   return consumerFiles?.reduce((prev: IFiles, cur) => {
-    prev[cur] = readFileByAppSystem(pathDb, cur);
+    const curName = cur.split('.')[0];
+    prev[curName] = readFileByAppSystem(pathDb, cur);
     return prev;
   }, {});
 };
