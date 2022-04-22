@@ -34,12 +34,12 @@ const updateProcess = (ctx: ParameterizedContext) => {
   log.info('updateProcess', response);
 };
 
-const removeProcess = (ctx: ParameterizedContext) => {
-  const response = processService.removeProcessById(ctx.params.id);
+const completeProcess = (ctx: ParameterizedContext) => {
+  const response = processService.completeProcessById(ctx.params.id);
 
   ok(ctx as Context, response);
 
-  log.info('removeProcess', response);
+  log.info('completeProcess', response);
 };
 
 const cancelProcess = (ctx: ParameterizedContext) => {
@@ -62,4 +62,4 @@ const interruptProcess = (ctx: ParameterizedContext) => {
   log.info('interruptProcess', response);
 };
 
-export { addProcess, api2, updateProcess, removeProcess, cancelProcess, interruptProcess };
+export { addProcess, api2, updateProcess, completeProcess, cancelProcess, interruptProcess };

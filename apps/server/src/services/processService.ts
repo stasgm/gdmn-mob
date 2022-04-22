@@ -5,7 +5,7 @@ import log from '../utils/logger';
 import {
   cancelProcess,
   checkProcess,
-  cleanUpProcess,
+  completeProcess,
   getFiles,
   getProcessById,
   removeProcessFromList,
@@ -86,13 +86,13 @@ export const updateProcessById = (processId: string, processedFiles: IFiles): IU
   };
 };
 
-export const removeProcessById = (processId: string): IUpdateProcessResponse => {
+export const completeProcessById = (processId: string): IUpdateProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
-  //Если в списке нет процесса с переданным ИД или его состояние не STARTED,
+  //Если в списке нет процесса с переданным ИД или его состояние не READY_TO_COMMIT,
   //то возвращается статус CANCELLED
-  if (!process || (process.status !== 'STARTED' && process.status !== 'READY_TO_COMMIT')) {
+  if (!process || process.status !== 'READY_TO_COMMIT') {
     if (!process) {
       log.warn(`Robust-protocol.removeProcess: процесс ${processId} не найден`);
     } else {
@@ -111,7 +111,7 @@ export const removeProcessById = (processId: string): IUpdateProcessResponse => 
     //4. Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
     //5. Файлы, при обработке которых возник dead lock, мы не трогаем.
     //   Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
-    cleanUpProcess(processId);
+    completeProcess(processId);
 
     // По успешному переносу процесс удаляется из списка процессов.
     removeProcessFromList(processId);
@@ -135,7 +135,7 @@ export const cancelProcessById = (processId: string, errorMessage: string): IUpd
 
   //Если в списке нет процесса с переданным ИД или его состояние не 'STARTED',
   //то возвращается статус CANCELLED
-  if (!process || (process.status !== 'STARTED' && process.status !== 'READY_TO_COMMIT')) {
+  if (!process || process.status !== 'READY_TO_COMMIT') {
     if (!process) {
       log.warn(`Robust-protocol.cancelProcess: процесс ${processId} не найден`);
     } else {

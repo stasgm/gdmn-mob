@@ -142,7 +142,7 @@ export const updateProcess = (processId: string, processedFiles: IFiles) => {
  *
  * @param processId
  */
-export const cleanUpProcess = (processId: string) => {
+export const completeProcess = (processId: string) => {
   const process = getProcessById(processId);
 
   console.log(11111);
@@ -156,8 +156,6 @@ export const cleanUpProcess = (processId: string) => {
   updateProcessInList(updatedProcess);
 
   console.log(5555, process!.fileNames);
-
-  saveProcessList();
 
   //Полученные файлы переносятся из папки PREPARED в MESSAGES.
   for (; process!.fileNames.length; ) {

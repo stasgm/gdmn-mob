@@ -6,6 +6,9 @@ import * as urlValidation from './url';
 
 const addProcess: Config = {
   validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+    }),
     type: 'json',
     body: Joi.object({
       companyId: Joi.string().required().error(new InvalidParameterException('Не указана компания')),
@@ -49,7 +52,7 @@ const updateProcess: Config = {
   },
 };
 
-const removeProcess: Config = {
+const completeProcess: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
@@ -86,4 +89,4 @@ const interruptProcess: Config = {
   },
 };
 
-export { addProcess, updateProcess, removeProcess, cancelProcess, interruptProcess };
+export { addProcess, updateProcess, completeProcess, cancelProcess, interruptProcess };
