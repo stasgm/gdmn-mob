@@ -62,8 +62,7 @@ export const getFiles = (companyId: string, appSystem: string, consumerId: strin
   const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
 
   return consumerFiles?.reduce((prev: IFiles, cur) => {
-    const curName = cur.split('.')[0];
-    prev[curName] = readFileByAppSystem(pathDb, cur);
+    prev[cur] = readFileByAppSystem(pathDb, cur);
     return prev;
   }, {});
 };
@@ -106,15 +105,14 @@ export const updateProcess = (processId: string, processedFiles: IFiles) => {
   const updatedProcess: IProcess = {
     ...process!,
     status: 'READY_TO_COMMIT',
-    // files: process!.files.filter((f) => !processedFileNames.includes(f)),
     processedFileNames,
     processedFiles,
   };
 
+  console.log('updatedProcess', updatedProcess);
+
   //Полученный список ИД обработанных сообщений со статусами их обработки фиксируется в объекте процесса.
   updateProcessInList(updatedProcess);
-
-  saveProcessList();
 
   //Формируются файлы и записываются синхронно в папку PREPARED.
   for (; process!.fileNames.length; ) {
@@ -146,7 +144,7 @@ export const cleanUpProcess = (processId: string) => {
 
   updateProcessInList(updatedProcess);
 
-  console.log(5555);
+  console.log(5555, process!.fileNames);
 
   saveProcessList();
 
