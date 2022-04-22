@@ -1,3 +1,4 @@
+import { StatusType } from './common';
 import { IMessage } from './messages';
 
 export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
@@ -7,17 +8,21 @@ export interface IProcess {
   companyId: string;
   appSystem: string;
   dateBegin: Date;
-  fileNames: string[];
-  processedFileNames: string[];
+  files: string[];
+  // processedFiles?: string[];
   status: ProcessType;
-  processedFiles?: IFiles;
+  processedFiles?: IProcessedFiles;
   dateReadyToCommit?: Date;
 }
 
 export type IDBProcess = IProcess;
 
 export interface IFiles {
-  [name: string]: IMessage;
+  [fileName: string]: IMessage;
+}
+
+export interface IProcessedFiles {
+  [fileName: string]: StatusType;
 }
 
 export type AddProcess = {

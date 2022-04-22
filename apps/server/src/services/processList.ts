@@ -1,11 +1,10 @@
-import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync, accessSync, constants } from 'fs';
+import { readFileSync, writeFileSync, renameSync, accessSync, constants } from 'fs';
 
 import path from 'path';
 
-import { IFiles, IMessage, IProcess } from '@lib/types';
+import { IFiles, IProcess, IProcessedFiles } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
 
-import log from '../utils/logger';
 import config from '../../config';
 
 export let processList: IProcess[];
@@ -62,22 +61,6 @@ export const checkProcess = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const readFileByAppSystem = (pathDb: string, fileName: string): IMessage => {
-  const fullName = path.join(pathDb, fileName);
-  return JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
-};
-
-export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
-  const pathDb = path.join(basePath, `DB_${companyId}/${appSystem}/messages/`);
-  console.log('111 pathDb', pathDb);
-  const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
-
-  return consumerFiles?.reduce((prev: IFiles, cur) => {
-    prev[cur] = readFileByAppSystem(pathDb, cur);
-    return prev;
-  }, {});
-};
-
 export const startProcess = (companyId: string, appSystem: string, files: IFiles) => {
   const newProcess: IProcess = {
     id: uidv1(),
@@ -85,9 +68,7 @@ export const startProcess = (companyId: string, appSystem: string, files: IFiles
     companyId,
     appSystem,
     status: 'STARTED',
-    fileNames: Object.keys(files),
-    processedFileNames: [],
-    dateReadyToCommit: undefined,
+    files: Object.keys(files),
   };
 
   processList.push(newProcess);
@@ -111,13 +92,16 @@ export const getProcessById = (processId: string) => {
 export const updateProcess = (processId: string, processedFiles: IFiles) => {
   const process = getProcessById(processId);
 
-  const processedFileNames = Object.keys(processedFiles);
+  const statusFiles: IProcessedFiles = {};
+  for (const [fn, mes] of Object.entries(processedFiles)) {
+    statusFiles[fn] = mes.status;
+  }
 
   const updatedProcess: IProcess = {
     ...process!,
     status: 'READY_TO_COMMIT',
-    processedFileNames,
-    processedFiles,
+    dateReadyToCommit: new Date(),
+    processedFiles: statusFiles,
   };
 
   console.log('updatedProcess', updatedProcess);
@@ -125,27 +109,24 @@ export const updateProcess = (processId: string, processedFiles: IFiles) => {
   //Полученный список ИД обработанных сообщений со статусами их обработки фиксируется в объекте процесса.
   updateProcessInList(updatedProcess);
 
-  //Формируются файлы и записываются синхронно в папку PREPARED.
-  for (; process!.fileNames.length; ) {
-    const fn = process!.fileNames.shift();
-    try {
-      const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
-      renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/prepared/${fn}`);
-      saveProcessList();
-    } catch (err) {
-      log.error(`Robust-protocol.updateProcess: файл ${fn} не удалось перенести в папку PREPARED`);
-    }
-  }
+  // for (; process!.processedFileNames.length; ) {
+  //   const fn = process!.fileNames.shift();
+  //   try {
+  //     //renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/prepared/${fn}`);
+
+  //     saveProcessList();
+  //   } catch (err) {
+  //     log.error(`Robust-protocol.updateProcess: файл ${fn} не удалось перенести в папку PREPARED`);
+  //   }
+  // }
 };
 
 /**
  *
  * @param processId
  */
-export const completeProcess = (processId: string) => {
+export const cleanupProcess = (processId: string) => {
   const process = getProcessById(processId);
-
-  console.log(11111);
 
   //Переводит процесс в состояние CLEANUP.
   const updatedProcess: IProcess = {
@@ -154,42 +135,29 @@ export const completeProcess = (processId: string) => {
   };
 
   updateProcessInList(updatedProcess);
+  // if (!process?.processedFiles) {
+  //   return;
+  // }
 
-  console.log(5555, process!.fileNames);
+  // console.log(6666);
 
-  //Полученные файлы переносятся из папки PREPARED в MESSAGES.
-  for (; process!.fileNames.length; ) {
-    const fn = process!.fileNames.shift();
-    console.log('fn', fn);
-    const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
-    console.log('pathFiles', pathFiles);
-    renameSync(`${pathFiles}/prepared/${fn}`, `${pathFiles}/messages/${fn}`);
-    saveProcessList();
-  }
+  // const processedFileList = Object.entries(process.processedFiles);
 
-  if (!process?.processedFiles) {
-    return;
-  }
-
-  console.log(6666);
-
-  const processedFileList = Object.entries(process.processedFiles);
-
-  //Успешно обработанные файлы переносятся из папки MESSAGES в папку LOG.
-  //Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
-  //Файлы, при обработке которых возник dead lock, мы не трогаем.
-  //Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
-  for (; processedFileList.length; ) {
-    const [fn, f] = processedFileList.shift()!;
-    const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
-    if (f.status !== 'PROCESSED_DEADLOCK' && f.status !== 'PROCESSED_INCORRECT') {
-      renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/log/${fn}`);
-      saveProcessList();
-    } else if (f.status === 'PROCESSED_INCORRECT') {
-      renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/error/${fn}`);
-      saveProcessList();
-    }
-  }
+  // //Успешно обработанные файлы переносятся из папки MESSAGES в папку LOG.
+  // //Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
+  // //Файлы, при обработке которых возник dead lock, мы не трогаем.
+  // //Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
+  // for (; processedFileList.length; ) {
+  //   const [fn, f] = processedFileList.shift()!;
+  //   const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+  //   if (f.status !== 'PROCESSED_DEADLOCK' && f.status !== 'PROCESSED_INCORRECT') {
+  //     renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/log/${fn}`);
+  //     saveProcessList();
+  //   } else if (f.status === 'PROCESSED_INCORRECT') {
+  //     renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/error/${fn}`);
+  //     saveProcessList();
+  //   }
+  // }
 };
 
 /**
@@ -199,16 +167,16 @@ export const completeProcess = (processId: string) => {
 export const cancelProcess = (processId: string) => {
   const process = getProcessById(processId);
 
-  //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
-  //Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
-  for (; process!.processedFileNames.length; ) {
-    const fn = process!.processedFileNames.shift();
-    try {
-      const pathFiles = path.join(basePath, `/DB_${process!.companyId}/${process!.appSystem}`);
-      unlinkSync(`${pathFiles}/prepared/${fn}`);
-      saveProcessList();
-    } catch {
-      log.error(`Robust-protocol.cancelProcess: файл ${fn} не удалось удалить`);
-    }
-  }
+  // //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
+  // //Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
+  // for (; process!.processedFileNames.length; ) {
+  //   const fn = process!.processedFileNames.shift();
+  //   try {
+  //     const pathFiles = path.join(basePath, `/DB_${process!.companyId}/${process!.appSystem}`);
+  //     unlinkSync(`${pathFiles}/prepared/${fn}`);
+  //     saveProcessList();
+  //   } catch {
+  //     log.error(`Robust-protocol.cancelProcess: файл ${fn} не удалось удалить`);
+  //   }
+  // }
 };
