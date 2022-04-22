@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync, accessSync, constants } from 'fs';
 
 import path from 'path';
 
@@ -10,8 +10,19 @@ import config from '../../config';
 
 export let processList: IProcess[];
 
+const checkFileSync = (path: string) => {
+  try {
+    accessSync(path, constants.R_OK | constants.W_OK);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 const basePath = path.join(config.FILES_PATH, '/.DB');
+
 const processPath = path.join(basePath, 'processes.json');
+if (!checkFileSync(processPath)) writeFileSync(processPath, '[]');
 
 export const loadProcessList = () => {
   const rawData = readFileSync(processPath).toString();
