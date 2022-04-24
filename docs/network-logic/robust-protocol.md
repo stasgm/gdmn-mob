@@ -174,3 +174,18 @@
 6. Следует помнить, что операции загрузки содержимого файла в оперативную память и парсинга JSON весьма затратны по процессорному времени и памяти. Там где возможно, мы должны избегать их. Например, получать информацию об источнике и адресате из имени файла. Определять размер файла функцией файловой системы. Сливать файлы в единый список без промежуточного парсинга JSON и т.п.
 7. По возможности следует собирать статистику в разрезе устройств/клиентов сервера сообщений: количество переданных сообщений, количество успешно обработанных, количество ошибок dead lock-ов и т.п.
 8. Поскольку наш сервер сообщений одновременно является и сервером администраторского веб интерфейса, следует предусмотреть в последнем dash board со статистическими показателями, индикацией текущих процессов, просмотром лога и т.п.
+
+
+```mermaid
+sequenceDiagram
+    Gedemin->>MS: API 1, Are there something for me? 
+    activate MS
+    MS--xGedemin: CANCELLED! There is a process in the list already!
+    MS->>Gedemin: OK! Take the messages for you!
+    deactivate MS
+    Gedemin->>MS: API 2, I will process only THESE messages? 
+    activate MS
+    MS--xGedemin: CANCELLED! Oh, you are too slow. I have cancelled the process!
+    MS->>Gedemin: OK! As you want!
+    deactivate MS
+```    
