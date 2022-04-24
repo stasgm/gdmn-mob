@@ -1,8 +1,8 @@
-import { readFileSync, writeFileSync, renameSync, accessSync, constants } from 'fs';
+import { readFileSync, writeFileSync, accessSync, constants } from 'fs';
 
 import path from 'path';
 
-import { IFiles, IProcess, IProcessedFiles } from '@lib/types';
+import { IFiles, IProcess } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
 
 import config from '../../config';
@@ -45,14 +45,6 @@ export const removeProcessFromList = (processId: string) => {
   saveProcessList();
 };
 
-export const setProcessFailed = (process: IProcess) => {
-  updateProcessInList({
-    ...process,
-    status: 'FAILED',
-  });
-  saveProcessList();
-};
-
 /**
  * Можем ли мы начать новый процесс. Вернет Истина, если да, Ложь, если уже идет процесс.
  * Если нет -- будеми сообщать Гедымину, что состояние BUSY.
@@ -82,101 +74,4 @@ export const getProcessById = (processId: string) => {
   const process = processList.find((p) => p.id === processId);
 
   return process;
-};
-
-/**
- *
- * @param processId
- * @param processedFiles
- */
-export const updateProcess = (processId: string, processedFiles: IFiles) => {
-  const process = getProcessById(processId);
-
-  const statusFiles: IProcessedFiles = {};
-  for (const [fn, mes] of Object.entries(processedFiles)) {
-    statusFiles[fn] = mes.status;
-  }
-
-  const updatedProcess: IProcess = {
-    ...process!,
-    status: 'READY_TO_COMMIT',
-    dateReadyToCommit: new Date(),
-    processedFiles: statusFiles,
-  };
-
-  console.log('updatedProcess', updatedProcess);
-
-  //Полученный список ИД обработанных сообщений со статусами их обработки фиксируется в объекте процесса.
-  updateProcessInList(updatedProcess);
-
-  // for (; process!.processedFileNames.length; ) {
-  //   const fn = process!.fileNames.shift();
-  //   try {
-  //     //renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/prepared/${fn}`);
-
-  //     saveProcessList();
-  //   } catch (err) {
-  //     log.error(`Robust-protocol.updateProcess: файл ${fn} не удалось перенести в папку PREPARED`);
-  //   }
-  // }
-};
-
-/**
- *
- * @param processId
- */
-export const cleanupProcess = (processId: string) => {
-  const process = getProcessById(processId);
-
-  //Переводит процесс в состояние CLEANUP.
-  const updatedProcess: IProcess = {
-    ...process!,
-    status: 'CLEANUP',
-  };
-
-  updateProcessInList(updatedProcess);
-  // if (!process?.processedFiles) {
-  //   return;
-  // }
-
-  // console.log(6666);
-
-  // const processedFileList = Object.entries(process.processedFiles);
-
-  // //Успешно обработанные файлы переносятся из папки MESSAGES в папку LOG.
-  // //Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
-  // //Файлы, при обработке которых возник dead lock, мы не трогаем.
-  // //Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
-  // for (; processedFileList.length; ) {
-  //   const [fn, f] = processedFileList.shift()!;
-  //   const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
-  //   if (f.status !== 'PROCESSED_DEADLOCK' && f.status !== 'PROCESSED_INCORRECT') {
-  //     renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/log/${fn}`);
-  //     saveProcessList();
-  //   } else if (f.status === 'PROCESSED_INCORRECT') {
-  //     renameSync(`${pathFiles}/messages/${fn}`, `${pathFiles}/error/${fn}`);
-  //     saveProcessList();
-  //   }
-  // }
-};
-
-/**
- *
- * @param processId
- */
-export const cancelProcess = (processId: string) => {
-  const process = getProcessById(processId);
-
-  // //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
-  // //Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
-  // for (; process!.processedFileNames.length; ) {
-  //   const fn = process!.processedFileNames.shift();
-  //   try {
-  //     const pathFiles = path.join(basePath, `/DB_${process!.companyId}/${process!.appSystem}`);
-  //     unlinkSync(`${pathFiles}/prepared/${fn}`);
-  //     saveProcessList();
-  //   } catch {
-  //     log.error(`Robust-protocol.cancelProcess: файл ${fn} не удалось удалить`);
-  //   }
-  // }
 };

@@ -1,21 +1,18 @@
 import path from 'path';
-import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync, accessSync, constants } from 'fs';
+import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync } from 'fs';
 
-import { IFiles, IAddProcessResponse, IUpdateProcessResponse, AddProcess, IMessage } from '@lib/types';
+import { IFiles, IAddProcessResponse, IUpdateProcessResponse, AddProcess, IMessage, IProcessedFiles } from '@lib/types';
 
 import log from '../utils/logger';
 
 import config from '../../config';
 
 import {
-  cancelProcess,
   checkProcess,
-  cleanupProcess,
   getProcessById,
   removeProcessFromList,
-  setProcessFailed,
+  saveProcessList,
   startProcess,
-  updateProcess,
   updateProcessInList,
 } from './processList';
 
@@ -110,19 +107,20 @@ export const updateProcessById = (processId: string, processedFiles: IFiles): IU
   let written;
   let error = '';
 
+  const statusFiles: IProcessedFiles = {};
+
   for (written = 0; written < processedFilesObj.length; written++) {
     const [fn, mes] = processedFilesObj[written];
-
+    statusFiles[fn] = mes.status;
     if (mes.status === 'PROCESSED_INCORRECT' || mes.status === 'PROCESSED_DEADLOCK') {
       log.warn(`Robust-protocol.updateProcess: сообщение ${mes.id} обработано со статусом ${mes.status}`);
-    } else {
-      try {
-        saveFile(`${pathFiles}/prepared/${fn}`, mes);
-      } catch (err) {
-        error = `Robust-protocol.updateProcess: не удалось создать файл ${fn} в папке PREPARED,
-          ${err instanceof Error ? err.message : 'ошибка'}`;
-        break;
-      }
+    }
+    try {
+      saveFile(`${pathFiles}/prepared/${fn}`, mes);
+    } catch (err) {
+      error = `Robust-protocol.updateProcess: не удалось создать файл ${fn} в папке PREPARED,
+        ${err instanceof Error ? err.message : 'ошибка'}`;
+      break;
     }
   }
 
@@ -141,7 +139,13 @@ export const updateProcessById = (processId: string, processedFiles: IFiles): IU
     return { status: 'CANCELLED' };
   }
 
-  updateProcess(process.id, processedFiles);
+  // updateProcess(process.id, statusFiles);
+  updateProcessInList({
+    ...process,
+    status: 'READY_TO_COMMIT',
+    dateReadyToCommit: new Date(),
+    processedFiles: statusFiles,
+  });
 
   return { status: 'OK' };
 };
@@ -164,48 +168,62 @@ export const completeProcessById = (processId: string): IUpdateProcessResponse =
     };
   }
 
-  try {
-    //1. Переводим процесс в состояние CLEANUP.
-    //2. Полученные файлы переносятся из папки PREPARED в MESSAGES.
-    //3. Успешно обработанные файлы переносятся из папки MESSAGES в папку LOG.
-    //4. Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
-    //5. Файлы, при обработке которых возник dead lock, мы не трогаем.
-    //   Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
-    cleanupProcess(processId);
+  //1. Переводим процесс в состояние CLEANUP.
+  //2. Полученные файлы переносятся из папки PREPARED в MESSAGES.
+  //3. Успешно обработанные файлы переносятся из папки MESSAGES в папку LOG.
+  //4. Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
+  //5. Файлы, при обработке которых возник dead lock, мы не трогаем.
+  //   Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
+  // cleanupProcess(processId);
 
-    let error = '';
-    const processedFilesObj = Object.keys(process!.processedFiles!);
-    //Полученные файлы переносятся из папки PREPARED в MESSAGES.
-    for (; processedFilesObj.length; ) {
-      const fn = processedFilesObj!.shift();
-      const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+  updateProcessInList({ ...process, status: 'CLEANUP' });
+
+  let error = '';
+  const processedFilesObj = Object.entries(process!.processedFiles!);
+  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+
+  const requestFiles: { [id: string]: string } = {};
+  process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));
+
+  for (const [fn, status] of processedFilesObj) {
+    try {
+      renameSync(`${pathFiles}/prepared/${fn}`, `${pathFiles}/messages/${fn}`);
+      delete process.processedFiles![fn];
+      saveProcessList();
+    } catch (err) {
+      error = `Robust-protocol.completeProcess: не удалось перенести файл ${fn} из PREPARED,
+          ${err instanceof Error ? err.message : 'ошибка'}`;
+      break;
+    }
+
+    const id = fn.split('_')[0];
+    const requestFN = requestFiles[id];
+    const toPatch = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+    if (toPatch && requestFN) {
       try {
-        renameSync(`${pathFiles}/prepared/${fn}`, `${pathFiles}/messages/${fn}`);
+        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPatch}/${requestFN}`);
+
+        const i = process.files.indexOf(requestFN);
+        process.files.splice(i, 1);
+        saveProcessList();
       } catch (err) {
-        error = `Robust-protocol.completeProcess: не удалось перенести файл ${fn} из PREPARED,
+        error = `Robust-protocol.completeProcess: не удалось перенести файл ${requestFN} из MESSAGES,
           ${err instanceof Error ? err.message : 'ошибка'}`;
         break;
       }
     }
-
-    if (error) {
-      log.error(error);
-
-      updateProcessInList({ ...process, status: 'FAILED' });
-
-      return { status: 'CANCELLED' };
-    }
-
-    // По успешному переносу процесс удаляется из списка процессов.
-    removeProcessFromList(processId);
-  } catch (err) {
-    //Если файлы не удается переместить -- об этом делается запись в логе сервера сообщений.
-    //Процесс остается в списке. Его статус меняется на FAILED.
-    //Такая ситуация требует вмешательства системного администратора.
-    log.error(`Robust-protocol.deleteProcess: процесс ${processId} не удалось удалить`);
-
-    setProcessFailed(process);
   }
+
+  if (error) {
+    log.error(error);
+
+    updateProcessInList({ ...process, status: 'FAILED' });
+
+    return { status: 'CANCELLED' };
+  }
+
+  // По успешному переносу процесс удаляется из списка процессов.
+  removeProcessFromList(processId);
 
   return {
     status: 'OK',
@@ -229,8 +247,24 @@ export const cancelProcessById = (processId: string, errorMessage: string): IUpd
       status: 'CANCELLED',
     };
   }
-  //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
-  cancelProcess(processId);
+
+  //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
+  //Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
+  const processedFilesObj = Object.keys(process!.processedFiles!);
+  const pathFiles = path.join(basePath, `/DB_${process!.companyId}/${process!.appSystem}`);
+
+  for (const fn of processedFilesObj) {
+    // const fn = process!.processedFiles!.shift();
+    try {
+      unlinkSync(`${pathFiles}/prepared/${fn}`);
+      delete process.processedFiles![fn];
+      saveProcessList();
+    } catch {
+      log.error(`Robust-protocol.cancelProcess: файл ${fn} не удалось удалить из PREPARED`);
+    }
+  }
+
+  removeProcessFromList(processId);
 
   log.warn(`Robust-protocol.cancelProcess: процесс ${processId} отменен, ${errorMessage}`);
 
