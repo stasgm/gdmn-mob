@@ -143,6 +143,28 @@
 13. Получив сообщение о неуспешном комите в базу данных сервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе. Файлы этого процесса, ранее записанные в папку `PREPARED`, удаляются. Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
 14. Разработчик может в любой прервать процесс обработки в Гедымине и сообщить об этом серверу сообщений вызовом `API_6` с передачей дполнительного текстового сообщения, которое будет помещено в лог системы. Сервер сообщений в ответ на `API_6` удаляет объект процесса из списка. Процесс на стороне Гедымина завершается. Транзакция откатывается. Прервать можно _только_ процесс в состоянии `STARTED`. Если процесс с переданным ИД находится в другом состоянии, то сервер сообщений не трогает его, но делает запись в логе о сложившейся ситуации.
 
+```mermaid
+sequenceDiagram
+    Gedemin->>MS: API 1, Are there something for me? 
+    activate MS
+    MS--xGedemin: CANCELLED! There is a process in the list already!
+    MS->>Gedemin: OK! Take the messages for you!
+    deactivate MS
+    Gedemin->>MS: API 2, I will process only THESE messages? 
+    activate MS
+    MS--xGedemin: CANCELLED! Oh, you are too slow. 
+    MS->>Gedemin: OK! As you want!
+    deactivate MS
+    Gedemin->>MS: API 6, I've changed my mind. CANCEL the process!
+    Gedemin->>MS: API 3, I'm done and ready to commit transaction
+    activate MS
+    MS--xGedemin: CANCELLED! Oh, you are timed-out!
+    MS->>Gedemin: OK! I have written the prepared files. Proceed!
+    deactivate MS
+    Gedemin->>MS: API 4, Commited successfully!
+    Gedemin->>MS: API 5, Has been error while committing :(
+``` 
+
 ### Обработка списка процессов при старте сервера
 
 При старте сервера загружаем список процессов с диска. Наличие там записей означает, что произошли какие-то ошибки в процессе работы сервера или процесс был принудительно завершен. Список обрабатывется следующим образом:
@@ -174,18 +196,4 @@
 6. Следует помнить, что операции загрузки содержимого файла в оперативную память и парсинга JSON весьма затратны по процессорному времени и памяти. Там где возможно, мы должны избегать их. Например, получать информацию об источнике и адресате из имени файла. Определять размер файла функцией файловой системы. Сливать файлы в единый список без промежуточного парсинга JSON и т.п.
 7. По возможности следует собирать статистику в разрезе устройств/клиентов сервера сообщений: количество переданных сообщений, количество успешно обработанных, количество ошибок dead lock-ов и т.п.
 8. Поскольку наш сервер сообщений одновременно является и сервером администраторского веб интерфейса, следует предусмотреть в последнем dash board со статистическими показателями, индикацией текущих процессов, просмотром лога и т.п.
-
-
-```mermaid
-sequenceDiagram
-    Gedemin->>MS: API 1, Are there something for me? 
-    activate MS
-    MS--xGedemin: CANCELLED! There is a process in the list already!
-    MS->>Gedemin: OK! Take the messages for you!
-    deactivate MS
-    Gedemin->>MS: API 2, I will process only THESE messages? 
-    activate MS
-    MS--xGedemin: CANCELLED! Oh, you are too slow. I have cancelled the process!
-    MS->>Gedemin: OK! As you want!
-    deactivate MS
-```    
+   
