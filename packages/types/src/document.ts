@@ -45,10 +45,9 @@ interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {
   lines?: K[];
 }
 
-type MandateProps<T extends IEntity, K extends keyof T> = Omit<T, K> &
-  {
-    [MK in K]-?: NonNullable<T[MK]>;
-  };
+type MandateProps<T extends IEntity, K extends keyof T> = Omit<T, K> & {
+  [MK in K]-?: NonNullable<T[MK]>;
+};
 
 export type IDepartment = INamedEntity;
 

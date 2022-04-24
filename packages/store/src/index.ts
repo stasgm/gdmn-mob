@@ -2,7 +2,7 @@
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
+import { composeWithDevTools } from '@redux-devtools/extension';
 import { StateType } from 'typesafe-actions';
 
 import { reducer as documentReducer } from './documents';

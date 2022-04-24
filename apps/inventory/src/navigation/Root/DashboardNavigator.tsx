@@ -4,15 +4,15 @@ import React from 'react';
 import TabsNavigator from './TabsNavigator';
 
 export type DashboardStackParamList = {
-  Dashboard: undefined;
+  InvDashboard: undefined;
 };
 
 const DashboardStack = createStackNavigator<DashboardStackParamList>();
 
 const DashboardNavigator = () => {
   return (
-    <DashboardStack.Navigator initialRouteName="Dashboard" screenOptions={{ headerShown: true }}>
-      <DashboardStack.Screen name="Dashboard" component={TabsNavigator} options={{ title: 'Дашборд' }} />
+    <DashboardStack.Navigator initialRouteName="InvDashboard" screenOptions={{ headerShown: true }}>
+      <DashboardStack.Screen name="InvDashboard" component={TabsNavigator} options={{ title: 'Дашборд' }} />
     </DashboardStack.Navigator>
   );
 };

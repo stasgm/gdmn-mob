@@ -12,6 +12,9 @@ import { store } from './src/store';
 
 const App = () => {
   const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
+  // const Router = () => {
+  //   return <RootNavigator />;
+  // };
 
   return (
     <Provider store={store}>

@@ -40,11 +40,12 @@ export interface IProps {
 const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
   const { colors } = useTheme();
   const navList: INavItem[] = [...(props?.items || []), ...baseNavList];
+
   return (
     <Drawer.Navigator
-      drawerContentOptions={{
-        activeBackgroundColor: colors.primary,
-        activeTintColor: '#ffffff',
+      screenOptions={{
+        drawerActiveBackgroundColor: colors.primary,
+        drawerActiveTintColor: '#ffffff',
       }}
       drawerContent={(props) => <DrawerContent {...props} onSync={onSyncClick} />}
     >
@@ -53,8 +54,9 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
           name={item.name}
           key={item.name}
           component={item.component}
-          initialParams={{ titleDoc: item.title }}
+          // initialParams={{ titleDoc: item.title }}
           options={{
+            headerShown: false,
             title: item.title,
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
             // gestureEnabled: !loading,

@@ -1,11 +1,12 @@
 module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  plugins: ['import', 'promise', '@typescript-eslint', 'prettier' /* , "sonarjs" */],
+  // plugins: ['import', 'promise', '@typescript-eslint', 'prettier', 'sonarjs'],
+  plugins: ['import', 'promise', '@typescript-eslint', 'prettier'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:promise/recommended',
-    // "plugin:sonarjs/recommended",
+    // 'plugin:sonarjs/recommended',
     'plugin:prettier/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
@@ -30,11 +31,12 @@ module.exports = {
     'import/no-duplicates': 'error',
     'import/default': 'off',
     'import/order': ['warn', { 'newlines-between': 'always-and-inside-groups' }],
-    'import/no-cycle': 'error',
+    'import/no-cycle': 'off',
     'import/no-self-import': 'warn',
     'import/extensions': ['off', 'never', { ts: 'never' }],
     'import/prefer-default-export': 'off',
     'import/extensions': 'off',
+    'import/no-unresolved': 'error',
     'max-len': ['error', { code: 120 }],
     'no-nested-ternary': 'off',
     'no-use-before-define': 'off',
@@ -53,7 +55,6 @@ module.exports = {
     '@typescript-eslint/restrict-template-expressions': 'off',
     'no-unused-vars': 'off',
     // '@typescript-eslint/no-unused-vars': [2, { args: 'none' }],
-    '@typescript-eslint/no-unused-vars-experimental': 'warn',
     // "sonarjs/no-duplicate-string": "off",
     'padded-blocks': ['error', 'never'],
     'no-await-in-loop': 'error',
@@ -69,26 +70,18 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       rules: {
         '@typescript-eslint/no-unused-vars': 'off',
-        // '@typescript-eslint/no-unused-vars': [2, { args: 'none' }],
       },
     },
   ],
-  /*    "sort-imports": [
-      "error",
-      {
-        ignoreCase: false,
-        ignoreDeclarationSort: true,
-        ignoreMemberSort: false,
-        memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
-      },
-    ], */
-  /* "sort-keys": [
-      "error",
-      "asc",
-      { caseSensitive: true, minKeys: 2, natural: false },
-    ], */
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
     'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: ['packages/*/tsconfig.json', 'apps/*/tsconfig.json'],
+      },
       node: {
         paths: ['src'],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],

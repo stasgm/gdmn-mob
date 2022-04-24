@@ -27,7 +27,7 @@ class CollectionMessage<T extends CollectionItem> {
   //private _fileEndTransfer: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
-    return R.assoc('id', uuid(), obj);
+    return R.assoc('id', uuid(), obj) as K;
   }
 
   constructor(pathDb: string, name: string) {

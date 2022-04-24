@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Platform, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import { IApiConfig } from '@lib/client-types';

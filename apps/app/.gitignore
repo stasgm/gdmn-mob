@@ -1,7 +1,14 @@
-#config
-src/config/prod.ts
-src/config/dev.ts
-src/config/devMock.ts
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
 
-#env
-.env.*
+# macOS
+.DS_Store

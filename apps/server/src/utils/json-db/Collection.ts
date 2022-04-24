@@ -16,7 +16,7 @@ class Collection<T extends CollectionItem> {
   private collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
-    return R.assoc('id', uuid(), obj);
+    return R.assoc('id', uuid(), obj) as K;
   }
 
   constructor(path: string) {

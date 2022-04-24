@@ -24,7 +24,7 @@ class Database {
       try {
         fs.mkdirSync(this.dbPath);
       } catch (err) {
-        console.log(err.name, err.message);
+        console.log((err as Error).name, (err as Error).message);
       }
     }
   }
