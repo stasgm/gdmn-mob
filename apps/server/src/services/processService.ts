@@ -7,31 +7,35 @@ import log from '../utils/logger';
 
 import config from '../../config';
 
+import { DataNotFoundException } from '../exceptions';
+
 import {
   checkProcess,
   getProcessById,
+  getProcesses,
   removeProcessFromList,
   saveProcessList,
   startProcess,
   updateProcessInList,
 } from './processList';
+import { getDb } from './dao/db';
 
 const basePath = path.join(config.FILES_PATH, '/.DB');
 
-export const saveFile = (filePath: string, data: IMessage) => {
+const saveFile = (filePath: string, data: IMessage) => {
   writeFileSync(filePath, JSON.stringify(data, undefined, 2));
 };
 
-export const deleteFile = (filePath: string) => {
+const deleteFile = (filePath: string) => {
   unlinkSync(filePath);
 };
 
-export const readFileByAppSystem = (pathDb: string, fileName: string): IMessage => {
+const readFileByAppSystem = (pathDb: string, fileName: string): IMessage => {
   const fullName = path.join(pathDb, fileName);
   return JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
 };
 
-export const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
+const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
   const pathDb = path.join(basePath, `DB_${companyId}/${appSystem}/messages/`);
   console.log('111 pathDb', pathDb);
   const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
@@ -51,7 +55,22 @@ export const getFiles = (companyId: string, appSystem: string, consumerId: strin
  * @param consumerId
  * @returns { status, processId, messages }
  */
-export const addProcess = ({ companyId, appSystem, consumerId }: AddProcess): IAddProcessResponse => {
+export const addOne = ({ companyId, appSystem, consumerId }: AddProcess): IAddProcessResponse => {
+  // const db = getDb();
+  // const { messages, companies, users } = db;
+
+  // const company = await companies.find(companyId);
+
+  // if (!company) {
+  //   throw new DataNotFoundException('Компания не найдена');
+  // }
+
+  // const consumer = await users.find(consumerId);
+
+  // if (!consumer) {
+  //   throw new DataNotFoundException('Получатель не найден');
+  // }
+
   //Находим процесс для конкеретной базы
   const process = checkProcess(companyId);
 
@@ -79,7 +98,7 @@ export const addProcess = ({ companyId, appSystem, consumerId }: AddProcess): IA
   };
 };
 
-export const updateProcessById = (processId: string, processedFiles: IFiles): IUpdateProcessResponse => {
+export const updateOneById = (processId: string, processedFiles: IFiles): IUpdateProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -150,7 +169,7 @@ export const updateProcessById = (processId: string, processedFiles: IFiles): IU
   return { status: 'OK' };
 };
 
-export const completeProcessById = (processId: string): IUpdateProcessResponse => {
+export const completeById = (processId: string): IUpdateProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -230,7 +249,7 @@ export const completeProcessById = (processId: string): IUpdateProcessResponse =
   };
 };
 
-export const cancelProcessById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
+export const cancelById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -273,7 +292,7 @@ export const cancelProcessById = (processId: string, errorMessage: string): IUpd
   };
 };
 
-export const interruptProcessById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
+export const interruptById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -296,6 +315,38 @@ export const interruptProcessById = (processId: string, errorMessage: string): I
   removeProcessFromList(processId);
 
   log.warn(`Robust-protocol.interruptProcess: процесс ${processId} прерван, ${errorMessage}`);
+
+  return {
+    status: 'OK',
+  };
+};
+
+/**
+ *
+ * @param params
+ * @returns
+ */
+export const findMany = (params: Record<string, string>) => {
+  return getProcesses(params);
+};
+
+export const deleteOne = (processId: string) => {
+  //Находим процесс для конкеретной базы
+  const process = getProcessById(processId);
+
+  //Если в списке нет процесса с переданным ИД
+  //то возвращается статус CANCELLED
+  if (!process) {
+    log.warn(`Robust-protocol.deleteProcess: процесс ${processId} не найден`);
+
+    return {
+      status: 'CANCELLED',
+    };
+  }
+  //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
+  removeProcessFromList(processId);
+
+  log.warn(`Robust-protocol.deleteProcess: процесс ${processId} удален`);
 
   return {
     status: 'OK',

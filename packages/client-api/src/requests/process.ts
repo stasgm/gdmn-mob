@@ -1,4 +1,4 @@
-import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
+import { IResponse } from '@lib/types';
 
 import { error, process as types } from '../types';
 import { sleep } from '../utils';

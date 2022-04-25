@@ -6,6 +6,7 @@ import { IFiles, IProcess } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
 
 import config from '../../config';
+import { extraPredicate } from '../utils/helpers';
 
 export let processList: IProcess[];
 
@@ -74,4 +75,8 @@ export const getProcessById = (processId: string) => {
   const process = processList.find((p) => p.id === processId);
 
   return process;
+};
+
+export const getProcesses = (params: Record<string, string>) => {
+  return processList.filter((item) => extraPredicate(item, params));
 };

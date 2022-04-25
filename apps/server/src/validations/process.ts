@@ -89,4 +89,23 @@ const interruptProcess: Config = {
   },
 };
 
-export { addProcess, updateProcess, completeProcess, cancelProcess, interruptProcess };
+const getProcesses: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана компании')),
+      appSystem: Joi.string().required().error(new InvalidParameterException('Не указана подсистема приложения')),
+    }),
+  },
+};
+
+const deleteProcess: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор процесса')),
+    }),
+  },
+};
+
+export { addProcess, updateProcess, completeProcess, cancelProcess, interruptProcess, getProcesses, deleteProcess };
