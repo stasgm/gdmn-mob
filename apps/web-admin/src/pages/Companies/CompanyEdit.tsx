@@ -27,7 +27,6 @@ const CompanyEdit = () => {
   console.log('list', list);
 
   const fetchAppSystems = useCallback(async () => {
-    console.log('1');
     await dispatch(appSystemActions.fetchAppSystems());
   }, [dispatch]);
 
