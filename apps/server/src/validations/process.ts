@@ -33,7 +33,7 @@ const updateProcess: Config = {
   },
 };
 
-const setReadyToCommit: Config = {
+const prepareProcess: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
@@ -127,7 +127,7 @@ const deleteProcess: Config = {
 export {
   addProcess,
   updateProcess,
-  setReadyToCommit,
+  prepareProcess,
   completeProcess,
   cancelProcess,
   interruptProcess,
