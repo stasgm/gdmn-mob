@@ -7,6 +7,7 @@ import * as messageService from './messageService';
 import * as deviceBindingService from './deviceBindingService';
 import * as transferService from './transferService';
 import * as processService from './processService';
+import * as appSystemService from './appSystemService';
 
 export {
   authService,
@@ -18,4 +19,5 @@ export {
   deviceBindingService,
   transferService,
   processService,
+  appSystemService,
 };

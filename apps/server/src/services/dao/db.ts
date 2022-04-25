@@ -13,6 +13,7 @@ import {
   INamedEntity,
   IDBDeviceBinding,
   SessionId,
+  IDBAppSystem,
 } from '@lib/types';
 
 import { v4 as uuid } from 'uuid';
@@ -29,6 +30,7 @@ export type dbtype = {
   devices: Collection<IDBDevice>;
   deviceBindings: Collection<IDBDeviceBinding>;
   sessionId: Collection<SessionId>;
+  appSystems: Collection<IDBAppSystem>;
   dbPath: string;
 };
 
@@ -43,9 +45,10 @@ export const createDb = async (dir: string, name: string) => {
   const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
   const sessionId = db.collection<SessionId>('session-id');
   const messages = db.messageCollection<IDBMessage>('messages');
+  const appSystems = db.collection<IDBAppSystem>('app-systems');
   const dbPath = db.getDbPath();
 
-  database = { users, codes, companies, devices, deviceBindings, sessionId, messages, dbPath };
+  database = { users, codes, companies, devices, deviceBindings, sessionId, messages, appSystems, dbPath };
   const dbArr = await sessionId.read();
   if (dbArr.length === 0) await sessionId.insert({ id: uuid() });
 

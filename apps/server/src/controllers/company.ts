@@ -8,7 +8,7 @@ import { created, ok } from '../utils/apiHelpers';
 import { DataNotFoundException, ForbiddenException } from '../exceptions';
 
 const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name, city, externalId } = ctx.request.body as NewCompany;
+  const { name, city, appSystems, externalId } = ctx.request.body as NewCompany;
 
   const user = ctx.state.user as IUser;
 
@@ -16,7 +16,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
     throw new ForbiddenException('Нет прав для создания компании');
   }
 
-  const company: NewCompany = { name, admin: { id: user.id, name: user.name }, externalId, city };
+  const company: NewCompany = { name, admin: { id: user.id, name: user.name }, externalId, city, appSystems };
 
   const newCompany = await companyService.addOne(company);
 
