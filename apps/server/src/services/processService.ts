@@ -1,13 +1,11 @@
 import path from 'path';
-import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync } from 'fs';
+import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync, statSync } from 'fs';
 
-import { IFiles, IAddProcessResponse, IUpdateProcessResponse, AddProcess, IMessage, IProcessedFiles } from '@lib/types';
+import { IFiles, IAddProcessResponse, IStatusResponse, AddProcess, IMessage, IProcessedFiles } from '@lib/types';
 
 import log from '../utils/logger';
 
 import config from '../../config';
-
-import { DataNotFoundException } from '../exceptions';
 
 import {
   checkProcess,
@@ -18,9 +16,9 @@ import {
   startProcess,
   updateProcessInList,
 } from './processList';
-import { getDb } from './dao/db';
 
 const basePath = path.join(config.FILES_PATH, '/.DB');
+const BYTES_PER_MB = 1024 ** 2;
 
 const saveFile = (filePath: string, data: IMessage) => {
   writeFileSync(filePath, JSON.stringify(data, undefined, 2));
@@ -35,10 +33,33 @@ const readFileByAppSystem = (pathDb: string, fileName: string): IMessage => {
   return JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
 };
 
-const getFiles = (companyId: string, appSystem: string, consumerId: string): IFiles => {
-  const pathDb = path.join(basePath, `DB_${companyId}/${appSystem}/messages/`);
-  console.log('111 pathDb', pathDb);
-  const consumerFiles = readdirSync(pathDb).filter((item) => item.indexOf(`to_${consumerId}`) > 0);
+const getFileSize = (fileName: string) => {
+  const stats = statSync(fileName);
+  return stats.size / BYTES_PER_MB;
+};
+
+const getFiles = (params: AddProcess): IFiles => {
+  const pathDb = path.join(basePath, `DB_${params.companyId}/${params.appSystem}/messages/`);
+
+  const maxDataVolume = params.maxDataVolume
+    ? Math.min(config.PROCESS_MAX_DATA_VOLUME, params.maxDataVolume)
+    : config.PROCESS_MAX_DATA_VOLUME;
+
+  let dataVolume = 0;
+
+  const consumerFiles = readdirSync(pathDb).filter((item) => {
+    dataVolume = dataVolume + getFileSize(`${pathDb}${item}`);
+    const producerFound = params.producerIds ? !!params.producerIds.find((pr) => item.includes(`from_${pr}`)) : true;
+    return dataVolume <= maxDataVolume && producerFound && item.includes(`to_${params.consumerId}`);
+  });
+
+  const numberOfFiles = params.maxFiles
+    ? Math.min(config.PROCESS_MAX_FILES, params.maxFiles)
+    : config.PROCESS_MAX_FILES;
+
+  if (numberOfFiles < consumerFiles.length) {
+    consumerFiles.length = numberOfFiles;
+  }
 
   return consumerFiles?.reduce((prev: IFiles, cur) => {
     prev[cur] = readFileByAppSystem(pathDb, cur);
@@ -55,7 +76,7 @@ const getFiles = (companyId: string, appSystem: string, consumerId: string): IFi
  * @param consumerId
  * @returns { status, processId, messages }
  */
-export const addOne = ({ companyId, appSystem, consumerId }: AddProcess): IAddProcessResponse => {
+export const addOne = (item: AddProcess): IAddProcessResponse => {
   // const db = getDb();
   // const { messages, companies, users } = db;
 
@@ -72,7 +93,7 @@ export const addOne = ({ companyId, appSystem, consumerId }: AddProcess): IAddPr
   // }
 
   //Находим процесс для конкеретной базы
-  const process = checkProcess(companyId);
+  const process = checkProcess(item.companyId);
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
@@ -81,7 +102,7 @@ export const addOne = ({ companyId, appSystem, consumerId }: AddProcess): IAddPr
   }
 
   //Находим список наименований файлов и список сообщений
-  const files = getFiles(companyId, appSystem, consumerId);
+  const files = getFiles(item);
 
   // //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
   // if (!files) {
@@ -89,7 +110,7 @@ export const addOne = ({ companyId, appSystem, consumerId }: AddProcess): IAddPr
   // }
 
   //Если нет процесса и есть сообщения, создаем процесс
-  const newProcess = startProcess(companyId, appSystem, files);
+  const newProcess = startProcess(item.companyId, item.appSystem, files);
 
   return {
     status: 'OK',
@@ -98,7 +119,32 @@ export const addOne = ({ companyId, appSystem, consumerId }: AddProcess): IAddPr
   };
 };
 
-export const updateOneById = (processId: string, processedFiles: IFiles): IUpdateProcessResponse => {
+export const updateById = (processId: string, files: string[]): IStatusResponse => {
+  //Находим процесс для конкеретной базы
+  const process = getProcessById(processId);
+
+  //Если в списке нет процесса с переданным ИД или его состояние не STARTED, то возвращается статус CANCELLED
+  if (!process || process.status !== 'STARTED') {
+    if (!process) {
+      log.warn(`Robust-protocol.updateProcess: процесс ${processId} не найден`);
+    } else {
+      log.warn(`Robust-protocol.updateProcess: нельзя изменить процесс ${processId}, его состояние ${process.status}`);
+    }
+
+    return {
+      status: 'CANCELLED',
+    };
+  }
+
+  updateProcessInList({
+    ...process,
+    files,
+  });
+
+  return { status: 'OK' };
+};
+
+export const setReadyToCommit = (processId: string, processedFiles: IFiles): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -169,7 +215,7 @@ export const updateOneById = (processId: string, processedFiles: IFiles): IUpdat
   return { status: 'OK' };
 };
 
-export const completeById = (processId: string): IUpdateProcessResponse => {
+export const completeById = (processId: string): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -249,7 +295,7 @@ export const completeById = (processId: string): IUpdateProcessResponse => {
   };
 };
 
-export const cancelById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
+export const cancelById = (processId: string, errorMessage: string): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -292,7 +338,7 @@ export const cancelById = (processId: string, errorMessage: string): IUpdateProc
   };
 };
 
-export const interruptById = (processId: string, errorMessage: string): IUpdateProcessResponse => {
+export const interruptById = (processId: string, errorMessage: string): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
