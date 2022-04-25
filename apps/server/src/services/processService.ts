@@ -77,6 +77,7 @@ const getFiles = (params: AddProcess): IFiles => {
  * @returns { status, processId, messages }
  */
 export const addOne = (item: AddProcess): IAddProcessResponse => {
+  console.log('basePath', basePath);
   // const db = getDb();
   // const { messages, companies, users } = db;
 
@@ -97,17 +98,12 @@ export const addOne = (item: AddProcess): IAddProcessResponse => {
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
-    log.warn(`Robust-protocol.updateProcess: процесс ${process.id} занят`);
+    log.warn(`Robust-protocol.addProcess: процесс ${process.id} занят`);
     return { status: 'BUSY', processId: process.id };
   }
 
   //Находим список наименований файлов и список сообщений
   const files = getFiles(item);
-
-  // //Если нет процесса и нет сообщений для данного клиента, то status 'OK' и messages = []
-  // if (!files) {
-  //   return { status: 'IDLE' };
-  // }
 
   //Если нет процесса и есть сообщения, создаем процесс
   const newProcess = startProcess(item.companyId, item.appSystem, files);
@@ -144,16 +140,16 @@ export const updateById = (processId: string, files: string[]): IStatusResponse 
   return { status: 'OK' };
 };
 
-export const setReadyToCommit = (processId: string, processedFiles: IFiles): IStatusResponse => {
+export const prepareById = (processId: string, processedFiles: IFiles): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
   //Если в списке нет процесса с переданным ИД или его состояние не STARTED, то возвращается статус CANCELLED
   if (!process || process.status !== 'STARTED') {
     if (!process) {
-      log.warn(`Robust-protocol.updateProcess: процесс ${processId} не найден`);
+      log.warn(`Robust-protocol.prepareProcess: процесс ${processId} не найден`);
     } else {
-      log.warn(`Robust-protocol.updateProcess: нельзя изменить процесс ${processId}, его состояние ${process.status}`);
+      log.warn(`Robust-protocol.prepareProcess: нельзя изменить процесс ${processId}, его состояние ${process.status}`);
     }
 
     return {
@@ -178,12 +174,12 @@ export const setReadyToCommit = (processId: string, processedFiles: IFiles): ISt
     const [fn, mes] = processedFilesObj[written];
     statusFiles[fn] = mes.status;
     if (mes.status === 'PROCESSED_INCORRECT' || mes.status === 'PROCESSED_DEADLOCK') {
-      log.warn(`Robust-protocol.updateProcess: сообщение ${mes.id} обработано со статусом ${mes.status}`);
+      log.warn(`Robust-protocol.prepareProcess: сообщение ${mes.id} обработано со статусом ${mes.status}`);
     }
     try {
       saveFile(`${pathFiles}/prepared/${fn}`, mes);
     } catch (err) {
-      error = `Robust-protocol.updateProcess: не удалось создать файл ${fn} в папке PREPARED,
+      error = `Robust-protocol.prepareProcess: не удалось создать файл ${fn} в папке PREPARED,
         ${err instanceof Error ? err.message : 'ошибка'}`;
       break;
     }
@@ -223,9 +219,9 @@ export const completeById = (processId: string): IStatusResponse => {
   //то возвращается статус CANCELLED
   if (!process || process.status !== 'READY_TO_COMMIT') {
     if (!process) {
-      log.warn(`Robust-protocol.removeProcess: процесс ${processId} не найден`);
+      log.warn(`Robust-protocol.completeProcess: процесс ${processId} не найден`);
     } else {
-      log.warn(`Robust-protocol.removeProcess: нельзя удалить процесс ${processId}, его состояние ${process.status}`);
+      log.warn(`Robust-protocol.completeProcess: нельзя удалить процесс ${processId}, его состояние ${process.status}`);
     }
 
     return {

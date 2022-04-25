@@ -30,7 +30,7 @@ const updateProcess = (ctx: ParameterizedContext) => {
 const prepareProcess = (ctx: ParameterizedContext) => {
   const { processedFiles } = ctx.request.body as ReadyToCommitProcess;
 
-  const response = processService.setReadyToCommit(ctx.params.id, processedFiles);
+  const response = processService.prepareById(ctx.params.id, processedFiles);
 
   ok(ctx as Context, response);
 
