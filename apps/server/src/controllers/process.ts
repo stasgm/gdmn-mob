@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess } from '@lib/types';
+import { AddProcess, InterruptProcess, CancelProcess, ReadyToCommitProcess, UpdateProcess } from '@lib/types';
 
 import log from '../utils/logger';
 import { processService } from '../services';
@@ -17,21 +17,24 @@ const addProcess = (ctx: ParameterizedContext) => {
   log.info('addProcess', response);
 };
 
-const api2 = async (ctx: ParameterizedContext): Promise<void> => {
-  // const { id: processId } = ctx.params;
-  // await processService.apiTwo(processId);
-  // ok(ctx as Context);
-  // log.info('Commit transaction is successful');
-};
-
 const updateProcess = (ctx: ParameterizedContext) => {
-  const { processedFiles } = ctx.request.body as UpdateProcess;
+  const { files } = ctx.request.body as UpdateProcess;
 
-  const response = processService.updateOneById(ctx.params.id, processedFiles);
+  const response = processService.updateById(ctx.params.id, files);
 
   ok(ctx as Context, response);
 
   log.info('updateProcess', response);
+};
+
+const setReadyToCommit = (ctx: ParameterizedContext) => {
+  const { processedFiles } = ctx.request.body as ReadyToCommitProcess;
+
+  const response = processService.setReadyToCommit(ctx.params.id, processedFiles);
+
+  ok(ctx as Context, response);
+
+  log.info('setReadyToCommit', response);
 };
 
 const completeProcess = (ctx: ParameterizedContext) => {
@@ -92,8 +95,8 @@ const deleteProcess = (ctx: ParameterizedContext) => {
 
 export {
   addProcess,
-  api2,
   updateProcess,
+  setReadyToCommit,
   completeProcess,
   cancelProcess,
   interruptProcess,

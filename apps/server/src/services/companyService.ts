@@ -1,12 +1,8 @@
-import path from 'path';
-
 import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
-
-import { messageFolders } from '../utils/constants';
 
 import { updateOne as updateUserCompany } from './userService';
 

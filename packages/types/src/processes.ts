@@ -29,6 +29,9 @@ export type AddProcess = {
   companyId: string;
   appSystem: string;
   consumerId: string;
+  producerIds?: string[];
+  maxFiles?: number;
+  maxDataVolume?: number;
 };
 
 export type AddProcessRequest = Omit<AddProcess, 'consumerId'>;
@@ -40,10 +43,14 @@ export interface IAddProcessResponse {
 }
 
 export type UpdateProcess = {
+  files: string[];
+};
+
+export type ReadyToCommitProcess = {
   processedFiles: IFiles;
 };
 
-export interface IUpdateProcessResponse {
+export interface IStatusResponse {
   status: 'OK' | 'CANCELLED';
 }
 

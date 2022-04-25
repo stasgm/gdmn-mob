@@ -13,11 +13,27 @@ const addProcess: Config = {
     body: Joi.object({
       companyId: Joi.string().required().error(new InvalidParameterException('Не указана компания')),
       appSystem: Joi.string().required().error(new InvalidParameterException('Не указана подсистема приложения')),
+      maxFiles: Joi.number().optional(),
+      maxDataVolume: Joi.number().optional(),
+      producerIds: Joi.array().optional(),
     }),
   },
 };
 
 const updateProcess: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+      id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор процесса')),
+    }),
+    type: 'json',
+    body: Joi.object({
+      files: Joi.object().required().error(new InvalidParameterException('Не указан список файлов')),
+    }),
+  },
+};
+
+const setReadyToCommit: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
@@ -108,4 +124,13 @@ const deleteProcess: Config = {
   },
 };
 
-export { addProcess, updateProcess, completeProcess, cancelProcess, interruptProcess, getProcesses, deleteProcess };
+export {
+  addProcess,
+  updateProcess,
+  setReadyToCommit,
+  completeProcess,
+  cancelProcess,
+  interruptProcess,
+  getProcesses,
+  deleteProcess,
+};

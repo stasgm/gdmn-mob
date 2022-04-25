@@ -8,6 +8,7 @@ import {
   interruptProcess,
   getProcesses,
   deleteProcess,
+  setReadyToCommit,
 } from '../controllers/process';
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
@@ -18,8 +19,8 @@ const router = Router();
 
 router.prefix('/process');
 router.post('/', processValidation.addProcess, authMiddleware, deviceMiddleware, processParamsMiddlware, addProcess);
-// router.get('/:id', messageValidation.getMessage, authMiddleware, api2);
-router.patch('/:id', authMiddleware, deviceMiddleware, updateProcess);
+router.get('/:id', processValidation.updateProcess, authMiddleware, deviceMiddleware, updateProcess);
+router.patch('/:id', authMiddleware, deviceMiddleware, setReadyToCommit);
 router.delete('/:id/complete', processValidation.completeProcess, authMiddleware, deviceMiddleware, completeProcess);
 router.delete('/:id/cancel', processValidation.cancelProcess, authMiddleware, deviceMiddleware, cancelProcess);
 router.delete('/:id/interrupt', processValidation.interruptProcess, authMiddleware, deviceMiddleware, interruptProcess);
