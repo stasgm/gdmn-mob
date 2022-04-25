@@ -3,12 +3,12 @@ import Router from 'koa-joi-router';
 import {
   addProcess,
   updateProcess,
+  prepareProcess,
   completeProcess,
   cancelProcess,
   interruptProcess,
   getProcesses,
   deleteProcess,
-  setReadyToCommit,
 } from '../controllers/process';
 import { authMiddleware } from '../middleware/authRequired';
 import { deviceMiddleware } from '../middleware/deviceRequired';
@@ -19,8 +19,8 @@ const router = Router();
 
 router.prefix('/process');
 router.post('/', processValidation.addProcess, authMiddleware, deviceMiddleware, processParamsMiddlware, addProcess);
-router.get('/:id', processValidation.updateProcess, authMiddleware, deviceMiddleware, updateProcess);
-router.patch('/:id', authMiddleware, deviceMiddleware, setReadyToCommit);
+router.patch('/:id', processValidation.updateProcess, authMiddleware, deviceMiddleware, updateProcess);
+router.patch('/:id/prepare', processValidation.prepareProcess, authMiddleware, deviceMiddleware, prepareProcess);
 router.delete('/:id/complete', processValidation.completeProcess, authMiddleware, deviceMiddleware, completeProcess);
 router.delete('/:id/cancel', processValidation.cancelProcess, authMiddleware, deviceMiddleware, cancelProcess);
 router.delete('/:id/interrupt', processValidation.interruptProcess, authMiddleware, deviceMiddleware, interruptProcess);

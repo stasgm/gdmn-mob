@@ -27,7 +27,7 @@ const updateProcess = (ctx: ParameterizedContext) => {
   log.info('updateProcess', response);
 };
 
-const setReadyToCommit = (ctx: ParameterizedContext) => {
+const prepareProcess = (ctx: ParameterizedContext) => {
   const { processedFiles } = ctx.request.body as ReadyToCommitProcess;
 
   const response = processService.setReadyToCommit(ctx.params.id, processedFiles);
@@ -96,7 +96,7 @@ const deleteProcess = (ctx: ParameterizedContext) => {
 export {
   addProcess,
   updateProcess,
-  setReadyToCommit,
+  prepareProcess,
   completeProcess,
   cancelProcess,
   interruptProcess,
