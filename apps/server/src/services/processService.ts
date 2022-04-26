@@ -1,7 +1,15 @@
 import path from 'path';
 import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync, statSync } from 'fs';
 
-import { IFiles, IAddProcessResponse, IStatusResponse, AddProcess, IMessage, IProcessedFiles } from '@lib/types';
+import {
+  IFiles,
+  IAddProcessResponse,
+  IStatusResponse,
+  AddProcess,
+  IMessage,
+  IProcessedFiles,
+  IDBMessage,
+} from '@lib/types';
 
 import log from '../utils/logger';
 
@@ -16,6 +24,8 @@ import {
   startProcess,
   updateProcessInList,
 } from './processList';
+import { getDb } from './dao/db';
+import { getNamedEntitySync } from './dao/utils';
 
 const basePath = path.join(config.FILES_PATH, '/.DB');
 const BYTES_PER_MB = 1024 ** 2;
@@ -28,7 +38,7 @@ const deleteFile = (filePath: string) => {
   unlinkSync(filePath);
 };
 
-const readFileByAppSystem = (pathDb: string, fileName: string): IMessage => {
+const readFileByAppSystem = (pathDb: string, fileName: string): IDBMessage => {
   const fullName = path.join(pathDb, fileName);
   return JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
 };
@@ -62,7 +72,9 @@ const getFiles = (params: AddProcess): IFiles => {
   }
 
   return consumerFiles?.reduce((prev: IFiles, cur) => {
-    prev[cur] = readFileByAppSystem(pathDb, cur);
+    const message = readFileByAppSystem(pathDb, cur);
+
+    prev[cur] = makeMessage(message);
     return prev;
   }, {});
 };
@@ -259,10 +271,10 @@ export const completeById = (processId: string): IStatusResponse => {
 
     const id = fn.split('_')[0];
     const requestFN = requestFiles[id];
-    const toPatch = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
-    if (toPatch && requestFN) {
+    const toPath = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+    if (toPath && requestFN) {
       try {
-        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPatch}/${requestFN}`);
+        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
 
         const i = process.files.indexOf(requestFN);
         process.files.splice(i, 1);
@@ -392,5 +404,27 @@ export const deleteOne = (processId: string) => {
 
   return {
     status: 'OK',
+  };
+};
+
+export const makeMessage = (message: IDBMessage): IMessage => {
+  const db = getDb();
+  const { users, companies } = db;
+
+  const consumer = getNamedEntitySync(message.head.consumerId, users);
+  const producer = getNamedEntitySync(message.head.producerId, users);
+  const company = getNamedEntitySync(message.head.companyId, companies);
+
+  return {
+    id: message.id,
+    head: {
+      appSystem: message.head.appSystem,
+      company,
+      consumer,
+      producer,
+      dateTime: message.head.dateTime,
+    },
+    status: message.status,
+    body: message.body,
   };
 };

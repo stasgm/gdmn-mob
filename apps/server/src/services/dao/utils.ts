@@ -25,4 +25,24 @@ async function getNamedEntity(
   return items || [];
 }
 
-export { getNamedEntity };
+function getNamedEntitySync(ids: string, dbObject: NamedDBEntities): INamedEntity;
+function getNamedEntitySync(ids: string[], dbObject: NamedDBEntities): INamedEntity[];
+function getNamedEntitySync(ids: string | string[], dbObject: NamedDBEntities): INamedEntity | INamedEntity[] {
+  if (typeof ids === 'string') {
+    const item = dbObject.findSync(ids);
+
+    return item! && { id: item.id, name: item.name };
+  }
+
+  const items: INamedEntity[] = [];
+
+  for (const id of ids) {
+    const item = dbObject.findSync(id);
+
+    item && items.push({ id: item.id, name: item.name });
+  }
+
+  return items || [];
+}
+
+export { getNamedEntity, getNamedEntitySync };

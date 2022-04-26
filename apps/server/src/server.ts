@@ -26,7 +26,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
 import { createDb, dbtype } from './services/dao/db';
-import { loadProcessList } from './services/processList';
+import { checkProcessList, loadProcessList } from './services/processList';
 
 interface IServer {
   name: string;
@@ -51,6 +51,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
 
   loadProcessList();
+  checkProcessList();
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные

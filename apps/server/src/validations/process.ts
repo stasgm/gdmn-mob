@@ -28,7 +28,7 @@ const updateProcess: Config = {
     }),
     type: 'json',
     body: Joi.object({
-      files: Joi.object().required().error(new InvalidParameterException('Не указан список файлов')),
+      files: Joi.array().required().error(new InvalidParameterException('Не указан список файлов')),
     }),
   },
 };
