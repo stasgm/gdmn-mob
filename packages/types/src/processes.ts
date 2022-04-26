@@ -9,7 +9,6 @@ export interface IProcess {
   appSystem: string;
   dateBegin: Date;
   files: string[];
-  // processedFiles?: string[];
   status: ProcessType;
   processedFiles?: IProcessedFiles;
   dateReadyToCommit?: Date;
@@ -44,10 +43,6 @@ export interface IAddProcessResponse {
 
 export type UpdateProcess = {
   files: string[];
-};
-
-export type ReadyToCommitProcess = {
-  processedFiles: IFiles;
 };
 
 export interface IStatusResponse {

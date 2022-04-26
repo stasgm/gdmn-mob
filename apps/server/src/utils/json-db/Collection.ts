@@ -75,6 +75,11 @@ class Collection<T extends CollectionItem> {
     return (await this._get()).find(predicate);
   }
 
+  public findSync(id: string | ((item: T) => boolean)) {
+    const predicate = typeof id === 'function' ? id : (item: T) => item.id === id;
+    return this._getSync().find(predicate);
+  }
+
   /**
    * Update an item. Will not update if the item does not have an `id` property
    */
@@ -140,6 +145,12 @@ class Collection<T extends CollectionItem> {
     //     return resolve(result);
     //   });
     // });
+  }
+
+  private _getSync(): Array<T> {
+    const data = fs.readFileSync(this.collectionPath, { encoding: 'utf8' });
+    const result = JSON.parse(data);
+    return result;
   }
 
   private _save(data: Array<T>): Promise<void> {

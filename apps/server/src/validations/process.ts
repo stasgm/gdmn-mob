@@ -28,7 +28,7 @@ const updateProcess: Config = {
     }),
     type: 'json',
     body: Joi.object({
-      files: Joi.object().required().error(new InvalidParameterException('Не указан список файлов')),
+      files: Joi.array().required().error(new InvalidParameterException('Не указан список файлов')),
     }),
   },
 };
@@ -40,31 +40,29 @@ const prepareProcess: Config = {
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор процесса')),
     }),
     type: 'json',
-    body: Joi.object({
-      processedFiles: Joi.object({
-        head: Joi.object({
-          company: Joi.object({
-            id: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-            name: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-          }),
-          appSystem: Joi.string().optional(),
-          producer: Joi.object().optional(),
-          consumer: Joi.object().optional(),
-          version: Joi.number().optional(),
-          dateTime: Joi.string().optional(),
-        }),
-        body: Joi.object({
-          type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-          version: Joi.number().optional(),
-          payload: Joi.alternatives()
-            .try(Joi.object(), Joi.array())
-            .required()
-            .error(new InvalidParameterException('Некорректный формат сообщения')),
-        }),
-        id: Joi.string().optional(),
-        status: Joi.string().optional(),
-      }),
-    }),
+    body: Joi.object().required().error(new InvalidParameterException('Не указан список обработанных файлов')),
+    //   head: Joi.object({
+    //     company: Joi.object({
+    //       id: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+    //       name: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+    //     }),
+    //     appSystem: Joi.string().optional(),
+    //     producer: Joi.object().optional(),
+    //     consumer: Joi.object().optional(),
+    //     version: Joi.number().optional(),
+    //     dateTime: Joi.string().optional(),
+    //   }),
+    //   body: Joi.object({
+    //     type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+    //     version: Joi.number().optional(),
+    //     payload: Joi.alternatives()
+    //       .try(Joi.object(), Joi.array())
+    //       .required()
+    //       .error(new InvalidParameterException('Некорректный формат сообщения')),
+    //   }),
+    //   id: Joi.string().optional(),
+    //   status: Joi.string().optional(),
+    // }),
   },
 };
 

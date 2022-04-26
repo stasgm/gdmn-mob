@@ -1,11 +1,23 @@
 import path from 'path';
-import { readFileSync, writeFileSync, renameSync, readdirSync, unlinkSync, statSync } from 'fs';
+import { readFileSync, writeFileSync, readdirSync, unlinkSync, statSync, renameSync } from 'fs';
 
-import { IFiles, IAddProcessResponse, IStatusResponse, AddProcess, IMessage, IProcessedFiles } from '@lib/types';
+import {
+  IFiles,
+  IAddProcessResponse,
+  IStatusResponse,
+  AddProcess,
+  IMessage,
+  IProcessedFiles,
+  IDBMessage,
+  NewProcessMessage,
+} from '@lib/types';
+import { v1 as uidv1 } from 'uuid';
 
 import log from '../utils/logger';
 
 import config from '../../config';
+
+import { DataNotFoundException } from '../exceptions';
 
 import {
   checkProcess,
@@ -16,11 +28,13 @@ import {
   startProcess,
   updateProcessInList,
 } from './processList';
+import { getDb } from './dao/db';
+import { getNamedEntitySync } from './dao/utils';
 
 const basePath = path.join(config.FILES_PATH, '/.DB');
 const BYTES_PER_MB = 1024 ** 2;
 
-const saveFile = (filePath: string, data: IMessage) => {
+const saveFile = (filePath: string, data: IDBMessage) => {
   writeFileSync(filePath, JSON.stringify(data, undefined, 2));
 };
 
@@ -28,7 +42,7 @@ const deleteFile = (filePath: string) => {
   unlinkSync(filePath);
 };
 
-const readFileByAppSystem = (pathDb: string, fileName: string): IMessage => {
+const readFileByAppSystem = (pathDb: string, fileName: string): IDBMessage => {
   const fullName = path.join(pathDb, fileName);
   return JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
 };
@@ -41,60 +55,72 @@ const getFileSize = (fileName: string) => {
 const getFiles = (params: AddProcess): IFiles => {
   const pathDb = path.join(basePath, `DB_${params.companyId}/${params.appSystem}/messages/`);
 
+  const fileObj: IFiles = {};
+
+  //Находим все подходящие файлы
+  readdirSync(pathDb).forEach((fn) => {
+    if (
+      (!params.producerIds || !!params.producerIds.find((pr) => fn.includes(`from_${pr}`))) &&
+      fn.includes(`to_${params.consumerId}`)
+    ) {
+      const message = readFileByAppSystem(pathDb, fn);
+      fileObj[fn] = makeMessage(message);
+    }
+  });
+
+  //Сортируем по времени создания через массив
+  const sortFileList = Object.entries(fileObj).sort(
+    (a, b) => new Date(a[1].head.dateTime).getTime() - new Date(b[1].head.dateTime).getTime(),
+  );
+
   const maxDataVolume = params.maxDataVolume
     ? Math.min(config.PROCESS_MAX_DATA_VOLUME, params.maxDataVolume)
     : config.PROCESS_MAX_DATA_VOLUME;
-
-  let dataVolume = 0;
-
-  const consumerFiles = readdirSync(pathDb).filter((item) => {
-    dataVolume = dataVolume + getFileSize(`${pathDb}${item}`);
-    const producerFound = params.producerIds ? !!params.producerIds.find((pr) => item.includes(`from_${pr}`)) : true;
-    return dataVolume <= maxDataVolume && producerFound && item.includes(`to_${params.consumerId}`);
-  });
 
   const numberOfFiles = params.maxFiles
     ? Math.min(config.PROCESS_MAX_FILES, params.maxFiles)
     : config.PROCESS_MAX_FILES;
 
-  if (numberOfFiles < consumerFiles.length) {
-    consumerFiles.length = numberOfFiles;
+  const files: IFiles = {};
+  let dataVolume = 0;
+  //Формируем объект заново, учитывая ограничения по количеству и объему файлов
+  for (let i = 0; i < Math.min(sortFileList.length, numberOfFiles) && dataVolume <= maxDataVolume; i++) {
+    const [fn, mes] = sortFileList[i];
+    dataVolume = dataVolume + getFileSize(`${pathDb}${fn}`);
+
+    if (dataVolume <= maxDataVolume) {
+      files[fn] = mes;
+    }
   }
 
-  return consumerFiles?.reduce((prev: IFiles, cur) => {
-    prev[cur] = readFileByAppSystem(pathDb, cur);
-    return prev;
-  }, {});
+  return files;
 };
 
 /**
  * 1. Если есть процесс для данной базы, то возвращает status 'BUSY'
    2. Если нет процесса и нет сообщений для данного клиента, то возвращает status 'OK' и messages = []
    3. Если нет процесса и есть сообщения, то status 'OK', processId и список сообщений
- * @param companyId
- * @param appSystem
- * @param consumerId
- * @returns { status, processId, messages }
+ * @param params
+ * @returns { status, processId, files }
  */
-export const addOne = (item: AddProcess): IAddProcessResponse => {
-  console.log('basePath', basePath);
-  // const db = getDb();
-  // const { messages, companies, users } = db;
+export const addOne = (params: AddProcess): IAddProcessResponse => {
+  const db = getDb();
+  const { companies, users } = db;
 
-  // const company = await companies.find(companyId);
+  const company = companies.findSync(params.companyId);
 
-  // if (!company) {
-  //   throw new DataNotFoundException('Компания не найдена');
-  // }
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
 
-  // const consumer = await users.find(consumerId);
+  const consumer = users.find(params.consumerId);
 
-  // if (!consumer) {
-  //   throw new DataNotFoundException('Получатель не найден');
-  // }
+  if (!consumer) {
+    throw new DataNotFoundException('Получатель не найден');
+  }
 
   //Находим процесс для конкеретной базы
-  const process = checkProcess(item.companyId);
+  const process = checkProcess(params.companyId);
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
@@ -102,11 +128,11 @@ export const addOne = (item: AddProcess): IAddProcessResponse => {
     return { status: 'BUSY', processId: process.id };
   }
 
-  //Находим список наименований файлов и список сообщений
-  const files = getFiles(item);
+  //Находим список файлов для обработки
+  const files = getFiles(params);
 
   //Если нет процесса и есть сообщения, создаем процесс
-  const newProcess = startProcess(item.companyId, item.appSystem, files);
+  const newProcess = startProcess(params.companyId, params.appSystem, files);
 
   return {
     status: 'OK',
@@ -177,7 +203,9 @@ export const prepareById = (processId: string, processedFiles: IFiles): IStatusR
       log.warn(`Robust-protocol.prepareProcess: сообщение ${mes.id} обработано со статусом ${mes.status}`);
     }
     try {
-      saveFile(`${pathFiles}/prepared/${fn}`, mes);
+      const producerId = fn.split('_')[2];
+      const dbMessage = makeDBNewMessage(mes, producerId);
+      saveFile(`${pathFiles}/prepared/${fn}`, dbMessage);
     } catch (err) {
       error = `Robust-protocol.prepareProcess: не удалось создать файл ${fn} в папке PREPARED,
         ${err instanceof Error ? err.message : 'ошибка'}`;
@@ -259,10 +287,10 @@ export const completeById = (processId: string): IStatusResponse => {
 
     const id = fn.split('_')[0];
     const requestFN = requestFiles[id];
-    const toPatch = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
-    if (toPatch && requestFN) {
+    const toPath = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+    if (toPath && requestFN) {
       try {
-        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPatch}/${requestFN}`);
+        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
 
         const i = process.files.indexOf(requestFN);
         process.files.splice(i, 1);
@@ -392,5 +420,42 @@ export const deleteOne = (processId: string) => {
 
   return {
     status: 'OK',
+  };
+};
+
+export const makeMessage = (message: IDBMessage): IMessage => {
+  const db = getDb();
+  const { users, companies } = db;
+
+  const consumer = getNamedEntitySync(message.head.consumerId, users);
+  const producer = getNamedEntitySync(message.head.producerId, users);
+  const company = getNamedEntitySync(message.head.companyId, companies);
+
+  return {
+    id: message.id,
+    head: {
+      appSystem: message.head.appSystem,
+      company,
+      consumer,
+      producer,
+      dateTime: message.head.dateTime,
+    },
+    status: message.status,
+    body: message.body,
+  };
+};
+
+export const makeDBNewMessage = (message: NewProcessMessage, producerId: string): IDBMessage => {
+  return {
+    id: message.id || uidv1(),
+    head: {
+      appSystem: message.head.appSystem,
+      companyId: message.head.company.id,
+      consumerId: message.head.consumer.id,
+      producerId: producerId,
+      dateTime: new Date().toISOString(),
+    },
+    status: message.status,
+    body: message.body,
   };
 };

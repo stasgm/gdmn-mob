@@ -1,9 +1,12 @@
-import { readFileSync, writeFileSync, accessSync, constants } from 'fs';
+/* eslint-disable max-len */
+import { readFileSync, writeFileSync, accessSync, constants, renameSync } from 'fs';
 
 import path from 'path';
 
 import { IFiles, IProcess } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
+
+import log from '../utils/logger';
 
 import config from '../../config';
 import { extraPredicate } from '../utils/helpers';
@@ -19,6 +22,7 @@ const checkFileSync = (path: string) => {
   }
 };
 
+// const PROCESS_CHECK_PERIOD_IN_MIN = 10;
 const basePath = path.join(config.FILES_PATH, '/.DB');
 
 const processPath = path.join(basePath, 'processes.json');
@@ -44,6 +48,126 @@ export const removeProcessFromList = (processId: string) => {
   const xid = processList.findIndex((p) => p.id === processId);
   processList.splice(xid, 1);
   saveProcessList();
+};
+
+export const cleanupProcess = (process: IProcess) => {
+  const processedFilesObj = Object.entries(process!.processedFiles!);
+  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+
+  const requestFiles: { [id: string]: string } = {};
+  process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));
+
+  for (const [fn, status] of processedFilesObj) {
+    try {
+      renameSync(`${pathFiles}/prepared/${fn}`, `${pathFiles}/messages/${fn}`);
+      delete process.processedFiles![fn];
+      saveProcessList();
+    } catch (err) {
+      log.warn(`Robust-protocol.cleanupProcess: не удалось перенести файл ${fn} из PREPARED,
+          ${err instanceof Error ? err.message : 'ошибка'}`);
+    }
+
+    const id = fn.split('_')[0];
+    const requestFN = requestFiles[id];
+    const toPath = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+
+    if (toPath && requestFN) {
+      try {
+        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
+
+        const i = process.files.indexOf(requestFN);
+        process.files.splice(i, 1);
+        saveProcessList();
+      } catch (err) {
+        log.warn(`Robust-protocol.cleanupProcess: не удалось перенести файл ${requestFN} из MESSAGES,
+          ${err instanceof Error ? err.message : 'ошибка'}`);
+      }
+    }
+  }
+};
+
+export const unknownProcess = (process: IProcess) => {
+  const processedFilesObj = Object.entries(process!.processedFiles!);
+  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+
+  const requestFiles: { [id: string]: string } = {};
+  process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));
+
+  for (const [fn, status] of processedFilesObj) {
+    try {
+      renameSync(`${pathFiles}/prepared/${fn}`, `${pathFiles}/unknown/${fn}`);
+      delete process.processedFiles![fn];
+      saveProcessList();
+    } catch (err) {
+      log.warn(`Robust-protocol.cleanupProcess: не удалось перенести файл ${fn} из PREPARED,
+          ${err instanceof Error ? err.message : 'ошибка'}`);
+    }
+
+    const id = fn.split('_')[0];
+    const requestFN = requestFiles[id];
+    const toPath = status === 'PROCESSED' ? 'unknown' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+
+    if (toPath && requestFN) {
+      try {
+        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
+
+        const i = process.files.indexOf(requestFN);
+        process.files.splice(i, 1);
+        saveProcessList();
+      } catch (err) {
+        log.warn(`Robust-protocol.cleanupProcess: не удалось перенести файл ${requestFN} из MESSAGES,
+          ${err instanceof Error ? err.message : 'ошибка'}`);
+      }
+    }
+  }
+};
+
+export const checkProcessList = () => {
+  console.log('11111111');
+  for (const process of processList) {
+    switch (process.status) {
+      //Записи в состоянии STARTED удаляются.
+      case 'STARTED': {
+        if (
+          (new Date().getTime() - new Date(process.dateBegin).getTime()) / 60000 >
+          config.PROCESS_CHECK_PERIOD_IN_MIN
+        ) {
+          removeProcessFromList(process.id);
+          log.warn(
+            `Robust-protocol.check: процесс ${process.id} удален, завис со статусом STARTED > ${config.PROCESS_CHECK_PERIOD_IN_MIN} мин.`,
+          );
+        }
+        break;
+      }
+      //Записи в состоянии CLEANUP удаляются из списка,
+      //а перечисленные в них файлы перемещаются в папки LOG, MESSAGES и ERROR соответственно.
+      case 'CLEANUP': {
+        cleanupProcess(process);
+        removeProcessFromList(process.id);
+        log.error(`Robust-protocol.check: процесс ${process.id} удален, завис со статусом CLEANUP`);
+        break;
+      }
+      //Записи в состоянии READY_TO_COMMIT говорят нам о том, что мы не знаем точно прошел ли комит на базе данных.
+      //О таких записях надо обязательно информировать системного администратора,
+      //а перечисленные в них файлы (как файлы из папки MESSAGES, так и файлы из папки PREPARED) должны быть перемещены
+      //в папку UNKNOWN, но не удалены с диска. Файлы, при обработке которых произошла ошибка переносятся в папку ERROR.
+      //Файлы, при обработке которых произошел dead lock мы оставляем в исходном состоянии.
+      //Такая ситуация требует вмешательства системного администратора. Сама запись процесса удаляется из списка.
+      case 'READY_TO_COMMIT': {
+        if (
+          (new Date().getTime() - new Date(process.dateReadyToCommit!).getTime()) / 60000 >
+          config.PROCESS_CHECK_PERIOD_IN_MIN
+        ) {
+          unknownProcess(process);
+          removeProcessFromList(process.id);
+          log.error(
+            `Robust-protocol.check: процесс ${process.id} удален, завис со статусом READY_TO_COMMIT > ${config.PROCESS_CHECK_PERIOD_IN_MIN} мин.`,
+          );
+        }
+        break;
+      }
+    }
+  }
 };
 
 /**
