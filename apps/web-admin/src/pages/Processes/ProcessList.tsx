@@ -1,17 +1,11 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import CachedIcon from '@material-ui/icons/Cached';
-
-import { authActions, useAuthThunkDispatch } from '@lib/store';
 
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
-import codeActions from '../../store/activationCode';
 import processActions from '../../store/process';
 import companyActions from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
@@ -20,17 +14,10 @@ import SnackBar from '../../components/SnackBar';
 import ProcessListTable from '../../components/process/ProcessListTable';
 
 const ProcessList = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
-  const authDispatch = useAuthThunkDispatch();
 
-  const { list, loading, errorMessage, pageParams } = useSelector((state) => state.devices);
-  const { list: activationCodes } = useSelector((state) => state.activationCodes);
-  const { list: processes } = useSelector((state) => state.processes);
+  const { list: processes, loading, errorMessage, pageParams } = useSelector((state) => state.processes);
   const { list: companies } = useSelector((state) => state.companies);
-
-  console.log('compan', companies);
 
   const fetchProcesses = useCallback(async () => {
     await dispatch(processActions.fetchProcesses());
@@ -56,26 +43,6 @@ const ProcessList = () => {
 
   const [pageParamLocal, setPageParamLocal] = useState<IPageParam | undefined>(pageParams);
 
-  const fetchDevices = useCallback(
-    (filterText?: string, fromRecord?: number, toRecord?: number) => {
-      dispatch(actions.fetchDevices(filterText, fromRecord, toRecord));
-      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
-    },
-    [dispatch],
-  );
-
-  const fetchActivationCodes = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
-    (deviceId?: string) => {
-      dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
-    },
-    [dispatch],
-  );
-
-  useEffect(() => {
-    fetchDevices(pageParams?.filterText as string);
-  }, [fetchDevices, pageParams?.filterText]);
-
   const handleUpdateInput = (value: string) => {
     const inputValue: string = value;
 
@@ -83,12 +50,12 @@ const ProcessList = () => {
 
     if (inputValue) return;
 
-    fetchDevices('');
+    // fetchDevices('');
   };
 
   const handleSearchClick = () => {
     dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    fetchDevices(pageParamLocal?.filterText as string);
+    // fetchDevices(pageParamLocal?.filterText as string);
 
     // const inputValue = valueRef?.current?.value;
     // fetchDevices(inputValue);
@@ -106,44 +73,12 @@ const ProcessList = () => {
     dispatch(actions.deviceActions.clearError());
   };
 
-  const handleCreateCode = (deviceId: string) => {
-    dispatch(codeActions.createActivationCode(deviceId));
-    fetchActivationCodes(deviceId);
-  };
-
-  const handleCreateUid = async (code: string, deviceId: string) => {
-    await authDispatch(authActions.activateDevice(code));
-    dispatch(actions.fetchDeviceById(deviceId));
-    fetchActivationCodes(deviceId);
-  };
-
   const buttons: IToolBarButton[] = [
     {
       name: 'Обновить',
       sx: { mx: 1 },
-      onClick: () => fetchDevices(),
+      onClick: () => fetchProcesses(),
       icon: <CachedIcon />,
-    },
-    // {
-    //   name: 'Загрузить',
-    //   onClick: () => {
-    //     return;
-    //   },
-    //   icon: <ImportExportIcon />,
-    // },
-    // {
-    //   name: 'Выгрузить',
-    //   sx: { mx: 1 },
-    //   onClick: () => {
-    //     return;
-    //   },
-    // },
-    {
-      name: 'Добавить',
-      color: 'primary',
-      variant: 'contained',
-      onClick: () => navigate(`${location.pathname}/new`),
-      icon: <AddCircleOutlineIcon />,
     },
   ];
 
@@ -162,7 +97,7 @@ const ProcessList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            searchTitle={'Найти устройство'}
+            searchTitle={'Найти компанию'}
             //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
@@ -173,14 +108,7 @@ const ProcessList = () => {
             <CircularProgressWithContent content={'Идет загрузка данных...'} />
           ) : (
             <Box sx={{ pt: 2 }}>
-              <ProcessListTable
-                processes={processes}
-                companies={companies}
-                // devices={list}
-                // activationCodes={activationCodes}
-                onCreateCode={handleCreateCode}
-                onCreateUid={handleCreateUid}
-              />
+              <ProcessListTable processes={processes} companies={companies} />
             </Box>
           )}
         </Container>

@@ -84,24 +84,4 @@ const removeProcess = (id: string): AppThunk => {
   };
 };
 
-/*CREATE*/
-
-// const getActivationCode = (): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(activationCodeActions.getActivationCodeAsync.request(''));
-
-//     const response = await api.activationCode.getActivationCode();
-
-//     if (response.type === 'GET_ACTIVATION_CODE') {
-//       return dispatch(activationCodeActions.getActivationCodeAsync.success(response.activationCode));
-//     }
-
-//     if (response.type === 'ERROR') {
-//       return dispatch(activationCodeActions.getActivationCodeAsync.failure(response.message));
-//     }
-
-//     return dispatch(activationCodeActions.getActivationCodeAsync.failure('Ошибка получения данных об устройствах'));
-//   };
-// };
-
 export default { fetchProcesses, removeProcess };

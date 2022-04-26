@@ -252,6 +252,38 @@ class Process extends BaseRequest {
       } as error.INetworkError;
     }
   };
+
+  removeProcess = async (processId: string) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'REMOVE_PROCESS',
+      } as types.IRemoveProcessResponse;
+    }
+
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>(`/process/${processId}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'REMOVE_PROCESS',
+        } as types.IRemoveProcessResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления процесса',
+        //err?.response?.data?.error || 'ошибка удаления компании',
+      } as error.INetworkError;
+    }
+  };
 }
 
 export default Process;

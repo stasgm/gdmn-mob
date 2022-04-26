@@ -83,7 +83,7 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     renderInput={(params) => <TextField {...params} label="Системы" />}
                   />
                 </Grid> */}
-                <Grid item md={6} xs={12}>
+                {/* <Grid item md={6} xs={12}>
                   <Field
                     component={MultipleAutocomplete}
                     name="appSystems"
@@ -95,7 +95,7 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     error={Boolean(formik.touched.appSystems && formik.errors.appSystems)}
                     disabled={loading}
                   />
-                </Grid>
+                </Grid> */}
               </Grid>
             </CardContent>
             <Divider />

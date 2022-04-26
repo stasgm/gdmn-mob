@@ -1,17 +1,10 @@
-import { profileEnd } from 'console';
-
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
-import RefreshIcon from '@material-ui/icons/Refresh';
-
-import Tooltip from '@material-ui/core/Tooltip';
-
 import {
   Box,
-  Button,
   Card,
   Checkbox,
   Table,
@@ -23,20 +16,16 @@ import {
   Typography,
 } from '@material-ui/core';
 
-import { IDevice, IActivationCode, IProcess, ICompany } from '@lib/types';
+import { IProcess, ICompany } from '@lib/types';
 
-import { deviceStates, adminPath } from '../../utils/constants';
+import { adminPath } from '../../utils/constants';
 
 interface IProps {
   processes: IProcess[];
   companies: ICompany[];
-  // devices: IDevice[];
   selectedProcesses?: IProcess[];
-  // activationCodes: IActivationCode[];
   limitRows?: number;
-  onCreateCode?: (deviceId: string) => void;
   onChangeSelectedDevices?: (newSelectedDeviceIds: any[]) => void;
-  onCreateUid?: (code: string, deviceId: string) => void;
 }
 
 const ProcessListTable = ({
@@ -47,8 +36,6 @@ const ProcessListTable = ({
   onChangeSelectedDevices,
   selectedProcesses = [],
   limitRows = 0,
-  onCreateCode,
-  onCreateUid,
 }: IProps) => {
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
@@ -119,6 +106,7 @@ const ProcessListTable = ({
   const TableRows = () => {
     const processList = processes.slice(page * limit, page * limit + limit).map((process: IProcess) => {
       const company = companies.find((a) => a.id === process.companyId)?.name;
+      console.log('process.id', process.id);
 
       return (
         <TableRow hover key={process.id} selected={selectedProcessIds.findIndex((d) => d.id === process?.id) !== -1}>
@@ -135,40 +123,6 @@ const ProcessListTable = ({
               value="true"
             />
           </TableCell>
-          {/* <TableCell style={{ padding: '0 16px' }}>
-            <Box
-              sx={{
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <NavLink to={`${adminPath}/app/devices/${process.id}`}>
-                <Typography color="textPrimary" variant="body1" key={process.id}>
-                  {process.name}
-                </Typography>
-              </NavLink>
-            </Box>
-          </TableCell> */}
-          {/* <TableCell>{device.uid}</TableCell> */}
-
-          {/* <TableCell>
-            <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <Box style={{ width: '40px' }}>{/*activationCodes.find((a) => a.device.id === device.id)?.* code}</Box>
-              <Box>
-                {onCreateCode && (
-                  <Tooltip title="Создать код">
-                    <Button
-                      // component={RouterLink}
-                      onClick={() => onCreateCode(device.id)}
-                    >
-                      <RefreshIcon />
-                    </Button>
-                  </Tooltip>
-                )}
-              </Box>
-            </Box>
-          </TableCell> */}
-
           <TableCell style={{ padding: '0 16px' }}>
             <Box
               sx={{
@@ -183,11 +137,10 @@ const ProcessListTable = ({
               </NavLink>
             </Box>
           </TableCell>
-          {/* <TableCell>{company}</TableCell> */}
           <TableCell>{process.appSystem}</TableCell>
           <TableCell>{process.status}</TableCell>
           <TableCell>{new Date(process.dateBegin || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          {/* <TableCell>{new Date(device.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell> */}
+          <TableCell>{new Date(process?.dateReadyToCommit || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
       );
     });
@@ -225,7 +178,8 @@ const ProcessListTable = ({
                 <TableCell>Система</TableCell>
                 <TableCell>Статус</TableCell>
                 {/* <TableCell>Код активации</TableCell> */}
-                <TableCell>Дата</TableCell>
+                <TableCell>Дата начала</TableCell>
+                <TableCell>Дата подготовки</TableCell>
                 {/* <TableCell>Дата редактирования</TableCell> */}
               </TableRow>
             </TableHead>

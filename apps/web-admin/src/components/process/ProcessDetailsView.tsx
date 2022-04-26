@@ -1,17 +1,17 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { IProcess } from '@lib/types';
+import { ICompany, IProcess } from '@lib/types';
 
 import { NavLink } from 'react-router-dom';
 
-import { deviceStates, adminPath } from '../../utils/constants';
+import { adminPath } from '../../utils/constants';
 
 interface IProps {
   process: IProcess;
-  company?: string;
+  company?: ICompany;
 }
 
-const ProcessDetailsView = ({ process }: IProps) => {
+const ProcessDetailsView = ({ process, company }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -20,38 +20,28 @@ const ProcessDetailsView = ({ process }: IProps) => {
         <Grid>
           <Grid>
             <Grid container>
-              {/* <Grid item md={2} xs={6}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Наименование
-                </Typography>
-              </Grid>
-              <Grid item md={10} xs={6}>
-                <NavLink to={`${adminPath}/app/devices/${deviceBinding.device.id}`} key={deviceBinding.device.id}>
-                  <Typography color="textPrimary" variant="h4" key={deviceBinding.device.id} gutterBottom>
-                    {deviceBinding.device.name}
-                  </Typography>
-                </NavLink>
-              </Grid>
-              <Grid item md={2} xs={6}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Пользователь
-                </Typography>
-              </Grid>
-              <Grid item md={10} xs={6}>
-                <NavLink to={`${adminPath}/app/users/${deviceBinding.user.id}`} key={deviceBinding.user.id}>
-                  <Typography color="textPrimary" variant="h4" key={deviceBinding.user.id} gutterBottom>
-                    {deviceBinding.user.name}
-                  </Typography>
-                </NavLink>
-              </Grid> */}
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
                   Компания
                 </Typography>
               </Grid>
+
+              <Grid item md={10} xs={6}>
+                <NavLink to={`${adminPath}/app/companies/${company?.id}`} key={company?.id}>
+                  <Typography color="textPrimary" variant="h4" key={company?.id} gutterBottom>
+                    {company?.name}
+                  </Typography>
+                </NavLink>
+              </Grid>
+
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Система
+                </Typography>
+              </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {process.status}
+                  {process.appSystem}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>
@@ -64,16 +54,38 @@ const ProcessDetailsView = ({ process }: IProps) => {
                   {process.status}
                 </Typography>
               </Grid>
-              <Grid item md={2} xs={6}>
+
+              {/* <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Статус
+                  Файлы
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <Typography variant="h4" gutterBottom>
-                  {process.status}
+                {process.files.map((file) => {
+                  return (
+                    <Typography variant="h4" gutterBottom key={file}>
+                      {file}
+                    </Typography>
+                  );
+                })}
+              </Grid>
+
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Обработанные файлы
                 </Typography>
               </Grid>
+              {process.processedFiles && (
+                <Grid item md={10} xs={6}>
+                  {Object.entries(process.processedFiles).map((file) => {
+                    return (
+                      <Typography variant="h4" gutterBottom key={file[0]}>
+                        {`${file[0]} : ${file[1]}`}
+                      </Typography>
+                    );
+                  })}
+                </Grid>
+              )} */}
             </Grid>
           </Grid>
         </Grid>

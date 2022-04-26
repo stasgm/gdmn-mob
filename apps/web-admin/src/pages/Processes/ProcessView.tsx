@@ -12,12 +12,10 @@ import {
 } from '@material-ui/core';
 import CachedIcon from '@material-ui/icons/Cached';
 import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
-import bindingActions from '../../store/deviceBinding';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
@@ -25,23 +23,26 @@ import processSelectors from '../../store/process/selectors';
 import companySelectors from '../../store/company/selectors';
 import SnackBar from '../../components/SnackBar';
 
-import { adminPath } from '../../utils/constants';
 import ProcessDetailsView from '../../components/process/ProcessDetailsView';
 import processActions from '../../store/process';
+import ProcessFiles from '../../components/process/ProcessFiles';
+import ProcessFilesProcessed from '../../components/process/ProcessFilesProcessed';
 
 export type Params = {
-  processId: string;
+  id: string;
 };
 
 const ProcessView = () => {
-  const { processId } = useParams<keyof Params>() as Params;
+  const { id } = useParams<keyof Params>() as Params;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { loading, errorMessage } = useSelector((state) => state.processes);
 
-  const process = processSelectors.processById(processId);
-  const company = companySelectors.companyById(process.companyId);
+  const process = processSelectors.processById(id);
+  const company = companySelectors.companyById(process?.companyId);
+
+  console.log('company', company);
 
   const [open, setOpen] = useState(false);
 
@@ -49,15 +50,10 @@ const ProcessView = () => {
     navigate(-1);
   };
 
-  // const handleEdit = () => {
-  //   navigate(`${adminPath}/app/compaines/${processs?.}/binding/${bindingid}/edit`);
-  //   // <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}></NavLink>
-  // };
-
   const handleDelete = async () => {
     setOpen(false);
-    const res = await dispatch(processActions.removeProcess(processId));
-    if (res.type === 'PROCESS/REMOVE_SUCCES') {
+    const res = await dispatch(processActions.removeProcess(id));
+    if (res.type === 'PROCESS/REMOVE_SUCCESS') {
       navigate(-1);
     }
   };
@@ -73,13 +69,6 @@ const ProcessView = () => {
     refreshData();
   }, [refreshData]);
 
-  // const fetchUsers = useCallback(
-  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
-  //     dispatch(userActions.fetchUsers('', filterText, fromRecord, toRecord));
-  //   },
-  //   [dispatch],
-  // );
-
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -87,9 +76,6 @@ const ProcessView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [fetchUsers]);
 
   const handleClearError = () => {
     dispatch(processActions.processActions.clearError());
@@ -118,15 +104,6 @@ const ProcessView = () => {
       onClick: refreshData,
       icon: <CachedIcon />,
     },
-    // {
-    //   name: 'Редактировать',
-    //   sx: { marginRight: 1 },
-    //   disabled: true,
-    //   color: 'secondary',
-    //   variant: 'contained',
-    //   onClick: handleEdit,
-    //   icon: <EditIcon />,
-    // },
     {
       name: 'Удалить',
       disabled: true,
@@ -187,9 +164,18 @@ const ProcessView = () => {
             minHeight: '100%',
           }}
         >
-          <ProcessDetailsView process={process} />
+          <ProcessDetailsView process={process} company={company} />
+        </Box>
+        <Box>
+          <CardHeader sx={{ mx: 2 }} />
+          <ProcessFiles files={process.files} />
+        </Box>
+        <Box>
+          <CardHeader sx={{ mx: 2 }} />
+          <ProcessFilesProcessed processedFiles1={process.processedFiles} />
         </Box>
       </Box>
+
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
     </>
   );
