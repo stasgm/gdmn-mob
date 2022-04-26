@@ -13,10 +13,11 @@ import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
 import codeActions from '../../store/activationCode';
 import processActions from '../../store/process';
+import companyActions from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
-import ProcessListTable from '../../components/processes/ProcessListTable';
+import ProcessListTable from '../../components/process/ProcessListTable';
 
 const ProcessList = () => {
   const navigate = useNavigate();
@@ -27,6 +28,9 @@ const ProcessList = () => {
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.devices);
   const { list: activationCodes } = useSelector((state) => state.activationCodes);
   const { list: processes } = useSelector((state) => state.processes);
+  const { list: companies } = useSelector((state) => state.companies);
+
+  console.log('compan', companies);
 
   const fetchProcesses = useCallback(async () => {
     await dispatch(processActions.fetchProcesses());
@@ -35,6 +39,16 @@ const ProcessList = () => {
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
     fetchProcesses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const fetchCompanies = useCallback(async () => {
+    await dispatch(companyActions.fetchCompanies());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchCompanies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -161,8 +175,9 @@ const ProcessList = () => {
             <Box sx={{ pt: 2 }}>
               <ProcessListTable
                 processes={processes}
-                devices={list}
-                activationCodes={activationCodes}
+                companies={companies}
+                // devices={list}
+                // activationCodes={activationCodes}
                 onCreateCode={handleCreateCode}
                 onCreateUid={handleCreateUid}
               />

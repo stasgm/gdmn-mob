@@ -66,6 +66,24 @@ const fetchProcesses = (): AppThunk => {
   };
 };
 
+const removeProcess = (id: string): AppThunk => {
+  return async (dispatch) => {
+    dispatch(processActions.removeProcessAsync.request('Удаление процесса'));
+
+    const response = await api.process.removeProcess(id);
+
+    if (response.type === 'REMOVE_PROCESS') {
+      return dispatch(processActions.removeProcessAsync.success(id));
+    }
+
+    if (response.type === 'ERROR') {
+      return dispatch(processActions.removeProcessAsync.failure(response.message));
+    }
+
+    return dispatch(processActions.removeProcessAsync.failure('Ошибка удаления процесса'));
+  };
+};
+
 /*CREATE*/
 
 // const getActivationCode = (): AppThunk => {
@@ -86,4 +104,4 @@ const fetchProcesses = (): AppThunk => {
 //   };
 // };
 
-export default { fetchProcesses };
+export default { fetchProcesses, removeProcess };

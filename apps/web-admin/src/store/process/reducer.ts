@@ -39,6 +39,27 @@ const reducer: Reducer<IProcessState, ProcessActionType> = (state = initialState
         errorMessage: action.payload || 'error',
       };
 
+    case getType(processActions.removeProcessAsync.request):
+      return {
+        ...state,
+        loading: true,
+        errorMessage: '',
+      };
+
+    case getType(processActions.removeProcessAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: [...state.list.filter((i) => i.id !== action.payload)],
+      };
+
+    case getType(processActions.removeProcessAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
     // case getType(activationCodeActions.createCodeAsync.request):
     //   return { ...state, loading: true, errorMessage: '' };
 
