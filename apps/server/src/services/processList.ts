@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { readFileSync, writeFileSync, accessSync, constants, renameSync } from 'fs';
 
 import path from 'path';
@@ -21,7 +22,7 @@ const checkFileSync = (path: string) => {
   }
 };
 
-const MAX_PROCESS_TIME = 10;
+// const PROCESS_CHECK_PERIOD_IN_MIN = 10;
 const basePath = path.join(config.FILES_PATH, '/.DB');
 
 const processPath = path.join(basePath, 'processes.json');
@@ -127,10 +128,13 @@ export const checkProcessList = () => {
     switch (process.status) {
       //Записи в состоянии STARTED удаляются.
       case 'STARTED': {
-        if ((new Date().getTime() - new Date(process.dateBegin).getTime()) / 60000 > MAX_PROCESS_TIME) {
+        if (
+          (new Date().getTime() - new Date(process.dateBegin).getTime()) / 60000 >
+          config.PROCESS_CHECK_PERIOD_IN_MIN
+        ) {
           removeProcessFromList(process.id);
           log.warn(
-            `Robust-protocol.check: процесс ${process.id} удален, завис со статусом STARTED > ${MAX_PROCESS_TIME} мин.`,
+            `Robust-protocol.check: процесс ${process.id} удален, завис со статусом STARTED > ${config.PROCESS_CHECK_PERIOD_IN_MIN} мин.`,
           );
         }
         break;
@@ -150,11 +154,14 @@ export const checkProcessList = () => {
       //Файлы, при обработке которых произошел dead lock мы оставляем в исходном состоянии.
       //Такая ситуация требует вмешательства системного администратора. Сама запись процесса удаляется из списка.
       case 'READY_TO_COMMIT': {
-        if ((new Date().getTime() - new Date(process.dateReadyToCommit!).getTime()) / 60000 > MAX_PROCESS_TIME) {
+        if (
+          (new Date().getTime() - new Date(process.dateReadyToCommit!).getTime()) / 60000 >
+          config.PROCESS_CHECK_PERIOD_IN_MIN
+        ) {
           unknownProcess(process);
           removeProcessFromList(process.id);
           log.error(
-            `Robust-protocol.check: ${process.id} удален, завис со статусом READY_TO_COMMIT > ${MAX_PROCESS_TIME} мин.`,
+            `Robust-protocol.check: процесс ${process.id} удален, завис со статусом READY_TO_COMMIT > ${config.PROCESS_CHECK_PERIOD_IN_MIN} мин.`,
           );
         }
         break;

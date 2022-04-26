@@ -19,6 +19,8 @@ import { IUser } from '@lib/types';
 
 import koaConfig from '../config/koa';
 
+import config from '../config';
+
 import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
@@ -37,6 +39,7 @@ interface IServer {
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 // export type KoaApp = Koa;
+let timerId: number;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();
@@ -52,6 +55,8 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 
   loadProcessList();
   checkProcessList();
+
+  timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * 60000);
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
@@ -130,6 +135,8 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 process.on('SIGINT', () => {
   console.log('Ctrl-C...');
   console.log('Finished all requests');
+  clearInterval(timerId);
+  console.log('222222');
   process.exit(2);
 });
 

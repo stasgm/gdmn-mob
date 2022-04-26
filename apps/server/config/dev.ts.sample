@@ -8,4 +8,5 @@ export default {
   TEMPLATE_CONFIG_NAME: 'C:\\databases\\templates.config.json',
   PROCESS_MAX_FILES: 10,
   PROCESS_MAX_DATA_VOLUME: 20,
+  PROCESS_CHECK_PERIOD_IN_MIN: 10,
 };
