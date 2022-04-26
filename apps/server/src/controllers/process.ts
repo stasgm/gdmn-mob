@@ -1,6 +1,6 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { AddProcess, InterruptProcess, CancelProcess, ReadyToCommitProcess, UpdateProcess } from '@lib/types';
+import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, IFiles } from '@lib/types';
 
 import log from '../utils/logger';
 import { processService } from '../services';
@@ -8,10 +8,10 @@ import { processService } from '../services';
 import { ok } from '../utils/apiHelpers';
 
 const addProcess = (ctx: ParameterizedContext) => {
-  const body = ctx.request.body as AddProcess;
+  const processParams = ctx.request.body as AddProcess;
   //companyId можем узнать из user.json по userId
 
-  const response = processService.addOne(body);
+  const response = processService.addOne(processParams);
   ok(ctx as Context, response);
 
   log.info('addProcess', response);
@@ -28,7 +28,7 @@ const updateProcess = (ctx: ParameterizedContext) => {
 };
 
 const prepareProcess = (ctx: ParameterizedContext) => {
-  const { processedFiles } = ctx.request.body as ReadyToCommitProcess;
+  const processedFiles = ctx.request.body as IFiles;
 
   const response = processService.prepareById(ctx.params.id, processedFiles);
 

@@ -69,6 +69,7 @@ export const cleanupProcess = (process: IProcess) => {
     const id = fn.split('_')[0];
     const requestFN = requestFiles[id];
     const toPath = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+
     if (toPath && requestFN) {
       try {
         renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
@@ -104,6 +105,7 @@ export const unknownProcess = (process: IProcess) => {
     const id = fn.split('_')[0];
     const requestFN = requestFiles[id];
     const toPath = status === 'PROCESSED' ? 'unknown' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+
     if (toPath && requestFN) {
       try {
         renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);

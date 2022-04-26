@@ -42,6 +42,11 @@ export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
 
+export type NewProcessMessage = Omit<IMessage, 'head' | 'id'> & {
+  id?: string;
+  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+};
+
 export interface IDataMessage<T = any> {
   id: string;
   name: string;

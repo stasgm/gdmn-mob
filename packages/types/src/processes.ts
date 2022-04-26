@@ -44,11 +44,7 @@ export interface IAddProcessResponse {
 
 export type UpdateProcess = {
   files: string[];
-};
-
-export type ReadyToCommitProcess = {
-  processedFiles: IFiles;
-};
+}
 
 export interface IStatusResponse {
   status: 'OK' | 'CANCELLED';
