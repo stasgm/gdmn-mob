@@ -54,7 +54,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
 
   loadProcessList();
-  checkProcessList();
+  checkProcessList(true);
 
   timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * 60000);
 

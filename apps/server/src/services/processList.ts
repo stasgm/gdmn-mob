@@ -99,7 +99,7 @@ export const unknownProcess = (process: IProcess) => {
       delete process.processedFiles![fn];
       saveProcessList();
     } catch (err) {
-      log.warn(`Robust-protocol.cleanupProcess: не удалось перенести файл ${fn} из PREPARED,
+      log.warn(`Robust-protocol.unknownProcess: не удалось перенести файл ${fn} из PREPARED,
           ${err instanceof Error ? err.message : 'ошибка'}`);
     }
 
@@ -115,15 +115,15 @@ export const unknownProcess = (process: IProcess) => {
         process.files.splice(i, 1);
         saveProcessList();
       } catch (err) {
-        log.warn(`Robust-protocol.cleanupProcess: не удалось перенести файл ${requestFN} из MESSAGES,
+        log.warn(`Robust-protocol.unknownProcess: не удалось перенести файл ${requestFN} из MESSAGES,
           ${err instanceof Error ? err.message : 'ошибка'}`);
       }
     }
   }
 };
 
-export const checkProcessList = () => {
-  console.log('11111111');
+export const checkProcessList = (isStart = false) => {
+  console.log('ProcessList check', isStart);
   for (const process of processList) {
     switch (process.status) {
       //Записи в состоянии STARTED удаляются.
@@ -142,9 +142,11 @@ export const checkProcessList = () => {
       //Записи в состоянии CLEANUP удаляются из списка,
       //а перечисленные в них файлы перемещаются в папки LOG, MESSAGES и ERROR соответственно.
       case 'CLEANUP': {
-        cleanupProcess(process);
-        removeProcessFromList(process.id);
-        log.error(`Robust-protocol.check: процесс ${process.id} удален, завис со статусом CLEANUP`);
+        if (isStart) {
+          cleanupProcess(process);
+          removeProcessFromList(process.id);
+          log.error(`Robust-protocol.check: процесс ${process.id} удален, завис со статусом CLEANUP`);
+        }
         break;
       }
       //Записи в состоянии READY_TO_COMMIT говорят нам о том, что мы не знаем точно прошел ли комит на базе данных.
