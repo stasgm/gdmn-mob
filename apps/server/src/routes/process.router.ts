@@ -25,6 +25,6 @@ router.delete('/:id/complete', processValidation.completeProcess, authMiddleware
 router.delete('/:id/cancel', processValidation.cancelProcess, authMiddleware, deviceMiddleware, cancelProcess);
 router.delete('/:id/interrupt', processValidation.interruptProcess, authMiddleware, deviceMiddleware, interruptProcess);
 router.get('/', processValidation.getProcesses, authMiddleware, deviceMiddleware, processParamsMiddlware, getProcesses);
-router.delete('/:id', /*processValidation.deleteProcess,*/ authMiddleware, deviceMiddleware, deleteProcess);
+router.delete('/:id', processValidation.deleteProcess, authMiddleware, deviceMiddleware, deleteProcess);
 
 export default router;
