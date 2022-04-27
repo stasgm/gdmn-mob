@@ -8,42 +8,6 @@ import { processActions, ProcessActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<ProcessActionType>, AppState, null, ProcessActionType>;
 
-/*const fetchActivationCodeById = (id: string): AppThunk => {
-  return async (dispatch) => {
-    dispatch(activationCodeActions.fetchActivationCodeAsync.request(''));
-
-    const response = await api.activationCode.getDevice(id);
-
-    if (response.type === 'GET_DEVICE') {
-      return dispatch(activationCodeActions.fetchActivationCodeAsync.success(response.activationCode));
-    }
-
-    if (response.type === 'ERROR') {
-      return dispatch(activationCodeActions.fetchActivationCodeAsync.failure(response.message));
-    }
-
-    return dispatch(activationCodeActions.fetchActivationCodesAsync.failure('Ошибка получения данных об устройстве'));
-  };
-};*/
-
-// const fetchActivationCodes = (deviceId?: string): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(activationCodeActions.fetchCodesAsync.request(''));
-
-//     const response = await api.activationCode.getActivationCodes(deviceId ? { deviceId: deviceId } : undefined);
-
-//     if (response.type === 'GET_CODES') {
-//       return dispatch(activationCodeActions.fetchCodesAsync.success(response.codes));
-//     }
-
-//     if (response.type === 'ERROR') {
-//       return dispatch(activationCodeActions.fetchCodesAsync.failure(response.message));
-//     }
-
-//     return dispatch(activationCodeActions.fetchCodesAsync.failure('Ошибка получения данных об активационных кодах'));
-//   };
-// };
-
 const fetchProcesses = (): AppThunk => {
   return async (dispatch) => {
     dispatch(processActions.fetchProcessesAsync.request(''));

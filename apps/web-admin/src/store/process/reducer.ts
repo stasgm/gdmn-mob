@@ -60,23 +60,6 @@ const reducer: Reducer<IProcessState, ProcessActionType> = (state = initialState
         errorMessage: action.payload || 'error',
       };
 
-    // case getType(activationCodeActions.createCodeAsync.request):
-    //   return { ...state, loading: true, errorMessage: '' };
-
-    // case getType(activationCodeActions.createCodeAsync.success):
-    //   return {
-    //     ...state,
-    //     list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
-    //     loading: false,
-    //   };
-
-    // case getType(activationCodeActions.createCodeAsync.failure):
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     errorMessage: action.payload || 'error',
-    //   };
-
     default:
       return state;
   }
