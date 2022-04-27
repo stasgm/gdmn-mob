@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button, Autocomplete } from '@material-ui/core';
 
 import { IAppSystem, ICompany, NewCompany } from '@lib/types';
-import { useFormik, Field } from 'formik';
+import { useFormik, Field, FieldArray } from 'formik';
 import * as yup from 'yup';
 
 import MultipleAutocomplete from '../MultipleAutocomplete';
@@ -17,7 +17,7 @@ interface IProps {
 const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IProps) => {
   const formik = useFormik<ICompany | NewCompany>({
     enableReinitialize: true,
-    initialValues: { ...company, city: company.city || '', appSystems: company.appSystems || [] },
+    initialValues: { ...company, city: company.city || '', appSystems: company.appSystems },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
@@ -69,6 +69,20 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     value={formik.values.city}
                   />
                 </Grid>
+                {/* <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.appSystems && Boolean(formik.errors.appSystems)}
+                    fullWidth
+                    label="app"
+                    name="app"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="app"
+                    disabled={loading}
+                    value={formik.values.appSystems}
+                  />
+                </Grid> */}
                 {/* <Grid>
                   <Autocomplete
                     multiple
@@ -96,6 +110,23 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     disabled={loading}
                   />
                 </Grid> */}
+                <Grid item md={6} xs={12}>
+                  <FieldArray
+                   name="appSystems"
+                   render={arrayHelpers => (
+                     <Box>
+                       {formik.values.appSystems && formik.values.appSystems.length > 0 ?
+                       (
+                         formik.values.appSystems.map((appSystem) => )
+
+                       ) : (
+
+                       )}
+                     </Box>)}
+                  >
+
+                  </FieldArray>
+                </Grid>
               </Grid>
             </CardContent>
             <Divider />
