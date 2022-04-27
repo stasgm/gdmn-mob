@@ -73,7 +73,6 @@ const getProcesses = (ctx: ParameterizedContext) => {
   if (companyId && typeof companyId === 'string') {
     params.companyId = companyId;
   }
-
   if (appSystem && typeof appSystem === 'string') {
     params.appSystem = appSystem;
   }
@@ -86,8 +85,8 @@ const getProcesses = (ctx: ParameterizedContext) => {
 };
 
 const deleteProcess = (ctx: ParameterizedContext) => {
-  const response = processService.completeById(ctx.params.id);
-
+  // const response = processService.completeById(ctx.params.id);
+  const response = processService.deleteOne(ctx.params.id);
   ok(ctx as Context, response);
 
   log.info('completeProcess', response);

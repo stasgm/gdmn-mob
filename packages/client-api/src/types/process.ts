@@ -1,17 +1,10 @@
-import { IMessage } from '@lib/types';
+import { IMessage, IProcess } from '@lib/types';
 
-export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
+// export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
 
-export interface IProcess {
-  id: string;
-  idDb: string;
-  dateBegin: Date;
-  messages: any[];
-  processedMessages: any[];
-  status: ProcessType;
-  dateReadyToCommit?: Date;
+export interface IProcessQueryResponse {
+  type: 'GET_PROCESS' | 'GET_PROCESSES' | 'REMOVE_PROCESS';
 }
-
 export interface IProcessSuccessfulResponse {
   type: 'SUCCESS_PROCESS';
 }
@@ -22,4 +15,9 @@ export interface IProcessErrorResponse {
 
 export interface IRemoveProcessResponse {
   type: 'REMOVE_PROCESS';
+}
+
+export interface IGetProcessesResponse extends IProcessQueryResponse {
+  type: 'GET_PROCESSES';
+  processes: IProcess[];
 }

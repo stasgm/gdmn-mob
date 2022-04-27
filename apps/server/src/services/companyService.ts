@@ -31,6 +31,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   const newCompanyObj = {
     name: company.name,
     city: company.city,
+    appSystems: company.appSystems,
     adminId: company.admin.id,
     externalId: company.externalId,
     creationDate: new Date().toISOString(),
@@ -77,6 +78,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     city: companyData.city,
+    appSystems: companyData.appSystems,
     creationDate: companyObj.creationDate,
     editionDate: new Date().toISOString(),
   };
@@ -254,6 +256,7 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
     id: company.id,
     name: company.name,
     city: company.city,
+    appSystems: company.appSystems,
     admin: adminEntity,
     externalId: company.externalId,
     creationDate: company.creationDate,

@@ -37,7 +37,7 @@ export interface ICompany extends INamedEntity, IExternalSystemProps {
   appSystems?: string[];
 }
 
-export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city'>;
+export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city' | 'appSystems'>;
 
 export interface IDevice extends INamedEntity {
   uid: string;
@@ -88,3 +88,7 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
 }
 
 export type SessionId = IEntity;
+
+export type IAppSystem = INamedEntity;
+
+export type IDBAppSystem = IAppSystem;
