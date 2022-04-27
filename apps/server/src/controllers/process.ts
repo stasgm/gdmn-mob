@@ -66,7 +66,7 @@ const interruptProcess = (ctx: ParameterizedContext) => {
 };
 
 const getProcesses = (ctx: ParameterizedContext) => {
-  const { companyId, appSystem } = ctx.params;
+  const { companyId, appSystem } = ctx.query;
 
   const params: Record<string, string> = {};
 
