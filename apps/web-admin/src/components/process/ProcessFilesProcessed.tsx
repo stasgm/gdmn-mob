@@ -36,7 +36,7 @@ const ProcessFilesProcessed = ({ processedFilesList = {}, limitRows = 0 }: IProp
     const deviceList = processedFiles.slice(page * limit, page * limit + limit).map((file: IProcessedFilesArray) => {
       return (
         <TableRow hover key={file[0]}>
-          <TableCell>{file[0]}</TableCell>
+          <TableCell width="85%">{file[0]}</TableCell>
           <TableCell>{file[1]}</TableCell>
         </TableRow>
       );

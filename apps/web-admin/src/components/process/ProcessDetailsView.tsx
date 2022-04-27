@@ -28,7 +28,7 @@ const ProcessDetailsView = ({ process, company }: IProps) => {
               <Grid item md={10} xs={6}>
                 <NavLink to={`${adminPath}/app/companies/${company?.id}`} key={company?.id}>
                   <Typography color="textPrimary" variant="h4" key={company?.id} gutterBottom>
-                    {company?.name}
+                    {company?.name || ''}
                   </Typography>
                 </NavLink>
               </Grid>
