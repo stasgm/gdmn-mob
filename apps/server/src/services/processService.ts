@@ -1,5 +1,6 @@
 import path from 'path';
-import { readFileSync, writeFileSync, readdirSync, unlinkSync, statSync, renameSync } from 'fs';
+
+import { readFileSync, writeFileSync, readdirSync, unlinkSync, statSync, renameSync, accessSync, constants } from 'fs';
 
 import {
   IFiles,
@@ -10,6 +11,7 @@ import {
   IProcessedFiles,
   IDBMessage,
   NewProcessMessage,
+  isIDBMessage,
 } from '@lib/types';
 import { v1 as uidv1 } from 'uuid';
 
@@ -17,7 +19,9 @@ import log from '../utils/logger';
 
 import config from '../../config';
 
-import { DataNotFoundException } from '../exceptions';
+import { DataNotFoundException, InnerErrorException } from '../exceptions';
+
+import { BYTES_PER_MB, defMaxDataVolume, defMaxFiles } from '../utils/constants';
 
 import {
   checkProcess,
@@ -31,8 +35,20 @@ import {
 import { getDb } from './dao/db';
 import { getNamedEntitySync } from './dao/utils';
 
-const basePath = path.join(config.FILES_PATH, '/.DB');
-const BYTES_PER_MB = 1024 ** 2;
+const getPath = (folder: string) => {
+  const p = path.join(getDb().dbPath, folder);
+  checkPath(p);
+  return p;
+};
+
+const checkPath = (filePath: string) => {
+  try {
+    accessSync(filePath, constants.F_OK);
+  } catch (err) {
+    log.error(`Robust-protocol.getPath: файл ${filePath} не найден!`);
+    throw new InnerErrorException(`Файл ${filePath} не найден!`);
+  }
+};
 
 const saveFile = (filePath: string, data: IDBMessage) => {
   writeFileSync(filePath, JSON.stringify(data, undefined, 2));
@@ -42,58 +58,49 @@ const deleteFile = (filePath: string) => {
   unlinkSync(filePath);
 };
 
-const readFileByAppSystem = (pathDb: string, fileName: string): IDBMessage => {
+const readMessageFile = (pathDb: string, fileName: string): IDBMessage => {
   const fullName = path.join(pathDb, fileName);
-  return JSON.parse(readFileSync(fullName, { encoding: 'utf8' }));
+  const data = readFileSync(fullName, { encoding: 'utf8' });
+  const parsed = JSON.parse(data);
+  if (isIDBMessage(parsed)) {
+    return parsed;
+  }
+  throw new InnerErrorException(`Неверный тип данных в файле ${fullName}`);
 };
 
-const getFileSize = (fileName: string) => {
-  const stats = statSync(fileName);
-  return stats.size / BYTES_PER_MB;
+const getFileSizeInMB = (fileName: string) => {
+  checkPath(fileName);
+  return statSync(fileName).size / BYTES_PER_MB;
 };
 
 const getFiles = (params: AddProcess): IFiles => {
-  const pathDb = path.join(basePath, `DB_${params.companyId}/${params.appSystem}/messages/`);
-
-  const fileObj: IFiles = {};
+  const pathDb = getPath(`DB_${params.companyId}/${params.appSystem}/messages/`);
 
   //Находим все подходящие файлы
-  readdirSync(pathDb).forEach((fn) => {
-    if (
-      (!params.producerIds || !!params.producerIds.find((pr) => fn.includes(`from_${pr}`))) &&
-      fn.includes(`to_${params.consumerId}`)
-    ) {
-      const message = readFileByAppSystem(pathDb, fn);
-      fileObj[fn] = makeMessage(message);
-    }
-  });
+  let files = readdirSync(pathDb).filter((fn) => fn.includes(`_to_${params.consumerId}`));
 
-  //Сортируем по времени создания через массив
-  const sortFileList = Object.entries(fileObj).sort(
-    (a, b) => new Date(a[1].head.dateTime).getTime() - new Date(b[1].head.dateTime).getTime(),
-  );
-
-  const maxDataVolume = params.maxDataVolume
-    ? Math.min(config.PROCESS_MAX_DATA_VOLUME, params.maxDataVolume)
-    : config.PROCESS_MAX_DATA_VOLUME;
-
-  const numberOfFiles = params.maxFiles
-    ? Math.min(config.PROCESS_MAX_FILES, params.maxFiles)
-    : config.PROCESS_MAX_FILES;
-
-  const files: IFiles = {};
-  let dataVolume = 0;
-  //Формируем объект заново, учитывая ограничения по количеству и объему файлов
-  for (let i = 0; i < Math.min(sortFileList.length, numberOfFiles) && dataVolume <= maxDataVolume; i++) {
-    const [fn, mes] = sortFileList[i];
-    dataVolume = dataVolume + getFileSize(`${pathDb}${fn}`);
-
-    if (dataVolume <= maxDataVolume) {
-      files[fn] = mes;
-    }
+  if (params.producerIds) {
+    files = params.producerIds.flatMap((prId) => files.filter((fn) => fn.includes(`from_${prId}_to`)));
   }
 
-  return files;
+  const sorted = files
+    .map<[string, IMessage]>((fn) => [fn, makeMessage(readMessageFile(pathDb, fn))])
+    .sort((a, b) => new Date(a[1].head.dateTime).getTime() - new Date(b[1].head.dateTime).getTime());
+
+  const limitDataVolume = Math.min(
+    params.maxDataVolume ?? defMaxDataVolume,
+    config.PROCESS_MAX_DATA_VOLUME ?? defMaxDataVolume,
+  );
+  const limitFiles = Math.min(params.maxFiles ?? defMaxFiles, config.PROCESS_MAX_FILES ?? defMaxFiles);
+
+  let c = 0;
+  let dataVolume = 0;
+
+  for (; c < sorted.length && c < limitFiles && dataVolume <= limitDataVolume; c++) {
+    dataVolume += getFileSizeInMB(path.join(pathDb, sorted[c][0]));
+  }
+
+  return Object.fromEntries(sorted.slice(0, c));
 };
 
 /**
@@ -104,23 +111,19 @@ const getFiles = (params: AddProcess): IFiles => {
  * @returns { status, processId, files }
  */
 export const addOne = (params: AddProcess): IAddProcessResponse => {
-  const db = getDb();
-  const { companies, users } = db;
+  const { companies, users } = getDb();
+  const { companyId, consumerId } = params;
 
-  const company = companies.findSync(params.companyId);
-
-  if (!company) {
+  if (!companies.findSync(companyId)) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  const consumer = users.find(params.consumerId);
-
-  if (!consumer) {
+  if (!users.findSync(consumerId)) {
     throw new DataNotFoundException('Получатель не найден');
   }
 
-  //Находим процесс для конкеретной базы
-  const process = checkProcess(params.companyId);
+  // Находим процесс для конкретной базы
+  const process = checkProcess(companyId);
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
@@ -188,7 +191,7 @@ export const prepareById = (processId: string, processedFiles: IFiles): IStatusR
   // 2. Полученный список ИД обработанных сообщений со статусами их обработки фиксируется в объекте процесса.
   // 3. Формируются файлы и записываются синхронно в папку PREPARED.
 
-  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+  const pathFiles = getPath(`DB_${process!.companyId}/${process!.appSystem}`);
   const processedFilesObj = Object.entries(processedFiles);
 
   let written;
@@ -269,7 +272,7 @@ export const completeById = (processId: string): IStatusResponse => {
 
   let error = '';
   const processedFilesObj = Object.entries(process!.processedFiles!);
-  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+  const pathFiles = getPath(`DB_${process!.companyId}/${process!.appSystem}`);
 
   const requestFiles: { [id: string]: string } = {};
   process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));
@@ -287,7 +290,8 @@ export const completeById = (processId: string): IStatusResponse => {
 
     const id = fn.split('_')[0];
     const requestFN = requestFiles[id];
-    const toPath = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+    const toPath =
+      status === 'PROCESSED' || status === 'READY' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
     if (toPath && requestFN) {
       try {
         renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
@@ -340,7 +344,7 @@ export const cancelById = (processId: string, errorMessage: string): IStatusResp
   //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
   //Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
   const processedFilesObj = Object.keys(process!.processedFiles!);
-  const pathFiles = path.join(basePath, `/DB_${process!.companyId}/${process!.appSystem}`);
+  const pathFiles = getPath(`/DB_${process!.companyId}/${process!.appSystem}`);
 
   for (const fn of processedFilesObj) {
     // const fn = process!.processedFiles!.shift();
@@ -424,8 +428,7 @@ export const deleteOne = (processId: string) => {
 };
 
 export const makeMessage = (message: IDBMessage): IMessage => {
-  const db = getDb();
-  const { users, companies } = db;
+  const { users, companies } = getDb();
 
   const consumer = getNamedEntitySync(message.head.consumerId, users);
   const producer = getNamedEntitySync(message.head.producerId, users);

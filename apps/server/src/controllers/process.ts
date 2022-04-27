@@ -7,15 +7,11 @@ import { processService } from '../services';
 
 import { ok } from '../utils/apiHelpers';
 
-const addProcess = (ctx: ParameterizedContext) => {
-  const processParams = ctx.request.body as AddProcess;
-  //companyId можем узнать из user.json по userId
-
-  const response = processService.addOne(processParams);
-  ok(ctx as Context, response);
-
-  log.info('addProcess', response);
-};
+/**
+ * API 1
+ * @param ctx
+ */
+const addProcess = (ctx: Context) => ok(ctx, processService.addOne(ctx.request.body as AddProcess), 'addProcess');
 
 const updateProcess = (ctx: ParameterizedContext) => {
   const { files } = ctx.request.body as UpdateProcess;

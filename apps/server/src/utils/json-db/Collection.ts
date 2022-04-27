@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import fs from 'fs';
+import { readFile } from 'fs/promises';
 
 import R from 'ramda';
 import { v1 as uuid } from 'uuid';
@@ -13,15 +14,19 @@ class Collection<T extends CollectionItem> {
   filter() {
     throw new Error('Method not implemented.');
   }
-  private collectionPath: string;
+  private _collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
     return R.assoc('id', uuid(), obj);
   }
 
   constructor(path: string) {
-    this.collectionPath = path;
+    this._collectionPath = path;
     this._ensureStorage();
+  }
+
+  get collectionPath() {
+    return this._collectionPath;
   }
 
   /**
@@ -75,9 +80,8 @@ class Collection<T extends CollectionItem> {
     return (await this._get()).find(predicate);
   }
 
-  public findSync(id: string | ((item: T) => boolean)) {
-    const predicate = typeof id === 'function' ? id : (item: T) => item.id === id;
-    return this._getSync().find(predicate);
+  public findSync(id: string) {
+    return this._getSync().find((item) => item.id === id);
   }
 
   /**
@@ -114,41 +118,17 @@ class Collection<T extends CollectionItem> {
   }
 
   private _ensureStorage() {
-    if (!fs.existsSync(this.collectionPath)) this._save([]);
+    if (!fs.existsSync(this._collectionPath)) this._save([]);
   }
 
-  private _get(): Promise<Array<T>> {
-    return new Promise((resolve, reject) => {
-      try {
-        const data = fs.readFileSync(this.collectionPath, { encoding: 'utf8' });
-        const result = JSON.parse(data);
-        return resolve(result);
-      } catch (err) {
-        reject(err);
-      }
-    });
-    //try {
-    // const parsed = JSON.parse(fs.readFileSync(this.collectionPath, { encoding: 'utf8' }));
-    // return parsed.data;
-    // } catch (e) {
-    //  throw e;
-    // }
-    // return new Promise((resolve, reject) => {
-    //   fs.readFile(this.collectionPath, { encoding: 'utf8' }, (err, data) => {
-    //     if (err) return reject(err);
-    //     let result: Array<T> = [];
-    //     try {
-    //       result = JSON.parse(data);
-    //     } catch (jsonErr) {
-    //       reject(jsonErr);
-    //     }
-    //     return resolve(result);
-    //   });
-    // });
+  private async _get(): Promise<Array<T>> {
+    const data = await readFile(this._collectionPath, { encoding: 'utf8' });
+    return JSON.parse(data);
   }
 
   private _getSync(): Array<T> {
-    const data = fs.readFileSync(this.collectionPath, { encoding: 'utf8' });
+    //FIXME: не обрабатываются ошибки с дисковыми операциями, парсингом и не проверяется тип.
+    const data = fs.readFileSync(this._collectionPath, { encoding: 'utf8' });
     const result = JSON.parse(data);
     return result;
   }
@@ -156,7 +136,7 @@ class Collection<T extends CollectionItem> {
   private _save(data: Array<T>): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        fs.writeFileSync(this.collectionPath, JSON.stringify(data), { encoding: 'utf8' });
+        fs.writeFileSync(this._collectionPath, JSON.stringify(data), { encoding: 'utf8' });
         return resolve();
       } catch (err) {
         reject(err);

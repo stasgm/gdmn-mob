@@ -1,40 +1,32 @@
-import { IResponse } from '@lib/types';
 import { Context } from 'koa';
 
-const ok = <T>(ctx: Context, dto?: T) => {
-  const resp: IResponse<T> = {
-    result: true,
-  };
+import log from '../utils/logger';
 
-  if (dto) {
-    resp.data = dto;
-  }
-
+export const ok = (ctx: Context, data?: any, logMessage?: string, logData?: boolean) => {
   ctx.statusMessage = 'success result';
   ctx.status = 200;
-  ctx.body = resp;
-};
-
-const created = <T>(ctx: Context, dto?: T) => {
-  const resp: IResponse<T> = {
+  ctx.body = {
     result: true,
+    data,
   };
-
-  if (dto) {
-    resp.data = dto;
+  if (logMessage) {
+    if (logData) {
+      log.info(logMessage, data);
+    } else {
+      log.info(logMessage);
+    }
   }
-
-  ctx.status = 201;
-  ctx.body = resp;
 };
 
-const notOk = <T>(ctx: Context) => {
-  const resp: IResponse<T> = {
-    result: false,
+export const created = (ctx: Context, data?: any) => {
+  ctx.status = 201;
+  ctx.body = {
+    result: true,
+    data,
   };
-
-  ctx.status = 201;
-  ctx.body = resp;
 };
 
-export { ok, created, notOk };
+export const notOk = (ctx: Context) => {
+  ctx.status = 201;
+  ctx.body = { result: false };
+};

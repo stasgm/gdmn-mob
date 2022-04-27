@@ -1,12 +1,15 @@
-const deviceStates = {
+export const deviceStates = {
   'NON-REGISTERED': 'Не зарегистрировано',
   'NON-ACTIVATED': 'Не активно',
   ACTIVE: 'Активно',
   BLOCKED: 'Заблокировано',
 };
 
-const adminPath = '/admin';
+export const adminPath = '/admin';
 
-const messageFolders = ['messages', 'error', 'prepared', 'log', 'unknown'];
+export const messageFolders = ['messages', 'error', 'prepared', 'log', 'unknown'];
 
-export { deviceStates, adminPath, messageFolders };
+export const BYTES_PER_MB = 1024 ** 2;
+
+export const defMaxDataVolume = 20; // Mb
+export const defMaxFiles = 10;

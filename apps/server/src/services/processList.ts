@@ -11,6 +11,8 @@ import log from '../utils/logger';
 import config from '../../config';
 import { extraPredicate } from '../utils/helpers';
 
+import { getDb } from './dao/db';
+
 export let processList: IProcess[];
 
 const checkFileSync = (path: string) => {
@@ -22,15 +24,18 @@ const checkFileSync = (path: string) => {
   }
 };
 
-// const PROCESS_CHECK_PERIOD_IN_MIN = 10;
-const basePath = path.join(config.FILES_PATH, '/.DB');
+let processPath = '';
 
-const processPath = path.join(basePath, 'processes.json');
-if (!checkFileSync(processPath)) writeFileSync(processPath, '[]');
+// const processPath = path.join(getDb().dbPath, 'processes.json');
 
 export const loadProcessList = () => {
-  const rawData = readFileSync(processPath).toString();
-  processList = JSON.parse(rawData);
+  processPath = path.join(getDb().dbPath, 'processes.json');
+  if (checkFileSync(processPath)) {
+    processList = JSON.parse(readFileSync(processPath).toString());
+  } else {
+    // writeFileSync(processPath, '[]');
+    processList = [];
+  }
 };
 
 export const saveProcessList = () => {
@@ -52,7 +57,7 @@ export const removeProcessFromList = (processId: string) => {
 
 export const cleanupProcess = (process: IProcess) => {
   const processedFilesObj = Object.entries(process!.processedFiles!);
-  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+  const pathFiles = path.join(getDb().dbPath, `DB_${process!.companyId}/${process!.appSystem}`);
 
   const requestFiles: { [id: string]: string } = {};
   process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));
@@ -69,7 +74,8 @@ export const cleanupProcess = (process: IProcess) => {
 
     const id = fn.split('_')[0];
     const requestFN = requestFiles[id];
-    const toPath = status === 'PROCESSED' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
+    const toPath =
+      status === 'PROCESSED' || status === 'READY' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
 
     if (toPath && requestFN) {
       try {
@@ -88,7 +94,7 @@ export const cleanupProcess = (process: IProcess) => {
 
 export const unknownProcess = (process: IProcess) => {
   const processedFilesObj = Object.entries(process!.processedFiles!);
-  const pathFiles = path.join(basePath, `DB_${process!.companyId}/${process!.appSystem}`);
+  const pathFiles = path.join(getDb().dbPath, `DB_${process!.companyId}/${process!.appSystem}`);
 
   const requestFiles: { [id: string]: string } = {};
   process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));

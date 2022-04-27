@@ -86,6 +86,7 @@ const checkFileExists = async (path: string): Promise<boolean> => {
     return false;
   }
 };
+
 const mkDir = async (path: string): Promise<void> => {
   const check: boolean = await checkFileExists(path);
   if (!check) await mkdir(path, { recursive: true });

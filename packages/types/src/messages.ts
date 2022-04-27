@@ -29,13 +29,21 @@ export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocum
 export interface IMessage<T = MessageType> {
   id: string;
   status: StatusType;
-  version?: number;
+  version?: string;
   head: IHeadMessage;
   body: {
     type: BodyType;
     version: number;
     payload: T;
   };
+}
+
+export function isIHeadMessage(obj: any): obj is IHeadMessage {
+  return typeof obj === 'object';
+}
+
+export function isIMessage(obj: any): obj is IMessage {
+  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
 }
 
 export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
@@ -70,6 +78,16 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
 
 export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
+}
+
+//TODO: добавить более специфические условия проверки
+export function isIDBHeadMessage(obj: any): obj is IDBHeadMessage {
+  return typeof obj === 'object';
+}
+
+//TODO: добавить более специфические условия проверки
+export function isIDBMessage(obj: any): obj is IDBMessage {
+  return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
 }
 
 export interface IFileMessageInfo {

@@ -27,7 +27,7 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb, dbtype } from './services/dao/db';
+import { createDb, dbtype, getDb } from './services/dao/db';
 import { checkProcessList, loadProcessList } from './services/processList';
 
 interface IServer {
@@ -53,6 +53,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   const dbid = dbArr.length === 1 ? dbArr[0].id : '';
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
 
+  // const processPath = path.join(getDb().dbPath, 'processes.json');
   loadProcessList();
   checkProcessList(true);
 
@@ -136,7 +137,6 @@ process.on('SIGINT', () => {
   console.log('Ctrl-C...');
   console.log('Finished all requests');
   clearInterval(timerId);
-  console.log('222222');
   process.exit(2);
 });
 
