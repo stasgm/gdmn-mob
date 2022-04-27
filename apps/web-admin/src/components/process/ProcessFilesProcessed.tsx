@@ -8,15 +8,15 @@ import { IProcessedFiles, StatusType } from '@lib/types';
 type IProcessedFilesArray = [string, StatusType];
 
 interface IProps {
-  processedFiles1?: IProcessedFiles;
+  processedFilesList?: IProcessedFiles;
   limitRows?: number;
 }
 
-const ProcessFilesProcessed = ({ processedFiles1 = {}, limitRows = 0 }: IProps) => {
+const ProcessFilesProcessed = ({ processedFilesList = {}, limitRows = 0 }: IProps) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const processedFiles = Object.entries(processedFiles1);
+  const processedFiles = Object.entries(processedFilesList);
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);

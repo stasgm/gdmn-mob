@@ -172,7 +172,7 @@ const ProcessView = () => {
         </Box>
         <Box>
           <CardHeader sx={{ mx: 2 }} />
-          <ProcessFilesProcessed processedFiles1={process.processedFiles} />
+          <ProcessFilesProcessed processedFilesList={process.processedFiles} />
         </Box>
       </Box>
 
