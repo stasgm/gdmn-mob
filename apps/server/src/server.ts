@@ -28,7 +28,8 @@ import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
 import { createDb, dbtype, getDb } from './services/dao/db';
-import { checkProcessList, loadProcessList } from './services/processList';
+import { checkProcessList, initProcessList } from './services/processList';
+import { MSEС_IN_MIN } from './utils/constants';
 
 interface IServer {
   name: string;
@@ -54,10 +55,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
 
   // const processPath = path.join(getDb().dbPath, 'processes.json');
-  loadProcessList();
+  initProcessList();
   checkProcessList(true);
 
-  timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * 60000);
+  timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные

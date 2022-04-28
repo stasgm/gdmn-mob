@@ -10,6 +10,7 @@ export interface IHeadMessage {
   producer: INamedEntity;
   consumer: INamedEntity;
   dateTime: string;
+  replyTo?: string;
 }
 
 export interface ICmdParams<T = any> {
@@ -46,14 +47,18 @@ export function isIMessage(obj: any): obj is IMessage {
   return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
 }
 
+export function isIResponseMessage(obj: any): obj is IMessage {
+  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
+}
+
 export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
 
-export type NewProcessMessage = Omit<IMessage, 'head' | 'id'> & {
-  id?: string;
-  head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-};
+// export type NewProcessMessage = Omit<IMessage, 'head' | 'id'> & {
+//   id?: string;
+//   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
+// };
 
 export interface IDataMessage<T = any> {
   id: string;

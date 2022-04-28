@@ -1,8 +1,7 @@
-import { Context, ParameterizedContext } from 'koa';
+import { Context } from 'koa';
 
-import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, IFiles } from '@lib/types';
+import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, PrepareProcess } from '@lib/types';
 
-import log from '../utils/logger';
 import { processService } from '../services';
 
 import { ok } from '../utils/apiHelpers';
@@ -11,57 +10,51 @@ import { ok } from '../utils/apiHelpers';
  * API 1
  * @param ctx
  */
-const addProcess = (ctx: Context) => ok(ctx, processService.addOne(ctx.request.body as AddProcess), 'addProcess');
+export const addProcess = (ctx: Context) =>
+  ok(ctx, processService.addOne(ctx.request.body as AddProcess), 'addProcess');
 
-const updateProcess = (ctx: ParameterizedContext) => {
-  const { files } = ctx.request.body as UpdateProcess;
+/**
+ * API 2
+ * @param ctx
+ * @returns
+ */
+export const updateProcess = (ctx: Context) =>
+  ok(ctx, processService.updateById(ctx.params.id, (ctx.request.body as UpdateProcess).files), 'updateProcess');
 
-  const response = processService.updateById(ctx.params.id, files);
+/**
+ * API 3
+ * @param ctx
+ * @returns
+ */
+export const prepareProcess = (ctx: Context) =>
+  ok(
+    ctx,
+    processService.prepareById({
+      processId: ctx.params.id,
+      producerId: ctx.state.user.id,
+      processedFiles: (ctx.request.body as PrepareProcess).processedFiles,
+    }),
+    'prepareProcess',
+  );
 
-  ok(ctx as Context, response);
+/**
+ * API 4
+ * @param ctx
+ * @returns
+ */
+export const completeProcess = (ctx: Context) => ok(ctx, processService.completeById(ctx.params.id), 'completeProcess');
 
-  log.info('updateProcess', response);
-};
+export const cancelProcess = (ctx: Context) =>
+  ok(ctx, processService.cancelById(ctx.params.id, (ctx.request.body as CancelProcess).errorMessage), 'cancelProcess');
 
-const prepareProcess = (ctx: ParameterizedContext) => {
-  const processedFiles = ctx.request.body as IFiles;
+export const interruptProcess = (ctx: Context) =>
+  ok(
+    ctx,
+    processService.interruptById(ctx.params.id, (ctx.request.body as InterruptProcess).errorMessage),
+    'interruptProcess',
+  );
 
-  const response = processService.prepareById(ctx.params.id, processedFiles);
-
-  ok(ctx as Context, response);
-
-  log.info('setReadyToCommit', response);
-};
-
-const completeProcess = (ctx: ParameterizedContext) => {
-  const response = processService.completeById(ctx.params.id);
-
-  ok(ctx as Context, response);
-
-  log.info('completeProcess', response);
-};
-
-const cancelProcess = (ctx: ParameterizedContext) => {
-  const { errorMessage } = ctx.request.body as CancelProcess;
-
-  const response = processService.cancelById(ctx.params.id, errorMessage);
-
-  ok(ctx as Context, response);
-
-  log.info('cancelProcess', response);
-};
-
-const interruptProcess = (ctx: ParameterizedContext) => {
-  const { errorMessage } = ctx.request.body as InterruptProcess;
-
-  const response = processService.interruptById(ctx.params.id, errorMessage);
-
-  ok(ctx as Context, response);
-
-  log.info('interruptProcess', response);
-};
-
-const getProcesses = (ctx: ParameterizedContext) => {
+export const getProcesses = (ctx: Context) => {
   const { companyId, appSystem } = ctx.query;
 
   const params: Record<string, string> = {};
@@ -73,28 +66,7 @@ const getProcesses = (ctx: ParameterizedContext) => {
     params.appSystem = appSystem;
   }
 
-  const response = processService.findMany(params);
-
-  ok(ctx as Context, response);
-
-  log.info('getProcesses', response);
+  ok(ctx, processService.findMany(params), 'getProcesses');
 };
 
-const deleteProcess = (ctx: ParameterizedContext) => {
-  // const response = processService.completeById(ctx.params.id);
-  const response = processService.deleteOne(ctx.params.id);
-  ok(ctx as Context, response);
-
-  log.info('completeProcess', response);
-};
-
-export {
-  addProcess,
-  updateProcess,
-  prepareProcess,
-  completeProcess,
-  cancelProcess,
-  interruptProcess,
-  getProcesses,
-  deleteProcess,
-};
+export const deleteProcess = (ctx: Context) => ok(ctx, processService.deleteOne(ctx.params.id), 'deleteProcess');

@@ -15,6 +15,29 @@ import { DataNotFoundException } from '../../exceptions/datanotfound.exception';
 import { CollectionItem } from './CollectionItem';
 
 /**
+ *
+ * @param fileName Имя файла без пути, но с расширением.
+ * @returns
+ */
+export const messageFileName2params = (fileName: string): IFileMessageInfo => {
+  const re = /(.+)_from_(.+)_to_(.+)\.json/gi;
+  const match = re.exec(fileName);
+
+  if (!match) {
+    throw new Error(`Invalid message file name ${fileName}`);
+  }
+
+  return {
+    id: match[1],
+    producer: match[2],
+    consumer: match[3],
+  };
+};
+
+export const params2messageFileName = ({ id, producer, consumer }: IFileMessageInfo) =>
+  `${id}_from_${producer}_to_${consumer}.json`;
+
+/**
  * @template T
  */
 class CollectionMessage<T extends CollectionItem> {
@@ -54,7 +77,7 @@ class CollectionMessage<T extends CollectionItem> {
     if (!filesInfoArr) return [];
     const fileInfo = typeof predicate === 'undefined' ? filesInfoArr : filesInfoArr.filter(predicate);
     const pr = fileInfo.map(async (item) => {
-      return await this._get(this._Obj2FileName(item));
+      return await this._get(this._Obj2FullFileName(item));
     });
     return Promise.all(pr);
   }
@@ -75,7 +98,7 @@ class CollectionMessage<T extends CollectionItem> {
         if (!fileInfo) {
           throw new DataNotFoundException('Сообщение не найдено');
         }
-        return await this._get(this._Obj2FileName(fileInfo));
+        return await this._get(this._Obj2FullFileName(fileInfo));
       } catch (err) {
         throw new DataNotFoundException(err as string);
       }
@@ -101,7 +124,7 @@ class CollectionMessage<T extends CollectionItem> {
         if (!fileInfo) {
           throw new DataNotFoundException('Сообщение не найдено');
         }
-        return await this._delete(this._Obj2FileName(fileInfo));
+        return await this._delete(this._Obj2FullFileName(fileInfo));
       } catch (err) {
         throw new DataNotFoundException(err as string);
       }
@@ -113,7 +136,7 @@ class CollectionMessage<T extends CollectionItem> {
   public async deleteAll(): Promise<void[]> {
     const filesInfoArr = await this._readDir();
     const pr = filesInfoArr.map(async (item) => {
-      await this._delete(this._Obj2FileName(item));
+      await this._delete(this._Obj2FullFileName(item));
     });
     return Promise.all(pr);
   }
@@ -123,21 +146,8 @@ class CollectionMessage<T extends CollectionItem> {
     if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
   }
 
-  private _Obj2FileName(fileInfo: IFileMessageInfo): string {
-    const { id, producer, consumer } = fileInfo;
-    const fileName = id + '_from_' + producer + '_to_' + consumer + '.json';
-    return path.join(this.collectionPath, fileName);
-  }
-
-  private _FileName2Obj(fileName: string): IFileMessageInfo {
-    const arr = fileName.split('.');
-    const name = arr[0];
-    const fileInfo = name.split('_');
-    return {
-      id: fileInfo[0],
-      producer: fileInfo[2],
-      consumer: fileInfo[4],
-    };
+  private _Obj2FullFileName(params: IFileMessageInfo): string {
+    return path.join(this.collectionPath, params2messageFileName(params));
   }
 
   private async _get(fileName: string): Promise<T> {
@@ -150,7 +160,7 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private async _save(data: T, fileInfo: IFileMessageInfo): Promise<void> {
-    const fileName = this._Obj2FileName(fileInfo);
+    const fileName = this._Obj2FullFileName(fileInfo);
     try {
       return fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
     } catch (err) {
@@ -168,8 +178,7 @@ class CollectionMessage<T extends CollectionItem> {
 
   private async _readDir(): Promise<IFileMessageInfo[]> {
     try {
-      const files = await readdir(this.collectionPath);
-      return files.map((file) => this._FileName2Obj(file.split('.')[0]));
+      return (await readdir(this.collectionPath)).map(messageFileName2params);
     } catch (err) {
       throw new DataNotFoundException(`Ошибка чтения папки ${this.collectionPath} - ${err}`);
     }

@@ -1,5 +1,5 @@
 import { StatusType } from './common';
-import { IMessage } from './messages';
+import { IMessage, NewMessage } from './messages';
 
 export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
 
@@ -21,7 +21,7 @@ export interface IFiles {
 }
 
 export interface IProcessedFiles {
-  [fileName: string]: StatusType;
+  [fileName: string]: { status: StatusType; replyTo?: string };
 }
 
 export type AddProcess = {
@@ -34,6 +34,10 @@ export type AddProcess = {
 };
 
 export type AddProcessRequest = Omit<AddProcess, 'consumerId'>;
+
+export type PrepareProcess = {
+  processedFiles: NewMessage[];
+};
 
 export interface IAddProcessResponse {
   status: 'BUSY' | 'OK';

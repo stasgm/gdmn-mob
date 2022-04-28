@@ -1,107 +1,33 @@
-import path from 'path';
+/* eslint-disable max-len */
 
-import { readFileSync, writeFileSync, readdirSync, unlinkSync, statSync, renameSync, accessSync, constants } from 'fs';
+import { unlinkSync, renameSync } from 'fs';
 
-import {
-  IFiles,
-  IAddProcessResponse,
-  IStatusResponse,
-  AddProcess,
-  IMessage,
-  IProcessedFiles,
-  IDBMessage,
-  NewProcessMessage,
-  isIDBMessage,
-} from '@lib/types';
-import { v1 as uidv1 } from 'uuid';
+import { IAddProcessResponse, IStatusResponse, AddProcess, IProcessedFiles, NewMessage } from '@lib/types';
 
 import log from '../utils/logger';
 
-import config from '../../config';
+import { DataNotFoundException } from '../exceptions';
 
-import { DataNotFoundException, InnerErrorException } from '../exceptions';
-
-import { BYTES_PER_MB, defMaxDataVolume, defMaxFiles } from '../utils/constants';
+import { messageFileName2params, params2messageFileName } from '../utils/json-db/MessageCollection';
 
 import {
-  checkProcess,
+  getProcessByCompanyId,
   getProcessById,
   getProcesses,
   removeProcessFromList,
   saveProcessList,
   startProcess,
-  updateProcessInList,
+  replaceProcessInList,
+  getPathPrepared,
+  getPathMessages,
+  getPathError,
+  getPathLog,
+  deleteFile,
+  saveFile,
+  makeDBNewMessageSync,
+  getFiles,
 } from './processList';
 import { getDb } from './dao/db';
-import { getNamedEntitySync } from './dao/utils';
-
-const getPath = (folder: string) => {
-  const p = path.join(getDb().dbPath, folder);
-  checkPath(p);
-  return p;
-};
-
-const checkPath = (filePath: string) => {
-  try {
-    accessSync(filePath, constants.F_OK);
-  } catch (err) {
-    log.error(`Robust-protocol.getPath: файл ${filePath} не найден!`);
-    throw new InnerErrorException(`Файл ${filePath} не найден!`);
-  }
-};
-
-const saveFile = (filePath: string, data: IDBMessage) => {
-  writeFileSync(filePath, JSON.stringify(data, undefined, 2));
-};
-
-const deleteFile = (filePath: string) => {
-  unlinkSync(filePath);
-};
-
-const readMessageFile = (pathDb: string, fileName: string): IDBMessage => {
-  const fullName = path.join(pathDb, fileName);
-  const data = readFileSync(fullName, { encoding: 'utf8' });
-  const parsed = JSON.parse(data);
-  if (isIDBMessage(parsed)) {
-    return parsed;
-  }
-  throw new InnerErrorException(`Неверный тип данных в файле ${fullName}`);
-};
-
-const getFileSizeInMB = (fileName: string) => {
-  checkPath(fileName);
-  return statSync(fileName).size / BYTES_PER_MB;
-};
-
-const getFiles = (params: AddProcess): IFiles => {
-  const pathDb = getPath(`DB_${params.companyId}/${params.appSystem}/messages/`);
-
-  //Находим все подходящие файлы
-  let files = readdirSync(pathDb).filter((fn) => fn.includes(`_to_${params.consumerId}`));
-
-  if (params.producerIds) {
-    files = params.producerIds.flatMap((prId) => files.filter((fn) => fn.includes(`from_${prId}_to`)));
-  }
-
-  const sorted = files
-    .map<[string, IMessage]>((fn) => [fn, makeMessage(readMessageFile(pathDb, fn))])
-    .sort((a, b) => new Date(a[1].head.dateTime).getTime() - new Date(b[1].head.dateTime).getTime());
-
-  const limitDataVolume = Math.min(
-    params.maxDataVolume ?? defMaxDataVolume,
-    config.PROCESS_MAX_DATA_VOLUME ?? defMaxDataVolume,
-  );
-  const limitFiles = Math.min(params.maxFiles ?? defMaxFiles, config.PROCESS_MAX_FILES ?? defMaxFiles);
-
-  let c = 0;
-  let dataVolume = 0;
-
-  for (; c < sorted.length && c < limitFiles && dataVolume <= limitDataVolume; c++) {
-    dataVolume += getFileSizeInMB(path.join(pathDb, sorted[c][0]));
-  }
-
-  return Object.fromEntries(sorted.slice(0, c));
-};
 
 /**
  * 1. Если есть процесс для данной базы, то возвращает status 'BUSY'
@@ -123,7 +49,7 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
   }
 
   // Находим процесс для конкретной базы
-  const process = checkProcess(companyId);
+  const process = getProcessByCompanyId(companyId);
 
   //Если процесс существует, то возвращаем status = BUSY
   if (process) {
@@ -161,7 +87,7 @@ export const updateById = (processId: string, files: string[]): IStatusResponse 
     };
   }
 
-  updateProcessInList({
+  replaceProcessInList({
     ...process,
     files,
   });
@@ -169,7 +95,21 @@ export const updateById = (processId: string, files: string[]): IStatusResponse 
   return { status: 'OK' };
 };
 
-export const prepareById = (processId: string, processedFiles: IFiles): IStatusResponse => {
+/**
+ * API 3
+ * @param processId
+ * @param processedFiles
+ * @returns
+ */
+export const prepareById = ({
+  processId,
+  producerId,
+  processedFiles,
+}: {
+  processId: string;
+  producerId: string;
+  processedFiles: NewMessage[];
+}): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
 
@@ -191,48 +131,37 @@ export const prepareById = (processId: string, processedFiles: IFiles): IStatusR
   // 2. Полученный список ИД обработанных сообщений со статусами их обработки фиксируется в объекте процесса.
   // 3. Формируются файлы и записываются синхронно в папку PREPARED.
 
-  const pathFiles = getPath(`DB_${process!.companyId}/${process!.appSystem}`);
-  const processedFilesObj = Object.entries(processedFiles);
-
-  let written;
-  let error = '';
-
+  const written: string[] = [];
   const statusFiles: IProcessedFiles = {};
 
-  for (written = 0; written < processedFilesObj.length; written++) {
-    const [fn, mes] = processedFilesObj[written];
-    statusFiles[fn] = mes.status;
-    if (mes.status === 'PROCESSED_INCORRECT' || mes.status === 'PROCESSED_DEADLOCK') {
-      log.warn(`Robust-protocol.prepareProcess: сообщение ${mes.id} обработано со статусом ${mes.status}`);
+  for (const mes of processedFiles) {
+    const newMes = makeDBNewMessageSync(mes, producerId);
+    const newFn = params2messageFileName({ id: newMes.id, producer: producerId, consumer: newMes.head.consumerId });
+
+    if (newMes.status === 'PROCESSED_INCORRECT' || newMes.status === 'PROCESSED_DEADLOCK') {
+      log.warn(`Robust-protocol.prepareProcess: сообщение ${newMes.id} обработано со статусом ${newMes.status}`);
     }
+
     try {
-      const producerId = fn.split('_')[2];
-      const dbMessage = makeDBNewMessage(mes, producerId);
-      saveFile(`${pathFiles}/prepared/${fn}`, dbMessage);
+      const fullFileName = getPathPrepared(process, newFn);
+      saveFile(fullFileName, newMes);
+      written.push(fullFileName);
+      statusFiles[newFn] = { replyTo: newMes.head.replyTo, status: newMes.status };
     } catch (err) {
-      error = `Robust-protocol.prepareProcess: не удалось создать файл ${fn} в папке PREPARED,
-        ${err instanceof Error ? err.message : 'ошибка'}`;
-      break;
-    }
-  }
+      log.error(`Robust-protocol.prepareProcess: не удалось создать файл ${newFn} в папке PREPARED,
+        ${err instanceof Error ? err.message : 'ошибка'}`);
 
-  if (error) {
-    log.error(error);
-
-    for (let j = written - 1; j > 0; j--) {
-      const [fn] = processedFilesObj[j];
       try {
-        deleteFile(`${pathFiles}/prepared/${fn}`);
+        written.forEach(deleteFile);
       } catch {
         //здесь мы просто подавляем ошибку
       }
-    }
 
-    return { status: 'CANCELLED' };
+      return { status: 'CANCELLED' };
+    }
   }
 
-  // updateProcess(process.id, statusFiles);
-  updateProcessInList({
+  replaceProcessInList({
     ...process,
     status: 'READY_TO_COMMIT',
     dateReadyToCommit: new Date(),
@@ -260,26 +189,29 @@ export const completeById = (processId: string): IStatusResponse => {
     };
   }
 
+  if (!process.processedFiles) {
+    log.error(`Robust-protocol.completeProcess: в процессе ${processId} массив обработанных файлов пуст`);
+    throw new Error('Should never be here');
+  }
+
   //1. Переводим процесс в состояние CLEANUP.
   //2. Полученные файлы переносятся из папки PREPARED в MESSAGES.
   //3. Успешно обработанные файлы переносятся из папки MESSAGES в папку LOG.
   //4. Файлы, при обработке которых возникли ошибки, переносятся из папки MESSAGES в папку ERROR.
   //5. Файлы, при обработке которых возник dead lock, мы не трогаем.
   //   Они будут переданы и обработаны повторно при следующих запросах данных из Гедымина.
-  // cleanupProcess(processId);
 
-  updateProcessInList({ ...process, status: 'CLEANUP' });
+  replaceProcessInList({ ...process, status: 'CLEANUP' });
 
   let error = '';
-  const processedFilesObj = Object.entries(process!.processedFiles!);
-  const pathFiles = getPath(`DB_${process!.companyId}/${process!.appSystem}`);
+  const processedFilesObj = Object.entries(process.processedFiles);
 
   const requestFiles: { [id: string]: string } = {};
-  process.files.forEach((f) => (requestFiles[f.split('_')[0]] = f));
+  process.files.forEach((fn) => (requestFiles[messageFileName2params(fn).id] = fn));
 
-  for (const [fn, status] of processedFilesObj) {
+  for (const [fn, mes] of processedFilesObj) {
     try {
-      renameSync(`${pathFiles}/prepared/${fn}`, `${pathFiles}/messages/${fn}`);
+      renameSync(getPathPrepared(process, fn), getPathMessages(process, fn));
       delete process.processedFiles![fn];
       saveProcessList();
     } catch (err) {
@@ -287,22 +219,28 @@ export const completeById = (processId: string): IStatusResponse => {
           ${err instanceof Error ? err.message : 'ошибка'}`;
       break;
     }
+    if (mes.replyTo) {
+      const requestFN = requestFiles[mes.replyTo];
 
-    const id = fn.split('_')[0];
-    const requestFN = requestFiles[id];
-    const toPath =
-      status === 'PROCESSED' || status === 'READY' ? 'log' : status === 'PROCESSED_INCORRECT' ? 'error' : undefined;
-    if (toPath && requestFN) {
-      try {
-        renameSync(`${pathFiles}/messages/${requestFN}`, `${pathFiles}/${toPath}/${requestFN}`);
+      const toPath =
+        mes.status === 'PROCESSED' || mes.status === 'READY'
+          ? getPathLog(process, requestFN)
+          : mes.status === 'PROCESSED_INCORRECT'
+          ? getPathError(process, requestFN)
+          : undefined;
 
-        const i = process.files.indexOf(requestFN);
-        process.files.splice(i, 1);
-        saveProcessList();
-      } catch (err) {
-        error = `Robust-protocol.completeProcess: не удалось перенести файл ${requestFN} из MESSAGES,
-          ${err instanceof Error ? err.message : 'ошибка'}`;
-        break;
+      if (toPath && requestFN) {
+        try {
+          renameSync(getPathMessages(process, requestFN), toPath);
+
+          const i = process.files.indexOf(requestFN);
+          process.files.splice(i, 1);
+          saveProcessList();
+        } catch (err) {
+          error = `Robust-protocol.completeProcess: не удалось перенести файл ${requestFN} из MESSAGES,
+            ${err instanceof Error ? err.message : 'ошибка'}`;
+          break;
+        }
       }
     }
   }
@@ -310,7 +248,7 @@ export const completeById = (processId: string): IStatusResponse => {
   if (error) {
     log.error(error);
 
-    updateProcessInList({ ...process, status: 'FAILED' });
+    replaceProcessInList({ ...process, status: 'FAILED' });
 
     return { status: 'CANCELLED' };
   }
@@ -341,15 +279,18 @@ export const cancelById = (processId: string, errorMessage: string): IStatusResp
     };
   }
 
+  if (!process.processedFiles) {
+    log.error(`Robust-protocol.completeProcess: в процессе ${processId} массив обработанных файлов пуст`);
+    throw new Error('Should never be here');
+  }
+
   //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
   //Ошибки, которые могут возникнуть при удалении файлов, подавляются. Сообщения о них выводятся в лог системы.
-  const processedFilesObj = Object.keys(process!.processedFiles!);
-  const pathFiles = getPath(`/DB_${process!.companyId}/${process!.appSystem}`);
+  const processedFilesObj = Object.keys(process.processedFiles);
 
   for (const fn of processedFilesObj) {
-    // const fn = process!.processedFiles!.shift();
     try {
-      unlinkSync(`${pathFiles}/prepared/${fn}`);
+      unlinkSync(getPathPrepared(process, fn));
       delete process.processedFiles![fn];
       saveProcessList();
     } catch {
@@ -424,41 +365,5 @@ export const deleteOne = (processId: string) => {
 
   return {
     status: 'OK',
-  };
-};
-
-export const makeMessage = (message: IDBMessage): IMessage => {
-  const { users, companies } = getDb();
-
-  const consumer = getNamedEntitySync(message.head.consumerId, users);
-  const producer = getNamedEntitySync(message.head.producerId, users);
-  const company = getNamedEntitySync(message.head.companyId, companies);
-
-  return {
-    id: message.id,
-    head: {
-      appSystem: message.head.appSystem,
-      company,
-      consumer,
-      producer,
-      dateTime: message.head.dateTime,
-    },
-    status: message.status,
-    body: message.body,
-  };
-};
-
-export const makeDBNewMessage = (message: NewProcessMessage, producerId: string): IDBMessage => {
-  return {
-    id: message.id || uidv1(),
-    head: {
-      appSystem: message.head.appSystem,
-      companyId: message.head.company.id,
-      consumerId: message.head.consumer.id,
-      producerId: producerId,
-      dateTime: new Date().toISOString(),
-    },
-    status: message.status,
-    body: message.body,
   };
 };

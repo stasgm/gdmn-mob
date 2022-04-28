@@ -189,20 +189,20 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   };
 };
 
-export const makeDBMessage = (message: IMessage): IDBMessage => {
-  return {
-    id: message.id,
-    head: {
-      appSystem: message.head.appSystem,
-      companyId: message.head.company.id,
-      consumerId: message.head.consumer.id,
-      producerId: message.head.producer.id,
-      dateTime: message.head.dateTime,
-    },
-    status: message.status,
-    body: message.body,
-  };
-};
+// export const makeDBMessage = (message: IMessage): IDBMessage => {
+//   return {
+//     id: message.id,
+//     head: {
+//       appSystem: message.head.appSystem,
+//       companyId: message.head.company.id,
+//       consumerId: message.head.consumer.id,
+//       producerId: message.head.producer.id,
+//       dateTime: message.head.dateTime,
+//     },
+//     status: message.status,
+//     body: message.body,
+//   };
+// };
 
 export const makeDBNewMessage = async (message: NewMessage, producerId: string): Promise<IDBMessage> => {
   return {
