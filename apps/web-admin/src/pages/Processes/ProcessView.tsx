@@ -20,7 +20,6 @@ import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import processSelectors from '../../store/process/selectors';
-import companySelectors from '../../store/company/selectors';
 import SnackBar from '../../components/SnackBar';
 
 import ProcessDetailsView from '../../components/process/ProcessDetailsView';
@@ -40,9 +39,7 @@ const ProcessView = () => {
   const { loading, errorMessage } = useSelector((state) => state.processes);
 
   const process = processSelectors.processById(id);
-  const company = companySelectors.companyById(process?.companyId);
-
-  console.log('company', company);
+  const company = processSelectors.companyByProcessId(id);
 
   const [open, setOpen] = useState(false);
 
@@ -59,11 +56,8 @@ const ProcessView = () => {
   };
 
   const refreshData = useCallback(() => {
-    //dispatch(deviceActions.fetchDeviceById(deviceId));
     dispatch(processActions.fetchProcesses());
-    //dispatch(userActions.fetchUsers());
-    //dispatch(codeActions.fetchActivationCodes(deviceId));
-  }, [dispatch /*, deviceId*/]);
+  }, [dispatch]);
 
   useEffect(() => {
     refreshData();
@@ -172,7 +166,7 @@ const ProcessView = () => {
         </Box>
         <Box>
           <CardHeader sx={{ mx: 2 }} />
-          <ProcessFilesProcessed processedFiles1={process.processedFiles} />
+          <ProcessFilesProcessed processedFilesList={process.processedFiles} />
         </Box>
       </Box>
 

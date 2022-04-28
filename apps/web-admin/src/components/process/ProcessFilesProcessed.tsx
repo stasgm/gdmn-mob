@@ -8,15 +8,15 @@ import { IProcessedFiles, StatusType } from '@lib/types';
 type IProcessedFilesArray = [string, StatusType];
 
 interface IProps {
-  processedFiles1?: IProcessedFiles;
+  processedFilesList?: IProcessedFiles;
   limitRows?: number;
 }
 
-const ProcessFilesProcessed = ({ processedFiles1 = {}, limitRows = 0 }: IProps) => {
+const ProcessFilesProcessed = ({ processedFilesList = {}, limitRows = 0 }: IProps) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
-  const processedFiles = Object.entries(processedFiles1);
+  const processedFiles = Object.entries(processedFilesList);
 
   const handleLimitChange = (event: any) => {
     setLimit(event.target.value);
@@ -36,7 +36,7 @@ const ProcessFilesProcessed = ({ processedFiles1 = {}, limitRows = 0 }: IProps) 
     const deviceList = processedFiles.slice(page * limit, page * limit + limit).map((file: IProcessedFilesArray) => {
       return (
         <TableRow hover key={file[0]}>
-          <TableCell>{file[0]}</TableCell>
+          <TableCell width="85%">{file[0]}</TableCell>
           <TableCell>{file[1]}</TableCell>
         </TableRow>
       );

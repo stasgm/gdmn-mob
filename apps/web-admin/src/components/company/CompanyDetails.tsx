@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button, Autocomplete } from '@material-ui/core';
 
 import { IAppSystem, ICompany, NewCompany } from '@lib/types';
-import { useFormik, Field } from 'formik';
+import { useFormik, Field, FieldArray } from 'formik';
 import * as yup from 'yup';
 
 import MultipleAutocomplete from '../MultipleAutocomplete';
@@ -17,7 +17,7 @@ interface IProps {
 const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IProps) => {
   const formik = useFormik<ICompany | NewCompany>({
     enableReinitialize: true,
-    initialValues: { ...company, city: company.city || '', appSystems: company.appSystems || [] },
+    initialValues: { ...company, city: company.city || '', appSystems: company.appSystems },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
@@ -69,7 +69,21 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     value={formik.values.city}
                   />
                 </Grid>
-                {/* <Grid>
+                {/* <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.appSystems && Boolean(formik.errors.appSystems)}
+                    fullWidth
+                    label="app"
+                    name="app"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="app"
+                    disabled={loading}
+                    value={formik.values.appSystems}
+                  />
+                </Grid> */}
+                {/* <Grid item md={6} xs={12}>
                   <Autocomplete
                     multiple
                     error={formik.touched.appSystems && Boolean(formik.errors.appSystems)}
@@ -78,7 +92,7 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     options={appSystems || []}
                     getOptionLabel={(option) => option?.name}
                     defaultValue={[appSystems?.[1]]}
-                    // value={formik.values.appSystems}
+                    value={formik.values.appSystems}
                     filterSelectedOptions
                     renderInput={(params) => <TextField {...params} label="Системы" />}
                   />
@@ -95,6 +109,22 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     error={Boolean(formik.touched.appSystems && formik.errors.appSystems)}
                     disabled={loading}
                   />
+                </Grid> */}
+                {/* <Grid item md={6} xs={12}>
+                  <FieldArray
+                    name="appSystems"
+                    render={(arrayHelpers) => (
+                      <Box>
+                        {formik.values.appSystems && formik.values.appSystems.length > 0 ? (
+                          formik.values.appSystems.map((appSystem) => {
+                            return appSystem;
+                          })
+                        ) : (
+                          <></>
+                        )}
+                      </Box>
+                    )}
+                  ></FieldArray>
                 </Grid> */}
               </Grid>
             </CardContent>
