@@ -83,7 +83,7 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     value={formik.values.appSystems}
                   />
                 </Grid> */}
-                {/* <Grid>
+                {/* <Grid item md={6} xs={12}>
                   <Autocomplete
                     multiple
                     error={formik.touched.appSystems && Boolean(formik.errors.appSystems)}
@@ -92,7 +92,7 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     options={appSystems || []}
                     getOptionLabel={(option) => option?.name}
                     defaultValue={[appSystems?.[1]]}
-                    // value={formik.values.appSystems}
+                    value={formik.values.appSystems}
                     filterSelectedOptions
                     renderInput={(params) => <TextField {...params} label="Системы" />}
                   />
@@ -110,23 +110,22 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     disabled={loading}
                   />
                 </Grid> */}
-                <Grid item md={6} xs={12}>
+                {/* <Grid item md={6} xs={12}>
                   <FieldArray
-                   name="appSystems"
-                   render={arrayHelpers => (
-                     <Box>
-                       {formik.values.appSystems && formik.values.appSystems.length > 0 ?
-                       (
-                         formik.values.appSystems.map((appSystem) => )
-
-                       ) : (
-
-                       )}
-                     </Box>)}
-                  >
-
-                  </FieldArray>
-                </Grid>
+                    name="appSystems"
+                    render={(arrayHelpers) => (
+                      <Box>
+                        {formik.values.appSystems && formik.values.appSystems.length > 0 ? (
+                          formik.values.appSystems.map((appSystem) => {
+                            return appSystem;
+                          })
+                        ) : (
+                          <></>
+                        )}
+                      </Box>
+                    )}
+                  ></FieldArray>
+                </Grid> */}
               </Grid>
             </CardContent>
             <Divider />
