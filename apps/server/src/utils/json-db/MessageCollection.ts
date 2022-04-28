@@ -51,9 +51,9 @@ class CollectionMessage<T extends CollectionItem> {
     return R.assoc('id', uuid(), obj);
   }
 
-  constructor(pathDb: string, name: string) {
-    this.collectionPath = path.join(pathDb, `/${name}/`);
-    this._ensureStorage();
+  constructor(pathDb: string) {
+    this.collectionPath = pathDb;
+    // this._ensureStorage();
   }
 
   /**
@@ -141,10 +141,15 @@ class CollectionMessage<T extends CollectionItem> {
     return Promise.all(pr);
   }
 
-  private async _ensureStorage() {
+  public async setCollectionPath(newPath: string): Promise<void> {
+    if (!this._checkFileExists(newPath)) await fs.mkdir(newPath, { recursive: true });
+    this.collectionPath = newPath;
+  }
+
+  /* private async _ensureStorage() {
     const check: boolean = await this._checkFileExists(this.collectionPath);
     if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
-  }
+  }*/
 
   private _Obj2FullFileName(params: IFileMessageInfo): string {
     return path.join(this.collectionPath, params2messageFileName(params));

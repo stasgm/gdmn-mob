@@ -1,3 +1,5 @@
+import path from 'path';
+
 import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
@@ -33,9 +35,19 @@ const findAll = async () => {
  * @param {string} userId - идентификатор пользователя
  * @return массив сообщений
  * */
-const FindMany = async ({ companyId, consumerId }: { appSystem: string; companyId: string; consumerId: string }) => {
+const FindMany = async ({
+  appSystem,
+  companyId,
+  consumerId,
+}: {
+  appSystem: string;
+  companyId: string;
+  consumerId: string;
+}) => {
   const db = getDb();
-  const { messages, companies, users } = db;
+  const { messages, companies, users, dbPath } = db;
+
+  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
 
   const company = await companies.find(companyId);
 
@@ -57,14 +69,27 @@ const FindMany = async ({ companyId, consumerId }: { appSystem: string; companyI
 
 /**
  * Добавляет одно сообщение
- * @param {string} head - заголовок сообщения
- * @param {string} body - тело сообщения
+ * @param {NewMessage} msgObject  - заголовок сообщения
+ * @param {string} producerId - тело сообщения
+ * @param {string} appSystem - идентификатор системы
+ * @param {string} companyId - идентификатор организация
  * @return id, идентификатор сообщения
  * */
 
-const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; producerId: string }): Promise<string> => {
+const addOne = async ({
+  msgObject,
+  producerId,
+  appSystem,
+  companyId,
+}: {
+  msgObject: NewMessage;
+  producerId: string;
+  appSystem: string;
+  companyId: string;
+}): Promise<string> => {
   const db = getDb();
-  const { messages } = db;
+  const { messages, dbPath } = db;
+  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
 
   /*if (await messages.find((i) => i.id === msgObject.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
@@ -110,10 +135,17 @@ const addOne = async ({ msgObject, producerId }: { msgObject: NewMessage; produc
 /**
  * Удаляет одно сообщениме
  * @param {string} id - идентификатор сообщения
+ * @param {string} appSystem - идентификатор системы
+ * @param {string} companyId - идентификатор организация
  * */
 const deleteOne = async (messageId: string): Promise<string> => {
   const db = getDb();
-  const { messages } = db;
+  const { messages, dbPath } = db;
+  const oldMessage = await messages.find(messageId);
+  const companyId = oldMessage.head.companyId;
+  const appSystem = oldMessage.head.appSystem;
+
+  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
 
   /*  if (!(await messages.find(messageId))) {
     throw new DataNotFoundException('Сообщение не найдено');

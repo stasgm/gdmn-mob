@@ -42,9 +42,9 @@ class Database {
     return new Collection<T>(collectionPath);
   }
 
-  messageCollection<T extends CollectionItem>(name: string) {
+  messageCollection<T extends CollectionItem>() {
     const collectionPath = this._dbPath;
-    return new CollectionMessage<T>(collectionPath, name);
+    return new CollectionMessage<T>(collectionPath);
   }
 
   getDbPath() {
