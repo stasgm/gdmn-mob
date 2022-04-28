@@ -16,7 +16,12 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
-  const messageId = await messageService.addOne({ msgObject: message, producerId: ctx.state.user.id });
+  const messageId = await messageService.addOne({
+    msgObject: message,
+    producerId: ctx.state.user.id,
+    appSystem: message.head.appSystem,
+    companyId: message.head.company.id,
+  });
 
   const resultData = { uid: messageId, date: new Date() };
   created(ctx as Context, resultData);

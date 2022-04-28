@@ -46,7 +46,7 @@ export const createDb = async (dir: string, name: string) => {
   const codes = db.collection<IDBActivationCode>('activation-codes');
   const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
   const sessionId = db.collection<SessionId>('session-id');
-  const messages = db.messageCollection<IDBMessage>('messages');
+  const messages = db.messageCollection<IDBMessage>();
   const appSystems = db.collection<IDBAppSystem>('app-systems');
   const processes = db.collection<IDBProcess>('processes');
   const dbPath = db.getDbPath();
