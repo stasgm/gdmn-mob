@@ -181,6 +181,7 @@ const verifyCode = async (code: string) => {
 
   const updateDeviceBindings = async (deviceBindingList: IDBDeviceBinding[]) => {
     for (const item of deviceBindingList) {
+      // eslint-disable-next-line no-await-in-loop
       await deviceBindings.update({ ...item, state: 'ACTIVE' });
     }
   };
