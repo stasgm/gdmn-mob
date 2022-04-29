@@ -13,7 +13,7 @@ import {
   INamedEntity,
   IDBDeviceBinding,
   SessionId,
-  IDBAppSystem,
+  DBAppSystem,
   IDBProcess,
 } from '@lib/types';
 
@@ -31,7 +31,7 @@ export type dbtype = {
   devices: Collection<IDBDevice>;
   deviceBindings: Collection<IDBDeviceBinding>;
   sessionId: Collection<SessionId>;
-  appSystems: Collection<IDBAppSystem>;
+  appSystems: Collection<DBAppSystem>;
   processes: Collection<IDBProcess>;
   dbPath: string;
 };
@@ -47,7 +47,7 @@ export const createDb = async (dir: string, name: string) => {
   const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
   const sessionId = db.collection<SessionId>('session-id');
   const messages = db.messageCollection<IDBMessage>();
-  const appSystems = db.collection<IDBAppSystem>('app-systems');
+  const appSystems = db.collection<DBAppSystem>('app-systems');
   const processes = db.collection<IDBProcess>('processes');
   const dbPath = db.getDbPath();
 

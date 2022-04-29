@@ -31,13 +31,14 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const isGetReferences = settings.getReferences?.data;
 
   const systemName = Constants.manifest?.extra?.slug;
-  const consumer: INamedEntity = { id: '-1', name: systemName };
+
+  // const consumer: INamedEntity = { id: '-1', name: systemName };
   const refVersion = 1;
   const docVersion = 1;
   const setVersion = 1;
 
   const sync = () => {
-    if (!company || !user) {
+    if (!company || !user || !user.erpUser) {
       return;
     }
     dispatch(appActions.setLoading(true));
@@ -45,6 +46,8 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
     const errList: string[] = [];
     const okList: string[] = [];
+
+    const consumer = user.erpUser;
 
     /*
       Поддержка платформы:

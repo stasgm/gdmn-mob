@@ -1,17 +1,56 @@
 import { IAppSystem } from '@lib/types';
 
-// import { DataNotFoundException } from '../exceptions';
+import { extraPredicate } from '../utils/helpers';
 
-// import { extraPredicate } from '../utils/helpers';
+import { appSystems as mockAppSystems } from './data/appSystems';
 
 import { getDb } from './dao/db';
 
-const findAll = async (params?: Record<string, string>): Promise<IAppSystem[]> => {
+const findAll = async (params: Record<string, string | number>): Promise<IAppSystem[]> => {
   const { appSystems } = getDb();
 
-  const appSystemsList = await appSystems.read();
+  let appSystemList;
+  if (process.env.MOCK) {
+    appSystemList = mockAppSystems;
+  } else {
+    appSystemList = await appSystems.read();
+  }
 
-  return Promise.all(appSystemsList);
+  appSystemList = appSystemList.filter((item) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+
+    /** filtering data */
+    let filteredAppSystems = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        const name = item.name.toUpperCase();
+        const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+        const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+
+        filteredAppSystems =
+          name.includes(filterText) || creationDate.includes(filterText) || editionDate.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return filteredAppSystems && extraPredicate(item, newParams as Record<string, string>);
+  });
+
+  /** pagination */
+  const limitParams = Object.assign({}, params);
+
+  let fromRecord = 0;
+  if ('fromRecord' in limitParams) {
+    fromRecord = limitParams.fromRecord as number;
+  }
+
+  let toRecord = appSystemList.length;
+  if ('toRecord' in limitParams)
+    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
+
+  return appSystemList.slice(fromRecord, toRecord);
 };
 
 // const genActivationCode = async (deviceId: string) => {
