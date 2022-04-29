@@ -11,7 +11,7 @@ import {
   authActions,
 } from '@lib/store';
 
-import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
+import { BodyType, IDocument, IMessage, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
