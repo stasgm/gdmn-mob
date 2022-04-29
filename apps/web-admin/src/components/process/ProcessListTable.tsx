@@ -175,7 +175,7 @@ const ProcessListTable = ({
                   />
                 </TableCell>
                 <TableCell>Компания</TableCell>
-                <TableCell>Система</TableCell>
+                <TableCell>Подсистема</TableCell>
                 <TableCell>Статус</TableCell>
                 {/* <TableCell>Код активации</TableCell> */}
                 <TableCell>Дата начала</TableCell>

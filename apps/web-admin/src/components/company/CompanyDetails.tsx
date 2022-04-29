@@ -95,6 +95,7 @@ const CompanyDetails = ({ company, appSystems, loading, onSubmit, onCancel }: IP
                     value={formik.values.appSystems}
                     filterSelectedOptions
                     renderInput={(params) => <TextField {...params} label="Системы" />}
+                    onChange={}
                   />
                 </Grid> */}
                 {/* <Grid item md={6} xs={12}>

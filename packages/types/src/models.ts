@@ -91,4 +91,6 @@ export type SessionId = IEntity;
 
 export type IAppSystem = INamedEntity;
 
+export type NewAppSystem = Pick<IAppSystem, 'name'>;
+
 export type IDBAppSystem = IAppSystem;

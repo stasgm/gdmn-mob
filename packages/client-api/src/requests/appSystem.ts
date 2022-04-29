@@ -1,9 +1,9 @@
-// import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-import { IResponse, IAppSystem } from '@lib/types';
+import { IResponse, IAppSystem, NewAppSystem } from '@lib/types';
 
 import { error, appSystem as types } from '../types';
-import { getParams } from '../utils';
+import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -12,47 +12,129 @@ class AppSystem extends BaseRequest {
     super(api);
   }
 
-  // getCompany = async (companyId: string) => {
-  //   if (this.api.config.debug?.isMock) {
-  //     await sleep(this.api.config.debug?.mockDelay || 0);
+  addAppSystem = async (appSystem: NewAppSystem) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-  //     const company = mockCompanies.find((item) => item.id === companyId);
+      return {
+        type: 'ADD_APP_SYSTEM',
+        appSystem: {
+          ...appSystem,
+          id: uuid(),
+          editionDate: new Date().toISOString(),
+          creationDate: new Date().toISOString(),
+        },
+      } as types.IAddAppSystemResponse;
+    }
 
-  //     if (company) {
-  //       return {
-  //         type: 'GET_COMPANY',
-  //         company,
-  //       } as types.IGetCompanyResponse;
-  //     }
+    const res = await this.api.axios.post<IResponse<IAppSystem>>('/appSystems', appSystem);
+    const resData = res.data;
 
-  //     return {
-  //       type: 'ERROR',
-  //       message: 'Компания не найдена',
-  //     } as error.INetworkError;
-  //   }
-  //   try {
-  //     const res = await this.api.axios.get<IResponse<ICompany>>(`/companies/${companyId}`);
-  //     const resData = res.data;
+    if (resData?.result) {
+      return {
+        type: 'ADD_APP_SYSTEM',
+        appSystem: resData?.data,
+      } as types.IAddAppSystemResponse;
+    }
 
-  //     if (resData.result) {
-  //       return {
-  //         type: 'GET_COMPANY',
-  //         company: resData.data,
-  //       } as types.IGetCompanyResponse;
-  //     }
+    return {
+      type: 'ERROR',
+      message: resData.error,
+    } as error.INetworkError;
+    // } catch (err) {
+    //   return {
+    //     type: 'ERROR',
+    //     message: err?.response?.data?.error || 'ошибка создания компании',
+    //   } as error.INetworkError;
+    // }
+  };
 
-  //     return {
-  //       type: 'ERROR',
-  //       message: resData.error,
-  //     } as error.INetworkError;
-  //   } catch (err) {
-  //     return {
-  //       type: 'ERROR',
-  //       message: err instanceof TypeError ? err.message : 'ошибка получения данных о компании',
-  //       //err?.response?.data?.error || 'ошибка получения данных о компании',
-  //     } as error.INetworkError;
-  //   }
-  // };
+  updateAppSystem = async (appSystem: Partial<IAppSystem>) => {
+    // if (this.api.config.debug?.isMock) {
+
+    try {
+      const res = await this.api.axios.patch<IResponse<IAppSystem>>(`/appSystems/${appSystem.id}`, appSystem);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'UPDATE_APP_SYSTEM',
+          appSystem: resData.data,
+        } as types.IUpdateAppSystemResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка обновления подсистемы',
+        //err?.response?.data?.error || 'ошибка обновления компании',
+      } as error.INetworkError;
+    }
+  };
+
+  removeAppSystem = async (appSystemId: string) => {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'REMOVE_APP_SYSTEM',
+      } as types.IRemoveAppSystemResponse;
+    }
+
+    try {
+      const res = await this.api.axios.delete<IResponse<void>>(`/appSystems/${appSystemId}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'REMOVE_APP_SYSTEM',
+        } as types.IRemoveAppSystemResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления компании',
+        //err?.response?.data?.error || 'ошибка удаления компании',
+      } as error.INetworkError;
+    }
+  };
+
+  getAppSystem = async (appSystemId: string) => {
+    // if (this.api.config.debug?.isMock) {
+    // }
+
+    try {
+      const res = await this.api.axios.get<IResponse<IAppSystem>>(`/appSystems/${appSystemId}`);
+      const resData = res.data;
+
+      if (resData.result) {
+        return {
+          type: 'GET_APP_SYSTEM',
+          appSystem: resData.data,
+        } as types.IGetAppSystemResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка получения данных о подсистеме',
+        //err?.response?.data?.error || 'ошибка получения данных о компании',
+      } as error.INetworkError;
+    }
+  };
 
   getAppSystems = async (params?: Record<string, string | number>) => {
     // if (this.api.config.debug?.isMock) {
@@ -60,7 +142,7 @@ class AppSystem extends BaseRequest {
 
     //   return {
     //     type: 'GET_APP_SYSTEMS',
-    //     companies: mockCompanies,
+    //     appSystems: mockAppSystems,
     //   } as types.IAppSystemQueryResponse;
     // }
 

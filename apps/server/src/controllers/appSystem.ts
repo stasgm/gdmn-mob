@@ -1,32 +1,58 @@
 import { Context, ParameterizedContext } from 'koa';
 
+import { IAppSystem, IUser, NewAppSystem } from '@lib/types';
+
 import log from '../utils/logger';
 import { appSystemService } from '../services';
 
-import { /*created,*/ ok } from '../utils/apiHelpers';
+import { DataNotFoundException, ForbiddenException } from '../exceptions';
 
-// const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { id: deviceId }: { id: string } = ctx.params;
+import { created, ok } from '../utils/apiHelpers';
 
-//   const device = await deviceService.findOne(deviceId);
+const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
+  const { name } = ctx.request.body as NewAppSystem;
 
-//   if (!device) {
-//     throw new DataNotFoundException('Устройство не найдено');
-//   }
+  const user = ctx.state.user as IUser;
 
-//   ok(ctx as Context, device);
+  if (user?.role !== 'SuperAdmin') {
+    throw new ForbiddenException('Нет прав для создания подсистемы');
+  }
 
-//   log.info(`getDevice: device '${device.name}' is successfully received`);
-// };
+  const appSystem: NewAppSystem = { name };
+
+  const newAppSystem = await appSystemService.addOne(appSystem);
+
+  created(ctx as Context, newAppSystem);
+
+  log.info(`addAppSystem: appSystem '${name}' is successfully created`);
+};
+
+const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.params;
+
+  const appSystemData = ctx.request.body as Partial<IAppSystem>;
+
+  const updatedAppSystem = await appSystemService.updateOne(id, appSystemData);
+
+  ok(ctx as Context, updatedAppSystem);
+
+  log.info(`updateAppSystem: appSystem '${updatedAppSystem.id}' is successfully updated`);
+};
+
+const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.params;
+
+  const res = await appSystemService.deleteOne(id);
+
+  ok(ctx as Context, res);
+
+  log.info(`removeAppSystem: appSystem '${id}' is successfully removed`);
+};
 
 const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
   const { appSystemId, name } = ctx.query;
 
   const params: Record<string, string> = {};
-
-  // if (typeof deviceId === 'string') {
-  //   params.deviceId = deviceId;
-  // }
 
   if (appSystemId && typeof appSystemId === 'string') {
     params.appSystemId = appSystemId;
@@ -43,14 +69,18 @@ const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('getAppSystem: app systems are successfully received');
 };
 
-// const getAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { deviceId } = ctx.params;
+const getAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
+  const { id } = ctx.params;
 
-//   const code = await activationCodeService.genActivationCode(deviceId);
+  const appSystem = await appSystemService.findOne(id);
 
-//   created(ctx as Context, code);
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
 
-//   log.info('getActivationCode: activation code generated successfully');
-// };
+  ok(ctx as Context, appSystem);
 
-export { /*getAppSystem,*/ getAppSystems };
+  log.info(`getAppSystem: appSystem '${appSystem.name}' is successfully received`);
+};
+
+export { getAppSystem, getAppSystems, addAppSystem, updateAppSystem, removeAppSystem };
