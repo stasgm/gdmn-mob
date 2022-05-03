@@ -1,10 +1,87 @@
-import { IAppSystem } from '@lib/types';
+import { IAppSystem, DBAppSystem, NewAppSystem } from '@lib/types';
+
+import { ConflictException, DataNotFoundException } from '../exceptions';
 
 import { extraPredicate } from '../utils/helpers';
 
 import { appSystems as mockAppSystems } from './data/appSystems';
 
 import { getDb } from './dao/db';
+
+const addOne = async (appSystem: NewAppSystem): Promise<IAppSystem> => {
+  /*
+    1. Проверяем что организация существует
+    2. Добавляем организацию
+    3. К текущему пользователю записываем созданную организацию
+    4. К администратору добавляем созданную организацию
+  */
+  const { appSystems } = getDb();
+
+  if (await appSystems.find((el) => el.name === appSystem.name)) {
+    throw new ConflictException('Подсистема уже существует');
+  }
+
+  const newAppSystemObj = {
+    id: '',
+    name: appSystem.name,
+    creationDate: new Date().toISOString(),
+    editionDate: new Date().toISOString(),
+  } as DBAppSystem;
+
+  const newAppSystem = await appSystems.insert(newAppSystemObj);
+  const createdAppSystem = await appSystems.find(newAppSystem);
+
+  const makedAppSystem = await makeAppSystem(createdAppSystem);
+
+  return makedAppSystem;
+};
+
+const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promise<IAppSystem> => {
+  const db = getDb();
+  const { appSystems } = db;
+
+  const appSystemObj = await appSystems.find(id);
+
+  if (!appSystemObj) {
+    throw new DataNotFoundException('Подсістема не найдена');
+  }
+
+  const newAppSystem: DBAppSystem = {
+    id,
+    name: appSystemData.name || appSystemObj.name,
+    creationDate: appSystemObj.creationDate,
+    editionDate: new Date().toISOString(),
+  };
+
+  await appSystems.update(newAppSystem);
+
+  const updatedAppSystem = await appSystems.find(id);
+
+  return await makeAppSystem(updatedAppSystem);
+};
+
+const deleteOne = async (id: string): Promise<void> => {
+  const db = getDb();
+  const { appSystems } = db;
+
+  if (!(await appSystems.find((d) => d.id === id))) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  await appSystems.delete((d) => d.id === id);
+};
+
+const findOne = async (id: string): Promise<IAppSystem | undefined> => {
+  const { appSystems } = getDb();
+
+  const appSystem = await appSystems.find(id);
+
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  return makeAppSystem(appSystem);
+};
 
 const findAll = async (params: Record<string, string | number>): Promise<IAppSystem[]> => {
   const { appSystems } = getDb();
@@ -19,7 +96,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IAppSys
   appSystemList = appSystemList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
-    /** filtering data */
+    /* filtering data */
     let filteredAppSystems = true;
     if ('filterText' in newParams) {
       const filterText: string = (newParams.filterText as string).toUpperCase();
@@ -38,7 +115,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IAppSys
     return filteredAppSystems && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  /** pagination */
+  /* pagination */
   const limitParams = Object.assign({}, params);
 
   let fromRecord = 0;
@@ -53,63 +130,11 @@ const findAll = async (params: Record<string, string | number>): Promise<IAppSys
   return appSystemList.slice(fromRecord, toRecord);
 };
 
-// const genActivationCode = async (deviceId: string) => {
-//   const { devices, codes, deviceBindings } = getDb();
+export const makeAppSystem = async (appSystem: DBAppSystem): Promise<IAppSystem> => {
+  return {
+    id: appSystem.id,
+    name: appSystem.name,
+  };
+};
 
-//   const device = await devices.find(deviceId);
-
-//   const deviceBinding = await deviceBindings.read((deviceBinding) => deviceBinding.deviceId === deviceId);
-
-//   if (!device) {
-//     throw new DataNotFoundException('Устройство не найдено');
-//   }
-
-//   await codes.delete((activationCode) => activationCode.deviceId === deviceId);
-
-//   // const code = Math.random()
-//   //   .toString(36)
-//   //   .substr(3, 6);
-//   const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-//   const newCodeObj = {
-//     code,
-//     date: new Date().toISOString(),
-//     deviceId,
-//   } as IDBActivationCode;
-
-//   const newCode = await codes.insert(newCodeObj);
-
-//   const createdCode = await codes.find(newCode);
-
-//   await devices.update({ ...device, state: 'NON-ACTIVATED' });
-
-//   const updateDeviceBindings = async (deviceBindingList: IDBDeviceBinding[]) => {
-//     for (const item of deviceBindingList) {
-//       await deviceBindings.update({ ...item, state: 'NON-ACTIVATED' });
-//     }
-//   };
-//   updateDeviceBindings(deviceBinding);
-
-//   const retCode = await makeCode(createdCode);
-
-//   return retCode;
-// };
-
-// export const makeCode = async (activationCode: IDBActivationCode): Promise<IActivationCode> => {
-//   const db = getDb();
-//   const { devices } = db;
-
-//   const device = await devices.find(activationCode.deviceId);
-
-//   /* TODO В звависимости от прав возвращать разный набор полей */
-//   return {
-//     code: activationCode.code,
-//     date: activationCode.date,
-//     device,
-//     id: activationCode.id,
-//   };
-// };
-
-// export { findAll, genActivationCode };
-
-export { findAll };
+export { addOne, updateOne, deleteOne, findOne, findAll };

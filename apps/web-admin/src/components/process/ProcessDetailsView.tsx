@@ -34,7 +34,7 @@ const ProcessDetailsView = ({ process, company }: IProps) => {
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Система
+                  Подсистема
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>

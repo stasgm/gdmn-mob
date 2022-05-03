@@ -39,23 +39,76 @@ const reducer: Reducer<IAppSystemState, AppSystemActionType> = (state = initialS
         errorMessage: action.payload || 'error',
       };
 
-    // // Получение компании
-    // case getType(companyActions.fetchCompanyAsync.request):
-    //   return { ...state, loading: true, errorMessage: '' };
+    case getType(appSystemActions.addAppSystemAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
 
-    // case getType(companyActions.fetchCompanyAsync.success):
-    //   return {
-    //     ...state,
-    //     list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
-    //     loading: false,
-    //   };
+    case getType(appSystemActions.addAppSystemAsync.success):
+      return {
+        ...state,
+        list: [...(state.list || []), action.payload],
+        loading: false,
+      };
 
-    // case getType(companyActions.fetchCompanyAsync.failure):
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     errorMessage: action.payload || 'error',
-    //   };
+    case getType(appSystemActions.addAppSystemAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+    case getType(appSystemActions.updateAppSystemAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(appSystemActions.updateAppSystemAsync.success):
+      return {
+        ...state,
+        list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
+        loading: false,
+      };
+
+    case getType(appSystemActions.updateAppSystemAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    case getType(appSystemActions.removeAppSystemAsync.request):
+      return {
+        ...state,
+        loading: true,
+        errorMessage: '',
+      };
+
+    case getType(appSystemActions.removeAppSystemAsync.success):
+      return {
+        ...state,
+        loading: false,
+        list: [...state.list.filter((i) => i.id !== action.payload)],
+      };
+
+    case getType(appSystemActions.removeAppSystemAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
+
+    case getType(appSystemActions.fetchAppSystemAsync.request):
+      return { ...state, loading: true, errorMessage: '' };
+
+    case getType(appSystemActions.fetchAppSystemAsync.success):
+      return {
+        ...state,
+        list: [...(state.list?.filter(({ id }) => id !== action.payload.id) || []), action.payload],
+        loading: false,
+      };
+
+    case getType(appSystemActions.fetchAppSystemAsync.failure):
+      return {
+        ...state,
+        loading: false,
+        errorMessage: action.payload || 'error',
+      };
 
     case getType(appSystemActions.setPageParam):
       return {

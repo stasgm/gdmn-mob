@@ -8,6 +8,7 @@ import {
   User as UserIcon,
   Users as UsersIcon,
   List as ProcessIcon,
+  Server as AppSystemsIcon,
 } from 'react-feather';
 
 import { useSelector } from '@lib/store';
@@ -50,6 +51,11 @@ const items = [
     href: `${adminPath}/app/processes`,
     icon: ProcessIcon,
     title: 'Процессы',
+  },
+  {
+    href: `${adminPath}/app/appSystems`,
+    icon: AppSystemsIcon,
+    title: 'Подсистемы',
   },
   {
     href: `${adminPath}/app/account`,

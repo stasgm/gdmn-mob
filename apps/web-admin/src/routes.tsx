@@ -11,6 +11,7 @@ import Companies from './pages/Companies';
 // import CompanyList from './pages/Companies/CompanyList';
 import Devices from './pages/Devices';
 import Processes from './pages/Processes';
+import AppSystems from './pages/AppSystems';
 import Register from './pages/Register';
 import Login from './pages/Login';
 // import CompanyDetails from './components/company/CompanyDetails';
@@ -27,6 +28,7 @@ const routes = (isLoggedIn: boolean): RouteObject[] => [
       { path: 'users/*', element: <Users /> },
       { path: 'devices/*', element: <Devices /> },
       { path: 'processes/*', element: <Processes /> },
+      { path: 'appSystems/*', element: <AppSystems /> },
       { path: '', element: <Dashboard /> },
       { path: '*', element: <Navigate to={`${adminPath}/404`} /> },
     ],

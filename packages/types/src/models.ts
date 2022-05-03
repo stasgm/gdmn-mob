@@ -95,4 +95,6 @@ export interface IAppSystem extends INamedEntity {
   description?: string;
 }
 
+export type NewAppSystem = Pick<IAppSystem, 'name'>;
+
 export type DBAppSystem = IAppSystem;
