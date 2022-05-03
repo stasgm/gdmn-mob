@@ -29,11 +29,8 @@ const addOne = async (appSystem: NewAppSystem): Promise<IAppSystem> => {
   } as DBAppSystem;
 
   const newAppSystem = await appSystems.insert(newAppSystemObj);
-  const createdAppSystem = await appSystems.find(newAppSystem);
 
-  const makedAppSystem = await makeAppSystem(createdAppSystem);
-
-  return makedAppSystem;
+  return await appSystems.find(newAppSystem);
 };
 
 const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promise<IAppSystem> => {
@@ -55,9 +52,7 @@ const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promis
 
   await appSystems.update(newAppSystem);
 
-  const updatedAppSystem = await appSystems.find(id);
-
-  return await makeAppSystem(updatedAppSystem);
+  return await appSystems.find(id);
 };
 
 const deleteOne = async (id: string): Promise<void> => {
@@ -80,7 +75,7 @@ const findOne = async (id: string): Promise<IAppSystem | undefined> => {
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  return makeAppSystem(appSystem);
+  return appSystem;
 };
 
 const findAll = async (params: Record<string, string | number>): Promise<IAppSystem[]> => {
@@ -128,13 +123,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IAppSys
     toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
 
   return appSystemList.slice(fromRecord, toRecord);
-};
-
-export const makeAppSystem = async (appSystem: DBAppSystem): Promise<IAppSystem> => {
-  return {
-    id: appSystem.id,
-    name: appSystem.name,
-  };
 };
 
 export { addOne, updateOne, deleteOne, findOne, findAll };

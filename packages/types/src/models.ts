@@ -16,6 +16,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   alias?: string;
   role: UserRole;
   erpUser?: INamedEntity;
+  appSystem?: INamedEntity;
   firstName?: string;
   lastName?: string;
   middleName?: string;
@@ -65,11 +66,12 @@ export interface IActivationCode extends IEntity {
 export type NewActivationCode = Pick<IActivationCode, 'code'>;
 
 // Типы для хранения данных в бд
-export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser'> {
+export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser' | 'appSystem'> {
   password: string;
   creatorId: string;
   company: string | null; // по умолчанию null
   erpUserId?: string;
+  appSystemId?: string;
 }
 
 export interface IDBCompany extends Omit<ICompany, 'admin'> {
