@@ -15,6 +15,7 @@ import {
   SessionId,
   DBAppSystem,
   IDBProcess,
+  IAppSystem,
 } from '@lib/types';
 
 import { v4 as uuid } from 'uuid';
@@ -59,9 +60,10 @@ export const createDb = async (dir: string, name: string) => {
   Проверяем наличие компаний и соответсвующих папок для компаний и подсистем
   */
   const dbCompanies = await companies.read();
+  const dbAppSystems = await appSystems.read();
 
   dbCompanies.forEach(async (company) => {
-    await createFolders(dbPath, company);
+    await createFolders(dbPath, company, dbAppSystems);
   });
 
   return database;
@@ -92,13 +94,16 @@ const mkDir = async (path: string): Promise<void> => {
   if (!check) await mkdir(path, { recursive: true });
 };
 
-export const createFolders = async (dbPath: string, company: IDBCompany): Promise<void> => {
+export const createFolders = async (dbPath: string, company: IDBCompany, dbAppSystems: IAppSystem[]): Promise<void> => {
   const companyFolder = path.join(dbPath, `db_${company.id}`);
   await mkDir(companyFolder);
   if (company.appSystems) {
-    company.appSystems.forEach(async (system) => {
-      await mkDir(path.join(companyFolder, system));
-      messageFolders.forEach(async (folder) => await mkDir(path.join(companyFolder, system, folder)));
+    company.appSystems.forEach(async (systemId) => {
+      const system = dbAppSystems.find((i) => i.id === systemId);
+      if (system?.name) {
+        await mkDir(path.join(companyFolder, system.name));
+        messageFolders.forEach(async (folder) => await mkDir(path.join(companyFolder, system.name, folder)));
+      }
     });
   }
 };
