@@ -41,7 +41,7 @@ const ReturnViewScreen = () => {
   const { colors } = useTheme();
   const [del, setDel] = useState(false);
 
-  const returnDoc = docSelectors.selectByDocType<IReturnDocument>('return')?.find((e) => e.id === id);
+  const returnDoc = docSelectors.selectByDocId<IReturnDocument>(id);
 
   const isBlocked = returnDoc?.status !== 'DRAFT';
 

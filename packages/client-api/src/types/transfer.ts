@@ -1,7 +1,7 @@
 import { Transfer } from '@lib/types';
 
 export interface ITransferQueryResponse {
-  type: 'SET_TRANSFER' | 'GET_TRANSFER' | 'REMOVE_TRANSFER';
+  type: 'SET_TRANSFER' | 'GET_TRANSFER' | 'CLEAR_TRANSFER';
 }
 
 export interface IGetTransferResponse extends ITransferQueryResponse {
@@ -14,8 +14,8 @@ export interface ISetTransferResponse extends ITransferQueryResponse {
   status: Transfer;
 }
 
-export interface IRemoveTransferResponse extends ITransferQueryResponse {
-  type: 'REMOVE_TRANSFER';
+export interface IClearTransferResponse extends ITransferQueryResponse {
+  type: 'CLEAR_TRANSFER';
 }
 
-export type TransferQueryResponse = IGetTransferResponse | ISetTransferResponse | IRemoveTransferResponse;
+export type TransferQueryResponse = IGetTransferResponse | ISetTransferResponse | IClearTransferResponse;

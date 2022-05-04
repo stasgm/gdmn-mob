@@ -10,6 +10,7 @@ export interface IHeadMessage {
   producer: INamedEntity;
   consumer: INamedEntity;
   dateTime: string;
+  replyTo?: string;
 }
 
 export interface ICmdParams<T = any> {
@@ -26,31 +27,10 @@ export interface ICmd<T extends ICmdParams[] | Pick<ICmdParams, 'data'> = ICmdPa
 
 export type MessageType = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings;
 
-/* const cmd1: ICmd<ICmdParams[]> = {
-  name: 'GET_DOCUMENTS',
-  params: [
-    {
-      dateBegin: '2021-07-06',
-      dateEnd: '2021-07-07',
-      documentType: {
-        id: '168063006',
-        name: 'Заявки на закупку ТМЦ',
-      },
-    },
-  ],
-};
-
-const cmd2: ICmd<Pick<ICmdParams, 'data'>> = {
-  name: 'GET_REF',
-  params: { data: 'ddgdhfghf' },
-};
- */
-export interface IMessage<
-  T = ICmd<ICmdParams[] | Pick<ICmdParams, 'data'>> | IDocument[] | IReferences | IUserSettings,
-> {
+export interface IMessage<T = MessageType> {
   id: string;
   status: StatusType;
-  version?: number;
+  version?: string;
   head: IHeadMessage;
   body: {
     type: BodyType;
@@ -59,17 +39,25 @@ export interface IMessage<
   };
 }
 
+export function isIHeadMessage(obj: any): obj is IHeadMessage {
+  return typeof obj === 'object';
+}
+
+export function isIMessage(obj: any): obj is IMessage {
+  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']);
+}
+
+export function isIResponseMessage(obj: any): obj is IMessage {
+  return obj['body']['version'] === 1 && isIHeadMessage(obj['head']) && !!obj['head']['replyTo'];
+}
+
 export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
 
-// export type NewMessage<T = any> = {
+// export type NewProcessMessage = Omit<IMessage, 'head' | 'id'> & {
+//   id?: string;
 //   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-//   status: StatusType;
-//   body: {
-//     type: BodyType;
-//     payload: T;
-//   };
 // };
 
 export interface IDataMessage<T = any> {
@@ -93,8 +81,18 @@ export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer
   // dateTime: string;
 }
 
-export interface IDBMessage<T = any> extends Omit<IMessage<T>, 'head'> {
+export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
   head: IDBHeadMessage;
+}
+
+//TODO: добавить более специфические условия проверки
+export function isIDBHeadMessage(obj: any): obj is IDBHeadMessage {
+  return typeof obj === 'object';
+}
+
+//TODO: добавить более специфические условия проверки
+export function isIDBMessage(obj: any): obj is IDBMessage {
+  return obj['body']['version'] === 1 && isIDBHeadMessage(obj['head']);
 }
 
 export interface IFileMessageInfo {

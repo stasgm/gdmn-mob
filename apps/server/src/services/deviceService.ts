@@ -165,15 +165,6 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
     return companyFound && filteredDevices && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  /*   const newParams = { ...params };
-
-    if ('adminId' in newParams) {
-      deviceList = await asyncFilter(deviceList, async (i: IDBDevice) => {
-        const company = await companies.find(i.companyId);
-        return company?.adminId === newParams.adminId;
-      });
-    } */
-
   /** pagination */
   const limitParams = Object.assign({}, params);
 

@@ -15,6 +15,29 @@ import { DataNotFoundException } from '../../exceptions/datanotfound.exception';
 import { CollectionItem } from './CollectionItem';
 
 /**
+ *
+ * @param fileName Имя файла без пути, но с расширением.
+ * @returns
+ */
+export const messageFileName2params = (fileName: string): IFileMessageInfo => {
+  const re = /(.+)_from_(.+)_to_(.+)\.json/gi;
+  const match = re.exec(fileName);
+
+  if (!match) {
+    throw new Error(`Invalid message file name ${fileName}`);
+  }
+
+  return {
+    id: match[1],
+    producer: match[2],
+    consumer: match[3],
+  };
+};
+
+export const params2messageFileName = ({ id, producer, consumer }: IFileMessageInfo) =>
+  `${id}_from_${producer}_to_${consumer}.json`;
+
+/**
  * @template T
  */
 class CollectionMessage<T extends CollectionItem> {
@@ -23,19 +46,14 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private collectionPath: string;
-  private _maxTimeOfTransfer = 10 * 60 * 1000;
-  //private _fileEndTransfer: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
     return R.assoc('id', uuid(), obj) as K;
   }
 
-  constructor(pathDb: string, name: string) {
-    this.collectionPath = path.join(pathDb, `/${name}/`);
-    this._ensureStorage();
-    // this.initTransfer();
-    //this._fileEndTransfer = path.join(pathDb, '/endTransfer.txt');
-    //this._setEndTransafer();
+  constructor(pathDb: string) {
+    this.collectionPath = pathDb;
+    // this._ensureStorage();
   }
 
   /**
@@ -58,17 +76,8 @@ class CollectionMessage<T extends CollectionItem> {
     const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir();
     if (!filesInfoArr) return [];
     const fileInfo = typeof predicate === 'undefined' ? filesInfoArr : filesInfoArr.filter(predicate);
-    //  const arr: T[] | PromiseLike<T[]> = [];
-    /*  for await (const item of fileInfo) {
-      try {
-        const newItem = await this._get(this._Obj2FileName(item));
-        if (newItem) arr.push(newItem);
-      } catch (err) {
-        throw new DataNotFoundException(err as string);
-      }
-    } */
     const pr = fileInfo.map(async (item) => {
-      return await this._get(this._Obj2FileName(item));
+      return await this._get(this._Obj2FullFileName(item));
     });
     return Promise.all(pr);
   }
@@ -89,7 +98,7 @@ class CollectionMessage<T extends CollectionItem> {
         if (!fileInfo) {
           throw new DataNotFoundException('Сообщение не найдено');
         }
-        return await this._get(this._Obj2FileName(fileInfo));
+        return await this._get(this._Obj2FullFileName(fileInfo));
       } catch (err) {
         throw new DataNotFoundException(err as string);
       }
@@ -115,7 +124,7 @@ class CollectionMessage<T extends CollectionItem> {
         if (!fileInfo) {
           throw new DataNotFoundException('Сообщение не найдено');
         }
-        return await this._delete(this._Obj2FileName(fileInfo));
+        return await this._delete(this._Obj2FullFileName(fileInfo));
       } catch (err) {
         throw new DataNotFoundException(err as string);
       }
@@ -127,95 +136,23 @@ class CollectionMessage<T extends CollectionItem> {
   public async deleteAll(): Promise<void[]> {
     const filesInfoArr = await this._readDir();
     const pr = filesInfoArr.map(async (item) => {
-      await this._delete(this._Obj2FileName(item));
+      await this._delete(this._Obj2FullFileName(item));
     });
     return Promise.all(pr);
   }
 
-  private async _ensureStorage() {
+  public async setCollectionPath(newPath: string): Promise<void> {
+    if (!this._checkFileExists(newPath)) await fs.mkdir(newPath, { recursive: true });
+    this.collectionPath = newPath;
+  }
+
+  /* private async _ensureStorage() {
     const check: boolean = await this._checkFileExists(this.collectionPath);
     if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
-  }
-
-  // public initTransfer(): Promise<Transfer> {
-  //   const initFunc = async () => {
-  //     setTransferFlag(undefined);
-  //     return getTransferFlag();
-  //   };
-  //   return initFunc();
-  // }
-
-  // public async getTransfer(): Promise<Transfer> {
-  //   const getFunc = async () => {
-  //     const __transfer = getTransferFlag();
-  //     if (!__transfer) return undefined;
-  //     const transferDate = new Date(__transfer.uDate);
-  //     const nowDate = new Date();
-  //     const delta = nowDate.getTime() - transferDate.getTime();
-  //     if (delta >= this._maxTimeOfTransfer) {
-  //       await this.initTransfer();
-  //     }
-  //     return getTransferFlag();
-  //   };
-  //   return getFunc();
-  // }
-
-  // public setTransfer(): Promise<Transfer> {
-  //   const setFunc = async () => {
-  //     const __transfer: ITransfer = {
-  //       uid: uuid(),
-  //       uDate: new Date().toISOString(),
-  //     };
-  //     setTransferFlag(__transfer);
-  //     return getTransferFlag();
-  //   };
-  //   return setFunc();
-  // }
-
-  // public async deleteTransfer(uid: string): Promise<void> {
-  //   const delFunc = async () => {
-  //     const check = await this.getTransfer();
-  //     if (check?.uid === uid) {
-  //       await this.initTransfer();
-  //     }
-  //     return;
-  //   };
-  //   delFunc();
-  // }
-
-  /*public insertTransfer(): void {
-    this._setEndTransafer();
-  }
-
-  public async deleteTransfer(): Promise<void> {
-    const check: boolean = await this._checkFileExists(this._fileEndTransfer);
-    if (check) await this._delete(this._fileEndTransfer);
-  }
-
-  public async checkTransfer(): Promise<boolean> {
-    return await this._checkFileExists(this._fileEndTransfer);
   }*/
 
-  /*private _setEndTransafer() {
-    const check: boolean = await this._checkFileExists(this._fileEndTransfer);
-    if (!check) await this._saveEndTransafer(this._fileEndTransfer);
-  }*/
-
-  private _Obj2FileName(fileInfo: IFileMessageInfo): string {
-    const { id, producer, consumer } = fileInfo;
-    const fileName = id + '_from_' + producer + '_to_' + consumer + '.json';
-    return path.join(this.collectionPath, fileName);
-  }
-
-  private _FileName2Obj(fileName: string): IFileMessageInfo {
-    const arr = fileName.split('.');
-    const name = arr[0];
-    const fileInfo = name.split('_');
-    return {
-      id: fileInfo[0],
-      producer: fileInfo[2],
-      consumer: fileInfo[4],
-    };
+  private _Obj2FullFileName(params: IFileMessageInfo): string {
+    return path.join(this.collectionPath, params2messageFileName(params));
   }
 
   private async _get(fileName: string): Promise<T> {
@@ -228,7 +165,7 @@ class CollectionMessage<T extends CollectionItem> {
   }
 
   private async _save(data: T, fileInfo: IFileMessageInfo): Promise<void> {
-    const fileName = this._Obj2FileName(fileInfo);
+    const fileName = this._Obj2FullFileName(fileInfo);
     try {
       return fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
     } catch (err) {
@@ -246,8 +183,7 @@ class CollectionMessage<T extends CollectionItem> {
 
   private async _readDir(): Promise<IFileMessageInfo[]> {
     try {
-      const files = await readdir(this.collectionPath);
-      return files.map((file) => this._FileName2Obj(file.split('.')[0]));
+      return (await readdir(this.collectionPath)).map(messageFileName2params);
     } catch (err) {
       throw new DataNotFoundException(`Ошибка чтения папки ${this.collectionPath} - ${err}`);
     }
@@ -261,14 +197,6 @@ class CollectionMessage<T extends CollectionItem> {
       return false;
     }
   }
-
-  /*private async _saveEndTransafer(path: string): Promise<void> {
-    try {
-      return fs.writeFile(path, JSON.stringify(''));
-    } catch (err) {
-      throw new DataNotFoundException(`Ошибка записи в файл ${err}`);
-    }
-  }*/
 }
 
 export default CollectionMessage;

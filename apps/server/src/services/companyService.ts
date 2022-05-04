@@ -6,7 +6,7 @@ import { ConflictException, DataNotFoundException } from '../exceptions';
 
 import { updateOne as updateUserCompany } from './userService';
 
-import { getDb } from './dao/db';
+import { getDb, createFolders } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
 
@@ -22,7 +22,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies } = getDb();
+  const { companies, dbPath } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
@@ -31,6 +31,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   const newCompanyObj = {
     name: company.name,
     city: company.city,
+    appSystems: company.appSystems,
     adminId: company.admin.id,
     externalId: company.externalId,
     creationDate: new Date().toISOString(),
@@ -38,8 +39,8 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   } as IDBCompany;
 
   const newCompany = await companies.insert(newCompanyObj);
-
   const createdCompany = await companies.find(newCompany);
+  await createFolders(dbPath, createdCompany);
 
   // Добавляем к текущему
   //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
@@ -77,6 +78,7 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     city: companyData.city,
+    appSystems: companyData.appSystems,
     creationDate: companyObj.creationDate,
     editionDate: new Date().toISOString(),
   };
@@ -254,6 +256,7 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
     id: company.id,
     name: company.name,
     city: company.city,
+    appSystems: company.appSystems,
     admin: adminEntity,
     externalId: company.externalId,
     creationDate: company.creationDate,

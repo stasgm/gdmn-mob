@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import { HelperText } from 'react-native-paper';
+
 import { IApiConfig } from '@lib/client-types';
 import { AppScreen, Input, PrimeButton, ScreenTitle } from '@lib/mobile-ui';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -28,6 +30,9 @@ const ConfigScreen = (props: Props) => {
   const [deviceId, setDeviceId] = useState(config?.deviceId || '');
 
   const handleSaveConfig = () => {
+    if (err) {
+      return;
+    }
     const match = serverName.match(/^(.*:\/\/)([A-Za-z0-9\-.]+)/);
     const protocol: string = match?.[1] || '';
     const server: string = match?.[2] || '';
@@ -51,11 +56,33 @@ const ConfigScreen = (props: Props) => {
     navigation.navigate('Splash');
   };
 
+  const [err, setErr] = useState(false);
+
+  const handleProtocolError = () => {
+    if (!(serverName.includes('http://') || serverName.includes('https://'))) {
+      setErr(true);
+    } else {
+      setErr(false);
+    }
+    return;
+  };
+
   return (
     <AppScreen style={configStyles.screen}>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={configStyles.keybord}>
         <ScreenTitle infoRow={false}>Настройка подключения</ScreenTitle>
-        <Input label="Адрес сервера" value={serverName} onChangeText={setServerName} clearInput={true} />
+        <Input
+          label="Адрес сервера"
+          value={serverName}
+          onChangeText={setServerName}
+          clearInput={true}
+          onEndEditing={handleProtocolError}
+        />
+        {err && (
+          <HelperText type="error" style={configStyles.error}>
+            {'Неверный протокол, пример: http://localhost'}
+          </HelperText>
+        )}
         <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
         <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} />
         <View style={localStyles.buttonsView}>
@@ -86,4 +113,5 @@ export default ConfigScreen;
 const configStyles = StyleSheet.create({
   screen: { alignItems: 'center', flexDirection: 'row', flex: 1 },
   keybord: { paddingVertical: 20, flexDirection: 'column' },
+  error: { marginTop: -5, paddingTop: -5 },
 });

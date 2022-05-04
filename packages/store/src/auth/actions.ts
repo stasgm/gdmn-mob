@@ -12,7 +12,6 @@ const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
 const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
-// const setDemoMode = createAction('AUTH/SET_DEMOMODE')();
 const setLoadingData = createAction('AUTH/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('AUTH/SET_LOADING_ERROR')<string>();
 const setInit = createAction('AUTH/SET_IS_INIT')<boolean>();

@@ -19,13 +19,17 @@ import { IUser } from '@lib/types';
 
 import koaConfig from '../config/koa';
 
+import config from '../config';
+
 import log from './utils/logger';
 
 import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb, dbtype } from './services/dao/db';
+import { createDb, dbtype, getDb } from './services/dao/db';
+import { checkProcessList, initProcessList } from './services/processList';
+import { MSEС_IN_MIN } from './utils/constants';
 
 interface IServer {
   name: string;
@@ -36,6 +40,7 @@ interface IServer {
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 // export type KoaApp = Koa;
+let timerId: number;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();
@@ -45,22 +50,28 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.port = server.port;
   app.context.name = server.name;
 
-  const dbArr = await (app.context.db as dbtype).dbid.read();
+  const dbArr = await (app.context.db as dbtype).sessionId.read();
   const dbid = dbArr.length === 1 ? dbArr[0].id : '';
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
+
+  // const processPath = path.join(getDb().dbPath, 'processes.json');
+  initProcessList();
+  checkProcessList(true);
+
+  timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
 
   passport.serializeUser((user: unknown, done) => {
-    console.log('serializeUser', user);
+    log.info('serializeUser', user);
     done(null, (user as IUser).id);
   });
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
   passport.deserializeUser(async (id: string, done) => {
     try {
-      console.log('deserializeUser', id);
+      log.info('deserializeUser', id);
       const user = await userService.findOne(id);
       done(null, user);
     } catch (err) {
@@ -126,6 +137,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 process.on('SIGINT', () => {
   console.log('Ctrl-C...');
   console.log('Finished all requests');
+  clearInterval(timerId);
   process.exit(2);
 });
 

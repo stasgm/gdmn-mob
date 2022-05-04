@@ -15,6 +15,8 @@ export interface IUserSetting {
 export interface IUser extends INamedEntity, IExternalSystemProps {
   alias?: string;
   role: UserRole;
+  erpUser?: INamedEntity;
+  appSystem?: INamedEntity;
   firstName?: string;
   lastName?: string;
   middleName?: string;
@@ -34,9 +36,10 @@ export type IUserCredentials = Pick<IUser, 'name' | 'email'> & { password: strin
 export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;
   admin: INamedEntity;
+  appSystems?: string[];
 }
 
-export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city'>;
+export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city' | 'appSystems'>;
 
 export interface IDevice extends INamedEntity {
   uid: string;
@@ -63,10 +66,12 @@ export interface IActivationCode extends IEntity {
 export type NewActivationCode = Pick<IActivationCode, 'code'>;
 
 // Типы для хранения данных в бд
-export interface IDBUser extends Omit<IUser, 'creator' | 'company'> {
+export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser' | 'appSystem'> {
   password: string;
   creatorId: string;
   company: string | null; // по умолчанию null
+  erpUserId?: string;
+  appSystemId?: string;
 }
 
 export interface IDBCompany extends Omit<ICompany, 'admin'> {
@@ -86,4 +91,12 @@ export interface IDBActivationCode extends Omit<IActivationCode, 'device'> {
   deviceId: string;
 }
 
-export type IDBid = IEntity;
+export type SessionId = IEntity;
+
+export interface IAppSystem extends INamedEntity {
+  description?: string;
+}
+
+export type NewAppSystem = Pick<IAppSystem, 'name'>;
+
+export type DBAppSystem = IAppSystem;

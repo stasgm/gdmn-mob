@@ -22,21 +22,8 @@ export interface IClearMessagesResponse extends IMessageQueryResponse {
   type: 'CLEAR_MESSAGES';
 }
 
-// export interface ISubscribeResponse extends IMessageQueryResponse {
-//   type: 'SUBSCRIBE';
-//   messageList: IMessage[];
-// }
-
-// export interface IPublishResponse extends IMessageQueryResponse {
-//   type: 'PUBLISH';
-//   uid: string;
-//   date: Date;
-// }
-
 export type MessageQueryResponse =
   | ISendMessageResponse
   | IGetMessagesResponse
   | IRemoveMessageResponse
   | IClearMessagesResponse;
-// | ISubscribeResponse
-// | IPublishResponse;

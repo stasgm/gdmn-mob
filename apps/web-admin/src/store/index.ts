@@ -9,10 +9,14 @@ import userReducer from './user/reducer';
 import deviceReducer from './device/reducer';
 import activationCodeReducer from './activationCode/reducer';
 import deviceBindingReducer from './deviceBinding/reducer';
+import appSystemReducer from './appSystem/reducer';
+import processReducer from './process/reducer';
 import { DeviceActionType } from './device/actions';
 import { ActivationCodeActionType } from './activationCode/actions';
 import { UserActionType } from './user/actions';
 import { DeviceBindingActionType } from './deviceBinding/actions';
+import { AppSystemActionType } from './appSystem/actions';
+import { ProcessActionType } from './process/actions';
 import { loadDataFromDisk, saveDataToDisk } from './appStorageWeb';
 
 export const reducers = {
@@ -21,6 +25,8 @@ export const reducers = {
   devices: deviceReducer,
   activationCodes: activationCodeReducer,
   deviceBindings: deviceBindingReducer,
+  appSystems: appSystemReducer,
+  processes: processReducer,
 };
 
 type TActions =
@@ -28,7 +34,9 @@ type TActions =
   | DeviceActionType
   | ActivationCodeActionType
   | UserActionType
-  | DeviceBindingActionType;
+  | DeviceBindingActionType
+  | AppSystemActionType
+  | ProcessActionType;
 
 const appReducer = combineReducers(reducers);
 

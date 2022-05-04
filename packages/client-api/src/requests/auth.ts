@@ -124,11 +124,6 @@ class Auth extends BaseRequest {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка выхода',
       } as error.INetworkError;
-
-      // return {
-      //   type: 'ERROR',
-      //   message: err?.response?.data?.error || 'ошибка выхода',
-      // } as error.INetworkError;
     }
   };
 
@@ -156,50 +151,11 @@ class Auth extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о пользователе',
-        //err?.response?.data?.error || 'ошибка получения данных о пользователе',
       } as error.INetworkError;
     }
   };
 
-  // getActivationCode = async () => {
-  //   try {
-  //     const res = await this.api.axios.get<IResponse<string>>(`/auth/device/${this.api.deviceId}/code`);
-  //     const resData = res.data;
-
-  //     if (resData.result) {
-  //       return {
-  //         type: 'GET_CODE',
-  //         code: resData.data,
-  //       } as types.ICreateCodeResponse;
-  //     }
-  //     return {
-  //       type: 'ERROR',
-  //       message: resData.error,
-  //     } as error.INetworkError;
-  //   } catch (err) {
-  //     return {
-  //       type: 'ERROR',
-  //       message: err?.response?.data?.error || 'ошибка получения кода',
-  //     } as error.INetworkError;
-  //   }
-  // };
-
   verifyCode = async (code: string) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
-    //   if (code === '1111') {
-    //     console.log('verifyCode code', code, mockDevice);
-    //     return {
-    //       type: 'VERIFY_CODE',
-    //       uid: mockDevice.uid,
-    //     } as types.IVerifyCodeResponse;
-    //   }
-    //   return {
-    //     type: 'ERROR',
-    //     message: 'Неверный код',
-    //   } as error.INetworkError;
-    // }
-
     try {
       const body = { code };
 

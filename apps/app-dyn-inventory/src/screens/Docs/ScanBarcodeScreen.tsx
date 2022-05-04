@@ -47,9 +47,7 @@ const ScanBarcodeScreen = () => {
     navigation.navigate('SelectRemainsItem', { docId });
   }, [docId, navigation]);
 
-  const document = docSelectors
-    .selectByDocType<IInventoryDocument>('inventory')
-    ?.find((e) => e.id === docId) as IInventoryDocument;
+  const document = docSelectors.selectByDocId<IInventoryDocument>(docId);
 
   const goods = useMemo(
     () => (document?.head?.department?.id ? model[document.head.department.id].goods : {}),

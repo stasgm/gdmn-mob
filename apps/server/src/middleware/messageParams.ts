@@ -10,7 +10,7 @@ export const messageParamsMiddlware = async (ctx: Context, next: Next): Promise<
 
   if (consumer.id === '-1') {
     const db = getDb();
-    const user = await db.users.find((u) => u.alias === consumer.name);
+    const user = await db.users.find((u) => u.alias === 'gdmn' && u.company === body.head.company.id);
 
     if (!user) {
       throw new InvalidParameterException('Системный пользователь не определен');

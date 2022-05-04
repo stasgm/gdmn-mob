@@ -10,19 +10,17 @@ import { refSelectors } from '@lib/store';
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGood, IGoodMatrix } from '../../store/types';
 
-import { getGoodMatrixGoodByContact } from '../../utils/helpers';
+import { getGoodMatrixByContact } from '../../utils/helpers';
 
 import GoodItem from './components/GoodItem';
+
+const keyExtractor = (item: IGood) => String(item.id);
 
 const GoodListScreen = () => {
   const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodList'>>().params;
   const contact = refSelectors.selectByName<IContact>('contact')?.data.find((e) => e.id === id);
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
-
-  // const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() =>
-  //   contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id]) : {},
-  // );
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -31,8 +29,9 @@ const GoodListScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good')?.data;
 
-  const [goodRemains] = useState<IGood[]>(() =>
-    contact?.id ? getGoodMatrixGoodByContact(goods, goodMatrix[contact.id], true) : [],
+  const goodRemains = useMemo(
+    () => (contact?.id ? getGoodMatrixByContact(goods, goodMatrix[contact.id], true) : []),
+    [contact?.id, goodMatrix, goods],
   );
 
   const filteredList = useMemo(() => {
@@ -70,6 +69,8 @@ const GoodListScreen = () => {
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
 
+  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
+
   return (
     <AppScreen>
       <SubTitle style={[localStyles.title]}>{contact?.name}</SubTitle>
@@ -88,11 +89,11 @@ const GoodListScreen = () => {
       )}
       <FlatList
         data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={!goods || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={EC}
       />
     </AppScreen>
   );

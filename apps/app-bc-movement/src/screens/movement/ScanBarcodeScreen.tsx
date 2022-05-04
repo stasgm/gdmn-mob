@@ -25,9 +25,9 @@ const ScanBarcodeScreen = () => {
     });
   }, [navigation]);
 
-  const bcMovement = docSelectors.selectByDocType<IMovementDocument>('bcMovement')?.find((e) => e.id === docId);
+  const document = docSelectors.selectByDocId<IMovementDocument>(docId);
 
-  const barcodes = bcMovement?.lines;
+  const barcodes = document?.lines;
 
   const handleSaveScannedItem = useCallback(
     (line: IMovementLine) => {
@@ -35,10 +35,6 @@ const ScanBarcodeScreen = () => {
     },
     [dispatch, docId],
   );
-
-  const document = docSelectors
-    .selectByDocType<IMovementDocument>('bcMovement')
-    ?.find((e) => e.id === docId) as IMovementDocument;
 
   const getScannedObject = useCallback(
     (brc: string): IMovementLine | undefined => {
