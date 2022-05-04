@@ -18,20 +18,16 @@ const CompanyCreate = () => {
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
 
-  const { list } = useSelector((state) => state.appSystems);
+  // const { list } = useSelector((state) => state.appSystems);
 
-  console.log('list', list);
-  console.log('list111');
+  // console.log('list', list);
+  // console.log('list111');
 
-  const fetchAppSystems = useCallback(async () => {
-    await dispatch(appSystemActions.fetchAppSystems());
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchAppSystems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   // Загружаем данные при загрузке компонента.
+  //   dispatch(appSystemActions.fetchAppSystems());
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -69,7 +65,7 @@ const CompanyCreate = () => {
         </Box>
         <CompanyDetails
           company={{ name: '' } as ICompany}
-          appSystems={list}
+          // appSystems={list}
           loading={loading}
           onSubmit={handleSubmit}
           onCancel={handleGoBack}
