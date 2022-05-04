@@ -1,4 +1,4 @@
-import Router from 'koa-joi-router';
+import route from 'koa-joi-router';
 
 import { getAppSystem, addAppSystem, getAppSystems, removeAppSystem, updateAppSystem } from '../controllers/appSystem';
 import { authMiddleware } from '../middleware/authRequired';
@@ -6,11 +6,11 @@ import { companyMiddleware } from '../middleware/companyRequired';
 // import { permissionMiddleware } from '../middleware/permissionRequired';
 import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 
-const router = Router();
+const appSystems = route();
 
-router.prefix('/appSystems');
-router.post('/', /*companyValidation.addCompany,*/ authMiddleware, /*permissionMiddleware,*/ addAppSystem);
-router.get(
+appSystems.prefix('/appSystems');
+appSystems.post('/', /*companyValidation.addCompany,*/ authMiddleware, /*permissionMiddleware,*/ addAppSystem);
+appSystems.get(
   '/:id',
   // companyValidation.getCompany,
   authMiddleware,
@@ -18,8 +18,16 @@ router.get(
   // roleBasedParamsMiddlware,
   getAppSystem,
 );
-router.get('/', authMiddleware, companyMiddleware, roleBasedParamsMiddlware, getAppSystems);
-router.patch('/:id', /*companyValidation.updateCompany,*/ authMiddleware, /*permissionMiddleware,*/ updateAppSystem);
-router.delete('/:id', /*companyValidation.removeCompany,*/ authMiddleware, /*permissionMiddleware,*/ removeAppSystem);
+appSystems.get('/', authMiddleware, companyMiddleware, roleBasedParamsMiddlware, getAppSystems);
+appSystems.patch(
+  '/:id',
+  /*companyValidation.updateCompany,*/ authMiddleware,
+  /*permissionMiddleware,*/ updateAppSystem,
+);
+appSystems.delete(
+  '/:id',
+  /*companyValidation.removeCompany,*/ authMiddleware,
+  /*permissionMiddleware,*/ removeAppSystem,
+);
 
-export default router;
+export default appSystems;

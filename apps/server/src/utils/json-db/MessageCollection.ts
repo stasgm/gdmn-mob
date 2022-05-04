@@ -5,7 +5,7 @@ import { constants } from 'fs';
 
 import path from 'path';
 
-import R from 'ramda';
+import { assoc } from 'ramda';
 import { v1 as uuid } from 'uuid';
 
 import { IFileMessageInfo } from '@lib/types';
@@ -48,7 +48,7 @@ class CollectionMessage<T extends CollectionItem> {
   private collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
-    return R.assoc('id', uuid(), obj) as K;
+    return assoc('id', uuid(), obj) as K;
   }
 
   constructor(pathDb: string) {

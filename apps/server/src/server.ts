@@ -13,7 +13,7 @@ import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
 import serve from 'koa-static-server';
-import historyApiFallback from 'koa2-connect-history-api-fallback';
+import { historyApiFallback } from 'koa2-connect-history-api-fallback';
 
 import { IUser } from '@lib/types';
 
@@ -40,7 +40,7 @@ interface IServer {
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 // export type KoaApp = Koa;
-let timerId: number;
+let timerId: NodeJS.Timer;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();

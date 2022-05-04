@@ -2,7 +2,7 @@ import { Next, Context } from 'koa';
 import koaPassport from 'koa-passport';
 import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
-import bcrypt from 'bcrypt';
+import { compare } from 'bcrypt';
 
 import { IUser, NewUser, IUserCredentials, DeviceState, IDBDeviceBinding } from '@lib/types';
 
@@ -137,7 +137,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
-  if (await bcrypt.compare(password, hashedPassword)) {
+  if (await compare(password, hashedPassword)) {
     done(null, user);
   } else {
     done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null

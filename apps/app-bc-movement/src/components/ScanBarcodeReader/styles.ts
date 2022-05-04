@@ -78,6 +78,9 @@ const styles = StyleSheet.create({
   btnUnknown: {
     backgroundColor: '#CC3C4D',
   },
+  scanFocus: {
+    width: 0,
+  },
 });
 
 export default styles;
