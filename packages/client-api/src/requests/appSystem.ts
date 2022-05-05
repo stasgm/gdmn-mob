@@ -178,7 +178,6 @@ class AppSystem extends BaseRequest {
       const res = await this.api.axios.get<IResponse<IAppSystem[]>>(`/appSystems${paramText}`);
       ///${this.api.config.version}
       const resData = res.data;
-      console.log('resData', resData);
 
       if (resData.result) {
         return {

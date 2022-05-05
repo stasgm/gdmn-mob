@@ -23,36 +23,20 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   const [open, setOpen] = useState(false);
   const [userERP, setUserERP] = useState(user.appSystem ? true : false);
 
-  const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
+  const [appSystems, setAppSystems] = useState<INamedEntity[] | undefined>([]);
   const [loadingAppSystems, setLoadingAppSystems] = useState(true);
-
-  const [companyAppSystems, setCompanyAppSystems] = useState<INamedEntity[] | undefined>([]);
 
   const [users, setUsers] = useState<INamedEntity[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
 
   useEffect(() => {
     let unmounted = false;
-    const getAppSystems = async () => {
-      const res = await api.appSystem.getAppSystems();
-      if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
-        setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
-        setLoadingAppSystems(false);
-      }
-    };
-    getAppSystems();
-    return () => {
-      unmounted = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let unmounted = false;
     const getCompanies = async () => {
       const res = await api.company.getCompanies();
       if (res.type === 'GET_COMPANIES' && !unmounted) {
-        const a = res.companies.map((d) => ({ appSystems: d.appSystems }));
-        setCompanyAppSystems(a[0].appSystems);
+        const companyAppSystems = res.companies.map((d) => ({ appSystems: d.appSystems }));
+        setAppSystems(companyAppSystems[0].appSystems);
+        setLoadingAppSystems(false);
       }
     };
     getCompanies();
@@ -60,16 +44,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       unmounted = true;
     };
   }, []);
-
-  console.log('1234567', user.appSystem);
-
-  const userAppSystems: INamedEntity[] = [];
-
-  for (const item of appSystems) {
-    if (companyAppSystems?.find((i) => i.id === item.id)) {
-      userAppSystems.push({ id: item.id, name: item.name });
-    }
-  }
 
   useEffect(() => {
     let unmounted = false;
@@ -86,8 +60,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     };
   }, []);
 
-  console.log('formik', users);
-
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
     initialValues: {
@@ -99,8 +71,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       password: (user as NewUser).password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
-      appSystem: user.appSystem || null,
-      erpUser: user.erpUser || null,
+      appSystem: (user.appSystem || null) as INamedEntity,
+      erpUser: (user.erpUser || null) as INamedEntity,
     },
 
     validationSchema: yup.object().shape({
@@ -111,7 +83,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
-      // onSubmit({ ...values, alias: values.alias.name } as IUser);
       onSubmit(values);
     },
   });
@@ -164,7 +135,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                       name="appSystem"
                       label="Подсистема"
                       type="appSystem"
-                      options={userAppSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
+                      options={appSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
                       setFieldValue={formik.setFieldValue}
                       setTouched={formik.setTouched}
                       error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
@@ -217,7 +188,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
-                  {/* <TextField */}
                   <TextField
                     error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                     fullWidth
@@ -289,14 +259,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     </Grid>
                   )}
                 <Grid item md={6} xs={12}>
-                  <Checkbox
-                    checked={userERP}
-                    color="primary"
-                    // indeterminate={selectedDeviceIds.length > 0 && selectedDeviceIds.length < devices.length}
-                    onChange={handleUserERP}
-                  />
+                  <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
                   Пользователь ERP
-                  {/* <Text>Пользователь ERP</Text> */}
                 </Grid>
               </Grid>
             </CardContent>
