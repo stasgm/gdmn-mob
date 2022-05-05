@@ -12,6 +12,7 @@ interface IProps {
   getOptionLabel?: (option: any) => string;
   filterOptions?: any;
   isOptionEqualToValue?: any;
+  required?: boolean;
 }
 
 const ComboBox = ({
@@ -24,6 +25,7 @@ const ComboBox = ({
   getOptionLabel = getOptionLabelDefault,
   filterOptions = filterOptionsDefault,
   isOptionEqualToValue = isOptionEqualToValueDefault,
+  required = false,
 }: IProps) => {
   return (
     <Autocomplete
@@ -34,7 +36,9 @@ const ComboBox = ({
       filterOptions={filterOptions}
       onChange={(_, newValue) => setFieldValue(field.name, newValue)}
       onBlur={() => setTouched({ [field.name]: true })}
-      renderInput={(params) => <TextField label={label} required {...params} variant="outlined" error={error} />}
+      renderInput={(params) => (
+        <TextField label={label} required={required} {...params} variant="outlined" error={error} />
+      )}
     />
   );
 };

@@ -2,14 +2,11 @@ import { Box, CardHeader, CircularProgress } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { ICompany, NewCompany } from '@lib/types';
 
-import { useCallback, useEffect } from 'react';
-
 import CompanyDetails from '../../components/company/CompanyDetails';
 import SnackBar from '../../components/SnackBar';
 
 import { useSelector, useDispatch, AppDispatch } from '../../store';
 import actions from '../../store/company';
-import appSystemActions from '../../store/appSystem';
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
@@ -17,17 +14,6 @@ const CompanyCreate = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const { errorMessage, loading } = useSelector((state) => state.companies);
-
-  // const { list } = useSelector((state) => state.appSystems);
-
-  // console.log('list', list);
-  // console.log('list111');
-
-  // useEffect(() => {
-  //   // Загружаем данные при загрузке компонента.
-  //   dispatch(appSystemActions.fetchAppSystems());
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -65,7 +51,6 @@ const CompanyCreate = () => {
         </Box>
         <CompanyDetails
           company={{ name: '' } as ICompany}
-          // appSystems={list}
           loading={loading}
           onSubmit={handleSubmit}
           onCancel={handleGoBack}

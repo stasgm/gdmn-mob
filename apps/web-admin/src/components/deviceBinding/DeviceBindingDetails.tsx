@@ -107,6 +107,7 @@ const DeviceBindingDetails = ({ deviceBinding, loading, onSubmit, onCancel }: IP
                     name="state"
                     label="Статус"
                     type="state"
+                    required={true}
                     options={Object.entries(deviceStates).map((key) => ({ id: key[0], name: key[1] })) || []}
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}

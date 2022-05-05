@@ -26,6 +26,7 @@ import ProcessDetailsView from '../../components/process/ProcessDetailsView';
 import processActions from '../../store/process';
 import ProcessFiles from '../../components/process/ProcessFiles';
 import ProcessFilesProcessed from '../../components/process/ProcessFilesProcessed';
+import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 
 export type Params = {
   id: string;
@@ -84,7 +85,7 @@ const ProcessView = () => {
           p: 3,
         }}
       >
-        Процесс не найден
+        {loading ? <CircularProgressWithContent content={'Идет загрузка данных...'} /> : 'Процесс не найден'}
       </Box>
     );
   }

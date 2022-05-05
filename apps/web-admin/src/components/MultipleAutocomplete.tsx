@@ -32,27 +32,11 @@ const MultipleAutocomplete = ({
       options={options}
       getOptionLabel={getOptionLabel}
       isOptionEqualToValue={isOptionEqualToValue}
-      // defaultValue={[top100Films[13]]}
       filterOptions={filterOptions}
       onChange={(_, newValue) => setFieldValue(field.name, newValue)}
       onBlur={() => setTouched({ [field.name]: true })}
-      renderInput={(params) => <TextField label={label} required {...params} variant="outlined" error={error} />}
+      renderInput={(params) => <TextField label={label} {...params} variant="outlined" error={error} />}
     />
-    // <Autocomplete
-    //     multiple
-    //     id="tags-outlined"
-    //     options={top100Films}
-    //     getOptionLabel={(option) => option.title}
-    //     defaultValue={[top100Films[13]]}
-    //     filterSelectedOptions
-    //     renderInput={(params) => (
-    //       <TextField
-    //         {...params}
-    //         label="filterSelectedOptions"
-    //         placeholder="Favorites"
-    //       />
-    //     )}
-    //   />
   );
 };
 

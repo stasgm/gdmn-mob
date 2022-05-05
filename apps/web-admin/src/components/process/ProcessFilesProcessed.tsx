@@ -5,7 +5,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import { Box, Card, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from '@material-ui/core';
 import { IProcessedFiles, StatusType } from '@lib/types';
 
-type IProcessedFilesArray = [string, StatusType];
+type IProcessedFilesArray = [string, { status: StatusType; replyTo?: string }];
 
 interface IProps {
   processedFilesList?: IProcessedFiles;
@@ -37,7 +37,7 @@ const ProcessFilesProcessed = ({ processedFilesList = {}, limitRows = 0 }: IProp
       return (
         <TableRow hover key={file[0]}>
           <TableCell width="85%">{file[0]}</TableCell>
-          <TableCell>{file[1]}</TableCell>
+          <TableCell>{file[1].status}</TableCell>
         </TableRow>
       );
     });

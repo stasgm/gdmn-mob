@@ -1,4 +1,5 @@
 import { IProcess, IResponse } from '@lib/types';
+import { processes as mockProcesses } from '@lib/mock';
 
 import { error, process as types } from '../types';
 import { getParams, sleep } from '../utils';
@@ -12,14 +13,14 @@ class Process extends BaseRequest {
   }
 
   getProcesses = async (params?: Record<string, string | number>) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-    //   return {
-    //     type: 'GET_COMPANIES',
-    //     companies: mockCompanies,
-    //   } as types.IGetCompaniesResponse;
-    // }
+      return {
+        type: 'GET_PROCESSES',
+        processes: mockProcesses,
+      } as types.IGetProcessesResponse;
+    }
 
     let paramText = params ? getParams(params) : '';
 
