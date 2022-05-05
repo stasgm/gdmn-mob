@@ -2,6 +2,8 @@ import { v4 as uuid } from 'uuid';
 
 import { IResponse, IAppSystem, NewAppSystem } from '@lib/types';
 
+import { appSystems as mockAppSystems } from '@lib/mock';
+
 import { error, appSystem as types } from '../types';
 import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
@@ -80,7 +82,6 @@ class AppSystem extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка обновления подсистемы',
-        //err?.response?.data?.error || 'ошибка обновления компании',
       } as error.INetworkError;
     }
   };
@@ -111,16 +112,29 @@ class AppSystem extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка удаления компании',
-        //err?.response?.data?.error || 'ошибка удаления компании',
+        message: err instanceof TypeError ? err.message : 'ошибка удаления подсистемы',
       } as error.INetworkError;
     }
   };
 
   getAppSystem = async (appSystemId: string) => {
-    // if (this.api.config.debug?.isMock) {
-    // }
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
+      const appSystem = mockAppSystems.find((item) => item.id === appSystemId);
+
+      if (appSystem) {
+        return {
+          type: 'GET_APP_SYSTEM',
+          appSystem,
+        } as types.IGetAppSystemResponse;
+      }
+
+      return {
+        type: 'ERROR',
+        message: 'Подсистема не найдена',
+      } as error.INetworkError;
+    }
     try {
       const res = await this.api.axios.get<IResponse<IAppSystem>>(`/appSystems/${appSystemId}`);
       const resData = res.data;
@@ -140,20 +154,19 @@ class AppSystem extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о подсистеме',
-        //err?.response?.data?.error || 'ошибка получения данных о компании',
       } as error.INetworkError;
     }
   };
 
   getAppSystems = async (params?: Record<string, string | number>) => {
-    // if (this.api.config.debug?.isMock) {
-    //   await sleep(this.api.config.debug?.mockDelay || 0);
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
 
-    //   return {
-    //     type: 'GET_APP_SYSTEMS',
-    //     appSystems: mockAppSystems,
-    //   } as types.IAppSystemQueryResponse;
-    // }
+      return {
+        type: 'GET_APP_SYSTEMS',
+        appSystems: mockAppSystems,
+      } as types.IAppSystemQueryResponse;
+    }
 
     let paramText = params ? getParams(params) : '';
 
@@ -182,7 +195,6 @@ class AppSystem extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о системах',
-        //err?.response?.data?.error || 'ошибка получения данных о компаниях',
       } as error.INetworkError;
     }
   };

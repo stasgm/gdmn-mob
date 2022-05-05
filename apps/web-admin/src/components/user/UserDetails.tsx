@@ -2,7 +2,7 @@ import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } fr
 
 import { useEffect, useState } from 'react';
 
-import { IAppSystem, INamedEntity, IUser, NewUser } from '@lib/types';
+import { IAppSystem, ICompany, INamedEntity, IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
@@ -27,6 +27,12 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
   const [appSystemm, setAppSystems] = useState<INamedEntity[]>([]);
   const [loadingAppSystems, setLoadingAppSystems] = useState(true);
 
+  const [companies, setCompanies] = useState<string[] | undefined>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
+
+  const [users, setUsers] = useState<INamedEntity[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
   useEffect(() => {
     let unmounted = false;
     const getAppSystems = async () => {
@@ -42,7 +48,55 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
     };
   }, []);
 
-  // console.log('formik', appSystems);
+  useEffect(() => {
+    let unmounted = false;
+    const getCompanies = async () => {
+      const res = await api.company.getCompanies();
+      if (res.type === 'GET_COMPANIES' && !unmounted) {
+        const a = res.companies.map((d) => ({ appSystems: d.appSystems }));
+        setCompanies(a[0].appSystems);
+        setLoadingCompanies(false);
+      }
+    };
+    getCompanies();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  console.log('compppp', companies);
+
+  console.log('1234567', user.appSystem);
+
+  const appSystems1: [] = [];
+
+  for (const item of appSystemm) {
+    if (companies?.find((i) => i === item.id)) {
+      // appSystems.push(item.name);
+      appSystems1.push({ id: item.id, name: item.name });
+    }
+  }
+
+  console.log('new', appSystems1);
+
+  // setAppSystems(appSystems1);
+
+  useEffect(() => {
+    let unmounted = false;
+    const getUsers = async () => {
+      const res = await api.user.getUsers();
+      if (res.type === 'GET_USERS' && !unmounted) {
+        setUsers(res.users.filter((i) => i.appSystem).map((d) => ({ id: d.id, name: d.name })));
+        setLoadingUsers(false);
+      }
+    };
+    getUsers();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  console.log('formik', users);
 
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
@@ -119,7 +173,7 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
                       name="appSystem"
                       label="Подсистема"
                       type="appSystem"
-                      options={appSystemm?.map((d) => ({ id: d.id, name: d.name })) || []} //{appSystems || []} //+
+                      options={appSystems1?.map((d) => ({ id: d.id, name: d.name })) || []} //{appSystems || []} //+
                       setFieldValue={formik.setFieldValue}
                       setTouched={formik.setTouched}
                       error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
@@ -142,6 +196,20 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
                       value={formik.values.alias}
                     />
                   </Grid>
+                  //   <Grid item md={6} xs={12}>
+                  //   <Field
+                  //     component={ComboBox}
+                  //     name="erpUser"
+                  //     label="Подсистема"
+                  //     type="erpUser"
+                  //     options={users?.map((d) => ({ id: d.id, name: d.name })) || []} //{appSystems || []} //+
+                  //     setFieldValue={formik.setFieldValue}
+                  //     setTouched={formik.setTouched}
+                  //     error={Boolean(formik.touched.erpUser && formik.errors.erpUser)}
+                  //     disabled={loading || loadingUsers}
+                  //     // getOptionLabel={formik.values.appSystem?.name || ''}
+                  //   />
+                  // </Grid>
                 )}
                 <Grid item md={6} xs={12}>
                   <TextField
