@@ -47,7 +47,7 @@ const AppSystemCreate = () => {
           }}
         >
           <Box sx={{ display: 'inline-flex', marginBottom: 1 }}>
-            <CardHeader title={'Добавление компании'} />
+            <CardHeader title={'Добавление подсистемы'} />
             {loading && <CircularProgress size={40} />}
           </Box>
         </Box>

@@ -1,22 +1,48 @@
-import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
+import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } from '@material-ui/core';
 
 import { useEffect, useState } from 'react';
 
-import { IUser, NewUser } from '@lib/types';
-import { FormikTouched, useFormik } from 'formik';
+import { IAppSystem, INamedEntity, IUser, NewUser } from '@lib/types';
+import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
+import api from '@lib/client-api';
+
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+
+import ComboBox from '../ComboBox';
 
 interface IProps {
   loading: boolean;
   user: IUser | NewUser;
+  // appSystems: IAppSystem[];
   onSubmit: (values: IUser | NewUser) => void;
   onCancel: () => void;
 }
 
-const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
+const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IProps) => {
   const [open, setOpen] = useState(false);
+  const [userERP, setUserERP] = useState(user.appSystem ? true : false);
+
+  const [appSystemm, setAppSystems] = useState<INamedEntity[]>([]);
+  const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+
+  useEffect(() => {
+    let unmounted = false;
+    const getAppSystems = async () => {
+      const res = await api.appSystem.getAppSystems();
+      if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
+        setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
+        setLoadingAppSystems(false);
+      }
+    };
+    getAppSystems();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  // console.log('formik', appSystems);
 
   const formik = useFormik<IUser | NewUser>({
     enableReinitialize: true,
@@ -29,7 +55,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       password: (user as NewUser).password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
-      alias: user.alias || '',
+      appSystem: user.appSystem || '', // user.alias || '',
+      // alias: user.alias || '',
     },
     validationSchema: yup.object().shape({
       name: yup.string().required('Заполните это поле'),
@@ -39,6 +66,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
         Object.keys(user).length == 0 ? yup.string().required('Заполните это поле') : yup.string().notRequired(),
     }),
     onSubmit: (values) => {
+      // onSubmit({ ...values, alias: values.alias.name } as IUser);
       onSubmit(values);
     },
   });
@@ -53,8 +81,12 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
     setOpen(true);
   };
 
+  const handleUserERP = () => {
+    userERP ? setUserERP(false) : setUserERP(true);
+  };
+
   return (
-    <>
+    <FormikProvider value={formik}>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -80,20 +112,37 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <TextField
-                    error={formik.touched.alias && Boolean(formik.errors.alias)}
-                    fullWidth
-                    label="Пользователь ERP"
-                    name="alias"
-                    variant="outlined"
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    type="alias"
-                    disabled={loading}
-                    value={formik.values.alias}
-                  />
-                </Grid>
+                {userERP ? (
+                  <Grid item md={6} xs={12}>
+                    <Field
+                      component={ComboBox}
+                      name="appSystem"
+                      label="Подсистема"
+                      type="appSystem"
+                      options={appSystemm?.map((d) => ({ id: d.id, name: d.name })) || []} //{appSystems || []} //+
+                      setFieldValue={formik.setFieldValue}
+                      setTouched={formik.setTouched}
+                      error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
+                      disabled={loading || loadingAppSystems}
+                      // getOptionLabel={formik.values.appSystem?.name || ''}
+                    />
+                  </Grid>
+                ) : (
+                  <Grid item md={6} xs={12}>
+                    <TextField
+                      error={formik.touched.alias && Boolean(formik.errors.alias)}
+                      fullWidth
+                      label="Пользователь ERP"
+                      name="alias"
+                      variant="outlined"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      type="alias"
+                      disabled={loading}
+                      value={formik.values.alias}
+                    />
+                  </Grid>
+                )}
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -194,6 +243,16 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                       Пароли не совпадают
                     </Grid>
                   )}
+                <Grid item md={6} xs={12}>
+                  <Checkbox
+                    checked={userERP}
+                    color="primary"
+                    // indeterminate={selectedDeviceIds.length > 0 && selectedDeviceIds.length < devices.length}
+                    onChange={handleUserERP}
+                  />
+                  Пользователь ERP
+                  {/* <Text>Пользователь ERP</Text> */}
+                </Grid>
               </Grid>
             </CardContent>
             <Divider />
@@ -232,7 +291,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
           </Card>
         </form>
       </Box>
-    </>
+    </FormikProvider>
   );
 };
 

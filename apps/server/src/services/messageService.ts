@@ -9,6 +9,38 @@ import { getNamedEntity } from './dao/utils';
 
 import { getDb } from './dao/db';
 
+const addOne = async ({
+  msgObject,
+  producerId,
+  appSystem,
+  companyId,
+}: {
+  msgObject: NewMessage;
+  producerId: string;
+  appSystem: string;
+  companyId: string;
+}): Promise<string> => {
+  const db = getDb();
+  const { messages, dbPath } = db;
+  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
+
+  /*if (await messages.find((i) => i.id === msgObject.id)) {
+    throw new Error('сообщение с таким идентификатором уже добавлено');
+  }*/
+
+  const newMessage = await makeDBNewMessage(msgObject, producerId);
+
+  const fileInfo = {
+    id: newMessage.id,
+    producer: newMessage.head.producerId,
+    consumer: newMessage.head.consumerId,
+  };
+
+  const messageId = await messages.insert(newMessage, fileInfo);
+
+  return messageId;
+};
+
 const findOne = async (id: string) => {
   const db = getDb();
   const { messages } = db;
@@ -75,38 +107,6 @@ const FindMany = async ({
  * @param {string} companyId - идентификатор организация
  * @return id, идентификатор сообщения
  * */
-
-const addOne = async ({
-  msgObject,
-  producerId,
-  appSystem,
-  companyId,
-}: {
-  msgObject: NewMessage;
-  producerId: string;
-  appSystem: string;
-  companyId: string;
-}): Promise<string> => {
-  const db = getDb();
-  const { messages, dbPath } = db;
-  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
-
-  /*if (await messages.find((i) => i.id === msgObject.id)) {
-    throw new Error('сообщение с таким идентификатором уже добавлено');
-  }*/
-
-  const newMessage = await makeDBNewMessage(msgObject, producerId);
-
-  const fileInfo = {
-    id: newMessage.id,
-    producer: newMessage.head.producerId,
-    consumer: newMessage.head.consumerId,
-  };
-
-  const messageId = await messages.insert(newMessage, fileInfo);
-
-  return messageId;
-};
 
 /**
  * Обновляет одно сообщение
@@ -243,7 +243,7 @@ export const makeDBNewMessage = async (message: NewMessage, producerId: string):
       appSystem: message.head.appSystem,
       companyId: message.head.company.id,
       consumerId: message.head.consumer.id,
-      producerId: producerId,
+      producerId,
       dateTime: new Date().toISOString(),
     },
     status: message.status,

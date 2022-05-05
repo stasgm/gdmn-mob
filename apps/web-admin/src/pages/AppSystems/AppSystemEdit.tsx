@@ -1,6 +1,6 @@
 import { Box, CircularProgress, CardHeader } from '@material-ui/core';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IAppSystem, ICompany, NewCompany } from '@lib/types';
+import { IAppSystem, ICompany, NewAppSystem, NewCompany } from '@lib/types';
 
 import { useCallback, useEffect } from 'react';
 
@@ -32,7 +32,7 @@ const AppSystemEdit = () => {
     dispatch(actions.appSystemActions.clearError());
   };
 
-  const handleSubmit = async (values: IAppSystem) => {
+  const handleSubmit = async (values: IAppSystem | NewAppSystem) => {
     const res = await dispatch(actions.updateAppSystem(values as IAppSystem));
     if (res.type === 'APP_SYSTEM/UPDATE_SUCCESS') {
       goBack();
@@ -65,7 +65,7 @@ const AppSystemEdit = () => {
           alignItems: 'center',
         }}
       >
-        <CardHeader title={'Редактирование компании'} />
+        <CardHeader title={'Редактирование подсистемы'} />
         {loading && <CircularProgress size={40} />}
       </Box>
       <AppSystemDetails appSystem={appSystem} loading={loading} onSubmit={handleSubmit} onCancel={goBack} />

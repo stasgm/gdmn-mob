@@ -33,6 +33,11 @@ const items = [
     title: 'Сводка',
   },
   {
+    href: `${adminPath}/app/appSystems`,
+    icon: AppSystemsIcon,
+    title: 'Подсистемы',
+  },
+  {
     href: `${adminPath}/app/companies`,
     icon: UsersIcon,
     title: 'Компании',
@@ -51,11 +56,6 @@ const items = [
     href: `${adminPath}/app/processes`,
     icon: ProcessIcon,
     title: 'Процессы',
-  },
-  {
-    href: `${adminPath}/app/appSystems`,
-    icon: AppSystemsIcon,
-    title: 'Подсистемы',
   },
   {
     href: `${adminPath}/app/account`,

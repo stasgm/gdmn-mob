@@ -27,30 +27,39 @@ class AppSystem extends BaseRequest {
       } as types.IAddAppSystemResponse;
     }
 
-    const res = await this.api.axios.post<IResponse<IAppSystem>>('/appSystems', appSystem);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.post<IResponse<IAppSystem>>('/appSystems', appSystem);
+      const resData = res.data;
 
-    if (resData?.result) {
+      if (resData?.result) {
+        return {
+          type: 'ADD_APP_SYSTEM',
+          appSystem: resData?.data,
+        } as types.IAddAppSystemResponse;
+      }
+
       return {
-        type: 'ADD_APP_SYSTEM',
-        appSystem: resData?.data,
-      } as types.IAddAppSystemResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка создания подсистемы',
+        // message: err?.response?.data?.error || 'ошибка создания подсистемы',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err?.response?.data?.error || 'ошибка создания компании',
-    //   } as error.INetworkError;
-    // }
   };
 
   updateAppSystem = async (appSystem: Partial<IAppSystem>) => {
-    // if (this.api.config.debug?.isMock) {
+    if (this.api.config.debug?.isMock) {
+      await sleep(this.api.config.debug?.mockDelay || 0);
+
+      return {
+        type: 'UPDATE_APP_SYSTEM',
+        appSystem: { ...appSystem, editionDate: new Date().toISOString() },
+      } as types.IUpdateAppSystemResponse;
+    }
 
     try {
       const res = await this.api.axios.patch<IResponse<IAppSystem>>(`/appSystems/${appSystem.id}`, appSystem);
