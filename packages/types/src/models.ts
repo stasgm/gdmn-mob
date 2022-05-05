@@ -36,7 +36,7 @@ export type IUserCredentials = Pick<IUser, 'name' | 'email'> & { password: strin
 export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;
   admin: INamedEntity;
-  appSystems?: string[];
+  appSystems?: INamedEntity[];
 }
 
 export type NewCompany = Pick<ICompany, 'admin' | 'externalId' | 'name' | 'city' | 'appSystems'>;
@@ -74,8 +74,9 @@ export interface IDBUser extends Omit<IUser, 'creator' | 'company' | 'erpUser' |
   appSystemId?: string;
 }
 
-export interface IDBCompany extends Omit<ICompany, 'admin'> {
+export interface IDBCompany extends Omit<ICompany, 'admin' | 'appSystems'> {
   adminId: string;
+  appSystemIds?: string[];
 }
 
 export interface IDBDevice extends Omit<IDevice, 'company'> {

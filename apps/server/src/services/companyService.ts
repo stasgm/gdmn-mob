@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice } from '@lib/types';
+import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice, IAppSystem } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -28,10 +28,13 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     throw new ConflictException('Компания уже существует');
   }
 
+  // Проверяем есть ли в базе подсистемы
+  const appSystemIds = company.appSystems ? await getAppSystemIds(company.appSystems) : undefined;
+
   const newCompanyObj = {
     name: company.name,
     city: company.city,
-    appSystems: company.appSystems,
+    appSystemIds,
     adminId: company.admin.id,
     externalId: company.externalId,
     creationDate: new Date().toISOString(),
@@ -42,8 +45,6 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
   const createdCompany = await companies.find(newCompany);
   await createFolders(dbPath, createdCompany);
 
-  // Добавляем к текущему
-  //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
   await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
 
   const retCompany = await makeCompany(createdCompany);
@@ -72,13 +73,16 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     adminId = (await users.find(companyData.admin.id))?.id;
   }
 
+  // Проверяем есть ли в базе подсистемы
+  const appSystemIds = companyData.appSystems ? await getAppSystemIds(companyData.appSystems) : undefined;
+
   const newCompany: IDBCompany = {
     id,
     name: companyData.name || companyObj.name,
     adminId,
     externalId: companyData.externalId || companyObj.externalId,
     city: companyData.city,
-    appSystems: companyData.appSystems,
+    appSystemIds: appSystemIds || companyObj.appSystemIds,
     creationDate: companyObj.creationDate,
     editionDate: new Date().toISOString(),
   };
@@ -160,24 +164,6 @@ const findOne = async (id: string): Promise<ICompany> => {
   return await makeCompany(company);
 };
 
-// /**
-//  * Возвращает одну организацию
-//  * @param {string} name - наименование организации
-//  * @return company, организация
-//  * */
-// const findOneByName = async (name: string): Promise<ICompany> => {
-//   const db = getDb();
-//   const { companies } = db;
-
-//   const company = await companies.find((i) => i.name === name);
-
-//   if (!company) {
-//     throw new DataNotFoundException('Компания не найдена');
-//   }
-
-//   return await makeCompany(company);
-// };
-
 /**
  * Возвращает множество компаний по указанным параметрам
  * @param {string} param - параметры
@@ -195,7 +181,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
   companyList = companyList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
-    //const newParams = Object.assign({}, params);
 
     let companyIdFound = true;
 
@@ -203,15 +188,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
       companyIdFound = item.id === newParams.companyId;
       delete newParams['companyId'];
     }
-
-    /*
-    let adminFound = true;
-
-    if ('adminId' in newParams) {
-       adminFound = item.adminId?.includes(newParams.adminId);
-       delete newParams['adminId'];
-    }
-    */
 
     /** filtering data */
     let filteredCompanies = true;
@@ -245,23 +221,43 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
 
 export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
   const db = getDb();
-  const { users } = db;
+  const { users, appSystems } = db;
 
   const admin = await users.find(company.adminId);
 
   const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };
+
+  //Формируем список подсистем с INamedEntity объектами
+  const appSystemList = await appSystems.read();
+  const namedAppSystems: INamedEntity[] | undefined = company.appSystemIds?.map((s) => {
+    const system = appSystemList.find((i) => i.id === s)!;
+    return { id: system?.id, name: system?.name };
+  });
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: company.id,
     name: company.name,
     city: company.city,
-    appSystems: company.appSystems,
+    appSystems: namedAppSystems,
     admin: adminEntity,
     externalId: company.externalId,
     creationDate: company.creationDate,
     editionDate: company.editionDate,
   };
+};
+
+const getAppSystemIds = async (namedAppSystems: IAppSystem[]) => {
+  const appSystems = await getDb().appSystems.read();
+
+  const appSystemIds: string[] = [];
+  namedAppSystems.forEach((newSystem) => {
+    if (!appSystems.find((s) => s.id === newSystem.id)) {
+      throw new DataNotFoundException(`Подсистема ${newSystem.id} не найдена`);
+    }
+    appSystemIds.push(newSystem.id);
+  });
+  return appSystemIds;
 };
 
 export { findOne, findAll, addOne, updateOne, deleteOne };

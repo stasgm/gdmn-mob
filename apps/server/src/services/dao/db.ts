@@ -95,8 +95,8 @@ const mkDir = async (path: string): Promise<void> => {
 export const createFolders = async (dbPath: string, company: IDBCompany): Promise<void> => {
   const companyFolder = path.join(dbPath, `db_${company.id}`);
   await mkDir(companyFolder);
-  if (company.appSystems) {
-    company.appSystems.forEach(async (system) => {
+  if (company.appSystemIds) {
+    company.appSystemIds.forEach(async (system) => {
       await mkDir(path.join(companyFolder, system));
       messageFolders.forEach(async (folder) => await mkDir(path.join(companyFolder, system, folder)));
     });

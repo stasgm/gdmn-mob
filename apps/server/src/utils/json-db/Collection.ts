@@ -2,7 +2,7 @@
 import fs from 'fs';
 import { readFile } from 'fs/promises';
 
-import R from 'ramda';
+import { assoc, pipe, not } from 'ramda';
 import { v1 as uuid } from 'uuid';
 
 import { CollectionItem } from './CollectionItem';
@@ -17,7 +17,7 @@ class Collection<T extends CollectionItem> {
   private _collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
-    return R.assoc('id', uuid(), obj);
+    return assoc('id', uuid(), obj) as K;
   }
 
   constructor(path: string) {
@@ -104,7 +104,7 @@ class Collection<T extends CollectionItem> {
   public async delete(predicate: (item: T) => boolean): Promise<void>;
 
   public async delete(id: string | ((item: T) => boolean)) {
-    const predicate = typeof id === 'function' ? R.pipe(id, R.not) : (item: T) => item.id !== id;
+    const predicate = typeof id === 'function' ? pipe(id, not) : (item: T) => item.id !== id;
 
     const db = await this._get();
 
