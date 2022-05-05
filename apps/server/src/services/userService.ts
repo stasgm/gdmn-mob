@@ -1,4 +1,4 @@
-import { IDBUser, IUser, NewUser } from '@lib/types';
+import { DBAppSystem, IDBUser, IUser, NewUser } from '@lib/types';
 
 import {
   DataNotFoundException,
@@ -55,7 +55,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     id: '',
     alias: newUser.alias,
     name: newUser.name,
-    company: company,
+    company,
     password: passwordHash,
     role: newUser.role,
     creatorId: creatorId || '',
@@ -64,6 +64,8 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     lastName: newUser.lastName,
     phoneNumber: newUser.phoneNumber,
     email: newUser.email,
+    erpUserId: newUser.erpUser?.id,
+    appSystemId: newUser.appSystem?.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   };
@@ -89,7 +91,7 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
  * @return id, идентификатор пользователя
  * */
 const updateOne = async (userId: string, userData: Partial<IUser & { password: string }>): Promise<IUser> => {
-  const { users, companies } = getDb();
+  const { users, companies, appSystems } = getDb();
 
   const oldUser = await users.find(userId);
 
@@ -99,12 +101,29 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
   // Если передан новый пароль то хешируем и заменяем
   const passwordHash = userData.password ? await hashPassword(userData.password) : oldUser.password;
 
-  // Ссылочные поля надо проверять на существование в БД
   // Проверяем есть ли в базе переданная организация
   const newCompany = userData?.company ? (await companies.find(userData.company.id)).id : oldUser.company;
 
   // Проверяем есть ли в базе переданный creator
   const creatorId = userData?.creator ? (await users.find(userData.creator.id))?.id : oldUser.creatorId;
+
+  // Проверяем есть ли в базе переданная подсистема
+  let newAppSystem: DBAppSystem | undefined;
+  if (userData.appSystem) {
+    newAppSystem = await appSystems.find(userData.appSystem.id);
+    if (!newAppSystem) {
+      throw new DataNotFoundException('Подсистема не найдена');
+    }
+  }
+
+  // Проверяем есть ли в базе пользователь ERP
+  let newErpUser: IDBUser | undefined;
+  if (userData.erpUser) {
+    newErpUser = await users.find(userData.erpUser.id);
+    if (!newErpUser) {
+      throw new DataNotFoundException('Пользователь ERP не найден');
+    }
+  }
 
   const newUser: IDBUser = {
     id: userId,
@@ -118,9 +137,11 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     firstName: userData.firstName === undefined ? oldUser.firstName : userData.firstName,
     lastName: userData.lastName === undefined ? oldUser.lastName : userData.lastName,
     phoneNumber: userData.phoneNumber === undefined ? oldUser.phoneNumber : userData.phoneNumber,
+    email: userData.email === undefined ? oldUser.email : userData.email,
+    erpUserId: userData.erpUser === null ? undefined : newErpUser?.id || oldUser.erpUserId,
+    appSystemId: userData.appSystem === null ? undefined : newAppSystem?.id || oldUser.appSystemId,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
-    email: userData.email === undefined ? oldUser.email : userData.email,
   };
 
   await users.update(newUser);
@@ -258,7 +279,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
 
 export const makeUser = async (user: IDBUser): Promise<IUser> => {
   const db = getDb();
-  const { companies, users } = db;
+  const { companies, users, appSystems } = db;
 
   const company = user.company ? await getNamedEntity(user.company, companies) : void 0;
 
@@ -266,7 +287,7 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
 
   const erpUser = user.erpUserId ? await getNamedEntity(user.erpUserId, users) : undefined;
 
-  const appSystem = user.appSystemId ? await getNamedEntity(user.appSystemId, users) : undefined;
+  const appSystem = user.appSystemId ? await getNamedEntity(user.appSystemId, appSystems) : undefined;
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {

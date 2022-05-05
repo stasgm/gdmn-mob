@@ -62,20 +62,6 @@ const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>)
     throw new DataNotFoundException('Связь с устройством не найдена');
   }
 
-  // const deviceId = deviceBindingData.device
-  //   ? (await devices.find(deviceBindingData.device.id))?.id
-  //   : oldDeviceBinding.deviceId;
-
-  // if (params) {
-  //   if ('companyId' in params) {
-  //     const device = await devices.find(deviceId);
-
-  //     if (device.companyId !== params.companyID) {
-  //       throw new DataNotFoundException('Устройство не может быть обновлено');
-  //     }
-  //   }
-  // }
-
   //TODO добавить проверку, что пользователь из компании
 
   const newDeviceBinding: IDBDeviceBinding = {
