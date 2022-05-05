@@ -38,7 +38,7 @@ const getMessage: Config = {
     params: Joi.object({
       ...urlValidation.checkURL,
       companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
-      appSystem: Joi.string().required().error(new InvalidParameterException('Не указана система')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана система')),
     }),
   },
 };
@@ -48,10 +48,21 @@ const removeMessage: Config = {
     params: Joi.object({
       ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор сообщения')),
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана система')),
     }),
   },
 };
 
+const clear: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана система')),
+    }),
+  },
+};
 // const publish: Config = {
 //   validate: {
 //     type: 'json',
@@ -67,4 +78,4 @@ const removeMessage: Config = {
 //   },
 // };
 
-export { newMessage, getMessage, removeMessage };
+export { newMessage, getMessage, removeMessage, clear };

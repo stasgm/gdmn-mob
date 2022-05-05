@@ -96,7 +96,7 @@ const MessageViewScreen = () => {
           <Text style={[styles.textBold, styles.title]}>Заголовок</Text>
           <Divider />
           <Text style={styles.name}>Система:</Text>
-          <Text style={styles.field}>{msg.head.appSystem}</Text>
+          <Text style={styles.field}>{msg.head.appSystemId}</Text>
           <Text style={styles.name}>Компания:</Text>
           <Text style={styles.field}>{msg.head.company.name}</Text>
           <Text style={styles.name}>Дата и время:</Text>

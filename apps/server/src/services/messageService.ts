@@ -1,28 +1,27 @@
-import path from 'path';
-
-import { IDBMessage, IMessage, NewMessage } from '@lib/types';
+import { IDBMessage, IMessage, ISystemParams, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
 import { DataNotFoundException } from '../exceptions';
 
 import { getNamedEntity } from './dao/utils';
 
-import { getDb } from './dao/db';
+import { getDb, getAppSystemName } from './dao/db';
 
-const findOne = async (id: string) => {
+const findOne = async (systemParams: ISystemParams, id: string) => {
   const db = getDb();
   const { messages } = db;
-  const mess = await messages.find(id);
+  const params = { companyId: systemParams.companyId, appSystem: await getAppSystemName(systemParams.appSystemId) };
+  const mess = await messages.find(params, id);
 
   if (!mess) return undefined;
   return makeMessage(mess);
 };
 
-const findAll = async () => {
+const findAll = async (systemParams: ISystemParams) => {
   const db = getDb();
   const { messages } = db;
-
-  const messageList = await messages.read();
+  const params = { companyId: systemParams.companyId, appSystem: await getAppSystemName(systemParams.appSystemId) };
+  const messageList = await messages.read(params);
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);
@@ -36,18 +35,20 @@ const findAll = async () => {
  * @return массив сообщений
  * */
 const FindMany = async ({
-  appSystem,
+  appSystemId,
   companyId,
   consumerId,
 }: {
-  appSystem: string;
+  appSystemId: string;
   companyId: string;
   consumerId: string;
 }) => {
   const db = getDb();
-  const { messages, companies, users, dbPath } = db;
+  const { messages, companies, users } = db;
 
-  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
+  const params = { companyId: companyId, appSystem: await getAppSystemName(appSystemId) };
+
+  //await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystemId}/messages`));
 
   const company = await companies.find(companyId);
 
@@ -61,7 +62,7 @@ const FindMany = async ({
     throw new DataNotFoundException('Получатель не найден');
   }
 
-  const messageList = await messages.read((item) => item.consumer === consumerId);
+  const messageList = await messages.read(params, (item) => item.consumer === consumerId);
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);
@@ -71,7 +72,7 @@ const FindMany = async ({
  * Добавляет одно сообщение
  * @param {NewMessage} msgObject  - заголовок сообщения
  * @param {string} producerId - тело сообщения
- * @param {string} appSystem - идентификатор системы
+ * @param {string} appSystemId - идентификатор системы
  * @param {string} companyId - идентификатор организация
  * @return id, идентификатор сообщения
  * */
@@ -79,17 +80,17 @@ const FindMany = async ({
 const addOne = async ({
   msgObject,
   producerId,
-  appSystem,
+  appSystemId,
   companyId,
 }: {
   msgObject: NewMessage;
   producerId: string;
-  appSystem: string;
+  appSystemId: string;
   companyId: string;
 }): Promise<string> => {
   const db = getDb();
-  const { messages, dbPath } = db;
-  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
+  const { messages } = db;
+  //await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystemId}/messages`));
 
   /*if (await messages.find((i) => i.id === msgObject.id)) {
     throw new Error('сообщение с таким идентификатором уже добавлено');
@@ -103,7 +104,9 @@ const addOne = async ({
     consumer: newMessage.head.consumerId,
   };
 
-  const messageId = await messages.insert(newMessage, fileInfo);
+  const params = { companyId: companyId, appSystem: await getAppSystemName(appSystemId) };
+
+  const messageId = await messages.insert(newMessage, params, fileInfo);
 
   return messageId;
 };
@@ -135,24 +138,30 @@ const addOne = async ({
 /**
  * Удаляет одно сообщениме
  * @param {string} id - идентификатор сообщения
- * @param {string} appSystem - идентификатор системы
+ * @param {string} appSystemId - идентификатор системы
  * @param {string} companyId - идентификатор организация
  * */
-const deleteOne = async (messageId: string): Promise<string> => {
+const deleteOne = async ({
+  messageId,
+  companyId,
+  appSystemId,
+}: {
+  messageId: string;
+  companyId: string;
+  appSystemId: string;
+}): Promise<string> => {
   const db = getDb();
-  const { messages, dbPath } = db;
-  const oldMessage = await messages.find(messageId);
-  const companyId = oldMessage.head.companyId;
-  const appSystem = oldMessage.head.appSystem;
+  const { messages } = db;
+  const params = { companyId, appSystem: await getAppSystemName(appSystemId) };
 
-  await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystem}/messages`));
+  // await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystemId}/messages`));
 
   /*  if (!(await messages.find(messageId))) {
     throw new DataNotFoundException('Сообщение не найдено');
   } */
 
   try {
-    await messages.delete(messageId);
+    await messages.delete(params, messageId);
     return 'Сообщение удалено';
   } catch (err) {
     throw new DataNotFoundException(err as string);
@@ -190,10 +199,13 @@ const deleteOne = async (messageId: string): Promise<string> => {
 //   return messages.delete(messageObj.id!);
 // };
 
-const deleteAll = async (): Promise<string> => {
+const deleteAll = async (systemParams: ISystemParams): Promise<string> => {
   const db = getDb();
   const { messages } = db;
-  messages.deleteAll();
+  const companyId = systemParams.companyId;
+  const appSystemId = systemParams.appSystemId;
+  const params = { companyId: companyId, appSystem: await getAppSystemName(appSystemId) };
+  messages.deleteAll(params);
 
   return 'Сообщения удалены';
   //TODO Ответ возвращать
@@ -210,7 +222,7 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   return {
     id: message.id,
     head: {
-      appSystem: message.head.appSystem,
+      appSystemId: message.head.appSystemId,
       company,
       consumer,
       producer,
@@ -240,7 +252,7 @@ export const makeDBNewMessage = async (message: NewMessage, producerId: string):
   return {
     id: uuidv1(),
     head: {
-      appSystem: message.head.appSystem,
+      appSystemId: message.head.appSystemId,
       companyId: message.head.company.id,
       consumerId: message.head.consumer.id,
       producerId: producerId,

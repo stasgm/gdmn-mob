@@ -19,7 +19,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const messageId = await messageService.addOne({
     msgObject: message,
     producerId: ctx.state.user.id,
-    appSystem: message.head.appSystem,
+    appSystemId: message.head.appSystemId,
     companyId: message.head.company.id,
   });
 
@@ -30,11 +30,11 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystem } = ctx.params;
+  const { companyId, appSystemId } = ctx.params;
   const userId = ctx.state.user.id;
 
   const messageList = await messageService.FindMany({
-    appSystem,
+    appSystemId,
     companyId,
     consumerId: userId,
   });
@@ -45,9 +45,9 @@ const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: messageId } = ctx.params;
+  const { id: messageId, companyId, appSystemId } = ctx.params;
 
-  await messageService.deleteOne(messageId);
+  await messageService.deleteOne({ messageId, companyId, appSystemId });
 
   ok(ctx as Context);
 
@@ -55,7 +55,8 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {
-  await messageService.deleteAll();
+  const { companyId, appSystemId } = ctx.params;
+  await messageService.deleteAll({ companyId, appSystemId });
 
   ok(ctx as Context);
 

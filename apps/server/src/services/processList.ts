@@ -4,7 +4,16 @@ import path from 'path';
 import { readFileSync, writeFileSync, readdirSync, unlinkSync, statSync, renameSync, accessSync, constants } from 'fs';
 
 import { v1 as uidv1 } from 'uuid';
-import { IFiles, IProcess, AddProcess, IMessage, IDBMessage, isIDBMessage, NewMessage } from '@lib/types';
+import {
+  IFiles,
+  IProcess,
+  AddProcess,
+  IMessage,
+  IDBMessage,
+  isIDBMessage,
+  NewMessage,
+  ISystemParams,
+} from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -63,12 +72,12 @@ export const getProcessByCompanyId = (companyId: string) => {
   return processList.find((p) => p.companyId === companyId);
 };
 
-export const startProcess = (companyId: string, appSystem: string, files: IFiles) => {
+export const startProcess = (companyId: string, appSystemId: string, files: IFiles) => {
   const newProcess: IProcess = {
     id: uidv1(),
     dateBegin: new Date(),
     companyId,
-    appSystem,
+    appSystemId,
     status: 'STARTED',
     files: Object.keys(files),
   };
@@ -90,18 +99,16 @@ export const getProcesses = (params: Record<string, string>) => {
   return processList.filter((item) => extraPredicate(item, params));
 };
 
-interface ISystemParams {
-  companyId: string;
-  appSystem: string;
-}
-
 const getPath = (folders: string[], fn = '') => {
   const folderPath = path.join(getDb().dbPath, ...folders);
   checkPath(folderPath);
   return path.join(folderPath, fn);
 };
 
-export const getPathSystem = ({ companyId, appSystem }: ISystemParams) => `DB_${companyId}/${appSystem}`;
+const getPathSystem = ({ companyId, appSystemId }: ISystemParams) => {
+  const appSystem = getDb().appSystems.findSync(appSystemId);
+  return `DB_${companyId}/${appSystem?.name}`;
+};
 
 export const getPathPrepared = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
 export const getPathMessages = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);
@@ -325,7 +332,7 @@ export const makeMessageSync = (message: IDBMessage): IMessage => {
   return {
     id: message.id,
     head: {
-      appSystem: message.head.appSystem,
+      appSystemId: message.head.appSystemId,
       company,
       consumer,
       producer,
@@ -340,7 +347,7 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
   return {
     id: uidv1(),
     head: {
-      appSystem: message.head.appSystem,
+      appSystemId: message.head.appSystemId,
       companyId: message.head.company.id,
       consumerId: message.head.consumer.id,
       producerId,
