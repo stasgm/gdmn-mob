@@ -264,6 +264,10 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
 
   const creator = await getNamedEntity(user.creatorId, users);
 
+  const erpUser = user.erpUserId ? await getNamedEntity(user.erpUserId, users) : undefined;
+
+  const appSystem = user.appSystemId ? await getNamedEntity(user.appSystemId, users) : undefined;
+
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: user.id,
@@ -279,6 +283,8 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     creationDate: user.creationDate,
     editionDate: user.editionDate,
     email: user.email,
+    appSystem,
+    erpUser,
   };
 };
 
