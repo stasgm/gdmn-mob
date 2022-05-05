@@ -2,7 +2,8 @@
   "name": "@lib/client-api",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn clean-dist && tsc",
     "clean-dist": "rimraf dist/*",
