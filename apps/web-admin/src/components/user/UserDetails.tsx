@@ -2,7 +2,7 @@ import { Box, Card, CardContent, Grid, TextField, Divider, Button, Checkbox } fr
 
 import { useEffect, useState } from 'react';
 
-import { IAppSystem, ICompany, INamedEntity, IUser, NewUser } from '@lib/types';
+import { INamedEntity, IUser, NewUser } from '@lib/types';
 import { FormikTouched, useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
 
@@ -15,20 +15,18 @@ import ComboBox from '../ComboBox';
 interface IProps {
   loading: boolean;
   user: IUser | NewUser;
-  // appSystems: IAppSystem[];
   onSubmit: (values: IUser | NewUser) => void;
   onCancel: () => void;
 }
 
-const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IProps) => {
+const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   const [open, setOpen] = useState(false);
   const [userERP, setUserERP] = useState(user.appSystem ? true : false);
 
-  const [appSystemm, setAppSystems] = useState<INamedEntity[]>([]);
+  const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
   const [loadingAppSystems, setLoadingAppSystems] = useState(true);
 
-  const [companies, setCompanies] = useState<string[] | undefined>([]);
-  const [loadingCompanies, setLoadingCompanies] = useState(true);
+  const [companyAppSystems, setCompanyAppSystems] = useState<INamedEntity[] | undefined>([]);
 
   const [users, setUsers] = useState<INamedEntity[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -54,8 +52,7 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
       const res = await api.company.getCompanies();
       if (res.type === 'GET_COMPANIES' && !unmounted) {
         const a = res.companies.map((d) => ({ appSystems: d.appSystems }));
-        setCompanies(a[0].appSystems);
-        setLoadingCompanies(false);
+        setCompanyAppSystems(a[0].appSystems);
       }
     };
     getCompanies();
@@ -64,22 +61,15 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
     };
   }, []);
 
-  console.log('compppp', companies);
-
   console.log('1234567', user.appSystem);
 
-  const appSystems1: [] = [];
+  const userAppSystems: INamedEntity[] = [];
 
-  for (const item of appSystemm) {
-    if (companies?.find((i) => i === item.id)) {
-      // appSystems.push(item.name);
-      appSystems1.push({ id: item.id, name: item.name });
+  for (const item of appSystems) {
+    if (companyAppSystems?.find((i) => i.id === item.id)) {
+      userAppSystems.push({ id: item.id, name: item.name });
     }
   }
-
-  console.log('new', appSystems1);
-
-  // setAppSystems(appSystems1);
 
   useEffect(() => {
     let unmounted = false;
@@ -109,9 +99,10 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
       password: (user as NewUser).password || '',
       phoneNumber: user.phoneNumber || '',
       email: user.email || '',
-      appSystem: user.appSystem || '', // user.alias || '',
-      // alias: user.alias || '',
+      appSystem: user.appSystem || null,
+      erpUser: user.erpUser || null,
     },
+
     validationSchema: yup.object().shape({
       name: yup.string().required('Заполните это поле'),
       password:
@@ -173,43 +164,29 @@ const UserDetails = ({ user, loading, /*appSystems,*/ onSubmit, onCancel }: IPro
                       name="appSystem"
                       label="Подсистема"
                       type="appSystem"
-                      options={appSystems1?.map((d) => ({ id: d.id, name: d.name })) || []} //{appSystems || []} //+
+                      options={userAppSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
                       setFieldValue={formik.setFieldValue}
                       setTouched={formik.setTouched}
                       error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
                       disabled={loading || loadingAppSystems}
-                      // getOptionLabel={formik.values.appSystem?.name || ''}
                     />
                   </Grid>
                 ) : (
                   <Grid item md={6} xs={12}>
-                    <TextField
-                      error={formik.touched.alias && Boolean(formik.errors.alias)}
-                      fullWidth
+                    <Field
+                      component={ComboBox}
+                      name="erpUser"
                       label="Пользователь ERP"
-                      name="alias"
-                      variant="outlined"
+                      type="erpUser"
+                      options={users?.map((d) => ({ id: d.id, name: d.name })) || []}
+                      setFieldValue={formik.setFieldValue}
+                      setTouched={formik.setTouched}
                       onBlur={formik.handleBlur}
                       onChange={formik.handleChange}
-                      type="alias"
-                      disabled={loading}
-                      value={formik.values.alias}
+                      error={formik.touched.erpUser && Boolean(formik.errors.erpUser)}
+                      disabled={loading || loadingUsers}
                     />
                   </Grid>
-                  //   <Grid item md={6} xs={12}>
-                  //   <Field
-                  //     component={ComboBox}
-                  //     name="erpUser"
-                  //     label="Подсистема"
-                  //     type="erpUser"
-                  //     options={users?.map((d) => ({ id: d.id, name: d.name })) || []} //{appSystems || []} //+
-                  //     setFieldValue={formik.setFieldValue}
-                  //     setTouched={formik.setTouched}
-                  //     error={Boolean(formik.touched.erpUser && formik.errors.erpUser)}
-                  //     disabled={loading || loadingUsers}
-                  //     // getOptionLabel={formik.values.appSystem?.name || ''}
-                  //   />
-                  // </Grid>
                 )}
                 <Grid item md={6} xs={12}>
                   <TextField

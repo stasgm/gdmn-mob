@@ -31,8 +31,6 @@ interface IProps {
 const ProcessListTable = ({
   processes = [],
   companies = [],
-  // devices = [],
-  // activationCodes = [],
   onChangeSelectedDevices,
   selectedProcesses = [],
   limitRows = 0,
@@ -40,10 +38,6 @@ const ProcessListTable = ({
   const [selectedProcessIds, setSelectedProcessIds] = useState<IProcess[]>(selectedProcesses);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-
-  console.log('processes', processes);
-
-  console.log('comp', companies);
 
   const handleSelectAll = (event: any) => {
     let newSelectedProcessIds;
@@ -106,7 +100,6 @@ const ProcessListTable = ({
   const TableRows = () => {
     const processList = processes.slice(page * limit, page * limit + limit).map((process: IProcess) => {
       const company = companies.find((a) => a.id === process.companyId)?.name;
-      console.log('process.id', process.id);
 
       return (
         <TableRow hover key={process.id} selected={selectedProcessIds.findIndex((d) => d.id === process?.id) !== -1}>
@@ -177,10 +170,8 @@ const ProcessListTable = ({
                 <TableCell>Компания</TableCell>
                 <TableCell>Подсистема</TableCell>
                 <TableCell>Статус</TableCell>
-                {/* <TableCell>Код активации</TableCell> */}
                 <TableCell>Дата начала</TableCell>
                 <TableCell>Дата подготовки</TableCell>
-                {/* <TableCell>Дата редактирования</TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>

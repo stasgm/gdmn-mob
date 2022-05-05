@@ -81,6 +81,7 @@ const DeviceDetails = ({ device, activationCode, loading, onSubmit, onCancel /*,
                     name="state"
                     label="Статус"
                     type="state"
+                    required={true}
                     options={Object.entries(deviceStates).map((key) => ({ id: key[0], name: key[1] })) || []} //+
                     setFieldValue={formik.setFieldValue}
                     setTouched={formik.setTouched}

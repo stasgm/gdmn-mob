@@ -165,7 +165,7 @@ class AppSystem extends BaseRequest {
       return {
         type: 'GET_APP_SYSTEMS',
         appSystems: mockAppSystems,
-      } as types.IAppSystemQueryResponse;
+      } as types.IGetAppSystemsResponse;
     }
 
     let paramText = params ? getParams(params) : '';
