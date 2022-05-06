@@ -5,7 +5,7 @@ import { IReferences } from './references';
 import { IUserSettings } from './models';
 
 export interface IHeadMessage {
-  appSystem: string;
+  appSystemId: string;
   company: INamedEntity;
   producer: INamedEntity;
   consumer: INamedEntity;
@@ -115,3 +115,12 @@ export type Transfer = ITransfer | undefined;
 export type ITransferReq = {
   uid: string;
 };
+
+export interface ISystemParams {
+  companyId: string;
+  appSystemId: string;
+}
+
+export interface IAppSystemParams extends Omit<ISystemParams, 'appSystemId'> {
+  appSystem: string;
+}

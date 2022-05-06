@@ -22,7 +22,7 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies, dbPath } = getDb();
+  const { companies, dbPath, appSystems } = getDb();
 
   if (await companies.find((el) => el.name === company.name)) {
     throw new ConflictException('Компания уже существует');
@@ -43,7 +43,8 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
 
   const newCompany = await companies.insert(newCompanyObj);
   const createdCompany = await companies.find(newCompany);
-  await createFolders(dbPath, createdCompany);
+  const dbAppSystems = await appSystems.read();
+  await createFolders(dbPath, createdCompany, dbAppSystems);
 
   await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
 

@@ -12,7 +12,7 @@ const addProcess: Config = {
     type: 'json',
     body: Joi.object({
       companyId: Joi.string().required().error(new InvalidParameterException('Не указана компания')),
-      appSystem: Joi.string().required().error(new InvalidParameterException('Не указана подсистема приложения')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема приложения')),
       maxFiles: Joi.number().optional(),
       maxDataVolume: Joi.number().optional(),
       producerIds: Joi.array().optional(),
@@ -108,7 +108,7 @@ const getProcesses: Config = {
     params: Joi.object({
       ...urlValidation.checkURL,
       companyId: Joi.string().optional(),
-      appSystem: Joi.string().optional(),
+      appSystemId: Joi.string().optional(),
     }),
   },
 };

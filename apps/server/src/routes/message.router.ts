@@ -10,8 +10,8 @@ const router = Router();
 
 router.prefix('/messages');
 router.post('/', messageValidation.newMessage, authMiddleware, deviceMiddleware, messageParamsMiddlware, newMessage);
-router.get('/:companyId/:appSystem', messageValidation.getMessage, authMiddleware, deviceMiddleware, getMessage);
+router.get('/:companyId/:appSystemId', messageValidation.getMessage, authMiddleware, deviceMiddleware, getMessage);
 router.delete('/:id', messageValidation.removeMessage, authMiddleware, deviceMiddleware, removeMessage);
-router.delete('/', authMiddleware, deviceMiddleware, clear);
+router.delete('/', messageValidation.clear, authMiddleware, deviceMiddleware, clear);
 
 export default router;
