@@ -14,7 +14,7 @@ interface IProps {
 const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) => {
   const formik = useFormik<IAppSystem | NewAppSystem>({
     enableReinitialize: true,
-    initialValues: { ...appSystem },
+    initialValues: { ...appSystem, description: appSystem.description || '' },
     validationSchema: yup.object().shape({
       name: yup.string().required('Required'),
     }),
@@ -48,6 +48,20 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                     type="name"
                     disabled={loading}
                     value={formik.values.name}
+                  />
+                </Grid>
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.description && Boolean(formik.errors.description)}
+                    fullWidth
+                    label="Описание подсистемы"
+                    name="description"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="description"
+                    disabled={loading}
+                    value={formik.values.description}
                   />
                 </Grid>
               </Grid>

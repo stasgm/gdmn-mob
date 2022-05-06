@@ -1,5 +1,7 @@
 import { INamedEntity, IUser } from '@lib/types';
 
+import { appSystem } from './appSystems';
+
 export const superAdmin: INamedEntity = {
   id: 'gdmn',
   name: 'gdmn',
@@ -50,6 +52,7 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
     creator: superAdmin,
     company: company1,
     role: 'Admin',
+    erpUser: { id: '12', name: 'Хозянин О.И.' },
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',
   },
@@ -64,6 +67,7 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
     creator: superAdmin,
     company: company1,
     role: 'User',
+    appSystem: appSystem,
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',
   },

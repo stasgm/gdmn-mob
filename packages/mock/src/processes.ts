@@ -16,7 +16,7 @@ const processes: IProcess[] = [
       '47a143a0-ac43-11ec-a4a9-0fa6355b9b44.json',
       '47a450e0-ac43-11ec-a4a9-0fa6355b9b44.json',
     ],
-    status: 'FAILED',
+    status: 'READY_TO_COMMIT',
     processedFiles: {
       '3efb4340-af63-11ec-a229-7fa5c8e1feee.json': { status: 'READY' },
       '3f0ef250-af63-11ec-a229-7fa5c8e1feee.json': { status: 'SENT' },
