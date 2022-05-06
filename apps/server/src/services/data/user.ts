@@ -32,6 +32,7 @@ const users: IDBUser[] = [
     creatorId: '1',
     company: '1',
     role: 'User',
+    erpUserId: '13',
   },
   {
     id: '13',
@@ -44,6 +45,7 @@ const users: IDBUser[] = [
     creatorId: '1',
     company: '1',
     role: 'User',
+    appSystemId: '1',
   },
   {
     id: '14',
