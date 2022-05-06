@@ -10,7 +10,7 @@ import { DataNotFoundException, ForbiddenException } from '../exceptions';
 import { created, ok } from '../utils/apiHelpers';
 
 const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
-  const { name } = ctx.request.body as NewAppSystem;
+  const { name, description } = ctx.request.body as NewAppSystem;
 
   const user = ctx.state.user as IUser;
 
@@ -18,7 +18,7 @@ const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
     throw new ForbiddenException('Нет прав для создания подсистемы');
   }
 
-  const appSystem: NewAppSystem = { name };
+  const appSystem: NewAppSystem = { name, description };
 
   const newAppSystem = await appSystemService.addOne(appSystem);
 
@@ -29,6 +29,12 @@ const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 
 const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.params;
+
+  const user = ctx.state.user as IUser;
+
+  if (user?.role !== 'SuperAdmin') {
+    throw new ForbiddenException('Нет прав для обновления подсистемы');
+  }
 
   const appSystemData = ctx.request.body as Partial<IAppSystem>;
 
@@ -41,6 +47,12 @@ const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.params;
+
+  const user = ctx.state.user as IUser;
+
+  if (user?.role !== 'SuperAdmin') {
+    throw new ForbiddenException('Нет прав для удаления подсистемы');
+  }
 
   const res = await appSystemService.deleteOne(id);
 

@@ -20,6 +20,10 @@ router.get(
 );
 router.get('/', authMiddleware, companyMiddleware, roleBasedParamsMiddlware, getAppSystems);
 router.patch('/:id', /*companyValidation.updateCompany,*/ authMiddleware, /*permissionMiddleware,*/ updateAppSystem);
-router.delete('/:id', /*companyValidation.removeCompany,*/ authMiddleware, /*permissionMiddleware,*/ removeAppSystem);
+router.delete(
+  '/:id',
+  /*companyValidation.removeCompany,*/ authMiddleware,
+  /*roleBasedParamsMiddlware,*/ removeAppSystem,
+);
 
 export default router;

@@ -16,5 +16,6 @@ const appSystems: IAppSystem[] = [
 ];
 
 const appSystem = appSystems[0];
+const appSystem2 = appSystems[1];
 
-export { appSystem, appSystems };
+export { appSystem, appSystem2, appSystems };
