@@ -71,11 +71,20 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         const getErpUser = await api.user.getUser(consumer.id);
 
         let appSystem: IAppSystem | undefined;
-        if (getErpUser.type === 'GET_USER') {
-          appSystem = getErpUser.user.appSystem;
+        if (getErpUser.type === 'ERROR') {
+          errList.push(`Пользователь ERP не определен: ${getErpUser.message}`);
         }
-        // Если нет функции из пропсов
+
+        if (getErpUser.type === 'GET_USER') {
+          if (!getErpUser.user.appSystem) {
+            errList.push('У пользователя ERP не установлена подсистема!\nПожалуйста, обратитесь к администратору.');
+          } else {
+            appSystem = getErpUser.user.appSystem;
+          }
+        }
+
         if (!onSync && appSystem) {
+          // Если нет функции из пропсов
           const params = {
             appSystemId: appSystem.id,
             companyId: company.id,

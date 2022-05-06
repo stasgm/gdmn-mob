@@ -1,7 +1,7 @@
-import { IMessage, IMessageInfo, INamedEntity, IResponse, NewMessage } from '@lib/types';
+import { IMessage, IMessageInfo, IMessageParams, INamedEntity, IResponse, NewMessage } from '@lib/types';
 
 import { error, message as types } from '../types';
-import { sleep, getParams } from '../utils';
+import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -56,7 +56,7 @@ class Message extends BaseRequest {
     }
   };
 
-  getMessages = async (params: Record<string, string | number>) => {
+  getMessages = async (params: IMessageParams) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -66,14 +66,10 @@ class Message extends BaseRequest {
       } as types.IGetMessagesResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
-
-    if (paramText > '') {
-      paramText = `?${paramText}`;
-    }
-
     try {
-      const res = await this.api.axios.get<IResponse<IMessage[]>>(`/messages${paramText}`);
+      const res = await this.api.axios.get<IResponse<IMessage[]>>(
+        `/messages?${params.companyId}?${params.appSystemId}`,
+      );
       const resData = res.data;
 
       if (resData.result) {
@@ -95,7 +91,7 @@ class Message extends BaseRequest {
     }
   };
 
-  removeMessage = async (messageId: string, params: Record<string, string | number>) => {
+  removeMessage = async (messageId: string, params: IMessageParams) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -104,14 +100,10 @@ class Message extends BaseRequest {
       } as types.IRemoveMessageResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
-
-    if (paramText > '') {
-      paramText = `?${paramText}`;
-    }
-
     try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/messages/${messageId}${paramText}`);
+      const res = await this.api.axios.delete<IResponse<void>>(
+        `/messages/${messageId}?${params.companyId}?${params.appSystemId}`,
+      );
       const resData = res.data;
 
       if (resData.result) {
@@ -131,7 +123,7 @@ class Message extends BaseRequest {
     }
   };
 
-  clear = async (params: Record<string, string | number>) => {
+  clear = async (params: IMessageParams) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -140,14 +132,8 @@ class Message extends BaseRequest {
       } as types.IClearMessagesResponse;
     }
 
-    let paramText = params ? getParams(params) : '';
-
-    if (paramText > '') {
-      paramText = `?${paramText}`;
-    }
-
     try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/messages'${paramText}`);
+      const res = await this.api.axios.delete<IResponse<void>>(`/messages?${params.companyId}?${params.appSystemId}`);
       const resData = res.data;
 
       if (resData.result) {
