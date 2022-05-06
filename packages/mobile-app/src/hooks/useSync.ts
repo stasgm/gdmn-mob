@@ -76,6 +76,10 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         }
         // Если нет функции из пропсов
         if (!onSync && appSystem) {
+          const params = {
+            appSystemId: appSystem.id,
+            companyId: company.id,
+          };
           const messageCompany = { id: company.id, name: company.name };
           const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -116,17 +120,14 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             await onGetMessages();
           } else {
             //2. Получаем все сообщения для мобильного
-            const getMessagesResponse = await api.message.getMessages({
-              appSystemId: appSystem.id,
-              companyId: company.id,
-            });
+            const getMessagesResponse = await api.message.getMessages(params);
 
             //Если сообщения получены успешно, то
             //  справочники: очищаем старые и записываем в хранилище новые данные
             //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
             if (getMessagesResponse.type === 'GET_MESSAGES') {
               await Promise.all(
-                getMessagesResponse.messageList?.map((message) => processMessage(message, errList, okList)),
+                getMessagesResponse.messageList?.map((message) => processMessage(message, errList, okList, params)),
               );
             } else {
               errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
@@ -243,7 +244,12 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     syncData();
   };
 
-  const processMessage = async (msg: IMessage, errList: string[], okList: string[]) => {
+  const processMessage = async (
+    msg: IMessage,
+    errList: string[],
+    okList: string[],
+    params: { appSystemId: string; companyId: string },
+  ) => {
     if (!msg) {
       return;
     }
@@ -269,7 +275,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id);
+            const removeMess = await api.message.removeMessage(msg.id, params);
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
@@ -283,7 +289,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id);
+            const removeMess = await api.message.removeMessage(msg.id, params);
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники добавлены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
@@ -310,7 +316,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id);
+          const removeMess = await api.message.removeMessage(msg.id, params);
           if (removeMess.type === 'ERROR') {
             errList.push(`Документы загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }
@@ -339,7 +345,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id);
+          const removeMess = await api.message.removeMessage(msg.id, params);
           if (removeMess.type === 'ERROR') {
             errList.push(`Настройки пользователя загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }

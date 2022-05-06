@@ -1,7 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
 import { companies, user2 } from '@lib/mock';
 import { baseSettingGroup } from '@lib/store/src/settings/reducer';
-import { IMessage, INamedEntity, MessageType, Settings, StatusType } from '@lib/types';
+import { IAppSystem, IMessage, INamedEntity, MessageType, Settings, StatusType } from '@lib/types';
 
 import { IGood } from '../store/app/types';
 
@@ -129,12 +129,17 @@ export const unknownGood: IGood = {
   goodGroup: { id: 'unknown', name: 'Неизвестная группа' },
 };
 
+export const appSystem: IAppSystem = {
+  id: 'gdmn-gd-movement',
+  name: 'gdmn-gd-movement',
+};
+
 export const messageGdMovement: IMessage<MessageType>[] = [
   {
     id: '147293377',
     status: 'READY',
     head: {
-      appSystem: 'gdmn-gd-movement',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user2,

@@ -1,6 +1,6 @@
 import { baseSettingGroup } from '@lib/store';
 import { companies, user2, user } from '@lib/mock';
-import { IMessage, INamedEntity, MessageType, Settings, StatusType } from '@lib/types';
+import { IAppSystem, IMessage, INamedEntity, MessageType, Settings, StatusType } from '@lib/types';
 
 import config from '../config';
 import { ISellBill } from '../store/types';
@@ -127,11 +127,16 @@ const mockSellBills: ISellBill[] = [
   },
 ] as any;
 
+export const appSystem: IAppSystem = {
+  id: 'gdmn-sales-representative',
+  name: 'gdmn-sales-representative',
+};
+
 const messageAgent: IMessage<MessageType>[] = [
   {
     id: '1f26fa10-17aa-11ec-951e-7fdefda6eb8e',
     head: {
-      appSystem: 'gdmn-sales-representative',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user,
@@ -1137,7 +1142,7 @@ const messageAgent: IMessage<MessageType>[] = [
   {
     id: '1f511750-17aa-11ec-951e-7fdefda6eb8e',
     head: {
-      appSystem: 'gdmn-sales-representative',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user,
@@ -1609,7 +1614,7 @@ const messageAgent: IMessage<MessageType>[] = [
   {
     id: '1f5cd720-17aa-11ec-951e-7fdefda6eb8e',
     head: {
-      appSystem: 'gdmn-sales-representative',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user,
