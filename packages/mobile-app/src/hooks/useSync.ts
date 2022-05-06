@@ -11,9 +11,8 @@ import {
   authActions,
 } from '@lib/store';
 
-import { BodyType, IDocument, IMessage, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
+import { BodyType, IAppSystem, IDocument, IMessage, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
-import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 
 const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
@@ -30,17 +29,29 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
 
-  const systemName = Constants.manifest?.extra?.slug;
-
-  // const consumer: INamedEntity = { id: '-1', name: systemName };
   const refVersion = 1;
   const docVersion = 1;
   const setVersion = 1;
 
   const sync = () => {
-    if (!company || !user || !user.erpUser) {
+    if (!user || !user.erpUser) {
+      Alert.alert(
+        'Внимание!',
+        `Для ${user?.name} не указан пользователь ERP!\nПожалуйста, обратитесь к администратору.`,
+        [{ text: 'OK' }],
+      );
       return;
     }
+
+    if (!company) {
+      Alert.alert(
+        'Внимание!',
+        `Для пользователя ${user.name} не определена компания!\nПожалуйста, выполните выход из профиля и заново залогиньтесь под вашей учетной записью`,
+        [{ text: 'OK' }],
+      );
+      return;
+    }
+
     dispatch(appActions.setLoading(true));
     dispatch(appActions.setErrorList([]));
 
@@ -57,8 +68,14 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     const syncData = async () => {
       // Загрузка данных
       try {
+        const getErpUser = await api.user.getUser(consumer.id);
+
+        let appSystem: IAppSystem | undefined;
+        if (getErpUser.type === 'GET_USER') {
+          appSystem = getErpUser.user.appSystem;
+        }
         // Если нет функции из пропсов
-        if (!onSync) {
+        if (!onSync && appSystem) {
           const messageCompany = { id: company.id, name: company.name };
           const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -74,7 +91,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             };
 
             const sendMessageResponse = await api.message.sendMessages(
-              systemName,
+              appSystem,
               messageCompany,
               consumer,
               sendingDocsMessage,
@@ -100,7 +117,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           } else {
             //2. Получаем все сообщения для мобильного
             const getMessagesResponse = await api.message.getMessages({
-              systemName,
+              appSystemId: appSystem.id,
               companyId: company.id,
             });
 
@@ -146,7 +163,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
             //3. Отправляем запрос на получение справочников
             const sendMesRefResponse = await api.message.sendMessages(
-              systemName,
+              appSystem,
               messageCompany,
               consumer,
               messageGetRef,
@@ -160,7 +177,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           }
 
           //4. Отправляем запрос на получение документов
-          const sendMesDocRespone = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetDoc);
+          const sendMesDocRespone = await api.message.sendMessages(appSystem, messageCompany, consumer, messageGetDoc);
 
           if (sendMesDocRespone.type === 'ERROR') {
             errList.push(`Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`);
@@ -191,7 +208,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //7. Отправляем запрос на получение склада для юзера
           const sendMesDepartResponse = await api.message.sendMessages(
-            systemName,
+            appSystem,
             messageCompany,
             consumer,
             messageGetDepart,

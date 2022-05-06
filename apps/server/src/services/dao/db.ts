@@ -107,7 +107,3 @@ export const createFolders = async (dbPath: string, company: IDBCompany, dbAppSy
     });
   }
 };
-
-export const getAppSystemName = async (appSystemId: string): Promise<string> => {
-  return (await getDb().appSystems.find(appSystemId)).name;
-};

@@ -5,7 +5,7 @@ import { IReferences } from './references';
 import { IUserSettings } from './models';
 
 export interface IHeadMessage {
-  appSystemId: string;
+  appSystem: INamedEntity;
   company: INamedEntity;
   producer: INamedEntity;
   consumer: INamedEntity;
@@ -55,11 +55,6 @@ export type NewMessage = Omit<IMessage, 'head' | 'id'> & {
   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
 };
 
-// export type NewProcessMessage = Omit<IMessage, 'head' | 'id'> & {
-//   id?: string;
-//   head: Omit<IHeadMessage, 'producer' | 'dateTime'>;
-// };
-
 export interface IDataMessage<T = any> {
   id: string;
   name: string;
@@ -73,12 +68,11 @@ export interface IMessageInfo {
 }
 
 // Messages
-export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer'> {
-  // appSystem: string;
+export interface IDBHeadMessage extends Omit<IHeadMessage, 'company' | 'producer' | 'consumer' | 'appSystem'> {
+  appSystemId: string;
   companyId: string;
   producerId: string;
   consumerId: string;
-  // dateTime: string;
 }
 
 export interface IDBMessage<T = MessageType> extends Omit<IMessage<T>, 'head'> {
@@ -116,11 +110,11 @@ export type ITransferReq = {
   uid: string;
 };
 
-export interface ISystemParams {
+export interface IMessageParams {
   companyId: string;
   appSystemId: string;
 }
 
-export interface IAppSystemParams extends Omit<ISystemParams, 'appSystemId'> {
-  appSystem: string;
+export interface IAppSystemParams extends Omit<IMessageParams, 'appSystemId'> {
+  appSystemName: string;
 }

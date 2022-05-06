@@ -1,31 +1,11 @@
-import { IDBMessage, IMessage, ISystemParams, NewMessage } from '@lib/types';
+import { IDBMessage, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
 import { DataNotFoundException } from '../exceptions';
 
 import { getNamedEntity } from './dao/utils';
 
-import { getDb, getAppSystemName } from './dao/db';
-
-const findOne = async (systemParams: ISystemParams, id: string) => {
-  const db = getDb();
-  const { messages } = db;
-  const params = { companyId: systemParams.companyId, appSystem: await getAppSystemName(systemParams.appSystemId) };
-  const mess = await messages.find(params, id);
-
-  if (!mess) return undefined;
-  return makeMessage(mess);
-};
-
-const findAll = async (systemParams: ISystemParams) => {
-  const db = getDb();
-  const { messages } = db;
-  const params = { companyId: systemParams.companyId, appSystem: await getAppSystemName(systemParams.appSystemId) };
-  const messageList = await messages.read(params);
-  const pr = messageList.map(async (i) => await makeMessage(i));
-
-  return Promise.all(pr);
-};
+import { getDb } from './dao/db';
 
 /**
  * Возвращает все сообщения по пользователю и организации
@@ -43,12 +23,7 @@ const FindMany = async ({
   companyId: string;
   consumerId: string;
 }) => {
-  const db = getDb();
-  const { messages, companies, users } = db;
-
-  const params = { companyId: companyId, appSystem: await getAppSystemName(appSystemId) };
-
-  //await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystemId}/messages`));
+  const { messages, companies, appSystems, users } = getDb();
 
   const company = await companies.find(companyId);
 
@@ -61,6 +36,14 @@ const FindMany = async ({
   if (!consumer) {
     throw new DataNotFoundException('Получатель не найден');
   }
+
+  const appSystem = await appSystems.find(appSystemId);
+
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  const params = { companyId, appSystemName: appSystem.name };
 
   const messageList = await messages.read(params, (item) => item.consumer === consumerId);
   const pr = messageList.map(async (i) => await makeMessage(i));
@@ -88,13 +71,25 @@ const addOne = async ({
   appSystemId: string;
   companyId: string;
 }): Promise<string> => {
-  const db = getDb();
-  const { messages } = db;
-  //await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystemId}/messages`));
+  const { messages, companies, appSystems, users } = getDb();
 
-  /*if (await messages.find((i) => i.id === msgObject.id)) {
-    throw new Error('сообщение с таким идентификатором уже добавлено');
-  }*/
+  const company = await companies.find(companyId);
+
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
+
+  const producer = await users.find(producerId);
+
+  if (!producer) {
+    throw new DataNotFoundException('Отпарвитель не найден');
+  }
+
+  const appSystem = await appSystems.find(appSystemId);
+
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
 
   const newMessage = await makeDBNewMessage(msgObject, producerId);
 
@@ -104,43 +99,13 @@ const addOne = async ({
     consumer: newMessage.head.consumerId,
   };
 
-  const params = { companyId: companyId, appSystem: await getAppSystemName(appSystemId) };
+  const params = { companyId, appSystemName: appSystem.name };
 
   const messageId = await messages.insert(newMessage, params, fileInfo);
 
   return messageId;
 };
 
-/**
- * Обновляет одно сообщение
- * @param {IMessage} message - сообщение
- * @return id, идентификатор сообщения
- * */
-/*const updateOne = async (message: IMessage): Promise<string> => {
-  const db = getDb();
-  const { messages } = db;
-
-  const oldMessage = await messages.find((i) => i.id === message.id);
-
-  if (!oldMessage) {
-    throw new DataNotFoundException('Сообщение не найдено');
-  }
-
-  // Удаляем поля которые нельзя перезаписывать
-  // eslint-disable-next-line no-param-reassign
-  //delete message.head.id;
-
-  await messages.update({ ...oldMessage, ...makeDBMessage(message) });
-
-  return message.id!;
-};
-
-/**
- * Удаляет одно сообщениме
- * @param {string} id - идентификатор сообщения
- * @param {string} appSystemId - идентификатор системы
- * @param {string} companyId - идентификатор организация
- * */
 const deleteOne = async ({
   messageId,
   companyId,
@@ -150,79 +115,62 @@ const deleteOne = async ({
   companyId: string;
   appSystemId: string;
 }): Promise<string> => {
-  const db = getDb();
-  const { messages } = db;
-  const params = { companyId, appSystem: await getAppSystemName(appSystemId) };
+  const { messages, companies, appSystems } = getDb();
 
-  // await db.messages.setCollectionPath(path.join(dbPath, `DB_${companyId}/${appSystemId}/messages`));
+  const company = await companies.find(companyId);
 
-  /*  if (!(await messages.find(messageId))) {
-    throw new DataNotFoundException('Сообщение не найдено');
-  } */
-
-  try {
-    await messages.delete(params, messageId);
-    return 'Сообщение удалено';
-  } catch (err) {
-    throw new DataNotFoundException(err as string);
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
   }
 
-  //TODO ответ возвращать
+  const appSystem = await appSystems.find(appSystemId);
+
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  const params = { companyId, appSystemName: appSystem.name };
+
+  await messages.delete(params, messageId);
+
+  return 'Сообщение удалено';
 };
 
-// /**
-//  * Удаляет одно сообщениме
-//  * @param {string} companyId - идентификатор организации
-//  * @param {string} uid - идентификатор сообщения
-//  * */
-// const deleteByUid = async ({
-//   companyId,
-//   uid,
-//   userId,
-// }: {
-//   companyId: string;
-//   uid: string;
-//   userId: string;
-// }): Promise<void> => {
-//   const db = getDb();
-//   const { messages } = db;
+const clear = async ({ companyId, appSystemId }: { companyId: string; appSystemId: string }): Promise<string> => {
+  const { messages, companies, appSystems } = getDb();
 
-//   const messageObj = await messages.find(
-//     (message) => message.head.companyId === companyId && message.head.consumerId === userId && message.id === uid,
-//   );
+  const company = await companies.find(companyId);
 
-//   if (!messageObj) {
-//     throw new DataNotFoundException('Сообщение не найдено');
-//   }
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
 
-//   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//   return messages.delete(messageObj.id!);
-// };
+  const appSystem = await appSystems.find(appSystemId);
 
-const deleteAll = async (systemParams: ISystemParams): Promise<string> => {
-  const db = getDb();
-  const { messages } = db;
-  const companyId = systemParams.companyId;
-  const appSystemId = systemParams.appSystemId;
-  const params = { companyId: companyId, appSystem: await getAppSystemName(appSystemId) };
+  if (!appSystem) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  const params = { companyId, appSystemName: appSystem.name };
+
   messages.deleteAll(params);
 
   return 'Сообщения удалены';
-  //TODO Ответ возвращать
 };
 
 export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   const db = getDb();
-  const { users, companies } = db;
+  const { users, companies, appSystems } = db;
 
   const consumer = await getNamedEntity(message.head.consumerId, users);
   const producer = await getNamedEntity(message.head.producerId, users);
   const company = await getNamedEntity(message.head.companyId, companies);
+  const appSystem = await getNamedEntity(message.head.appSystemId, appSystems);
 
   return {
     id: message.id,
     head: {
-      appSystemId: message.head.appSystemId,
+      appSystem,
       company,
       consumer,
       producer,
@@ -233,26 +181,11 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   };
 };
 
-// export const makeDBMessage = (message: IMessage): IDBMessage => {
-//   return {
-//     id: message.id,
-//     head: {
-//       appSystem: message.head.appSystem,
-//       companyId: message.head.company.id,
-//       consumerId: message.head.consumer.id,
-//       producerId: message.head.producer.id,
-//       dateTime: message.head.dateTime,
-//     },
-//     status: message.status,
-//     body: message.body,
-//   };
-// };
-
 export const makeDBNewMessage = async (message: NewMessage, producerId: string): Promise<IDBMessage> => {
   return {
     id: uuidv1(),
     head: {
-      appSystemId: message.head.appSystemId,
+      appSystemId: message.head.appSystem.id,
       companyId: message.head.company.id,
       consumerId: message.head.consumer.id,
       producerId,
@@ -263,4 +196,4 @@ export const makeDBNewMessage = async (message: NewMessage, producerId: string):
   };
 };
 
-export { findOne, findAll, addOne, deleteOne, FindMany, deleteAll };
+export { addOne, deleteOne, FindMany, clear };

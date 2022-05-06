@@ -11,15 +11,16 @@ import { ForbiddenException } from '../exceptions';
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const message = ctx.request.body as NewMessage;
+  const user = ctx.state.user;
 
-  if (ctx.state.user.company.id !== message.head.company.id) {
+  if (user.company.id !== message.head.company.id) {
     throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
 
   const messageId = await messageService.addOne({
     msgObject: message,
-    producerId: ctx.state.user.id,
-    appSystemId: message.head.appSystemId,
+    producerId: user.id,
+    appSystemId: message.head.appSystem.id,
     companyId: message.head.company.id,
   });
 
@@ -29,25 +30,25 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   log.info('newMessage: message is successfully created');
 };
 
-const getMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemId } = ctx.params;
-  const userId = ctx.state.user.id;
+const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
+  const { companyId, appSystemId } = ctx.query;
 
   const messageList = await messageService.FindMany({
-    appSystemId,
-    companyId,
-    consumerId: userId,
+    companyId: companyId as string,
+    appSystemId: appSystemId as string,
+    consumerId: ctx.state.user.id,
   });
 
   ok(ctx as Context, messageList);
 
-  log.info('getMessage: message is successfully received');
+  log.info('getMessages: message is successfully received');
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
-  const { id: messageId, companyId, appSystemId } = ctx.params;
+  const { id: messageId } = ctx.params;
+  const { companyId, appSystemId } = ctx.query;
 
-  await messageService.deleteOne({ messageId, companyId, appSystemId });
+  await messageService.deleteOne({ messageId, companyId: companyId as string, appSystemId: appSystemId as string });
 
   ok(ctx as Context);
 
@@ -56,11 +57,11 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {
   const { companyId, appSystemId } = ctx.params;
-  await messageService.deleteAll({ companyId, appSystemId });
+  await messageService.clear({ companyId, appSystemId });
 
   ok(ctx as Context);
 
   log.info('clear: all messages are successfully removed');
 };
 
-export { newMessage, removeMessage, getMessage, clear };
+export { newMessage, removeMessage, getMessages, clear };

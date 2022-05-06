@@ -12,7 +12,7 @@ import {
   IDBMessage,
   isIDBMessage,
   NewMessage,
-  ISystemParams,
+  IMessageParams,
 } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
@@ -105,16 +105,16 @@ const getPath = (folders: string[], fn = '') => {
   return path.join(folderPath, fn);
 };
 
-const getPathSystem = ({ companyId, appSystemId }: ISystemParams) => {
+const getPathSystem = ({ companyId, appSystemId }: IMessageParams) => {
   const appSystem = getDb().appSystems.findSync(appSystemId);
   return `DB_${companyId}/${appSystem?.name}`;
 };
 
-export const getPathPrepared = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
-export const getPathMessages = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);
-export const getPathLog = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'log'], fn);
-export const getPathUnknown = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'unknown'], fn);
-export const getPathError = (params: ISystemParams, fn = '') => getPath([getPathSystem(params), 'error'], fn);
+export const getPathPrepared = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
+export const getPathMessages = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);
+export const getPathLog = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'log'], fn);
+export const getPathUnknown = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'unknown'], fn);
+export const getPathError = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'error'], fn);
 
 export const cleanupProcess = (process: IProcess) => {
   if (!process.processedFiles) {

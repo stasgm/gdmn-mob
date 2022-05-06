@@ -33,12 +33,14 @@ const newMessage: Config = {
   },
 };
 
-const getMessage: Config = {
+const getMessages: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана система')),
+    }),
+    query: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
     }),
   },
 };
@@ -48,8 +50,10 @@ const removeMessage: Config = {
     params: Joi.object({
       ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор сообщения')),
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана система')),
+    }),
+    query: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
     }),
   },
 };
@@ -58,8 +62,10 @@ const clear: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана система')),
+    }),
+    query: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
     }),
   },
 };
@@ -78,4 +84,4 @@ const clear: Config = {
 //   },
 // };
 
-export { newMessage, getMessage, removeMessage, clear };
+export { newMessage, getMessages, removeMessage, clear };
