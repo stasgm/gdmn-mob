@@ -107,9 +107,15 @@ const getProcesses: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      companyId: Joi.string().optional(),
-      appSystemId: Joi.string().optional(),
     }),
+    query: Joi.object()
+      .keys({
+        companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+        appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+      })
+      .options({
+        allowUnknown: true,
+      }),
   },
 };
 

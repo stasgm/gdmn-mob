@@ -136,7 +136,7 @@ export const prepareById = ({
 
   for (const mes of processedFiles) {
     const newMes = makeDBNewMessageSync(mes, producerId);
-    const newFn = params2messageFileName({ id: newMes.id, producer: producerId, consumer: newMes.head.consumerId });
+    const newFn = params2messageFileName({ id: newMes.id, producerId: producerId, consumerId: newMes.head.consumerId });
 
     if (newMes.status === 'PROCESSED_INCORRECT' || newMes.status === 'PROCESSED_DEADLOCK') {
       log.warn(`Robust-protocol.prepareProcess: сообщение ${newMes.id} обработано со статусом ${newMes.status}`);

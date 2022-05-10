@@ -10,12 +10,21 @@ const newMessage: Config = {
     body: Joi.object({
       head: Joi.object({
         company: Joi.object({
-          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
+          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта компании')),
+          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта компании')),
         }),
-        appSystem: Joi.string().optional(),
-        producer: Joi.object().optional(),
-        consumer: Joi.object().optional(),
+        appSystem: Joi.object({
+          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта подсистемы')),
+          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта подсистемы')),
+        }),
+        producer: Joi.object({
+          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта отправителя')),
+          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта отправителя')),
+        }),
+        consumer: Joi.object({
+          id: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта получателя')),
+          name: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта получателя')),
+        }),
         version: Joi.number().optional(),
         dateTime: Joi.string().optional(),
       }),
@@ -38,10 +47,14 @@ const getMessages: Config = {
     params: Joi.object({
       ...urlValidation.checkURL,
     }),
-    query: Joi.object({
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
-    }),
+    query: Joi.object()
+      .keys({
+        companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+        appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+      })
+      .options({
+        allowUnknown: true,
+      }),
   },
 };
 
@@ -51,10 +64,14 @@ const removeMessage: Config = {
       ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор сообщения')),
     }),
-    query: Joi.object({
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
-    }),
+    query: Joi.object()
+      .keys({
+        companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+        appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+      })
+      .options({
+        allowUnknown: true,
+      }),
   },
 };
 
@@ -63,25 +80,15 @@ const clear: Config = {
     params: Joi.object({
       ...urlValidation.checkURL,
     }),
-    query: Joi.object({
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
-      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
-    }),
+    query: Joi.object()
+      .keys({
+        companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+        appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+      })
+      .options({
+        allowUnknown: true,
+      }),
   },
 };
-// const publish: Config = {
-//   validate: {
-//     type: 'json',
-//     body: Joi.object({
-//       head: Joi.object({
-//         company: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-//       }),
-//       body: Joi.object({
-//         type: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-//         payload: Joi.string().required().error(new InvalidParameterException('Некорректный формат сообщения')),
-//       }),
-//     }),
-//   },
-// };
 
 export { newMessage, getMessages, removeMessage, clear };

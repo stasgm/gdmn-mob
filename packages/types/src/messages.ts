@@ -91,8 +91,8 @@ export function isIDBMessage(obj: any): obj is IDBMessage {
 
 export interface IFileMessageInfo {
   id: string;
-  producer: string;
-  consumer: string;
+  producerId: string;
+  consumerId: string;
 }
 
 export interface ICheckTransafer {

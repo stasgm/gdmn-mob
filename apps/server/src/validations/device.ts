@@ -10,7 +10,6 @@ const addDevice: Config = {
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не указано наименование устройства')),
       state: Joi.string().required().error(new InvalidParameterException('Не указано статус устройства')),
-      // userId: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор пользователя')),
     }),
   },
 };
