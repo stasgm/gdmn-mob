@@ -130,6 +130,7 @@ const AppSystemListTable = ({
               </NavLink>
             </Box>
           </TableCell>
+          <TableCell>{appSystem.description}</TableCell>
           <TableCell>{new Date(appSystem.creationDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(appSystem.editionDate || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
@@ -166,6 +167,7 @@ const AppSystemListTable = ({
                   />
                 </TableCell>
                 <TableCell>Подсистема</TableCell>
+                <TableCell>Описание</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>
               </TableRow>

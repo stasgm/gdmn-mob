@@ -98,9 +98,12 @@ export const createFolders = async (dbPath: string, company: IDBCompany, dbAppSy
   const companyFolder = path.join(dbPath, `db_${company.id}`);
   await mkDir(companyFolder);
   if (company.appSystemIds) {
-    company.appSystemIds.forEach(async (system) => {
-      await mkDir(path.join(companyFolder, system));
-      messageFolders.forEach(async (folder) => await mkDir(path.join(companyFolder, system, folder)));
+    company.appSystemIds.forEach(async (systemId) => {
+      const system = dbAppSystems.find((i) => i.id === systemId);
+      if (system?.name) {
+        await mkDir(path.join(companyFolder, system.name));
+        messageFolders.forEach(async (folder) => await mkDir(path.join(companyFolder, system.name, folder)));
+      }
     });
   }
 };

@@ -45,7 +45,6 @@ class Device extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка добавления устройства',
-        //err?.response?.data?.error || 'ошибка добавления устройства',
       } as error.INetworkError;
     }
   };
@@ -78,7 +77,6 @@ class Device extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка обновления устройства',
-        //err?.response?.data?.error || 'ошибка обновления устройства',
       } as error.INetworkError;
     }
   };
@@ -109,7 +107,6 @@ class Device extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка удаления устройства',
-        //err?.response?.data?.error || 'ошибка удаления устройства',
       } as error.INetworkError;
     }
   };
@@ -133,9 +130,7 @@ class Device extends BaseRequest {
     }
 
     try {
-      // || this.api.deviceId
       const res = await this.api.axios.get<IResponse<IDevice>>(`/devices/${deviceId || this.api.config.deviceId}`);
-      //${this.api.config.version}
 
       const resData = res?.data;
 
@@ -184,7 +179,7 @@ class Device extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`); ///${this.api.config.version}
+      const res = await this.api.axios.get<IResponse<IDevice[]>>(`/devices${paramText}`);
       const resData = res.data;
 
       if (resData.result) {
@@ -201,7 +196,6 @@ class Device extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных об устройствах',
-        //err?.response?.data?.error || 'ошибка получения данных об устройствах',
       } as error.INetworkError;
     }
   };
@@ -225,7 +219,6 @@ class Device extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения пользователей по устройству',
-        //err?.response?.data?.error || 'ошибка получения пользователей по устройству',
       } as error.INetworkError;
     }
   };

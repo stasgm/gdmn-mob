@@ -6,7 +6,7 @@ export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' |
 export interface IProcess {
   id: string;
   companyId: string;
-  appSystem: string;
+  appSystemId: string;
   dateBegin: Date;
   files: string[];
   status: ProcessType;
@@ -26,7 +26,7 @@ export interface IProcessedFiles {
 
 export type AddProcess = {
   companyId: string;
-  appSystem: string;
+  appSystemId: string;
   consumerId: string;
   producerIds?: string[];
   maxFiles?: number;

@@ -1,6 +1,4 @@
-import { IMessage, IProcess } from '@lib/types';
-
-// export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
+import { IProcess } from '@lib/types';
 
 export interface IProcessQueryResponse {
   type: 'GET_PROCESS' | 'GET_PROCESSES' | 'REMOVE_PROCESS';

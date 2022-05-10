@@ -1,5 +1,7 @@
 import { ICompany, INamedEntity } from '@lib/types';
 
+import { appSystem, appSystem2 } from './appSystems';
+
 const admin1: INamedEntity = {
   id: '123',
   name: 'Stas',
@@ -15,6 +17,7 @@ const companies: ICompany[] = [
     id: '777',
     name: 'Моя компания',
     admin: admin1,
+    appSystems: [appSystem, appSystem2],
     city: 'Мой город',
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',
@@ -23,6 +26,7 @@ const companies: ICompany[] = [
     id: '789',
     name: 'Моя компания 1',
     admin: admin1,
+    appSystems: [appSystem],
     city: 'Город 1',
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',

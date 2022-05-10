@@ -26,7 +26,7 @@ const fetchAppSystems = (): AppThunk => {
       return dispatch(appSystemActions.fetchAppSystemsAsync.failure(response.message));
     }
 
-    return dispatch(appSystemActions.fetchAppSystemsAsync.failure('Ошибка получения данных о системах'));
+    return dispatch(appSystemActions.fetchAppSystemsAsync.failure('Ошибка получения данных о подсистемах'));
   };
 };
 
@@ -44,7 +44,7 @@ const fetchAppSystemById = (id: string): AppThunk => {
       return dispatch(appSystemActions.fetchAppSystemAsync.failure(response.message));
     }
 
-    return dispatch(appSystemActions.fetchAppSystemAsync.failure('Ошибка получения данных о компании'));
+    return dispatch(appSystemActions.fetchAppSystemAsync.failure('Ошибка получения данных о подсистеме'));
   };
 };
 

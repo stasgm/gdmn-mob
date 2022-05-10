@@ -126,7 +126,7 @@ const AppSystemView = () => {
       <Box>
         <Dialog open={open} onClose={handleClose}>
           <DialogContent>
-            <DialogContentText color="black">Вы действительно хотите удалить процесс?</DialogContentText>
+            <DialogContentText color="black">Вы действительно хотите удалить подсистему?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDelete} color="primary" variant="contained">

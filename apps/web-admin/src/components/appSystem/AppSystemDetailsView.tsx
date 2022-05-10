@@ -1,10 +1,6 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { IAppSystem, ICompany, IProcess } from '@lib/types';
-
-import { NavLink } from 'react-router-dom';
-
-import { adminPath } from '../../utils/constants';
+import { IAppSystem } from '@lib/types';
 
 interface IProps {
   appSystem: IAppSystem;
@@ -29,6 +25,20 @@ const AppSystemDetailsView = ({ appSystem }: IProps) => {
                   {appSystem.name}
                 </Typography>
               </Grid>
+              {appSystem.description ? (
+                <>
+                  <Grid item md={2} xs={6}>
+                    <Typography variant="subtitle1" gutterBottom>
+                      Описание
+                    </Typography>
+                  </Grid>
+                  <Grid item md={10} xs={6}>
+                    <Typography variant="h4" gutterBottom>
+                      {appSystem.description}
+                    </Typography>
+                  </Grid>
+                </>
+              ) : null}
             </Grid>
           </Grid>
         </Grid>

@@ -24,6 +24,7 @@ const addOne = async (appSystem: NewAppSystem): Promise<IAppSystem> => {
   const newAppSystemObj = {
     id: '',
     name: appSystem.name,
+    description: appSystem.description || '',
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   } as DBAppSystem;
@@ -40,12 +41,13 @@ const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promis
   const appSystemObj = await appSystems.find(id);
 
   if (!appSystemObj) {
-    throw new DataNotFoundException('Подсістема не найдена');
+    throw new DataNotFoundException('Подсистема не найдена');
   }
 
   const newAppSystem: DBAppSystem = {
     id,
     name: appSystemData.name || appSystemObj.name,
+    description: appSystemData.description === undefined ? appSystemObj.description : appSystemData.description,
     creationDate: appSystemObj.creationDate,
     editionDate: new Date().toISOString(),
   };

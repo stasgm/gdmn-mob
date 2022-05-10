@@ -27,7 +27,7 @@ appSystems.patch(
 appSystems.delete(
   '/:id',
   /*companyValidation.removeCompany,*/ authMiddleware,
-  /*permissionMiddleware,*/ removeAppSystem,
+  /*roleBasedParamsMiddlware,*/ removeAppSystem,
 );
 
 export default appSystems;
