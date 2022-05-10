@@ -68,7 +68,7 @@ class Message extends BaseRequest {
 
     try {
       const res = await this.api.axios.get<IResponse<IMessage[]>>(
-        `/messages?${params.companyId}?${params.appSystemId}`,
+        `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
       );
       const resData = res.data;
 
@@ -102,7 +102,7 @@ class Message extends BaseRequest {
 
     try {
       const res = await this.api.axios.delete<IResponse<void>>(
-        `/messages/${messageId}?${params.companyId}?${params.appSystemId}`,
+        `/messages/${messageId}?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
       );
       const resData = res.data;
 
@@ -133,7 +133,9 @@ class Message extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/messages?${params.companyId}?${params.appSystemId}`);
+      const res = await this.api.axios.delete<IResponse<void>>(
+        `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
+      );
       const resData = res.data;
 
       if (resData.result) {

@@ -6,9 +6,6 @@ import * as urlValidation from './url';
 
 const login: Config = {
   validate: {
-    /* query: {
-      deviceId: Joi.string().required().error(new InvalidParameterException('Не указано устройство')),
-    }, */
     type: 'json',
     body: Joi.object({
       name: Joi.string().required().error(new InvalidParameterException('Не заполнено имя пользователя')),

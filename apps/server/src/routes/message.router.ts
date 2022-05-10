@@ -9,7 +9,13 @@ const messages = router();
 
 messages.prefix('/messages');
 messages.post('/', messageValidation.newMessage, authMiddleware, deviceMiddleware, newMessage);
-messages.get('/', messageValidation.getMessages, authMiddleware, deviceMiddleware, getMessages);
+messages.get(
+  '/',
+  // messageValidation.getMessages,
+  authMiddleware,
+  deviceMiddleware,
+  getMessages,
+);
 messages.delete('/:id', messageValidation.removeMessage, authMiddleware, deviceMiddleware, removeMessage);
 messages.delete('/', messageValidation.clear, authMiddleware, deviceMiddleware, clear);
 
