@@ -7,9 +7,8 @@ interface IHeaderListProps extends StackHeaderProps {
   menuAction?: () => void;
 }
 
-const HeaderList = ({ scene, menuAction }: IHeaderListProps) => {
-  const { options, navigation } = scene.descriptor;
-  const title = options.headerTitle ?? options.title ?? scene.route.name;
+const HeaderList = ({ route, options, navigation, menuAction }: IHeaderListProps) => {
+  const title = options.title ?? route.name;
 
   return (
     <Appbar.Header>

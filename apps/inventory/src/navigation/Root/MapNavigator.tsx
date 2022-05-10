@@ -4,15 +4,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MapScreen from '../../screens/Maps';
 
 type MapStackParamList = {
-  Map: undefined;
+  InvMap: undefined;
 };
 
 const Stack = createStackNavigator<MapStackParamList>();
 
 const ReferencesNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Map" screenOptions={{ headerShown: true }}>
-      <Stack.Screen key="References" name="Map" component={MapScreen} options={{ title: 'Карта' }} />
+    <Stack.Navigator initialRouteName="InvMap" screenOptions={{ headerShown: true }}>
+      <Stack.Screen key="References" name="InvMap" component={MapScreen} options={{ title: 'Карта' }} />
     </Stack.Navigator>
   );
 };

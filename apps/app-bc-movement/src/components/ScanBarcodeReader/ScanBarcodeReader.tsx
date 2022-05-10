@@ -98,7 +98,7 @@ export const ScanBarcodeReader = ({ onSave, getScannedObject }: IProps) => {
           <View style={[styles.scannerContainer, styles.notScannedContainer]}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <TextInput
-                style={{ width: 0 }}
+                style={styles.scanFocus}
                 autoFocus={true}
                 ref={ref}
                 showSoftInputOnFocus={false}

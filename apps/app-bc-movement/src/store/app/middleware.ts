@@ -12,7 +12,7 @@ import { actions } from './actions';
 import { initialState } from './reducer';
 
 export const appMovMiddlewareFactory: PersistedMiddleware =
-  (load, save) => (store: any) => (next: any) => (action: any) => {
+  (load, _) => (store: any) => (next: any) => (action: any) => {
     /**
      *  Данные одной подсистемы кэшируются в одном или нескольких файлах.
      *  Мы не сохраняем ВЕСЬ стэйт в ОДНОМ файле, так как он может быть ОЧЕНЬ

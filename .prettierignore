@@ -1,0 +1,7 @@
+*.json
+*.md
+dist
+build
+/coverage
+/log
+/db

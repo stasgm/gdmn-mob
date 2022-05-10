@@ -128,6 +128,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           if (onGetMessages) {
             await onGetMessages();
           } else {
+            console.log('params', params);
             //2. Получаем все сообщения для мобильного
             const getMessagesResponse = await api.message.getMessages(params);
 

@@ -1,4 +1,4 @@
-import Router from 'koa-joi-router';
+import router from 'koa-joi-router';
 
 import { addDevice, getDevices, updateDevice, removeDevice, getDevice } from '../controllers/device';
 import { authMiddleware } from '../middleware/authRequired';
@@ -8,13 +8,20 @@ import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 
 import { deviceValidation } from '../validations';
 
-const router = Router();
+const devices = router();
 
-router.prefix('/devices');
-router.post('/', deviceValidation.addDevice, authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, addDevice);
-router.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getDevices);
-router.get('/:id', deviceValidation.getDevice, deviceMiddleware, roleBasedParamsMiddlware, getDevice);
-router.patch(
+devices.prefix('/devices');
+devices.post(
+  '/',
+  deviceValidation.addDevice,
+  authMiddleware,
+  permissionMiddleware,
+  roleBasedParamsMiddlware,
+  addDevice,
+);
+devices.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getDevices);
+devices.get('/:id', deviceValidation.getDevice, deviceMiddleware, roleBasedParamsMiddlware, getDevice);
+devices.patch(
   '/:id',
   deviceValidation.updateDevice,
   authMiddleware,
@@ -22,7 +29,7 @@ router.patch(
   roleBasedParamsMiddlware,
   updateDevice,
 );
-router.delete(
+devices.delete(
   '/:id',
   deviceValidation.removeDevice,
   authMiddleware,
@@ -31,4 +38,4 @@ router.delete(
   removeDevice,
 );
 
-export default router;
+export default devices;

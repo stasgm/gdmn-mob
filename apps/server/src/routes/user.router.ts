@@ -1,4 +1,4 @@
-import Router from 'koa-joi-router';
+import router from 'koa-joi-router';
 
 import { addUser, getUsers, getUser, removeUser, updateUser } from '../controllers/user';
 import { authMiddleware } from '../middleware/authRequired';
@@ -8,13 +8,13 @@ import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 
 import { userValidation } from '../validations';
 
-const router = Router();
+const users = router();
 
-router.prefix('/users');
-router.post('/', userValidation.addUser, authMiddleware, permissionMiddleware, addUser);
-router.get('/:id', userValidation.getUser, authMiddleware, deviceMiddleware, getUser);
-router.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getUsers);
-router.patch('/:id', userValidation.updateUser, authMiddleware, permissionMiddleware, updateUser);
-router.delete('/:id', userValidation.removeUser, authMiddleware, permissionMiddleware, removeUser);
+users.prefix('/users');
+users.post('/', userValidation.addUser, authMiddleware, permissionMiddleware, addUser);
+users.get('/:id', userValidation.getUser, authMiddleware, deviceMiddleware, getUser);
+users.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, getUsers);
+users.patch('/:id', userValidation.updateUser, authMiddleware, permissionMiddleware, updateUser);
+users.delete('/:id', userValidation.removeUser, authMiddleware, permissionMiddleware, removeUser);
 
-export default router;
+export default users;

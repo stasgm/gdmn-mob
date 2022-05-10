@@ -13,7 +13,7 @@ import bodyParser from 'koa-bodyparser';
 import morganlogger from 'koa-morgan';
 
 import serve from 'koa-static-server';
-import historyApiFallback from 'koa2-connect-history-api-fallback';
+import { historyApiFallback } from 'koa2-connect-history-api-fallback';
 
 import { IUser } from '@lib/types';
 

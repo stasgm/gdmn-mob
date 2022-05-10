@@ -11,7 +11,7 @@ const DashboardStack = createStackNavigator<DashboardStackParamList>();
 
 const DashboardNavigator = () => {
   return (
-    <DashboardStack.Navigator initialRouteName="Dashboard" screenOptions={{ headerShown: true }}>
+    <DashboardStack.Navigator initialRouteName="Dashboard">
       <DashboardStack.Screen name="Dashboard" component={TabsNavigator} options={{ title: 'Дашборд' }} />
     </DashboardStack.Navigator>
   );
