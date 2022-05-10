@@ -323,16 +323,17 @@ export const getFiles = (params: AddProcess): IFiles => {
 };
 
 export const makeMessageSync = (message: IDBMessage): IMessage => {
-  const { users, companies } = getDb();
+  const { users, companies, appSystems } = getDb();
 
   const consumer = getNamedEntitySync(message.head.consumerId, users);
   const producer = getNamedEntitySync(message.head.producerId, users);
   const company = getNamedEntitySync(message.head.companyId, companies);
+  const appSystem = getNamedEntitySync(message.head.appSystemId, appSystems);
 
   return {
     id: message.id,
     head: {
-      appSystemId: message.head.appSystemId,
+      appSystem,
       company,
       consumer,
       producer,
@@ -347,7 +348,7 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
   return {
     id: uidv1(),
     head: {
-      appSystemId: message.head.appSystemId,
+      appSystemId: message.head.appSystem.id,
       companyId: message.head.company.id,
       consumerId: message.head.consumer.id,
       producerId,
