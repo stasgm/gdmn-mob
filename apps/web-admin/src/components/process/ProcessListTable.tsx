@@ -99,8 +99,6 @@ const ProcessListTable = ({
 
   const TableRows = () => {
     const processList = processes.slice(page * limit, page * limit + limit).map((process: IProcess) => {
-      const company = companies.find((a) => a.id === process.companyId)?.name;
-
       return (
         <TableRow hover key={process.id} selected={selectedProcessIds.findIndex((d) => d.id === process?.id) !== -1}>
           <TableCell padding="checkbox">
@@ -125,12 +123,12 @@ const ProcessListTable = ({
             >
               <NavLink to={`${adminPath}/app/processes/${process.id}`}>
                 <Typography color="textPrimary" variant="body1" key={process.id}>
-                  {company}
+                  {process.company.name}
                 </Typography>
               </NavLink>
             </Box>
           </TableCell>
-          <TableCell>{process.appSystem}</TableCell>
+          <TableCell>{process.appSystem.name}</TableCell>
           <TableCell>{process.status}</TableCell>
           <TableCell>{new Date(process.dateBegin || '').toLocaleString('ru', { hour12: false })}</TableCell>
           <TableCell>{new Date(process?.dateReadyToCommit || '').toLocaleString('ru', { hour12: false })}</TableCell>

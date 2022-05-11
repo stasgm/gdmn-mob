@@ -59,6 +59,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     const okList: string[] = [];
 
     const consumer = user.erpUser;
+    console.log('consumer', consumer);
 
     /*
       Поддержка платформы:

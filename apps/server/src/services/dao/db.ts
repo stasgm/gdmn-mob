@@ -14,8 +14,8 @@ import {
   IDBDeviceBinding,
   SessionId,
   DBAppSystem,
-  IDBProcess,
   IAppSystem,
+  IDBProcess,
 } from '@lib/types';
 
 import { v4 as uuid } from 'uuid';

@@ -1,6 +1,5 @@
+import { IProcess } from '@lib/types';
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
-
-import { ICompany, IProcess } from '@lib/types';
 
 import { NavLink } from 'react-router-dom';
 
@@ -8,10 +7,9 @@ import { adminPath } from '../../utils/constants';
 
 interface IProps {
   process: IProcess;
-  company?: ICompany;
 }
 
-const ProcessDetailsView = ({ process, company }: IProps) => {
+const ProcessDetailsView = ({ process }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />
@@ -26,9 +24,9 @@ const ProcessDetailsView = ({ process, company }: IProps) => {
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
-                <NavLink to={`${adminPath}/app/companies/${company?.id}`} key={company?.id}>
-                  <Typography color="textPrimary" variant="h4" key={company?.id} gutterBottom>
-                    {company?.name || ''}
+                <NavLink to={`${adminPath}/app/companies/${process.company?.id}`} key={process.company?.id}>
+                  <Typography color="textPrimary" variant="h4" key={process.company?.id} gutterBottom>
+                    {process.company.name}
                   </Typography>
                 </NavLink>
               </Grid>
@@ -39,7 +37,7 @@ const ProcessDetailsView = ({ process, company }: IProps) => {
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {process.appSystem}
+                  {process.appSystem.name}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>

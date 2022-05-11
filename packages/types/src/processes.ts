@@ -1,12 +1,12 @@
-import { StatusType } from './common';
+import { INamedEntity, StatusType } from './common';
 import { IMessage, NewMessage } from './messages';
 
 export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
 
 export interface IProcess {
   id: string;
-  companyId: string;
-  appSystemId: string;
+  company: INamedEntity;
+  appSystem: INamedEntity;
   dateBegin: Date;
   files: string[];
   status: ProcessType;
@@ -14,7 +14,10 @@ export interface IProcess {
   dateReadyToCommit?: Date;
 }
 
-export type IDBProcess = IProcess;
+export interface IDBProcess extends Omit<IProcess, 'company' | 'appSystem'> {
+  companyId: string;
+  appSystemId: string;
+}
 
 export interface IFiles {
   [fileName: string]: IMessage;

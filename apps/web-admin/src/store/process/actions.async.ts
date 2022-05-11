@@ -8,15 +8,17 @@ import { processActions, ProcessActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<ProcessActionType>, AppState, null, ProcessActionType>;
 
-const fetchProcesses = (): AppThunk => {
+const fetchProcesses = (filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
   return async (dispatch) => {
     dispatch(processActions.fetchProcessesAsync.request(''));
 
-    // const params: Record<string, string | number> = {};
+    const params: Record<string, string | number> = {};
 
-    // const response = await api.appSystem.getAppSystems(params);
-    const response = await api.process.getProcesses();
-    // const response = await api.appSystem.getAppSystems();
+    if (filterText) params.filterText = filterText;
+    if (fromRecord) params.fromRecord = fromRecord;
+    if (toRecord) params.toRecord = toRecord;
+
+    const response = await api.process.getProcesses(params);
 
     if (response.type === 'GET_PROCESSES') {
       return dispatch(processActions.fetchProcessesAsync.success(response.processes));
