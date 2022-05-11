@@ -179,7 +179,12 @@ const findOne = async (id: string): Promise<IUser | undefined> => {
   const db = getDb();
   const { users } = db;
 
-  const user = await users.find(id);
+  let user;
+  if (process.env.MOCK) {
+    user = mockUsers.find((i) => i.id === id) as IDBUser;
+  } else {
+    user = await users.find(id);
+  }
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
@@ -192,7 +197,14 @@ const findByName = async (name: string): Promise<IUser> => {
   const db = getDb();
   const { users } = db;
 
-  const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
+  let user;
+
+  if (process.env.MOCK) {
+    user = mockUsers.find((user) => user.name.toUpperCase() === name.toUpperCase());
+  } else {
+    user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
+  }
+  // const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
@@ -205,7 +217,14 @@ const getUserPassword = async (id: string): Promise<string> => {
   const db = getDb();
   const { users } = db;
 
-  const user = await users.find(id);
+  let user;
+  if (process.env.MOCK) {
+    user = mockUsers.find((i) => i.id === id) as IDBUser;
+  } else {
+    user = await users.find(id);
+  }
+
+  // const user = await users.find(id);
 
   if (!user) {
     throw new DataNotFoundException('Пароль пользователя не найден');

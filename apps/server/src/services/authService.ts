@@ -4,19 +4,27 @@ import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import { compare } from 'bcrypt';
 
-import { IUser, NewUser, IUserCredentials, DeviceState, IDBDeviceBinding } from '@lib/types';
+import { IUser, NewUser, IUserCredentials, DeviceState, IDBDeviceBinding, IDBUser } from '@lib/types';
 
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
 import * as userService from './userService';
 import { getDb } from './dao/db';
+import { users as mockUsers } from './data/user';
 
 const authenticate = async (ctx: Context, next: Next): Promise<IUser> => {
   const { devices, users, deviceBindings } = getDb();
 
   const { name } = ctx.request.body as IUserCredentials;
 
-  const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
+  let user: IDBUser;
+
+  if (process.env.MOCK) {
+    user = mockUsers.find((i) => i.name.toUpperCase() === name.toUpperCase()) as IDBUser;
+  } else {
+    user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
+  }
+  // const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
 
   // TODO Вынести в отдельную функцию
   if (!user) {
@@ -140,7 +148,11 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   if (await compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
+    if (await compare(password, hashedPassword)) {
+      done(null, user);
+    } else {
+      done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
+    }
   }
 };
 

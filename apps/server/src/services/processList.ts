@@ -150,7 +150,6 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
     }
 
     return filteredProcesses && extraPredicate(item, newParams as Record<string, string>);
-    // return processList.filter((item) => extraPredicate(item, params));
   });
   /** pagination */
   const limitParams = Object.assign({}, params);
