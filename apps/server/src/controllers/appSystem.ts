@@ -62,7 +62,7 @@ const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
-  const { appSystemId, name } = ctx.query;
+  const { appSystemId, name, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -72,6 +72,18 @@ const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
 
   if (name && typeof name === 'string') {
     params.name = name;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string') {
+    params.fromRecord = fromRecord;
+  }
+
+  if (typeof toRecord === 'string') {
+    params.toRecord = toRecord;
   }
 
   const appSystemList = await appSystemService.findAll(params);

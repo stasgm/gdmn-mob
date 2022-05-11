@@ -19,15 +19,17 @@ const ProcessList = () => {
   const { list: processes, loading, errorMessage, pageParams } = useSelector((state) => state.processes);
   const companies = useSelector((state) => state.companies.list);
 
-  const fetchProcesses = useCallback(async () => {
-    await dispatch(processActions.fetchProcesses());
-  }, [dispatch]);
+  const fetchProcesses = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(processActions.fetchProcesses(filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchProcesses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchProcesses(pageParams?.filterText as string);
+  }, [fetchProcesses, pageParams?.filterText]);
 
   const fetchCompanies = useCallback(async () => {
     await dispatch(companyActions.fetchCompanies());
@@ -55,7 +57,7 @@ const ProcessList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    // fetchDevices(pageParamLocal?.filterText as string);
+    fetchProcesses(pageParamLocal?.filterText as string);
 
     // const inputValue = valueRef?.current?.value;
     // fetchDevices(inputValue);

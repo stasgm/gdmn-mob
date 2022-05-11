@@ -9,14 +9,17 @@ import { appSystemActions, AppSystemActionType } from './actions';
 
 export type AppThunk = ThunkAction<Promise<AppSystemActionType>, AppState, null, AppSystemActionType>;
 
-const fetchAppSystems = (): AppThunk => {
+const fetchAppSystems = (filterText?: string, fromRecord?: number, toRecord?: number): AppThunk => {
   return async (dispatch) => {
     dispatch(appSystemActions.fetchAppSystemsAsync.request(''));
 
-    // const params: Record<string, string | number> = {};
+    const params: Record<string, string | number> = {};
 
-    // const response = await api.appSystem.getAppSystems(params);
-    const response = await api.appSystem.getAppSystems();
+    if (filterText) params.filterText = filterText;
+    if (fromRecord) params.fromRecord = fromRecord;
+    if (toRecord) params.toRecord = toRecord;
+
+    const response = await api.appSystem.getAppSystems(params);
 
     if (response.type === 'GET_APP_SYSTEMS') {
       return dispatch(appSystemActions.fetchAppSystemsAsync.success(response.appSystems));

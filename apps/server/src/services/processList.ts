@@ -14,6 +14,8 @@ import {
   NewMessage,
   IMessageParams,
   IProcess,
+  IAppSystem,
+  ICompany,
 } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
@@ -99,6 +101,8 @@ export const getProcessById = (processId: string) => {
 };
 
 export const getProcesses = (params: Record<string, string | number>): IProcess[] => {
+  const { appSystems, companies } = getDb();
+
   initProcessList();
   console.log('processList', processList);
 
@@ -112,39 +116,41 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
   const filteredList = processList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
-    // let companyFound = true;
+    const processAppSystem = appSystems.findSync(item.appSystemId);
+    const processCompany = companies.findSync(item.companyId);
 
-    // if ('companyId' in newParams) {
-    //   companyFound = item.companyId === newParams.companyId;
-    //   delete newParams['companyId'];
-    // }
+    let companyFound = true;
 
-    // let appSystemFound = true;
+    if ('companyId' in newParams) {
+      companyFound = item.companyId === newParams.companyId;
+      delete newParams['companyId'];
+    }
 
-    // if ('appSystemId' in newParams) {
-    //   appSystemFound = item.appSystemId === newParams.appSystemId;
-    //   delete newParams['appSystemId'];
-    // }
+    let appSystemFound = true;
+
+    if ('appSystemId' in newParams) {
+      appSystemFound = item.appSystemId === newParams.appSystemId;
+      delete newParams['appSystemId'];
+    }
 
     /** filtering data */
-    const filteredProcesses = true;
+    let filteredProcesses = true;
     if ('filterText' in newParams) {
       const filterText: string = (newParams.filterText as string).toUpperCase();
 
       if (filterText) {
-        //по полям процесса
-        // const name = item.name.toUpperCase();
-        // const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
-        // const newState = deviceStates[item.state];
-        // const state = typeof newState === 'string' ? newState.toUpperCase() : '';
-        // const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        // const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
-        //   filteredDevices =
-        //     name.includes(filterText) ||
-        //     uid.includes(filterText) ||
-        //     state.includes(filterText) ||
-        //     creationDate.includes(filterText) ||
-        //     editionDate.includes(filterText);
+        const companyName = processCompany?.name.toUpperCase() || '';
+        const appSystemName = processAppSystem?.name.toUpperCase() || '';
+        const status = item.status.toUpperCase();
+        const dateBegin = new Date(item.dateBegin || '').toLocaleString('ru', { hour12: false });
+        const dateReadyToCommit = new Date(item.dateReadyToCommit || '').toLocaleString('ru', { hour12: false });
+        filteredProcesses =
+          companyName.includes(filterText) ||
+          appSystemName.includes(filterText) ||
+          status.includes(filterText) ||
+          dateBegin.includes(filterText) ||
+          dateReadyToCommit.includes(filterText);
+        const company = item.companyId;
       }
       delete newParams['filterText'];
     }
