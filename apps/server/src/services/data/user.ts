@@ -7,6 +7,16 @@ export const superAdmin: INamedEntity = {
 
 const users: IDBUser[] = [
   {
+    id: 'gdmn',
+    name: 'gdmn',
+    password: 'gdmn',
+    company: null,
+    creatorId: '',
+    role: 'SuperAdmin',
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
+  },
+  {
     id: '15',
     externalId: '147012274',
     name: 'Короткевич З.С.',

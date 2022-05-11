@@ -1,7 +1,14 @@
 import { IDBCompany } from '@lib/types';
 
 const companies: IDBCompany[] = [
-  { id: '789', name: 'Моя компания 1', adminId: '1', appSystemIds: ['1', '2'] },
+  {
+    id: '789',
+    name: 'Моя компания 1',
+    adminId: '15',
+    appSystemIds: ['1', '2'],
+    creationDate: '2021.01.01',
+    editionDate: '2021.01.01',
+  },
   { id: '654', name: 'Моя компания 2', adminId: 'user2', appSystemIds: ['1'] },
   { id: '777', name: 'Моя компания', adminId: 'user1', appSystemIds: ['3', '2'] },
   { id: '12', name: 'Company 2', adminId: 'user2' },

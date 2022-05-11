@@ -145,10 +145,18 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
     // throw new DataNotFoundException('имя пользователя или пароль')
   }
 
-  if (await bcrypt.compare(password, hashedPassword)) {
-    done(null, user);
+  if (process.env.MOCK) {
+    if (password === hashedPassword) {
+      done(null, user);
+    } else {
+      done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
+    }
   } else {
-    done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
+    if (await bcrypt.compare(password, hashedPassword)) {
+      done(null, user);
+    } else {
+      done(new Error('Неверные данные')); //TODO возвращать ошибку вместо null
+    }
   }
 };
 
