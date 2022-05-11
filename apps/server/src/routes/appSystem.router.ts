@@ -4,26 +4,17 @@ import { getAppSystem, addAppSystem, getAppSystems, removeAppSystem, updateAppSy
 import { authMiddleware } from '../middleware/authRequired';
 import { companyMiddleware } from '../middleware/companyRequired';
 // import { permissionMiddleware } from '../middleware/permissionRequired';
+import { appSystemMiddleware } from '../middleware/appSystemRequired';
 import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
+import { appSystemValidation } from '../validations';
 
 const router = Router();
 
 router.prefix('/appSystems');
-router.post('/', /*companyValidation.addCompany,*/ authMiddleware, /*permissionMiddleware,*/ addAppSystem);
-router.get(
-  '/:id',
-  // companyValidation.getCompany,
-  authMiddleware,
-  // deviceMiddleware,
-  // roleBasedParamsMiddlware,
-  getAppSystem,
-);
+router.post('/', appSystemValidation.addAppSystem, authMiddleware, appSystemMiddleware, addAppSystem);
+router.get('/:id', appSystemValidation.getAppSystem, authMiddleware, getAppSystem);
 router.get('/', authMiddleware, companyMiddleware, roleBasedParamsMiddlware, getAppSystems);
-router.patch('/:id', /*companyValidation.updateCompany,*/ authMiddleware, /*permissionMiddleware,*/ updateAppSystem);
-router.delete(
-  '/:id',
-  /*companyValidation.removeCompany,*/ authMiddleware,
-  /*roleBasedParamsMiddlware,*/ removeAppSystem,
-);
+router.patch('/:id', appSystemValidation.updateAppSystem, authMiddleware, appSystemMiddleware, updateAppSystem);
+router.delete('/:id', appSystemValidation.removeAppSystem, authMiddleware, appSystemMiddleware, removeAppSystem);
 
 export default router;

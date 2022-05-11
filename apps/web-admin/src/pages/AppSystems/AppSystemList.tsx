@@ -9,9 +9,7 @@ import { useNavigate } from 'react-router';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
-import processActions from '../../store/process';
 import appSystemsActions from '../../store/appSystem';
-import companyActions from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
@@ -98,7 +96,7 @@ const AppSystemList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            searchTitle={'Найти компанию'}
+            searchTitle={'Найти подсистему'}
             //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}

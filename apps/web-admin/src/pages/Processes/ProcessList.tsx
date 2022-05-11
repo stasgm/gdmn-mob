@@ -97,7 +97,7 @@ const ProcessList = () => {
         <Container maxWidth={false}>
           <ToolbarActionsWithSearch
             buttons={buttons}
-            searchTitle={'Найти компанию'}
+            searchTitle={'Найти процесс'}
             //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
