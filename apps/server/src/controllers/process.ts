@@ -10,8 +10,15 @@ import { ok } from '../utils/apiHelpers';
  * API 1
  * @param ctx
  */
-export const addProcess = (ctx: Context) =>
-  ok(ctx, processService.addOne(ctx.request.body as AddProcess), 'addProcess');
+export const addProcess = (ctx: Context) => {
+  const { appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles } = ctx.request.body as AddProcess;
+
+  ok(
+    ctx,
+    processService.addOne({ appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles }),
+    'addProcess',
+  );
+};
 
 /**
  * API 2

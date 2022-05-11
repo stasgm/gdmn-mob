@@ -12,12 +12,6 @@ import { created, ok } from '../utils/apiHelpers';
 const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, description } = ctx.request.body as NewAppSystem;
 
-  const user = ctx.state.user as IUser;
-
-  if (user?.role !== 'SuperAdmin') {
-    throw new ForbiddenException('Нет прав для создания подсистемы');
-  }
-
   const appSystem: NewAppSystem = { name, description };
 
   const newAppSystem = await appSystemService.addOne(appSystem);
