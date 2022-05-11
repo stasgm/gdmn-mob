@@ -4,7 +4,7 @@ import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, PrepareProc
 
 import { processService } from '../services';
 
-import { ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils/apiHelpers';
 
 /**
  * API 1
@@ -13,7 +13,7 @@ import { ok } from '../utils/apiHelpers';
 export const addProcess = (ctx: Context) => {
   const { appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles } = ctx.request.body as AddProcess;
 
-  ok(
+  created(
     ctx,
     processService.addOne({ appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles }),
     'addProcess',
