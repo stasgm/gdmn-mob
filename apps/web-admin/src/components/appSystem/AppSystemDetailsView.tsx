@@ -1,10 +1,6 @@
 import { CardHeader, CardContent, Typography, Card, Grid, Divider } from '@material-ui/core';
 
-import { IAppSystem, ICompany, IProcess } from '@lib/types';
-
-import { NavLink } from 'react-router-dom';
-
-import { adminPath } from '../../utils/constants';
+import { IAppSystem } from '@lib/types';
 
 interface IProps {
   appSystem: IAppSystem;

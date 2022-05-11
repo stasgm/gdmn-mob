@@ -33,12 +33,14 @@ const newMessage: Config = {
   },
 };
 
-const getMessage: Config = {
+const getMessages: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      companyId: Joi.string().required().error(new InvalidParameterException('Не указана органиазция')),
-      appSystem: Joi.string().required().error(new InvalidParameterException('Не указана система')),
+    }),
+    query: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
     }),
   },
 };
@@ -49,9 +51,24 @@ const removeMessage: Config = {
       ...urlValidation.checkURL,
       id: Joi.string().required().error(new InvalidParameterException('Не указан идентификатор сообщения')),
     }),
+    query: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+    }),
   },
 };
 
+const clear: Config = {
+  validate: {
+    params: Joi.object({
+      ...urlValidation.checkURL,
+    }),
+    query: Joi.object({
+      companyId: Joi.string().required().error(new InvalidParameterException('Не указана организация')),
+      appSystemId: Joi.string().required().error(new InvalidParameterException('Не указана подсистема')),
+    }),
+  },
+};
 // const publish: Config = {
 //   validate: {
 //     type: 'json',
@@ -67,4 +84,4 @@ const removeMessage: Config = {
 //   },
 // };
 
-export { newMessage, getMessage, removeMessage };
+export { newMessage, getMessages, removeMessage, clear };

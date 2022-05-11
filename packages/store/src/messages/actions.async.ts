@@ -15,10 +15,10 @@ export type MsgDispatch = ThunkDispatch<MessagesState, any, MsgActionType>;
 export const useMsgThunkDispatch = () => useDispatch<MsgDispatch>();
 
 const fetchMessages = ({
-  systemId,
+  appSystemId,
   companyId,
 }: {
-  systemId: string;
+  appSystemId: string;
   companyId: string;
 }): AppThunk<
   Promise<ActionType<typeof actions.fetchMessagesAsync>>,
@@ -28,7 +28,7 @@ const fetchMessages = ({
   return async (dispatch) => {
     dispatch(actions.fetchMessagesAsync.request(''));
 
-    const response = await api.message.getMessages({ systemName: systemId, companyId });
+    const response = await api.message.getMessages({ appSystemId, companyId });
 
     if (response.type === 'GET_MESSAGES') {
       return dispatch(actions.fetchMessagesAsync.success(response.messageList));
@@ -42,49 +42,11 @@ const fetchMessages = ({
   };
 };
 
-// const sendMessages = (messages: IMessage[]): AppThunk<
-//   Promise<ActionType<typeof actions.addMessage>>,
-//   MessagesState,
-//   ActionType<typeof actions.addMessages>
-// > => {
-//   return async (dispatch) => {
-//     dispatch(actions.fetchMessagesAsync.request('Создание сообщения'));
-
-//     if (messages) {
-//       return dispatch(actions.fetchMessagesAsync.success(messages));
-//     }
-
-//     return dispatch(actions.fetchMessagesAsync.failure('Ошибка создания сообщения'));
-//   };
-// };
-// AppThunk<
-//   Promise<ActionType<typeof actions.removeMessageAsync>>,
-//   MessagesState,
-//   ActionType<typeof actions.removeMessageAsync>>
-// const removeMessage = (messageId: string): AppThunk => {
-//   return async (dispatch) => {
-//     dispatch(actions.removeMessageAsync.request('Удаление сообщения'));
-
-//     const response = await api.message.removeMessage(messageId);
-
-//     if (response.type === 'REMOVE_MESSAGE') {
-//       return dispatch(actions.removeMessageAsync.success(messageId));
-//     }
-
-//     return dispatch(actions.removeMessageAsync.failure('Ошибка удаления сообщения'));
-//   };
-// };
-// <
-//   Promise<ActionType<typeof actions.clearMessagesAsync>>,
-//   MessagesState,
-//   ActionType<typeof actions.clearMessagesAsync>
-// >
-
-const clearMessages = (): AppThunk => {
+const clearMessages = (params: { appSystemId: string; companyId: string }): AppThunk => {
   return async (dispatch) => {
     dispatch(actions.clearMessagesAsync.request('Удаление сообщений'));
 
-    const response = await api.message.clear();
+    const response = await api.message.clear(params);
 
     if (response.type === 'CLEAR_MESSAGES') {
       return dispatch(actions.clearMessagesAsync.success());

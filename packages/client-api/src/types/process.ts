@@ -1,7 +1,5 @@
 import { IProcess } from '@lib/types';
 
-// export type ProcessType = 'STARTED' | 'READY_TO_COMMIT' | 'CANCEL' | 'CLEANUP' | 'FAILED';
-
 export interface IProcessQueryResponse {
   type: 'GET_PROCESS' | 'GET_PROCESSES' | 'REMOVE_PROCESS';
 }

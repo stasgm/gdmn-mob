@@ -1,12 +1,14 @@
 import { IProcess } from '@lib/types';
 
+import { appSystem } from './appSystems';
+
 import { company } from './companies';
 
 const processes: IProcess[] = [
   {
     id: 'qw3673f0-45eb-11ec-va5c-b7494455c651',
     companyId: company.id,
-    appSystem: 'gdmn-gd-movement',
+    appSystemId: appSystem.id,
     dateBegin: new Date(),
     files: [
       '3efb4340-af63-11ec-a229-7fa5c8e1feee.json',

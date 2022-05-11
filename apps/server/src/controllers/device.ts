@@ -21,27 +21,13 @@ const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
   log.info(`add device: device '${name}' is successfully created'`);
 };
 
-// const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
-//   const { name, userId } = ctx.request.body;
-
-//   const device: NewDevice = { name, userId };
-
-//   const newDevice = await deviceService.addOne(device);
-
-//   created(ctx as Context, newDevice);
-
-//   log.info(`addDevice: device '${name}' is successfully created'`);
-// };
-
 const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId } = ctx.params;
   const deviceData = ctx.request.body as Partial<IDevice>;
 
   const params: Record<string, string> = {};
 
-  const { id: adminId } = ctx.state.user;
-
-  params.adminId = adminId;
+  params.adminId = ctx.state.user.id;
 
   const updatedDevice = await deviceService.updateOne(deviceId, deviceData, params);
 

@@ -6,4 +6,4 @@ export * from './src/users';
 export * from './src/references';
 export * from './src/documents';
 export * from './src/appSystems';
-export * from './src/process';
+export * from './src/processes';

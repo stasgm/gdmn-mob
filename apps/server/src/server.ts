@@ -41,7 +41,7 @@ interface IServer {
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
 // export type KoaApp = Koa;
 // let timerId: NodeJS.Timer;
-let timerId: number;
+let timerId: NodeJS.Timer;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
   const app: KoaApp = new Koa();

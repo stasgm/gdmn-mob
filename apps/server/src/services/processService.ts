@@ -61,7 +61,7 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
   const files = getFiles(params);
 
   //Если нет процесса и есть сообщения, создаем процесс
-  const newProcess = startProcess(params.companyId, params.appSystem, files);
+  const newProcess = startProcess(params.companyId, params.appSystemId, files);
 
   return {
     status: 'OK',
