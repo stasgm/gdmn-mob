@@ -7,8 +7,8 @@ import { company } from './companies';
 const processes: IProcess[] = [
   {
     id: 'qw3673f0-45eb-11ec-va5c-b7494455c651',
-    companyId: company.id,
-    appSystemId: appSystem.id,
+    company,
+    appSystem,
     dateBegin: new Date(),
     files: [
       '3efb4340-af63-11ec-a229-7fa5c8e1feee.json',

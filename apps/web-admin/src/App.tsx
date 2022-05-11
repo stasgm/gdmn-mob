@@ -16,7 +16,6 @@ import routes from './routes';
 const Router = () => {
   const dispatch = useDispatch();
   const isLogged = authSelectors.isLogged();
-  console.log('isLogged', isLogged);
 
   useEffect(() => {
     dispatch(appActions.loadGlobalDataFromDisc());

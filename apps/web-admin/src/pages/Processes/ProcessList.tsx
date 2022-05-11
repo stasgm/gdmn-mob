@@ -17,7 +17,7 @@ const ProcessList = () => {
   const dispatch = useDispatch();
 
   const { list: processes, loading, errorMessage, pageParams } = useSelector((state) => state.processes);
-  const { list: companies } = useSelector((state) => state.companies);
+  const companies = useSelector((state) => state.companies.list);
 
   const fetchProcesses = useCallback(async () => {
     await dispatch(processActions.fetchProcesses());

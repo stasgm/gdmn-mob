@@ -20,6 +20,8 @@ import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import processSelectors from '../../store/process/selectors';
+import companySelectors from '../../store/company/selectors';
+import appSystemSelectors from '../../store/appSystem/selectors';
 import SnackBar from '../../components/SnackBar';
 
 import ProcessDetailsView from '../../components/process/ProcessDetailsView';
@@ -40,7 +42,9 @@ const ProcessView = () => {
   const { loading, errorMessage } = useSelector((state) => state.processes);
 
   const process = processSelectors.processById(id);
-  const company = processSelectors.companyByProcessId(id);
+  // const company = process?.companyId ? companySelectors.companyById(process.companyId) : undefined;
+  // const appSystem = process?.appSystemId ? appSystemSelectors.appSystemById(process.appSystemId) : undefined;
+  console.log('process', process);
 
   const [open, setOpen] = useState(false);
 
@@ -104,7 +108,7 @@ const ProcessView = () => {
       disabled: true,
       color: 'secondary',
       variant: 'contained',
-      onClick: handleClickOpen, //handleDelete,
+      onClick: handleClickOpen,
       icon: <DeleteIcon />,
     },
   ];
@@ -159,7 +163,7 @@ const ProcessView = () => {
             minHeight: '100%',
           }}
         >
-          <ProcessDetailsView process={process} company={company} />
+          <ProcessDetailsView process={process} />
         </Box>
         <Box>
           <CardHeader sx={{ mx: 2 }} />

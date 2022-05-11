@@ -30,13 +30,13 @@ export const messageFileName2params = (fileName: string): IFileMessageInfo => {
 
   return {
     id: match[1],
-    producer: match[2],
-    consumer: match[3],
+    producerId: match[2],
+    consumerId: match[3],
   };
 };
 
-export const params2messageFileName = ({ id, producer, consumer }: IFileMessageInfo) =>
-  `${id}_from_${producer}_to_${consumer}.json`;
+export const params2messageFileName = ({ id, producerId, consumerId }: IFileMessageInfo) =>
+  `${id}_from_${producerId}_to_${consumerId}.json`;
 
 /**
  * @template T

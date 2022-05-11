@@ -107,9 +107,15 @@ const getProcesses: Config = {
   validate: {
     params: Joi.object({
       ...urlValidation.checkURL,
-      companyId: Joi.string().optional(),
-      appSystemId: Joi.string().optional(),
     }),
+    query: Joi.object()
+      .keys({
+        companyId: Joi.string().optional(),
+        appSystemId: Joi.string().optional(),
+      })
+      .options({
+        allowUnknown: true,
+      }),
   },
 };
 

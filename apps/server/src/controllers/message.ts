@@ -16,7 +16,6 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (user.company.id !== message.head.company.id) {
     throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
-
   const messageId = await messageService.addOne({
     msgObject: message,
     producerId: user.id,

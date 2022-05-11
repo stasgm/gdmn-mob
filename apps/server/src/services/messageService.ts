@@ -1,4 +1,4 @@
-import { IDBMessage, IMessage, NewMessage } from '@lib/types';
+import { IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
 import { v1 as uuidv1 } from 'uuid';
 
 import { DataNotFoundException } from '../exceptions';
@@ -24,7 +24,6 @@ const FindMany = async ({
   consumerId: string;
 }) => {
   const { messages, companies, appSystems, users } = getDb();
-
   const company = await companies.find(companyId);
 
   if (!company) {
@@ -45,7 +44,7 @@ const FindMany = async ({
 
   const params = { companyId, appSystemName: appSystem.name };
 
-  const messageList = await messages.read(params, (item) => item.consumer === consumerId);
+  const messageList = await messages.read(params, (item) => item.consumerId === consumerId);
   const pr = messageList.map(async (i) => await makeMessage(i));
 
   return Promise.all(pr);
@@ -82,7 +81,7 @@ const addOne = async ({
   const producer = await users.find(producerId);
 
   if (!producer) {
-    throw new DataNotFoundException('Отпарвитель не найден');
+    throw new DataNotFoundException('Отправитель не найден');
   }
 
   const appSystem = await appSystems.find(appSystemId);
@@ -93,10 +92,10 @@ const addOne = async ({
 
   const newMessage = await makeDBNewMessage(msgObject, producerId);
 
-  const fileInfo = {
+  const fileInfo: IFileMessageInfo = {
     id: newMessage.id,
-    producer: newMessage.head.producerId,
-    consumer: newMessage.head.consumerId,
+    producerId,
+    consumerId: newMessage.head.consumerId,
   };
 
   const params = { companyId, appSystemName: appSystem.name };

@@ -18,7 +18,7 @@ import { processValidation } from '../validations';
 
 const processes = router();
 
-processes.prefix('/process');
+processes.prefix('/processes');
 processes.post('/', processValidation.addProcess, authMiddleware, deviceMiddleware, processParamsMiddlware, addProcess);
 processes.patch('/:id', processValidation.updateProcess, authMiddleware, deviceMiddleware, updateProcess);
 processes.patch('/:id/prepare', processValidation.prepareProcess, authMiddleware, deviceMiddleware, prepareProcess);

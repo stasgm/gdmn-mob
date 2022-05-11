@@ -5,7 +5,6 @@ import { error, process as types } from '../types';
 import { getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
-// import { IProcess } from '../types/process';
 
 class Process extends BaseRequest {
   constructor(api: BaseApi) {
@@ -29,8 +28,7 @@ class Process extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IProcess[]>>(`/process${paramText}`);
-      ///${this.api.config.version}
+      const res = await this.api.axios.get<IResponse<IProcess[]>>(`/processes${paramText}`);
       const resData = res.data;
 
       if (resData.result) {
@@ -48,7 +46,6 @@ class Process extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о процессах',
-        //err?.response?.data?.error || 'ошибка получения данных о компаниях',
       } as error.INetworkError;
     }
   };
@@ -63,7 +60,7 @@ class Process extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.delete<IResponse<void>>(`/process/${processId}`);
+      const res = await this.api.axios.delete<IResponse<void>>(`/processes/${processId}`);
       const resData = res.data;
 
       if (resData.result) {
@@ -80,7 +77,6 @@ class Process extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка удаления процесса',
-        //err?.response?.data?.error || 'ошибка удаления компании',
       } as error.INetworkError;
     }
   };

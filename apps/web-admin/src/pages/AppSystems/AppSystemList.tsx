@@ -9,9 +9,7 @@ import { useNavigate } from 'react-router';
 import ToolbarActionsWithSearch from '../../components/ToolbarActionsWithSearch';
 import { useSelector, useDispatch } from '../../store';
 import actions from '../../store/device';
-import processActions from '../../store/process';
 import appSystemsActions from '../../store/appSystem';
-import companyActions from '../../store/company';
 import { IPageParam, IToolBarButton } from '../../types';
 import CircularProgressWithContent from '../../components/CircularProgressWidthContent';
 import SnackBar from '../../components/SnackBar';
@@ -43,24 +41,16 @@ const AppSystemList = () => {
     setPageParamLocal({ filterText: value });
 
     if (inputValue) return;
-
-    // fetchDevices('');
   };
 
   const handleSearchClick = () => {
     dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
-    // fetchDevices(pageParamLocal?.filterText as string);
-
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-    // fetchDevices(inputValue);
   };
 
   const handleClearError = () => {
@@ -99,7 +89,6 @@ const AppSystemList = () => {
           <ToolbarActionsWithSearch
             buttons={buttons}
             searchTitle={'Найти компанию'}
-            //valueRef={valueRef}
             updateInput={handleUpdateInput}
             searchOnClick={handleSearchClick}
             keyPress={handleKeyPress}

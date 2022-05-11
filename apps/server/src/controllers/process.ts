@@ -55,7 +55,7 @@ export const interruptProcess = (ctx: Context) =>
   );
 
 export const getProcesses = (ctx: Context) => {
-  const { companyId, appSystemId } = ctx.query;
+  const { companyId, appSystemId, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
 
@@ -64,6 +64,18 @@ export const getProcesses = (ctx: Context) => {
   }
   if (appSystemId && typeof appSystemId === 'string') {
     params.appSystemId = appSystemId;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string') {
+    params.fromRecord = fromRecord;
+  }
+
+  if (typeof toRecord === 'string') {
+    params.toRecord = toRecord;
   }
 
   ok(ctx, processService.findMany(params), 'getProcesses');

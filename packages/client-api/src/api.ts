@@ -19,7 +19,6 @@ import Process from './requests/process';
 
 class Api extends BaseApi {
   protected _config: IApiConfig = {} as IApiConfig;
-  // protected _deviceId: string | undefined;
   protected _axios: AxiosInstance = {} as AxiosInstance;
   // Классы запросов
   public auth: Auth;

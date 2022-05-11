@@ -6,13 +6,14 @@ import { readFileSync, writeFileSync, readdirSync, unlinkSync, statSync, renameS
 import { v1 as uidv1 } from 'uuid';
 import {
   IFiles,
-  IProcess,
+  IDBProcess,
   AddProcess,
   IMessage,
   IDBMessage,
   isIDBMessage,
   NewMessage,
   IMessageParams,
+  IProcess,
 } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
@@ -30,7 +31,7 @@ import { messageFileName2params } from '../utils/json-db/MessageCollection';
 import { getDb } from './dao/db';
 import { getNamedEntitySync } from './dao/utils';
 
-export let processList: IProcess[];
+export let processList: IDBProcess[];
 
 let processPath = '';
 
@@ -49,7 +50,7 @@ export const saveProcessList = () => {
  * массив должен быть СИНХРОННЫМ!
  * @param process
  */
-export const replaceProcessInList = (process: IProcess) => {
+export const replaceProcessInList = (process: IDBProcess) => {
   const idx = processList.findIndex((p) => p.id === process.id);
   if (idx === -1) {
     throw new Error('We should never be here');
@@ -69,11 +70,12 @@ export const removeProcessFromList = (processId: string) => {
  * Если нет -- будеми сообщать Гедымину, что состояние BUSY.
  */
 export const getProcessByCompanyId = (companyId: string) => {
+  initProcessList();
   return processList.find((p) => p.companyId === companyId);
 };
 
 export const startProcess = (companyId: string, appSystemId: string, files: IFiles) => {
-  const newProcess: IProcess = {
+  const newProcess: IDBProcess = {
     id: uidv1(),
     dateBegin: new Date(),
     companyId,
@@ -90,13 +92,79 @@ export const startProcess = (companyId: string, appSystemId: string, files: IFil
 };
 
 export const getProcessById = (processId: string) => {
+  initProcessList();
   const process = processList.find((p) => p.id === processId);
 
   return process;
 };
 
-export const getProcesses = (params: Record<string, string>) => {
-  return processList.filter((item) => extraPredicate(item, params));
+export const getProcesses = (params: Record<string, string | number>): IProcess[] => {
+  initProcessList();
+  console.log('processList', processList);
+
+  // let filteredList;
+  // if (process.env.MOCK) {
+  //   filteredList = mockProcesses;
+  // } else {
+  // filteredList = processList;
+  // }
+
+  const filteredList = processList.filter((item) => {
+    const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+
+    // let companyFound = true;
+
+    // if ('companyId' in newParams) {
+    //   companyFound = item.companyId === newParams.companyId;
+    //   delete newParams['companyId'];
+    // }
+
+    // let appSystemFound = true;
+
+    // if ('appSystemId' in newParams) {
+    //   appSystemFound = item.appSystemId === newParams.appSystemId;
+    //   delete newParams['appSystemId'];
+    // }
+
+    /** filtering data */
+    const filteredProcesses = true;
+    if ('filterText' in newParams) {
+      const filterText: string = (newParams.filterText as string).toUpperCase();
+
+      if (filterText) {
+        //по полям процесса
+        // const name = item.name.toUpperCase();
+        // const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
+        // const newState = deviceStates[item.state];
+        // const state = typeof newState === 'string' ? newState.toUpperCase() : '';
+        // const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
+        // const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
+        //   filteredDevices =
+        //     name.includes(filterText) ||
+        //     uid.includes(filterText) ||
+        //     state.includes(filterText) ||
+        //     creationDate.includes(filterText) ||
+        //     editionDate.includes(filterText);
+      }
+      delete newParams['filterText'];
+    }
+
+    return filteredProcesses && extraPredicate(item, newParams as Record<string, string>);
+    // return processList.filter((item) => extraPredicate(item, params));
+  });
+  /** pagination */
+  const limitParams = Object.assign({}, params);
+
+  let fromRecord = 0;
+  if ('fromRecord' in limitParams) {
+    fromRecord = limitParams.fromRecord as number;
+  }
+
+  let toRecord = filteredList.length;
+  if ('toRecord' in limitParams)
+    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
+
+  return filteredList.slice(fromRecord, toRecord).map((i) => makeProcess(i));
 };
 
 const getPath = (folders: string[], fn = '') => {
@@ -107,6 +175,7 @@ const getPath = (folders: string[], fn = '') => {
 
 const getPathSystem = ({ companyId, appSystemId }: IMessageParams) => {
   const appSystem = getDb().appSystems.findSync(appSystemId);
+  console.log('getPathSystem', appSystemId, appSystem);
   return `DB_${companyId}/${appSystem?.name}`;
 };
 
@@ -116,7 +185,7 @@ export const getPathLog = (params: IMessageParams, fn = '') => getPath([getPathS
 export const getPathUnknown = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'unknown'], fn);
 export const getPathError = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'error'], fn);
 
-export const cleanupProcess = (process: IProcess) => {
+export const cleanupProcess = (process: IDBProcess) => {
   if (!process.processedFiles) {
     log.error(`Robust-protocol.cleanupProcess: в процессе ${process.id} массив обработанных файлов пуст`);
     return;
@@ -163,7 +232,7 @@ export const cleanupProcess = (process: IProcess) => {
   }
 };
 
-export const unknownProcess = (process: IProcess) => {
+export const unknownProcess = (process: IDBProcess) => {
   if (!process.processedFiles) {
     log.error(`Robust-protocol.unknownProcess: в процессе ${process.id} массив обработанных файлов пуст`);
     return;
@@ -357,5 +426,23 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
     },
     status: message.status,
     body: message.body,
+  };
+};
+
+export const makeProcess = (process: IDBProcess): IProcess => {
+  const { companies, appSystems } = getDb();
+
+  const company = getNamedEntitySync(process.companyId, companies);
+  const appSystem = getNamedEntitySync(process.appSystemId, appSystems);
+
+  return {
+    id: process.id,
+    appSystem,
+    company,
+    dateBegin: process.dateBegin,
+    files: process.files,
+    dateReadyToCommit: process.dateReadyToCommit,
+    processedFiles: process.processedFiles,
+    status: process.status,
   };
 };
