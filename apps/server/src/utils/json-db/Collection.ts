@@ -2,7 +2,7 @@
 import fs from 'fs';
 import { readFile } from 'fs/promises';
 
-import { assoc, pipe, not } from 'ramda';
+import { pipe, not } from 'ramda';
 import { v1 as uuid } from 'uuid';
 
 import { CollectionItem } from './CollectionItem';
@@ -17,7 +17,7 @@ class Collection<T extends CollectionItem> {
   private _collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
-    return assoc('id', uuid(), obj) as K;
+    return { ...obj, id: uuid() };
   }
 
   constructor(path: string) {

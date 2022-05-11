@@ -2,7 +2,6 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { IAppSystem, IUser, NewAppSystem } from '@lib/types';
 
-import log from '../utils/logger';
 import { appSystemService } from '../services';
 
 import { DataNotFoundException, ForbiddenException } from '../exceptions';
@@ -16,9 +15,7 @@ const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 
   const newAppSystem = await appSystemService.addOne(appSystem);
 
-  created(ctx as Context, newAppSystem);
-
-  log.info(`addAppSystem: appSystem '${name}' is successfully created`);
+  created(ctx as Context, newAppSystem, `addAppSystem: appSystem '${name}' is successfully created`);
 };
 
 const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
@@ -26,17 +23,11 @@ const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 
   const user = ctx.state.user as IUser;
 
-  if (user?.role !== 'SuperAdmin') {
-    throw new ForbiddenException('Нет прав для обновления подсистемы');
-  }
-
   const appSystemData = ctx.request.body as Partial<IAppSystem>;
 
   const updatedAppSystem = await appSystemService.updateOne(id, appSystemData);
 
-  ok(ctx as Context, updatedAppSystem);
-
-  log.info(`updateAppSystem: appSystem '${updatedAppSystem.id}' is successfully updated`);
+  ok(ctx as Context, updatedAppSystem, `updateAppSystem: appSystem '${updatedAppSystem.id}' is successfully updated`);
 };
 
 const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
@@ -44,15 +35,9 @@ const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 
   const user = ctx.state.user as IUser;
 
-  if (user?.role !== 'SuperAdmin') {
-    throw new ForbiddenException('Нет прав для удаления подсистемы');
-  }
+  await appSystemService.deleteOne(id);
 
-  const res = await appSystemService.deleteOne(id);
-
-  ok(ctx as Context, res);
-
-  log.info(`removeAppSystem: appSystem '${id}' is successfully removed`);
+  ok(ctx as Context, undefined, `removeAppSystem: appSystem '${id}' is successfully removed`);
 };
 
 const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
@@ -70,9 +55,7 @@ const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
 
   const appSystemList = await appSystemService.findAll(params);
 
-  ok(ctx as Context, appSystemList);
-
-  log.info('getAppSystem: app systems are successfully received');
+  ok(ctx as Context, appSystemList, 'getAppSystem: app systems are successfully received');
 };
 
 const getAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
@@ -84,9 +67,7 @@ const getAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  ok(ctx as Context, appSystem);
-
-  log.info(`getAppSystem: appSystem '${appSystem.name}' is successfully received`);
+  ok(ctx as Context, appSystem, `getAppSystem: appSystem '${appSystem.name}' is successfully received`);
 };
 
 export { getAppSystem, getAppSystems, addAppSystem, updateAppSystem, removeAppSystem };

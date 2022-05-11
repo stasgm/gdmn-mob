@@ -70,7 +70,7 @@ export const removeProcessFromList = (processId: string) => {
  * Если нет -- будеми сообщать Гедымину, что состояние BUSY.
  */
 export const getProcessByCompanyId = (companyId: string) => {
-  initProcessList();
+  // initProcessList();
   return processList.find((p) => p.companyId === companyId);
 };
 
@@ -92,14 +92,14 @@ export const startProcess = (companyId: string, appSystemId: string, files: IFil
 };
 
 export const getProcessById = (processId: string) => {
-  initProcessList();
+  // initProcessList();
   const process = processList.find((p) => p.id === processId);
 
   return process;
 };
 
 export const getProcesses = (params: Record<string, string | number>): IProcess[] => {
-  initProcessList();
+  // initProcessList();
   console.log('processList', processList);
 
   // let filteredList;

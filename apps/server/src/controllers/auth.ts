@@ -11,15 +11,14 @@ import { created, ok } from '../utils/apiHelpers';
  * */
 const signup = async (ctx: ParameterizedContext): Promise<void> => {
   const { name, password, email } = ctx.request.body as IUserCredentials;
+
   await authService.signup({
     password,
     name,
     email,
   });
 
-  created(ctx as Context);
-
-  log.info(`signup: user '${name}' is successfully signed up`);
+  created(ctx as Context, undefined, `signup: user '${name}' is successfully signed up`);
 };
 
 /**
@@ -30,9 +29,7 @@ const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
 
   const user = ctx.state.user as IUser;
 
-  ok(ctx as Context, user);
-
-  log.info(`logIn: user '${user.id}' is successfully logged in`);
+  ok(ctx as Context, user, `logIn: user '${user.id}' is successfully logged in`);
 };
 
 /**
@@ -43,9 +40,7 @@ const getCurrentUser = (ctx: ParameterizedContext): void => {
 
   delete user.password;
 
-  ok(ctx as Context, user);
-
-  log.info(`getCurrentUser: user '${ctx.state.user.name}' authenticated`);
+  ok(ctx as Context, user, `getCurrentUser: user '${user.name}' authenticated`);
 };
 
 const logout = async (ctx: Context): Promise<void> => {
@@ -56,9 +51,7 @@ const logout = async (ctx: Context): Promise<void> => {
   ctx.logout();
   ctx.session = null;
 
-  ok(ctx as Context);
-
-  log.info(`logout: user '${user.name}' successfully logged out`);
+  ok(ctx as Context, undefined, `logout: user '${user.name}' successfully logged out`);
 };
 
 const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
@@ -66,9 +59,7 @@ const verifyCode = async (ctx: ParameterizedContext): Promise<void> => {
 
   const uid = await authService.verifyCode(code);
 
-  ok(ctx as Context, uid);
-
-  log.info('verifyCode: ok');
+  ok(ctx as Context, uid, 'verifyCode: ok');
 };
 
 const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
@@ -76,9 +67,7 @@ const getDeviceStatus = async (ctx: ParameterizedContext): Promise<void> => {
 
   const deviceStatus = await authService.getDeviceStatus(uid);
 
-  ok(ctx as Context, deviceStatus);
-
-  log.info('getDeviceStatus: ok');
+  ok(ctx as Context, deviceStatus, 'getDeviceStatus: ok');
 };
 
 export { signup, logIn, logout, getCurrentUser, verifyCode, getDeviceStatus };

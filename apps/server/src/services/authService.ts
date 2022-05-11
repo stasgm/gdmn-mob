@@ -86,48 +86,6 @@ const signup = async (user: Omit<NewUser, 'role' | 'company'>): Promise<undefine
   // Создаём пользователя
   await userService.addOne({ ...user, role });
 
-  /*   if (userCount === 0) {
-      // При создании первого пользователя создаётся устройство WEB для входа через браузер (WEB-ADMIN)
-      const webDeviceId = await devices.insert({
-        name: 'WEB',
-        uid: 'WEB',
-        state: 'ACTIVE',
-        creationDate: new Date().toISOString(),
-        editionDate: new Date().toISOString(),
-      } as IDBDevice);
-
-      // TODO временно!!!
-      // Создаём пользователя gdmn (внешняя система). В дальнейшем тоже надо создавать для каждой организации
-      const gdmnUserObj: NewUser = {
-        name: 'gdmn',
-        password: 'gdmn',
-        companies: [],
-        creationDate: new Date().toISOString(),
-        editionDate: new Date().toISOString(),
-      };
-
-      const { id: gdmnUserId } = await userService.addOne(gdmnUserObj);
-      // TODO временно!!! Привязываем пользователя gdmn (внешняя система) к устройству WEB
-      // в дальнейшем будет создаваться свой DeviceId для учётной систмеы
-      await deviceBindings.insert({
-        state: 'ACTIVE',
-        deviceId: webDeviceId,
-        userId: gdmnUserId,
-      } as IDBDeviceBinding);
-    }
-
-    const webDevice = await devices.find((e) => e.uid === 'WEB');
-
-    if (webDevice) {
-      // Привязываем нового пользователя к устройству WEB
-      await deviceBindings.insert({
-        state: 'ACTIVE',
-        deviceId: webDevice.id,
-        userId: newUser.id,
-      } as IDBDeviceBinding);
-    } */
-
-  // return newUser;
   return;
 };
 

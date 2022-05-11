@@ -2,7 +2,6 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { IUser, NewUser } from '@lib/types';
 
-import log from '../utils/logger';
 import { userService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
@@ -32,9 +31,7 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   const newUser = await userService.addOne(user);
 
-  created(ctx as Context, newUser);
-
-  log.info(`signup: user '${name}' is successfully signed up`);
+  created(ctx as Context, newUser, `signup: user '${name}' is successfully signed up`);
 };
 
 const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
@@ -44,19 +41,15 @@ const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
 
   const updatedUser = await userService.updateOne(userId, userData);
 
-  ok(ctx as Context, updatedUser);
-
-  log.info(`updatedUser: user '${updatedUser.name}' is successfully updated`);
+  ok(ctx as Context, updatedUser, `updatedUser: user '${updatedUser.name}' is successfully updated`);
 };
 
 const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: userId } = ctx.params;
-  // TODO
+
   await userService.deleteOne(userId);
 
-  ok(ctx as Context);
-
-  log.info(`removeUser: user '${removeUser.name}' is successfully removed `);
+  ok(ctx as Context, undefined, `removeUser: user '${removeUser.name}' is successfully removed `);
 };
 
 const getUser = async (ctx: ParameterizedContext): Promise<void> => {
@@ -68,9 +61,7 @@ const getUser = async (ctx: ParameterizedContext): Promise<void> => {
     throw new DataNotFoundException('Пользователь не найден');
   }
 
-  ok(ctx as Context, user);
-
-  log.info(`getUser: device '${user.name}' is successfully received'`);
+  ok(ctx as Context, user, `getUser: device '${user.name}' is successfully received'`);
 };
 
 const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
@@ -115,9 +106,7 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
       break;
   }
 
-  ok(ctx as Context, users);
-
-  log.info('getUsers: users are successfully received');
+  ok(ctx as Context, users, 'getUsers: users are successfully received');
 };
 
 export { addUser, updateUser, removeUser, getUser, getUsers };
