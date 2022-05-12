@@ -87,7 +87,7 @@ const ProcessList = () => {
   return (
     <>
       <Helmet>
-        <title>Устройства</title>
+        <title>Процессы</title>
       </Helmet>
       <Box
         sx={{

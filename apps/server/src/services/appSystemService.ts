@@ -44,6 +44,10 @@ const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promis
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
+  if (await appSystems.find((el) => el.name === appSystemData.name && el.id !== appSystemData.id)) {
+    throw new ConflictException('Подсистема уже существует');
+  }
+
   const newAppSystem: DBAppSystem = {
     id,
     name: appSystemData.name || appSystemObj.name,

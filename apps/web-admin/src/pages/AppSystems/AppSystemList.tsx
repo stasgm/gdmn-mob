@@ -80,7 +80,7 @@ const AppSystemList = () => {
   return (
     <>
       <Helmet>
-        <title>Устройства</title>
+        <title>Подсистемы</title>
       </Helmet>
       <Box
         sx={{
