@@ -44,6 +44,10 @@ const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promis
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
+  if (await appSystems.find((el) => el.name === appSystemData.name && el.id !== appSystemData.id)) {
+    throw new ConflictException('Подсистема уже существует');
+  }
+
   const newAppSystem: DBAppSystem = {
     id,
     name: appSystemData.name || appSystemObj.name,
@@ -100,11 +104,15 @@ const findAll = async (params: Record<string, string | number>): Promise<IAppSys
 
       if (filterText) {
         const name = item.name.toUpperCase();
+        const description = item.description?.toUpperCase() || '';
         const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
         const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
         filteredAppSystems =
-          name.includes(filterText) || creationDate.includes(filterText) || editionDate.includes(filterText);
+          name.includes(filterText) ||
+          description.includes(filterText) ||
+          creationDate.includes(filterText) ||
+          editionDate.includes(filterText);
       }
       delete newParams['filterText'];
     }

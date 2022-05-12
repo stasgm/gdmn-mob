@@ -14,6 +14,8 @@ import {
   NewMessage,
   IMessageParams,
   IProcess,
+  IAppSystem,
+  ICompany,
 } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
@@ -99,8 +101,7 @@ export const getProcessById = (processId: string) => {
 };
 
 export const getProcesses = (params: Record<string, string | number>): IProcess[] => {
-  // initProcessList();
-  console.log('processList', processList);
+  const { appSystems, companies } = getDb();
 
   // let filteredList;
   // if (process.env.MOCK) {
@@ -111,6 +112,9 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
 
   const filteredList = processList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
+
+    const appSystem = appSystems.findSync(item.appSystemId);
+    const company = companies.findSync(item.companyId);
 
     // let companyFound = true;
 
@@ -127,24 +131,23 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
     // }
 
     /** filtering data */
-    const filteredProcesses = true;
+    let filteredProcesses = true;
     if ('filterText' in newParams) {
       const filterText: string = (newParams.filterText as string).toUpperCase();
 
       if (filterText) {
-        //по полям процесса
-        // const name = item.name.toUpperCase();
-        // const uid = typeof item.uid === 'string' ? item.uid.toUpperCase() : '';
-        // const newState = deviceStates[item.state];
-        // const state = typeof newState === 'string' ? newState.toUpperCase() : '';
-        // const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
-        // const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
-        //   filteredDevices =
-        //     name.includes(filterText) ||
-        //     uid.includes(filterText) ||
-        //     state.includes(filterText) ||
-        //     creationDate.includes(filterText) ||
-        //     editionDate.includes(filterText);
+        const companyName = company?.name.toUpperCase() || '';
+        const appSystemName = appSystem?.name.toUpperCase() || '';
+        const status = item.status.toUpperCase();
+        const dateBegin = new Date(item.dateBegin || '').toLocaleString('ru', { hour12: false });
+        const dateReadyToCommit = new Date(item.dateReadyToCommit || '').toLocaleString('ru', { hour12: false });
+        filteredProcesses =
+          companyName.includes(filterText) ||
+          appSystemName.includes(filterText) ||
+          status.includes(filterText) ||
+          dateBegin.includes(filterText) ||
+          dateReadyToCommit.includes(filterText);
+        // const company = item.companyId;
       }
       delete newParams['filterText'];
     }

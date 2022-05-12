@@ -21,15 +21,17 @@ const AppSystemList = () => {
 
   const { list, loading, errorMessage, pageParams } = useSelector((state) => state.appSystems);
 
-  const fetchAppSystems = useCallback(async () => {
-    await dispatch(appSystemsActions.fetchAppSystems());
-  }, [dispatch]);
+  const fetchAppSystems = useCallback(
+    (filterText?: string, fromRecord?: number, toRecord?: number) => {
+      dispatch(appSystemsActions.fetchAppSystems(filterText, fromRecord, toRecord));
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    fetchAppSystems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchAppSystems(pageParams?.filterText as string);
+  }, [fetchAppSystems, pageParams?.filterText]);
 
   // const valueRef = useRef<HTMLInputElement>(null); // reference to TextField
 
@@ -45,6 +47,8 @@ const AppSystemList = () => {
 
   const handleSearchClick = () => {
     dispatch(actions.deviceActions.setPageParam({ filterText: pageParamLocal?.filterText }));
+
+    fetchAppSystems(pageParamLocal?.filterText as string);
   };
 
   const handleKeyPress = (key: string) => {
@@ -76,7 +80,7 @@ const AppSystemList = () => {
   return (
     <>
       <Helmet>
-        <title>Устройства</title>
+        <title>Подсистемы</title>
       </Helmet>
       <Box
         sx={{
