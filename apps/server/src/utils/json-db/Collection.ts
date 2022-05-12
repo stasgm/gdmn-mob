@@ -1,148 +1,94 @@
 /* eslint-disable no-underscore-dangle */
-import fs from 'fs';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 
-import { pipe, not } from 'ramda';
 import { v1 as uuid } from 'uuid';
 
 import { CollectionItem } from './CollectionItem';
 
 /**
+ * Массив объектов, который хранится в JSON файле на диске.
+ * Считывается один раз и находится в оперативной памяти.
+ * После изменения пишется на диск.
  * @template T
  */
-class Collection<T extends CollectionItem> {
-  filter() {
-    throw new Error('Method not implemented.');
-  }
-  private _collectionPath: string;
+export class Collection<T extends CollectionItem> {
+  private _fullFileName: string;
+  private _data: T[];
+  private _currWrite: Promise<void>;
 
-  private static _initObject<K extends CollectionItem>(obj: K): K {
-    return { ...obj, id: uuid() };
+  private static _setId<K extends CollectionItem>(obj: K): K {
+    if (obj.id) {
+      return obj;
+    } else {
+      return { ...obj, id: uuid() };
+    }
   }
 
   constructor(path: string) {
-    this._collectionPath = path;
-    this._ensureStorage();
+    this._fullFileName = path;
+    this._data = [];
+    this._currWrite = Promise.resolve();
   }
 
-  get collectionPath() {
-    return this._collectionPath;
+  public get data(): T[] {
+    return this._data;
+  }
+
+  /**
+   * Считываем данные и помещаем их в объект в памяти.
+   *
+   * @validator функция, которая проверяет данные, соответствуют ли они нашей структуре.
+   *            вызывает исключение, если нет.
+   */
+  public async readDataFromDisk(validator?: (data: any) => T[]): Promise<void> {
+    await this._currWrite;
+    const data = await readFile(this._fullFileName, { encoding: 'utf8' });
+    const parsed = JSON.parse(data);
+    this._data = validator ? validator(parsed) : parsed;
   }
 
   /**
    * Inserts an object into the database without checking for existence.
    */
-  public async insert(obj: T): Promise<string> {
-    const db = await this._get();
+  public insert(obj: T): T {
+    const tempObj = Collection._setId(obj);
+    this._data.push(tempObj);
+    this._save();
+    return tempObj;
+  }
 
-    const initObject = obj.id ? obj : Collection._initObject(obj);
-
-    db.push(initObject);
-    await this._save(db);
-    return initObject.id as string;
+  public findById(id: string): T | undefined {
+    return this._data.find((item) => item.id === id);
   }
 
   /**
-   * Inserts an array of objects into the database without checking for existence.
+   * Update an item found by Id.
+   * Will do nothing if an item provided does not have an `id` property.
    */
-  public async insertMany(obj: Array<T>): Promise<Array<string>> {
-    const db = await this._get();
-
-    const initObjects = obj.map((item) => (item.id ? item : Collection._initObject(item)));
-    const ids = obj.map((item) => item.id as string);
-
-    db.push(...initObjects);
-    await this._save(db);
-    return ids;
-  }
-
-  /**
-   * Returns every entry in the collection.
-   */
-  public async read(): Promise<Array<T>>;
-
-  public async read(predicate: (item: T) => boolean): Promise<Array<T>>;
-
-  public async read(predicate?: (item: T) => boolean): Promise<Array<T>> {
-    if (typeof predicate === 'undefined') return this._get();
-    return (await this._get()).filter(predicate);
-  }
-
-  /**
-   * Finds an item by id or using the specified predicate.
-   */
-  public async find(id: string): Promise<T>;
-
-  public async find(predicate: (item: T) => boolean): Promise<T>;
-
-  public async find(id: string | ((item: T) => boolean)) {
-    const predicate = typeof id === 'function' ? id : (item: T) => item.id === id;
-    return (await this._get()).find(predicate);
-  }
-
-  public findSync(id: string) {
-    return this._getSync().find((item) => item.id === id);
-  }
-
-  /**
-   * Update an item. Will not update if the item does not have an `id` property
-   */
-  public async update(obj: T): Promise<void> {
-    const db = await this._get();
-
-    if (!obj.id) return;
-    const newDb = db.map((val) => (val.id === obj.id ? obj : val));
-    this._save(newDb);
+  public update(obj: T) {
+    if (obj.id) {
+      const foundIndex = this._data.findIndex((item) => item.id === obj.id);
+      if (foundIndex >= 0) {
+        this._data[foundIndex] = obj;
+        this._save();
+      }
+    }
   }
 
   /**
    * Delete items by `id` or using a specified predicate.
    * Items for which the predicate returns true will be deleted.
    */
-  public async delete(id: string): Promise<void>;
-
-  public async delete(predicate: (item: T) => boolean): Promise<void>;
-
-  public async delete(id: string | ((item: T) => boolean)) {
-    const predicate = typeof id === 'function' ? pipe(id, not) : (item: T) => item.id !== id;
-
-    const db = await this._get();
-
-    const deleted = db.filter(predicate);
-
-    return this._save(deleted);
+  public deleteById(id: string) {
+    const foundId = this._data.findIndex((item) => item.id === id);
+    if (foundId >= 0) {
+      this._data.splice(foundId, 1);
+      this._save();
+    }
   }
 
-  public async deleteAll(): Promise<void> {
-    return this._save([]);
-  }
-
-  private _ensureStorage() {
-    if (!fs.existsSync(this._collectionPath)) this._save([]);
-  }
-
-  private async _get(): Promise<Array<T>> {
-    const data = await readFile(this._collectionPath, { encoding: 'utf8' });
-    return JSON.parse(data);
-  }
-
-  private _getSync(): Array<T> {
-    //FIXME: не обрабатываются ошибки с дисковыми операциями, парсингом и не проверяется тип.
-    const data = fs.readFileSync(this._collectionPath, { encoding: 'utf8' });
-    const result = JSON.parse(data);
-    return result;
-  }
-
-  private _save(data: Array<T>): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        fs.writeFileSync(this._collectionPath, JSON.stringify(data), { encoding: 'utf8' });
-        return resolve();
-      } catch (err) {
-        reject(err);
-      }
-    });
+  private async _save(): Promise<void> {
+    await this._currWrite;
+    this._currWrite = writeFile(this._fullFileName, JSON.stringify(this._data));
   }
 }
-
-export default Collection;

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-import Collection from './Collection';
+import { Collection } from './Collection';
 import CollectionMessage from './MessageCollection';
 
 import { CollectionItem } from './CollectionItem';

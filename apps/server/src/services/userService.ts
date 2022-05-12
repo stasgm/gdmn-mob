@@ -90,10 +90,10 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
  * @param user - пользователь
  * @return id, идентификатор пользователя
  * */
-const updateOne = async (userId: string, userData: Partial<IUser & { password: string }>): Promise<IUser> => {
+const updateOne = (userId: string, userData: Partial<IUser & { password: string }>): IUser => {
   const { users, companies, appSystems } = getDb();
 
-  const oldUser = await users.find(userId);
+  const oldUser = users.find(userId);
 
   if (!oldUser) {
     throw new DataNotFoundException('Пользователь не найден');

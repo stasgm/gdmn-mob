@@ -1,4 +1,4 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice, IAppSystem } from '@lib/types';
+import { ICompany, IDBCompany, NewCompany as NewCompanyData, IAppSystem } from '@lib/types';
 
 import { extraPredicate } from '../utils/helpers';
 
@@ -6,51 +6,47 @@ import { ConflictException, DataNotFoundException } from '../exceptions';
 
 import { updateOne as updateUserCompany } from './userService';
 
-import { getDb, createFolders } from './dao/db';
+import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
+import { getNamedEntitySync } from './dao/utils';
 
 /**
  * Добавление новой организации
  * @param {string} title - наименование организации
- * @return id, идентификатор организации
+ * @return объект компании
  * */
-const addOne = async (company: NewCompany): Promise<ICompany> => {
+const addOne = (companyData: NewCompanyData): ICompany => {
   /*
     1. Проверяем что организация существует
     2. Добавляем организацию
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies, dbPath, appSystems } = getDb();
+  const { companies, createFoldersForCompany } = getDb();
 
-  if (await companies.find((el) => el.name === company.name)) {
-    throw new ConflictException('Компания уже существует');
+  if (companies.data.findById((el) => el.name === companyData.name)) {
+    throw new ConflictException(`Компания с названием ${companyData.name} уже существует`);
   }
 
   // Проверяем есть ли в базе подсистемы
-  const appSystemIds = company.appSystems ? await getAppSystemIds(company.appSystems) : undefined;
+  const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
 
-  const newCompanyObj = {
-    name: company.name,
-    city: company.city,
+  const company = companies.insert({
+    name: companyData.name,
+    city: companyData.city,
     appSystemIds,
-    adminId: company.admin.id,
-    externalId: company.externalId,
+    adminId: companyData.admin.id,
+    externalId: companyData.externalId,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
-  } as IDBCompany;
+  });
 
-  const newCompany = await companies.insert(newCompanyObj);
-  const createdCompany = await companies.find(newCompany);
-  const dbAppSystems = await appSystems.read();
-  await createFolders(dbPath, createdCompany, dbAppSystems);
+  createFoldersForCompany(company);
 
-  await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
+  updateUserCompany(company.adminId, { id: company.adminId, company });
 
-  const retCompany = await makeCompany(createdCompany);
-
-  return retCompany;
+  return makeCompany(company);
 };
 
 /**
@@ -58,11 +54,10 @@ const addOne = async (company: NewCompany): Promise<ICompany> => {
  * @param {IDBCompany} company - организациия
  * @return id, идентификатор организации
  * */
-const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
-  const db = getDb();
-  const { companies, users } = db;
+const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
+  const { companies, users } = getDb();
 
-  const companyObj = await companies.find(id);
+  const companyObj = companies.findById(id);
 
   if (!companyObj) {
     throw new DataNotFoundException('Компания не найдена');
@@ -70,12 +65,16 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
 
   // Проверяем есть ли в базе переданный админ
   let adminId = companyObj.adminId;
-  if (companyData?.admin) {
-    adminId = (await users.find(companyData.admin.id))?.id;
+  if (companyData.admin) {
+    const admin = users.findById(companyData.admin.id);
+    if (!admin) {
+      throw new DataNotFoundException(`Администратор ${companyData.admin.id} не найден`);
+    }
+    adminId = admin.id;
   }
 
   // Проверяем есть ли в базе подсистемы
-  const appSystemIds = companyData.appSystems ? await getAppSystemIds(companyData.appSystems) : undefined;
+  const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
 
   const newCompany: IDBCompany = {
     id,
@@ -88,18 +87,18 @@ const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<IC
     editionDate: new Date().toISOString(),
   };
 
-  await companies.update(newCompany);
+  companies.update(newCompany);
 
-  const updatedCompany = await companies.find(id);
+  const updatedCompany = companies.findById(id);
 
-  return await makeCompany(updatedCompany);
+  return makeCompany(updatedCompany);
 };
 
 /**
  * Удаляет одну организацию
  * @param {string} id - идентификатор организации
  * */
-const deleteOne = async (id: string): Promise<string> => {
+const deleteOne = (id: string): string => {
   /*
     1. Проверяем что организация существует
     2. Удаляем у пользователей организацию //TODO
@@ -108,41 +107,34 @@ const deleteOne = async (id: string): Promise<string> => {
 
   const { companies, users, devices, codes, deviceBindings } = getDb();
 
-  const companyObj = await companies.find(id);
+  const companyObj = companies.findById(id);
 
   if (!companyObj) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  const devicesByCompany = await devices.read((item) => item.companyId === id);
+  //Удаляем все устройства, привязанные устройства и коды данной компании
+  devices.data
+    .filter((device) => device.companyId === id)
+    ?.forEach((device) => {
+      deviceBindings.data
+        .filter((binding) => binding.deviceId === device.id)
+        ?.forEach((binding) => deviceBindings.deleteById(binding.id));
+      codes.data.filter((code) => code.deviceId === device.id)?.forEach((code) => deviceBindings.deleteById(code.id));
+      devices.deleteById(device.id);
+    });
 
-  const delDevices = async (deviceList: IDBDevice[]) => {
-    for (const item of deviceList) {
-      // eslint-disable-next-line no-await-in-loop
-      await deviceBindings.delete((b) => b.deviceId === item.id);
-      // eslint-disable-next-line no-await-in-loop
-      await codes.delete((c) => c.deviceId === item.id);
-      // eslint-disable-next-line no-await-in-loop
-      await devices.delete((i) => i.id === item.id);
-    }
-  };
+  //Удаляем всех пользователей данной компании кроме Админа и Суперадмина
+  users.data
+    .filter((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin')
+    ?.forEach((user) => users.deleteById(user.id));
 
-  // const delDevices2 = async (deviceList: IDBDevice[]) => {
-  //   const promises = deviceList.map(async (item) => {
-  //     await deviceBindings.delete((b) => b.deviceId === item.id);
-  //     await codes.delete((c) => c.deviceId === item.id);
-  //     await devices.delete((i) => i.id === item.id);
-  //   });
-  //   await Promise.all(promises);
-  // };
+  const company = companies.findById(id);
 
-  delDevices(devicesByCompany);
+  //Очищаем компанию у админа
+  updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
 
-  await users.delete((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin');
-  const company = await companies.find((adminCompany) => adminCompany.id === id);
-  await updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
-
-  await companies.delete(id);
+  companies.deleteById(id);
 
   return 'Компания удалена';
 };
@@ -152,17 +144,16 @@ const deleteOne = async (id: string): Promise<string> => {
  * @param {string} id - идентификатор организации
  * @return company, организация
  * */
-const findOne = async (id: string): Promise<ICompany> => {
-  const db = getDb();
-  const { companies } = db;
+const findOne = (id: string): ICompany => {
+  const { companies } = getDb();
 
-  const company = await companies.find(id);
+  const company = companies.findById(id);
 
   if (!company) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  return await makeCompany(company);
+  return makeCompany(company);
 };
 
 /**
@@ -170,14 +161,14 @@ const findOne = async (id: string): Promise<ICompany> => {
  * @param {string} param - параметры
  * @return company[], компании
  * */
-const findAll = async (params: Record<string, string | number>): Promise<ICompany[]> => {
+const findAll = (params: Record<string, string | number>): ICompany[] => {
   const { companies } = getDb();
 
   let companyList;
   if (process.env.MOCK) {
     companyList = mockCompanies;
   } else {
-    companyList = await companies.read();
+    companyList = companies.data;
   }
 
   companyList = companyList.filter((item) => {
@@ -209,9 +200,7 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     return companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  const pr = companyList?.map(async (i) => await makeCompany(i));
-
-  return await Promise.all(pr);
+  return companyList?.map((company) => makeCompany(company));
 };
 
 /**
@@ -220,20 +209,13 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
  * @return users, пользователи
  * */
 
-export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
-  const db = getDb();
-  const { users, appSystems } = db;
+export const makeCompany = (company: IDBCompany): ICompany => {
+  const { users, appSystems } = getDb();
 
-  const admin = await users.find(company.adminId);
-
-  const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };
+  const admin = getNamedEntitySync(company.adminId, users.data);
 
   //Формируем список подсистем с INamedEntity объектами
-  const appSystemList = await appSystems.read();
-  const namedAppSystems: INamedEntity[] | undefined = company.appSystemIds?.map((s) => {
-    const system = appSystemList.find((i) => i.id === s)!;
-    return { id: system?.id, name: system?.name };
-  });
+  const namedAppSystems = company.appSystemIds?.map((s) => getNamedEntitySync(s, appSystems.data));
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
@@ -241,24 +223,23 @@ export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
     name: company.name,
     city: company.city,
     appSystems: namedAppSystems,
-    admin: adminEntity,
+    admin,
     externalId: company.externalId,
     creationDate: company.creationDate,
     editionDate: company.editionDate,
   };
 };
 
-const getAppSystemIds = async (namedAppSystems: IAppSystem[]) => {
-  const appSystems = await getDb().appSystems.read();
+const getAppSystemIds = (namedAppSystems: IAppSystem[]) => {
+  const appSystems = getDb().appSystems.data;
 
-  const appSystemIds: string[] = [];
-  namedAppSystems.forEach((newSystem) => {
-    if (!appSystems.find((s) => s.id === newSystem.id)) {
-      throw new DataNotFoundException(`Подсистема ${newSystem.id} не найдена`);
+  // Проверяем есть ли в базе подсистемы
+  return namedAppSystems.map(({ id }) => {
+    if (!appSystems.findById(id)) {
+      throw new DataNotFoundException(`Подсистема ${id} не найдена`);
     }
-    appSystemIds.push(newSystem.id);
+    return id;
   });
-  return appSystemIds;
 };
 
 export { findOne, findAll, addOne, updateOne, deleteOne };

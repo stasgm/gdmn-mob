@@ -27,7 +27,7 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb, dbtype, getDb } from './services/dao/db';
+import { createDb, DBType, getDb } from './services/dao/db';
 import { checkProcessList, initProcessList } from './services/processList';
 import { MSEС_IN_MIN } from './utils/constants';
 
@@ -51,7 +51,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.port = server.port;
   app.context.name = server.name;
 
-  const dbArr = await (app.context.db as dbtype).sessionId.read();
+  const dbArr = await (app.context.db as DBType).sessionId.read();
   const dbid = dbArr.length === 1 ? dbArr[0].id : '';
   const Config = { ...koaConfig, key: koaConfig.key + dbid };
 
