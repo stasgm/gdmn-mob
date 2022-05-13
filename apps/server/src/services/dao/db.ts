@@ -2,6 +2,8 @@ import { existsSync, mkdirSync } from 'fs';
 
 import path from 'path';
 
+import { v4 as uuid } from 'uuid';
+
 import {
   IDBUser,
   IDBMessage,
@@ -12,6 +14,7 @@ import {
   IDBDeviceBinding,
   DBAppSystem,
   IDBProcess,
+  SessionId,
 } from '@lib/types';
 
 import { Collection, Database, CollectionMessage } from '../../utils/json-db';
@@ -27,6 +30,7 @@ export type DBType = {
   deviceBindings: Collection<IDBDeviceBinding>;
   appSystems: Collection<DBAppSystem>;
   processes: Collection<IDBProcess>;
+  sessionId: Collection<SessionId>;
   dbPath: string;
   createFoldersForCompany: (company: IDBCompany) => void;
 };
@@ -43,7 +47,13 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
     deviceBindings: db.collection<IDBDeviceBinding>('device-bindings'),
     appSystems: db.collection<DBAppSystem>('app-systems'),
     processes: db.collection<IDBProcess>('processes'),
+    sessionId: db.collection<SessionId>('session-id'),
   };
+
+  // const dbArr = collections.sessionId.data;
+  if (collections.sessionId.data.length === 0) {
+    collections.sessionId.insert({ id: uuid() });
+  }
 
   await Promise.all(Object.values(collections).map((c) => c.readDataFromDisk()));
 
@@ -56,7 +66,7 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
     mkDir(companyFolder);
     if (company.appSystemIds) {
       for (const appSystemId of company.appSystemIds) {
-        const appSystemName = database.appSystems.findById(appSystemId)?.name;
+        const appSystemName = collections.appSystems.findById(appSystemId)?.name;
         if (appSystemName) {
           mkDir(path.join(companyFolder, appSystemName));
           messageFolders.forEach((folder) => mkDir(path.join(companyFolder, appSystemName, folder)));

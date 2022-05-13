@@ -15,6 +15,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   if (user.company.id !== message.head.company.id) {
     throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
   }
+
   const messageId = await messageService.addOne({
     msgObject: message,
     producerId: user.id,
@@ -27,11 +28,11 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemId } = ctx.query;
+  const { companyId, appSystemName } = ctx.query;
 
   const messageList = await messageService.FindMany({
     companyId: companyId as string,
-    appSystemId: appSystemId as string,
+    appSystemName: appSystemName as string,
     consumerId: ctx.state.user.id,
   });
 
@@ -40,16 +41,16 @@ const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: messageId } = ctx.params;
-  const { companyId, appSystemId } = ctx.query;
+  const { companyId, appSystemName } = ctx.query;
 
-  await messageService.deleteOne({ messageId, companyId: companyId as string, appSystemId: appSystemId as string });
+  await messageService.deleteOne({ messageId, companyId: companyId as string, appSystemName: appSystemName as string });
 
   ok(ctx as Context, undefined, 'removeMessage: message is successfully removed');
 };
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemId } = ctx.params;
-  await messageService.clear({ companyId, appSystemId });
+  const { companyId, appSystemName } = ctx.params;
+  await messageService.clear({ companyId, appSystemName });
 
   ok(ctx as Context, undefined, 'clear: all messages are successfully removed');
 };

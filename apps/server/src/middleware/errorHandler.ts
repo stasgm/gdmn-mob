@@ -7,8 +7,10 @@ import { ApplicationException } from '../exceptions';
 
 const errorHandler = async (ctx: Context, next: Next) => {
   try {
+    console.log('errorHandler');
     await next();
   } catch (error) {
+    console.log('66666', error);
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {
         result: false,

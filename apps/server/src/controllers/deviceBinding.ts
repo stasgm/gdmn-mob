@@ -10,7 +10,7 @@ import { DataNotFoundException } from '../exceptions';
 const addDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
   const { device, user, state } = ctx.request.body as NewDeviceBinding;
 
-  const newDeviceBinding = await deviceBindingService.addOne({ device, user, state });
+  const newDeviceBinding = deviceBindingService.addOne({ device, user, state });
 
   created(ctx as Context, newDeviceBinding, 'addDeviceBinding: deviceBinding is successfully created');
 };
@@ -20,7 +20,7 @@ const updateDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => 
 
   const deviceBindingData = ctx.request.body as Partial<IDeviceBinding>;
 
-  const updatedDeviceBinding = await deviceBindingService.updateOne(deviceBindingId, deviceBindingData);
+  const updatedDeviceBinding = deviceBindingService.updateOne(deviceBindingId, deviceBindingData);
 
   ok(ctx as Context, updatedDeviceBinding, 'updateDevice: deviceBinding is successfully updated');
 };
@@ -28,7 +28,7 @@ const updateDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => 
 const removeDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
   const { id }: { id: string } = ctx.params;
 
-  await deviceBindingService.deleteOne({ deviceBindingId: id });
+  deviceBindingService.deleteOne(id);
 
   ok(ctx as Context, undefined, `removeDevice: device '${id}' is successfully removed `);
 
@@ -38,7 +38,7 @@ const removeDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => 
 const getDeviceBinding = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceBindingId }: { id: string } = ctx.params;
 
-  const deviceBinding = await deviceBindingService.findOne(deviceBindingId);
+  const deviceBinding = deviceBindingService.findOne(deviceBindingId);
 
   if (!deviceBinding) {
     throw new DataNotFoundException('Связь с устройством не определена');
@@ -80,7 +80,7 @@ const getDeviceBindings = async (ctx: ParameterizedContext): Promise<void> => {
     params.toRecord = toRecord;
   }
 
-  const deviceBindingList = await deviceBindingService.findAll(params);
+  const deviceBindingList = deviceBindingService.findMany(params);
 
   ok(ctx as Context, deviceBindingList, 'getDeviceBindings: deviseBindings are successfully received');
 };

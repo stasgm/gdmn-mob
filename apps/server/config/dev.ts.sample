@@ -5,8 +5,8 @@ export default {
   LOG_ERROR_PATH: './logs/error.log',
   LOG_COMBINED_PATH: './logs/combined.log',
   SALT_ROUND: 10,
-  TEMPLATE_CONFIG_NAME: 'C:\\databases\\templates.config.json',
   PROCESS_MAX_FILES: 10,
   PROCESS_MAX_DATA_VOLUME: 20,
   PROCESS_CHECK_PERIOD_IN_MIN: 10,
+  ACTIVE_CODE_DAYS: 7,
 };

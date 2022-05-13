@@ -51,9 +51,10 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.port = server.port;
   app.context.name = server.name;
 
-  const dbArr = await (app.context.db as DBType).sessionId.read();
-  const dbid = dbArr.length === 1 ? dbArr[0].id : '';
-  const Config = { ...koaConfig, key: koaConfig.key + dbid };
+  // const sessions = app.context.db.sessionId.data;
+  // const sessionId = sessions.length ? sessions[0].id : '';
+  // const Config = { ...koaConfig, key: koaConfig.key + sessionId };
+  const Config = koaConfig;
 
   // const processPath = path.join(getDb().dbPath, 'processes.json');
   initProcessList();
@@ -73,7 +74,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   passport.deserializeUser(async (id: string, done) => {
     try {
       log.info('deserializeUser', id);
-      const user = await userService.findOne(id);
+      const user = userService.findOne(id);
       done(null, user);
     } catch (err) {
       done(err);
@@ -91,13 +92,11 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   }
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
-  //const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'http://example.com';
-
   app
-    .use((ctx, next) => {
-      console.log(ctx.querystring);
-      return next();
-    })
+    // .use(async (ctx, next) => {
+    //   console.log('querystring: ', ctx.querystring);
+    //   return next();
+    // })
     .use(errorHandler)
     .use(helmet())
     .use(
@@ -118,7 +117,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         formLimit: '10mb',
         jsonLimit: '20mb',
         textLimit: '10mb',
-        enableTypes: ['json', 'form', 'text'],
+        enableTypes: ['application/json', 'text', 'json'],
       }),
     )
     .use(

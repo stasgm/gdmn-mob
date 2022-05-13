@@ -4,13 +4,12 @@ import { NewMessage } from '@lib/types';
 import { getDb } from '../services/dao/db';
 import { InvalidParameterException } from '../exceptions';
 
-export const messageParamsMiddlware = async (ctx: Context, next: Next): Promise<void> => {
+export const messageParamsMiddlware = async (ctx: Context, next: Next) => {
   const body = ctx.request.body as NewMessage;
   const consumer = body.head?.consumer;
 
   if (consumer.id === '-1') {
-    const db = getDb();
-    const user = await db.users.find((u) => u.alias === 'gdmn' && u.company === body.head.company.id);
+    const user = getDb().users.data.find((u: any) => u.alias === 'gdmn' && u.company === body.head.company.id);
 
     if (!user) {
       throw new InvalidParameterException('Системный пользователь не определен');

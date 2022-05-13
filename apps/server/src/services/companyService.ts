@@ -9,11 +9,11 @@ import { updateOne as updateUserCompany } from './userService';
 import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
-import { getNamedEntitySync } from './dao/utils';
+import { getListPart, getNamedEntity } from './dao/utils';
 
 /**
  * Добавление новой организации
- * @param {string} title - наименование организации
+ * @param companyData - объект компании
  * @return объект компании
  * */
 const addOne = (companyData: NewCompanyData): ICompany => {
@@ -25,7 +25,7 @@ const addOne = (companyData: NewCompanyData): ICompany => {
   */
   const { companies, createFoldersForCompany } = getDb();
 
-  if (companies.data.findById((el) => el.name === companyData.name)) {
+  if (companies.data.find((el) => el.name === companyData.name)) {
     throw new ConflictException(`Компания с названием ${companyData.name} уже существует`);
   }
 
@@ -33,6 +33,7 @@ const addOne = (companyData: NewCompanyData): ICompany => {
   const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
 
   const company = companies.insert({
+    id: '',
     name: companyData.name,
     city: companyData.city,
     appSystemIds,
@@ -51,24 +52,28 @@ const addOne = (companyData: NewCompanyData): ICompany => {
 
 /**
  * Обновляет одну организацию
- * @param {IDBCompany} company - организациия
- * @return id, идентификатор организации
- * */
+ * @param id ИД компании
+ * @param companyData Новые данные компании
+ * @returns Обновленный объект компании
+ */
 const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
   const { companies, users } = getDb();
+  const company = companies.findById(id);
 
-  const companyObj = companies.findById(id);
-
-  if (!companyObj) {
+  if (!company) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
+  if (companies.data.find((el) => el.name === companyData.name && el.id !== companyData.id)) {
+    throw new ConflictException(`Компания с названием ${companyData.name} уже существует`);
+  }
+
   // Проверяем есть ли в базе переданный админ
-  let adminId = companyObj.adminId;
+  let adminId = company.adminId;
   if (companyData.admin) {
     const admin = users.findById(companyData.admin.id);
     if (!admin) {
-      throw new DataNotFoundException(`Администратор ${companyData.admin.id} не найден`);
+      throw new DataNotFoundException('Администратор не найден');
     }
     adminId = admin.id;
   }
@@ -76,40 +81,41 @@ const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
   // Проверяем есть ли в базе подсистемы
   const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
 
-  const newCompany: IDBCompany = {
+  companies.update({
     id,
-    name: companyData.name || companyObj.name,
+    name: companyData.name || company.name,
     adminId,
-    externalId: companyData.externalId || companyObj.externalId,
+    externalId: companyData.externalId || company.externalId,
     city: companyData.city,
-    appSystemIds: appSystemIds || companyObj.appSystemIds,
-    creationDate: companyObj.creationDate,
+    appSystemIds: appSystemIds || company.appSystemIds,
+    creationDate: company.creationDate,
     editionDate: new Date().toISOString(),
-  };
-
-  companies.update(newCompany);
+  });
 
   const updatedCompany = companies.findById(id);
+
+  if (!updatedCompany) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
 
   return makeCompany(updatedCompany);
 };
 
 /**
  * Удаляет одну организацию
- * @param {string} id - идентификатор организации
+ * @param id ИД организации
  * */
-const deleteOne = (id: string): string => {
+const deleteOne = (id: string) => {
   /*
     1. Проверяем что организация существует
     2. Удаляем у пользователей организацию //TODO
     3. Удаляем организацию
   */
-
   const { companies, users, devices, codes, deviceBindings } = getDb();
 
-  const companyObj = companies.findById(id);
+  const company = companies.findById(id);
 
-  if (!companyObj) {
+  if (!company) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
@@ -120,7 +126,7 @@ const deleteOne = (id: string): string => {
       deviceBindings.data
         .filter((binding) => binding.deviceId === device.id)
         ?.forEach((binding) => deviceBindings.deleteById(binding.id));
-      codes.data.filter((code) => code.deviceId === device.id)?.forEach((code) => deviceBindings.deleteById(code.id));
+      codes.data.filter((code) => code.deviceId === device.id)?.forEach((code) => codes.deleteById(code.id));
       devices.deleteById(device.id);
     });
 
@@ -129,25 +135,18 @@ const deleteOne = (id: string): string => {
     .filter((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin')
     ?.forEach((user) => users.deleteById(user.id));
 
-  const company = companies.findById(id);
-
   //Очищаем компанию у админа
   updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
-
   companies.deleteById(id);
-
-  return 'Компания удалена';
 };
 
 /**
  * Возвращает одну организацию
- * @param {string} id - идентификатор организации
- * @return company, организация
+ * @param {string} id - ИД организации
+ * @return {ICompany} Объект организации
  * */
 const findOne = (id: string): ICompany => {
-  const { companies } = getDb();
-
-  const company = companies.findById(id);
+  const company = getDb().companies.findById(id);
 
   if (!company) {
     throw new DataNotFoundException('Компания не найдена');
@@ -158,17 +157,15 @@ const findOne = (id: string): ICompany => {
 
 /**
  * Возвращает множество компаний по указанным параметрам
- * @param {string} param - параметры
- * @return company[], компании
+ * @param {Record<string, string | number>} params - параметры
+ * @return {ICompany[]}, Массив компаний
  * */
-const findAll = (params: Record<string, string | number>): ICompany[] => {
-  const { companies } = getDb();
-
+const findMany = (params: Record<string, string | number>): ICompany[] => {
   let companyList;
   if (process.env.MOCK) {
     companyList = mockCompanies;
   } else {
-    companyList = companies.data;
+    companyList = getDb().companies.data;
   }
 
   companyList = companyList.filter((item) => {
@@ -200,30 +197,19 @@ const findAll = (params: Record<string, string | number>): ICompany[] => {
     return companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  return companyList?.map((company) => makeCompany(company));
+  return getListPart(companyList, params)?.map((company) => makeCompany(company));
 };
-
-/**
- * Возвращает пользователей организации
- * @param {string} id - идентификатор организации
- * @return users, пользователи
- * */
 
 export const makeCompany = (company: IDBCompany): ICompany => {
   const { users, appSystems } = getDb();
-
-  const admin = getNamedEntitySync(company.adminId, users.data);
-
-  //Формируем список подсистем с INamedEntity объектами
-  const namedAppSystems = company.appSystemIds?.map((s) => getNamedEntitySync(s, appSystems.data));
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: company.id,
     name: company.name,
     city: company.city,
-    appSystems: namedAppSystems,
-    admin,
+    appSystems: company.appSystemIds?.map((s) => getNamedEntity(s, appSystems)),
+    admin: getNamedEntity(company.adminId, users),
     externalId: company.externalId,
     creationDate: company.creationDate,
     editionDate: company.editionDate,
@@ -231,15 +217,13 @@ export const makeCompany = (company: IDBCompany): ICompany => {
 };
 
 const getAppSystemIds = (namedAppSystems: IAppSystem[]) => {
-  const appSystems = getDb().appSystems.data;
-
   // Проверяем есть ли в базе подсистемы
   return namedAppSystems.map(({ id }) => {
-    if (!appSystems.findById(id)) {
-      throw new DataNotFoundException(`Подсистема ${id} не найдена`);
+    if (!getDb().appSystems.findById(id)) {
+      throw new DataNotFoundException('Подсистема не найдена');
     }
     return id;
   });
 };
 
-export { findOne, findAll, addOne, updateOne, deleteOne };
+export { findOne, findMany, addOne, updateOne, deleteOne };

@@ -1,10 +1,10 @@
 import { Context, ParameterizedContext } from 'koa';
 
-import { IAppSystem, IUser, NewAppSystem } from '@lib/types';
+import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import { appSystemService } from '../services';
 
-import { DataNotFoundException, ForbiddenException } from '../exceptions';
+import { DataNotFoundException } from '../exceptions';
 
 import { created, ok } from '../utils/apiHelpers';
 
@@ -13,7 +13,7 @@ const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 
   const appSystem: NewAppSystem = { name, description };
 
-  const newAppSystem = await appSystemService.addOne(appSystem);
+  const newAppSystem = appSystemService.addOne(appSystem);
 
   created(ctx as Context, newAppSystem, `addAppSystem: appSystem '${name}' is successfully created`);
 };
@@ -21,11 +21,9 @@ const addAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.params;
 
-  const user = ctx.state.user as IUser;
-
   const appSystemData = ctx.request.body as Partial<IAppSystem>;
 
-  const updatedAppSystem = await appSystemService.updateOne(id, appSystemData);
+  const updatedAppSystem = appSystemService.updateOne(id, appSystemData);
 
   ok(ctx as Context, updatedAppSystem, `updateAppSystem: appSystem '${updatedAppSystem.id}' is successfully updated`);
 };
@@ -33,9 +31,7 @@ const updateAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
 const removeAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.params;
 
-  const user = ctx.state.user as IUser;
-
-  await appSystemService.deleteOne(id);
+  appSystemService.deleteOne(id);
 
   ok(ctx as Context, undefined, `removeAppSystem: appSystem '${id}' is successfully removed`);
 };
@@ -65,7 +61,7 @@ const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
     params.toRecord = toRecord;
   }
 
-  const appSystemList = await appSystemService.findAll(params);
+  const appSystemList = appSystemService.findMany(params);
 
   ok(ctx as Context, appSystemList, 'getAppSystem: app systems are successfully received');
 };
@@ -73,7 +69,7 @@ const getAppSystems = async (ctx: ParameterizedContext): Promise<void> => {
 const getAppSystem = async (ctx: ParameterizedContext): Promise<void> => {
   const { id } = ctx.params;
 
-  const appSystem = await appSystemService.findOne(id);
+  const appSystem = appSystemService.findOne(id);
 
   if (!appSystem) {
     throw new DataNotFoundException('Подсистема не найдена');

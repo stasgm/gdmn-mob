@@ -3,10 +3,10 @@ import { IUser } from '@lib/types';
 
 import { UnauthorizedException } from '../exceptions';
 
-export const appSystemMiddleware = async (ctx: Context, next: Next): Promise<void> => {
+export const appSystemMiddleware = async (ctx: Context, next: Next) => {
   if ((ctx.state.user as IUser).role !== 'SuperAdmin') {
     throw new UnauthorizedException('Нет прав на операцию');
   }
 
-  await next();
+  next();
 };

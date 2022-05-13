@@ -19,9 +19,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
       throw new InvalidParameterException('Не указан идентификатор устройства');
     }
 
-    const { devices, deviceBindings } = getDb();
-
-    const device = await devices.find((el) => el.uid === deviceId);
+    const device = getDb().devices.data.find((el: any) => el.uid === deviceId);
 
     if (!device) {
       throw new UnauthorizedException('Устройство не найдено');
@@ -31,7 +29,9 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
       throw new UnauthorizedException('Устройство заблокировано');
     }
 
-    const deviceBinding = await deviceBindings.find((el) => el.deviceId === device.id && el.userId === user.id);
+    const deviceBinding = getDb().deviceBindings.data.find(
+      (el: any) => el.deviceId === device.id && el.userId === user.id,
+    );
     if (!deviceBinding) {
       throw new UnauthorizedException('Связанное с пользователем устройство не найдено');
     }
@@ -41,5 +41,5 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     }
   }
 
-  await next();
+  next();
 };

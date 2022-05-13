@@ -40,11 +40,11 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
   const { companies, users } = getDb();
   const { companyId, consumerId } = params;
 
-  if (!companies.findSync(companyId)) {
+  if (!companies.findById(companyId)) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  if (!users.findSync(consumerId)) {
+  if (!users.findById(consumerId)) {
     throw new DataNotFoundException('Получатель не найден');
   }
 

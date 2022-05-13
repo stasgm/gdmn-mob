@@ -1,7 +1,7 @@
 import { Context, Next } from 'koa';
 import { IUser } from '@lib/types';
 
-export const getProcessParamsMiddlware = async (ctx: Context, next: Next): Promise<void> => {
+export const getProcessParamsMiddlware = async (ctx: Context, next: Next) => {
   const user = ctx.state.user as IUser;
 
   if (user.role !== 'SuperAdmin') {
@@ -12,5 +12,5 @@ export const getProcessParamsMiddlware = async (ctx: Context, next: Next): Promi
     }
   }
 
-  await next();
+  next();
 };

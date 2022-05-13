@@ -2,47 +2,49 @@ import { INamedEntity } from '@lib/types';
 
 import { NamedDBEntities } from './db';
 
-async function getNamedEntity(ids: string, dbObject: NamedDBEntities): Promise<INamedEntity>;
-async function getNamedEntity(ids: string[], dbObject: NamedDBEntities): Promise<INamedEntity[]>;
-async function getNamedEntity(
-  ids: string | string[],
-  dbObject: NamedDBEntities,
-): Promise<INamedEntity | INamedEntity[]> {
-  if (typeof ids === 'string') {
-    const item = await dbObject.find(ids);
+// async function getNamedEntity(ids: string, dbObject: NamedDBEntities): Promise<INamedEntity>;
+// async function getNamedEntity(ids: string[], dbObject: NamedDBEntities): Promise<INamedEntity[]>;
+// async function getNamedEntity(
+//   ids: string | string[],
+//   dbObject: NamedDBEntities,
+// ): Promise<INamedEntity | INamedEntity[]> {
+//   if (typeof ids === 'string') {
+//     const item = await dbObject.find(ids);
 
-    return item && { id: item.id, name: item.name };
-  }
+//     return item && { id: item.id, name: item.name };
+//   }
 
-  const items: INamedEntity[] = [];
+//   const items: INamedEntity[] = [];
 
-  for await (const id of ids) {
-    const item = await dbObject.find(id);
+//   for await (const id of ids) {
+//     const item = await dbObject.find(id);
 
-    item && items.push({ id: item.id, name: item.name });
-  }
+//     item && items.push({ id: item.id, name: item.name });
+//   }
 
-  return items || [];
+//   return items || [];
+// }
+
+function getNamedEntity(id: string, dbObject: NamedDBEntities): INamedEntity {
+  const item = dbObject.findById(id);
+
+  return item! && { id: item.id, name: item.name };
 }
 
-function getNamedEntitySync(ids: string, dbObject: NamedDBEntities): INamedEntity;
-function getNamedEntitySync(ids: string[], dbObject: NamedDBEntities): INamedEntity[];
-function getNamedEntitySync(ids: string | string[], dbObject: NamedDBEntities): INamedEntity | INamedEntity[] {
-  if (typeof ids === 'string') {
-    const item = dbObject.findSync(ids);
+const getListPart = (list: any[], params: Record<string, string | number>) => {
+  /* pagination */
+  const limitParams = Object.assign({}, params);
 
-    return item! && { id: item.id, name: item.name };
+  let fromRecord = 0;
+  if ('fromRecord' in limitParams && typeof limitParams.fromRecord === 'number') {
+    fromRecord = limitParams.fromRecord;
   }
 
-  const items: INamedEntity[] = [];
+  let toRecord = list.length;
+  if ('toRecord' in limitParams && typeof limitParams.toRecord === 'number')
+    toRecord = limitParams.toRecord > 0 ? limitParams.toRecord : toRecord;
 
-  for (const id of ids) {
-    const item = dbObject.findSync(id);
+  return list.slice(fromRecord, toRecord);
+};
 
-    item && items.push({ id: item.id, name: item.name });
-  }
-
-  return items || [];
-}
-
-export { getNamedEntity, getNamedEntitySync };
+export { getNamedEntity, getListPart };

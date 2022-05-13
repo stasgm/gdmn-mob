@@ -31,7 +31,7 @@ import { BYTES_PER_MB, defMaxDataVolume, defMaxFiles, MSEС_IN_MIN } from '../ut
 import { messageFileName2params } from '../utils/json-db/MessageCollection';
 
 import { getDb } from './dao/db';
-import { getNamedEntitySync } from './dao/utils';
+import { getNamedEntity } from './dao/utils';
 
 export let processList: IDBProcess[];
 
@@ -113,8 +113,8 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
   const filteredList = processList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
-    const appSystem = appSystems.findSync(item.appSystemId);
-    const company = companies.findSync(item.companyId);
+    const appSystem = appSystems.findById(item.appSystemId);
+    const company = companies.findById(item.companyId);
 
     // let companyFound = true;
 
@@ -175,11 +175,8 @@ const getPath = (folders: string[], fn = '') => {
   return path.join(folderPath, fn);
 };
 
-const getPathSystem = ({ companyId, appSystemId }: IMessageParams) => {
-  const appSystem = getDb().appSystems.findSync(appSystemId);
-  console.log('getPathSystem', appSystemId, appSystem);
-  return `DB_${companyId}/${appSystem?.name}`;
-};
+const getPathSystem = ({ companyId, appSystemId }: IMessageParams) =>
+  `DB_${companyId}/${getDb().appSystems.findById(appSystemId)?.name}`;
 
 export const getPathPrepared = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'prepared'], fn);
 export const getPathMessages = (params: IMessageParams, fn = '') => getPath([getPathSystem(params), 'messages'], fn);
@@ -396,10 +393,10 @@ export const getFiles = (params: AddProcess): IFiles => {
 export const makeMessageSync = (message: IDBMessage): IMessage => {
   const { users, companies, appSystems } = getDb();
 
-  const consumer = getNamedEntitySync(message.head.consumerId, users);
-  const producer = getNamedEntitySync(message.head.producerId, users);
-  const company = getNamedEntitySync(message.head.companyId, companies);
-  const appSystem = getNamedEntitySync(message.head.appSystemId, appSystems);
+  const consumer = getNamedEntity(message.head.consumerId, users);
+  const producer = getNamedEntity(message.head.producerId, users);
+  const company = getNamedEntity(message.head.companyId, companies);
+  const appSystem = getNamedEntity(message.head.appSystemId, appSystems);
 
   return {
     id: message.id,
@@ -434,8 +431,8 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
 export const makeProcess = (process: IDBProcess): IProcess => {
   const { companies, appSystems } = getDb();
 
-  const company = getNamedEntitySync(process.companyId, companies);
-  const appSystem = getNamedEntitySync(process.appSystemId, appSystems);
+  const company = getNamedEntity(process.companyId, companies);
+  const appSystem = getNamedEntity(process.appSystemId, appSystems);
 
   return {
     id: process.id,

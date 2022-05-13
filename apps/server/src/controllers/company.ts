@@ -11,7 +11,7 @@ const addCompany = async (ctx: ParameterizedContext): Promise<void> => {
 
   const user = ctx.state.user as IUser;
 
-  const newCompany = await companyService.addOne({
+  const newCompany = companyService.addOne({
     name,
     admin: { id: user.id, name: user.name },
     externalId,
@@ -28,15 +28,15 @@ const updateCompany = async (ctx: ParameterizedContext): Promise<void> => {
   //TODO редактировать только свои компании
   const companyData = ctx.request.body as Partial<ICompany>;
 
-  const updatedCompany = await companyService.updateOne(companyId, companyData);
+  const updatedCompany = companyService.updateOne(companyId, companyData);
 
   ok(ctx as Context, updatedCompany, `updateCompany: company '${updatedCompany.id}' is successfully updated`);
 };
 
-const removeCompany = async (ctx: ParameterizedContext): Promise<void> => {
+const removeCompany = (ctx: ParameterizedContext): void => {
   const { id: companyId } = ctx.params;
   //TODO удалить только свои компании
-  await companyService.deleteOne(companyId);
+  companyService.deleteOne(companyId);
 
   ok(ctx as Context, undefined, `removeCompany: company '${companyId}' is successfully removed`);
 };
@@ -44,7 +44,7 @@ const removeCompany = async (ctx: ParameterizedContext): Promise<void> => {
 const getCompany = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: companyId } = ctx.params;
 
-  const company = await companyService.findOne(companyId);
+  const company = companyService.findOne(companyId);
 
   if (!company) {
     throw new DataNotFoundException('Компания не найдена');
@@ -81,7 +81,7 @@ const getCompanies = async (ctx: ParameterizedContext): Promise<void> => {
   if (name && typeof name === 'string') {
     params.name = name;
   }
-  const companyList = await companyService.findAll(params);
+  const companyList = companyService.findMany(params);
 
   ok(ctx as Context, companyList, 'getCompanies: companies are successfully received');
 };
