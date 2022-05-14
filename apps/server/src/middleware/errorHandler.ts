@@ -7,18 +7,11 @@ import { ApplicationException } from '../exceptions';
 import { getDb } from '../services/dao/db';
 
 export const errorHandler = async (ctx: Context, next: Next) => {
-  const { waitPendingWrites } = getDb();
+  const { pendingWrites: waitPendingWrites } = getDb();
 
   try {
-    //waitPendingWrites - ожидаем, когда сохранятся все файлы на
-    await Promise.allSettled([next(), waitPendingWrites()]);
+    await Promise.all([next(), waitPendingWrites()]);
   } catch (error) {
-    try {
-      await waitPendingWrites();
-    } catch (e) {
-      log.error('Ошибка при сохранении json-файлов на диск');
-    }
-
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {
         result: false,
