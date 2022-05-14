@@ -10,7 +10,6 @@ import {
   IDBCompany,
   IDBDeviceBinding,
   DBAppSystem,
-  IDBProcess,
   SessionId,
 } from '@lib/types';
 
@@ -31,7 +30,7 @@ export type DBType = {
   sessionId: Collection<SessionId>;
   dbPath: string;
   createFoldersForCompany: (company: IDBCompany) => void;
-  waitPendingWrites: () => Promise<void>;
+  pendingWrites: () => Promise<void[]>;
 };
 
 let database: DBType;
@@ -77,16 +76,14 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
     createFoldersForCompany(company);
   }
 
-  const waitPendingWrites = async () => {
-    await Promise.all(Object.values(collections).map((c) => c.pendingWrite()));
-  };
+  const pendingWrites = () => Promise.all(Object.values(collections).map((c) => c.pendingWrite()));
 
   database = {
     ...collections,
     messages,
     dbPath,
     createFoldersForCompany,
-    waitPendingWrites,
+    pendingWrites,
   };
 
   return database;
