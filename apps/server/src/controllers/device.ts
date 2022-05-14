@@ -2,7 +2,6 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { IDevice, INamedEntity, NewDevice } from '@lib/types';
 
-import log from '../utils/logger';
 import { deviceService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
@@ -14,11 +13,9 @@ const addDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   const company = ctx.state.user.company as INamedEntity;
 
-  const newDevice = await deviceService.addOne({ name, company, state });
+  const newDevice = deviceService.addOne({ name, company, state });
 
-  created(ctx as Context, newDevice);
-
-  log.info(`add device: device '${name}' is successfully created'`);
+  created(ctx as Context, newDevice, `add device: device '${name}' is successfully created'`);
 };
 
 const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
@@ -29,37 +26,29 @@ const updateDevice = async (ctx: ParameterizedContext): Promise<void> => {
 
   params.adminId = ctx.state.user.id;
 
-  const updatedDevice = await deviceService.updateOne(deviceId, deviceData, params);
+  const updatedDevice = deviceService.updateOne(deviceId, deviceData, params);
 
-  ok(ctx as Context, updatedDevice);
-
-  log.info(`updateDevice: device '${updatedDevice.name}' is successfully updated`);
+  ok(ctx as Context, updatedDevice, `updateDevice: device '${updatedDevice.name}' is successfully updated`);
 };
 
 const removeDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId } = ctx.params;
 
-  await deviceService.deleteOne({ deviceId });
+  deviceService.deleteOne(deviceId);
 
-  ok(ctx as Context);
-
-  // TODO передавать только код 204 без body
-
-  log.info(`removeDevice: device '${deviceId}' is successfully removed `);
+  ok(ctx as Context, undefined, `removeDevice: device '${deviceId}' is successfully removed `);
 };
 
 const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: deviceId }: { id: string } = ctx.params;
 
-  const device = await deviceService.findOne(deviceId);
+  const device = deviceService.findOne(deviceId);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  ok(ctx as Context, device);
-
-  log.info(`getDevice: device '${device.name}' is successfully received`);
+  ok(ctx as Context, device, `getDevice: device '${device.name}' is successfully received`);
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
@@ -91,11 +80,9 @@ const getDevices = async (ctx: ParameterizedContext): Promise<void> => {
     params.toRecord = toRecord;
   }
 
-  const deviceList = await deviceService.findAll(params);
+  const deviceList = deviceService.findMany(params);
 
-  ok(ctx as Context, deviceList);
-
-  log.info('getDevices: devises are successfully received');
+  ok(ctx as Context, deviceList, 'getDevices: devises are successfully received');
 };
 
 export { addDevice, updateDevice, removeDevice, getDevice, getDevices };

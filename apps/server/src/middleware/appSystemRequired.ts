@@ -3,9 +3,8 @@ import { IUser } from '@lib/types';
 
 import { UnauthorizedException } from '../exceptions';
 
-export const permissionMiddleware = async (ctx: Context, next: Next) => {
-  if ((ctx.state.user as IUser)?.role === 'User') {
-    // TODO сделать гибкую систему прав
+export const appSystemMiddleware = async (ctx: Context, next: Next) => {
+  if ((ctx.state.user as IUser).role !== 'SuperAdmin') {
     throw new UnauthorizedException('Нет прав на операцию');
   }
 

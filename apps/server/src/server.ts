@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import Koa, { Context, Next } from 'koa';
+import Koa from 'koa';
 import cors from '@koa/cors';
 
 import session from 'koa-session';
@@ -27,8 +27,8 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb, dbtype, getDb } from './services/dao/db';
-import { checkProcessList, initProcessList } from './services/processList';
+import { createDb } from './services/dao/db';
+import { checkProcessList, loadProcessListFromDisk } from './services/processList';
 import { MSEС_IN_MIN } from './utils/constants';
 
 interface IServer {
@@ -39,8 +39,6 @@ interface IServer {
 }
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
-// export type KoaApp = Koa;
-// let timerId: NodeJS.Timer;
 let timerId: NodeJS.Timer;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
@@ -48,18 +46,20 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.keys = ['super-secret-key-web1215'];
 
   app.context.db = await createDb(server.dbPath, server.dbName);
+
+  loadProcessListFromDisk();
+  checkProcessList(true);
+
+  timerId = setInterval(checkProcessList, config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
+
   app.context.port = server.port;
   app.context.name = server.name;
 
-  const dbArr = await (app.context.db as dbtype).sessionId.read();
-  const dbid = dbArr.length === 1 ? dbArr[0].id : '';
-  const Config = { ...koaConfig, key: koaConfig.key + dbid };
-
-  // const processPath = path.join(getDb().dbPath, 'processes.json');
-  initProcessList();
-  checkProcessList(true);
-
-  timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
+  const sessions = app.context.db.sessionId.data;
+  const sessionId = sessions.length ? sessions[0].id : '';
+  console.log('sessionId', sessionId);
+  const Config = { ...koaConfig, key: `${koaConfig.key}-${sessionId}` };
+  // const Config = koaConfig;
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
@@ -73,7 +73,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   passport.deserializeUser(async (id: string, done) => {
     try {
       log.info('deserializeUser', id);
-      const user = await userService.findOne(id);
+      const user = userService.findOne(id);
       done(null, user);
     } catch (err) {
       done(err);
@@ -91,13 +91,11 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   }
   const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
 
-  //const origin = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'http://example.com';
-
   app
-    .use((ctx, next) => {
-      console.log(ctx.querystring);
-      return next();
-    })
+    // .use(async (ctx, next) => {
+    //   console.log('querystring: ', ctx.querystring);
+    //   return next();
+    // })
     .use(errorHandler)
     .use(helmet())
     .use(
@@ -118,7 +116,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
         formLimit: '10mb',
         jsonLimit: '20mb',
         textLimit: '10mb',
-        enableTypes: ['json', 'form', 'text'],
+        enableTypes: ['application/json', 'text', 'json'],
       }),
     )
     .use(

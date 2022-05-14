@@ -42,10 +42,6 @@ export const params2messageFileName = ({ id, producerId, consumerId }: IFileMess
  * @template T
  */
 class CollectionMessage<T extends CollectionItem> {
-  filter() {
-    throw new Error('Method not implemented.');
-  }
-
   private collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
