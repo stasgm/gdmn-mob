@@ -1,12 +1,11 @@
 import { IDBDeviceBinding, IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { deviceStates } from '../utils/constants';
 
 import { getDb } from './dao/db';
-import { getListPart, getNamedEntity } from './dao/utils';
 
 /**
  * Добавляет одно устройство
@@ -212,8 +211,8 @@ export const makeDeviceBinding = (binding: IDBDeviceBinding): IDeviceBinding => 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: binding.id,
-    user: getNamedEntity(binding.userId, users),
-    device: getNamedEntity(binding.deviceId, devices),
+    user: users.getNamedItem(binding.userId),
+    device: devices.getNamedItem(binding.deviceId),
     state: binding.state,
     creationDate: binding.creationDate,
     editionDate: binding.editionDate,

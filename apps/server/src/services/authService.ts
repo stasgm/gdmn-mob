@@ -2,7 +2,7 @@ import { Next, Context } from 'koa';
 import koaPassport from 'koa-passport';
 import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
-import { compareSync, compare } from 'bcrypt';
+import { compare } from 'bcrypt';
 
 import { IUser, NewUser, IUserCredentials, DeviceState, IDBUser } from '@lib/types';
 
@@ -20,7 +20,7 @@ import { users as mockUsers } from './data/user';
  * @param next
  * @returns Объект пользователя
  */
-const authenticate = (ctx: Context, next: Next): IUser => {
+const authenticate = async (ctx: Context, next: Next) => {
   const { devices, users, deviceBindings } = getDb();
 
   const { name } = ctx.request.body as IUserCredentials;
@@ -61,7 +61,7 @@ const authenticate = (ctx: Context, next: Next): IUser => {
     }
   }
 
-  return koaPassport.authenticate('local', (err: Error, usr: IUser) => {
+  return koaPassport.authenticate('local', async (err: Error, usr: IUser) => {
     if (err) {
       throw new UnauthorizedException(err.message);
     }
@@ -71,7 +71,7 @@ const authenticate = (ctx: Context, next: Next): IUser => {
       throw new UnauthorizedException('Неверные данные');
     }
 
-    ctx.login(usr);
+    await ctx.login(usr);
 
     return usr;
   })(ctx, next);
@@ -111,11 +111,7 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   if (await compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    if (await compare(password, hashedPassword)) {
-      done(null, user);
-    } else {
-      done(new Error('Неверные данные'));
-    }
+    done(new UnauthorizedException('Неверные данные'));
   }
 };
 
@@ -155,7 +151,7 @@ const verifyCode = (code: string): string | undefined => {
   }
 
   //Устанавливаем состояние данного устройства в 'ACTIVE'
-  devices.update({ ...device, state: 'ACTIVE' });
+  devices.update({ ...device, uid: uid, state: 'ACTIVE' });
 
   //Устанавливаем состояние привязанных устройств данного устройства в 'ACTIVE'
   deviceBindings.data

@@ -2,18 +2,16 @@ import { ParameterizedContext, Next, Context } from 'koa';
 
 import { IUser, IUserCredentials, NewActivationCode } from '@lib/types';
 
-import log from '../utils/logger';
 import { authService } from '../services';
 import { created, ok } from '../utils/apiHelpers';
-import { DataNotFoundException } from '../exceptions';
 
 /**
  * Регистрация нового пользователя (Администратора компании)
  * */
 export const signup = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   const { name, password, email } = ctx.request.body as IUserCredentials;
-  console.log('1111');
-  await authService.signup({
+
+  authService.signup({
     password,
     name,
     email,
@@ -27,10 +25,7 @@ export const signup = async (ctx: ParameterizedContext, next: Next): Promise<voi
  * */
 export const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
   await authService.authenticate(ctx as Context, next);
-  // console.log('1111');
   const user = ctx.state.user as IUser;
-  // const user = { id: 1, name: 'name' };
-  console.log('user', user);
 
   ok(ctx as Context, user, `logIn: user '${user.id}' is successfully logged in`);
 };

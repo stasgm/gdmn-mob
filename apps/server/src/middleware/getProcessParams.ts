@@ -12,5 +12,5 @@ export const getProcessParamsMiddlware = async (ctx: Context, next: Next) => {
     }
   }
 
-  next();
+  await next();
 };

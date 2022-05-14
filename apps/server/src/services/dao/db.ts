@@ -1,8 +1,6 @@
-import { existsSync, mkdirSync } from 'fs';
-
 import path from 'path';
 
-import { v4 as uuid } from 'uuid';
+import { v1 as uuid } from 'uuid';
 
 import {
   IDBUser,
@@ -10,7 +8,6 @@ import {
   IDBDevice,
   IDBActivationCode,
   IDBCompany,
-  INamedEntity,
   IDBDeviceBinding,
   DBAppSystem,
   IDBProcess,
@@ -21,6 +18,8 @@ import { Collection, Database, CollectionMessage } from '../../utils/json-db';
 
 import { messageFolders } from '../../utils/constants';
 
+import { mkDir } from './utils';
+
 export type DBType = {
   users: Collection<IDBUser>;
   codes: Collection<IDBActivationCode>;
@@ -29,10 +28,10 @@ export type DBType = {
   devices: Collection<IDBDevice>;
   deviceBindings: Collection<IDBDeviceBinding>;
   appSystems: Collection<DBAppSystem>;
-  processes: Collection<IDBProcess>;
   sessionId: Collection<SessionId>;
   dbPath: string;
   createFoldersForCompany: (company: IDBCompany) => void;
+  waitPendingWrites: () => Promise<void>;
 };
 
 let database: DBType;
@@ -46,7 +45,6 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
     codes: db.collection<IDBActivationCode>('activation-codes'),
     deviceBindings: db.collection<IDBDeviceBinding>('device-bindings'),
     appSystems: db.collection<DBAppSystem>('app-systems'),
-    processes: db.collection<IDBProcess>('processes'),
     sessionId: db.collection<SessionId>('session-id'),
   };
 
@@ -79,19 +77,20 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
     createFoldersForCompany(company);
   }
 
+  const waitPendingWrites = async () => {
+    await Promise.all(Object.values(collections).map((c) => c.pendingWrite()));
+  };
+
   database = {
     ...collections,
     messages,
     dbPath,
     createFoldersForCompany,
+    waitPendingWrites,
   };
 
   return database;
 };
-
-type ExtractTypes<P> = P extends Collection<infer T> ? T : never;
-
-export type NamedDBEntities = Collection<Extract<ExtractTypes<DBType[keyof DBType]>, INamedEntity>>;
 
 export function getDb(): DBType {
   if (!database) {
@@ -99,7 +98,3 @@ export function getDb(): DBType {
   }
   return database;
 }
-
-const mkDir = (path: string) => {
-  if (!existsSync(path)) mkdirSync(path, { recursive: true });
-};

@@ -1,9 +1,15 @@
 /* eslint-disable no-underscore-dangle */
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile, access } from 'fs/promises';
+import { constants } from 'fs';
+
+import { INamedEntity } from '@lib/types';
 
 import { v1 as uuid } from 'uuid';
 
 import { CollectionItem } from './CollectionItem';
+
+// export type NamedDBEntities = Collection<Extract<ExtractTypes<DBType[keyof DBType]>, INamedEntity>>;
+// export type NamedDBEntities = Collection<Extract<T, INamedEntity>>;
 
 /**
  * Массив объектов, который хранится в JSON файле на диске.
@@ -42,9 +48,14 @@ export class Collection<T extends CollectionItem> {
    */
   public async readDataFromDisk(validator?: (data: any) => T[]): Promise<void> {
     await this._currWrite;
-    const data = await readFile(this._fullFileName, { encoding: 'utf8' });
-    const parsed = JSON.parse(data);
-    this._data = validator ? validator(parsed) : parsed;
+    try {
+      await access(this._fullFileName, constants.R_OK | constants.W_OK);
+      const data = await readFile(this._fullFileName, { encoding: 'utf8' });
+      const parsed = JSON.parse(data);
+      this._data = validator ? validator(parsed) : parsed;
+    } catch {
+      await this._save();
+    }
   }
 
   /**
@@ -87,8 +98,18 @@ export class Collection<T extends CollectionItem> {
     }
   }
 
+  public getNamedItem(id: string): INamedEntity {
+    const item = this.findById(id) as any;
+
+    return item! && { id: item.id, name: typeof item === 'object' && 'name' in item ? item.name : '' };
+  }
+
+  public pendingWrite() {
+    return this._currWrite;
+  }
+
   private async _save(): Promise<void> {
     await this._currWrite;
-    this._currWrite = writeFile(this._fullFileName, JSON.stringify(this._data));
+    this._currWrite = writeFile(this._fullFileName, JSON.stringify(this._data), { encoding: 'utf8' });
   }
 }

@@ -4,17 +4,25 @@ import { IResponse } from '@lib/types';
 
 import log from '../utils/logger';
 import { ApplicationException } from '../exceptions';
+import { getDb } from '../services/dao/db';
 
-const errorHandler = async (ctx: Context, next: Next) => {
+export const errorHandler = async (ctx: Context, next: Next) => {
+  const { waitPendingWrites } = getDb();
+
   try {
-    console.log('errorHandler');
-    await next();
+    //waitPendingWrites - ожидаем, когда сохранятся все файлы на
+    await Promise.allSettled([next(), waitPendingWrites()]);
   } catch (error) {
-    console.log('66666', error);
+    try {
+      await waitPendingWrites();
+    } catch (e) {
+      log.error('Ошибка при сохранении json-файлов на диск');
+    }
+
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {
         result: false,
-        error: error.message || 'unknown error',
+        error: error.message || 'Неизвестная ошибка',
         data: error.name || 'InnerErrorException',
       };
 
@@ -22,8 +30,15 @@ const errorHandler = async (ctx: Context, next: Next) => {
       ctx.body = result;
 
       log.error(error.toString());
+    } else {
+      ctx.status = 500;
+      ctx.body = {
+        result: false,
+        error: 'Неизвестная ошибка',
+        data: 'InnerErrorException',
+      };
+
+      log.error('Неизвестная ошибка');
     }
   }
 };
-
-export { errorHandler };

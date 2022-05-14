@@ -24,5 +24,5 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
     }
   }
 
-  next();
+  await next();
 };

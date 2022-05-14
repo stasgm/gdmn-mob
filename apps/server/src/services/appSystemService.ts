@@ -1,13 +1,12 @@
-import { IAppSystem, DBAppSystem, NewAppSystem } from '@lib/types';
+import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { appSystems as mockAppSystems } from './data/appSystems';
 
 import { getDb } from './dao/db';
-import { getListPart } from './dao/utils';
 
 /**
  * Добавление новой подсистемы

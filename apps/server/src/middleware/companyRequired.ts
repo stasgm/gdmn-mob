@@ -8,5 +8,5 @@ export const companyMiddleware = async (ctx: Context, next: Next) => {
     ctx.request.query.adminId = user.id;
   }
 
-  next();
+  await next();
 };

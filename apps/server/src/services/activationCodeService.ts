@@ -5,7 +5,6 @@ import { DataNotFoundException } from '../exceptions';
 import { extraPredicate } from '../utils/helpers';
 
 import { getDb } from './dao/db';
-import { getNamedEntity } from './dao/utils';
 
 /**
  * Создает новый код для устройства
@@ -75,7 +74,7 @@ const findMany = (params?: Record<string, string>): IActivationCode[] => {
 export const makeCode = (codeDBObj: IDBActivationCode): IActivationCode => ({
   code: codeDBObj.code,
   date: codeDBObj.date,
-  device: getNamedEntity(codeDBObj.deviceId, getDb().devices),
+  device: getDb().devices.getNamedItem(codeDBObj.deviceId),
   id: codeDBObj.id,
 });
 

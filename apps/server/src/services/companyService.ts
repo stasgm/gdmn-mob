@@ -1,6 +1,6 @@
 import { ICompany, IDBCompany, NewCompany as NewCompanyData, IAppSystem } from '@lib/types';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
@@ -9,7 +9,6 @@ import { updateOne as updateUserCompany } from './userService';
 import { getDb } from './dao/db';
 
 import { companies as mockCompanies } from './data/companies';
-import { getListPart, getNamedEntity } from './dao/utils';
 
 /**
  * Добавление новой организации
@@ -208,8 +207,8 @@ export const makeCompany = (company: IDBCompany): ICompany => {
     id: company.id,
     name: company.name,
     city: company.city,
-    appSystems: company.appSystemIds?.map((s) => getNamedEntity(s, appSystems)),
-    admin: getNamedEntity(company.adminId, users),
+    appSystems: company.appSystemIds?.map((s) => appSystems.getNamedItem(s)),
+    admin: users.getNamedItem(company.adminId),
     externalId: company.externalId,
     creationDate: company.creationDate,
     editionDate: company.editionDate,

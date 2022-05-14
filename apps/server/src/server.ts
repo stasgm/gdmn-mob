@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import Koa, { Context, Next } from 'koa';
+import Koa from 'koa';
 import cors from '@koa/cors';
 
 import session from 'koa-session';
@@ -27,8 +27,8 @@ import { validateAuthCreds } from './services/authService';
 import { errorHandler } from './middleware/errorHandler';
 import { userService } from './services';
 import router from './routes';
-import { createDb, DBType, getDb } from './services/dao/db';
-import { checkProcessList, initProcessList } from './services/processList';
+import { createDb } from './services/dao/db';
+import { checkProcessList, loadProcessListFromDisk } from './services/processList';
 import { MSEС_IN_MIN } from './utils/constants';
 
 interface IServer {
@@ -39,8 +39,6 @@ interface IServer {
 }
 
 export type KoaApp = Koa<Koa.DefaultState, Koa.DefaultContext>;
-// export type KoaApp = Koa;
-// let timerId: NodeJS.Timer;
 let timerId: NodeJS.Timer;
 
 export async function createServer(server: IServer): Promise<KoaApp> {
@@ -48,19 +46,20 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.keys = ['super-secret-key-web1215'];
 
   app.context.db = await createDb(server.dbPath, server.dbName);
+
+  loadProcessListFromDisk();
+  checkProcessList(true);
+
+  timerId = setInterval(checkProcessList, config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
+
   app.context.port = server.port;
   app.context.name = server.name;
 
-  // const sessions = app.context.db.sessionId.data;
-  // const sessionId = sessions.length ? sessions[0].id : '';
-  // const Config = { ...koaConfig, key: koaConfig.key + sessionId };
-  const Config = koaConfig;
-
-  // const processPath = path.join(getDb().dbPath, 'processes.json');
-  initProcessList();
-  checkProcessList(true);
-
-  timerId = setInterval(() => checkProcessList(), config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
+  const sessions = app.context.db.sessionId.data;
+  const sessionId = sessions.length ? sessions[0].id : '';
+  console.log('sessionId', sessionId);
+  const Config = { ...koaConfig, key: `${koaConfig.key}-${sessionId}` };
+  // const Config = koaConfig;
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные

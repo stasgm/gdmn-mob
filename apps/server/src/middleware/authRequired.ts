@@ -7,5 +7,5 @@ export const authMiddleware = async (ctx: Context, next: Next) => {
     throw new UnauthorizedException('Не пройдена аутентификация');
   }
 
-  next();
+  await next();
 };

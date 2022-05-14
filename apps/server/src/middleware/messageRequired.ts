@@ -28,5 +28,5 @@ export const messageMiddleware = async (ctx: Context, next: Next) => {
 
   ctx.query.appSystemName = appSystem.name;
 
-  next();
+  await next();
 };

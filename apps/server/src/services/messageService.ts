@@ -3,8 +3,6 @@ import { v1 as uuidv1 } from 'uuid';
 
 import { DataNotFoundException } from '../exceptions';
 
-import { getNamedEntity } from './dao/utils';
-
 import { getDb } from './dao/db';
 
 /**
@@ -105,10 +103,10 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   return {
     id: message.id,
     head: {
-      appSystem: getNamedEntity(message.head.appSystemId, appSystems),
-      company: getNamedEntity(message.head.companyId, companies),
-      consumer: getNamedEntity(message.head.consumerId, users),
-      producer: getNamedEntity(message.head.producerId, users),
+      appSystem: appSystems.getNamedItem(message.head.appSystemId),
+      company: companies.getNamedItem(message.head.companyId),
+      consumer: users.getNamedItem(message.head.consumerId),
+      producer: users.getNamedItem(message.head.producerId),
       dateTime: message.head.dateTime,
     },
     status: message.status,

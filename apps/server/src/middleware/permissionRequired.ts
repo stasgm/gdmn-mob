@@ -9,5 +9,5 @@ export const permissionMiddleware = async (ctx: Context, next: Next) => {
     throw new UnauthorizedException('Нет прав на операцию');
   }
 
-  next();
+  await next();
 };

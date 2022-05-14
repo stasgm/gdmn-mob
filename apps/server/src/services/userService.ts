@@ -1,17 +1,9 @@
 import { IDBUser, IUser, NewUser } from '@lib/types';
 
-import {
-  DataNotFoundException,
-  InnerErrorException,
-  ConflictException,
-  InvalidParameterException,
-  ForbiddenException,
-} from '../exceptions';
+import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
-import { extraPredicate } from '../utils/helpers';
-
-import { getListPart, getNamedEntity } from './dao/utils';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
@@ -117,12 +109,12 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     if (!newAppSystemId) {
       throw new DataNotFoundException('Подсистема не найдена');
     }
-    console.log('userData.appSystem!.id', userData.appSystem!.id);
-    if (users.data.find((u) => u.appSystemId === userData.appSystem!.id && u.company === company)) {
+    if (
+      users.data.find((u) => u.appSystemId === userData.appSystem!.id && u.company === company && u.id !== userData.id)
+    ) {
       throw new DataNotFoundException('Пользователь для данной подсистемы уже существует');
     }
   }
-
   // Проверяем есть ли в базе пользователь ERP
   let newErpUserId;
   if (userData.erpUser) {
@@ -133,7 +125,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
   }
 
   users.update({
-    id: id,
+    id,
     alias: userData.alias === undefined ? oldUser.alias : userData.alias,
     name: userData.name || oldUser.name,
     company,
@@ -302,9 +294,9 @@ export const makeUser = (user: IDBUser): IUser => {
     id: user.id,
     alias: user.alias,
     name: user.name,
-    company: user.company ? getNamedEntity(user.company, companies) : void 0,
+    company: user.company ? companies.getNamedItem(user.company) : void 0,
     role: user.role,
-    creator: getNamedEntity(user.creatorId, users),
+    creator: users.getNamedItem(user.creatorId),
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
@@ -312,8 +304,8 @@ export const makeUser = (user: IDBUser): IUser => {
     creationDate: user.creationDate,
     editionDate: user.editionDate,
     email: user.email,
-    appSystem: user.appSystemId ? getNamedEntity(user.appSystemId, appSystems) : undefined,
-    erpUser: user.erpUserId ? getNamedEntity(user.erpUserId, users) : undefined,
+    appSystem: user.appSystemId ? appSystems.getNamedItem(user.appSystemId) : undefined,
+    erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
   };
 };
 

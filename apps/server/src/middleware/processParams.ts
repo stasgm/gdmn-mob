@@ -7,5 +7,5 @@ export const processParamsMiddlware = async (ctx: Context, next: Next) => {
 
   ctx.request.body = { ...body, consumerId: userId };
 
-  next();
+  await next();
 };

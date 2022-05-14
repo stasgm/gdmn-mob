@@ -2,14 +2,13 @@ import { IDBDevice, IDevice, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { deviceStates } from '../utils/constants';
 
 import { getDb } from './dao/db';
 
 import { devices as mockDevices } from './data/devices';
-import { getListPart, getNamedEntity } from './dao/utils';
 
 /**
  * Добавляет одно устройство
@@ -191,7 +190,7 @@ const findMany = (params: Record<string, string | number>): IDevice[] => {
 export const makeDevice = (device: IDBDevice): IDevice => ({
   id: device.id,
   name: device.name,
-  company: getNamedEntity(device.companyId, getDb().companies),
+  company: getDb().companies.getNamedItem(device.companyId),
   state: device.state,
   uid: device.uid,
   creationDate: device.creationDate,

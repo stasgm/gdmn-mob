@@ -12,5 +12,5 @@ export const roleBasedParamsMiddlware = async (ctx: Context, next: Next) => {
     }
   }
 
-  next();
+  await next();
 };
