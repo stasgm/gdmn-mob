@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 import { Response } from 'express';
 
-import { IResponse } from './type';
+import { IResponse, IQuerySellBill, ISellBill } from './type';
 
 const ok = <T>(res: Response, dto?: T) => {
   const resp: IResponse<T> = {
@@ -24,4 +24,22 @@ const generateAuthToken = () => {
   return crypto.randomBytes(30).toString('hex');
 };
 
-export { ok, errorMessage, generateAuthToken };
+const queryArray2SellBill = (arr: IQuerySellBill[] | undefined): ISellBill[] | undefined => {
+  if (!arr) return undefined;
+  return arr.map((item) => ({
+    number: item.NUMBER,
+    contract: {
+      id: item.CONTRACTKEY,
+      name: item.CONTRACT,
+    },
+    depart: {
+      id: item.DEPARTKEY,
+      name: item.DEPARTNAME,
+    },
+    documentdate: item.DOCUMENTDATE,
+    quantity: item.QUANTITY,
+    price: item.PRICE,
+  })) as ISellBill[];
+};
+
+export { ok, errorMessage, generateAuthToken, queryArray2SellBill };

@@ -1,8 +1,8 @@
 import { attach } from '../connect';
 import ApiErrorRet from '../exceptions/apiError';
-import { IParams, IRecordObject } from '../type';
+import { IParams, IRecordObject, IQuerySellBill } from '../type';
 
-export const selectRecordSet = async <T extends IRecordObject>(
+export const selectRecordSet = async <T extends IQuerySellBill>(
   query: string,
   arrParams: IParams,
 ): Promise<T[] | undefined> => {
