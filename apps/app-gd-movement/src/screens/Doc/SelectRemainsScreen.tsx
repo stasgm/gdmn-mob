@@ -27,7 +27,7 @@ const keyExtractor = (item: IRemGood) => String(item.good.id);
 
 const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.good.barcode;
 
@@ -70,7 +70,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const { colors } = useTheme();
   const [filterVisible, setFilterVisible] = useState(false);
 

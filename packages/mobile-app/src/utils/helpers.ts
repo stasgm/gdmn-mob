@@ -1,4 +1,5 @@
 import { INamedEntity } from '@lib/types';
+import { customAlphabet } from 'nanoid';
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
@@ -76,4 +77,8 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
   }
 };
 
-export { truncate, log, getDateString, shortenString, extraPredicate, isNamedEntity, formatValue };
+const generateId = () => {
+  return customAlphabet('1234567890abcdef', 10)();
+};
+
+export { truncate, log, getDateString, shortenString, extraPredicate, isNamedEntity, formatValue, generateId };

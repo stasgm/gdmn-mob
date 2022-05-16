@@ -19,12 +19,12 @@ interface IProps {
 }
 
 const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const dispatch = useDispatch();
 
   const handleSwipe = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate(routeName as never, { id } as never);
+      navigation.navigate(routeName, { id });
     } else if (name === 'copy') {
       const newDocDate = new Date().toISOString();
 
@@ -40,7 +40,7 @@ const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) =
 
       dispatch(documentActions.addDocument(newDoc));
 
-      navigation.navigate(routeName as never, { id: newDoc.id } as never);
+      navigation.navigate(routeName, { id: newDoc.id });
     } else if (name === 'delete') {
       if (isBlocked) {
         return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);

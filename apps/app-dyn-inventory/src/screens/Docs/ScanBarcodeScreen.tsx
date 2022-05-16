@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback, useLayoutEffect } from 'react';
 import { Text } from 'react-native';
-import { v4 as uuid } from 'uuid';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
@@ -9,6 +8,8 @@ import { useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
 
+import { generateId } from '@lib/mobile-app';
+
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocLine, IInventoryDocument } from '../../store/types';
@@ -16,7 +17,7 @@ import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
@@ -73,7 +74,7 @@ const ScanBarcodeScreen = () => {
 
         return {
           good: { id: good.id, name: good.name } as INamedEntity,
-          id: uuid(),
+          id: generateId(),
           quantity: 1,
           price: remains?.length ? remains[0].price : 0,
           remains: remains?.length ? remains?.[0].q : 0,
@@ -100,7 +101,7 @@ const ScanBarcodeScreen = () => {
 
       return {
         good: { id: good.id, name: good.name } as INamedEntity,
-        id: uuid(),
+        id: generateId(),
         quantity: qty,
         price: remains?.length ? remains[0].price : 0,
         remains: remains?.length ? remains?.[0].q : 0,

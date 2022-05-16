@@ -17,12 +17,12 @@ interface IProps {
 }
 
 const SwipeLineItem = ({ children, docId, item, readonly, edit, copy, del, routeName }: IProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const dispatch = useDispatch();
 
   const handleSwipe = (name: 'edit' | 'copy' | 'delete') => {
     if (name === 'edit') {
-      navigation.navigate(routeName as never, { mode: 0, docId, item } as never);
+      navigation.navigate(routeName, { mode: 0, docId, item });
     } else if (name === 'delete') {
       Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
         {

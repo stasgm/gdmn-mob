@@ -1,11 +1,12 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { Text } from 'react-native';
-import { v4 as uuid } from 'uuid';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
 import { globalStyles, BackButton } from '@lib/mobile-ui';
 import { useSelector, docSelectors, useDispatch, documentActions } from '@lib/store';
+
+import { generateId } from '@lib/mobile-app';
 
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
@@ -37,16 +38,17 @@ const ScanBarcodeScreen = () => {
   );
 
   const getScannedObject = useCallback(
-    (brc: string): IMovementLine | undefined => {
-      if (barcodes?.find((item) => item.barcode === brc)) {
+    (barcode: string): IMovementLine | undefined => {
+      const id = generateId();
+      if (barcodes?.find((item) => item.barcode === barcode)) {
         return {
           barcode: '-1',
-          id: uuid(),
+          id,
         };
       } else {
         return {
-          barcode: brc,
-          id: uuid(),
+          barcode,
+          id,
         };
       }
     },

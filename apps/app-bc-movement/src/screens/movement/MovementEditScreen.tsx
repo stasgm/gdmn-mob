@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
@@ -19,7 +18,7 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { IDepartment, IMovementFormParam, IMovementDocument } from '../../store/types';
@@ -112,7 +111,7 @@ export const MovementEditScreen = () => {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
-    const docId = !id ? uuid() : id;
+    const docId = !id ? generateId() : id;
     const createdDate = new Date().toISOString();
 
     if (!id) {

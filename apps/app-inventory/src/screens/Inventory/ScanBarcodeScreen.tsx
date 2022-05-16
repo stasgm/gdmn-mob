@@ -17,7 +17,7 @@ import { getRemGoodByContact } from '../../utils/helpers';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<InventoryStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';

@@ -18,7 +18,7 @@ import { IModelRem, IRem } from '../../store/app/types';
 
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
@@ -59,7 +59,7 @@ const GoodRemains = ({ item }: { item: IRem }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
