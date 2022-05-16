@@ -22,7 +22,8 @@
   "prettier": "@config/prettier-config",
   "dependencies": {
     "@lib/types": "*",
-    "axios": "^0.26.1"
+    "axios": "^0.26.1",
+    "nanoid": "^3.3.4"
   },
   "devDependencies": {
     "@config/prettier-config": "*",

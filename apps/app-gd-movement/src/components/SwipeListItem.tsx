@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { v4 as uuid } from 'uuid';
 import { Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
@@ -7,6 +6,7 @@ import { documentActions, useDispatch } from '@lib/store';
 import { IDocument } from '@lib/types';
 
 import { SwipeItem } from '@lib/mobile-ui';
+import { generateId } from '@lib/mobile-app';
 
 interface IProps {
   children?: ReactNode;
@@ -30,7 +30,7 @@ const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) =
 
       const newDoc: IDocument = {
         ...item,
-        id: uuid(),
+        id: generateId(),
         number: 'б\\н',
         status: 'DRAFT',
         documentDate: newDocDate,

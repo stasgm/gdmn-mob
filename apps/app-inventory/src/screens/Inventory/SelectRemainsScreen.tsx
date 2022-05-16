@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
@@ -11,7 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IDepartment } from '@lib/types';
 
-import { formatValue } from '@lib/mobile-app';
+import { formatValue, generateId } from '@lib/mobile-app';
 
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { InventoryStackParamList } from '../../navigation/Root/types';
@@ -38,7 +37,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
           mode: 0,
           docId,
           item: {
-            id: uuid(),
+            id: generateId(),
             good: { id: item.good.id, name: item.good.name },
             quantity: 0,
             remains: item.remains,

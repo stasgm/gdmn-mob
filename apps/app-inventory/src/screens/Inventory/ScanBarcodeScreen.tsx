@@ -1,6 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Text } from 'react-native';
-import { v4 as uuid } from 'uuid';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
@@ -8,6 +7,8 @@ import { globalStyles, BackButton } from '@lib/mobile-ui';
 import { useSelector, docSelectors, refSelectors } from '@lib/store';
 
 import { IDepartment, INamedEntity, ISettingsOption } from '@lib/types';
+
+import { generateId } from '@lib/mobile-app';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
@@ -74,7 +75,7 @@ const ScanBarcodeScreen = () => {
 
         return {
           good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
-          id: uuid(),
+          id: generateId(),
           quantity: 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
           remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
@@ -99,7 +100,7 @@ const ScanBarcodeScreen = () => {
 
       return {
         good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
-        id: uuid(),
+        id: generateId(),
         quantity: qty,
         price: remItem.remains?.length ? remItem.remains[0].price : 0,
         remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,

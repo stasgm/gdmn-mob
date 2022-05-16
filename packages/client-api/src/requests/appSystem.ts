@@ -1,11 +1,9 @@
-import { v4 as uuid } from 'uuid';
-
 import { IResponse, IAppSystem, NewAppSystem } from '@lib/types';
 
 import { appSystems as mockAppSystems } from '@lib/mock';
 
 import { error, appSystem as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -22,7 +20,7 @@ class AppSystem extends BaseRequest {
         type: 'ADD_APP_SYSTEM',
         appSystem: {
           ...appSystem,
-          id: uuid(),
+          id: generateId(),
           editionDate: new Date().toISOString(),
           creationDate: new Date().toISOString(),
         },

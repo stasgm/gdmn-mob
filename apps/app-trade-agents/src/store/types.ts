@@ -148,9 +148,9 @@ interface IReturnHead extends IHead {
 export interface IReturnLine extends IEntity {
   good: INamedEntity;
   quantity: number;
+  sellBillId?: string;
   quantityFromSellBill?: number;
   priceFromSellBill?: number;
-  sellBillId: string;
 }
 
 export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
@@ -167,9 +167,9 @@ export interface ISellBill extends IEntity {
   PRICE: number;
 }
 
-export interface ISellBillItem extends ISellBill {
-  valueName: string;
-}
+// export interface ISellBillItem extends ISellBill {
+//   valueName: string;
+// }
 
 export interface ISellBillHead extends IHead {
   outlet?: INamedEntity;
