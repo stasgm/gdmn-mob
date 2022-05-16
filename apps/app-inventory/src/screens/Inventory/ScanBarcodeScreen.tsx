@@ -10,6 +10,8 @@ import { IDepartment, INamedEntity, ISettingsOption } from '@lib/types';
 
 import { generateId } from '@lib/mobile-app';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryLine, IInventoryDocument } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
@@ -18,7 +20,7 @@ import { getRemGoodByContact } from '../../utils/helpers';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<InventoryStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
