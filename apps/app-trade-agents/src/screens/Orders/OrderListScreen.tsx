@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect, useRef } from 'react';
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
@@ -16,11 +16,18 @@ import {
   SubTitle,
   ScreenListItem,
   IListItemProps,
+  BottomSheet,
+  PrimeButton,
+  RadioGroup,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
+
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+
+import { IListItem } from '@lib/mobile-types';
 
 import { IOrderDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
@@ -141,8 +148,41 @@ const OrderListScreen = () => {
     ) : null;
   };
 
+  const docTypeRef = useRef<BottomSheetModal>(null);
+  const handleDismissDocType = () => docTypeRef.current?.dismiss();
+
+  const handleApplyDocType = () => {
+    docTypeRef.current?.dismiss();
+
+    switch (selectedDocType.id) {
+      case 'order':
+        console.log('order');
+        break;
+      case 'return':
+        console.log('return');
+        break;
+      default:
+        return;
+    }
+  };
+
+  const listDocumentType: IListItem[] = [
+    { id: 'order', value: 'Заявка' },
+    { id: 'return', value: 'Возврат' },
+  ];
+
+  const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
+
+  const handlePresentDocType = () => {
+    setSelectedDocType(listDocumentType[0]);
+    docTypeRef.current?.present();
+  };
+
   return (
     <AppScreen>
+      <PrimeButton icon="plus-circle-outline" onPress={handlePresentDocType}>
+        Добавить документ
+      </PrimeButton>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
       {filterVisible && (
         <>
@@ -168,6 +208,19 @@ const OrderListScreen = () => {
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
+      <BottomSheet
+        sheetRef={docTypeRef}
+        title={'Тип документа'}
+        snapPoints={['20%', '90%']}
+        onDismiss={handleDismissDocType}
+        onApply={handleApplyDocType}
+      >
+        <RadioGroup
+          options={listDocumentType}
+          onChange={(option) => setSelectedDocType(option)}
+          activeButtonId={selectedDocType?.id}
+        />
+      </BottomSheet>
     </AppScreen>
   );
 };

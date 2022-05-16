@@ -1,16 +1,33 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container, Typography, Grid } from '@material-ui/core';
 
-import { useSelector } from '../store';
+import { useCallback, useEffect } from 'react';
+
+import { authActions, useAuthThunkDispatch } from '@lib/store';
+
+import { useDispatch, useSelector } from '../store';
 
 import TotalCompanies from '../components/dashboard/Totalcompanies';
 import TotalUsers from '../components/dashboard/Totalusers';
 import TotalDevices from '../components/dashboard/Totaldevices';
 
+import companyActions from '../store/company';
+import userActions from '../store/user';
+import deviceActions from '../store/device';
+
 const Dashboard = () => {
   const { list: devices } = useSelector((state) => state.devices);
   const { list: users } = useSelector((state) => state.users);
   const { list: companies } = useSelector((state) => state.companies);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    dispatch(companyActions.fetchCompanies());
+    dispatch(userActions.fetchUsers());
+    dispatch(deviceActions.fetchDevices());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

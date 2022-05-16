@@ -12,7 +12,6 @@ export class ApplicationException extends Error {
   }
 
   public toString(): string {
-    console.log('111111');
     return `${this.name} (${this.status}): ${this.message}\n${this.stack || ''}`;
   }
 }

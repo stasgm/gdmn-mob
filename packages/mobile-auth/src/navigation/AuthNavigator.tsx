@@ -61,9 +61,10 @@ const AuthNavigator: React.FC = () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
     const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+
     //Получим устройство по uid
     if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
-      authDispatch(authActions.getDeviceByUid(config.deviceId));
+      await authDispatch(authActions.getDeviceByUid(config.deviceId));
     }
   }, [authDispatch, config.deviceId, user]);
 

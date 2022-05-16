@@ -21,7 +21,7 @@ interface IProps {
   onApply: () => void;
 }
 
-LogBox.ignoreAllLogs();
+// LogBox.ignoreAllLogs();
 
 const BottomSheet = ({ sheetRef, children, title, snapPoints = ['40%', '90%'], onDismiss, onApply }: IProps) => {
   return (
