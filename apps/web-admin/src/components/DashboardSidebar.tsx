@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Avatar, Box, Divider, Drawer, List, Typography } from '@material-ui/core';
 import {
@@ -11,9 +11,11 @@ import {
   Server as AppSystemsIcon,
 } from 'react-feather';
 
-import { useSelector } from '@lib/store';
+import { useDispatch, useSelector } from '@lib/store';
 
 import { adminPath } from '../utils/constants';
+
+import actions from '../store/user';
 
 import NavItem from './NavItem';
 import NavToggle from './NavToggle';
@@ -70,24 +72,26 @@ interface IProps {
 }
 
 const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
+  const dispatch = useDispatch();
+
   const [isCompact, setCompact] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
 
-  // const dispatch = useDispatch();
+  const fetchUser = useCallback(
+    async (id: string) => {
+      if (user?.id) {
+        dispatch(actions.fetchUserById(id));
+      }
+    },
+    [user?.id, dispatch],
+  );
 
-  // const fetchUsers = useCallback(
-  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
-  //     dispatch(actions.fetchUsers('', filterText, fromRecord, toRecord));
-  //   },
-  //   [dispatch],
-  // );
-
-  // useEffect(() => {
-  //   dispatch(actions.fetchUsers(''));
-  //   //   },
-  //   //   [dispatch],
-  // }, [dispatch]);
+  useEffect(() => {
+    if (user?.id) {
+      fetchUser(user.id);
+    }
+  }, [fetchUser, user]);
 
   const content = (
     <Box
@@ -122,7 +126,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
             : `${user?.lastName?.slice(0, 1) || ''}${user?.firstName?.slice(0, 1) || ''}`}
         </Typography>
         <Typography color="textSecondary" variant="body2">
-          {userInfo.jobTitle}
+          {user ? user.name : userInfo.jobTitle}
         </Typography>
       </Box>
       <Divider />
@@ -138,6 +142,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
     </Box>
   );
 
+  console.log('user', user);
   return (
     <>
       <Box

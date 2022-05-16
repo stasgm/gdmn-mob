@@ -1,16 +1,44 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container, Typography, Grid } from '@material-ui/core';
 
-import { useSelector } from '../store';
+import { useCallback, useEffect } from 'react';
+
+import { useDispatch, useSelector } from '../store';
 
 import TotalCompanies from '../components/dashboard/Totalcompanies';
 import TotalUsers from '../components/dashboard/Totalusers';
 import TotalDevices from '../components/dashboard/Totaldevices';
 
+import companyActions from '../store/company';
+import userActions from '../store/user';
+import deviceActions from '../store/device';
+
 const Dashboard = () => {
   const { list: devices } = useSelector((state) => state.devices);
   const { list: users } = useSelector((state) => state.users);
   const { list: companies } = useSelector((state) => state.companies);
+
+  const dispatch = useDispatch();
+
+  const fetchCompanies = useCallback(async () => {
+    await dispatch(companyActions.fetchCompanies());
+  }, [dispatch]);
+
+  const fetchUsers = useCallback(async () => {
+    await dispatch(userActions.fetchUsers());
+  }, [dispatch]);
+
+  const fetchDevices = useCallback(async () => {
+    await dispatch(deviceActions.fetchDevices());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    fetchCompanies();
+    fetchUsers();
+    fetchDevices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
