@@ -5,7 +5,6 @@ import { constants } from 'fs';
 
 import path from 'path';
 
-import { assoc } from 'ramda';
 import { v1 as uuid } from 'uuid';
 
 import { IFileMessageInfo, IAppSystemParams } from '@lib/types';
@@ -44,8 +43,12 @@ export const params2messageFileName = ({ id, producerId, consumerId }: IFileMess
 class CollectionMessage<T extends CollectionItem> {
   private collectionPath: string;
 
-  private static _initObject<K extends CollectionItem>(obj: K): K {
-    return assoc('id', uuid(), obj) as K;
+  private static _setId<K extends CollectionItem>(obj: K): K {
+    if (obj.id) {
+      return obj;
+    } else {
+      return { ...obj, id: uuid() };
+    }
   }
 
   constructor(pathDb: string) {
@@ -70,7 +73,7 @@ class CollectionMessage<T extends CollectionItem> {
    * Inserts an object into the file.
    */
   public async insert(obj: T, params: IAppSystemParams, fileInfo: IFileMessageInfo): Promise<string> {
-    const initObject = obj.id ? obj : CollectionMessage._initObject(obj);
+    const initObject = obj.id ? obj : CollectionMessage._setId(obj);
     fileInfo.id = initObject.id as string;
     await this._save(initObject, params, fileInfo);
     return initObject.id as string;
@@ -78,16 +81,12 @@ class CollectionMessage<T extends CollectionItem> {
   /**
    * Returns every entry in the collection.
    */
-  public async read(params: IAppSystemParams): Promise<Array<T>>;
-
-  public async read(params: IAppSystemParams, predicate: (item: IFileMessageInfo) => boolean): Promise<Array<T>>;
-
-  public async read(params: IAppSystemParams, predicate?: (item: IFileMessageInfo) => boolean): Promise<Array<T>> {
+  public async readByConsumerId(params: IAppSystemParams, consumerId: string): Promise<Array<T>> {
     const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir(params);
 
     if (!filesInfoArr) return [];
 
-    const fileInfo = typeof predicate === 'undefined' ? filesInfoArr : filesInfoArr.filter(predicate);
+    const fileInfo = filesInfoArr.filter((item) => item.consumerId === consumerId);
 
     const pr = fileInfo.map(async (item) => {
       return await this._get(await this._Obj2FullFileName(params, item));
@@ -99,52 +98,26 @@ class CollectionMessage<T extends CollectionItem> {
   /**
    * Finds an item by id or using the specified predicate.
    */
-  public async find(params: IAppSystemParams, id: string): Promise<T>;
-
-  public async find(params: IAppSystemParams, predicate: (item: IFileMessageInfo) => boolean): Promise<T>;
-
-  public async find(params: IAppSystemParams, id: string | ((item: IFileMessageInfo) => boolean)): Promise<T> {
-    const predicate = typeof id === 'function' ? id : (item: IFileMessageInfo) => item.id === id;
-    try {
-      const filesInfoArr = await this._readDir(params);
-      try {
-        const fileInfo = filesInfoArr.find(predicate);
-        if (!fileInfo) {
-          throw new DataNotFoundException('Сообщение не найдено');
-        }
-        return await this._get(await this._Obj2FullFileName(params, fileInfo));
-      } catch (err) {
-        throw new DataNotFoundException(err as string);
-      }
-    } catch (err) {
-      throw new DataNotFoundException(err as string);
+  public async findById(params: IAppSystemParams, id: string): Promise<T | undefined> {
+    const filesInfoArr = await this._readDir(params);
+    const fileInfo = filesInfoArr.find((item: IFileMessageInfo) => item.id === id);
+    if (!fileInfo) {
+      throw new DataNotFoundException('Сообщение не найдено');
     }
+    return await this._get(await this._Obj2FullFileName(params, fileInfo));
   }
 
   /**
    * Delete items by `id` or using a specified predicate.
    * Items for which the predicate returns true will be deleted.
    */
-  public async delete(params: IAppSystemParams, id: string): Promise<void>;
-
-  public async delete(params: IAppSystemParams, predicate: (item: IFileMessageInfo) => boolean): Promise<void>;
-
-  public async delete(params: IAppSystemParams, id: string | ((item: IFileMessageInfo) => boolean)) {
-    const predicate = typeof id === 'function' ? id : (item: IFileMessageInfo) => item.id === id;
-    try {
-      const filesInfoArr = await this._readDir(params);
-      try {
-        const fileInfo = filesInfoArr.find(predicate);
-        if (!fileInfo) {
-          throw new DataNotFoundException('Сообщение не найдено');
-        }
-        return await this._delete(await this._Obj2FullFileName(params, fileInfo));
-      } catch (err) {
-        throw new DataNotFoundException(err as string);
-      }
-    } catch (err) {
-      throw new DataNotFoundException(err as string);
+  public async deleteById(params: IAppSystemParams, id: string): Promise<void> {
+    const filesInfoArr = await this._readDir(params);
+    const fileInfo = filesInfoArr.find((item: IFileMessageInfo) => item.id === id);
+    if (!fileInfo) {
+      throw new DataNotFoundException('Сообщение не найдено');
     }
+    return await this._delete(await this._Obj2FullFileName(params, fileInfo));
   }
 
   public async deleteAll(params: IAppSystemParams): Promise<void[]> {
@@ -154,16 +127,6 @@ class CollectionMessage<T extends CollectionItem> {
     });
     return Promise.all(pr);
   }
-
-  /* public async setCollectionPath(newPath: string): Promise<void> {
-    if (!this._checkFileExists(newPath)) await fs.mkdir(newPath, { recursive: true });
-    this.collectionPath = newPath;
-  } */
-
-  /* private async _ensureStorage() {
-    const check: boolean = await this._checkFileExists(this.collectionPath);
-    if (!check) await fs.mkdir(this.collectionPath, { recursive: true });
-  }*/
 
   private async _Obj2FullFileName(params: IAppSystemParams, messageInfo: IFileMessageInfo): Promise<string> {
     const filePath = await this.getPathMessages(params);
@@ -175,25 +138,21 @@ class CollectionMessage<T extends CollectionItem> {
       const data = await fs.readFile(fileName, { encoding: 'utf8' });
       return JSON.parse(data);
     } catch (err) {
-      throw new DataNotFoundException(`Ошибка чтения данных в файле ${fileName} - ${err}`);
+      throw new Error(`Ошибка чтения данных в файле ${fileName} - ${err}`);
     }
   }
 
   private async _save(data: T, params: IAppSystemParams, fileInfo: IFileMessageInfo): Promise<void> {
-    const fileName = await this._Obj2FullFileName(params, fileInfo);
     try {
+      const fileName = await this._Obj2FullFileName(params, fileInfo);
       return fs.writeFile(fileName, JSON.stringify(data), { encoding: 'utf8' });
     } catch (err) {
-      throw new DataNotFoundException(`Ошибка записи в файл ${err}`);
+      throw new Error(`Ошибка записи данных в файл - ${err}`);
     }
   }
 
   private async _delete(fileName: string): Promise<void> {
-    try {
-      return fs.unlink(fileName);
-    } catch (err) {
-      throw new DataNotFoundException(`Ошибка удаления файла ${err}`);
-    }
+    return fs.unlink(fileName);
   }
 
   private async _readDir(params: IAppSystemParams): Promise<IFileMessageInfo[]> {
@@ -201,7 +160,7 @@ class CollectionMessage<T extends CollectionItem> {
       const filePath = await this.getPathMessages(params);
       return (await readdir(filePath)).map(messageFileName2params);
     } catch (err) {
-      throw new DataNotFoundException(`Ошибка чтения папки ${this.collectionPath} - ${err}`);
+      throw new Error(`Ошибка чтения папки ${this.collectionPath} - ${err}`);
     }
   }
 
