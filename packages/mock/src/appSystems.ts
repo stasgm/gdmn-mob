@@ -3,7 +3,7 @@ import { IAppSystem } from '@lib/types';
 const appSystems: IAppSystem[] = [
   {
     id: '1',
-    name: 'gdmn-agent',
+    name: 'gdmn-sales-representative',
   },
   {
     id: '2',
