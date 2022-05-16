@@ -4,7 +4,6 @@ import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigat
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
 import {
@@ -18,7 +17,7 @@ import {
 } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
@@ -126,7 +125,7 @@ const OrderEditScreen = () => {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
-    const docId = !id ? uuid() : id;
+    const docId = !id ? generateId() : id;
 
     const newOrderDate = new Date().toISOString();
 

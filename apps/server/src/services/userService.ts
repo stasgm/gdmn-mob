@@ -1,17 +1,9 @@
-import { DBAppSystem, IDBUser, IUser, NewUser } from '@lib/types';
+import { IDBUser, IUser, NewUser } from '@lib/types';
 
-import {
-  DataNotFoundException,
-  InnerErrorException,
-  ConflictException,
-  InvalidParameterException,
-  ForbiddenException,
-} from '../exceptions';
+import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
 
 import { hashPassword } from '../utils/crypt';
-import { extraPredicate } from '../utils/helpers';
-
-import { getNamedEntity } from './dao/utils';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
@@ -19,19 +11,19 @@ import { users as mockUsers } from './data/user';
 
 /**
  * Добавляет одного пользователя
- * @param newUser - пользователь
- * @return id, идентификатор пользователя
+ * @param {NewUser} userData - данные пользователя
+ * @return {IUser} объект пользователя
  * */
-const addOne = async (newUser: NewUser): Promise<IUser> => {
+const addOne = (userData: NewUser): IUser => {
   const { users } = getDb();
 
   let creatorId;
   let company: string | null = null;
 
-  if (newUser.creator) {
-    const creator = await users.find(newUser.creator.id);
+  if (userData.creator) {
+    const creator = users.findById(userData.creator.id);
 
-    if (!creator.company) {
+    if (!creator?.company) {
       // Нельзя создавать пользователей пока не создана администратором организация
       throw new InvalidParameterException('Не создана организация');
     }
@@ -40,96 +32,103 @@ const addOne = async (newUser: NewUser): Promise<IUser> => {
     company = creator.company;
   }
 
-  const user = await users.find(
-    (i) => i.name.toUpperCase() === newUser.name.toUpperCase() && (i.company === company || i.role === 'Admin'),
-  );
-
-  if (user) {
+  if (
+    users.data.find(
+      (i) => i.name.toUpperCase() === userData.name.toUpperCase() && (i.company === company || i.role === 'Admin'),
+    )
+  ) {
     // TODO проверять по каждой организации
     throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
-  const passwordHash = await hashPassword(newUser.password);
+  const passwordHash = hashPassword(userData.password);
 
-  const newUserObj: IDBUser = {
+  const user = users.insert({
     id: '',
-    alias: newUser.alias,
-    name: newUser.name,
+    alias: userData.alias,
+    name: userData.name,
     company,
     password: passwordHash,
-    role: newUser.role,
+    role: userData.role,
     creatorId: creatorId || '',
-    externalId: newUser.externalId,
-    firstName: newUser.firstName,
-    lastName: newUser.lastName,
-    phoneNumber: newUser.phoneNumber,
-    email: newUser.email,
-    erpUserId: newUser.erpUser?.id,
-    appSystemId: newUser.appSystem?.id,
+    externalId: userData.externalId,
+    firstName: userData.firstName,
+    lastName: userData.lastName,
+    phoneNumber: userData.phoneNumber,
+    email: userData.email,
+    erpUserId: userData.erpUser?.id,
+    appSystemId: userData.appSystem?.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  const userId = await users.insert(newUserObj);
-
-  if (!userId) {
-    throw new InnerErrorException('Ошбка при создании пользователя');
-  }
-
-  const createdUser = await users.find(userId);
-
-  if (!createdUser) {
-    throw new InnerErrorException('Ошбка при создании пользователя');
-  }
-
-  return makeUser(createdUser);
+  return makeUser(user);
 };
 
 /**
  * Обновляет одного пользователя
- * @param user - пользователь
- * @return id, идентификатор пользователя
+ * @param id - ИД пользователя
+ * @param userData - данные пользователя
+ * @return обновленный объект пользователя
  * */
-const updateOne = async (userId: string, userData: Partial<IUser & { password: string }>): Promise<IUser> => {
+const updateOne = (id: string, userData: Partial<IUser & { password: string }>): IUser => {
   const { users, companies, appSystems } = getDb();
 
-  const oldUser = await users.find(userId);
+  const oldUser = users.findById(id);
 
   if (!oldUser) {
     throw new DataNotFoundException('Пользователь не найден');
   }
   // Если передан новый пароль то хешируем и заменяем
-  const passwordHash = userData.password ? await hashPassword(userData.password) : oldUser.password;
+  const passwordHash = userData.password ? hashPassword(userData.password) : oldUser.password;
 
-  // Проверяем есть ли в базе переданная организация
-  const newCompany = userData?.company ? (await companies.find(userData.company.id)).id : oldUser.company;
-
-  // Проверяем есть ли в базе переданный creator
-  const creatorId = userData?.creator ? (await users.find(userData.creator.id))?.id : oldUser.creatorId;
-
-  // Проверяем есть ли в базе переданная подсистема
-  let newAppSystem: DBAppSystem | undefined;
-  if (userData.appSystem) {
-    newAppSystem = await appSystems.find(userData.appSystem.id);
-    if (!newAppSystem) {
-      throw new DataNotFoundException('Подсистема не найдена');
+  // Проверяем есть ли в базе переданная компания
+  let company = oldUser.company;
+  if (userData.company) {
+    const companyObj = companies.findById(userData.company.id);
+    if (!companyObj) {
+      throw new DataNotFoundException('Компания не найдена');
     }
+    company = companyObj.id;
   }
 
+  // Проверяем есть ли в базе переданный creator
+  let creatorId = oldUser.creatorId;
+  if (userData.creator) {
+    const creator = users.findById(userData.creator.id);
+    if (!creator) {
+      throw new DataNotFoundException('Создатель пользователя не найден');
+    }
+    creatorId = creator.id;
+  }
+
+  // Проверяем есть ли в базе переданная подсистема
+  let newAppSystemId;
+  if (userData.appSystem) {
+    newAppSystemId = appSystems.findById(userData.appSystem.id)?.id;
+    if (!newAppSystemId) {
+      throw new DataNotFoundException('Подсистема не найдена');
+    }
+    if (
+      users.data.find((u) => u.appSystemId === userData.appSystem!.id && u.company === company && u.id !== userData.id)
+    ) {
+      throw new DataNotFoundException('Пользователь для данной подсистемы уже существует');
+    }
+  }
   // Проверяем есть ли в базе пользователь ERP
-  let newErpUser: IDBUser | undefined;
+  let newErpUserId;
   if (userData.erpUser) {
-    newErpUser = await users.find(userData.erpUser.id);
-    if (!newErpUser) {
+    newErpUserId = users.findById(userData.erpUser.id)?.id;
+    if (!newErpUserId) {
       throw new DataNotFoundException('Пользователь ERP не найден');
     }
   }
 
-  const newUser: IDBUser = {
-    id: userId,
+  users.update({
+    id,
     alias: userData.alias === undefined ? oldUser.alias : userData.alias,
     name: userData.name || oldUser.name,
-    company: newCompany,
+    company,
     password: passwordHash,
     role: oldUser.role,
     creatorId,
@@ -138,15 +137,17 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
     lastName: userData.lastName === undefined ? oldUser.lastName : userData.lastName,
     phoneNumber: userData.phoneNumber === undefined ? oldUser.phoneNumber : userData.phoneNumber,
     email: userData.email === undefined ? oldUser.email : userData.email,
-    erpUserId: userData.erpUser === null ? undefined : newErpUser?.id || oldUser.erpUserId,
-    appSystemId: userData.appSystem === null ? undefined : newAppSystem?.id || oldUser.appSystemId,
+    erpUserId: userData.erpUser === null ? undefined : newErpUserId || oldUser.erpUserId,
+    appSystemId: userData.appSystem === null ? undefined : newAppSystemId || oldUser.appSystemId,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  await users.update(newUser);
+  const updatedUser = users.findById(id);
 
-  const updatedUser = await users.find(userId);
+  if (!updatedUser) {
+    throw new DataNotFoundException('Пользователь не найден');
+  }
 
   return makeUser(updatedUser);
 };
@@ -155,12 +156,10 @@ const updateOne = async (userId: string, userData: Partial<IUser & { password: s
  * Удаляет одного пользователя
  * @param {string} id - идентификатор пользователя
  * */
-const deleteOne = async (id: string): Promise<void> => {
-  const db = getDb();
-  const { users } = db;
-  const { deviceBindings } = getDb();
+const deleteOne = (id: string) => {
+  const { users, deviceBindings } = getDb();
 
-  const user = await users.find(id);
+  const user = users.findById(id);
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
@@ -171,19 +170,22 @@ const deleteOne = async (id: string): Promise<void> => {
   if (user.role === 'SuperAdmin' || (user.role === 'Admin' && Boolean(user.company))) {
     throw new ForbiddenException('Администратор не может быть удален');
   }
-  await deviceBindings.delete((deviceBinding) => deviceBinding.userId === user.id);
-  await users.delete(id);
+
+  deviceBindings.data.filter((b) => b.userId === id)?.forEach((b) => deviceBindings.deleteById(b.id));
+  users.deleteById(id);
 };
 
-const findOne = async (id: string): Promise<IUser | undefined> => {
-  const db = getDb();
-  const { users } = db;
-
+/**
+ * Возвращает одного пользователя
+ * @param id ИД пользователя
+ * @returns
+ */
+const findOne = (id: string): IUser => {
   let user;
   if (process.env.MOCK) {
     user = mockUsers.find((i) => i.id === id) as IDBUser;
   } else {
-    user = await users.find(id);
+    user = getDb().users.findById(id);
   }
 
   if (!user) {
@@ -193,18 +195,18 @@ const findOne = async (id: string): Promise<IUser | undefined> => {
   return makeUser(user);
 };
 
-const findByName = async (name: string): Promise<IUser> => {
-  const db = getDb();
-  const { users } = db;
-
+/**
+ * Находит пользователя по логину
+ * @param name - логин пользователя
+ * @returns
+ */
+const findByName = (name: string): IUser => {
   let user;
-
   if (process.env.MOCK) {
     user = mockUsers.find((user) => user.name.toUpperCase() === name.toUpperCase());
   } else {
-    user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
+    user = getDb().users.data.find((user) => user.name.toUpperCase() === name.toUpperCase());
   }
-  // const user = await users.find((user) => user.name.toUpperCase() === name.toUpperCase());
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
@@ -213,35 +215,37 @@ const findByName = async (name: string): Promise<IUser> => {
   return makeUser(user);
 };
 
-const getUserPassword = async (id: string): Promise<string> => {
-  const db = getDb();
-  const { users } = db;
-
+/**
+ * Возвращает хэшированный пароль пользователя
+ * @param id
+ * @returns
+ */
+const getUserPassword = (id: string): string => {
   let user;
   if (process.env.MOCK) {
     user = mockUsers.find((i) => i.id === id) as IDBUser;
   } else {
-    user = await users.find(id);
+    user = getDb().users.findById(id);
   }
 
-  // const user = await users.find(id);
-
   if (!user) {
-    throw new DataNotFoundException('Пароль пользователя не найден');
+    throw new DataNotFoundException('Пользователь не найден');
   }
 
   return user.password;
 };
 
-const findAll = async (params: Record<string, string | number>): Promise<IUser[]> => {
-  const db = getDb();
-  const { users } = db;
-
+/**
+ *  Возвращает множество пользователей по указанным параметрам
+ * @param params - параметры
+ * @returns
+ */
+const findMany = (params: Record<string, string | number>): IUser[] => {
   let userList;
   if (process.env.MOCK) {
     userList = mockUsers;
   } else {
-    userList = await users.read();
+    userList = getDb().users.data;
   }
 
   userList = userList.filter((item) => {
@@ -279,43 +283,20 @@ const findAll = async (params: Record<string, string | number>): Promise<IUser[]
     return companyFound && filteredUsers && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  /** pagination */
-  const limitParams = Object.assign({}, params);
-
-  let fromRecord = 0;
-  if ('fromRecord' in limitParams) {
-    fromRecord = limitParams.fromRecord as number;
-  }
-
-  let toRecord = userList.length;
-  if ('toRecord' in limitParams)
-    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
-
-  const pr = userList.slice(fromRecord, toRecord).map(async (i) => await makeUser(i));
-
-  return Promise.all(pr);
+  return getListPart(userList, params).map((i) => makeUser(i));
 };
 
-export const makeUser = async (user: IDBUser): Promise<IUser> => {
-  const db = getDb();
-  const { companies, users, appSystems } = db;
-
-  const company = user.company ? await getNamedEntity(user.company, companies) : void 0;
-
-  const creator = await getNamedEntity(user.creatorId, users);
-
-  const erpUser = user.erpUserId ? await getNamedEntity(user.erpUserId, users) : undefined;
-
-  const appSystem = user.appSystemId ? await getNamedEntity(user.appSystemId, appSystems) : undefined;
+export const makeUser = (user: IDBUser): IUser => {
+  const { companies, users, appSystems } = getDb();
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: user.id,
     alias: user.alias,
     name: user.name,
-    company,
+    company: user.company ? companies.getNamedItem(user.company) : void 0,
     role: user.role,
-    creator,
+    creator: users.getNamedItem(user.creatorId),
     firstName: user.firstName,
     lastName: user.lastName,
     phoneNumber: user.phoneNumber,
@@ -323,9 +304,9 @@ export const makeUser = async (user: IDBUser): Promise<IUser> => {
     creationDate: user.creationDate,
     editionDate: user.editionDate,
     email: user.email,
-    appSystem,
-    erpUser,
+    appSystem: user.appSystemId ? appSystems.getNamedItem(user.appSystemId) : undefined,
+    erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
   };
 };
 
-export { findOne, findAll, findByName, addOne, updateOne, deleteOne, getUserPassword };
+export { findOne, findMany, findByName, addOne, updateOne, deleteOne, getUserPassword };

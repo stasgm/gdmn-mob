@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
@@ -10,7 +9,10 @@ import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle, globalSty
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
+import { generateId } from '@lib/mobile-app';
+
 import { ReturnsStackParamList } from '../../navigation/Root/types';
+import { IReturnLine } from '../../store/types';
 
 const SelectItemScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SelectItemReturn'>>();
@@ -50,20 +52,10 @@ const SelectItemScreen = () => {
     return (
       <TouchableOpacity
         onPress={() => {
-          // dispatch(documentActions.);
-          /*
-          navigation.dispatch(
-            StackActions.replace('ReturnLine', {
-              mode: 0,
-              docId,
-              item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
-            }),
-          ); */
-
           navigation.navigate('ReturnLine', {
             mode: 0,
             docId,
-            item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
+            item: { id: generateId(), good: { id: item.id, name: item.name }, quantity: 0 } as IReturnLine,
           });
         }}
       >

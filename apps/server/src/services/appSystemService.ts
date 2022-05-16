@@ -1,14 +1,19 @@
-import { IAppSystem, DBAppSystem, NewAppSystem } from '@lib/types';
+import { IAppSystem, NewAppSystem } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { appSystems as mockAppSystems } from './data/appSystems';
 
 import { getDb } from './dao/db';
 
-const addOne = async (appSystem: NewAppSystem): Promise<IAppSystem> => {
+/**
+ * Добавление новой подсистемы
+ * @param appSystemData Данные новой подсистемы
+ * @returns Созданный объект подсистемы
+ */
+const addOne = (appSystemData: NewAppSystem): IAppSystem => {
   /*
     1. Проверяем что организация существует
     2. Добавляем организацию
@@ -17,65 +22,76 @@ const addOne = async (appSystem: NewAppSystem): Promise<IAppSystem> => {
   */
   const { appSystems } = getDb();
 
-  if (await appSystems.find((el) => el.name === appSystem.name)) {
-    throw new ConflictException('Подсистема уже существует');
+  if (appSystems.data.find((el) => el.name === appSystemData.name)) {
+    throw new ConflictException(`Подсистема с названием ${appSystemData.name} уже существует`);
   }
 
-  const newAppSystemObj = {
+  return appSystems.insert({
     id: '',
-    name: appSystem.name,
-    description: appSystem.description || '',
+    name: appSystemData.name,
+    description: appSystemData.description || '',
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
-  } as DBAppSystem;
-
-  const newAppSystem = await appSystems.insert(newAppSystemObj);
-
-  return await appSystems.find(newAppSystem);
+  });
 };
 
-const updateOne = async (id: string, appSystemData: Partial<IAppSystem>): Promise<IAppSystem> => {
-  const db = getDb();
-  const { appSystems } = db;
+/**
+ * Обновляет подсистему по ИД
+ * @param id ИД подсистемы
+ * @param appSystemData Новые данные подсистемы
+ * @returns Обновленный объект подсистемы
+ */
+const updateOne = (id: string, appSystemData: Partial<IAppSystem>): IAppSystem => {
+  const { appSystems } = getDb();
 
-  const appSystemObj = await appSystems.find(id);
+  const appSystemObj = appSystems.findById(id);
 
   if (!appSystemObj) {
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  if (await appSystems.find((el) => el.name === appSystemData.name && el.id !== appSystemData.id)) {
-    throw new ConflictException('Подсистема уже существует');
+  if (appSystems.data.find((el) => el.name === appSystemData.name && el.id !== appSystemData.id)) {
+    throw new ConflictException(`Подсистема с названием ${appSystemData.name} уже существует`);
   }
 
-  const newAppSystem: DBAppSystem = {
+  appSystems.update({
     id,
     name: appSystemData.name || appSystemObj.name,
     description: appSystemData.description === undefined ? appSystemObj.description : appSystemData.description,
     creationDate: appSystemObj.creationDate,
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  await appSystems.update(newAppSystem);
+  const updatedAppSystem = appSystems.findById(id);
 
-  return await appSystems.find(id);
-};
-
-const deleteOne = async (id: string): Promise<void> => {
-  const db = getDb();
-  const { appSystems } = db;
-
-  if (!(await appSystems.find((d) => d.id === id))) {
+  if (!updatedAppSystem) {
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  await appSystems.delete((d) => d.id === id);
+  return updatedAppSystem;
 };
 
-const findOne = async (id: string): Promise<IAppSystem | undefined> => {
+/**
+ * Удаляет подсистему по ИД
+ * @param id ИД подсистемы
+ */
+const deleteOne = (id: string): void => {
   const { appSystems } = getDb();
 
-  const appSystem = await appSystems.find(id);
+  if (!appSystems.findById(id)) {
+    throw new DataNotFoundException('Подсистема не найдена');
+  }
+
+  appSystems.deleteById(id);
+};
+
+/**
+ * Возвращает подсистему по ИД
+ * @param id ИД подсистемы
+ * @returns Объект найденной подсистемы
+ */
+const findOne = (id: string): IAppSystem => {
+  const appSystem = getDb().appSystems.findById(id);
 
   if (!appSystem) {
     throw new DataNotFoundException('Подсистема не найдена');
@@ -84,14 +100,17 @@ const findOne = async (id: string): Promise<IAppSystem | undefined> => {
   return appSystem;
 };
 
-const findAll = async (params: Record<string, string | number>): Promise<IAppSystem[]> => {
-  const { appSystems } = getDb();
-
+/**
+ * Возвращает множество подсистем по указанным параметрам
+ * @param params Параметры поиска
+ * @returns Массив объектов подсистем
+ */
+const findMany = (params: Record<string, string | number>): IAppSystem[] => {
   let appSystemList;
   if (process.env.MOCK) {
     appSystemList = mockAppSystems;
   } else {
-    appSystemList = await appSystems.read();
+    appSystemList = getDb().appSystems.data;
   }
 
   appSystemList = appSystemList.filter((item) => {
@@ -120,19 +139,7 @@ const findAll = async (params: Record<string, string | number>): Promise<IAppSys
     return filteredAppSystems && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  /* pagination */
-  const limitParams = Object.assign({}, params);
-
-  let fromRecord = 0;
-  if ('fromRecord' in limitParams) {
-    fromRecord = limitParams.fromRecord as number;
-  }
-
-  let toRecord = appSystemList.length;
-  if ('toRecord' in limitParams)
-    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
-
-  return appSystemList.slice(fromRecord, toRecord);
+  return getListPart(appSystemList, params);
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll };
+export { addOne, updateOne, deleteOne, findOne, findMany };

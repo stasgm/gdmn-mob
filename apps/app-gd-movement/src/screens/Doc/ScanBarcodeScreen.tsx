@@ -1,6 +1,5 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Text } from 'react-native';
-import { v4 as uuid } from 'uuid';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
@@ -8,6 +7,8 @@ import { globalStyles, BackButton } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
+
+import { generateId } from '@lib/mobile-app';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
@@ -18,7 +19,7 @@ import { unknownGood } from '../../utils/constants';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
@@ -85,7 +86,7 @@ const ScanBarcodeScreen = () => {
 
         return {
           good: { id: remItem.good.id, name: remItem.good.name },
-          id: uuid(),
+          id: generateId(),
           quantity: 1,
           price: remItem.remains?.length ? remItem.remains[0].price : 0,
           buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
@@ -113,7 +114,7 @@ const ScanBarcodeScreen = () => {
 
       return {
         good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
-        id: uuid(),
+        id: generateId(),
         quantity: qty,
         price: remItem.remains?.length ? remItem.remains[0].price : 0,
         buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,

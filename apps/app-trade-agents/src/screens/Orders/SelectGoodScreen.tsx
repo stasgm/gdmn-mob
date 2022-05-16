@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
@@ -9,6 +8,8 @@ import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { generateId } from '@lib/mobile-app';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IOrderDocument } from '../../store/types';
@@ -25,7 +26,7 @@ const Good = ({ item }: { item: IGood }) => {
         navigation.navigate('OrderLine', {
           mode: 0,
           docId,
-          item: { id: uuid(), good: item, quantity: 0 },
+          item: { id: generateId(), good: item, quantity: 0 },
         });
       }}
     >

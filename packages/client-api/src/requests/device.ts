@@ -1,9 +1,8 @@
-import { v4 as uuid } from 'uuid';
 import { IDevice, IResponse, NewDevice } from '@lib/types';
 import { device as mockDevice } from '@lib/mock';
 
 import { error, device as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -20,7 +19,7 @@ class Device extends BaseRequest {
         type: 'ADD_DEVICE',
         device: {
           ...newDevice,
-          id: uuid(),
+          id: generateId(),
           editionDate: new Date().toISOString(),
           creationDate: new Date().toISOString(),
         },

@@ -55,8 +55,7 @@
     "react-native-screens": "~3.10.1",
     "react-native-vector-icons": "^9.0.0",
     "react-native-web": "~0.17.7",
-    "react-redux": "^7.2.4",
-    "uuidv4": "^6.2.13"
+    "react-redux": "^7.2.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.7",

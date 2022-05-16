@@ -2,14 +2,13 @@ import { Context, ParameterizedContext } from 'koa';
 
 import { IUser, NewUser } from '@lib/types';
 
-import log from '../utils/logger';
 import { userService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
 import { DataNotFoundException } from '../exceptions';
 
-const addUser = async (ctx: ParameterizedContext): Promise<void> => {
+const addUser = async (ctx: ParameterizedContext) => {
   const { externalId, name, password, firstName, lastName, phoneNumber, email, alias, erpUser, appSystem } = ctx.request
     .body as NewUser;
 
@@ -30,50 +29,42 @@ const addUser = async (ctx: ParameterizedContext): Promise<void> => {
     creator: { id: creator.id, name: creator.name },
   } as NewUser;
 
-  const newUser = await userService.addOne(user);
+  const newUser = userService.addOne(user);
 
-  created(ctx as Context, newUser);
-
-  log.info(`signup: user '${name}' is successfully signed up`);
+  created(ctx as Context, newUser, `signup: user '${name}' is successfully signed up`);
 };
 
-const updateUser = async (ctx: ParameterizedContext): Promise<void> => {
+const updateUser = async (ctx: ParameterizedContext) => {
   const { id: userId } = ctx.params;
   // TODO Исключать поля: role, creator, creationDate, company
   const userData = ctx.request.body as Partial<IUser & { password: string }>;
 
-  const updatedUser = await userService.updateOne(userId, userData);
+  const updatedUser = userService.updateOne(userId, userData);
 
-  ok(ctx as Context, updatedUser);
-
-  log.info(`updatedUser: user '${updatedUser.name}' is successfully updated`);
+  ok(ctx as Context, updatedUser, `updatedUser: user '${updatedUser.name}' is successfully updated`);
 };
 
-const removeUser = async (ctx: ParameterizedContext): Promise<void> => {
+const removeUser = async (ctx: ParameterizedContext) => {
   const { id: userId } = ctx.params;
-  // TODO
-  await userService.deleteOne(userId);
 
-  ok(ctx as Context);
+  userService.deleteOne(userId);
 
-  log.info(`removeUser: user '${removeUser.name}' is successfully removed `);
+  ok(ctx as Context, undefined, `removeUser: user '${removeUser.name}' is successfully removed `);
 };
 
-const getUser = async (ctx: ParameterizedContext): Promise<void> => {
+const getUser = async (ctx: ParameterizedContext) => {
   const { id: userId } = ctx.params;
 
-  const user = await userService.findOne(userId);
+  const user = userService.findOne(userId);
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
   }
 
-  ok(ctx as Context, user);
-
-  log.info(`getUser: device '${user.name}' is successfully received'`);
+  ok(ctx as Context, user, `getUser: device '${user.name}' is successfully received'`);
 };
 
-const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
+const getUsers = async (ctx: ParameterizedContext) => {
   const { companyId, name, filterText, fromRecord, toRecord, version } = ctx.query;
 
   const params: Record<string, string> = {};
@@ -101,23 +92,21 @@ const getUsers = async (ctx: ParameterizedContext): Promise<void> => {
   let users;
   switch (version) {
     case '1.0.0':
-      users = await userService.findAll(params);
+      users = userService.findMany(params);
       /** example for versioning */
-      //users = await verUsers.v1.myFunction(params);
+      //users = verUsers.v1.myFunction(params);
       break;
     case '2.0.0':
-      users = await userService.findAll(params);
+      users = userService.findMany(params);
       /** example for versioning */
-      //users = await verUsers.v2.myFunction(params);
+      //users = verUsers.v2.myFunction(params);
       break;
     default:
-      users = await userService.findAll(params);
+      users = userService.findMany(params);
       break;
   }
 
-  ok(ctx as Context, users);
-
-  log.info('getUsers: users are successfully received');
+  ok(ctx as Context, users, 'getUsers: users are successfully received');
 };
 
 export { addUser, updateUser, removeUser, getUser, getUsers };

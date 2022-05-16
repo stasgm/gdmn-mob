@@ -13,15 +13,6 @@ const defaultDatabase: IItemDatabase = {
 };
 
 const run = async (dbase?: IItemDatabase): Promise<KoaApp> => {
-  // TODO
-  /* if (dbase) {
-    db = dbase;
-  } else {
-    const templateName: IItemDatabase[] | undefined = await readFile(config.TEMPLATE_CONFIG_NAME);
-    const chosenDatabase = !templateName || templateName.length === 0 ? undefined : await databaseMenu(templateName);
-
-    db = chosenDatabase ? JSON.parse(chosenDatabase) : defaultDatabase;
-  } */
   const db: IItemDatabase = dbase ?? defaultDatabase;
 
   const app = await createServer({ name: 'WS-Server', dbName: db.name, dbPath: db.path, port: db.port });

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
@@ -11,7 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { IDocumentType } from '@lib/types';
 
-import { formatValue } from '@lib/mobile-app';
+import { formatValue, generateId } from '@lib/mobile-app';
 
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -27,7 +26,7 @@ const keyExtractor = (item: IRemGood) => String(item.good.id);
 
 const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.good.barcode;
 
@@ -38,7 +37,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
           mode: 0,
           docId,
           item: {
-            id: uuid(),
+            id: generateId(),
             good: { id: item.good.id, name: item.good.name },
             quantity: 0,
             remains: item.remains,
@@ -70,7 +69,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const { colors } = useTheme();
   const [filterVisible, setFilterVisible] = useState(false);
 

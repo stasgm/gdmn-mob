@@ -24,7 +24,7 @@ const baseSettings: Settings<IBaseSettings> = {
     data: true,
     type: 'boolean',
     sortOrder: 2,
-    visible: true,
+    visible: false,
     group: baseSettingGroup,
   },
   cleanDocTime: {

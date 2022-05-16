@@ -99,17 +99,6 @@ export interface ICheckTransafer {
   state: boolean;
 }
 
-export interface ITransfer {
-  uid: string;
-  uDate: string;
-}
-
-export type Transfer = ITransfer | undefined;
-
-export type ITransferReq = {
-  uid: string;
-};
-
 export interface IMessageParams {
   companyId: string;
   appSystemId: string;

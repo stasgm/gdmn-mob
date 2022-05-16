@@ -4,21 +4,28 @@ import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, PrepareProc
 
 import { processService } from '../services';
 
-import { ok } from '../utils/apiHelpers';
+import { created, ok } from '../utils/apiHelpers';
 
 /**
  * API 1
  * @param ctx
  */
-export const addProcess = (ctx: Context) =>
-  ok(ctx, processService.addOne(ctx.request.body as AddProcess), 'addProcess');
+export const addProcess = async (ctx: Context) => {
+  const { appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles } = ctx.request.body as AddProcess;
+
+  created(
+    ctx,
+    processService.addOne({ appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles }),
+    'addProcess',
+  );
+};
 
 /**
  * API 2
  * @param ctx
  * @returns
  */
-export const updateProcess = (ctx: Context) =>
+export const updateProcess = async (ctx: Context) =>
   ok(ctx, processService.updateById(ctx.params.id, (ctx.request.body as UpdateProcess).files), 'updateProcess');
 
 /**
@@ -26,7 +33,7 @@ export const updateProcess = (ctx: Context) =>
  * @param ctx
  * @returns
  */
-export const prepareProcess = (ctx: Context) =>
+export const prepareProcess = async (ctx: Context) =>
   ok(
     ctx,
     processService.prepareById({
@@ -42,19 +49,20 @@ export const prepareProcess = (ctx: Context) =>
  * @param ctx
  * @returns
  */
-export const completeProcess = (ctx: Context) => ok(ctx, processService.completeById(ctx.params.id), 'completeProcess');
+export const completeProcess = async (ctx: Context) =>
+  ok(ctx, processService.completeById(ctx.params.id), 'completeProcess');
 
-export const cancelProcess = (ctx: Context) =>
+export const cancelProcess = async (ctx: Context) =>
   ok(ctx, processService.cancelById(ctx.params.id, (ctx.request.body as CancelProcess).errorMessage), 'cancelProcess');
 
-export const interruptProcess = (ctx: Context) =>
+export const interruptProcess = async (ctx: Context) =>
   ok(
     ctx,
     processService.interruptById(ctx.params.id, (ctx.request.body as InterruptProcess).errorMessage),
     'interruptProcess',
   );
 
-export const getProcesses = (ctx: Context) => {
+export const getProcesses = async (ctx: Context) => {
   const { companyId, appSystemId, filterText, fromRecord, toRecord } = ctx.query;
 
   const params: Record<string, string> = {};
@@ -81,4 +89,4 @@ export const getProcesses = (ctx: Context) => {
   ok(ctx, processService.findMany(params), 'getProcesses');
 };
 
-export const deleteProcess = (ctx: Context) => ok(ctx, processService.deleteOne(ctx.params.id), 'deleteProcess');
+export const deleteProcess = async (ctx: Context) => ok(ctx, processService.deleteOne(ctx.params.id), 'deleteProcess');

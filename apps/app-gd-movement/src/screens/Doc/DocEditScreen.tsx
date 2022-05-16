@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider, useTheme } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
@@ -20,7 +19,7 @@ import {
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocumentType } from '@lib/types';
 
@@ -120,7 +119,7 @@ export const DocEditScreen = () => {
       return;
     }
 
-    const docId = !id ? uuid() : id;
+    const docId = !id ? generateId() : id;
     const createdDate = new Date().toISOString();
 
     if (!id) {

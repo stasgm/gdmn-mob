@@ -1,7 +1,7 @@
 import { IMessage, IMessageInfo, IMessageParams, INamedEntity, IResponse, NewMessage } from '@lib/types';
 
 import { error, message as types } from '../types';
-import { sleep } from '../utils';
+import { generateId, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -22,7 +22,7 @@ class Message extends BaseRequest {
       return {
         type: 'SEND_MESSAGE',
         date: new Date(),
-        uid: '11111',
+        uid: generateId(),
       } as types.ISendMessageResponse;
     }
 

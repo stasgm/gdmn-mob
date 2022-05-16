@@ -1,5 +1,4 @@
 import React from 'react';
-import { v4 as uuid } from 'uuid';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -8,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { INamedEntity } from '@lib/types';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
 import { ReturnsStackParamList } from '../../../navigation/Root/types';
 
@@ -46,7 +45,7 @@ const SellBillItem = ({ item }: IProps) => {
               quantityFromSellBill: item.quantity,
               priceFromSellBill: item.price,
               quantity: 0,
-              id: uuid(),
+              id: generateId(),
               sellBillId: item.sellBillId,
             },
           });

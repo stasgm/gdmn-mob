@@ -30,10 +30,6 @@ export interface IDocFormParam extends IFormParam {
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
 
-// export interface IDocumentType extends INamedEntity {
-//   description?: string;
-// }
-
 export interface IContact extends INamedEntity, IReferenceData {
   contractNumber: string; // Номер договора
   contractDate: string; // Дата договора

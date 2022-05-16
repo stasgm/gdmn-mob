@@ -1,8 +1,8 @@
-import { IDBDevice, IDevice, INamedEntity, NewDevice } from '@lib/types';
+import { IDBDevice, IDevice, NewDevice } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { deviceStates } from '../utils/constants';
 
@@ -12,31 +12,28 @@ import { devices as mockDevices } from './data/devices';
 
 /**
  * Добавляет одно устройство
- * @param {string} name - название устройства
- * @param {string} companyId - идентификатор компании
- * @return устройство
+ * @param {NewDevice} deviceData - данные устройства
+ * @return объект устройства
  * */
 
-const addOne = async (device: NewDevice): Promise<IDevice> => {
+const addOne = (deviceData: NewDevice): IDevice => {
   const { devices } = getDb();
 
-  if (await devices.find((i) => i.name === device.name && i.companyId === device.company?.id)) {
-    throw new ConflictException(`Устройство с наименование ${device.name} уже сущеcтвует`);
+  if (devices.data.find((i) => i.name === deviceData.name && i.companyId === deviceData.company?.id)) {
+    throw new ConflictException(`Устройство с наименование ${deviceData.name} уже сущеcтвует`);
   }
 
-  const newDevice: IDBDevice = {
+  const device = devices.insert({
     id: '',
-    name: device.name,
+    name: deviceData.name,
     uid: '',
-    state: device.state || 'NON-REGISTERED',
-    companyId: device.company?.id,
+    state: deviceData.state || 'NON-REGISTERED',
+    companyId: deviceData.company?.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  const createdDevice = await devices.find(await devices.insert(newDevice));
-
-  return makeDevice(createdDevice);
+  return makeDevice(device);
 };
 
 /**
@@ -44,26 +41,35 @@ const addOne = async (device: NewDevice): Promise<IDevice> => {
  * @param {IDBDevice} device - устройство
  * @return обновленное устройство
  * */
-const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>) => {
-  const { devices, companies } = getDb();
-  const oldDevice = await devices.find(id);
+const updateOne = (id: string, deviceData: Partial<IDevice>, params?: Record<string, string>): IDevice => {
+  const { companies, devices } = getDb();
+
+  const oldDevice = devices.findById(id);
 
   if (!oldDevice) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  const companyId = deviceData.company ? (await companies.find(deviceData.company.id))?.id : oldDevice.companyId;
+  // Проверяем есть ли в базе переданная компания
+  let companyId = oldDevice.companyId;
+  if (deviceData.company) {
+    const company = companies.findById(deviceData.company.id);
+    if (!company) {
+      throw new DataNotFoundException('Компания не найдена');
+    }
+    companyId = company.id;
+  }
 
   if (params) {
     if ('adminId' in params) {
-      const company = await companies.find((c) => c.id === companyId && c.adminId === params.adminId);
+      const company = companies.data.find((c) => c.id === companyId && c.adminId === params.adminId);
       if (!company) {
         throw new DataNotFoundException('Устройство не может быть отредактировано');
       }
     }
   }
 
-  const newDevice: IDBDevice = {
+  devices.update({
     id,
     name: deviceData.name || oldDevice.name,
     state: deviceData.state || oldDevice.state,
@@ -71,11 +77,13 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
     companyId,
     creationDate: oldDevice.creationDate,
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  await devices.update(newDevice);
+  const updatedDevice = devices.findById(id);
 
-  const updatedDevice = await devices.find(id);
+  if (!updatedDevice) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }
 
   return makeDevice(updatedDevice);
 };
@@ -84,22 +92,25 @@ const updateOne = async (id: string, deviceData: Partial<IDevice>, params?: Reco
  * Удаляет одно устройство
  * @param {string} id - идентификатор устройства
  * */
-const deleteOne = async ({ deviceId }: { deviceId: string }): Promise<void> => {
+const deleteOne = (id: string) => {
   const { devices, codes, deviceBindings } = getDb();
 
-  if (!(await devices.find((device) => device.id === deviceId))) {
+  if (!devices.data.find((device) => device.id === id)) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  await devices.delete((device) => device.id === deviceId);
-  await deviceBindings.delete((deviceBinding) => deviceBinding.deviceId === deviceId);
-  await codes.delete((activationCode) => activationCode.deviceId === deviceId);
+  devices.deleteById(id);
+  deviceBindings.data.filter((b) => b.deviceId === id)?.forEach((b) => deviceBindings.deleteById(b.id));
+  codes.data.filter((b) => b.deviceId === id)?.forEach((b) => codes.deleteById(b.id));
 };
 
-const findOne = async (id: string): Promise<IDevice | undefined> => {
-  const { devices } = getDb();
-
-  const device = await devices.find(id);
+/**
+ * Возвращает одно устройство
+ * @param id ИД устройства
+ * @returns
+ */
+const findOne = (id: string): IDevice => {
+  const device = getDb().devices.findById(id);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
@@ -108,28 +119,35 @@ const findOne = async (id: string): Promise<IDevice | undefined> => {
   return makeDevice(device);
 };
 
-const findOneByUid = async (uid: string) => {
-  const db = getDb();
-  const { devices } = db;
-
-  const device = await devices.find((i) => i.uid === uid);
+/**
+ * Возвращает устройство по уникальному номеру
+ * @param uid
+ * @returns объект устройства
+ */
+const findOneByUid = (uid: string) => {
+  const device = getDb().devices.data.find((i) => i.uid === uid);
 
   if (!device) return;
 
   return makeDevice(device);
 };
 
-const findAll = async (params: Record<string, string | number>): Promise<IDevice[]> => {
+/**
+ * Возвращает множество устройств
+ * @param params - параметры
+ * @returns массив объектов устройств
+ */
+const findMany = (params: Record<string, string | number>): IDevice[] => {
   const { devices } = getDb();
 
   let deviceList;
   if (process.env.MOCK) {
     deviceList = mockDevices;
   } else {
-    deviceList = await devices.read();
+    deviceList = devices.data;
   }
 
-  deviceList = deviceList.filter((item) => {
+  deviceList = deviceList.filter((item: IDBDevice) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
 
     let companyFound = true;
@@ -165,84 +183,18 @@ const findAll = async (params: Record<string, string | number>): Promise<IDevice
     return companyFound && filteredDevices && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  /** pagination */
-  const limitParams = Object.assign({}, params);
-
-  let fromRecord = 0;
-  if ('fromRecord' in limitParams) {
-    fromRecord = limitParams.fromRecord as number;
-  }
-
-  let toRecord = deviceList.length;
-  if ('toRecord' in limitParams)
-    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
-
-  const pr = deviceList.slice(fromRecord, toRecord).map(async (i) => await makeDevice(i));
-
-  return Promise.all(pr);
+  return getListPart(deviceList, params)?.map((i) => makeDevice(i));
 };
 
-// /**
-//  * Возвращает список пользователей по устройству
-//  * @param {string} id - идентификатор устройства
-//  * */
-// const findUsers = async (deviceId: string) => {
-//   const db = getDb();
-//   const { devices, users, deviceBindings } = db;
+/* TODO В звависимости от прав возвращать разный набор полей */
+export const makeDevice = (device: IDBDevice): IDevice => ({
+  id: device.id,
+  name: device.name,
+  company: getDb().companies.getNamedItem(device.companyId),
+  state: device.state,
+  uid: device.uid,
+  creationDate: device.creationDate,
+  editionDate: device.editionDate,
+});
 
-//   if (!(await devices.find(deviceId))) {
-//     throw new DataNotFoundException('Устройство не найдено');
-//   }
-
-//   return Promise.all(
-//     (await deviceBindings.read())
-//       .filter((i) => i.deviceId === deviceId)
-//       .map(async (i) => {
-//         const device = await devices.find(deviceId);
-
-//         if (!device) {
-//           throw new DataNotFoundException('Устройство не найдено');
-//         }
-
-//         const user = await users.find(i.userId);
-
-//         if (!user) {
-//           throw new DataNotFoundException('Пользователь не найден');
-//         }
-
-//         return await makeDevice(i);
-//       }),
-//   );
-// };
-
-// const findOneByUidAndUser = async ({ deviceId, name }: { deviceId: string; name: string }) => {
-//   const user = await users.find((i) => i.name.toUpperCase() === name.toUpperCase());
-
-//   if (!user) {
-//     throw new Error('Пользователь не найден');
-//   }
-
-//   return makeDevice(await devices.find((i) => i.uid === deviceId && i.userId === user.id));
-// };
-
-export const makeDevice = async (device: IDBDevice): Promise<IDevice> => {
-  const db = getDb();
-  const { companies } = db;
-
-  const company = await companies.find(device?.companyId);
-
-  const companyEntity: INamedEntity = company && { id: company.id, name: company.name };
-
-  /* TODO В звависимости от прав возвращать разный набор полей */
-  return {
-    id: device.id,
-    name: device.name,
-    company: companyEntity,
-    state: device.state,
-    uid: device.uid,
-    creationDate: device.creationDate,
-    editionDate: device.editionDate,
-  };
-};
-
-export { addOne, updateOne, deleteOne, findOne, findOneByUid, findAll };
+export { addOne, updateOne, deleteOne, findOne, findOneByUid, findMany };
