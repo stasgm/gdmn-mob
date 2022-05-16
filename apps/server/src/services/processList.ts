@@ -13,7 +13,6 @@ import {
   existsSync,
 } from 'fs';
 
-import { v1 as uidv1 } from 'uuid';
 import {
   IFiles,
   IDBProcess,
@@ -26,7 +25,7 @@ import {
   IProcess,
 } from '@lib/types';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, generateId } from '../utils/helpers';
 
 import log from '../utils/logger';
 
@@ -88,7 +87,7 @@ export const getProcessByCompanyId = (companyId: string) => {
 
 export const startProcess = (companyId: string, appSystemId: string, files: IFiles) => {
   const newProcess: IDBProcess = {
-    id: uidv1(),
+    id: generateId(),
     dateBegin: new Date(),
     companyId,
     appSystemId,
@@ -424,7 +423,7 @@ export const makeMessageSync = (message: IDBMessage): IMessage => {
 
 export const makeDBNewMessageSync = (message: NewMessage, producerId: string): IDBMessage => {
   return {
-    id: uidv1(),
+    id: generateId(),
     head: {
       appSystemId: message.head.appSystem.id,
       companyId: message.head.company.id,

@@ -1,4 +1,4 @@
-import { INamedEntity } from '@lib/types';
+import { customAlphabet } from 'nanoid';
 
 const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   let matched = 0;
@@ -33,4 +33,8 @@ const getListPart = (list: any[], params: Record<string, string | number>) => {
   return list.slice(fromRecord, toRecord);
 };
 
-export { extraPredicate, getListPart };
+const generateId = () => {
+  return customAlphabet('1234567890abcdef', 10)();
+};
+
+export { extraPredicate, getListPart, generateId };

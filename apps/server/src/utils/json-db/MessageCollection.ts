@@ -6,11 +6,12 @@ import { constants } from 'fs';
 import path from 'path';
 
 import { assoc } from 'ramda';
-import { v1 as uuid } from 'uuid';
 
 import { IFileMessageInfo, IAppSystemParams } from '@lib/types';
 
 import { DataNotFoundException } from '../../exceptions/datanotfound.exception';
+
+import { generateId } from '../helpers';
 
 import { CollectionItem } from './CollectionItem';
 
@@ -45,7 +46,7 @@ class CollectionMessage<T extends CollectionItem> {
   private collectionPath: string;
 
   private static _initObject<K extends CollectionItem>(obj: K): K {
-    return assoc('id', uuid(), obj) as K;
+    return assoc('id', generateId(), obj) as K;
   }
 
   constructor(pathDb: string) {

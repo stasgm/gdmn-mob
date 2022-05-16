@@ -1,7 +1,7 @@
 import { IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
-import { v1 as uuidv1 } from 'uuid';
 
 import { DataNotFoundException } from '../exceptions';
+import { generateId } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
@@ -116,7 +116,7 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
 
 export const makeDBNewMessage = async (message: NewMessage, producerId: string): Promise<IDBMessage> => {
   return {
-    id: uuidv1(),
+    id: generateId(),
     head: {
       appSystemId: message.head.appSystem.id,
       companyId: message.head.company.id,

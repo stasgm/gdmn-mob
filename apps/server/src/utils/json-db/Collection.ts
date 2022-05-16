@@ -4,7 +4,7 @@ import { constants } from 'fs';
 
 import { INamedEntity } from '@lib/types';
 
-import { v1 as uuid } from 'uuid';
+import { generateId } from '../helpers';
 
 import { CollectionItem } from './CollectionItem';
 
@@ -26,7 +26,7 @@ export class Collection<T extends CollectionItem> {
     if (obj.id) {
       return obj;
     } else {
-      return { ...obj, id: uuid() };
+      return { ...obj, id: generateId() };
     }
   }
 

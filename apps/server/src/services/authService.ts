@@ -1,6 +1,5 @@
 import { Next, Context } from 'koa';
 import koaPassport from 'koa-passport';
-import { v1 as uuidv1 } from 'uuid';
 import { VerifyFunction } from 'passport-local';
 import { compare } from 'bcrypt';
 
@@ -9,6 +8,8 @@ import { IUser, NewUser, IUserCredentials, DeviceState, IDBUser } from '@lib/typ
 import { DataNotFoundException, UnauthorizedException } from '../exceptions';
 
 import config from '../../config';
+
+import { generateId } from '../utils/helpers';
 
 import * as userService from './userService';
 import { getDb } from './dao/db';
@@ -142,16 +143,14 @@ const verifyCode = (code: string): string | undefined => {
     throw new UnauthorizedException('Срок действия кода истёк');
   }
 
-  // обновляем uid у устройства
-  const uid = uuidv1();
   const device = devices.findById(codeObj.deviceId);
 
   if (!device) {
     throw new DataNotFoundException('По данному коду устройство не найдено');
   }
 
-  //Устанавливаем состояние данного устройства в 'ACTIVE'
-  devices.update({ ...device, uid: uid, state: 'ACTIVE' });
+  //Устанавливаем состояние данного устройства в 'ACTIVE' и обновляем uid у устройства
+  devices.update({ ...device, uid: generateId(), state: 'ACTIVE' });
 
   //Устанавливаем состояние привязанных устройств данного устройства в 'ACTIVE'
   deviceBindings.data

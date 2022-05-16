@@ -1,7 +1,5 @@
 import path from 'path';
 
-import { v1 as uuid } from 'uuid';
-
 import {
   IDBUser,
   IDBMessage,
@@ -16,6 +14,8 @@ import {
 import { Collection, Database, CollectionMessage } from '../../utils/json-db';
 
 import { messageFolders } from '../../utils/constants';
+
+import { generateId } from '../../utils/helpers';
 
 import { mkDir } from './utils';
 
@@ -49,7 +49,7 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
 
   // const dbArr = collections.sessionId.data;
   if (collections.sessionId.data.length === 0) {
-    collections.sessionId.insert({ id: uuid() });
+    collections.sessionId.insert({ id: generateId() });
   }
 
   await Promise.all(Object.values(collections).map((c) => c.readDataFromDisk()));
