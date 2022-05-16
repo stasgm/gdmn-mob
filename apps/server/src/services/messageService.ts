@@ -1,6 +1,6 @@
 import { IDBMessage, IFileMessageInfo, IMessage, NewMessage } from '@lib/types';
 
-import { DataNotFoundException } from '../exceptions';
+import { DataNotFoundException, InnerErrorException } from '../exceptions';
 import { generateId } from '../utils/helpers';
 
 import { getDb } from './dao/db';
@@ -77,11 +77,13 @@ const FindMany = async ({
   if (!users.findById(consumerId)) {
     throw new DataNotFoundException('Получатель не найден');
   }
-
-  const messageList = await messages.read({ companyId, appSystemName }, (item) => item.consumerId === consumerId);
-  const pr = messageList.map(async (i) => await makeMessage(i));
-
-  return Promise.all(pr);
+  try {
+    const messageList = await messages.readByConsumerId({ companyId, appSystemName }, consumerId);
+    const pr = messageList.map(async (i) => await makeMessage(i));
+    return Promise.all(pr);
+  } catch (err) {
+    throw new InnerErrorException(`Поиск сообщений завершился с ошибкой ${err}`);
+  }
 };
 
 const deleteOne = async ({
@@ -92,10 +94,21 @@ const deleteOne = async ({
   messageId: string;
   companyId: string;
   appSystemName: string;
-}): Promise<void> => await getDb().messages.delete({ companyId, appSystemName }, messageId);
+}): Promise<void> => {
+  try {
+    await getDb().messages.deleteById({ companyId, appSystemName }, messageId);
+  } catch (err) {
+    throw new DataNotFoundException('Сообщение не найдено');
+  }
+};
 
-const clear = async ({ companyId, appSystemName }: { companyId: string; appSystemName: string }): Promise<void[]> =>
-  await getDb().messages.deleteAll({ companyId, appSystemName });
+const clear = async ({ companyId, appSystemName }: { companyId: string; appSystemName: string }): Promise<void> => {
+  try {
+    await getDb().messages.deleteAll({ companyId, appSystemName });
+  } catch (err) {
+    throw new InnerErrorException(`Удаление всех сообщений завершилось с ошибкой ${err}`);
+  }
+};
 
 export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
   const { users, companies, appSystems } = getDb();
