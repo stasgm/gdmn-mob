@@ -10,6 +10,8 @@ import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
 
 import { generateId } from '@lib/mobile-app';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
@@ -19,7 +21,7 @@ import { unknownGood } from '../../utils/constants';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';

@@ -12,6 +12,8 @@ import { IDepartment } from '@lib/types';
 
 import { formatValue, generateId } from '@lib/mobile-app';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { getRemGoodListByContact } from '../../utils/helpers';
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IInventoryDocument } from '../../store/types';
@@ -26,7 +28,7 @@ const keyExtractor = (item: IRemGood) => String(item.good.id);
 
 const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'ScanBarcode'>>();
   const { docId } = useRoute<RouteProp<InventoryStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.good.barcode;
 
@@ -68,7 +70,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'ScanBarcode'>>();
   const { colors } = useTheme();
   const [filterVisible, setFilterVisible] = useState(false);
 

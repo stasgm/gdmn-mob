@@ -26,6 +26,7 @@ const users: (IUser & { password?: string; verifyPassword?: string })[] = [
     creationDate: '2021-11-24T14:02:55.886Z',
     editionDate: '2021-11-24T14:02:55.886Z',
     password: '@123!',
+    erpUser: { id: '12', name: 'Хозянин О.И.' },
   },
   {
     id: '123',

@@ -16,12 +16,14 @@ import {
 
 import { extraPredicate } from '@lib/mobile-app';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { useDispatch } from '../store';
 import { IFormParam } from '../store/types';
-import { RefParamList } from '../navigation/Root/types';
+import { InventoryStackParamList, RefParamList } from '../navigation/Root/types';
 
 export const SelectRefItemScreen = () => {
-  const navigation = useNavigation() as any;
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectRefItem'>>();
   const dispatch = useDispatch();
   const { refName, isMulti, fieldName, value, clause, refFieldName } =
     useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
