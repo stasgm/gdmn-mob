@@ -2,7 +2,7 @@
   "name": "@lib/mobile-types",
   "version": "1.0.0",
   "license": "MIT",
-  "main": "./index.ts",
+  "main": "index.ts",
   "scripts": {
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
@@ -23,6 +23,6 @@
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "lint-staged": "^11.0.0"
+    "lint-staged": "^12.4.0"
   }
 }

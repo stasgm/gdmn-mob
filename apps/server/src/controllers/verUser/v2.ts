@@ -3,7 +3,7 @@ import { IUser } from '@lib/types';
 import { userService } from '../../services';
 
 const myFunction = async (params: Record<string, string | number>): Promise<IUser[]> => {
-  const res: IUser[] = await userService.findAll(params);
+  const res: IUser[] = userService.findMany(params);
 
   res.splice(1, res.length);
   res[0].name = 'Data for version 2.0';
@@ -12,7 +12,7 @@ const myFunction = async (params: Record<string, string | number>): Promise<IUse
 };
 
 const myFunction_3 = async (id: string): Promise<IUser | undefined> => {
-  const user = await userService.findOne(id);
+  const user = userService.findOne(id);
 
   return user;
 };

@@ -13,11 +13,11 @@ import DeviceBinding from './requests/deviceBinding';
 import ActivationCode from './requests/activationCode';
 import Message from './requests/message';
 import User from './requests/user';
-import CTransfer from './requests/transfer';
+import AppSystem from './requests/appSystem';
+import Process from './requests/process';
 
 class Api extends BaseApi {
   protected _config: IApiConfig = {} as IApiConfig;
-  // protected _deviceId: string | undefined;
   protected _axios: AxiosInstance = {} as AxiosInstance;
   // Классы запросов
   public auth: Auth;
@@ -27,7 +27,8 @@ class Api extends BaseApi {
   public activationCode: ActivationCode;
   public message: Message;
   public user: User;
-  public transfer: CTransfer;
+  public appSystem: AppSystem;
+  public process: Process;
 
   constructor(config: IApiConfig) {
     super();
@@ -39,7 +40,8 @@ class Api extends BaseApi {
     this.activationCode = new ActivationCode(this);
     this.message = new Message(this);
     this.user = new User(this);
-    this.transfer = new CTransfer(this);
+    this.appSystem = new AppSystem(this);
+    this.process = new Process(this);
     this.setAxios(config);
   }
 

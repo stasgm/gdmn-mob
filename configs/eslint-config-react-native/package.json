@@ -5,7 +5,16 @@
   "license": "MIT",
   "main": "index.js",
   "dependencies": {
-    "@react-native-community/eslint-config": "^3.0.0",
-    "eslint-plugin-react-native": "^3.11.0"
+    "eslint": "^7.0.0",
+    "prettier": "^2.6.2",
+    "@react-native-community/eslint-config": "^3.0.1",
+    "eslint-plugin-react-native": "^4.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-flowtype": "^7.0.0",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/plugin-syntax-flow": "^7.16.7",
+    "@babel/plugin-transform-react-jsx": "^7.17.3",
+    "eslint-plugin-react": "^7.29.4"
   }
 }

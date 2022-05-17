@@ -17,6 +17,7 @@ interface ActionSheetOptions {
 
 const useActionSheet = () => {
   const { showActionSheetWithOptions } = useExpoActionSheet();
+
   return useCallback(
     (items: ActionSheetItem[], options: Partial<ActionSheetOptions> = {}) => {
       showActionSheetWithOptions(
@@ -27,7 +28,7 @@ const useActionSheet = () => {
           destructiveButtonIndex: items.findIndex((i) => i.type === 'destructive'),
         },
         (i) => {
-          items[i]?.onPress?.();
+          items[i as number]?.onPress?.();
         },
       );
     },

@@ -51,7 +51,6 @@ const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => voi
 
 const ListScreen = () => {
   const navigation = useNavigation();
-  // const { colors } = useTheme();
   const dispatch = useDispatch();
 
   const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);

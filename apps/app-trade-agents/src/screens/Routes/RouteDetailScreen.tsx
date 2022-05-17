@@ -4,13 +4,12 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
-import { v4 as uuid } from 'uuid';
 
 import { useTheme } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -80,10 +79,10 @@ const RouteDetailScreen = () => {
 
     try {
       coords = await getCurrentPosition();
+      console.log('coords', coords);
 
       const date = new Date().toISOString();
-
-      const visitId = uuid();
+      const visitId = generateId();
 
       const newVisit: IVisitDocument = {
         id: visitId,

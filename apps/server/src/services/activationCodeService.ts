@@ -1,4 +1,4 @@
-import { IActivationCode, IDBActivationCode, IDBDeviceBinding } from '@lib/types';
+import { IActivationCode, IDBActivationCode } from '@lib/types';
 
 import { DataNotFoundException } from '../exceptions';
 
@@ -6,10 +6,50 @@ import { extraPredicate } from '../utils/helpers';
 
 import { getDb } from './dao/db';
 
-const findAll = async (params?: Record<string, string>): Promise<IActivationCode[]> => {
-  const { codes } = getDb();
+/**
+ * Создает новый код для устройства
+ * @param deviceId ИД устройства
+ * @returns Созданный объект кода
+ */
+const genActivationCode = (deviceId: string): IActivationCode => {
+  const { devices, codes, deviceBindings } = getDb();
 
-  const activationCodesList = await codes.read((item) => {
+  const device = devices.findById(deviceId);
+
+  if (!device) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }
+
+  //Удаляем все коды по устройству
+  codes.data.filter((code) => code.deviceId === deviceId)?.forEach((code) => codes.deleteById(code.id));
+
+  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+  const newCode = codes.insert({
+    id: '',
+    code,
+    date: new Date().toISOString(),
+    deviceId,
+  });
+
+  //Устанавливаем состояние данного устройства в 'NON-ACTIVATED'
+  devices.update({ ...device, state: 'NON-ACTIVATED' });
+
+  //Устанавливаем состояние привязанных устройств данного устройства в 'NON-ACTIVATED'
+  deviceBindings.data
+    .filter((binding) => binding.deviceId === deviceId)
+    ?.forEach((binding) => deviceBindings.update({ ...binding, state: 'NON-ACTIVATED' }));
+
+  return makeCode(newCode);
+};
+
+/**
+ * Возвращает множество кодов по указанным параметрам
+ * @param params Параметры поиска
+ * @returns Массив найденных объектов кодов
+ */
+const findMany = (params?: Record<string, string>): IActivationCode[] => {
+  const activationCodesList = getDb().codes.data.filter((item) => {
     const newParams = { ...params };
 
     let deviceFound = true;
@@ -22,66 +62,20 @@ const findAll = async (params?: Record<string, string>): Promise<IActivationCode
     return deviceFound && extraPredicate(item, newParams);
   });
 
-  const pr = activationCodesList.map(async (i) => await makeCode(i));
-
-  return Promise.all(pr);
+  return activationCodesList.map((i) => makeCode(i));
 };
 
-const genActivationCode = async (deviceId: string) => {
-  const { devices, codes, deviceBindings } = getDb();
+/**
+ * Возвращает объект кода с преобразованными полями-ссылками в INamedEntity
+ * @param codeDBObj Объект кода типа IDBActivationCode
+ * @returns Объект кода типа IActivationCode
+ */
+/* TODO В звависимости от прав возвращать разный набор полей */
+export const makeCode = (codeDBObj: IDBActivationCode): IActivationCode => ({
+  code: codeDBObj.code,
+  date: codeDBObj.date,
+  device: getDb().devices.getNamedItem(codeDBObj.deviceId),
+  id: codeDBObj.id,
+});
 
-  const device = await devices.find(deviceId);
-
-  const deviceBinding = await deviceBindings.read((deviceBinding) => deviceBinding.deviceId === deviceId);
-
-  if (!device) {
-    throw new DataNotFoundException('Устройство не найдено');
-  }
-
-  await codes.delete((activationCode) => activationCode.deviceId === deviceId);
-
-  // const code = Math.random()
-  //   .toString(36)
-  //   .substr(3, 6);
-  const code = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-  const newCodeObj = {
-    code,
-    date: new Date().toISOString(),
-    deviceId,
-  } as IDBActivationCode;
-
-  const newCode = await codes.insert(newCodeObj);
-
-  const createdCode = await codes.find(newCode);
-
-  await devices.update({ ...device, state: 'NON-ACTIVATED' });
-
-  const updateDeviceBindings = async (deviceBindingList: IDBDeviceBinding[]) => {
-    for (const item of deviceBindingList) {
-      await deviceBindings.update({ ...item, state: 'NON-ACTIVATED' });
-    }
-  };
-  updateDeviceBindings(deviceBinding);
-
-  const retCode = await makeCode(createdCode);
-
-  return retCode;
-};
-
-export const makeCode = async (activationCode: IDBActivationCode): Promise<IActivationCode> => {
-  const db = getDb();
-  const { devices } = db;
-
-  const device = await devices.find(activationCode.deviceId);
-
-  /* TODO В звависимости от прав возвращать разный набор полей */
-  return {
-    code: activationCode.code,
-    date: activationCode.date,
-    device,
-    id: activationCode.id,
-  };
-};
-
-export { findAll, genActivationCode };
+export { findMany, genActivationCode };

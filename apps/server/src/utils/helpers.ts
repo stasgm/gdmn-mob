@@ -1,3 +1,5 @@
+import { customAlphabet } from 'nanoid';
+
 const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   let matched = 0;
 
@@ -15,10 +17,24 @@ const extraPredicate = <T>(item: T, params: Record<string, string>) => {
   return matched === paramsEntries.length;
 };
 
-const asyncFilter = async (arr: any[], predicate: any) => {
-  const results = await Promise.all(arr.map(predicate));
+const getListPart = (list: any[], params: Record<string, string | number>) => {
+  /* pagination */
+  const limitParams = Object.assign({}, params);
 
-  return arr.filter((_v, index) => results[index]);
+  let fromRecord = 0;
+  if ('fromRecord' in limitParams && typeof limitParams.fromRecord === 'number') {
+    fromRecord = limitParams.fromRecord;
+  }
+
+  let toRecord = list.length;
+  if ('toRecord' in limitParams && typeof limitParams.toRecord === 'number')
+    toRecord = limitParams.toRecord > 0 ? limitParams.toRecord : toRecord;
+
+  return list.slice(fromRecord, toRecord);
 };
 
-export { extraPredicate, asyncFilter };
+const generateId = () => {
+  return customAlphabet('1234567890abcdef', 10)();
+};
+
+export { extraPredicate, getListPart, generateId };

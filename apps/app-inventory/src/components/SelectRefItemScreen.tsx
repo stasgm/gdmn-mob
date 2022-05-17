@@ -16,12 +16,14 @@ import {
 
 import { extraPredicate } from '@lib/mobile-app';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { useDispatch } from '../store';
 import { IFormParam } from '../store/types';
-import { RefParamList } from '../navigation/Root/types';
+import { InventoryStackParamList, RefParamList } from '../navigation/Root/types';
 
 export const SelectRefItemScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectRefItem'>>();
   const dispatch = useDispatch();
   const { refName, isMulti, fieldName, value, clause, refFieldName } =
     useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
@@ -77,7 +79,7 @@ export const SelectRefItemScreen = () => {
   useScrollToTop(refList);
 
   const handleSelectItem = useCallback(
-    (item: INamedEntity) => {
+    (item) => {
       const returnItem = item.description
         ? { id: item.id, name: item.name, description: item.description }
         : { id: item.id, name: item.name };
@@ -164,9 +166,8 @@ const LineItem = React.memo(
     item,
     isChecked,
     onCheck,
-    refFieldName,
   }: {
-    item: INamedEntity;
+    item: INamedEntity & { description?: string };
     isChecked: boolean;
     onCheck: (id: INamedEntity) => void;
     refFieldName?: string;
@@ -181,7 +182,6 @@ const LineItem = React.memo(
             <View style={styles.rowCenter}>
               <Text style={[styles.name, { color: colors.text }]}>
                 {item.description ? item.description : item.name || item.id}
-                {/* {item.name || item.id} */}
               </Text>
             </View>
           </View>

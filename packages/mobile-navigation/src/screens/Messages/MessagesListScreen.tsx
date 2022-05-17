@@ -10,7 +10,7 @@ import { useSelector, messageActions, useDispatch } from '@lib/store';
 import { useActionSheet, MenuButton, DrawerButton, globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 
 const MessageItem = ({ item }: { item: IMessage }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
 
   return (
     <TouchableOpacity

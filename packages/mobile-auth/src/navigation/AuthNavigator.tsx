@@ -8,6 +8,8 @@ import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 import api from '@lib/client-api';
 
+import { NavigationContainer } from '@react-navigation/native';
+
 import {
   SplashScreen,
   SignInScreen,
@@ -61,9 +63,10 @@ const AuthNavigator: React.FC = () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
     const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+
     //Получим устройство по uid
     if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
-      authDispatch(authActions.getDeviceByUid(config.deviceId));
+      await authDispatch(authActions.getDeviceByUid(config.deviceId));
     }
   }, [authDispatch, config.deviceId, user]);
 
@@ -166,43 +169,49 @@ const AuthNavigator: React.FC = () => {
 
   return (
     <SafeAreaProvider>
-      <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-        {isInit ? (
-          <AuthStack.Screen name="Mode" component={ModeSelection} />
-        ) : connectionStatus === 'connected' ? (
-          !user ? (
-            <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
-          ) : (
-            <AuthStack.Screen
-              name="LoginCompany"
-              component={AppLoadWithParams}
-              options={{ animationTypeForReplace: 'push' }}
-            />
-          )
-        ) : connectionStatus === 'not-connected' ? (
-          config.deviceId ? (
-            <>
+      <NavigationContainer>
+        <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+          {isInit ? (
+            <AuthStack.Screen name="Mode" component={ModeSelection} />
+          ) : connectionStatus === 'connected' ? (
+            !user ? (
               <AuthStack.Screen
-                name="Splash"
-                component={SplashWithParams}
+                name="Login"
+                component={SignInWithParams}
                 options={{ animationTypeForReplace: 'pop' }}
               />
-              <AuthStack.Screen name="Config" component={CongfigWithParams} />
-            </>
-          ) : (
-            <>
-              <AuthStack.Screen name="Config" component={CongfigWithParams} />
+            ) : (
               <AuthStack.Screen
-                name="Splash"
-                component={SplashWithParams}
-                options={{ animationTypeForReplace: 'pop' }}
+                name="LoginCompany"
+                component={AppLoadWithParams}
+                options={{ animationTypeForReplace: 'push' }}
               />
-            </>
-          )
-        ) : (
-          <AuthStack.Screen name="Activation" component={ActivateWithParams} />
-        )}
-      </AuthStack.Navigator>
+            )
+          ) : connectionStatus === 'not-connected' ? (
+            config.deviceId ? (
+              <>
+                <AuthStack.Screen
+                  name="Splash"
+                  component={SplashWithParams}
+                  options={{ animationTypeForReplace: 'pop' }}
+                />
+                <AuthStack.Screen name="Config" component={CongfigWithParams} />
+              </>
+            ) : (
+              <>
+                <AuthStack.Screen name="Config" component={CongfigWithParams} />
+                <AuthStack.Screen
+                  name="Splash"
+                  component={SplashWithParams}
+                  options={{ animationTypeForReplace: 'pop' }}
+                />
+              </>
+            )
+          ) : (
+            <AuthStack.Screen name="Activation" component={ActivateWithParams} />
+          )}
+        </AuthStack.Navigator>
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 };

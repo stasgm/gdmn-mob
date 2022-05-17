@@ -7,8 +7,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { IInventoryLine } from '../store/types';
 import { IGood } from '../store/app/types';
+import { InventoryStackParamList } from '../navigation/Root/types';
 
 interface IProps {
   docId: string;
@@ -18,7 +21,7 @@ interface IProps {
 
 export const InventoryItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'InventoryView'>>();
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 

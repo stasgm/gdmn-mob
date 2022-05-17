@@ -1,6 +1,6 @@
-import { ICompany, IDBCompany, INamedEntity, NewCompany, IDBDevice } from '@lib/types';
+import { ICompany, IDBCompany, NewCompany as NewCompanyData, IAppSystem } from '@lib/types';
 
-import { extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
 
@@ -12,188 +12,163 @@ import { companies as mockCompanies } from './data/companies';
 
 /**
  * Добавление новой организации
- * @param {string} title - наименование организации
- * @return id, идентификатор организации
+ * @param companyData - объект компании
+ * @return объект компании
  * */
-const addOne = async (company: NewCompany): Promise<ICompany> => {
+const addOne = (companyData: NewCompanyData): ICompany => {
   /*
     1. Проверяем что организация существует
     2. Добавляем организацию
     3. К текущему пользователю записываем созданную организацию
     4. К администратору добавляем созданную организацию
   */
-  const { companies } = getDb();
+  const { companies, createFoldersForCompany } = getDb();
 
-  if (await companies.find((el) => el.name === company.name)) {
-    throw new ConflictException('Компания уже существует');
+  if (companies.data.find((el) => el.name === companyData.name)) {
+    throw new ConflictException(`Компания с названием ${companyData.name} уже существует`);
   }
 
-  const newCompanyObj = {
-    name: company.name,
-    city: company.city,
-    adminId: company.admin.id,
-    externalId: company.externalId,
+  // Проверяем есть ли в базе подсистемы
+  const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
+
+  const company = companies.insert({
+    id: '',
+    name: companyData.name,
+    city: companyData.city,
+    appSystemIds,
+    adminId: companyData.admin.id,
+    externalId: companyData.externalId,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
-  } as IDBCompany;
+  });
 
-  const newCompany = await companies.insert(newCompanyObj);
+  createFoldersForCompany(company);
 
-  const createdCompany = await companies.find(newCompany);
+  updateUserCompany(company.adminId, { id: company.adminId, company });
 
-  // Добавляем к текущему
-  //await addCompanyToUser(createdCompany.adminId, createdCompany.id);
-  await updateUserCompany(createdCompany.adminId, { id: createdCompany.adminId, company: createdCompany });
-
-  const retCompany = await makeCompany(createdCompany);
-
-  return retCompany;
+  return makeCompany(company);
 };
 
 /**
  * Обновляет одну организацию
- * @param {IDBCompany} company - организациия
- * @return id, идентификатор организации
- * */
-const updateOne = async (id: string, companyData: Partial<ICompany>): Promise<ICompany> => {
-  const db = getDb();
-  const { companies, users } = db;
-
-  const companyObj = await companies.find(id);
-
-  if (!companyObj) {
-    throw new DataNotFoundException('Компания не найдена');
-  }
-
-  // Проверяем есть ли в базе переданный админ
-  let adminId = companyObj.adminId;
-  if (companyData?.admin) {
-    adminId = (await users.find(companyData.admin.id))?.id;
-  }
-
-  const newCompany: IDBCompany = {
-    id,
-    name: companyData.name || companyObj.name,
-    adminId,
-    externalId: companyData.externalId || companyObj.externalId,
-    city: companyData.city,
-    creationDate: companyObj.creationDate,
-    editionDate: new Date().toISOString(),
-  };
-
-  await companies.update(newCompany);
-
-  const updatedCompany = await companies.find(id);
-
-  return await makeCompany(updatedCompany);
-};
-
-/**
- * Удаляет одну организацию
- * @param {string} id - идентификатор организации
- * */
-const deleteOne = async (id: string): Promise<string> => {
-  /*
-    1. Проверяем что организация существует
-    2. Удаляем у пользователей организацию //TODO
-    3. Удаляем организацию
-  */
-
-  const { companies, users, devices, codes, deviceBindings } = getDb();
-
-  const companyObj = await companies.find(id);
-
-  if (!companyObj) {
-    throw new DataNotFoundException('Компания не найдена');
-  }
-
-  const devicesByCompany = await devices.read((item) => item.companyId === id);
-
-  const delDevices = async (deviceList: IDBDevice[]) => {
-    for (const item of deviceList) {
-      // eslint-disable-next-line no-await-in-loop
-      await deviceBindings.delete((b) => b.deviceId === item.id);
-      // eslint-disable-next-line no-await-in-loop
-      await codes.delete((c) => c.deviceId === item.id);
-      // eslint-disable-next-line no-await-in-loop
-      await devices.delete((i) => i.id === item.id);
-    }
-  };
-
-  // const delDevices2 = async (deviceList: IDBDevice[]) => {
-  //   const promises = deviceList.map(async (item) => {
-  //     await deviceBindings.delete((b) => b.deviceId === item.id);
-  //     await codes.delete((c) => c.deviceId === item.id);
-  //     await devices.delete((i) => i.id === item.id);
-  //   });
-  //   await Promise.all(promises);
-  // };
-
-  delDevices(devicesByCompany);
-
-  await users.delete((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin');
-  const company = await companies.find((adminCompany) => adminCompany.id === id);
-  await updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
-
-  await companies.delete(id);
-
-  return 'Компания удалена';
-};
-
-/**
- * Возвращает одну организацию
- * @param {string} id - идентификатор организации
- * @return company, организация
- * */
-const findOne = async (id: string): Promise<ICompany> => {
-  const db = getDb();
-  const { companies } = db;
-
-  const company = await companies.find(id);
+ * @param id ИД компании
+ * @param companyData Новые данные компании
+ * @returns Обновленный объект компании
+ */
+const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
+  const { companies, users } = getDb();
+  const company = companies.findById(id);
 
   if (!company) {
     throw new DataNotFoundException('Компания не найдена');
   }
 
-  return await makeCompany(company);
+  if (companies.data.find((el) => el.name === companyData.name && el.id !== companyData.id)) {
+    throw new ConflictException(`Компания с названием ${companyData.name} уже существует`);
+  }
+
+  // Проверяем есть ли в базе переданный админ
+  let adminId = company.adminId;
+  if (companyData.admin) {
+    const admin = users.findById(companyData.admin.id);
+    if (!admin) {
+      throw new DataNotFoundException('Администратор не найден');
+    }
+    adminId = admin.id;
+  }
+
+  // Проверяем есть ли в базе подсистемы
+  const appSystemIds = companyData.appSystems ? getAppSystemIds(companyData.appSystems) : undefined;
+
+  companies.update({
+    id,
+    name: companyData.name || company.name,
+    adminId,
+    externalId: companyData.externalId || company.externalId,
+    city: companyData.city,
+    appSystemIds: appSystemIds || company.appSystemIds,
+    creationDate: company.creationDate,
+    editionDate: new Date().toISOString(),
+  });
+
+  const updatedCompany = companies.findById(id);
+
+  if (!updatedCompany) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
+
+  return makeCompany(updatedCompany);
 };
 
-// /**
-//  * Возвращает одну организацию
-//  * @param {string} name - наименование организации
-//  * @return company, организация
-//  * */
-// const findOneByName = async (name: string): Promise<ICompany> => {
-//   const db = getDb();
-//   const { companies } = db;
+/**
+ * Удаляет одну организацию
+ * @param id ИД организации
+ * */
+const deleteOne = (id: string) => {
+  /*
+    1. Проверяем что организация существует
+    2. Удаляем у пользователей организацию //TODO
+    3. Удаляем организацию
+  */
+  const { companies, users, devices, codes, deviceBindings } = getDb();
 
-//   const company = await companies.find((i) => i.name === name);
+  const company = companies.findById(id);
 
-//   if (!company) {
-//     throw new DataNotFoundException('Компания не найдена');
-//   }
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
 
-//   return await makeCompany(company);
-// };
+  //Удаляем все устройства, привязанные устройства и коды данной компании
+  devices.data
+    .filter((device) => device.companyId === id)
+    ?.forEach((device) => {
+      deviceBindings.data
+        .filter((binding) => binding.deviceId === device.id)
+        ?.forEach((binding) => deviceBindings.deleteById(binding.id));
+      codes.data.filter((code) => code.deviceId === device.id)?.forEach((code) => codes.deleteById(code.id));
+      devices.deleteById(device.id);
+    });
+
+  //Удаляем всех пользователей данной компании кроме Админа и Суперадмина
+  users.data
+    .filter((user) => user.company === id && user.role !== 'Admin' && user.role !== 'SuperAdmin')
+    ?.forEach((user) => users.deleteById(user.id));
+
+  //Очищаем компанию у админа
+  updateUserCompany(company.adminId, { id: company.adminId, company: undefined });
+  companies.deleteById(id);
+};
+
+/**
+ * Возвращает одну организацию
+ * @param {string} id - ИД организации
+ * @return {ICompany} Объект организации
+ * */
+const findOne = (id: string): ICompany => {
+  const company = getDb().companies.findById(id);
+
+  if (!company) {
+    throw new DataNotFoundException('Компания не найдена');
+  }
+
+  return makeCompany(company);
+};
 
 /**
  * Возвращает множество компаний по указанным параметрам
- * @param {string} param - параметры
- * @return company[], компании
+ * @param {Record<string, string | number>} params - параметры
+ * @return {ICompany[]}, Массив компаний
  * */
-const findAll = async (params: Record<string, string | number>): Promise<ICompany[]> => {
-  const { companies } = getDb();
-
+const findMany = (params: Record<string, string | number>): ICompany[] => {
   let companyList;
   if (process.env.MOCK) {
     companyList = mockCompanies;
   } else {
-    companyList = await companies.read();
+    companyList = getDb().companies.data;
   }
 
   companyList = companyList.filter((item) => {
     const newParams = (({ fromRecord, toRecord, ...others }) => others)(params);
-    //const newParams = Object.assign({}, params);
 
     let companyIdFound = true;
 
@@ -201,15 +176,6 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
       companyIdFound = item.id === newParams.companyId;
       delete newParams['companyId'];
     }
-
-    /*
-    let adminFound = true;
-
-    if ('adminId' in newParams) {
-       adminFound = item.adminId?.includes(newParams.adminId);
-       delete newParams['adminId'];
-    }
-    */
 
     /** filtering data */
     let filteredCompanies = true;
@@ -230,35 +196,33 @@ const findAll = async (params: Record<string, string | number>): Promise<ICompan
     return companyIdFound && filteredCompanies && extraPredicate(item, newParams as Record<string, string>);
   });
 
-  const pr = companyList?.map(async (i) => await makeCompany(i));
-
-  return await Promise.all(pr);
+  return getListPart(companyList, params)?.map((company) => makeCompany(company));
 };
 
-/**
- * Возвращает пользователей организации
- * @param {string} id - идентификатор организации
- * @return users, пользователи
- * */
-
-export const makeCompany = async (company: IDBCompany): Promise<ICompany> => {
-  const db = getDb();
-  const { users } = db;
-
-  const admin = await users.find(company.adminId);
-
-  const adminEntity: INamedEntity = admin && { id: admin.id, name: admin.name };
+export const makeCompany = (company: IDBCompany): ICompany => {
+  const { users, appSystems } = getDb();
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
     id: company.id,
     name: company.name,
     city: company.city,
-    admin: adminEntity,
+    appSystems: company.appSystemIds?.map((s) => appSystems.getNamedItem(s)),
+    admin: users.getNamedItem(company.adminId),
     externalId: company.externalId,
     creationDate: company.creationDate,
     editionDate: company.editionDate,
   };
 };
 
-export { findOne, findAll, addOne, updateOne, deleteOne };
+const getAppSystemIds = (namedAppSystems: IAppSystem[]) => {
+  // Проверяем есть ли в базе подсистемы
+  return namedAppSystems.map(({ id }) => {
+    if (!getDb().appSystems.findById(id)) {
+      throw new DataNotFoundException('Подсистема не найдена');
+    }
+    return id;
+  });
+};
+
+export { findOne, findMany, addOne, updateOne, deleteOne };

@@ -1,11 +1,11 @@
-import Router from 'koa-joi-router';
+import router from 'koa-joi-router';
 
 import { testServerConnection } from '../controllers/test';
 
-const router = Router();
+const test = router();
 
-router.prefix('/test');
+test.prefix('/test');
 
-router.get('/', testServerConnection);
+test.get('/', testServerConnection);
 
-export default router;
+export default test;

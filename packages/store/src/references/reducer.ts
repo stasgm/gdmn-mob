@@ -90,7 +90,7 @@ const reducer: Reducer<ReferenceState, ReferenceActionType> = (state = initialSt
         const ref = {
           ...newRef,
           data: newRef.data.map((r) => {
-            const oldItem = oldRef.data.find((i) => i.id === r.id);
+            const oldItem = oldRef?.data?.find((i) => i.id === r.id);
             return oldItem ? oldItem : r;
           }),
         };

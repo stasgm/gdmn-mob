@@ -1,10 +1,8 @@
-import { v4 as uuid } from 'uuid';
-
 import { IDeviceBinding, IResponse, NewDeviceBinding } from '@lib/types';
 import { deviceBinding as mockDeviceBinding, deviceBindings as mockDeviceBindings } from '@lib/mock';
 
 import { error, deviceBinding as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -21,7 +19,7 @@ class DeviceBinding extends BaseRequest {
         type: 'ADD_DEVICEBINDING',
         deviceBinding: {
           ...newDeviceBinding,
-          id: uuid(),
+          id: generateId(),
           editionDate: new Date().toISOString(),
           creationDate: new Date().toISOString(),
         },

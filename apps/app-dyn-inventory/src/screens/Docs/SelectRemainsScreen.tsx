@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
@@ -9,7 +8,9 @@ import { docSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { formatValue } from '@lib/mobile-app';
+import { formatValue, generateId } from '@lib/mobile-app';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector as useAppInventorySelector } from '../../store/index';
 import { DocStackParamList } from '../../navigation/Root/types';
@@ -18,7 +19,7 @@ import { IModelRem, IRem } from '../../store/app/types';
 
 const GoodRemains = ({ item }: { item: IRem }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.barcode;
 
@@ -29,7 +30,7 @@ const GoodRemains = ({ item }: { item: IRem }) => {
           mode: 0,
           docId,
           item: {
-            id: uuid(),
+            id: generateId(),
             good: { id: item.id, name: item.name },
             quantity: 0,
             remains: item.remains,
@@ -59,7 +60,7 @@ const GoodRemains = ({ item }: { item: IRem }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
   const { colors } = useTheme();
   const [searchText, setSearchText] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);

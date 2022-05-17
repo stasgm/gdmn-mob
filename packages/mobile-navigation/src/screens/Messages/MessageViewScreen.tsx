@@ -33,7 +33,7 @@ const MessageViewScreen = () => {
 
       case 'REFS':
         //TODO: проверка данных, приведение к типу
-        dispatch(referenceActions.updateList(msg.body.payload as IReferences));
+        dispatch(referenceActions.addReferences(msg.body.payload as IReferences));
         dispatch(messageActions.updateStatusMessage({ id: msg.id, status: 'PROCESSED' }));
         break;
 
@@ -96,7 +96,7 @@ const MessageViewScreen = () => {
           <Text style={[styles.textBold, styles.title]}>Заголовок</Text>
           <Divider />
           <Text style={styles.name}>Система:</Text>
-          <Text style={styles.field}>{msg.head.appSystem}</Text>
+          <Text style={styles.field}>{msg.head.appSystem.name}</Text>
           <Text style={styles.name}>Компания:</Text>
           <Text style={styles.field}>{msg.head.company.name}</Text>
           <Text style={styles.name}>Дата и время:</Text>

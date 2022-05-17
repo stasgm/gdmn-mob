@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import { v4 as uuid } from 'uuid';
 import { Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
@@ -7,6 +6,7 @@ import { documentActions, useDispatch } from '@lib/store';
 import { IDocument } from '@lib/types';
 
 import { SwipeItem } from '@lib/mobile-ui';
+import { generateId } from '@lib/mobile-app';
 
 interface IProps {
   children?: ReactNode;
@@ -19,18 +19,18 @@ interface IProps {
 }
 
 const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const dispatch = useDispatch();
 
   const handleSwipe = (name: 'edit' | 'copy' | 'delete', id: string, isBlocked?: boolean) => {
     if (name === 'edit') {
-      navigation.navigate(routeName as never, { id } as never);
+      navigation.navigate(routeName, { id });
     } else if (name === 'copy') {
       const newDocDate = new Date().toISOString();
 
       const newDoc: IDocument = {
         ...item,
-        id: uuid(),
+        id: generateId(),
         number: 'б\\н',
         status: 'DRAFT',
         documentDate: newDocDate,
@@ -40,7 +40,7 @@ const SwipeListItem = ({ children, item, edit, del, copy, routeName }: IProps) =
 
       dispatch(documentActions.addDocument(newDoc));
 
-      navigation.navigate(routeName as never, { id: newDoc.id } as never);
+      navigation.navigate(routeName, { id: newDoc.id });
     } else if (name === 'delete') {
       if (isBlocked) {
         return Alert.alert('Внимание!', 'Документ не может быть удален', [{ text: 'OK' }]);

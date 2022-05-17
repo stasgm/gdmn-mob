@@ -1,4 +1,4 @@
-import Router from 'koa-joi-router';
+import router from 'koa-joi-router';
 
 import { addCompany, updateCompany, getCompany, getCompanies, removeCompany } from '../controllers/company';
 import { authMiddleware } from '../middleware/authRequired';
@@ -9,11 +9,11 @@ import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 
 import { companyValidation } from '../validations';
 
-const router = Router();
+const companies = router();
 
-router.prefix('/companies');
-router.post('/', companyValidation.addCompany, authMiddleware, permissionMiddleware, addCompany);
-router.get(
+companies.prefix('/companies');
+companies.post('/', companyValidation.addCompany, authMiddleware, permissionMiddleware, addCompany);
+companies.get(
   '/:id',
   companyValidation.getCompany,
   authMiddleware,
@@ -21,8 +21,8 @@ router.get(
   roleBasedParamsMiddlware,
   getCompany,
 );
-router.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, companyMiddleware, getCompanies);
-router.patch('/:id', companyValidation.updateCompany, authMiddleware, permissionMiddleware, updateCompany);
-router.delete('/:id', companyValidation.removeCompany, authMiddleware, permissionMiddleware, removeCompany);
+companies.get('/', authMiddleware, deviceMiddleware, roleBasedParamsMiddlware, companyMiddleware, getCompanies);
+companies.patch('/:id', companyValidation.updateCompany, authMiddleware, permissionMiddleware, updateCompany);
+companies.delete('/:id', companyValidation.removeCompany, authMiddleware, permissionMiddleware, removeCompany);
 
-export default router;
+export default companies;

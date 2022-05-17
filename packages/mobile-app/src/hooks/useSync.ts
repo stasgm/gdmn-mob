@@ -11,9 +11,8 @@ import {
   authActions,
 } from '@lib/store';
 
-import { BodyType, IDocument, IMessage, INamedEntity, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
+import { BodyType, IAppSystem, IDocument, IMessage, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
-import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 
 const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
@@ -30,21 +29,37 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const refLoadType = (settings.refLoadType as ISettingsOption<boolean>).data;
   const isGetReferences = settings.getReferences?.data;
 
-  const systemName = Constants.manifest?.extra?.slug;
-  const consumer: INamedEntity = { id: '-1', name: systemName };
   const refVersion = 1;
   const docVersion = 1;
   const setVersion = 1;
 
   const sync = () => {
-    if (!company || !user) {
+    if (!user || !user.erpUser) {
+      Alert.alert(
+        'Внимание!',
+        `Для ${user?.name} не указан пользователь ERP!\nПожалуйста, обратитесь к администратору.`,
+        [{ text: 'OK' }],
+      );
       return;
     }
+
+    if (!company) {
+      Alert.alert(
+        'Внимание!',
+        `Для пользователя ${user.name} не определена компания!\nПожалуйста, выполните выход из профиля и заново залогиньтесь под вашей учетной записью`,
+        [{ text: 'OK' }],
+      );
+      return;
+    }
+
     dispatch(appActions.setLoading(true));
     dispatch(appActions.setErrorList([]));
 
     const errList: string[] = [];
     const okList: string[] = [];
+
+    const consumer = user.erpUser;
+    console.log('consumer', consumer);
 
     /*
       Поддержка платформы:
@@ -54,8 +69,27 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     const syncData = async () => {
       // Загрузка данных
       try {
-        // Если нет функции из пропсов
-        if (!onSync) {
+        const getErpUser = await api.user.getUser(consumer.id);
+
+        let appSystem: IAppSystem | undefined;
+        if (getErpUser.type === 'ERROR') {
+          errList.push(`Пользователь ERP не определен: ${getErpUser.message}`);
+        }
+
+        if (getErpUser.type === 'GET_USER') {
+          if (!getErpUser.user.appSystem) {
+            errList.push('У пользователя ERP не установлена подсистема!\nПожалуйста, обратитесь к администратору.');
+          } else {
+            appSystem = getErpUser.user.appSystem;
+          }
+        }
+
+        if (!onSync && appSystem) {
+          // Если нет функции из пропсов
+          const params = {
+            appSystemId: appSystem.id,
+            companyId: company.id,
+          };
           const messageCompany = { id: company.id, name: company.name };
           const readyDocs = documents.filter((doc) => doc.status === 'READY');
 
@@ -71,7 +105,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             };
 
             const sendMessageResponse = await api.message.sendMessages(
-              systemName,
+              appSystem,
               messageCompany,
               consumer,
               sendingDocsMessage,
@@ -95,18 +129,16 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           if (onGetMessages) {
             await onGetMessages();
           } else {
+            console.log('params', params);
             //2. Получаем все сообщения для мобильного
-            const getMessagesResponse = await api.message.getMessages({
-              systemName,
-              companyId: company.id,
-            });
+            const getMessagesResponse = await api.message.getMessages(params);
 
             //Если сообщения получены успешно, то
             //  справочники: очищаем старые и записываем в хранилище новые данные
             //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
             if (getMessagesResponse.type === 'GET_MESSAGES') {
               await Promise.all(
-                getMessagesResponse.messageList?.map((message) => processMessage(message, errList, okList)),
+                getMessagesResponse.messageList?.map((message) => processMessage(message, errList, okList, params)),
               );
             } else {
               errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
@@ -143,7 +175,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
             //3. Отправляем запрос на получение справочников
             const sendMesRefResponse = await api.message.sendMessages(
-              systemName,
+              appSystem,
               messageCompany,
               consumer,
               messageGetRef,
@@ -157,7 +189,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           }
 
           //4. Отправляем запрос на получение документов
-          const sendMesDocRespone = await api.message.sendMessages(systemName, messageCompany, consumer, messageGetDoc);
+          const sendMesDocRespone = await api.message.sendMessages(appSystem, messageCompany, consumer, messageGetDoc);
 
           if (sendMesDocRespone.type === 'ERROR') {
             errList.push(`Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`);
@@ -188,7 +220,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //7. Отправляем запрос на получение склада для юзера
           const sendMesDepartResponse = await api.message.sendMessages(
-            systemName,
+            appSystem,
             messageCompany,
             consumer,
             messageGetDepart,
@@ -223,7 +255,12 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     syncData();
   };
 
-  const processMessage = async (msg: IMessage, errList: string[], okList: string[]) => {
+  const processMessage = async (
+    msg: IMessage,
+    errList: string[],
+    okList: string[],
+    params: { appSystemId: string; companyId: string },
+  ) => {
     if (!msg) {
       return;
     }
@@ -249,7 +286,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id);
+            const removeMess = await api.message.removeMessage(msg.id, params);
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
@@ -263,7 +300,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id);
+            const removeMess = await api.message.removeMessage(msg.id, params);
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники добавлены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
@@ -290,7 +327,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id);
+          const removeMess = await api.message.removeMessage(msg.id, params);
           if (removeMess.type === 'ERROR') {
             errList.push(`Документы загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }
@@ -319,7 +356,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id);
+          const removeMess = await api.message.removeMessage(msg.id, params);
           if (removeMess.type === 'ERROR') {
             errList.push(`Настройки пользователя загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }

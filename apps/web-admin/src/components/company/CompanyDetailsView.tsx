@@ -45,6 +45,18 @@ const CompanyDetailsView = ({ company }: IProps) => {
                   {company.admin.name}
                 </Typography>
               </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Подсистемы
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                {company.appSystems?.map((item) => (
+                  <Typography variant="h4" gutterBottom key={item.id}>
+                    {item.name}
+                  </Typography>
+                ))}
+              </Grid>
               {/* <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
                   Дата создания

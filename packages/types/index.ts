@@ -5,3 +5,4 @@ export * from './src/messages';
 export * from './src/models';
 export * from './src/requests';
 export * from './src/settings';
+export * from './src/processes';

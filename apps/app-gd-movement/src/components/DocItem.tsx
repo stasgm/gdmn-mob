@@ -7,8 +7,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import { IMovementLine } from '../store/types';
 import { IGood } from '../store/app/types';
+import { DocStackParamList } from '../navigation/Root/types';
 
 interface IProps {
   docId: string;
@@ -18,7 +21,7 @@ interface IProps {
 
 export const DocItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 

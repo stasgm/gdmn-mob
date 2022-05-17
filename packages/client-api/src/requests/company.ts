@@ -1,10 +1,8 @@
-import { v4 as uuid } from 'uuid';
-
 import { NewCompany, IResponse, ICompany } from '@lib/types';
 import { user as mockUser, companies as mockCompanies } from '@lib/mock';
 
 import { error, company as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 import { BaseRequest } from '../types/BaseRequest';
 
@@ -22,33 +20,35 @@ class Company extends BaseRequest {
         company: {
           ...company,
           admin: mockUser,
-          id: uuid(),
+          id: generateId(),
           editionDate: new Date().toISOString(),
           creationDate: new Date().toISOString(),
         },
       } as types.IAddCompanyResponse;
     }
 
-    const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
-    const resData = res.data;
+    try {
+      const res = await this.api.axios.post<IResponse<ICompany>>('/companies', company);
+      const resData = res.data;
 
-    if (resData?.result) {
+      if (resData?.result) {
+        return {
+          type: 'ADD_COMPANY',
+          company: resData?.data,
+        } as types.IAddCompanyResponse;
+      }
+
       return {
-        type: 'ADD_COMPANY',
-        company: resData?.data,
-      } as types.IAddCompanyResponse;
+        type: 'ERROR',
+        message: resData.error,
+      } as error.INetworkError;
+    } catch (err) {
+      return {
+        type: 'ERROR',
+        message: err instanceof TypeError ? err.message : 'ошибка создания компании',
+        // message: err?.response?.data?.error || 'ошибка создания компании',
+      } as error.INetworkError;
     }
-
-    return {
-      type: 'ERROR',
-      message: resData.error,
-    } as error.INetworkError;
-    // } catch (err) {
-    //   return {
-    //     type: 'ERROR',
-    //     message: err?.response?.data?.error || 'ошибка создания компании',
-    //   } as error.INetworkError;
-    // }
   };
 
   updateCompany = async (company: Partial<ICompany>) => {

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "common mobile app package",
   "license": "MIT",
-  "main": "./index.ts",
+  "main": "index.ts",
   "scripts": {
     "prettier:check": "prettier --check \"**/*.ts*\"",
     "prettier:fix": "prettier --write \"**/*.ts*\"",
@@ -19,32 +19,31 @@
   },
   "prettier": "@config/prettier-config",
   "dependencies": {
-    "@expo/vector-icons": "^12.0.4",
-    "@expo/webpack-config": "^0.12.77",
     "@lib/store": "*",
     "@lib/client-api": "*",
     "@lib/mobile-navigation": "*",
     "@lib/mobile-auth": "*",
     "@lib/mobile-ui": "*",
-    "@react-native-community/masked-view": "0.1.10",
-    "@expo/react-native-action-sheet": "^3.9.0",
-    "@react-navigation/native": "^5.9.4",
-    "@types/node": "^15.12.4",
-    "@types/react": "~17.0.11",
-    "@types/react-native": "0.65.5",
-    "@types/react-redux": "^7.1.16",
-    "expo": "^41.0.1",
+    "@expo/vector-icons": "^12.0.0",
+    "@expo/webpack-config": "^0.16.20",
+    "@react-native-community/masked-view": "0.1.11",
+    "@expo/react-native-action-sheet": "^3.13.0",
+    "@react-navigation/native": "^6.0.10",
+    "@types/node": "^17.0.25",
+    "@types/react": "~17.0.2",
+    "@types/react-native": "~0.64.3",
     "react": "17.0.2",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-41.0.0.tar.gz",
-    "react-native-paper": "4.9.2",
-    "react-native-reanimated": "~2.1.0",
+    "react-native": "~0.64.3",
+    "react-native-paper": "^4.12.0",
+    "react-native-reanimated": "~2.3.1",
     "react-redux": "^7.2.4",
-    "typescript": "^4.3.4"
+    "typescript": "^4.6.3",
+    "react-native-get-random-values": "^1.8.0",
+    "nanoid": "^3.3.4"
   },
   "devDependencies": {
     "@config/eslint-config": "*",
     "@config/prettier-config": "*",
-    "@react-navigation/devtools": "^6.0.4",
-    "lint-staged": "^11.0.0"
+    "lint-staged": "^12.4.0"
   }
 }

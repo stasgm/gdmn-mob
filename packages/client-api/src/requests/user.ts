@@ -1,10 +1,8 @@
-import { v4 as uuid } from 'uuid';
-
 import { IResponse, IUser, NewUser } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
 import { error, user as types } from '../types';
-import { getParams, sleep } from '../utils';
+import { generateId, getParams, sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
 
 import { BaseRequest } from '../types/BaseRequest';
@@ -18,14 +16,11 @@ class User extends BaseRequest {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
-      // const uu = user.
-
       return {
         type: 'ADD_USER',
         user: {
           ...user,
-          //name: user
-          id: uuid(),
+          id: generateId(),
           creator: mockUser,
           role: 'User',
           editionDate: new Date().toISOString(),

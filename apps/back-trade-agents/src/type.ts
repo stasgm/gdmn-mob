@@ -1,3 +1,5 @@
+import { INamedEntity } from '@lib/types';
+
 export type IParams = (string | Date | number)[];
 
 export type IRecordObject = {
@@ -21,3 +23,25 @@ export interface IUserRequest extends Request {
 export type AuthToken = {
   [name: string]: IUser;
 };
+
+export interface IQuerySellBill {
+  ID: string;
+  NUMBER: string;
+  CONTRACT?: string;
+  CONTRACTKEY?: string;
+  DEPARTNAME?: string;
+  DEPARTKEY?: string;
+  DOCUMENTDATE: string;
+  QUANTITY: number;
+  PRICE: number;
+}
+
+export interface ISellBill {
+  id: string;
+  number: string;
+  contract?: INamedEntity;
+  depart?: INamedEntity;
+  documentdate: string;
+  quantity: number;
+  price: number;
+}

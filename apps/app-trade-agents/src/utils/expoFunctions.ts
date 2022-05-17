@@ -1,6 +1,6 @@
 import { Platform, Linking } from 'react-native';
 import * as Location from 'expo-location';
-import * as IntentLauncher from 'expo-intent-launcher';
+import { startActivityAsync, ActivityAction } from 'expo-intent-launcher';
 
 import { ICoords } from '../store/geo/types';
 
@@ -29,10 +29,6 @@ export const getPermissionLocationStatus = async () => {
     }
   }
 };
-
-/* const getPermissionLocation = async () => {
-  return await Location.requestForegroundPermissionsAsync();
-}; */
 
 const getLocationAndroid = async (status: Location.PermissionStatus) => {
   try {
@@ -122,7 +118,7 @@ export const getLatitudeAndLongitudeFromString = async (string: string) => {
 
 export const openGPSAndroid = async () => {
   try {
-    await IntentLauncher.startActivityAsync(IntentLauncher.ACTION_LOCATION_SOURCE_SETTINGS);
+    await startActivityAsync(ActivityAction.LOCATION_SOURCE_SETTINGS);
 
     if (await Location.hasServicesEnabledAsync()) {
       return LocationStatus.permissionsAllowed;

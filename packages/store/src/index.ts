@@ -2,7 +2,7 @@
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
 import { TypedUseSelectorHook, useSelector as useReduxSelector, useDispatch as useReduxDispatch } from 'react-redux';
 import { Reducer, createStore, combineReducers, applyMiddleware, AnyAction } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
+import { composeWithDevTools } from '@redux-devtools/extension';
 import { StateType } from 'typesafe-actions';
 
 import { reducer as documentReducer } from './documents';
@@ -17,52 +17,6 @@ import { documentMiddlewareFactory } from './documents/middleware';
 import { referenceMiddlewareFactory } from './references/middleware';
 import { appMiddlewareFactory } from './app/middleware';
 import { settingMiddlewareFactory } from './settings/middleware';
-// import { logMiddleware } from './logMiddleware';
-
-// const persistConfig = {
-//   key: 'config',
-//   storage: UserAsyncStorage,
-// };
-
-// const persistAuthConfig = {
-//   key: 'auth',
-//   storage: UserAsyncStorage,
-//   whitelist: ['user', 'settings', 'company', 'device', 'isDemo'],
-// };
-
-// const persistDocsConfig = {
-//   key: 'documents',
-//   storage: UserAsyncStorage,
-//   whitelist: ['list'],
-// };
-
-// const persistRefsConfig = {
-//   key: 'references',
-//   storage: UserAsyncStorage,
-//   whitelist: ['list'],
-// };
-
-// const persistSettingsConfig = {
-//   key: 'settings',
-//   storage: UserAsyncStorage,
-//   whitelist: ['data'],
-// };
-
-// const persistAppConfig = {
-//   key: 'app',
-//   storage: UserAsyncStorage,
-//   whitelist: ['formParams', 'errorList'],
-// };
-
-// export const rootReducer = {
-//   // config: persistReducer(persistConfig, configReducer),
-//   auth: persistReducer(persistAuthConfig, authReducer),
-//   messages: msgReducer,
-//   references: persistReducer(persistRefsConfig, referenceReducer),
-//   documents: persistReducer(persistDocsConfig, documentReducer),
-//   settings: persistReducer(persistSettingsConfig, settingsReducer),
-//   app: persistReducer(persistAppConfig, appReducer),
-// };
 
 export const rootReducer = {
   auth: authReducer,

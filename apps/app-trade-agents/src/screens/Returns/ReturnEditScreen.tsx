@@ -3,7 +3,6 @@ import { Alert, Switch, View, Text, StyleSheet, ScrollView } from 'react-native'
 import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { v4 as uuid } from 'uuid';
 
 import {
   appActions,
@@ -24,6 +23,8 @@ import {
   SubTitle,
 } from '@lib/mobile-ui';
 import { IDocumentType } from '@lib/types';
+
+import { generateId } from '@lib/mobile-app';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
@@ -118,7 +119,7 @@ const ReturnEditScreen = () => {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
-    const docId = !id ? uuid() : id;
+    const docId = !id ? generateId() : id;
 
     if (!id) {
       if (!returnType) {

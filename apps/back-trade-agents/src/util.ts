@@ -1,8 +1,8 @@
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 
 import { Response } from 'express';
 
-import { IResponse } from './type';
+import { IResponse, IQuerySellBill, ISellBill } from './type';
 
 const ok = <T>(res: Response, dto?: T) => {
   const resp: IResponse<T> = {
@@ -21,7 +21,25 @@ const ok = <T>(res: Response, dto?: T) => {
 const errorMessage = (status: number, name: string): string => status + ': ' + name;
 
 const generateAuthToken = () => {
-  return crypto.randomBytes(30).toString('hex');
+  return randomBytes(30).toString('hex');
 };
 
-export { ok, errorMessage, generateAuthToken };
+const queryArray2SellBill = (arr: IQuerySellBill[] | undefined): ISellBill[] | undefined => {
+  if (!arr) return undefined;
+  return arr.map((item) => ({
+    number: item.NUMBER,
+    contract: {
+      id: item.CONTRACTKEY,
+      name: item.CONTRACT,
+    },
+    depart: {
+      id: item.DEPARTKEY,
+      name: item.DEPARTNAME,
+    },
+    documentdate: item.DOCUMENTDATE,
+    quantity: item.QUANTITY,
+    price: item.PRICE,
+  })) as ISellBill[];
+};
+
+export { ok, errorMessage, generateAuthToken, queryArray2SellBill };

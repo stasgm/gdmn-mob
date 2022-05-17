@@ -48,13 +48,11 @@ const DocumentViewScreen = () => {
 
   const showActionSheet = useActionSheet();
   const navigation = useNavigation();
-  // const dispatch = useDispatch();
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Добавить',
-        // onPress: () => { },
       },
       {
         title: 'Отмена',

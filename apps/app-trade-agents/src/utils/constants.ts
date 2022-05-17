@@ -1,6 +1,6 @@
 import { baseSettingGroup } from '@lib/store';
 import { companies, user2, user } from '@lib/mock';
-import { IMessage, INamedEntity, MessageType, Settings, StatusType } from '@lib/types';
+import { IAppSystem, IMessage, INamedEntity, MessageType, Settings, StatusType } from '@lib/types';
 
 import config from '../config';
 import { ISellBill } from '../store/types';
@@ -82,56 +82,53 @@ const appSettings: Settings = {
 
 const mockSellBills: ISellBill[] = [
   {
-    ID: '1246759230',
-    NUMBER: '1448516',
-    CONTRACT: '53 от 2013-12-10',
-    CONTRACTKEY: '165934057',
-    DEPARTNAME: 'Магазин-склад',
-    DEPARTKEY: '323658854',
-    DOCUMENTDATE: new Date().toISOString(),
-    QUANTITY: 4.9511,
-    PRICE: 5.35,
+    id: '1246759230',
+    number: '1448516',
+    contract: { id: '165934057', name: '53 от 2013-12-10' },
+    depart: { id: '323658854', name: 'Магазин-склад' },
+    documentdate: new Date().toISOString(),
+    quantity: 4.9511,
+    price: 5.35,
   },
   {
-    ID: '1215293118',
-    NUMBER: '5376518',
-    CONTRACT: '53 от 2013-12-10',
-    CONTRACTKEY: '165934057',
-    DEPARTKEY: '323658854',
-    DEPARTNAME: 'Магазин-склад',
-    DOCUMENTDATE: new Date().toISOString(),
-    QUANTITY: 5.25,
-    PRICE: 6.12,
+    id: '1215293118',
+    number: '5376518',
+    contract: { id: '165934057', name: '53 от 2013-12-10' },
+    depart: { id: '323658854', name: 'Магазин-склад' },
+    documentdate: new Date().toISOString(),
+    quantity: 5.25,
+    price: 6.12,
   },
   {
-    ID: '1308039951',
-    NUMBER: '1453027',
-    CONTRACT: '53 от 2013-12-10',
-    CONTRACTKEY: '165934057',
-    DEPARTNAME: 'Магазин-склад',
-    DEPARTKEY: '323658854',
-    DOCUMENTDATE: new Date().toISOString(),
-    QUANTITY: 6.4,
-    PRICE: 6.12,
+    id: '1308039951',
+    number: '1453027',
+    contract: { id: '165934057', name: '53 от 2013-12-10' },
+    depart: { id: '323658854', name: 'Магазин-склад' },
+    documentdate: new Date().toISOString(),
+    quantity: 6.4,
+    price: 6.12,
   },
   {
-    ID: '1334757495',
-    NUMBER: '5947875',
-    CONTRACT: '53 от 2013-12-10',
-    CONTRACTKEY: '165934057',
-    DEPARTNAME: 'Магазин-склад',
-    DEPARTKEY: '323658854',
-    DOCUMENTDATE: new Date().toISOString(),
-    QUANTITY: 5.6,
-    PRICE: 6.12,
+    id: '1334757495',
+    number: '5947875',
+    contract: { id: '165934057', name: '53 от 2013-12-10' },
+    depart: { id: '323658854', name: 'Магазин-склад' },
+    documentdate: new Date().toISOString(),
+    quantity: 5.6,
+    price: 6.12,
   },
 ] as any;
+
+export const appSystem: IAppSystem = {
+  id: 'gdmn-sales-representative',
+  name: 'gdmn-sales-representative',
+};
 
 const messageAgent: IMessage<MessageType>[] = [
   {
     id: '1f26fa10-17aa-11ec-951e-7fdefda6eb8e',
     head: {
-      appSystem: 'gdmn-sales-representative',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user,
@@ -1137,7 +1134,7 @@ const messageAgent: IMessage<MessageType>[] = [
   {
     id: '1f511750-17aa-11ec-951e-7fdefda6eb8e',
     head: {
-      appSystem: 'gdmn-sales-representative',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user,
@@ -1476,6 +1473,9 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '1607786772',
                 name: '500 гр.-700  гр.(10)',
               },
+              priceFromSellBill: 3.68,
+              quantityFromSellBill: 4.2,
+              sellBillId: '1246759231',
             },
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e82',
@@ -1483,11 +1483,14 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '807686299',
                 name: 'Сосиски сливочные',
               },
-              quantity: 2,
+              quantity: 5,
               packagekey: {
                 id: '1607786773',
                 name: '2 кг. - 3 кг.(5)',
               },
+              priceFromSellBill: 5.35,
+              quantityFromSellBill: 4.9511,
+              sellBillId: '1246759230',
             },
           ],
           creationDate: new Date().toISOString(),
@@ -1525,6 +1528,9 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '1607786791',
                 name: '2 кг. - 3 кг.(10)',
               },
+              priceFromSellBill: 4.96,
+              quantityFromSellBill: 4.0,
+              sellBillId: '1246753230',
             },
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e80',
@@ -1537,6 +1543,9 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '1607786790',
                 name: '500 гр.-700  гр.(5)',
               },
+              priceFromSellBill: 6.35,
+              quantityFromSellBill: 5.381,
+              sellBillId: '1246752587',
             },
           ],
           creationDate: new Date().toISOString(),
@@ -1574,6 +1583,9 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '1617776619',
                 name: 'мал. батон 5',
               },
+              priceFromSellBill: 5.34,
+              quantityFromSellBill: 8.69,
+              sellBillId: '1246759250',
             },
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e78',
@@ -1598,6 +1610,9 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '273098057',
                 name: '5',
               },
+              priceFromSellBill: 6.35,
+              quantityFromSellBill: 5.98,
+              sellBillId: '1246799230',
             },
           ],
           creationDate: new Date().toISOString(),
@@ -1609,7 +1624,7 @@ const messageAgent: IMessage<MessageType>[] = [
   {
     id: '1f5cd720-17aa-11ec-951e-7fdefda6eb8e',
     head: {
-      appSystem: 'gdmn-sales-representative',
+      appSystem,
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user,

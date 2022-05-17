@@ -17,12 +17,11 @@ export type RefParamList = {
 
 export type DocParamList = RefParamList & {
   DocView: { id: string; docType?: string };
-  DocEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  DocEdit: { id: string; docType?: string } | undefined;
   DocLine: { mode: number; docId: string; item: IDocLine; docType?: string };
   SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
-  // ScanBarcodeReader: { docId: string; docType?: string };
   DocLineEdit: {
     docId: string;
     prodId: string;

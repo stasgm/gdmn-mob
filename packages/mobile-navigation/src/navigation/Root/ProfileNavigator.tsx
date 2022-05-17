@@ -9,8 +9,8 @@ const Stack = createStackNavigator<ProfileStackParamList>();
 
 const ProfileNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: true }}>
-      <Stack.Screen key="Profile" name="Profile" component={ProfileScreen} options={{ title: 'Профиль' }} />
+    <Stack.Navigator initialRouteName="Profile" screenOptions={{ headerShown: true, title: 'Профиль' }}>
+      <Stack.Screen key="Profile" name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 };

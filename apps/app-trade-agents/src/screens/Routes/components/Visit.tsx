@@ -1,7 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { v4 as uuid } from 'uuid';
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
@@ -16,7 +15,7 @@ import {
   ScreenListItem,
   IListItemProps,
 } from '@lib/mobile-ui';
-import { useSendDocs, getDateString } from '@lib/mobile-app';
+import { useSendDocs, getDateString, generateId } from '@lib/mobile-app';
 
 import { useTheme } from 'react-native-paper';
 
@@ -34,7 +33,7 @@ interface IVisitProps {
 }
 
 const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation() as any;
   const loading = useSelector((state) => state.documents.loading);
 
   const dispatch = useDispatch();
@@ -63,54 +62,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   );
 
   const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
-
-  // useEffect(() => {
-  //   // let cleanupFunction = true;
-
-  //   const closeVisit = async () => {
-  //     if (process) {
-  //       // try {
-  //       const coords = await getCurrentPosition();
-  //       // } catch (e) {
-  //       //   // setMessage(e.message);
-  //       //   // setBarVisible(true);
-  //       // }
-
-  //       const date = new Date().toISOString();
-
-  //       const updatedVisit: IVisitDocument = {
-  //         ...visit,
-  //         head: {
-  //           ...visit.head,
-  //           dateEnd: date,
-  //           endGeoPoint: coords,
-  //         },
-  //         creationDate: visit.creationDate || date,
-  //         editionDate: date,
-  //       };
-
-  //       const updatedOrders: IOrderDocument[] = orderDocs
-  //         .filter((doc) => doc.status === 'DRAFT')
-  //         ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
-
-  //       const updatedReturns: IReturnDocument[] = returnDocs
-  //         .filter((doc) => doc.status === 'DRAFT')
-  //         ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
-
-  //       console.log('docs', [updatedVisit, ...updatedOrders, ...updatedReturns].length);
-  //       await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders, ...updatedReturns]));
-  //       // if (cleanupFunction) {
-  //       setProcess(false);
-  //       // }
-  //     }
-  //   }
-
-  //   closeVisit().catch((err) => {
-  //     docDispatch(documentActions.setLoadingError(err || 'При закрытии визита произошла ошибка'));
-  //   });
-
-  //   // return () => { cleanupFunction = false };
-  // }, [process]);
 
   const handleCloseVisit = useCallback(async () => {
     // TODO Вынести в async actions
@@ -165,7 +116,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const newOrderDate = new Date().toISOString();
 
     const newOrder: IOrderDocument = {
-      id: uuid(),
+      id: generateId(),
       number: 'б\\н',
       status: 'DRAFT',
       documentDate: newOrderDate,
@@ -196,7 +147,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     const newReturnDate = new Date().toISOString();
 
     const newReturn: IReturnDocument = {
-      id: uuid(),
+      id: generateId(),
       number: 'б\\н',
       status: 'DRAFT',
       documentDate: newReturnDate,

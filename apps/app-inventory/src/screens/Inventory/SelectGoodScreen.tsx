@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-import { v4 as uuid } from 'uuid';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,6 +10,8 @@ import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { generateId } from '@lib/mobile-app';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/app/types';
@@ -25,7 +26,7 @@ const Good = ({ item }: { item: INamedEntity }) => {
         navigation.navigate('InventoryLine', {
           mode: 0,
           docId,
-          item: { id: uuid(), good: { id: item.id, name: item.name }, quantity: 0 },
+          item: { id: generateId(), good: { id: item.id, name: item.name }, quantity: 0 },
         });
       }}
     >

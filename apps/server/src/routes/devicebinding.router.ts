@@ -1,4 +1,4 @@
-import Router from 'koa-joi-router';
+import router from 'koa-joi-router';
 
 import {
   addDeviceBinding,
@@ -13,10 +13,10 @@ import { roleBasedParamsMiddlware } from '../middleware/roleBasedParams';
 
 import { deviceBindingValidation } from '../validations';
 
-const router = Router();
+const deviceBindings = router();
 
-router.prefix('/binding');
-router.post(
+deviceBindings.prefix('/binding');
+deviceBindings.post(
   '/',
   deviceBindingValidation.bindingDevice,
   authMiddleware,
@@ -24,8 +24,8 @@ router.post(
   roleBasedParamsMiddlware,
   addDeviceBinding,
 );
-router.get('/', authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, getDeviceBindings);
-router.get(
+deviceBindings.get('/', authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, getDeviceBindings);
+deviceBindings.get(
   '/:id',
   deviceBindingValidation.getDeviceBinding,
   authMiddleware,
@@ -33,7 +33,7 @@ router.get(
   roleBasedParamsMiddlware,
   getDeviceBinding,
 );
-router.patch(
+deviceBindings.patch(
   '/:id',
   deviceBindingValidation.updateDeviceBinding,
   authMiddleware,
@@ -41,6 +41,6 @@ router.patch(
   roleBasedParamsMiddlware,
   updateDeviceBinding,
 );
-router.delete('/:id', authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, removeDeviceBinding);
+deviceBindings.delete('/:id', authMiddleware, permissionMiddleware, roleBasedParamsMiddlware, removeDeviceBinding);
 
-export default router;
+export default deviceBindings;

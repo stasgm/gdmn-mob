@@ -1,8 +1,13 @@
 import { Box, Card, CardContent, Grid, TextField, Divider, Button } from '@material-ui/core';
 
-import { ICompany, NewCompany } from '@lib/types';
-import { useFormik } from 'formik';
+import { ICompany, INamedEntity, NewCompany } from '@lib/types';
+import { useFormik, Field, FormikProvider } from 'formik';
 import * as yup from 'yup';
+import api from '@lib/client-api';
+
+import { useEffect, useState } from 'react';
+
+import MultipleAutocomplete from '../MultipleAutocomplete';
 
 interface IProps {
   loading: boolean;
@@ -12,6 +17,24 @@ interface IProps {
 }
 
 const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
+  const [appSystems, setAppSystems] = useState<INamedEntity[]>([]);
+  const [loadingAppSystems, setLoadingAppSystems] = useState(true);
+
+  useEffect(() => {
+    let unmounted = false;
+    const getAppSystems = async () => {
+      const res = await api.appSystem.getAppSystems();
+      if (res.type === 'GET_APP_SYSTEMS' && !unmounted) {
+        setAppSystems(res.appSystems.map((d) => ({ id: d.id, name: d.name })));
+        setLoadingAppSystems(false);
+      }
+    };
+    getAppSystems();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
   const formik = useFormik<ICompany | NewCompany>({
     enableReinitialize: true,
     initialValues: { ...company, city: company.city || '' },
@@ -24,7 +47,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
   });
 
   return (
-    <>
+    <FormikProvider value={formik}>
       <Box
         sx={{
           backgroundColor: 'background.default',
@@ -64,6 +87,19 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.city}
                   />
                 </Grid>
+                <Grid item md={6} xs={12}>
+                  <Field
+                    component={MultipleAutocomplete}
+                    name="appSystems"
+                    label="Подсистемы"
+                    type="appSystems"
+                    options={appSystems || []} //+
+                    setFieldValue={formik.setFieldValue}
+                    setTouched={formik.setTouched}
+                    error={Boolean(formik.touched.appSystems && formik.errors.appSystems)}
+                    disabled={loading || loadingAppSystems}
+                  />
+                </Grid>
               </Grid>
             </CardContent>
             <Divider />
@@ -78,7 +114,7 @@ const CompanyDetails = ({ company, loading, onSubmit, onCancel }: IProps) => {
           </Card>
         </form>
       </Box>
-    </>
+    </FormikProvider>
   );
 };
 

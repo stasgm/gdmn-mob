@@ -1,53 +1,95 @@
+import path from 'path';
+
 import {
   IDBUser,
   IDBMessage,
   IDBDevice,
   IDBActivationCode,
   IDBCompany,
-  INamedEntity,
   IDBDeviceBinding,
-  IDBid,
+  DBAppSystem,
+  SessionId,
 } from '@lib/types';
-
-import { v4 as uuid } from 'uuid';
 
 import { Collection, Database, CollectionMessage } from '../../utils/json-db';
 
-export type dbtype = {
+import { messageFolders } from '../../utils/constants';
+
+import { generateId } from '../../utils/helpers';
+
+import { mkDir } from './utils';
+
+export type DBType = {
   users: Collection<IDBUser>;
   codes: Collection<IDBActivationCode>;
   companies: Collection<IDBCompany>;
   messages: CollectionMessage<IDBMessage>;
   devices: Collection<IDBDevice>;
   deviceBindings: Collection<IDBDeviceBinding>;
-  dbid: Collection<IDBid>;
+  appSystems: Collection<DBAppSystem>;
+  sessionId: Collection<SessionId>;
+  dbPath: string;
+  createFoldersForCompany: (company: IDBCompany) => void;
+  pendingWrites: () => Promise<void[]>;
 };
 
-let database: dbtype | null = null;
+let database: DBType;
 
-export const createDb = async (dir: string, name: string) => {
+export const createDb = async (dir: string, name: string): Promise<DBType> => {
   const db = new Database(dir, name);
+  const collections = {
+    users: db.collection<IDBUser>('users'),
+    devices: db.collection<IDBDevice>('devices'),
+    companies: db.collection<IDBCompany>('companies'),
+    codes: db.collection<IDBActivationCode>('activation-codes'),
+    deviceBindings: db.collection<IDBDeviceBinding>('device-bindings'),
+    appSystems: db.collection<DBAppSystem>('app-systems'),
+    sessionId: db.collection<SessionId>('session-id'),
+  };
 
-  const users = db.collection<IDBUser>('users');
-  const devices = db.collection<IDBDevice>('devices');
-  const companies = db.collection<IDBCompany>('companies');
-  const codes = db.collection<IDBActivationCode>('activation-codes');
-  const deviceBindings = db.collection<IDBDeviceBinding>('device-bindings');
-  const dbid = db.collection<IDBid>('dbid');
-  const messages = db.messageCollection<IDBMessage>('messages');
+  await Promise.all(Object.values(collections).map((c) => c.readDataFromDisk()));
 
-  database = { users, codes, companies, messages, devices, deviceBindings, dbid };
-  const dbArr = await dbid.read();
-  if (dbArr.length === 0) await dbid.insert({ id: uuid() });
+  //При запуске сервера в первый раз формируем ид сессии
+  if (collections.sessionId.data.length === 0) {
+    collections.sessionId.insert({ id: generateId() });
+  }
+
+  // TODO: привести в соответствие с нашей откорректерованной коллекцией
+  const messages = db.messageCollection<IDBMessage>();
+  const dbPath = db.getDbPath();
+
+  const createFoldersForCompany = (company: IDBCompany) => {
+    const companyFolder = path.join(dbPath, `db_${company.id}`);
+    mkDir(companyFolder);
+    if (company.appSystemIds) {
+      for (const appSystemId of company.appSystemIds) {
+        const appSystemName = collections.appSystems.findById(appSystemId)?.name;
+        if (appSystemName) {
+          mkDir(path.join(companyFolder, appSystemName));
+          messageFolders.forEach((folder) => mkDir(path.join(companyFolder, appSystemName, folder)));
+        }
+      }
+    }
+  };
+
+  for (const company of collections.companies.data) {
+    createFoldersForCompany(company);
+  }
+
+  const pendingWrites = () => Promise.all(Object.values(collections).map((c) => c.pendingWrite()));
+
+  database = {
+    ...collections,
+    messages,
+    dbPath,
+    createFoldersForCompany,
+    pendingWrites,
+  };
 
   return database;
 };
 
-type ExtractTypes<P> = P extends Collection<infer T> ? T : never;
-
-export type NamedDBEntities = Collection<Extract<ExtractTypes<dbtype[keyof dbtype]>, INamedEntity>>;
-
-export function getDb(): dbtype {
+export function getDb(): DBType {
   if (!database) {
     throw new Error('Database is not initialized');
   }

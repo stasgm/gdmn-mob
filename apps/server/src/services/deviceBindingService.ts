@@ -1,7 +1,7 @@
-import { IDBDeviceBinding, IDeviceBinding, INamedEntity, NewDeviceBinding } from '@lib/types';
+import { IDBDeviceBinding, IDeviceBinding, NewDeviceBinding } from '@lib/types';
 
 import { ConflictException, DataNotFoundException } from '../exceptions';
-import { asyncFilter, extraPredicate } from '../utils/helpers';
+import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { deviceStates } from '../utils/constants';
 
@@ -9,110 +9,114 @@ import { getDb } from './dao/db';
 
 /**
  * Добавляет одно устройство
- * @param {string} name - название устройства
- * @param {string} userId - идентификатор пользователя
- * @return id, идентификатор устройства
+ * @param {NewDeviceBinding} deviceBinding - данные привязки устройства
+ * @return объект привязки устройства
  * */
 
-const addOne = async (deviceBinding: NewDeviceBinding): Promise<IDeviceBinding> => {
-  const db = getDb();
-  const { deviceBindings, users, devices } = db;
+const addOne = (deviceBinding: NewDeviceBinding): IDeviceBinding => {
+  const { deviceBindings, users, devices } = getDb();
 
-  const user = await users.find(deviceBinding.user.id);
+  const user = users.findById(deviceBinding.user.id);
 
   if (!user) {
     throw new DataNotFoundException('Пользователь не найден');
   }
 
-  const device = await devices.find(deviceBinding.device.id);
+  const device = devices.findById(deviceBinding.device.id);
 
   if (!device) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  if (await deviceBindings.find((i) => i.deviceId === deviceBinding.device.id && i.userId === deviceBinding.user.id)) {
+  if (deviceBindings.data.find((i) => i.deviceId === deviceBinding.device.id && i.userId === deviceBinding.user.id)) {
     throw new ConflictException('Данное устройство уже добавлено пользователю');
   }
 
-  const newDeviceBinding: IDBDeviceBinding = {
+  const binding = deviceBindings.insert({
     id: '',
     state: deviceBinding.state,
     deviceId: deviceBinding.device.id,
     userId: deviceBinding.user.id,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  const createdDeviceBinding = await deviceBindings.find(await deviceBindings.insert(newDeviceBinding));
-  return makeDeviceBinding(createdDeviceBinding);
+  return makeDeviceBinding(binding);
 };
 
 /**
  * Обновляет связь с устройством
- * @param {IDBDevice} deviceBindingId - устройство
- * @return обновленную связь
+ * @param {string} id - ИД устройства
+ * @param {Partial<IDeviceBinding>} bindingData - данные привязки устройства
+ * @return обновленный объект привязк устройства
  * */
-const updateOne = async (id: string, deviceBindingData: Partial<IDeviceBinding>) => {
-  //, params?: Record<string, string>
-  const { deviceBindings } = getDb();
-
-  const oldDeviceBinding = await deviceBindings.find(id);
+const updateOne = (id: string, bindingData: Partial<IDeviceBinding>): IDeviceBinding => {
+  const { deviceBindings, users } = getDb();
+  const oldDeviceBinding = deviceBindings.findById(id);
 
   if (!oldDeviceBinding) {
     throw new DataNotFoundException('Связь с устройством не найдена');
   }
 
-  // const deviceId = deviceBindingData.device
-  //   ? (await devices.find(deviceBindingData.device.id))?.id
-  //   : oldDeviceBinding.deviceId;
+  // Проверяем есть ли в базе переданный пользователь
+  let userId = oldDeviceBinding.userId;
+  if (bindingData.user) {
+    const user = users.findById(bindingData.user.id);
+    if (!user) {
+      throw new DataNotFoundException('Пользователь не найден');
+    }
+    userId = user.id;
+  }
 
-  // if (params) {
-  //   if ('companyId' in params) {
-  //     const device = await devices.find(deviceId);
+  // Проверяем есть ли в базе переданное устройство
+  let deviceId = oldDeviceBinding.userId;
+  if (bindingData.device) {
+    const device = getDb().devices.findById(bindingData.device.id);
+    if (!device) {
+      throw new DataNotFoundException('Устройство не найдено');
+    }
+    deviceId = device.id;
+  }
 
-  //     if (device.companyId !== params.companyID) {
-  //       throw new DataNotFoundException('Устройство не может быть обновлено');
-  //     }
-  //   }
-  // }
-
-  //TODO добавить проверку, что пользователь из компании
-
-  const newDeviceBinding: IDBDeviceBinding = {
+  deviceBindings.update({
     id,
-    userId: deviceBindingData.user?.id || oldDeviceBinding.userId,
-    state: deviceBindingData.state || oldDeviceBinding.state,
-    deviceId: deviceBindingData.device?.id || oldDeviceBinding.deviceId,
-    creationDate: deviceBindingData.creationDate,
+    userId,
+    state: bindingData.state || oldDeviceBinding.state,
+    deviceId,
+    creationDate: bindingData.creationDate,
     editionDate: new Date().toISOString(),
-  };
+  });
 
-  await deviceBindings.update(newDeviceBinding);
+  const updatedBinding = deviceBindings.findById(id);
 
-  const updatedDeviceBinding = await deviceBindings.find(id);
+  if (!updatedBinding) {
+    throw new DataNotFoundException('Привязка устройства не найдена');
+  }
 
-  return makeDeviceBinding(updatedDeviceBinding);
+  return makeDeviceBinding(updatedBinding);
 };
 
 /**
  * Удаляет одно устройство
  * @param {string} id - идентификатор устройства
  * */
-const deleteOne = async ({ deviceBindingId }: { deviceBindingId: string }): Promise<void> => {
-  const db = getDb();
-  const { deviceBindings } = db;
+const deleteOne = (id: string): void => {
+  const { deviceBindings } = getDb();
 
-  if (!(await deviceBindings.find((d) => d.id === deviceBindingId))) {
+  if (!deviceBindings.findById(id)) {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  await deviceBindings.delete((d) => d.id === deviceBindingId);
+  deviceBindings.deleteById(id);
 };
 
-const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
-  const { deviceBindings } = getDb();
-
-  const deviceBinding = await deviceBindings.find(id);
+/**
+ * Возвращает одну привязку устройства
+ * @param id ИД привязки устройства
+ * @returns
+ */
+const findOne = (id: string): IDeviceBinding => {
+  const deviceBinding = getDb().deviceBindings.findById(id);
 
   if (!deviceBinding) {
     throw new DataNotFoundException('Связь с устройством не определена');
@@ -121,10 +125,15 @@ const findOne = async (id: string): Promise<IDeviceBinding | undefined> => {
   return makeDeviceBinding(deviceBinding);
 };
 
-const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[]> => {
-  const { deviceBindings, devices } = getDb();
+/**
+ *  Возвращает множество привязок по указанным параметрам
+ * @param params - параметры
+ * @returns
+ */
+const findMany = (params: Record<string, string>): IDeviceBinding[] => {
+  const { devices, deviceBindings } = getDb();
 
-  let deviceBindingList = await deviceBindings.read((item) => {
+  let deviceBindingList = deviceBindings.data.filter((item) => {
     const newParams = { ...params };
 
     let userFound = true;
@@ -153,10 +162,13 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
   const newParams = { ...params };
 
   if ('companyId' in newParams || 'filterText' in newParams) {
-    deviceBindingList = await asyncFilter(deviceBindingList, async (i: IDBDeviceBinding) => {
+    deviceBindingList = deviceBindingList.filter((i: IDBDeviceBinding) => {
       const newParams = { ...params };
 
-      const device = await devices.find(i.deviceId);
+      const device = devices.findById(i.deviceId);
+      if (!device) {
+        throw new DataNotFoundException(`Устройство с ИД = ${i.deviceId} не найдено в таблице устройств`);
+      }
 
       let companyIdFound = true;
 
@@ -172,7 +184,7 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
 
         if (filterText) {
           const state = deviceStates[i.state].toUpperCase();
-          const deviceName = device.name.toUpperCase();
+          const deviceName = device?.name.toUpperCase();
           const creationDate = new Date(i.creationDate || '').toLocaleString('ru', { hour12: false });
           const editionDate = new Date(i.editionDate || '').toLocaleString('ru', { hour12: false });
 
@@ -190,32 +202,21 @@ const findAll = async (params?: Record<string, string>): Promise<IDeviceBinding[
     });
   }
 
-  const pr = deviceBindingList.map(async (i) => await makeDeviceBinding(i));
-
-  return Promise.all(pr);
+  return getListPart(deviceBindingList, params)?.map((i) => makeDeviceBinding(i));
 };
 
-export const makeDeviceBinding = async (deviceBinding: IDBDeviceBinding): Promise<IDeviceBinding> => {
-  const db = getDb();
-  const { users, devices } = db;
-
-  const user = await users.find(deviceBinding?.userId);
-
-  const userEntity: INamedEntity = user && { id: user.id, name: user.name };
-
-  const device = await devices.find(deviceBinding?.deviceId);
-
-  const deviceEntity: INamedEntity = device && { id: device.id, name: device.name };
+export const makeDeviceBinding = (binding: IDBDeviceBinding): IDeviceBinding => {
+  const { users, devices } = getDb();
 
   /* TODO В звависимости от прав возвращать разный набор полей */
   return {
-    id: deviceBinding.id,
-    user: userEntity,
-    device: deviceEntity,
-    state: deviceBinding.state,
-    creationDate: deviceBinding.creationDate,
-    editionDate: deviceBinding.editionDate,
+    id: binding.id,
+    user: users.getNamedItem(binding.userId),
+    device: devices.getNamedItem(binding.deviceId),
+    state: binding.state,
+    creationDate: binding.creationDate,
+    editionDate: binding.editionDate,
   };
 };
 
-export { addOne, updateOne, deleteOne, findOne, findAll };
+export { addOne, updateOne, deleteOne, findOne, findMany };

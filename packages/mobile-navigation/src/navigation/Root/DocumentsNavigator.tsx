@@ -8,8 +8,8 @@ const Stack = createStackNavigator<DocumentsStackParamList>();
 
 const DocumentsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="TabsNavigator" screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="TabsNavigator" component={TabsNavigator} options={{ title: 'Документы' }} />
+    <Stack.Navigator initialRouteName="TabsNavigator" screenOptions={{ headerShown: true, title: 'Документы' }}>
+      <Stack.Screen name="TabsNavigator" component={TabsNavigator} />
     </Stack.Navigator>
   );
 };
