@@ -1,13 +1,8 @@
-import {
-  DrawerContentComponentProps,
-  DrawerContentScrollView,
-  DrawerItemList,
-  // useDrawerProgress,
-} from '@react-navigation/drawer';
+import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
 
 const getDateString = (_date: string | Date) => {

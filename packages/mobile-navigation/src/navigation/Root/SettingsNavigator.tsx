@@ -9,8 +9,8 @@ const Stack = createStackNavigator<SettingsStackParamList>();
 
 const SettingsNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Settings" screenOptions={{ headerShown: true }}>
-      <Stack.Screen key="Settings" name="Settings" component={SettingsSceen} options={{ title: 'Настройки' }} />
+    <Stack.Navigator initialRouteName="Settings" screenOptions={{ headerShown: true, title: 'Настройки' }}>
+      <Stack.Screen key="Settings" name="Settings" component={SettingsSceen} />
     </Stack.Navigator>
   );
 };
