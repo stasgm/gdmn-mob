@@ -107,18 +107,14 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     <Provider store={store}>
       <UIProvider theme={defaultTheme}>
         <ActionSheetProvider>
-          <NavigationContainer>
-            <Router />
-          </NavigationContainer>
+          <Router />
         </ActionSheetProvider>
       </UIProvider>
     </Provider>
   ) : (
     <UIProvider theme={defaultTheme}>
       <ActionSheetProvider>
-        <NavigationContainer>
-          <Router />
-        </NavigationContainer>
+        <Router />
       </ActionSheetProvider>
     </UIProvider>
   );

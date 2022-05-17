@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 
 import { Response } from 'express';
 
@@ -21,7 +21,7 @@ const ok = <T>(res: Response, dto?: T) => {
 const errorMessage = (status: number, name: string): string => status + ': ' + name;
 
 const generateAuthToken = () => {
-  return crypto.randomBytes(30).toString('hex');
+  return randomBytes(30).toString('hex');
 };
 
 const queryArray2SellBill = (arr: IQuerySellBill[] | undefined): ISellBill[] | undefined => {

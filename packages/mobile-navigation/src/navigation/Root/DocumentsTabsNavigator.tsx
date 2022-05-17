@@ -26,17 +26,13 @@ const TabsNavigator = () => {
   const dispatch = useDispatch();
 
   const handleAddDocument = () => {
-    // console.log('types', JSON.stringify(types?.data));
+    //
   };
 
   const handleLoad = () => {
     dispatch(documentActions.addDocuments(documentsMock));
   };
 
-  /*   const handleReset = () => {
-      dispatch(documentActions.init());
-    };
-   */
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -87,17 +83,6 @@ const TabsNavigator = () => {
           }}
         />
       ))}
-      {/*<TabsStack.Screen
-        key="OtherTypes"
-        name="OtherTypes"
-        component={DocumentsScreen}
-        //initialParams={{ types: ['Приход', 'Инвенторизация'] }}
-        options={{
-          title: 'Другие',
-          tabBarLabel: 'Другие',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="dots-horizontal" size={24} color={color} />,
-        }}
-      />*/}
     </TabsStack.Navigator>
   );
 };

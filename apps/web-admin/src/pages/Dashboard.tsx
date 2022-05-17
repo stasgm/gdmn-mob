@@ -16,16 +16,19 @@ import userActions from '../store/user';
 import deviceActions from '../store/device';
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
   const { list: devices } = useSelector((state) => state.devices);
   const { list: users } = useSelector((state) => state.users);
   const { list: companies } = useSelector((state) => state.companies);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     // Загружаем данные при загрузке компонента.
-    dispatch(companyActions.fetchCompanies());
-    dispatch(userActions.fetchUsers());
-    dispatch(deviceActions.fetchDevices());
+    const loadData = async () => {
+      await dispatch(companyActions.fetchCompanies());
+      await dispatch(userActions.fetchUsers());
+      await dispatch(deviceActions.fetchDevices());
+    };
+    loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
