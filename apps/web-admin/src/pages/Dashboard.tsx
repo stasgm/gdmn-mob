@@ -32,28 +32,6 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const dispatch = useDispatch();
-
-  const fetchCompanies = useCallback(async () => {
-    await dispatch(companyActions.fetchCompanies());
-  }, [dispatch]);
-
-  const fetchUsers = useCallback(async () => {
-    await dispatch(userActions.fetchUsers());
-  }, [dispatch]);
-
-  const fetchDevices = useCallback(async () => {
-    await dispatch(deviceActions.fetchDevices());
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Загружаем данные при загрузке компонента.
-    fetchCompanies();
-    fetchUsers();
-    fetchDevices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <>
       <Helmet>
