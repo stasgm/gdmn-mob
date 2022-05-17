@@ -79,9 +79,9 @@ const RouteDetailScreen = () => {
 
     try {
       coords = await getCurrentPosition();
+      console.log('coords', coords);
 
       const date = new Date().toISOString();
-
       const visitId = generateId();
 
       const newVisit: IVisitDocument = {

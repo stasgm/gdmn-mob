@@ -56,7 +56,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.name = server.name;
 
   const sessions = app.context.db.sessionId.data;
-  console.log('sessions', sessions);
   const sessionId = sessions.length ? sessions[0].id : '';
   const Config = { ...koaConfig, key: `${koaConfig.key}-${sessionId}` };
 
