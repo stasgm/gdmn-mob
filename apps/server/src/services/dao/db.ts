@@ -47,12 +47,12 @@ export const createDb = async (dir: string, name: string): Promise<DBType> => {
     sessionId: db.collection<SessionId>('session-id'),
   };
 
-  // const dbArr = collections.sessionId.data;
+  await Promise.all(Object.values(collections).map((c) => c.readDataFromDisk()));
+
+  //При запуске сервера в первый раз формируем ид сессии
   if (collections.sessionId.data.length === 0) {
     collections.sessionId.insert({ id: generateId() });
   }
-
-  await Promise.all(Object.values(collections).map((c) => c.readDataFromDisk()));
 
   // TODO: привести в соответствие с нашей откорректерованной коллекцией
   const messages = db.messageCollection<IDBMessage>();

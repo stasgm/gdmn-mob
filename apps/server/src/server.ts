@@ -56,10 +56,9 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   app.context.name = server.name;
 
   const sessions = app.context.db.sessionId.data;
+  console.log('sessions', sessions);
   const sessionId = sessions.length ? sessions[0].id : '';
-  console.log('sessionId', sessionId);
   const Config = { ...koaConfig, key: `${koaConfig.key}-${sessionId}` };
-  // const Config = koaConfig;
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные

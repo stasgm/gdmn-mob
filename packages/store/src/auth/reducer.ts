@@ -77,7 +77,8 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
       return { ...state, loading: false, status: '', error: false, device: action.payload };
 
     case getType(actions.getDeviceByUidAsync.failure):
-      return { ...state, loading: false, status: action.payload, error: true };
+      // user = undefined - в случае ошибки получения устройства очищаем user для перехода в окно логина
+      return { ...state, loading: false, status: action.payload, error: true, user: undefined };
 
     case getType(actions.activateDeviceAsync.request):
       return { ...state, error: false, status: '', loading: true };
@@ -190,17 +191,6 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setConnectionStatus):
       return { ...state, error: false, connectionStatus: action.payload };
-
-    // case getType(actions.setDemoMode):
-    //   return {
-    //     ...state,
-    //     connectionStatus: 'connected',
-    //     user: mockUser,
-    //     device: mockDevice,
-    //     company: mockCompany,
-    //     // loading: false,
-    //     isDemo: true,
-    //   };
 
     case getType(actions.setDemoModeAsync.request):
       return {

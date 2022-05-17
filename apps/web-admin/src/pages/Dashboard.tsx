@@ -3,6 +3,8 @@ import { Box, Container, Typography, Grid } from '@material-ui/core';
 
 import { useCallback, useEffect } from 'react';
 
+import { authActions, useAuthThunkDispatch } from '@lib/store';
+
 import { useDispatch, useSelector } from '../store';
 
 import TotalCompanies from '../components/dashboard/Totalcompanies';
@@ -17,6 +19,15 @@ const Dashboard = () => {
   const { list: devices } = useSelector((state) => state.devices);
   const { list: users } = useSelector((state) => state.users);
   const { list: companies } = useSelector((state) => state.companies);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // Загружаем данные при загрузке компонента.
+    dispatch(companyActions.fetchCompanies());
+    dispatch(userActions.fetchUsers());
+    dispatch(deviceActions.fetchDevices());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const dispatch = useDispatch();
 
