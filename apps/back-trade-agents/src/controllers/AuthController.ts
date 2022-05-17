@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-import bcrypt from 'bcrypt';
+import { compare } from 'bcrypt';
 
 import { db, users } from '../users';
 import { insert, remove } from '../service/neDB';
@@ -27,7 +27,7 @@ const loginController = async (req: Request, res: Response, next: NextFunction) 
 
   const hashedPassword = user.password;
 
-  if (await bcrypt.compare(password, hashedPassword)) {
+  if (await compare(password, hashedPassword)) {
     //Сгенерируем новый токен
     const authToken = generateAuthToken();
     //Сохраним новый токен в bd для вошедшего пользователя

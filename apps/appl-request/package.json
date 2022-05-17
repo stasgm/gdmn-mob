@@ -51,8 +51,6 @@
     "expo-asset": "~8.4.4",
     "expo-constants": "~13.0.2",
     "expo-font": "~10.0.5",
-    "expo-intent-launcher": "^9.0.0",
-    "expo-location": "12.0.4",
     "expo-status-bar": "~1.2.0",
     "expo-updates": "~0.11.6",
     "react": "17.0.2",
