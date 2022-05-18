@@ -288,7 +288,7 @@ export const unknownProcess = (process: IDBProcess) => {
 };
 
 export const checkProcessList = (isStart = false) => {
-  console.log('ProcessList check', isStart);
+  log.info('Check processList');
   for (const process of processList) {
     switch (process.status) {
       //Записи в состоянии STARTED удаляются.

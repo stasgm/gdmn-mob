@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import { NavigationContainer } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import {

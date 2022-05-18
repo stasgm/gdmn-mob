@@ -48,7 +48,6 @@ const ConfigScreen = (props: Props) => {
     };
 
     onSetConfig(newConfig);
-
     navigation.navigate('Splash');
   };
 
@@ -58,11 +57,7 @@ const ConfigScreen = (props: Props) => {
   };
 
   const handleProtocolError = () => {
-    if (!(serverName.includes('http://') || serverName.includes('https://'))) {
-      setErr(true);
-    } else {
-      setErr(false);
-    }
+    setErr(!(serverName.includes('http://') || serverName.includes('https://')));
   };
 
   return (

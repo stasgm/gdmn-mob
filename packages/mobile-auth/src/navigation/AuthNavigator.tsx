@@ -28,6 +28,7 @@ const AuthNavigator: React.FC = () => {
   const isDemo = useSelector((state) => state.auth.isDemo);
   const isInit = useSelector((state) => state.auth.isInit);
   const user = useSelector((state) => state.auth.user);
+  const isConfigFirst = useSelector((state) => state.auth.isConfigFirst);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
 
@@ -54,6 +55,7 @@ const AuthNavigator: React.FC = () => {
         disconnect();
       }
       authDispatch(authActions.setConfig(newConfig));
+      authDispatch(authActions.setIsConfigFirst(false));
       api.config = { ...api.config, ...newConfig };
     },
     [config.deviceId, authDispatch, disconnect],
@@ -188,23 +190,23 @@ const AuthNavigator: React.FC = () => {
               />
             )
           ) : connectionStatus === 'not-connected' ? (
-            config.deviceId ? (
+            isConfigFirst ? (
               <>
+                <AuthStack.Screen name="Config" component={CongfigWithParams} />
                 <AuthStack.Screen
                   name="Splash"
                   component={SplashWithParams}
                   options={{ animationTypeForReplace: 'pop' }}
                 />
-                <AuthStack.Screen name="Config" component={CongfigWithParams} />
               </>
             ) : (
               <>
-                <AuthStack.Screen name="Config" component={CongfigWithParams} />
                 <AuthStack.Screen
                   name="Splash"
                   component={SplashWithParams}
                   options={{ animationTypeForReplace: 'pop' }}
                 />
+                <AuthStack.Screen name="Config" component={CongfigWithParams} />
               </>
             )
           ) : (
