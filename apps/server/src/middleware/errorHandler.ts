@@ -19,7 +19,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
         data: error.name || 'InnerErrorException',
       };
 
-      ctx.status = error.status || 500;
+      ctx.status = 200;
       ctx.body = result;
 
       log.error(error.toString());
