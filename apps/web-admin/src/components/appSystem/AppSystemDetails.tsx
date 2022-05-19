@@ -39,7 +39,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                   <TextField
                     error={formik.touched.name && Boolean(formik.errors.name)}
                     fullWidth
-                    label="Наименование подсистемы"
+                    label="Наименование"
                     name="name"
                     required
                     variant="outlined"
@@ -54,7 +54,7 @@ const AppSystemDetails = ({ appSystem, loading, onSubmit, onCancel }: IProps) =>
                   <TextField
                     error={formik.touched.description && Boolean(formik.errors.description)}
                     fullWidth
-                    label="Описание подсистемы"
+                    label="Описание"
                     name="description"
                     variant="outlined"
                     onBlur={formik.handleBlur}

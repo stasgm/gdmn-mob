@@ -90,6 +90,7 @@ const Root = () => {
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
 
+  //Для получения демо данных в useSync
   const getMessages = useCallback(async () => {
     await sleep(ONE_SECOND_IN_MS);
     await refDispatch(

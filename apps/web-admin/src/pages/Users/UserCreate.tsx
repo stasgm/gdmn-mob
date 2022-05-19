@@ -24,7 +24,6 @@ const UserCreate = () => {
   };
 
   const handleSubmit = async (values: IUser | NewUser) => {
-    console.log(values);
     const res = await dispatch(actions.addUser(values as NewUser));
     if (res.type === 'USER/ADD_SUCCESS') {
       goBack();

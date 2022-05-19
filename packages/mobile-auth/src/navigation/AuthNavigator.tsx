@@ -8,8 +8,6 @@ import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 import api from '@lib/client-api';
 
-import { NavigationContainer } from '@react-navigation/native';
-
 import {
   SplashScreen,
   SignInScreen,
@@ -28,6 +26,7 @@ const AuthNavigator: React.FC = () => {
   const isDemo = useSelector((state) => state.auth.isDemo);
   const isInit = useSelector((state) => state.auth.isInit);
   const user = useSelector((state) => state.auth.user);
+  const isConfigFirst = useSelector((state) => state.auth.isConfigFirst);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
   const authDispatch = useAuthThunkDispatch();
 
@@ -54,6 +53,7 @@ const AuthNavigator: React.FC = () => {
         disconnect();
       }
       authDispatch(authActions.setConfig(newConfig));
+      authDispatch(authActions.setIsConfigFirst(false));
       api.config = { ...api.config, ...newConfig };
     },
     [config.deviceId, authDispatch, disconnect],
@@ -87,14 +87,14 @@ const AuthNavigator: React.FC = () => {
     async (credentials: IUserCredentials) => {
       const res = await authDispatch(authActions.login(credentials));
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
-        authDispatch(authActions.getDeviceByUid(config.deviceId));
+        await authDispatch(authActions.getDeviceByUid(config.deviceId));
       }
     },
     [authDispatch, config.deviceId],
   );
 
   const logout = useCallback(async () => {
-    authDispatch(authActions.logout());
+    await authDispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
 
@@ -140,7 +140,6 @@ const AuthNavigator: React.FC = () => {
       await disconnect();
     }
     authDispatch(authActions.setInit(false));
-
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [user, authDispatch, disconnect]);
 
@@ -169,49 +168,43 @@ const AuthNavigator: React.FC = () => {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-          {isInit ? (
-            <AuthStack.Screen name="Mode" component={ModeSelection} />
-          ) : connectionStatus === 'connected' ? (
-            !user ? (
+      <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+        {isInit ? (
+          <AuthStack.Screen name="Mode" component={ModeSelection} />
+        ) : connectionStatus === 'connected' ? (
+          !user ? (
+            <AuthStack.Screen name="Login" component={SignInWithParams} options={{ animationTypeForReplace: 'pop' }} />
+          ) : (
+            <AuthStack.Screen
+              name="LoginCompany"
+              component={AppLoadWithParams}
+              options={{ animationTypeForReplace: 'push' }}
+            />
+          )
+        ) : connectionStatus === 'not-connected' ? (
+          isConfigFirst ? (
+            <>
+              <AuthStack.Screen name="Config" component={CongfigWithParams} />
               <AuthStack.Screen
-                name="Login"
-                component={SignInWithParams}
+                name="Splash"
+                component={SplashWithParams}
                 options={{ animationTypeForReplace: 'pop' }}
               />
-            ) : (
-              <AuthStack.Screen
-                name="LoginCompany"
-                component={AppLoadWithParams}
-                options={{ animationTypeForReplace: 'push' }}
-              />
-            )
-          ) : connectionStatus === 'not-connected' ? (
-            config.deviceId ? (
-              <>
-                <AuthStack.Screen
-                  name="Splash"
-                  component={SplashWithParams}
-                  options={{ animationTypeForReplace: 'pop' }}
-                />
-                <AuthStack.Screen name="Config" component={CongfigWithParams} />
-              </>
-            ) : (
-              <>
-                <AuthStack.Screen name="Config" component={CongfigWithParams} />
-                <AuthStack.Screen
-                  name="Splash"
-                  component={SplashWithParams}
-                  options={{ animationTypeForReplace: 'pop' }}
-                />
-              </>
-            )
+            </>
           ) : (
-            <AuthStack.Screen name="Activation" component={ActivateWithParams} />
-          )}
-        </AuthStack.Navigator>
-      </NavigationContainer>
+            <>
+              <AuthStack.Screen
+                name="Splash"
+                component={SplashWithParams}
+                options={{ animationTypeForReplace: 'pop' }}
+              />
+              <AuthStack.Screen name="Config" component={CongfigWithParams} />
+            </>
+          )
+        ) : (
+          <AuthStack.Screen name="Activation" component={ActivateWithParams} />
+        )}
+      </AuthStack.Navigator>
     </SafeAreaProvider>
   );
 };

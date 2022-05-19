@@ -54,11 +54,11 @@ const authenticate = async (ctx: Context, next: Next) => {
 
     const deviceBinding = deviceBindings.data.find((el) => el.deviceId === device.id && el.userId === user!.id);
     if (!deviceBinding) {
-      throw new UnauthorizedException('Связанное с пользователем устройство не найдено');
+      throw new UnauthorizedException('Связанное устройство не найдено');
     }
 
     if (deviceBinding.state === 'BLOCKED') {
-      throw new UnauthorizedException('Связанное с пользователем устройство заблокировано');
+      throw new UnauthorizedException('Связанное устройство заблокировано');
     }
   }
 

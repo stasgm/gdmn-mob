@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import { NavigationContainer } from '@react-navigation/native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import {
@@ -21,6 +20,8 @@ import api from '@lib/client-api';
 
 import { Snackbar } from 'react-native-paper';
 import { View, Text } from 'react-native';
+
+import { NavigationContainer } from '@react-navigation/native';
 
 import { useSync } from './hooks';
 import { truncate } from './utils/helpers';
@@ -107,14 +108,18 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     <Provider store={store}>
       <UIProvider theme={defaultTheme}>
         <ActionSheetProvider>
-          <Router />
+          <NavigationContainer>
+            <Router />
+          </NavigationContainer>
         </ActionSheetProvider>
       </UIProvider>
     </Provider>
   ) : (
     <UIProvider theme={defaultTheme}>
       <ActionSheetProvider>
-        <Router />
+        <NavigationContainer>
+          <Router />
+        </NavigationContainer>
       </ActionSheetProvider>
     </UIProvider>
   );

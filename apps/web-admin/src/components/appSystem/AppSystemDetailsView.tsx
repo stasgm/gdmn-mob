@@ -17,7 +17,7 @@ const AppSystemDetailsView = ({ appSystem }: IProps) => {
             <Grid container>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Подсистема
+                  Наименование
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
@@ -25,20 +25,16 @@ const AppSystemDetailsView = ({ appSystem }: IProps) => {
                   {appSystem.name}
                 </Typography>
               </Grid>
-              {appSystem.description ? (
-                <>
-                  <Grid item md={2} xs={6}>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Описание
-                    </Typography>
-                  </Grid>
-                  <Grid item md={10} xs={6}>
-                    <Typography variant="h4" gutterBottom>
-                      {appSystem.description}
-                    </Typography>
-                  </Grid>
-                </>
-              ) : null}
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Описание
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {appSystem.description}
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
