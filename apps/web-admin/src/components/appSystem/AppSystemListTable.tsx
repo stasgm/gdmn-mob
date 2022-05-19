@@ -166,7 +166,7 @@ const AppSystemListTable = ({
                     onChange={handleSelectAll}
                   />
                 </TableCell>
-                <TableCell>Подсистема</TableCell>
+                <TableCell>Наименование</TableCell>
                 <TableCell>Описание</TableCell>
                 <TableCell>Дата создания</TableCell>
                 <TableCell>Дата редактирования</TableCell>

@@ -87,14 +87,14 @@ const AuthNavigator: React.FC = () => {
     async (credentials: IUserCredentials) => {
       const res = await authDispatch(authActions.login(credentials));
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
-        authDispatch(authActions.getDeviceByUid(config.deviceId));
+        await authDispatch(authActions.getDeviceByUid(config.deviceId));
       }
     },
     [authDispatch, config.deviceId],
   );
 
   const logout = useCallback(async () => {
-    authDispatch(authActions.logout());
+    await authDispatch(authActions.logout());
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [authDispatch]);
 
@@ -140,7 +140,6 @@ const AuthNavigator: React.FC = () => {
       await disconnect();
     }
     authDispatch(authActions.setInit(false));
-
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
   }, [user, authDispatch, disconnect]);
 
