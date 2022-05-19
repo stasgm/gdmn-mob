@@ -28,6 +28,7 @@ const ConfigScreen = (props: Props) => {
   const [serverPort, setServerPort] = useState(config?.port?.toString() || '');
   const [timeout] = useState(config?.timeout?.toString() || '');
   const [deviceId, setDeviceId] = useState(config?.deviceId || '');
+  const [err, setErr] = useState(false);
 
   const handleSaveConfig = () => {
     if (err) {
@@ -47,7 +48,6 @@ const ConfigScreen = (props: Props) => {
     };
 
     onSetConfig(newConfig);
-
     navigation.navigate('Splash');
   };
 
@@ -56,15 +56,8 @@ const ConfigScreen = (props: Props) => {
     navigation.navigate('Splash');
   };
 
-  const [err, setErr] = useState(false);
-
   const handleProtocolError = () => {
-    if (!(serverName.includes('http://') || serverName.includes('https://'))) {
-      setErr(true);
-    } else {
-      setErr(false);
-    }
-    return;
+    setErr(!(serverName.includes('http://') || serverName.includes('https://')));
   };
 
   return (
@@ -80,7 +73,7 @@ const ConfigScreen = (props: Props) => {
         />
         {err && (
           <HelperText type="error" style={configStyles.error}>
-            {'Неверный протокол, пример: http://localhost'}
+            Неверный протокол, пример: http://localhost
           </HelperText>
         )}
         <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
