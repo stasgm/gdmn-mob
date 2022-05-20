@@ -30,7 +30,8 @@ import {
 import { getDb } from './dao/db';
 
 /**
- * 1. Если есть процесс для данной базы, то возвращает status 'BUSY'
+ * API 1. Создает процесс, возвращает файлы для обработки
+   1. Если есть процесс для данной базы, то возвращает status 'BUSY'
    2. Если нет процесса и нет сообщений для данного клиента, то возвращает status 'OK' и messages = []
    3. Если нет процесса и есть сообщения, то status 'OK', processId и список сообщений
  * @param params
@@ -70,6 +71,12 @@ export const addOne = (params: AddProcess): IAddProcessResponse => {
   };
 };
 
+/**
+ * API 2. Обновляет список файлов для обработки
+ * @param processId
+ * @param files
+ * @returns
+ */
 export const updateById = (processId: string, files: string[]): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
@@ -96,9 +103,8 @@ export const updateById = (processId: string, files: string[]): IStatusResponse 
 };
 
 /**
- * API 3
- * @param processId
- * @param processedFiles
+ * API 3. Записывает на диск подготовленные файлы для ответа
+ * @param params  {processId: string; producerId: string; processedFiles: NewMessage[]}
  * @returns
  */
 export const prepareById = ({
@@ -171,6 +177,12 @@ export const prepareById = ({
   return { status: 'OK' };
 };
 
+/**
+ * API 4. Завершает успешный процесс, если состояние 'READY_TO_COMMIT'.
+ Переносит подготовленные файлы с ответом в папку messages или error
+ * @param processId
+ * @returns
+ */
 export const completeById = (processId: string): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
@@ -261,6 +273,13 @@ export const completeById = (processId: string): IStatusResponse => {
   };
 };
 
+/**
+ * API 5. Удаляет процесс в случае возникновения ошибок при коммите транзакции, если было состояние 'READY_TO_COMMIT'.
+   Подготовленные файлы удаляются
+ * @param processId
+ * @param errorMessage
+ * @returns
+ */
 export const cancelById = (processId: string, errorMessage: string): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
@@ -307,6 +326,12 @@ export const cancelById = (processId: string, errorMessage: string): IStatusResp
   };
 };
 
+/**
+ * API 6. Удаляет процесс в случае возникновения ошибок, если состояние 'STARTED'
+ * @param processId
+ * @param errorMessage
+ * @returns
+ */
 export const interruptById = (processId: string, errorMessage: string): IStatusResponse => {
   //Находим процесс для конкеретной базы
   const process = getProcessById(processId);
@@ -337,7 +362,7 @@ export const interruptById = (processId: string, errorMessage: string): IStatusR
 };
 
 /**
- *
+ * Возвращает множество процессов
  * @param params
  * @returns
  */
@@ -358,10 +383,15 @@ export const deleteOne = (processId: string) => {
       status: 'CANCELLED',
     };
   }
+
+  switch (process.status) {
+    case 'STARTED':
+    case 'FAILED':
+  }
   //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
   removeProcessFromList(processId);
 
-  log.warn(`Robust-protocol.deleteProcess: процесс ${processId} удален`);
+  log.warn(`Robust-protocol.deleteProcess: процесс ${processId} удален вручную`);
 
   return {
     status: 'OK',

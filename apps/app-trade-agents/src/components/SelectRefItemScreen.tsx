@@ -43,7 +43,6 @@ const SelectRefItemScreen = () => {
         });
         companyFound = (item as IOutlet).company.id.includes(newParams.companyId);
         delete newParams.companyId;
-        // }
 
         return companyFound && extraPredicate(item, newParams);
       });

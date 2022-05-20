@@ -25,7 +25,7 @@ import {
   IProcess,
 } from '@lib/types';
 
-import { extraPredicate, generateId } from '../utils/helpers';
+import { extraPredicate, generateId, getListPart } from '../utils/helpers';
 
 import log from '../utils/logger';
 
@@ -80,10 +80,7 @@ export const removeProcessFromList = (processId: string) => {
  * Можем ли мы начать новый процесс. Вернет Истина, если да, Ложь, если уже идет процесс.
  * Если нет -- будеми сообщать Гедымину, что состояние BUSY.
  */
-export const getProcessByCompanyId = (companyId: string) => {
-  // initProcessList();
-  return processList.find((p) => p.companyId === companyId);
-};
+export const getProcessByCompanyId = (companyId: string) => processList.find((p) => p.companyId === companyId);
 
 export const startProcess = (companyId: string, appSystemId: string, files: IFiles) => {
   const newProcess: IDBProcess = {
@@ -102,12 +99,7 @@ export const startProcess = (companyId: string, appSystemId: string, files: IFil
   return newProcess;
 };
 
-export const getProcessById = (processId: string) => {
-  // initProcessList();
-  const process = processList.find((p) => p.id === processId);
-
-  return process;
-};
+export const getProcessById = (processId: string) => processList.find((p) => p.id === processId);
 
 export const getProcesses = (params: Record<string, string | number>): IProcess[] => {
   const { appSystems, companies } = getDb();
@@ -163,19 +155,8 @@ export const getProcesses = (params: Record<string, string | number>): IProcess[
 
     return filteredProcesses && extraPredicate(item, newParams as Record<string, string>);
   });
-  /** pagination */
-  const limitParams = Object.assign({}, params);
 
-  let fromRecord = 0;
-  if ('fromRecord' in limitParams) {
-    fromRecord = limitParams.fromRecord as number;
-  }
-
-  let toRecord = filteredList.length;
-  if ('toRecord' in limitParams)
-    toRecord = (limitParams.toRecord as number) > 0 ? (limitParams.toRecord as number) : toRecord;
-
-  return filteredList.slice(fromRecord, toRecord).map((i) => makeProcess(i));
+  return getListPart(filteredList, params).map((i) => makeProcess(i));
 };
 
 const getPath = (folders: string[], fn = '') => {
