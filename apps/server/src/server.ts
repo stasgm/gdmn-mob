@@ -61,7 +61,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
 
   //Каждый запрос содержит cookies, по которому passport опознаёт пользователя, и достаёт его данные из сессии.
   //passport сохраняет пользовательские данные
-
   passport.serializeUser((user: unknown, done) => {
     log.info('serializeUser', user);
     done(null, (user as IUser).id);
