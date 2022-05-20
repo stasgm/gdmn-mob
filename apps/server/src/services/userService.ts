@@ -32,12 +32,7 @@ const addOne = (userData: NewUser): IUser => {
     company = creator.company;
   }
 
-  if (
-    users.data.find(
-      (i) => i.name.toUpperCase() === userData.name.toUpperCase() && (i.company === company || i.role === 'Admin'),
-    )
-  ) {
-    // TODO проверять по каждой организации
+  if (users.data.find((i) => i.name.toUpperCase() === userData.name.toUpperCase())) {
     throw new ConflictException('Пользователь с таким именем уже существует');
   }
 
