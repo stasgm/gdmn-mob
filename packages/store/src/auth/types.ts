@@ -7,7 +7,6 @@ export type AuthState = {
   readonly user: IUser | undefined;
   readonly device: IDevice | undefined;
   readonly company: ICompany | undefined;
-  readonly userToken: string | undefined;
   readonly config: IApiConfig;
   readonly connectionStatus: ConnectionStatus;
   readonly isDemo: boolean;

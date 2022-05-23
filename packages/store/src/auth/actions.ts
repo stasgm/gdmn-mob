@@ -10,7 +10,6 @@ const loadData = createAction('AUTH/LOAD_DATA')<AuthState>();
 const setConfig = createAction('AUTH/SET_CONFIG')<IApiConfig>();
 const setCompany = createAction('AUTH/SET_COMPANY')<ICompany | undefined>();
 const setConnectionStatus = createAction('AUTH/SET_CONNECTION_STATUS')<ConnectionStatus>();
-const setUserToken = createAction('AUTH/SET_USERTOKEN')<string | undefined>();
 const setLoading = createAction('AUTH/SET_LOADING')<boolean>();
 const setLoadingData = createAction('AUTH/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('AUTH/SET_LOADING_ERROR')<string>();
@@ -85,7 +84,6 @@ export const actions = {
   disconnectAsync,
   logoutUserAsync,
   setCompany,
-  setUserToken,
   getDeviceByUidAsync,
   loginUserAsync,
   signupAsync,

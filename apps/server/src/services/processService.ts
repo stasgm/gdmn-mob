@@ -6,7 +6,7 @@ import { IAddProcessResponse, IStatusResponse, AddProcess, IProcessedFiles, NewM
 
 import log from '../utils/logger';
 
-import { DataNotFoundException } from '../exceptions';
+import { DataNotFoundException, ForbiddenException, InnerErrorException } from '../exceptions';
 
 import { messageFileName2params, params2messageFileName } from '../utils/json-db/MessageCollection';
 
@@ -203,7 +203,7 @@ export const completeById = (processId: string): IStatusResponse => {
 
   if (!process.processedFiles) {
     log.error(`Robust-protocol.completeProcess: в процессе ${processId} массив обработанных файлов пуст`);
-    throw new Error('Should never be here');
+    throw new InnerErrorException('Should never be here');
   }
 
   //1. Переводим процесс в состояние CLEANUP.
@@ -300,7 +300,7 @@ export const cancelById = (processId: string, errorMessage: string): IStatusResp
 
   if (!process.processedFiles) {
     log.error(`Robust-protocol.completeProcess: в процессе ${processId} массив обработанных файлов пуст`);
-    throw new Error('Should never be here');
+    throw new InnerErrorException('Should never be here');
   }
 
   //Файлы этого процесса, ранее записанные в папку PREPARED, удаляются.
@@ -376,24 +376,22 @@ export const deleteOne = (processId: string) => {
 
   //Если в списке нет процесса с переданным ИД
   //то возвращается статус CANCELLED
-  if (!process) {
-    log.warn(`Robust-protocol.deleteProcess: процесс ${processId} не найден`);
-
-    return {
-      status: 'CANCELLED',
-    };
+  if (!process || (process.status !== 'STARTED' && process.status !== 'FAILED')) {
+    if (!process) {
+      log.warn(`Robust-protocol.deleteProcess: процесс ${processId} не найден`);
+      throw new DataNotFoundException('Процесс не найден');
+    } else {
+      log.warn(`Robust-protocol.deleteProcess: нельзя удалить процесс ${processId}, его состояние ${process.status}`);
+      throw new ForbiddenException(`Процесс не может быть удален, его состояние ${process.status}`);
+    }
   }
 
+  //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
   switch (process.status) {
     case 'STARTED':
     case 'FAILED':
+      removeProcessFromList(processId);
   }
-  //Cервер сообщений удаляет процесс из списка процессов и делает соответствующую запись в логе.
-  removeProcessFromList(processId);
 
   log.warn(`Robust-protocol.deleteProcess: процесс ${processId} удален вручную`);
-
-  return {
-    status: 'OK',
-  };
 };

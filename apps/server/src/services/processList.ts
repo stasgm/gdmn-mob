@@ -31,7 +31,7 @@ import log from '../utils/logger';
 
 import config from '../../config';
 
-import { InnerErrorException } from '../exceptions';
+import { InnerErrorException, InvalidParameterException } from '../exceptions';
 
 import { BYTES_PER_MB, defMaxDataVolume, defMaxFiles, MSEС_IN_MIN } from '../utils/constants';
 
@@ -64,7 +64,7 @@ export const saveProcessList = () => {
 export const replaceProcessInList = (process: IDBProcess) => {
   const idx = processList.findIndex((p) => p.id === process.id);
   if (idx === -1) {
-    throw new Error('We should never be here');
+    throw new InnerErrorException('We should never be here');
   }
   processList[idx] = process;
   saveProcessList();
@@ -323,7 +323,7 @@ const checkPath = (filePath: string) => {
     accessSync(filePath, constants.R_OK | constants.W_OK);
   } catch (err) {
     log.error(`Robust-protocol.checkPath: файл ${filePath} не найден!`);
-    throw new Error(`Файл ${filePath} не найден!`);
+    throw new InnerErrorException(`Файл ${filePath} не найден!`);
   }
 };
 
@@ -342,7 +342,7 @@ const readMessageFile = (pathDb: string, fileName: string): IDBMessage => {
   if (isIDBMessage(parsed)) {
     return parsed;
   }
-  throw new InnerErrorException(`Неверный тип данных в файле ${fullName}`);
+  throw new InvalidParameterException(`Неверный тип данных в файле ${fullName}`);
 };
 
 const getFileSizeInMB = (fileName: string) => {

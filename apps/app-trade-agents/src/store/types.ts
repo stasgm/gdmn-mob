@@ -15,8 +15,6 @@ import {
 import { ICoords } from './geo/types';
 import { IGood } from './app/types';
 
-// import { IGood } from './app/types';
-
 export * from './app/types';
 
 export interface IFormParam {
@@ -163,10 +161,6 @@ export interface ISellBill extends IEntity {
   quantity: number;
   price: number;
 }
-
-// export interface ISellBillItem extends ISellBill {
-//   valueName: string;
-// }
 
 export interface ISellBillHead extends IHead {
   outlet?: INamedEntity;

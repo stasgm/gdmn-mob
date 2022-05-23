@@ -7,6 +7,7 @@ const loadData = createAction('APP_TRADE/LOAD_DATA')<AppTradeState>();
 const setLoading = createAction('APP_TRADE/SET_LOADING')<boolean>();
 const setLoadingData = createAction('APP_TRADE/SET_LOADING_DATA')<boolean>();
 const setLoadingError = createAction('APP_TRADE/SET_LOADING_ERROR')<string>();
+const setUserToken = createAction('APP_TRADE/SET_USERTOKEN')<string | undefined>();
 
 const setGoodModelAsync = createAsyncAction(
   'APP_TRADE/SET_GOOD_MODEL',
@@ -21,6 +22,7 @@ export const actions = {
   setLoading,
   setLoadingData,
   setLoadingError,
+  setUserToken,
 };
 
 export type AppTradeActionType = ActionType<typeof actions>;
