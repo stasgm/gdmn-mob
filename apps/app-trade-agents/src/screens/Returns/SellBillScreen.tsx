@@ -34,6 +34,13 @@ import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBil
 const onlineUser = config.USER_NAME;
 const onlineUserPass = config.USER_PASSWORD;
 
+const fetchWithTimeOut = (url: string, options: RequestInit, timeout = config.TIMEOUT) => {
+  return Promise.race([
+    fetch(url, options),
+    new Promise((resolve, reject) => setTimeout(() => reject(new Error('Превышено время ожидания!')), timeout)),
+  ]);
+};
+
 function SellBillScreen() {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'SellBill'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SellBill'>>();
@@ -149,6 +156,14 @@ function SellBillScreen() {
   const renderItem: ListRenderItem<ISellBillListRenderItemProps> = ({ item }) =>
     returnDoc?.id && docGood ? <SellBillItem item={item} /> : null;
 
+  const [unmounted, setUnmounted] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      setUnmounted(true);
+    };
+  }, []);
+
   const handleSearchSellBills = useCallback(async () => {
     setSellBills(undefined);
     setLoading(true);
@@ -165,7 +180,7 @@ function SellBillScreen() {
       };
 
       try {
-        const tokenFetched = await fetch(pathLogin, {
+        const tokenFetched = await fetchWithTimeOut(pathLogin, {
           method: 'POST',
           body: JSON.stringify(userData),
           headers: {
@@ -173,7 +188,7 @@ function SellBillScreen() {
           },
         });
 
-        const parsedToken: IResponse<IToken> = await tokenFetched.json();
+        const parsedToken: IResponse<IToken> = await (tokenFetched as Response).json();
 
         if (parsedToken.result) {
           const token = parsedToken.data;
@@ -183,7 +198,7 @@ function SellBillScreen() {
           }
         }
       } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Ошибка при логине пользователя');
+        throw new Error(err instanceof Error ? err.message : 'Ошибка при подключении!');
       }
       return undefined;
     };
@@ -210,7 +225,9 @@ function SellBillScreen() {
           const parsed: IResponse<ISellBill[]> = await fetched.json();
 
           if (parsed.result) {
-            setSellBills(parsed.data);
+            if (!unmounted) {
+              setSellBills(parsed.data);
+            }
           } else {
             //Если пришла ошибка токена, то логинимся и повторно пытаемся получить накладные
             if (parsed.error?.slice(0, 3) === '401') {
@@ -219,23 +236,29 @@ function SellBillScreen() {
                 await fetchSellBill(false, token);
               }
             } else {
-              setMessage(parsed.error || 'Ошибка при разборе полученных накладных');
-              setBarVisible(true);
+              if (!unmounted) {
+                setMessage(parsed.error || 'Ошибка при получении накладных!');
+                setBarVisible(true);
+              }
             }
           }
         } catch (e) {
-          if (e instanceof TypeError) {
-            setMessage(e.message);
-          } else {
-            setMessage('Неизвестная ошибка');
+          if (!unmounted) {
+            if (e instanceof Error) {
+              setMessage(e.message);
+            } else {
+              setMessage('Ошибка при запросе накладных!');
+            }
+            setBarVisible(true);
           }
-          setBarVisible(true);
         }
       }
     };
+
     await fetchSellBill();
+
     setLoading(false);
-  }, [dispatch, docDateBegin, docDateEnd, docGood, isDemo, outletId, serverName, serverPort, userToken]);
+  }, [dispatch, docDateBegin, docDateEnd, docGood, isDemo, outletId, serverName, serverPort, unmounted, userToken]);
 
   return (
     <AppScreen style={localStyles.appScreen}>
@@ -244,9 +267,19 @@ function SellBillScreen() {
         {loading ? <ActivityIndicator size="small" color={colors.primary} /> : <View style={localStyles.blank} />}
       </View>
       <Divider />
-      <SelectableInput label="Дата начала" value={getDateString(docDateBegin || '')} onPress={handlePresentDateBegin} />
-      <SelectableInput label="Дата окончания" value={getDateString(docDateEnd || '')} onPress={handlePresentDateEnd} />
-      <SelectableInput label="Товар" value={docGood?.name || ''} onPress={handlePresentGood} />
+      <SelectableInput
+        label="Дата начала"
+        value={getDateString(docDateBegin || '')}
+        onPress={handlePresentDateBegin}
+        disabled={loading}
+      />
+      <SelectableInput
+        label="Дата окончания"
+        value={getDateString(docDateEnd || '')}
+        onPress={handlePresentDateEnd}
+        disabled={loading}
+      />
+      <SelectableInput label="Товар" value={docGood?.name || ''} onPress={handlePresentGood} disabled={loading} />
       <PrimeButton
         icon={'magnify'}
         onPress={handleSearchSellBills}

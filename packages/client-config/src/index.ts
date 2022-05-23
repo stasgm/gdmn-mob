@@ -19,11 +19,6 @@ export interface IEnvConfig {
 const getConfig = () => {
   let config: IEnvConfig;
 
-  console.log('process.env.DEV_ENV', process.env.NODE_ENV);
-  console.log('process.env.MOCK', process.env.MOCK);
-
-  console.log('config', process.env.NODE_ENV, dev);
-
   switch (process.env.NODE_ENV) {
     case 'production':
       config = prod;
@@ -41,7 +36,6 @@ const getConfig = () => {
     ...config,
     debug: {
       useMockup: process.env.MOCK ? process.env.MOCK === 'true' : config.debug.useMockup,
-      //deviceId: (process.env.DEVICE_ID || config.debug.deviceId || '').toUpperCase(),
     },
   };
 
