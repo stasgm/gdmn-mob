@@ -67,6 +67,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       name: user.name || '',
       firstName: user.firstName || '',
       lastName: user.lastName || '',
+      middleName: user.middleName || '',
       verifyPassword: '',
       password: (user as NewUser).password || '',
       phoneNumber: user.phoneNumber || '',
@@ -128,37 +129,20 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     value={formik.values.name}
                   />
                 </Grid>
-                {userERP ? (
-                  <Grid item md={6} xs={12}>
-                    <Field
-                      component={ComboBox}
-                      name="appSystem"
-                      label="Подсистема"
-                      type="appSystem"
-                      options={appSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
-                      setFieldValue={formik.setFieldValue}
-                      setTouched={formik.setTouched}
-                      error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
-                      disabled={loading || loadingAppSystems}
-                    />
-                  </Grid>
-                ) : (
-                  <Grid item md={6} xs={12}>
-                    <Field
-                      component={ComboBox}
-                      name="erpUser"
-                      label="Пользователь ERP"
-                      type="erpUser"
-                      options={users?.map((d) => ({ id: d.id, name: d.name })) || []}
-                      setFieldValue={formik.setFieldValue}
-                      setTouched={formik.setTouched}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      error={formik.touched.erpUser && Boolean(formik.errors.erpUser)}
-                      disabled={loading || loadingUsers}
-                    />
-                  </Grid>
-                )}
+                <Grid item md={6} xs={12}>
+                  <TextField
+                    error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                    fullWidth
+                    label="Фамилия"
+                    name="lastName"
+                    variant="outlined"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="lastName"
+                    disabled={loading}
+                    value={formik.values.lastName}
+                  />
+                </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
                     error={formik.touched.firstName && Boolean(formik.errors.firstName)}
@@ -175,16 +159,16 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                 </Grid>
                 <Grid item md={6} xs={12}>
                   <TextField
-                    error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                    error={formik.touched.middleName && Boolean(formik.errors.middleName)}
                     fullWidth
-                    label="Фамилия"
-                    name="lastName"
+                    label="Отчество"
+                    name="middleName"
                     variant="outlined"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    type="lastName"
+                    type="middleName"
                     disabled={loading}
-                    value={formik.values.lastName}
+                    value={formik.values.middleName}
                   />
                 </Grid>
                 <Grid item md={6} xs={12}>
@@ -215,6 +199,43 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                     disabled={loading}
                     value={formik.values.email}
                   />
+                </Grid>
+                {userERP ? (
+                  <Grid item md={6} xs={12}>
+                    <Field
+                      component={ComboBox}
+                      name="appSystem"
+                      label="Подсистема"
+                      type="appSystem"
+                      options={appSystems?.map((d) => ({ id: d.id, name: d.name })) || []}
+                      setFieldValue={formik.setFieldValue}
+                      setTouched={formik.setTouched}
+                      error={Boolean(formik.touched.appSystem && formik.errors.appSystem)}
+                      disabled={loading || loadingAppSystems}
+                      required={userERP ? true : false}
+                    />
+                  </Grid>
+                ) : (
+                  <Grid item md={6} xs={12}>
+                    <Field
+                      component={ComboBox}
+                      name="erpUser"
+                      label="Пользователь ERP"
+                      type="erpUser"
+                      options={users?.map((d) => ({ id: d.id, name: d.name })) || []}
+                      setFieldValue={formik.setFieldValue}
+                      setTouched={formik.setTouched}
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      error={formik.touched.erpUser && Boolean(formik.errors.erpUser)}
+                      disabled={loading || loadingUsers}
+                      required={userERP ? false : true}
+                    />
+                  </Grid>
+                )}
+                <Grid item md={6} xs={12}>
+                  <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
+                  Пользователь ERP
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
                   <TextField
@@ -258,10 +279,6 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                       Пароли не совпадают
                     </Grid>
                   )}
-                <Grid item md={6} xs={12}>
-                  <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
-                  Пользователь ERP
-                </Grid>
               </Grid>
             </CardContent>
             <Divider />
