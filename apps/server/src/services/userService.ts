@@ -49,6 +49,7 @@ const addOne = (userData: NewUser): IUser => {
     externalId: userData.externalId,
     firstName: userData.firstName,
     lastName: userData.lastName,
+    middleName: userData.middleName,
     phoneNumber: userData.phoneNumber,
     email: userData.email,
     erpUserId: userData.erpUser?.id,
@@ -130,6 +131,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     externalId: userData.externalId || oldUser.externalId,
     firstName: userData.firstName === undefined ? oldUser.firstName : userData.firstName,
     lastName: userData.lastName === undefined ? oldUser.lastName : userData.lastName,
+    middleName: userData.middleName === undefined ? oldUser.middleName : userData.middleName,
     phoneNumber: userData.phoneNumber === undefined ? oldUser.phoneNumber : userData.phoneNumber,
     email: userData.email === undefined ? oldUser.email : userData.email,
     erpUserId: userData.erpUser === null ? undefined : newErpUserId || oldUser.erpUserId,
@@ -262,6 +264,7 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
         const name = item.name.toUpperCase();
         const firstname = typeof item.firstName === 'string' ? item.firstName.toUpperCase() : '';
         const lastName = typeof item.lastName === 'string' ? item.lastName.toUpperCase() : '';
+        const middleName = typeof item.middleName === 'string' ? item.middleName.toUpperCase() : '';
         const creationDate = new Date(item.creationDate || '').toLocaleString('ru', { hour12: false });
         const editionDate = new Date(item.editionDate || '').toLocaleString('ru', { hour12: false });
 
@@ -269,6 +272,7 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
           name.includes(filterText) ||
           firstname.includes(filterText) ||
           lastName.includes(filterText) ||
+          middleName.includes(filterText) ||
           creationDate.includes(filterText) ||
           editionDate.includes(filterText);
       }
@@ -294,6 +298,7 @@ export const makeUser = (user: IDBUser): IUser => {
     creator: users.getNamedItem(user.creatorId),
     firstName: user.firstName,
     lastName: user.lastName,
+    middleName: user.middleName,
     phoneNumber: user.phoneNumber,
     externalId: user.externalId,
     creationDate: user.creationDate,
