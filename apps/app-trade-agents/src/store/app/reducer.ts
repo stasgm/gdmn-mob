@@ -11,6 +11,7 @@ export const initialState: Readonly<AppTradeState> = {
   loadingData: false,
   errorMessage: '',
   loadingError: '',
+  userToken: undefined,
 };
 
 const reducer: Reducer<AppTradeState, AppTradeActionType> = (state = initialState, action): AppTradeState => {
@@ -49,6 +50,9 @@ const reducer: Reducer<AppTradeState, AppTradeActionType> = (state = initialStat
         ...state,
         loadingError: action.payload,
       };
+
+    case getType(actions.setUserToken):
+      return { ...state, userToken: action.payload };
 
     default:
       return state;
