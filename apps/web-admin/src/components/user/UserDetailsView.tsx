@@ -31,6 +31,16 @@ const UserDetailsView = ({ user }: IProps) => {
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
+                  Фамилия
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {user.lastName}
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
                   Имя
                 </Typography>
               </Grid>
@@ -41,12 +51,12 @@ const UserDetailsView = ({ user }: IProps) => {
               </Grid>
               <Grid item md={2} xs={6}>
                 <Typography variant="subtitle1" gutterBottom>
-                  Фамилия
+                  Отчество
                 </Typography>
               </Grid>
               <Grid item md={10} xs={6}>
                 <Typography variant="h4" gutterBottom>
-                  {user.lastName}
+                  {user.middleName}
                 </Typography>
               </Grid>
               <Grid item md={2} xs={6}>

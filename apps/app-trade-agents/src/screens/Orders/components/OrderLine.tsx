@@ -93,17 +93,47 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <ItemSeparator />
-          <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-            </View>
-            <MaterialCommunityIcons
-              name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
+          {packages.length > 0 ? (
+            <>
+              <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
+                <View style={styles.details}>
+                  <Text style={styles.name}>Упаковка</Text>
+                  <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+              <View>
+                {isVisiblePackages && (
+                  <View style={localStyles.packages}>
+                    {packages.map((elem) => (
+                      <Checkbox
+                        key={elem.package.id}
+                        title={elem.package.name}
+                        selected={elem.package.id === pack?.id}
+                        onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                      />
+                    ))}
+                  </View>
+                )}
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={localStyles.item}>
+                <View style={localStyles.details}>
+                  <Text style={styles.name}>Упаковка</Text>
+                  <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+                </View>
+                <MaterialCommunityIcons name={'chevron-down' as Icon} size={24} color="black" />
+              </View>
+              <Text style={localStyles.text}>Для данного товара нет упаковки</Text>
+            </>
+          )}
+          {/*
           {packages.length > 0 ? (
             <View>
               {isVisiblePackages && (
@@ -120,8 +150,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               )}
             </View>
           ) : (
-            <Text style={localStyles.text}>Для данного товара нет упаковки</Text>
-          )}
+
+          )} */}
           <ItemSeparator />
         </View>
       </ScrollView>
@@ -135,7 +165,19 @@ const localStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   text: {
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginHorizontal: 3,
+    marginTop: 3,
+  },
+  details: {
+    flex: 1,
+    marginHorizontal: 5,
+    marginTop: 5,
   },
 });
 

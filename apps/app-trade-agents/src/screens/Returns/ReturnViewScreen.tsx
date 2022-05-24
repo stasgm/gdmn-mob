@@ -141,7 +141,7 @@ const ReturnViewScreen = () => {
         colorLabel={getStatusColor(returnDoc?.status || 'DRAFT')}
         title={returnDoc?.head.outlet.name}
         onPress={handleEditReturnHead}
-        disabled={isBlocked}
+        disabled={!['DRAFT', 'READY'].includes(returnDoc.status)}
       >
         <View style={styles.directionRow}>
           <Text>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>

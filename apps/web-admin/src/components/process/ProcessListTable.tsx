@@ -131,7 +131,11 @@ const ProcessListTable = ({
           <TableCell>{process.appSystem.name}</TableCell>
           <TableCell>{process.status}</TableCell>
           <TableCell>{new Date(process.dateBegin || '').toLocaleString('ru', { hour12: false })}</TableCell>
-          <TableCell>{new Date(process?.dateReadyToCommit || '').toLocaleString('ru', { hour12: false })}</TableCell>
+          <TableCell>
+            {process.dateReadyToCommit
+              ? new Date(process?.dateReadyToCommit || '').toLocaleString('ru', { hour12: false })
+              : ''}
+          </TableCell>
         </TableRow>
       );
     });
