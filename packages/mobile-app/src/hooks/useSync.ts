@@ -59,7 +59,6 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     const okList: string[] = [];
 
     const consumer = user.erpUser;
-    console.log('consumer', consumer);
 
     /*
       Поддержка платформы:
@@ -129,7 +128,6 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           if (onGetMessages) {
             await onGetMessages();
           } else {
-            console.log('params', params);
             //2. Получаем все сообщения для мобильного
             const getMessagesResponse = await api.message.getMessages(params);
 

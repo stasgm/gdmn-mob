@@ -27,6 +27,7 @@ const generateAuthToken = () => {
 const queryArray2SellBill = (arr: IQuerySellBill[] | undefined): ISellBill[] | undefined => {
   if (!arr) return undefined;
   return arr.map((item) => ({
+    id: item.ID,
     number: item.NUMBER,
     contract: {
       id: item.CONTRACTKEY,
