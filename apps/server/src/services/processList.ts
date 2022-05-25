@@ -423,6 +423,7 @@ export const makeProcess = (process: IDBProcess): IProcess => {
 
   const company = companies.getNamedItem(process.companyId);
   const appSystem = appSystems.getNamedItem(process.appSystemId);
+  const dateDelete = new Date(new Date(process.dateBegin).getTime() + config.PROCESS_CHECK_PERIOD_IN_MIN * MSEС_IN_MIN);
 
   return {
     id: process.id,
@@ -433,5 +434,6 @@ export const makeProcess = (process: IDBProcess): IProcess => {
     dateReadyToCommit: process.dateReadyToCommit,
     processedFiles: process.processedFiles,
     status: process.status,
+    dateEnd: dateDelete,
   };
 };

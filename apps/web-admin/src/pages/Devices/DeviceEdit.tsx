@@ -38,11 +38,6 @@ const DeviceEdit = () => {
     dispatch(actions.deviceActions.clearError());
   };
 
-  // const handleCreateUid = (code: string) => {
-  //   console.log('handleCreateUid', code);
-  //   dispatch(authActions.activateDevice(code));
-  // };
-
   const handleSubmit = async (values: IDevice | NewDevice) => {
     const res = await dispatch(actions.updateDevice(values as IDevice));
     if (res.type === 'DEVICE/UPDATE_SUCCESS') {

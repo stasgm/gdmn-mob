@@ -50,6 +50,26 @@ const ProcessDetailsView = ({ process }: IProps) => {
                   {process.status}
                 </Typography>
               </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Дата создания
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {new Date(process.dateBegin || '').toLocaleString('ru', { hour12: false })}
+                </Typography>
+              </Grid>
+              <Grid item md={2} xs={6}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Дата окончания
+                </Typography>
+              </Grid>
+              <Grid item md={10} xs={6}>
+                <Typography variant="h4" gutterBottom>
+                  {new Date(process.dateEnd || '').toLocaleString('ru', { hour12: false })}
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

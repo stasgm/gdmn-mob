@@ -136,6 +136,7 @@ const ProcessListTable = ({
               ? new Date(process?.dateReadyToCommit || '').toLocaleString('ru', { hour12: false })
               : ''}
           </TableCell>
+          <TableCell>{new Date(process.dateEnd || '').toLocaleString('ru', { hour12: false })}</TableCell>
         </TableRow>
       );
     });
@@ -174,6 +175,7 @@ const ProcessListTable = ({
                 <TableCell>Статус</TableCell>
                 <TableCell>Дата начала</TableCell>
                 <TableCell>Дата подготовки</TableCell>
+                <TableCell>Дата окончания</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
