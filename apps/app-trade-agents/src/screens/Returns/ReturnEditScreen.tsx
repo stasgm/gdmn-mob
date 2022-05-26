@@ -270,6 +270,8 @@ export default ReturnEditScreen;
 
 const localStyles = StyleSheet.create({
   switchContainer: {
-    margin: 10,
+    marginHorizontal: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 });
