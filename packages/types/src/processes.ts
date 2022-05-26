@@ -12,6 +12,7 @@ export interface IProcess {
   status: ProcessType;
   processedFiles?: IProcessedFiles;
   dateReadyToCommit?: Date;
+  dateEnd?: Date;
 }
 
 export interface IDBProcess extends Omit<IProcess, 'company' | 'appSystem'> {

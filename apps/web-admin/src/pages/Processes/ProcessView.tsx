@@ -44,7 +44,6 @@ const ProcessView = () => {
   const process = processSelectors.processById(id);
   // const company = process?.companyId ? companySelectors.companyById(process.companyId) : undefined;
   // const appSystem = process?.appSystemId ? appSystemSelectors.appSystemById(process.appSystemId) : undefined;
-  console.log('process', process);
 
   const [open, setOpen] = useState(false);
 

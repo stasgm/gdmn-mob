@@ -133,25 +133,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               <Text style={localStyles.text}>Для данного товара нет упаковки</Text>
             </>
           )}
-          {/*
-          {packages.length > 0 ? (
-            <View>
-              {isVisiblePackages && (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === pack?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              )}
-            </View>
-          ) : (
-
-          )} */}
           <ItemSeparator />
         </View>
       </ScrollView>

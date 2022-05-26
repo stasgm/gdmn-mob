@@ -49,6 +49,7 @@ const MapScreen = () => {
 
   const routeList = docSelectors
     .selectByDocType<IRouteDocument>('route')
+    // .filter((i) => getDateString(i.documentDate) === getDateString(new Date()))
     ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
   const currentList: IListItem[] = useMemo(() => {
@@ -59,7 +60,12 @@ const MapScreen = () => {
     return newCurrentList;
   }, [routeList]);
 
-  const [selectedRoute, setSelectedRoute] = useState(currentList[0]);
+  const [selectedRoute, setSelectedRoute] = useState(
+    currentList.find(
+      (i) =>
+        getDateString(routeList.find((item) => item.id === i.id)?.documentDate || '') === getDateString(new Date()),
+    ),
+  );
   const [newSelectedRoute, setNewSelectedRoute] = useState(selectedRoute);
 
   const routeRef = useRef<BottomSheetModal>(null);

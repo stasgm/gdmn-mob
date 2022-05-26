@@ -142,7 +142,6 @@ const DashboardSidebar = ({ onMobileClose, openMobile }: IProps) => {
     </Box>
   );
 
-  console.log('user', user);
   return (
     <>
       <Box
