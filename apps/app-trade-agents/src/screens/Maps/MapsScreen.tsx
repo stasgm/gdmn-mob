@@ -269,13 +269,11 @@ const MapScreen = () => {
           <View style={localStyles.routeWidth}>
             <Text style={localStyles.routeName}>
               Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}
-              {/* {selectedRoute.value} */}
             </Text>
             {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
           </View>
           <View>
             <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>
-              {/* <MaterialCommunityIcons style={localStyles.routeIcon} name="cached" size={25} color="#000" /> */}
               <MaterialCommunityIcons style={localStyles.routeIcon} name="autorenew" size={25} color="#000" />
             </TouchableOpacity>
           </View>
@@ -285,15 +283,12 @@ const MapScreen = () => {
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
         </TouchableOpacity>
-
         <TouchableOpacity onPress={moveNextPoint} style={[localStyles.bubble, localStyles.button]}>
           <MaterialCommunityIcons name="chevron-right" size={35} color="#000" />
         </TouchableOpacity>
-
         <TouchableOpacity onPress={handleFitToCoordinates} style={[localStyles.bubble, localStyles.button]}>
           <MaterialCommunityIcons name="routes" size={35} color="#000" />
         </TouchableOpacity>
-
         <TouchableOpacity
           onPress={handleGetLocation}
           disabled={loading}
@@ -305,7 +300,7 @@ const MapScreen = () => {
       <BottomSheet
         sheetRef={routeRef}
         title={'Маршруты'}
-        snapPoints={['20%', '90%']}
+        snapPoints={[`${Math.min(currentList.length * 5 + 10, 90)}%`, '90%']}
         onDismiss={handleDismissRoute}
         onApply={handleApplyRoute}
       >
@@ -315,7 +310,6 @@ const MapScreen = () => {
           activeButtonId={newSelectedRoute?.id}
         />
       </BottomSheet>
-
       <Snackbar
         visible={barVisible}
         onDismiss={() => setBarVisible(false)}

@@ -21,29 +21,25 @@ interface IProps {
   onApply: () => void;
 }
 
-// LogBox.ignoreAllLogs();
-
 const BottomSheet = ({ sheetRef, children, title, snapPoints = ['40%', '90%'], onDismiss, onApply }: IProps) => {
   return (
-    <BottomSheetModalProvider>
-      <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <TouchableOpacity onPress={onDismiss}>
-              <MaterialCommunityIcons name={'close'} color={'#000'} size={24} />
-            </TouchableOpacity>
-            <Text style={styles.text}>{title}</Text>
-            <TouchableOpacity onPress={onApply}>
-              <MaterialCommunityIcons name={'check'} color={'#000'} size={24} />
-            </TouchableOpacity>
-          </View>
-          <ItemSeparator />
+    <BottomSheetModal ref={sheetRef} snapPoints={snapPoints} backdropComponent={BottomSheetBackdrop}>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={onDismiss}>
+            <MaterialCommunityIcons name={'close'} color={'#000'} size={24} />
+          </TouchableOpacity>
+          <Text style={styles.text}>{title}</Text>
+          <TouchableOpacity onPress={onApply}>
+            <MaterialCommunityIcons name={'check'} color={'#000'} size={24} />
+          </TouchableOpacity>
         </View>
-        <BottomSheetScrollView style={styles.content}>
-          <View>{children}</View>
-        </BottomSheetScrollView>
-      </BottomSheetModal>
-    </BottomSheetModalProvider>
+        <ItemSeparator />
+      </View>
+      <BottomSheetScrollView style={styles.content}>
+        <View>{children}</View>
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   );
 };
 

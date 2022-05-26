@@ -61,8 +61,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     position: 'absolute',
-    // right: 0,
-    // bottom: 0,
     top: 0,
     left: 0,
     width: '100%',
@@ -87,6 +85,8 @@ const styles = StyleSheet.create({
   },
   routeName: {
     textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   routeIcon: {
     textAlign: 'center',

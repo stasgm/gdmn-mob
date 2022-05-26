@@ -8,6 +8,8 @@ import { DrawerButton } from '@lib/mobile-ui';
 
 import { useNavigation } from '@react-navigation/native';
 
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+
 import MapScreen from '../../../screens/Maps/MapsScreen';
 import ListScreen from '../../../screens/Maps/ListScreen';
 
@@ -28,26 +30,28 @@ const MapTabsNavigator = () => {
   }, [navigation]);
 
   return (
-    <MapTabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Maps">
-      <MapTabsStack.Screen
-        name="Maps"
-        component={MapScreen}
-        options={{
-          title: 'Карта',
-          tabBarLabel: 'Карта',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="map-outline" size={24} color={color} />,
-        }}
-      />
-      <MapTabsStack.Screen
-        name="ListLocations"
-        component={ListScreen}
-        options={{
-          title: 'Список',
-          tabBarLabel: 'Список',
-          tabBarIcon: ({ color }) => <Entypo name="location" size={24} color={color} />,
-        }}
-      />
-    </MapTabsStack.Navigator>
+    <BottomSheetModalProvider>
+      <MapTabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Maps">
+        <MapTabsStack.Screen
+          name="Maps"
+          component={MapScreen}
+          options={{
+            title: 'Карта',
+            tabBarLabel: 'Карта',
+            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="map-outline" size={24} color={color} />,
+          }}
+        />
+        <MapTabsStack.Screen
+          name="ListLocations"
+          component={ListScreen}
+          options={{
+            title: 'Список',
+            tabBarLabel: 'Список',
+            tabBarIcon: ({ color }) => <Entypo name="location" size={24} color={color} />,
+          }}
+        />
+      </MapTabsStack.Navigator>
+    </BottomSheetModalProvider>
   );
 };
 
