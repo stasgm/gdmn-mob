@@ -152,6 +152,7 @@ const OrderListScreen = () => {
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
+              autoFocus
             />
           </View>
           <ItemSeparator />

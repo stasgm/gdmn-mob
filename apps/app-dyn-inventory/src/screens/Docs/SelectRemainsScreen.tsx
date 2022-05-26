@@ -141,6 +141,7 @@ export const SelectRemainsScreen = () => {
               onChangeText={setSearchText}
               value={searchText}
               style={[styles.flexGrow, styles.searchBar]}
+              autoFocus
             />
           </View>
           <ItemSeparator />
