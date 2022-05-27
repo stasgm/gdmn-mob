@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
-import { Divider, useTheme } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
+
+import { useTheme } from '@react-navigation/native';
 
 import { IGood, IGoodGroup, IOrderDocument, IOrderLine, IRouteTotalLine } from '../../../store/types';
 

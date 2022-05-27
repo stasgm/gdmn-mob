@@ -18,7 +18,7 @@ import {
 
 import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
 
-import { ActivityIndicator, Caption, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Caption } from 'react-native-paper';
 
 import { IDocument, IReferences, ISettingsOption } from '@lib/types';
 
@@ -74,7 +74,6 @@ const Root = () => {
   );
 
   const dispatch = useDispatch();
-  const { colors } = useTheme();
 
   useEffect(() => {
     // dispatch(authActions.init());
@@ -141,7 +140,7 @@ const Root = () => {
 
   return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>
-      <ActivityIndicator size="large" color={colors.primary} />
+      <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
       <Caption style={styles.title}>
         {appDataLoading || tradeLoading
           ? 'Загрузка данных...'

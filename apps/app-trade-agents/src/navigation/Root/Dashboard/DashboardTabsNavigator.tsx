@@ -4,10 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
-import { MenuButton, DrawerButton, useActionSheet } from '@lib/mobile-ui';
+import { MenuButton, useActionSheet } from '@lib/mobile-ui';
 
 import Home from '../../../screens/Dashboard/HomeScreen';
 import TaskListScreen from '../../../screens/Dashboard/TaskListScreen';
+import { navBackDrawer } from '../../../components/navigateOptions';
 
 export type TabsStackParams = {
   Main: undefined;
@@ -15,6 +16,8 @@ export type TabsStackParams = {
 };
 
 const TabsStack = createMaterialBottomTabNavigator<TabsStackParams>();
+const tabHome = ({ color }: any) => <FontAwesome5 size={20} name="copy" color={color} />;
+const tabTasks = ({ color }: any) => <FontAwesome5 size={20} name="tasks" color={color} />;
 
 const TabsNavigator = () => {
   const navigation = useNavigation();
@@ -37,12 +40,14 @@ const TabsNavigator = () => {
     ]);
   }, [showActionSheet]);
 
+  const renderRight = useCallback(() => <MenuButton actionsMenu={actionsMenu} />, [actionsMenu]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
-      headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
+      headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
-  }, [actionsMenu, navigation]);
+  }, [navigation, renderRight]);
 
   return (
     <TabsStack.Navigator barStyle={[styles.tabBar]} initialRouteName="Main">
@@ -52,7 +57,7 @@ const TabsNavigator = () => {
         options={{
           title: 'Дела',
           tabBarLabel: 'Дела',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="copy" color={color} />,
+          tabBarIcon: tabHome,
         }}
       />
       <TabsStack.Screen
@@ -61,7 +66,7 @@ const TabsNavigator = () => {
         options={{
           title: 'Задачи',
           tabBarLabel: 'Задачи',
-          tabBarIcon: ({ color }) => <FontAwesome5 size={20} name="tasks" color={color} />,
+          tabBarIcon: tabTasks,
         }}
       />
     </TabsStack.Navigator>

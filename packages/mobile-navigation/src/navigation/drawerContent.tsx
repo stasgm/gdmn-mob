@@ -1,9 +1,10 @@
 import { DrawerContentComponentProps, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Avatar, Caption, Divider, Drawer, Title, useTheme } from 'react-native-paper';
+import { Avatar, Caption, Divider, Drawer, Title } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
+import { useTheme } from '@react-navigation/native';
 
 const getDateString = (_date: string | Date) => {
   if (!_date) {
@@ -35,7 +36,11 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       <View style={styles.userProfile}>
         <View style={styles.userInfoSection}>
           <TouchableOpacity onPress={props.navigation.toggleDrawer}>
-            <Avatar.Icon size={50} icon="badge-account-horizontal-outline" children={undefined} />
+            <Avatar.Icon
+              size={50}
+              icon="badge-account-horizontal-outline"
+              style={{ backgroundColor: colors.primary }}
+            />
           </TouchableOpacity>
           <View style={styles.profileInfo}>
             <Title style={styles.title}>{user?.firstName}</Title>
@@ -52,7 +57,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
           style={[
             styles.drawerContent,
             {
-              backgroundColor: colors.surface,
+              backgroundColor: colors.card,
             },
           ]}
         >
@@ -63,7 +68,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
       </DrawerContentScrollView>
       <View style={styles.systemInfo}>
         <TouchableOpacity onPress={onSync}>
-          <Avatar.Icon size={50} icon="cloud-refresh" children={undefined} />
+          <Avatar.Icon size={50} icon="cloud-refresh" style={{ backgroundColor: colors.primary }} />
         </TouchableOpacity>
         {!!syncDate && (
           <View style={styles.updateSection}>

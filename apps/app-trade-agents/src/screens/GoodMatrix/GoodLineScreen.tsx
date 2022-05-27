@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
@@ -10,6 +10,7 @@ import { IRefMetadata } from '@lib/types';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
+import { navBackButton } from '../../components/navigateOptions';
 
 interface IProperty {
   sortOrder: number;
@@ -55,13 +56,11 @@ const GoodLineScreen = () => {
     [metadata, matrixItem],
   );
 
-  const { colors } = useTheme();
-
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
-  }, [navigation, colors.card]);
+  }, [navigation]);
 
   const renderItem = ({ item }: { item: IProperty }) => <LineItem item={item} />;
 

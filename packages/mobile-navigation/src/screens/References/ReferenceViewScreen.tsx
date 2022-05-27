@@ -69,6 +69,7 @@ const ReferenceViewScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor="green"
             />
           </View>
           <ItemSeparator />

@@ -8,7 +8,6 @@ import { useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
-  DrawerButton,
   FilterButtons,
   ItemSeparator,
   Status,
@@ -25,6 +24,7 @@ import { getDateString } from '@lib/mobile-app';
 import { IOrderDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
+import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface OrderListSectionProps {
   title: string;
@@ -115,22 +115,27 @@ const OrderListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+        />
+        <AddButton onPress={handleAddDocument} />
+      </View>
+    ),
+    [colors.card, filterVisible, handleAddDocument],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <IconButton
-            icon="card-search-outline"
-            style={filterVisible && { backgroundColor: colors.card }}
-            size={26}
-            onPress={() => setFilterVisible((prev) => !prev)}
-          />
-          <AddButton onPress={handleAddDocument} />
-        </View>
-      ),
+      headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
-  }, [colors.card, filterVisible, handleAddDocument, navigation]);
+  }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
@@ -153,6 +158,7 @@ const OrderListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

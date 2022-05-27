@@ -187,7 +187,7 @@ const globalStyles = StyleSheet.create({
   },
   bottomTotal: {
     alignItems: 'flex-end',
-    marginRight: 8,
+    marginRight: 4,
   },
   colorRed: {
     color: '#e91e63',

@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Provider } from 'react-redux';
 import { Store } from 'redux';
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import {
   authActions,
@@ -14,7 +12,7 @@ import {
 } from '@lib/store';
 import { AuthNavigator } from '@lib/mobile-auth';
 import { DrawerNavigator, INavItem } from '@lib/mobile-navigation';
-import { Theme as defaultTheme, Provider as UIProvider, Theme, globalStyles } from '@lib/mobile-ui';
+import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 
 import api from '@lib/client-api';
 
@@ -84,7 +82,7 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     <Snackbar
       visible={barVisible}
       onDismiss={closeSnackbar}
-      style={{ backgroundColor: Theme.colors.error }}
+      style={{ backgroundColor: defaultTheme.colors.error }}
       action={{
         icon: 'close',
         label: '',
@@ -104,24 +102,10 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     </>
   );
 
-  return store ? (
-    <Provider store={store}>
-      <UIProvider theme={defaultTheme}>
-        <ActionSheetProvider>
-          <NavigationContainer>
-            <Router />
-          </NavigationContainer>
-        </ActionSheetProvider>
-      </UIProvider>
-    </Provider>
-  ) : (
-    <UIProvider theme={defaultTheme}>
-      <ActionSheetProvider>
-        <NavigationContainer>
-          <Router />
-        </NavigationContainer>
-      </ActionSheetProvider>
-    </UIProvider>
+  return (
+    <NavigationContainer theme={defaultTheme}>
+      <Router />
+    </NavigationContainer>
   );
 };
 

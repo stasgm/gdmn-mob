@@ -3,15 +3,13 @@ import { StyleSheet } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
 import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
-
-import { DrawerButton } from '@lib/mobile-ui';
-
 import { useNavigation } from '@react-navigation/native';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import MapScreen from '../../../screens/Maps/MapsScreen';
 import ListScreen from '../../../screens/Maps/ListScreen';
+import { navBackDrawer } from '../../../components/navigateOptions';
 
 type MapTabsStackParams = {
   Maps: undefined;
@@ -25,9 +23,12 @@ const MapTabsNavigator = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
     });
   }, [navigation]);
+
+  const tabMap = ({ color }: any) => <MaterialCommunityIcons name="map-outline" size={24} color={color} />;
+  const tabList = ({ color }: any) => <Entypo name="location" size={24} color={color} />;
 
   return (
     <BottomSheetModalProvider>
@@ -38,7 +39,7 @@ const MapTabsNavigator = () => {
           options={{
             title: 'Карта',
             tabBarLabel: 'Карта',
-            tabBarIcon: ({ color }) => <MaterialCommunityIcons name="map-outline" size={24} color={color} />,
+            tabBarIcon: tabMap,
           }}
         />
         <MapTabsStack.Screen
@@ -47,7 +48,7 @@ const MapTabsNavigator = () => {
           options={{
             title: 'Список',
             tabBarLabel: 'Список',
-            tabBarIcon: ({ color }) => <Entypo name="location" size={24} color={color} />,
+            tabBarIcon: tabList,
           }}
         />
       </MapTabsStack.Navigator>

@@ -1,9 +1,9 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
@@ -11,6 +11,8 @@ import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGood, IGoodMatrix } from '../../store/types';
 
 import { getGoodMatrixByContact } from '../../utils/helpers';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import GoodItem from './components/GoodItem';
 
@@ -53,19 +55,24 @@ const GoodListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => (
+      <IconButton
+        icon="card-search-outline"
+        style={filterVisible && { backgroundColor: colors.card }}
+        size={26}
+        onPress={() => setFilterVisible((prev) => !prev)}
+      />
+    ),
+    [colors.card, filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, filterVisible, colors.card]);
+  }, [navigation, renderRight]);
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
 
@@ -83,6 +90,7 @@ const GoodListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

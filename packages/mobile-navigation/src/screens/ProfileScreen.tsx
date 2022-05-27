@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { Alert, View, Text, StyleSheet } from 'react-native';
-import { Avatar, Divider, useTheme } from 'react-native-paper';
+import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
@@ -10,6 +10,7 @@ import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
 import api from '@lib/client-api';
 
 import { useActionSheet } from '@lib/mobile-ui';
+import { useTheme } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
@@ -74,20 +75,20 @@ const ProfileScreen = () => {
     <View style={styles.container}>
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" children={undefined} />
+          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>
             {!user?.firstName && !user?.lastName ? user?.name : user?.lastName || ''}
           </Text>
-          <Text style={[styles.profileInfoTextCompany, { color: colors.placeholder }]}>{company?.name || ''}</Text>
+          <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{company?.name || ''}</Text>
         </View>
       </View>
       <Divider />
       <View style={[styles.profileContainer]}>
         <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="devices" />
+          <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{device?.name || ''}</Text>
