@@ -1,13 +1,11 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { useTheme } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
-  BackButton,
   MenuButton,
   useActionSheet,
   globalStyles as styles,
@@ -29,6 +27,8 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import SwipeLineItem from '../../components/SwipeLineItem';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import ReturnItem from './components/ReturnItem';
 
@@ -97,18 +97,23 @@ const ReturnViewScreen = () => {
     ]);
   }, [showActionSheet, handleAddSellBill, handleEditReturnHead, handleDelete]);
 
+  const renderRight = useCallback(
+    () =>
+      !isBlocked && (
+        <View style={styles.buttons}>
+          <AddButton onPress={handleAddSellBill} />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
+    [actionsMenu, handleAddSellBill, isBlocked],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () =>
-        !isBlocked && (
-          <View style={styles.buttons}>
-            <AddButton onPress={handleAddSellBill} />
-            <MenuButton actionsMenu={actionsMenu} />
-          </View>
-        ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, actionsMenu, isBlocked, handleAddSellBill]);
+  }, [navigation, renderRight]);
 
   if (del) {
     return (

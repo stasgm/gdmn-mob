@@ -11,7 +11,7 @@ interface AppProviderProps {
 const AppProvider = ({ theme, children }: AppProviderProps) => {
   return (
     <ActionSheetProvider>
-      <PaperProvider {...{ theme }}>
+      <PaperProvider theme={theme}>
         <>
           {Platform.OS === 'ios' && <StatusBar barStyle={'dark-content'} />}
           {children}

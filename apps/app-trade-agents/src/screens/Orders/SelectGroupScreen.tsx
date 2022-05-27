@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { getDateString } from '@lib/mobile-app';
@@ -14,6 +14,7 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IOrderDocument, IGoodGroup, IMGroupModel } from '../../store/types';
 import { getGroupModelByContact } from '../../utils/helpers';
 import { unknownGroup } from '../../utils/constants';
+import { navBackButton } from '../../components/navigateOptions';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -126,7 +127,7 @@ const SelectGroupScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
 
     if (formParams?.groupId) {

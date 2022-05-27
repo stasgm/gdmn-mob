@@ -1,13 +1,12 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
-  BackButton,
   MenuButton,
   useActionSheet,
   globalStyles as styles,
@@ -18,8 +17,6 @@ import {
 
 import { sleep } from '@lib/client-api';
 
-import { useTheme } from 'react-native-paper';
-
 import { getDateString } from '@lib/mobile-app';
 
 import { IOrderDocument, IOrderLine } from '../../store/types';
@@ -29,6 +26,8 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import SwipeLineItem from '../../components/SwipeLineItem';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import OrderItem from './components/OrderItem';
 
@@ -100,18 +99,23 @@ const OrderViewScreen = () => {
     ]);
   }, [showActionSheet, handleAddOrderLine, handleDelete, handleEditOrderHead]);
 
+  const renderRight = useCallback(
+    () =>
+      !isBlocked && (
+        <View style={styles.buttons}>
+          <AddButton onPress={handleAddOrderLine} />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
+    [actionsMenu, handleAddOrderLine, isBlocked],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () =>
-        !isBlocked && (
-          <View style={styles.buttons}>
-            <AddButton onPress={handleAddOrderLine} />
-            <MenuButton actionsMenu={actionsMenu} />
-          </View>
-        ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, handleAddOrderLine, actionsMenu, isBlocked]);
+  }, [navigation, renderRight]);
 
   if (del) {
     return (

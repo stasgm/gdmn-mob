@@ -1,9 +1,9 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
-import { AppScreen, BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
@@ -14,6 +14,7 @@ import { generateId } from '@lib/mobile-app';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IOrderDocument } from '../../store/types';
 import { getGoodMatrixByContact } from '../../utils/helpers';
+import { navBackButton } from '../../components/navigateOptions';
 
 const Good = ({ item }: { item: IGood }) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();
@@ -58,19 +59,24 @@ const SelectGoodScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => (
+      <IconButton
+        icon="card-search-outline"
+        style={filterVisible && { backgroundColor: colors.card }}
+        size={26}
+        onPress={() => setFilterVisible((prev) => !prev)}
+      />
+    ),
+    [colors.card, filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, filterVisible, colors.card]);
+  }, [navigation, renderRight]);
 
   const refList = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refList);
@@ -110,6 +116,7 @@ const SelectGoodScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

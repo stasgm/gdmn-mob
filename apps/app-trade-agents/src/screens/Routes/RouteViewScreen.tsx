@@ -4,15 +4,7 @@ import { View, FlatList, Alert, RefreshControl, Text } from 'react-native';
 import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import {
-  globalStyles as styles,
-  ItemSeparator,
-  SubTitle,
-  useActionSheet,
-  MenuButton,
-  BackButton,
-  AppScreen,
-} from '@lib/mobile-ui';
+import { globalStyles as styles, ItemSeparator, SubTitle, useActionSheet, MenuButton, AppScreen } from '@lib/mobile-ui';
 import { documentActions, docSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 
 import { getDateString } from '@lib/mobile-app';
@@ -24,6 +16,8 @@ import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocu
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';
@@ -149,22 +143,27 @@ const RouteViewScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+        />
+        <MenuButton actionsMenu={actionsMenu} />
+      </View>
+    ),
+    [actionsMenu, colors.card, filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <IconButton
-            icon="card-search-outline"
-            style={filterVisible && { backgroundColor: colors.card }}
-            size={26}
-            onPress={() => setFilterVisible((prev) => !prev)}
-          />
-          <MenuButton actionsMenu={actionsMenu} />
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [actionsMenu, colors.card, filterVisible, navigation]);
+  }, [navigation, renderRight]);
 
   const RC = useMemo(
     () => <RefreshControl refreshing={!filteredList.routeLineList} title="загрузка данных..." />,
@@ -196,6 +195,7 @@ const RouteViewScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

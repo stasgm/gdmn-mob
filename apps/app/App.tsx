@@ -11,14 +11,12 @@ import RootNavigator from './src/navigation/RootNavigator';
 import { store } from './src/store';
 
 const App = () => {
-  const Router = () => (authSelectors.isLoggedWithCompany() ? <RootNavigator /> : <AuthNavigator />);
+  const isAuth = authSelectors.isLoggedWithCompany();
 
   return (
     <Provider store={store}>
       <UIProvider theme={defaultTheme}>
-        <NavigationContainer>
-          <Router />
-        </NavigationContainer>
+        <NavigationContainer>{isAuth ? <RootNavigator /> : <AuthNavigator />}</NavigationContainer>
       </UIProvider>
     </Provider>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from 'react-native-paper';
+import { useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 

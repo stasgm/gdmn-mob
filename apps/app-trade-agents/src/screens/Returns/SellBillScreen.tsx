@@ -1,21 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text, ListRenderItem } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { Divider, Snackbar, useTheme } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { Divider, Snackbar } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { appActions, docSelectors, refSelectors, useSelector } from '@lib/store';
-import {
-  BackButton,
-  SelectableInput,
-  SubTitle,
-  PrimeButton,
-  InfoBlock,
-  ItemSeparator,
-  AppScreen,
-  Theme,
-} from '@lib/mobile-ui';
+import { SelectableInput, SubTitle, PrimeButton, InfoBlock, ItemSeparator, AppScreen, Theme } from '@lib/mobile-ui';
 
 import { IResponse, ISettingsOption } from '@lib/types';
 
@@ -28,6 +19,8 @@ import config from '../../config';
 import { mockSellBills } from '../../utils/constants';
 
 import { useDispatch, useSelector as useAppSelector, appTradeActions } from '../../store';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 
@@ -96,7 +89,7 @@ function SellBillScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
   }, [dispatch, navigation]);
 

@@ -6,15 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import {
-  BackButton,
-  AppInputScreen,
-  Input,
-  SelectableInput,
-  SaveButton,
-  globalStyles as styles,
-  SubTitle,
-} from '@lib/mobile-ui';
+import { AppInputScreen, Input, SelectableInput, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
 import { generateId, getDateString } from '@lib/mobile-app';
@@ -22,6 +14,7 @@ import { generateId, getDateString } from '@lib/mobile-app';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
+import { navBackButton } from '../../components/navigateOptions';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
@@ -196,12 +189,14 @@ const OrderEditScreen = () => {
     docStatus,
   ]);
 
+  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => <SaveButton onPress={handleSave} />,
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [dispatch, handleSave, navigation]);
+  }, [navigation, renderRight]);
 
   const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 

@@ -13,15 +13,7 @@ import {
   useDispatch,
   useSelector,
 } from '@lib/store';
-import {
-  BackButton,
-  AppInputScreen,
-  Input,
-  SelectableInput,
-  SaveButton,
-  globalStyles as styles,
-  SubTitle,
-} from '@lib/mobile-ui';
+import { AppInputScreen, Input, SelectableInput, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
 import { IDocumentType } from '@lib/types';
 
 import { generateId } from '@lib/mobile-app';
@@ -29,6 +21,7 @@ import { generateId } from '@lib/mobile-app';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
+import { navBackButton } from '../../components/navigateOptions';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
@@ -188,12 +181,17 @@ const ReturnEditScreen = () => {
 
   const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
 
+  const renderRight = useCallback(
+    () => ['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && <SaveButton onPress={handleSave} />,
+    [docStatus, handleSave],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => ['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && <SaveButton onPress={handleSave} />,
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [dispatch, docStatus, handleSave, isBlocked, navigation]);
+  }, [navigation, renderRight]);
 
   const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
 

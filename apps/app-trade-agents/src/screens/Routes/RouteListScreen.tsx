@@ -2,10 +2,12 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
 
-import { ItemSeparator, FilterButtons, Status, globalStyles as styles, DrawerButton, AppScreen } from '@lib/mobile-ui';
+import { ItemSeparator, FilterButtons, Status, globalStyles as styles, AppScreen } from '@lib/mobile-ui';
 import { useSelector, docSelectors } from '@lib/store';
 
 import { IRouteDocument } from '../../store/types';
+
+import { navBackDrawer } from '../../components/navigateOptions';
 
 import RouteListItem from './components/RouteListItem';
 
@@ -35,7 +37,7 @@ const RouteListScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
     });
   }, [navigation]);
 

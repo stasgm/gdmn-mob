@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Snackbar, useTheme } from 'react-native-paper';
+import { Snackbar } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
@@ -12,6 +12,8 @@ import { docSelectors, refSelectors } from '@lib/store';
 import { IListItem } from '@lib/mobile-types';
 
 import { getDateString } from '@lib/mobile-app';
+
+import { useTheme } from '@react-navigation/native';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';

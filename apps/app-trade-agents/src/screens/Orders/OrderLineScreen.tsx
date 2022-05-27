@@ -4,11 +4,13 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { OrdersStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
 import { IOrderLine } from '../../store/types';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import OrderLine from './components/OrderLine';
 
@@ -27,19 +29,23 @@ const OrderLineScreen = () => {
     );
 
     navigation.goBack();
-    // navigation.navigate('OrderView', { id: docId });
   }, [navigation, line, docId, dispatch, mode]);
+
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <SaveButton onPress={handleSave} />
+      </View>
+    ),
+    [handleSave],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <SaveButton onPress={handleSave} />
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, handleSave]);
+  }, [navigation, renderRight]);
 
   return (
     <View style={[styles.container]}>

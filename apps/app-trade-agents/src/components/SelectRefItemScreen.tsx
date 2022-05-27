@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+import { Searchbar, Divider, Checkbox } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { INamedEntity } from '@lib/types';
 import { appActions, refSelectors, useSelector, IFormParam } from '@lib/store';
-import {
-  AppScreen,
-  BackButton,
-  ItemSeparator,
-  SaveButton,
-  SearchButton,
-  SubTitle,
-  globalStyles as styles,
-} from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SaveButton, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-app';
 
@@ -21,10 +13,13 @@ import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
 import { IOutlet } from '../store/types';
 
+import { navBackButton } from './navigateOptions';
+
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { refName, isMulti, fieldName, value, clause } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
+  const { colors } = useTheme();
 
   const refObj = refSelectors.selectByName<any>(refName);
 
@@ -106,32 +101,37 @@ const SelectRefItemScreen = () => {
     [checkedItem, handleSelectItem],
   );
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />
+        {isMulti && (
+          <SaveButton
+            onPress={() => {
+              if (!checkedItem) {
+                Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
+                return;
+              }
+              const newFormParams: IFormParam = {
+                ...formParams,
+                [fieldName]: checkedItem,
+              };
+              dispatch(appActions.setFormParams(newFormParams));
+              navigation.goBack();
+            }}
+          />
+        )}
+      </View>
+    ),
+    [checkedItem, dispatch, fieldName, filterVisible, formParams, isMulti, navigation],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />
-          {isMulti && (
-            <SaveButton
-              onPress={() => {
-                if (!checkedItem) {
-                  Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
-                  return;
-                }
-                const newFormParams: IFormParam = {
-                  ...formParams,
-                  [fieldName]: checkedItem,
-                };
-                dispatch(appActions.setFormParams(newFormParams));
-                navigation.goBack();
-              }}
-            />
-          )}
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [checkedItem, fieldName, isMulti, navigation, formParams, filterVisible, dispatch]);
+  }, [navigation, renderRight]);
 
   return (
     <AppScreen>
@@ -146,6 +146,7 @@ const SelectRefItemScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

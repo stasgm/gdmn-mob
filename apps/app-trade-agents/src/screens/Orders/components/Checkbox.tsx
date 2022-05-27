@@ -2,7 +2,7 @@ import React from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useTheme } from 'react-native-paper';
+import { useTheme } from '@react-navigation/native';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -14,7 +14,7 @@ const Checkbox = ({ title, selected, onSelect }: { title: string; selected: bool
       style={[
         styles.container,
         {
-          borderColor: selected ? colors.primary : colors.disabled,
+          borderColor: selected ? colors.primary : colors.border,
           backgroundColor: selected ? colors.primary : colors.background,
         },
       ]}
@@ -23,7 +23,7 @@ const Checkbox = ({ title, selected, onSelect }: { title: string; selected: bool
       <MaterialCommunityIcons
         name={(selected ? 'check-circle-outline' : 'circle-outline') as Icon}
         size={20}
-        color={selected ? 'white' : colors.disabled}
+        color={selected ? 'white' : colors.border}
       />
       <Text style={[styles.text, { color: selected ? colors.background : colors.text }]}>{title}</Text>
     </TouchableOpacity>

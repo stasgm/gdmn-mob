@@ -6,7 +6,6 @@ import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
-  BackButton,
   BottomSheet,
   InfoBlock,
   ItemSeparator,
@@ -17,13 +16,12 @@ import {
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId } from '@lib/mobile-app';
 
-import { useTheme } from 'react-native-paper';
-
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getTimeProcess, twoDigits } from '../../../utils/helpers';
 import SwipeListItem from '../../../components/SwipeListItem';
+import { navBackButton } from '../../../components/navigateOptions';
 
 interface IVisitProps {
   item: IVisitDocument;
@@ -38,8 +36,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-
-  const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
 
@@ -104,7 +100,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
   }, [navigation]);
 
@@ -155,7 +151,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       head: {
         contact,
         outlet,
-        // depart: deprt1,
         route,
         reason: 'Брак',
       },
@@ -294,7 +289,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </InfoBlock>
         )}
         {returnDocs.length !== 0 && (
-          <InfoBlock colorLabel={colors.error} title="Возвраты">
+          <InfoBlock colorLabel={'#c98f10'} title="Возвраты">
             <FlatList
               data={returns}
               keyExtractor={(_, i) => String(i)}

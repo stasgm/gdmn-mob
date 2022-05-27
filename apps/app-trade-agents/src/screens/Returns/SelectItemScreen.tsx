@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Searchbar, Divider } from 'react-native-paper';
 
-import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
@@ -13,6 +13,7 @@ import { generateId } from '@lib/mobile-app';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IReturnLine } from '../../store/types';
+import { navBackButton } from '../../components/navigateOptions';
 
 const SelectItemScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SelectItemReturn'>>();
@@ -38,12 +39,17 @@ const SelectItemScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
+    [filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, filterVisible, colors.card]);
+  }, [navigation, renderRight]);
 
   const refList = React.useRef<FlatList<INamedEntity>>(null);
   useScrollToTop(refList);
@@ -86,6 +92,7 @@ const SelectItemScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

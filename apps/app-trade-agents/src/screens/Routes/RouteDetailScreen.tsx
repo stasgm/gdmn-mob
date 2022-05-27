@@ -1,11 +1,9 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Text, View } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import { INamedEntity } from '@lib/types';
-import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen, BackButton } from '@lib/mobile-ui';
-
-import { useTheme } from 'react-native-paper';
+import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -15,6 +13,8 @@ import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import Visit from './components/Visit';
 
@@ -30,7 +30,7 @@ const RouteDetailScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
   }, [navigation]);
 
@@ -79,7 +79,6 @@ const RouteDetailScreen = () => {
 
     try {
       coords = await getCurrentPosition();
-      console.log('coords', coords);
 
       const date = new Date().toISOString();
       const visitId = generateId();
@@ -103,14 +102,14 @@ const RouteDetailScreen = () => {
     } catch (e) {
       // setMessage(e.message);
       // setBarVisible(true);
-      console.log('err', e);
+      // console.log('err', e);
     }
     setProcess(false);
   };
 
   return (
     <AppScreen style={styles.contentTop}>
-      <InfoBlock colorLabel={colors.placeholder} title={point.outlet.name}>
+      <InfoBlock colorLabel={'#06567D'} title={point.outlet.name}>
         <>
           {outlet && (
             <>
@@ -121,7 +120,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? colors.error : '#a91160'}
+        colorLabel={debt.saldo > 0 ? colors.notification : '#a91160'}
         title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>
