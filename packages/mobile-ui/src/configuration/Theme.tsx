@@ -1,13 +1,5 @@
-import {
-  DarkTheme as PaperDarkTheme,
-  DefaultTheme as PaperDefaultTheme,
-  Provider as PaperProvider,
-} from 'react-native-paper';
-import {
-  NavigationContainer,
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
-} from '@react-navigation/native';
+import { DarkTheme as PaperDarkTheme, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
+import { DarkTheme as NavigationDarkTheme, DefaultTheme as NavigationDefaultTheme } from '@react-navigation/native';
 
 import colors from '../styles/colors';
 
@@ -22,6 +14,7 @@ const theme = {
     text: colors.text,
     placeholder: colors.placeholder,
   },
+  roundness: 2,
   dark: false,
 };
 const CombinedDarkTheme = {

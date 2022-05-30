@@ -97,12 +97,13 @@ const SelectGroupScreen = () => {
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
 
   const syncDate = useSelector((state) => state.app.syncDate);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   useEffect(() => {
-    if (syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+    if (syncDate && getDateString(syncDate) !== getDateString(new Date()) && !isDemo) {
       return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
     }
-  }, [syncDate]);
+  }, [syncDate, isDemo]);
 
   const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact.id;
 

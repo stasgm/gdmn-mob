@@ -4,7 +4,7 @@ import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 interface AppProviderProps {
-  theme: typeof DefaultTheme;
+  theme: any;
   children: React.ReactNode;
 }
 
