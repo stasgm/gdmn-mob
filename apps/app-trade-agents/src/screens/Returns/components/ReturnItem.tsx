@@ -32,7 +32,7 @@ const ReturnItem = ({ docId, item, readonly = false }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
+          <Text style={styles.name}>{item.good.name}</Text>
           <Text style={[styles.field, { color: colors.text }]}>
             {item.quantity} {good?.valueName} x {(item.priceFromSellBill || 0).toString()} р.
           </Text>

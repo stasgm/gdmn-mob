@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
 import { BackButton, SubTitle, AppScreen } from '@lib/mobile-ui';
@@ -24,11 +24,13 @@ interface IProperty {
 }
 
 const LineItem = React.memo(({ item }: { item: IProperty }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.item}>
       <View style={styles.details}>
         <Text style={styles.name}>{item.title}</Text>
-        <Text style={[styles.number, styles.field]}>{item.value}</Text>
+        <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.value}</Text>
       </View>
     </View>
   );

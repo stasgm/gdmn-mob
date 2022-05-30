@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
@@ -38,6 +38,8 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
+
+  const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
 
@@ -261,7 +263,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       <View style={localStyles.container}>
         <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
-            <Text style={localStyles.text}>{visitTextBegin}</Text>
+            <Text style={[localStyles.text, { color: colors.text }]}>{visitTextBegin}</Text>
             {dateEnd && <Text>{visitTextEnd}</Text>}
             {
               <>

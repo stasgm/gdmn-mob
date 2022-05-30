@@ -1,7 +1,7 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
-import { useScrollToTop } from '@react-navigation/native';
+import { useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ItemSeparator, globalStyles as styles, AppScreen } from '@lib/mobile-ui';
@@ -14,31 +14,36 @@ import { navBackDrawer } from '../../components/navigateOptions';
 
 import localStyles from './styles';
 
-const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => (
-  <TouchableHighlight onPress={onPress} style={styles.flexDirectionRow} activeOpacity={0.4} underlayColor="#DDDDDD">
-    <>
-      <View style={styles.item}>
-        <View
-          style={[
-            styles.icon,
-            item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
-          ]}
-        >
-          <Text style={styles.lightText}>{item.number}</Text>
+const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
+  const { colors } = useTheme();
+  return (
+    <TouchableHighlight onPress={onPress} style={styles.flexDirectionRow} activeOpacity={0.4} underlayColor="#DDDDDD">
+      <>
+        <View style={styles.item}>
+          <View
+            style={[
+              styles.icon,
+              item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
+            ]}
+          >
+            <Text style={styles.lightText}>{item.number}</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.details}>
-        <View style={styles.directionRow}>
-          <Text style={styles.name}>{item.name}</Text>
+        <View style={styles.details}>
+          <View style={styles.directionRow}>
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+          <View style={styles.flexDirectionRow}>
+            <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
+            <Text
+              style={[styles.field, { color: colors.text }]}
+            >{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+          </View>
         </View>
-        <View style={styles.flexDirectionRow}>
-          <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
-          <Text style={styles.field}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
-        </View>
-      </View>
-    </>
-  </TouchableHighlight>
-);
+      </>
+    </TouchableHighlight>
+  );
+};
 
 const ListScreen = () => {
   const navigation = useNavigation();
