@@ -235,7 +235,7 @@ const ReturnEditScreen = () => {
         {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && !docRoute && (
           <>
             <View style={[styles.directionRow, localStyles.switchContainer]}>
-              <Text>Черновик:</Text>
+              <Text style={styles.textLow}>Черновик:</Text>
               <Switch
                 value={docStatus === 'DRAFT' || !docStatus}
                 // disabled={isBlocked}

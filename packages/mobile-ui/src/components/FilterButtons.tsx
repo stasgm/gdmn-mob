@@ -51,7 +51,9 @@ const FilterButtons = ({ status, onPress, style }: IProps) => {
             ]}
             onPress={() => onPress(e.status)}
           >
-            <Text style={{ color: e.status === status ? colors.background : colors.text }}>{e.name}</Text>
+            <Text style={[{ color: e.status === status ? colors.background : colors.text }, { fontSize: 17 }]}>
+              {e.name}
+            </Text>
           </TouchableHighlight>
         );
       })}

@@ -51,6 +51,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingHorizontal: 12,
+    fontSize: 20,
   },
   settingsContainer: {
     flexDirection: 'column',
@@ -62,7 +63,7 @@ const localStyles = StyleSheet.create({
   },
   subHeading: {
     width: '85%',
-    fontSize: 14,
+    fontSize: 15,
   },
 });
 

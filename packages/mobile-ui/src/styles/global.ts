@@ -81,6 +81,9 @@ const globalStyles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  textLow: {
+    fontSize: 15,
+  },
   textBold: {
     fontWeight: 'bold',
   },
@@ -90,7 +93,7 @@ const globalStyles = StyleSheet.create({
   },
   title: {
     margin: 3,
-    fontSize: 18,
+    fontSize: 17,
     textAlign: 'center',
   },
   content: {
@@ -161,18 +164,19 @@ const globalStyles = StyleSheet.create({
     flexDirection: 'row',
   },
   name: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: 'bold',
   },
   number: {
-    fontSize: 12,
+    fontSize: 14,
   },
   textDescription: {
-    fontSize: 12,
+    fontSize: 14,
     textAlign: 'right',
   },
   field: {
-    opacity: 0.5,
+    // opacity: 0.7,
+    fontSize: 15,
   },
   lightText: {
     fontSize: 15,
