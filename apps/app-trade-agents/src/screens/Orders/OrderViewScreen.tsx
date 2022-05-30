@@ -4,7 +4,7 @@ import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
   MenuButton,
@@ -19,7 +19,7 @@ import { sleep } from '@lib/client-api';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IOrderDocument, IOrderLine } from '../../store/types';
+import { IDebt, IOrderDocument, IOrderLine } from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -43,6 +43,10 @@ const OrderViewScreen = () => {
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
   const isBlocked = order?.status !== 'DRAFT';
+
+  const debt =
+    refSelectors.selectByName<IDebt>('debt').data.find((item) => item.contact.id === order.head.contact.id) ||
+    undefined;
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {
@@ -150,11 +154,20 @@ const OrderViewScreen = () => {
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
-        <View style={styles.rowCenter}>
+        <View style={{ flexDirection: 'column' }}>
           <Text style={[styles.textLow, { color: colors.text }]}>{`№ ${order.number} от ${getDateString(
             order.documentDate,
           )} на ${getDateString(order.head?.onDate)}`}</Text>
-          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+
+          <Text style={[styles.textLow, { color: colors.text }]}>
+            {debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}
+          </Text>
+          <View style={styles.rowCenter}>
+            <Text style={[styles.textLow, { color: colors.text }]}>
+              {`Просроченная задолженность: ${debt.saldoDebt}`}
+            </Text>
+            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+          </View>
         </View>
       </InfoBlock>
       <FlatList

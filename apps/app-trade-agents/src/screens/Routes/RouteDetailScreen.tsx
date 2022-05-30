@@ -69,7 +69,7 @@ const RouteDetailScreen = () => {
     contact: contact as INamedEntity,
     ondate: '2021-01-01',
     saldo: debtSaldo?.saldo || 0,
-    saldoDebt: 0,
+    saldoDebt: debtSaldo?.saldoDebt || 0,
   };
 
   const handleNewVisit = async () => {
@@ -129,6 +129,9 @@ const RouteDetailScreen = () => {
               <Text style={[styles.textLow, { color: colors.text }]}>{`Условия оплаты: ${contact.paycond}`}</Text>
               <Text style={[styles.textLow, { color: colors.text }]}>
                 {debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}
+              </Text>
+              <Text style={[styles.textLow, { color: colors.text }]}>
+                {`Просроченная задолженность: ${debt.saldoDebt}`}
               </Text>
             </>
           )}
