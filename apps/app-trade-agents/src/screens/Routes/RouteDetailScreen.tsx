@@ -113,8 +113,8 @@ const RouteDetailScreen = () => {
         <>
           {outlet && (
             <>
-              <Text>{outlet.address}</Text>
-              <Text>{outlet.phoneNumber}</Text>
+              <Text style={styles.textLow}>{outlet.address}</Text>
+              <Text style={styles.textLow}>{outlet.phoneNumber}</Text>
             </>
           )}
         </>
@@ -126,8 +126,10 @@ const RouteDetailScreen = () => {
         <>
           {contact && (
             <>
-              <Text>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text>{debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}</Text>
+              <Text style={styles.textLow}>{`Условия оплаты: ${contact.paycond}`}</Text>
+              <Text style={styles.textLow}>
+                {debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}
+              </Text>
             </>
           )}
         </>

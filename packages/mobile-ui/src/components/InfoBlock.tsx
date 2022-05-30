@@ -61,7 +61,7 @@ const localStyles = StyleSheet.create({
   },
   titleText: {
     color: '#333536',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   infoContainer: {

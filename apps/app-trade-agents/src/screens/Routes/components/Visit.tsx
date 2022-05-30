@@ -16,6 +16,8 @@ import {
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId } from '@lib/mobile-app';
 
+// import styles from '@lib/mobile-ui/src/components/ScreenTitle/styles';
+
 import { useDispatch } from '../../../store';
 import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
@@ -259,7 +261,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       <View style={localStyles.container}>
         <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
-            <Text>{visitTextBegin}</Text>
+            <Text style={localStyles.text}>{visitTextBegin}</Text>
             {dateEnd && <Text>{visitTextEnd}</Text>}
             {
               <>
@@ -337,6 +339,9 @@ const localStyles = StyleSheet.create({
   container: {
     flex: 1,
     // padding: 24,
+  },
+  text: {
+    fontSize: 15,
   },
 });
 

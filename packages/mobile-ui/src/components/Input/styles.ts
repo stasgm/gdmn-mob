@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     height: 40,
     flex: 1,
     marginHorizontal: 10,
+    fontSize: 17,
   },
   containerInput: {
     width: '100%',

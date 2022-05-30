@@ -1598,6 +1598,9 @@ const messageAgent: IMessage<MessageType>[] = [
                 id: '273098058',
                 name: '10',
               },
+              priceFromSellBill: 4.68,
+              quantityFromSellBill: 4,
+              sellBillId: '1656799230',
             },
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e77',

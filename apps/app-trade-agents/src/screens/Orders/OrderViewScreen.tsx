@@ -151,7 +151,7 @@ const OrderViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
         <View style={styles.rowCenter}>
-          <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+          <Text style={styles.textLow}>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
             order.head?.onDate,
           )}`}</Text>
           {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}

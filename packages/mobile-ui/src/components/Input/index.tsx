@@ -60,7 +60,6 @@ const Input = ({
           value={value || ''}
           onChangeText={onChangeText}
           onEndEditing={onEndEditing}
-          autoComplete={false}
           theme={{
             colors: {
               primary: colors.primary,

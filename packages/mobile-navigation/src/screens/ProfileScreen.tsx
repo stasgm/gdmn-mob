@@ -152,11 +152,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   profileInfoTextCompany: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '300',
   },
   profileInfoTextUser: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
   },
   title: {
