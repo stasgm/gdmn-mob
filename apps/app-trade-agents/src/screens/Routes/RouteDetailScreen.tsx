@@ -60,17 +60,17 @@ const RouteDetailScreen = () => {
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
     : undefined;
 
-  const debtSaldo = contact
+  const debt = contact
     ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.contact.id === contact.id)
     : undefined;
 
-  const debt: IDebt = {
-    id: '1',
-    contact: contact as INamedEntity,
-    ondate: '2021-01-01',
-    saldo: debtSaldo?.saldo || 0,
-    saldoDebt: debtSaldo?.saldoDebt || 0,
-  };
+  // const debt: IDebt = {
+  //   id: '1',
+  //   contact: contact as INamedEntity,
+  //   ondate: '2021-01-01',
+  //   saldo: debtSaldo?.saldo || 0,
+  //   saldoDebt: debtSaldo?.saldoDebt || 0,
+  // };
 
   const handleNewVisit = async () => {
     setProcess(true);
@@ -120,7 +120,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? colors.notification : '#a91160'}
+        colorLabel={debt?.saldo && debt?.saldo > 0 ? colors.notification : '#a91160'}
         title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>
@@ -128,14 +128,14 @@ const RouteDetailScreen = () => {
             <>
               <Text style={[styles.textLow, { color: colors.text }]}>{`Условия оплаты: ${contact.paycond}`}</Text>
               <Text style={[styles.textLow, { color: colors.text }]}>
-                {debt.saldo < 0
-                  ? `Предоплата: ${Math.abs(debt.saldo)
+                {debt?.saldo && debt.saldo < 0
+                  ? `Предоплата: ${Math.abs(debt?.saldo)
                       .toString()
                       .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`
-                  : `Задолженность: ${debt.saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
+                  : `Задолженность: ${debt?.saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
               </Text>
               <Text style={[styles.textLow, { color: colors.text }]}>
-                {`Просроченная задолженность: ${debt.saldoDebt
+                {`Просроченная задолженность: ${debt?.saldoDebt
                   .toString()
                   .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
               </Text>
