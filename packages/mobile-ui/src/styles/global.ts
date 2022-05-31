@@ -93,7 +93,7 @@ const globalStyles = StyleSheet.create({
   },
   title: {
     margin: 3,
-    fontSize: 17,
+    fontSize: 18,
     textAlign: 'center',
     color: colors.text,
   },
