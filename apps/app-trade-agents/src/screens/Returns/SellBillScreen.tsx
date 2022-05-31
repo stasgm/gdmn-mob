@@ -16,11 +16,11 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IGood, IReturnDocument, ISellBill, IToken, ISellBillFormParam } from '../../store/types';
 import config from '../../config';
 
-import { mockSellBills } from '../../utils/constants';
-
 import { useDispatch, useSelector as useAppSelector, appTradeActions } from '../../store';
 
 import { navBackButton } from '../../components/navigateOptions';
+
+import { mockSellBills } from '../../store/mock';
 
 import SellBillItem, { ISellBillListRenderItemProps } from './components/SellBillItem';
 

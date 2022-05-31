@@ -194,9 +194,6 @@ const globalStyles = StyleSheet.create({
     alignItems: 'flex-end',
     marginRight: 4,
   },
-  colorRed: {
-    color: '#e91e63',
-  },
   marginBottom5: {
     marginBottom: 5,
   },

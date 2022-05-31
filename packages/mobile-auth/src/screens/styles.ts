@@ -5,7 +5,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
   },
   serverName: {
-    color: '#888',
     fontSize: 18,
     marginBottom: 18,
   },

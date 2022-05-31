@@ -60,17 +60,11 @@ const RouteDetailScreen = () => {
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
     : undefined;
 
-  const debtSaldo = contact
-    ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.contact.id === contact.id)
+  const debt = contact
+    ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === contact.id)
     : undefined;
 
-  const debt: IDebt = {
-    id: '1',
-    contact: contact as INamedEntity,
-    ondate: '2021-01-01',
-    saldo: debtSaldo?.saldo || 0,
-    saldoDebt: 0,
-  };
+  const saldo = debt?.saldo ?? 0;
 
   const handleNewVisit = async () => {
     setProcess(true);
@@ -120,15 +114,15 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? colors.notification : '#a91160'}
+        colorLabel={'#a91160'}
         title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>
           {contact && (
             <>
               <Text style={styles.textLow}>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text style={styles.textLow}>
-                {debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}
+              <Text style={[styles.textLow, styles.textBold, { color: saldo < 0 ? colors.text : colors.notification }]}>
+                {saldo < 0 ? `Предоплата: ${Math.abs(saldo)}` : `Задолженность: ${saldo}`}
               </Text>
             </>
           )}

@@ -34,7 +34,8 @@ import {
   GoodMatrixNavigator,
 } from './src/navigation';
 
-import { appSettings, messageAgent, ONE_SECOND_IN_MS } from './src/utils/constants';
+import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
+import { messageAgent } from './src/store/mock';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -135,6 +136,13 @@ const Root = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isDemo) {
+      //Если включен демо режим, то запускаем получение данных
+      getMessages();
+    }
+  }, [isDemo, getMessages]);
 
   const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
 

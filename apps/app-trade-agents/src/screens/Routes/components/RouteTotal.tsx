@@ -69,7 +69,7 @@ const RouteTotal = ({ routeId }: IItem) => {
       <FlatList data={totalList} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
       <Divider />
       <View style={styles.bottomTotal}>
-        <Text style={[styles.textTotal, styles.colorRed]}>
+        <Text style={[styles.textTotal, { color: colors.notification }]}>
           {totalList?.reduce((prev, item) => prev + item.quantity, 0)}
         </Text>
       </View>

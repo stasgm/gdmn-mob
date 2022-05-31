@@ -29,6 +29,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
   const user = useSelector((state) => state.auth.user);
   const company = useSelector((state) => state.auth.company);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   const syncDate = useSelector((state) => state.app.syncDate) as Date;
 
@@ -67,16 +68,18 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
           </Drawer.Section>
         </Animated.View>
       </DrawerContentScrollView>
-      <PrimeButton icon="cloud-sync-outline" onPress={onSync} outlined>
-        <View>
-          <Caption style={{ color: colors.text, fontSize: 16 }}>Синхронизировать</Caption>
-          {!!syncDate && (
-            <Caption style={[styles.caption, { color: colors.text }]}>
-              {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
-            </Caption>
-          )}
-        </View>
-      </PrimeButton>
+      {!isDemo && (
+        <PrimeButton icon="cloud-sync-outline" onPress={onSync} outlined>
+          <View>
+            <Caption style={{ color: colors.text, fontSize: 16 }}>Синхронизировать</Caption>
+            {!!syncDate && (
+              <Caption style={[styles.caption, { color: colors.text }]}>
+                {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
+              </Caption>
+            )}
+          </View>
+        </PrimeButton>
+      )}
     </>
   );
 }
@@ -110,8 +113,8 @@ const styles = StyleSheet.create({
   },
   caption: {
     textAlign: 'center',
-    fontSize: 15,
-    lineHeight: 15,
+    fontSize: 16,
+    lineHeight: 16,
   },
   updateSection: {
     alignItems: 'flex-end',
