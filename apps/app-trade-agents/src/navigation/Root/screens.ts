@@ -23,44 +23,44 @@ import SelectRefItemScreen from '../../components/SelectRefItemScreen';
 import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens/GoodMatrix';
 
 const orderListScreens = {
-  OrderList: OrderListScreen,
+  OrderList: { title: 'Заявки', component: OrderListScreen },
 };
 
 const orderScreens = {
-  OrderView: OrderViewScreen,
-  OrderEdit: OrderEditScreen,
-  OrderLine: OrderLineScreen,
-  SelectGroupItem: SelectGroupScreen,
-  SelectGoodItem: SelectGoodScreen,
-  SelectRefItem: SelectRefItemScreen,
+  OrderView: { title: 'Заявка', component: OrderViewScreen },
+  OrderEdit: { title: 'Заявка', component: OrderEditScreen },
+  OrderLine: { title: 'Позиция заявки', component: OrderLineScreen },
+  SelectGroupItem: { title: 'Добавление позиции заявки', component: SelectGroupScreen },
+  SelectGoodItem: { title: 'Добавление позиции заявки', component: SelectGoodScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
 
 const returnListScreens = {
-  ReturnList: ReturnListScreen,
+  ReturnList: { title: 'Возвраты', component: ReturnListScreen },
 };
 
 const returnScreens = {
-  ReturnView: ReturnViewScreen,
-  ReturnEdit: ReturnEditScreen,
-  ReturnLine: ReturnLineScreen,
-  SelectRefItem: SelectRefItemScreen,
-  SelectItemReturn: SelectItemScreen,
-  SellBill: SellBillScreen,
+  ReturnView: { title: 'Возврат', component: ReturnViewScreen },
+  ReturnEdit: { title: 'Возврат', component: ReturnEditScreen },
+  ReturnLine: { title: 'Позиция возврата', component: ReturnLineScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  SelectItemReturn: { title: 'Добавление позиции возврата', component: SelectItemScreen },
+  SellBill: { title: 'Добавление позиции возврата', component: SellBillScreen },
 };
 
 const routerScreen = {
-  RouteList: RouteListScreen,
-  RouteView: RouteViewScreen,
-  RouteDetails: RouteDetailsScreen,
+  RouteList: { title: 'Маршруты', component: RouteListScreen },
+  RouteView: { title: 'Точки маршрута', component: RouteViewScreen },
+  RouteDetails: { title: 'Визит', component: RouteDetailsScreen },
 };
 
 const goodMatrixListScreens = {
-  ContactList: ContactListScreen,
+  ContactList: { title: 'Матрицы', component: ContactListScreen },
 };
 
 const goodMatrixScreens = {
-  GoodList: GoodListScreen,
-  GoodLine: GoodLineScreen,
+  GoodList: { title: 'Матрица', component: GoodListScreen },
+  GoodLine: { title: 'Позиция матрицы', component: GoodLineScreen },
 };
 
 export {

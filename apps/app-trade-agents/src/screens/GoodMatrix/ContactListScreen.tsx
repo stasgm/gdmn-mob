@@ -36,12 +36,14 @@ const ContactListScreen = () => {
   const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 
   const syncDate = useSelector((state) => state.app.syncDate);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   useEffect(() => {
-    if (matrix && contacts && syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+    if (matrix && contacts && syncDate && getDateString(syncDate) !== getDateString(new Date()) && !isDemo) {
       return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
     }
-  }, [contacts, matrix, syncDate]);
+  }, [contacts, matrix, syncDate, isDemo]);
+
   const filteredList = useMemo(() => {
     return (
       contacts

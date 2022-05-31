@@ -95,6 +95,7 @@ const globalStyles = StyleSheet.create({
     margin: 3,
     fontSize: 17,
     textAlign: 'center',
+    color: colors.text,
   },
   content: {
     height: '100%',

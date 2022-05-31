@@ -59,6 +59,7 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
           options={{
             headerShown: false,
             title: item.title,
+            drawerLabelStyle: { fontSize: 16 },
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
           }}
         />
