@@ -154,17 +154,24 @@ const OrderViewScreen = () => {
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
-        <View style={{ flexDirection: 'column' }}>
+        <View style={localStyles.infoBlock}>
           <Text style={[styles.textLow, { color: colors.text }]}>{`№ ${order.number} от ${getDateString(
             order.documentDate,
           )} на ${getDateString(order.head?.onDate)}`}</Text>
 
           <Text style={[styles.textLow, { color: colors.text }]}>
-            {debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}
+            {(debt?.saldo && debt?.saldo < 0
+              ? `Предоплата: ${Math.abs(debt?.saldo)
+                  .toString()
+                  .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`
+              : // : `Задолженность: ${new Intl.NumberFormat('ru-RU').format(Number(debt?.saldo))}`) || 0}
+                `Задолженность: ${debt?.saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`) || 0}
           </Text>
           <View style={styles.rowCenter}>
             <Text style={[styles.textLow, { color: colors.text }]}>
-              {`Просроченная задолженность: ${debt.saldoDebt}`}
+              {`Просроченная задолженность: ${debt?.saldoDebt
+                .toString()
+                .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}` || 0}
             </Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
@@ -188,5 +195,8 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  infoBlock: {
+    flexDirection: 'column',
   },
 });

@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SelectableInput, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
+import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
+
+import { IListItem } from '@lib/mobile-types';
 
 import { generateId, getDateString } from '@lib/mobile-app';
 
@@ -278,24 +280,25 @@ const OrderEditScreen = () => {
     });
   };
 
+  const drafts: IListItem[] = [
+    { id: 'DRAFT', value: 'Черновик' },
+    { id: 'READY', value: 'Готов' },
+  ];
+
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
-          <>
-            <View style={[styles.directionRow, localStyles.switchContainer]}>
-              <Text>Черновик:</Text>
-              <Switch
-                value={docStatus === 'DRAFT' || !docStatus}
-                onValueChange={() => {
-                  dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-                }}
-              />
-            </View>
-          </>
-        )}
+        <View style={localStyles.switchContainer}>
+          <RadioGroup
+            options={drafts}
+            onChange={() => {
+              dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+            }}
+            activeButtonId={drafts.find((i) => i.id === docStatus)?.id}
+          />
+        </View>
         <Input
           label="Номер"
           value={docNumber}
@@ -340,8 +343,6 @@ export default OrderEditScreen;
 
 const localStyles = StyleSheet.create({
   switchContainer: {
-    marginHorizontal: 10,
-    alignItems: 'center',
-    flexDirection: 'row',
+    marginVertical: 10,
   },
 });

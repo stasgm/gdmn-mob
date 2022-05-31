@@ -128,10 +128,16 @@ const RouteDetailScreen = () => {
             <>
               <Text style={[styles.textLow, { color: colors.text }]}>{`Условия оплаты: ${contact.paycond}`}</Text>
               <Text style={[styles.textLow, { color: colors.text }]}>
-                {debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}
+                {debt.saldo < 0
+                  ? `Предоплата: ${Math.abs(debt.saldo)
+                      .toString()
+                      .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`
+                  : `Задолженность: ${debt.saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
               </Text>
               <Text style={[styles.textLow, { color: colors.text }]}>
-                {`Просроченная задолженность: ${debt.saldoDebt}`}
+                {`Просроченная задолженность: ${debt.saldoDebt
+                  .toString()
+                  .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
               </Text>
             </>
           )}
