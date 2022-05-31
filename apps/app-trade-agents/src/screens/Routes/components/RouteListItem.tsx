@@ -36,7 +36,7 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
             <Text style={styles.name}>{`${getDateString(item.documentDate)}${todayStr}`}</Text>
             <View style={styles.directionRow}>
               <Text style={styles.field}>{item.lines.length}</Text>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
             </View>
           </View>
           <View style={styles.directionRow}>

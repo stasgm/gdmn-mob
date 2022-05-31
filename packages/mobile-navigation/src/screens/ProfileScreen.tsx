@@ -78,8 +78,8 @@ const ProfileScreen = () => {
           <Avatar.Icon size={50} icon="badge-account-horizontal-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{user?.firstName || ''}</Text>
-          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>
+          <Text style={styles.profileInfoTextUser}>{user?.firstName || ''}</Text>
+          <Text style={styles.profileInfoTextUser}>
             {!user?.firstName && !user?.lastName ? user?.name : user?.lastName || ''}
           </Text>
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{company?.name || ''}</Text>
@@ -91,7 +91,7 @@ const ProfileScreen = () => {
           <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={[styles.profileInfoTextUser, { color: colors.text }]}>{device?.name || ''}</Text>
+          <Text style={styles.profileInfoTextUser}>{device?.name || ''}</Text>
           <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.state || ''}</Text>
         </View>
       </View>

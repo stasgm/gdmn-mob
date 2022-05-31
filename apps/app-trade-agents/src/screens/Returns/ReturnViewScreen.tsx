@@ -149,7 +149,9 @@ const ReturnViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(returnDoc.status)}
       >
         <View style={styles.directionRow}>
-          <Text style={styles.textLow}>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
+          <Text style={[styles.textLow, { color: colors.text }]}>{`№ ${returnDoc.number} от ${getDateString(
+            returnDoc.documentDate,
+          )}`}</Text>
           {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
         </View>
       </InfoBlock>

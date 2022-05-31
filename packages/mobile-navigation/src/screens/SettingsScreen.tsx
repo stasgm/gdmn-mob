@@ -2,7 +2,7 @@ import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
@@ -21,6 +21,8 @@ const SettingsSceen = () => {
   const showActionSheet = useActionSheet();
   const data = useSelector((state) => state.settings.data);
   const config = useSelector((state) => state.auth.config);
+
+  const { colors } = useTheme();
 
   const settsData = useMemo(
     () =>
@@ -91,7 +93,7 @@ const SettingsSceen = () => {
           <Divider />
           <View style={styles.details}>
             <Text style={styles.name}>Путь к серверу</Text>
-            <Text style={[styles.number, styles.field]}>{serverPath}</Text>
+            <Text style={[styles.number, styles.field, { color: colors.text }]}>{serverPath}</Text>
           </View>
         </View>
         <View>

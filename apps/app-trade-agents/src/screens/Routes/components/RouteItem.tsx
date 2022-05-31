@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { View, Text, TouchableHighlight } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -21,6 +21,8 @@ type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 const RouteItem = ({ item, routeId }: IItem) => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
+
+  const { colors } = useTheme();
 
   //TODO получить адрес item.outlet.id
   const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === item.outlet.id);
@@ -60,7 +62,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
             <Text style={styles.name}>{item.outlet.name}</Text>
           </View>
           <View style={styles.directionRow}>
-            <Text style={styles.field}>{address}</Text>
+            <Text style={[styles.field, { color: colors.text }]}>{address}</Text>
             <View style={styles.directionRow}>
               <Text style={styles.field}>{item.comment}</Text>
             </View>
@@ -68,7 +70,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
         </View>
         <View style={styles.bottomButtons}>
           {status ? <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" /> : null}
-          <Text style={styles.field}>
+          <Text style={[styles.field, { color: colors.text }]}>
             {status === 2 && lastVisit[0].head.dateEnd && getDateString(lastVisit[0].head.dateEnd)}
           </Text>
         </View>

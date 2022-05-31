@@ -65,6 +65,7 @@ const RouteDetailScreen = () => {
     : undefined;
 
   const saldo = debt?.saldo ?? 0;
+  const saldoDebt = debt?.saldoDebt ?? 0;
 
   const handleNewVisit = async () => {
     setProcess(true);
@@ -107,8 +108,8 @@ const RouteDetailScreen = () => {
         <>
           {outlet && (
             <>
-              <Text style={styles.textLow}>{outlet.address}</Text>
-              <Text style={styles.textLow}>{outlet.phoneNumber}</Text>
+              <Text style={[styles.textLow, { color: colors.text }]}>{outlet.address}</Text>
+              <Text style={[styles.textLow, { color: colors.text }]}>{outlet.phoneNumber}</Text>
             </>
           )}
         </>
@@ -120,9 +121,20 @@ const RouteDetailScreen = () => {
         <>
           {contact && (
             <>
-              <Text style={styles.textLow}>{`Условия оплаты: ${contact.paycond}`}</Text>
+              <Text style={[styles.textLow, { color: colors.text }]}>{`Условия оплаты: ${contact.paycond}`}</Text>
               <Text style={[styles.textLow, styles.textBold, { color: saldo < 0 ? colors.text : colors.notification }]}>
-                {saldo < 0 ? `Предоплата: ${Math.abs(saldo)}` : `Задолженность: ${saldo}`}
+                {saldo < 0
+                  ? `Предоплата: ${Math.abs(saldo)
+                      .toString()
+                      .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`
+                  : `Задолженность: ${saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
+              </Text>
+              <Text
+                style={[styles.textLow, styles.textBold, { color: saldoDebt < 0 ? colors.text : colors.notification }]}
+              >
+                {`Просроченная задолженность: ${saldoDebt
+                  .toString()
+                  .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
               </Text>
             </>
           )}
