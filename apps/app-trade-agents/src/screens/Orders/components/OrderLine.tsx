@@ -59,9 +59,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  // const priceFSN =
-  //   (refSelectors.selectByName('good') as IReference<IGood>)?.data?.find((e) => e.id === item?.good.id)?.priceFsn || 0;
-
   return (
     <>
       <ScrollView>
