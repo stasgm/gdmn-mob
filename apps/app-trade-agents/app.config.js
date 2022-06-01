@@ -16,5 +16,6 @@ export default ({ config }) => ({
     buildVersion: config.android.versionCode,
     slug: config.slug,
     name: config.name,
+    githubUrl: config.githubUrl,
   },
 });

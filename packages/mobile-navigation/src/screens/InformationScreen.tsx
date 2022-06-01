@@ -24,8 +24,6 @@ const InformationScreen = () => {
     });
   }, [navigation]);
 
-  console.log('doc', Constants.manifest?.extra?.documentation);
-
   return (
     <View style={localStyles.container}>
       <Text style={[styles.title]}>Приложение {Constants.manifest?.extra?.name}</Text>
@@ -51,7 +49,7 @@ const InformationScreen = () => {
           <Avatar.Icon size={40} icon="file-document-edit-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
-          <TouchableOpacity onPress={() => Linking.openURL('http://')}>
+          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.githubUrl)}>
             <Text style={localStyles.profileInfoTextUser}>Документация</Text>
           </TouchableOpacity>
         </View>
@@ -66,8 +64,10 @@ const InformationScreen = () => {
           <Avatar.Icon size={40} icon="office-building" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
-          <Text style={localStyles.profileInfoTextUser}>Компания ООО Амперсант</Text>
-          <Text style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
+          <Text selectable={true} style={localStyles.profileInfoTextUser}>
+            Компания ООО Амперсант
+          </Text>
+          <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
             Торговая марка Golden Software
           </Text>
         </View>
@@ -81,7 +81,9 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Телефон</Text>
-          <Text style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>+ 375 17 256 17 59</Text>
+          <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
+            + 375 17 256 17 59
+          </Text>
         </View>
       </View>
 
@@ -93,7 +95,9 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Email</Text>
-          <Text style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>support@gsbelarus.com</Text>
+          <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
+            support@gsbelarus.com
+          </Text>
         </View>
       </View>
 
@@ -106,7 +110,12 @@ const InformationScreen = () => {
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Сайт</Text>
           <TouchableOpacity onPress={() => Linking.openURL('http://gsbelarus.com')}>
-            <Text style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>http://gsbelarus.com</Text>
+            <Text
+              selectable={true}
+              style={[localStyles.profileInfoTextCompany, { color: colors.text, textDecorationLine: 'underline' }]}
+            >
+              http://gsbelarus.com
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

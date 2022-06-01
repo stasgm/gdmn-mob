@@ -112,11 +112,6 @@ const SettingsSceen = () => {
           </View>
         </View>
       </KeyboardAwareScrollView>
-      <View style={localStyles.details}>
-        <Text style={localStyles.text}>
-          GDMN Mobile {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
-        </Text>
-      </View>
     </AppScreen>
   );
 };
