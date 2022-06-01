@@ -172,17 +172,20 @@ const Root = () => {
           'Добро пожаловать в GDMN Агент!\n\nНаше приложение облегчает труд торгового агента и позволяет выполнить следующие действия:\n\n1. Оформить заявку на поставку товаров\n\n2. Оформить возврат непроданных товаров\n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
         }
       </Text>
+      <TouchableOpacity style={styles.buttonPrev} onPress={() => setMode(0)}>
+        <Text style={styles.textInfo}>{'« Назад'}</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.buttonNext} onPress={() => setMode(2)}>
         <Text style={styles.textInfo}>{'Далее »'}</Text>
       </TouchableOpacity>
     </AppScreen>
   ) : mode === 2 ? (
     <AppScreen>
-      <Caption style={styles.textInfo}>
+      <Text style={styles.textInfo}>
         {
           'Вы находитесь в демонстрационном режиме и работаете с вымышленными данными.\n\nДля подключения приложения к торговой или складской системе вашего предприятия обратитесь в компанию ООО Амперсант (торговая марка Golden Software)\n'
         }
-      </Caption>
+      </Text>
       <TouchableOpacity onPress={() => dialCall('+375172561759')}>
         <Text style={styles.textInfo}>{'Телефон: +375 17 256 17 59\n'}</Text>
       </TouchableOpacity>
@@ -201,11 +204,11 @@ const Root = () => {
     </AppScreen>
   ) : mode === 3 ? (
     <AppScreen>
-      <Caption style={styles.textInfo}>
+      <Text style={styles.textInfo}>
         {
           'Подробную информацию об использовании приложения вы найдете в справочной системе.\n\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Агент!\n\n'
         }
-      </Caption>
+      </Text>
       <TouchableOpacity style={styles.buttonPrev} onPress={() => setMode(2)}>
         <Text style={styles.textInfo}>{'« Назад'}</Text>
       </TouchableOpacity>
