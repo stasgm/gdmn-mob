@@ -1,15 +1,12 @@
-import React, { useCallback, useLayoutEffect } from 'react';
-import { Alert, View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
+import React, { useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
+import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
-import { DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
-import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
-import api from '@lib/client-api';
-
-import { useActionSheet, globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles as styles } from '@lib/mobile-ui';
+import { dialCall } from '@lib/mobile-app';
 import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
 
@@ -32,7 +29,7 @@ const InformationScreen = () => {
 
       <View style={[localStyles.profileContainer]}>
         <View style={localStyles.profileIcon}>
-          <Avatar.Icon size={40} icon="sync" style={{ backgroundColor: colors.primary }} />
+          <Avatar.Icon size={40} icon="cog-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Версия</Text>
@@ -81,9 +78,11 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Телефон</Text>
-          <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
-            + 375 17 256 17 59
-          </Text>
+          <TouchableOpacity onPress={() => dialCall('+375172561759')}>
+            <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
+              + 375 17 256 17 59
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -95,9 +94,11 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Email</Text>
-          <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
-            support@gsbelarus.com
-          </Text>
+          <TouchableOpacity onPress={() => Linking.openURL('mailto:support@gsbelarus.com')}>
+            <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
+              support@gsbelarus.com
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 

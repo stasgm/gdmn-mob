@@ -127,7 +127,7 @@ const RouteDetailScreen = () => {
                   ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(saldo) ?? 0)}`
                   : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldo)}`}
               </Text>
-              <Text style={[styles.textLow, { color: saldoDebt <= 0 ? colors.text : colors.notification }]}>
+              <Text style={[styles.textLow, { color: saldoDebt > 0 ? colors.notification : colors.text }]}>
                 {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
               </Text>
             </>
