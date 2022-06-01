@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
@@ -22,6 +22,8 @@ const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
+
+  const { colors } = useTheme();
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
   const order = orders?.find((e) => e.id === id);
@@ -280,7 +282,7 @@ const OrderEditScreen = () => {
     });
   };
 
-  const drafts: IListItem[] = [
+  const statusList: IListItem[] = [
     { id: 'DRAFT', value: 'Черновик' },
     { id: 'READY', value: 'Готов' },
   ];
@@ -290,13 +292,20 @@ const OrderEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        <View style={localStyles.switchContainer}>
+        <View
+          style={[
+            localStyles.switchContainer,
+            localStyles.border,
+            { borderColor: colors.primary, backgroundColor: colors.card },
+          ]}
+        >
           <RadioGroup
-            options={drafts}
+            options={statusList}
             onChange={() => {
               dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
             }}
-            activeButtonId={drafts.find((i) => i.id === docStatus)?.id}
+            activeButtonId={statusList.find((i) => i.id === docStatus)?.id}
+            directionRow={true}
           />
         </View>
         <Input
@@ -344,5 +353,12 @@ export default OrderEditScreen;
 const localStyles = StyleSheet.create({
   switchContainer: {
     marginVertical: 10,
+  },
+  border: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 2,
   },
 });

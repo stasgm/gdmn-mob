@@ -7,7 +7,7 @@ import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen } f
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString } from '@lib/mobile-app';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -122,21 +122,13 @@ const RouteDetailScreen = () => {
           {contact && (
             <>
               <Text style={[styles.textLow, { color: colors.text }]}>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text
-                style={[styles.textLow, styles.textBold, { color: saldo <= 0 ? colors.text : colors.notification }]}
-              >
+              <Text style={[styles.textLow, { color: colors.text }]}>
                 {saldo < 0
-                  ? `Предоплата: ${Math.abs(saldo)
-                      .toString()
-                      .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`
-                  : `Задолженность: ${saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
+                  ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(saldo) ?? 0)}`
+                  : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldo)}`}
               </Text>
-              <Text
-                style={[styles.textLow, styles.textBold, { color: saldoDebt <= 0 ? colors.text : colors.notification }]}
-              >
-                {`Просроченная задолженность: ${saldoDebt
-                  .toString()
-                  .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`}
+              <Text style={[styles.textLow, { color: saldoDebt <= 0 ? colors.text : colors.notification }]}>
+                {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
               </Text>
             </>
           )}

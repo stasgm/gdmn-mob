@@ -17,7 +17,7 @@ import {
 
 import { sleep } from '@lib/client-api';
 
-import { getDateString } from '@lib/mobile-app';
+import { formatValue, getDateString } from '@lib/mobile-app';
 
 import { IDebt, IOrderDocument, IOrderLine } from '../../store/types';
 
@@ -160,17 +160,12 @@ const OrderViewScreen = () => {
 
           <Text style={[styles.textLow, { color: colors.text }]}>
             {(debt?.saldo && debt?.saldo < 0
-              ? `Предоплата: ${Math.abs(debt?.saldo)
-                  .toString()
-                  .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`
-              : // : `Задолженность: ${new Intl.NumberFormat('ru-RU').format(Number(debt?.saldo))}`) || 0}
-                `Задолженность: ${debt?.saldo.toString().replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}`) || 0}
+              ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
+              : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
           </Text>
           <View style={styles.rowCenter}>
-            <Text style={[styles.textLow, { color: colors.text }]}>
-              {`Просроченная задолженность: ${debt?.saldoDebt
-                .toString()
-                .replace(/(\d{1,3}(?=(?:\d\d\d)+(?!\d)))/g, '$1' + ' ')}` || 0}
+            <Text style={[styles.textLow, { color: colors.notification }]}>
+              {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
             </Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>

@@ -15,5 +15,6 @@ export default ({ config }) => ({
     appVesion: config.version,
     buildVersion: config.android.versionCode,
     slug: config.slug,
+    name: config.name,
   },
 });

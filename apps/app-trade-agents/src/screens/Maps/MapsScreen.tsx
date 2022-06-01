@@ -82,18 +82,22 @@ const MapScreen = () => {
 
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
-      const initialList: ILocation[] = selectedItem.lines.map((e) => {
-        const outlet = outlets.find((i) => i.id === e.outlet.id);
-        const res: ILocation = {
-          number: e.ordNumber,
-          id: `${e.id}${e.outlet.id}`,
-          name: e.outlet.name,
-          coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
-        };
-        return res;
-      });
+      const isWithoutCoords = selectedItem.lines.find((item) =>
+        outlets.find((i) => i.id === item.outlet.id && (!i.lat || !i.lon)),
+      );
+      if (!isWithoutCoords) {
+        const initialList: ILocation[] = selectedItem.lines.map((e) => {
+          const outlet = outlets.find((i) => i.id === e.outlet.id);
 
-      dispatch(geoActions.addMany(initialList));
+          return {
+            number: e.ordNumber,
+            id: `${e.id}${e.outlet.id}`,
+            name: e.outlet.name,
+            coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
+          };
+        });
+        dispatch(geoActions.addMany(initialList));
+      }
     } else {
       dispatch(geoActions.init());
     }
@@ -285,6 +289,17 @@ const MapScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
+      ) : null}
+      {selectedItem && !list.length ? (
+        <>
+          <View style={localStyles.statusContainerError}>
+            <View style={localStyles.routeWidth}>
+              <Text style={localStyles.routeError}>
+                Невозможно отобразить точки маршрута: не для всех магазинов в маршруте указаны координаты.
+              </Text>
+            </View>
+          </View>
+        </>
       ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
