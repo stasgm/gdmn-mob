@@ -51,7 +51,6 @@ const MapScreen = () => {
 
   const routeList = docSelectors
     .selectByDocType<IRouteDocument>('route')
-    // .filter((i) => getDateString(i.documentDate) === getDateString(new Date()))
     ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
   const currentList: IListItem[] = useMemo(() => {
@@ -83,26 +82,20 @@ const MapScreen = () => {
 
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
-      let geoMap = false;
-      const initialList: ILocation[] = selectedItem.lines.map((e) => {
-        const outlet = outlets.find((i) => i.id === e.outlet.id);
-        if (outlet === undefined) {
-          geoMap = true;
-          console.log('02');
-        }
-        if (geoMap) {
-          return;
-        } else {
-          const res: ILocation = {
+      const isWithoutCoords = selectedItem.lines.find((item) =>
+        outlets.find((i) => i.id === item.outlet.id && (!i.lat || !i.lon)),
+      );
+      if (!isWithoutCoords) {
+        const initialList: ILocation[] = selectedItem.lines.map((e) => {
+          const outlet = outlets.find((i) => i.id === e.outlet.id);
+
+          return {
             number: e.ordNumber,
             id: `${e.id}${e.outlet.id}`,
             name: e.outlet.name,
             coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
           };
-          return res;
-        }
-      });
-      if (!geoMap) {
+        });
         dispatch(geoActions.addMany(initialList));
       }
     } else {

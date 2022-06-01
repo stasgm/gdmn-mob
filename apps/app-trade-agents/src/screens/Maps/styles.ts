@@ -1,7 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-// const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   containerMap: {
     flex: 1,
