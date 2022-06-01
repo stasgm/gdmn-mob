@@ -68,7 +68,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     overflow: 'hidden',
-    height: 50,
+    height: 55,
+  },
+  statusContainerError: {
+    display: 'flex',
+    flexDirection: 'row',
+    position: 'absolute',
+    top: 41,
+    left: 0,
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    overflow: 'hidden',
+    height: 60,
+    marginTop: 10,
   },
   pointName: {
     textAlign: 'center',
@@ -86,6 +100,10 @@ const styles = StyleSheet.create({
   routeName: {
     textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  routeError: {
+    textAlign: 'center',
     fontSize: 16,
   },
   routeIcon: {

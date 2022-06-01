@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Alert, View, StyleSheet, ScrollView } from 'react-native';
-import { RouteProp, StackActions, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, StackActions, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -30,6 +30,8 @@ const ReturnEditScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnEdit'>>();
   const dispatch = useDispatch();
   const docDispatch = useDocDispatch();
+
+  const { colors } = useTheme();
 
   const returns = docSelectors.selectByDocType<IReturnDocument>('return');
   const returnDoc = returns?.find((e) => e.id === id);
@@ -229,7 +231,7 @@ const ReturnEditScreen = () => {
     });
   };
 
-  const drafts: IListItem[] = [
+  const statusList: IListItem[] = [
     { id: 'DRAFT', value: 'Черновик' },
     { id: 'READY', value: 'Готов' },
   ];
@@ -239,13 +241,14 @@ const ReturnEditScreen = () => {
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        <View style={localStyles.switchContainer}>
+        <View style={[localStyles.switchContainer, localStyles.border, { borderColor: colors.primary }]}>
           <RadioGroup
-            options={drafts}
+            options={statusList}
             onChange={() => {
               dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
             }}
-            activeButtonId={drafts.find((i) => i.id === docStatus)?.id}
+            activeButtonId={statusList.find((i) => i.id === docStatus)?.id}
+            directionRow={true}
           />
         </View>
         <Input
@@ -271,5 +274,12 @@ export default ReturnEditScreen;
 const localStyles = StyleSheet.create({
   switchContainer: {
     marginVertical: 10,
+  },
+  border: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 2,
   },
 });
