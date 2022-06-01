@@ -1,6 +1,7 @@
 import { INamedEntity } from '@lib/types';
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
+import { Linking, Platform } from 'react-native';
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
@@ -80,4 +81,24 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
 
 const generateId = () => customAlphabet('1234567890abcdef', 10)();
 
-export { truncate, log, getDateString, shortenString, extraPredicate, isNamedEntity, formatValue, generateId };
+const dialCall = (number: string) => {
+  let phoneNumber = '';
+  if (Platform.OS === 'android') {
+    phoneNumber = `tel:${number}`;
+  } else {
+    phoneNumber = `telprompt:${number}`;
+  }
+  Linking.openURL(phoneNumber);
+};
+
+export {
+  truncate,
+  log,
+  getDateString,
+  shortenString,
+  extraPredicate,
+  isNamedEntity,
+  formatValue,
+  generateId,
+  dialCall,
+};

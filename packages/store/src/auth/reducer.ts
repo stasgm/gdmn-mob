@@ -152,7 +152,6 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
         status: '',
         loading: false,
         isDemo: false,
-        // isInit: false,
       };
 
     case getType(actions.disconnectAsync.failure):

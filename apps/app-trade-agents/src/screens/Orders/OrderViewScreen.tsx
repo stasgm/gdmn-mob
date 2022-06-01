@@ -45,8 +45,7 @@ const OrderViewScreen = () => {
   const isBlocked = order?.status !== 'DRAFT';
 
   const debt =
-    refSelectors.selectByName<IDebt>('debt').data.find((item) => item.contact.id === order.head.contact.id) ||
-    undefined;
+    refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === order?.head?.contact.id) || undefined;
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {

@@ -51,7 +51,6 @@ const MapScreen = () => {
 
   const routeList = docSelectors
     .selectByDocType<IRouteDocument>('route')
-    // .filter((i) => getDateString(i.documentDate) === getDateString(new Date()))
     ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
   const currentList: IListItem[] = useMemo(() => {

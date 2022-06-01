@@ -26,7 +26,7 @@ const localStyles = StyleSheet.create({
     right: 20,
   },
   serverModeText: {
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 

@@ -26,13 +26,6 @@ const RoundButton = ({ onPress, style, icon, disabled }: IProps) => {
       <View style={[styles.roundButton, disabled && { backgroundColor: colors.disabled }]}>
         <Icon name={icon} size={30} color={colors.background} />
       </View>
-      {/*       <View style={localStyles.buttons}>
-        {icon && <Icon name={icon} size={16} color={colors.background} />}
-        <Text style={[localStyles.text, { color: colors.background }]}>
-          {'  '}
-          {typeof children === 'string' ? children.toUpperCase() : children}
-        </Text>
-      </View> */}
     </TouchableOpacity>
   );
 };

@@ -204,6 +204,21 @@ const globalStyles = StyleSheet.create({
     fontSize: 5,
     textAlign: 'left',
   },
+
+  buttonNext: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+  buttonPrev: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+  },
+  textReference: {
+    textDecorationLine: 'underline',
+  },
+  textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
 });
 
 export default globalStyles;
