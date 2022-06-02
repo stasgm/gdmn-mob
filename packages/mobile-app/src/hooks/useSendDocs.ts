@@ -5,6 +5,8 @@ import { IAppSystem, IDocument, IMessage } from '@lib/types';
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
 
+import { getNextOrder } from './orderCounter';
+
 const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
@@ -74,6 +76,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
             messageCompany,
             consumer,
             sendingDocsMessage,
+            getNextOrder(),
           );
 
           if (sendMessageResponse.type === 'SEND_MESSAGE') {

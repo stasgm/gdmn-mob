@@ -15,6 +15,8 @@ import { BodyType, IAppSystem, IDocument, IMessage, IReferences, ISettingsOption
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
 
+import { getNextOrder } from './orderCounter';
+
 const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
@@ -108,6 +110,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
               messageCompany,
               consumer,
               sendingDocsMessage,
+              getNextOrder(),
             );
 
             if (sendMessageResponse.type === 'SEND_MESSAGE') {
@@ -177,6 +180,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
               messageCompany,
               consumer,
               messageGetRef,
+              getNextOrder(),
             );
 
             if (sendMesRefResponse?.type === 'ERROR') {
@@ -187,7 +191,13 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           }
 
           //4. Отправляем запрос на получение документов
-          const sendMesDocRespone = await api.message.sendMessages(appSystem, messageCompany, consumer, messageGetDoc);
+          const sendMesDocRespone = await api.message.sendMessages(
+            appSystem,
+            messageCompany,
+            consumer,
+            messageGetDoc,
+            getNextOrder(),
+          );
 
           if (sendMesDocRespone.type === 'ERROR') {
             errList.push(`Запрос на получение документов не отправлен: ${sendMesDocRespone.message}`);
@@ -222,6 +232,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             messageCompany,
             consumer,
             messageGetDepart,
+            getNextOrder(),
           );
 
           if (sendMesDepartResponse.type === 'ERROR') {
