@@ -11,7 +11,7 @@ import {
   IMGroupModel,
 } from '../store/types';
 
-import { unknownGroup } from './constants';
+import { UNKNOWN_GROUP } from './constants';
 
 const getTimeProcess = (db: string, de?: string) => {
   const diffMinutes = Math.floor(((de ? Date.parse(de) : Date.now()) - Date.parse(db)) / 60000);
@@ -82,7 +82,7 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
           if (good && group) {
             if (!p[group.id]) {
               p[group.id] = {
-                group: group.parent?.id ? group : ({ ...group, parent: unknownGroup } as IGoodGroup),
+                group: group.parent?.id ? group : ({ ...group, parent: UNKNOWN_GROUP } as IGoodGroup),
                 goods: [{ ...good, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }],
               };
             } else {
@@ -96,7 +96,7 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
             const group = groups.find((gr) => gr.id === good.goodgroup.id);
             if (group) {
               p[good.goodgroup.id] = {
-                group: group.parent?.id ? group : ({ ...group, parent: unknownGroup } as IGoodGroup),
+                group: group.parent?.id ? group : ({ ...group, parent: UNKNOWN_GROUP } as IGoodGroup),
                 goods: [good],
               };
             }
@@ -112,7 +112,7 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
   // Пример {'parentGroup1': { parent: {}, children: [{'groupId1':{ group: {id: '11', name: 'Группа1', parent: {id: '1', name: 'Группа родительская1'}},goods: []}},
   //         'groupId2':{ group: {id: '22', name: 'Группа2', parent: {id: '2', name: 'Группа родительская2'}}, goods: []}}}]}
   for (const gr of mGroups) {
-    const p = gr.group.parent?.id ? gr.group.parent.id : unknownGroup.id;
+    const p = gr.group.parent?.id ? gr.group.parent.id : UNKNOWN_GROUP.id;
     if (p) {
       if (parents[p]) {
         parents[p].children?.push(gr);

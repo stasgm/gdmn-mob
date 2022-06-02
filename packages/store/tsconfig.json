@@ -6,6 +6,6 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src/**/*", "index.ts"],
+  "include": ["src/**/*", "index.ts", "../mobile-navigation/constants.ts"],
   "exclude": ["node_modules", "dist"]
 }

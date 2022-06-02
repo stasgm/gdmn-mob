@@ -4,11 +4,11 @@ import { Settings, StatusType } from '@lib/types';
 
 import config from '../config';
 
-const ONE_SECOND_IN_MS = 1000;
+export const ONE_SECOND_IN_MS = 1000;
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700'] as const;
 
-const getStatusColor = (status: StatusType) => {
+export const getStatusColor = (status: StatusType) => {
   let statusColor: typeof statusColors[number];
 
   switch (status) {
@@ -36,16 +36,16 @@ const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-const statusList: IListItem[] = [
+export const STATUS_LIST: IListItem[] = [
   { id: 'DRAFT', value: 'Черновик' },
   { id: 'READY', value: 'Готов' },
 ];
 
 const backGroup = { id: '3', name: 'Настройки бэк-офиса', sortOrder: 3 };
 
-const unknownGroup = { id: 'unknown', name: 'Другое' };
+export const UNKNOWN_GROUP = { id: 'unknown', name: 'Другое' };
 
-const appSettings: Settings = {
+export const appSettings: Settings = {
   isUseNetPrice: {
     id: '5',
     description: 'Использовать матрицы',
@@ -83,5 +83,3 @@ const appSettings: Settings = {
     group: backGroup,
   },
 };
-
-export { getStatusColor, appSettings, ONE_SECOND_IN_MS, unknownGroup, statusList };

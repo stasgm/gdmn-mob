@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform } from 'rea
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
+import { DrawerButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
 import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
+
+import { GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS } from '../constants';
 
 const dialCall = (number: string) => {
   let phoneNumber = '';
@@ -29,6 +30,7 @@ const InformationScreen = () => {
       headerLeft: () => <DrawerButton />,
     });
   }, [navigation]);
+  console.log('Constants.manifest?.extra?.documentationUrl', Constants.manifest?.extra?.documentationUrl);
 
   return (
     <View style={localStyles.container}>
@@ -55,7 +57,7 @@ const InformationScreen = () => {
           <Avatar.Icon size={40} icon="file-document-edit-outline" style={{ backgroundColor: colors.primary }} />
         </View>
         <View style={localStyles.profileInfo}>
-          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.githubUrl)}>
+          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
             <Text style={localStyles.profileInfoTextUser}>Документация</Text>
           </TouchableOpacity>
         </View>
@@ -87,7 +89,7 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Телефон</Text>
-          <TouchableOpacity onPress={() => dialCall('+375172561759')}>
+          <TouchableOpacity onPress={() => dialCall(GDMN_PHONE)}>
             <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
               + 375 17 256 17 59
             </Text>
@@ -103,9 +105,9 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Email</Text>
-          <TouchableOpacity onPress={() => Linking.openURL('mailto:support@gsbelarus.com')}>
+          <TouchableOpacity onPress={() => Linking.openURL(`mailto:${GDMN_EMAIL}`)}>
             <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
-              support@gsbelarus.com
+              {GDMN_EMAIL}
             </Text>
           </TouchableOpacity>
         </View>
@@ -119,12 +121,12 @@ const InformationScreen = () => {
         </View>
         <View style={localStyles.profileInfo}>
           <Text style={localStyles.profileInfoTextUser}>Сайт</Text>
-          <TouchableOpacity onPress={() => Linking.openURL('http://gsbelarus.com')}>
+          <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
             <Text
               selectable={true}
               style={[localStyles.profileInfoTextCompany, { color: colors.text, textDecorationLine: 'underline' }]}
             >
-              http://gsbelarus.com
+              {GDMN_SITE_ADDRESS}
             </Text>
           </TouchableOpacity>
         </View>
