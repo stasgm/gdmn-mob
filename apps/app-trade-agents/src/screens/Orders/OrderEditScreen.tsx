@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
+import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SelectableInput, SaveButton, globalStyles as styles, SubTitle } from '@lib/mobile-ui';
+import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
 import { generateId, getDateString } from '@lib/mobile-app';
@@ -15,11 +15,14 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
+import { statusList } from '../../utils/constants';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
+
+  const { colors } = useTheme();
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
   const order = orders?.find((e) => e.id === id);
@@ -198,31 +201,37 @@ const OrderEditScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
+  const isBlocked = useMemo(() => docStatus !== 'DRAFT' || !!docRoute, [docRoute, docStatus]);
 
-  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+  const statusName = useMemo(
+    () => (id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ'),
+    [id, isBlocked],
+  );
 
   // Окно календаря для выбора даты
   const [showOnDate, setShowOnDate] = useState(false);
 
-  const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату
-    setShowOnDate(false);
+  const handleApplyOnDate = useCallback(
+    (_event: any, selectedOnDate: Date | undefined) => {
+      //Закрываем календарь и записываем выбранную дату
+      setShowOnDate(false);
 
-    if (selectedOnDate) {
-      dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
-    }
-  };
+      if (selectedOnDate) {
+        dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
+      }
+    },
+    [dispatch],
+  );
 
-  const handlePresentOnDate = () => {
+  const handlePresentOnDate = useCallback(() => {
     if (docStatus !== 'DRAFT') {
       return;
     }
 
     setShowOnDate(true);
-  };
+  }, [docStatus]);
 
-  const handlePresentContact = () => {
+  const handlePresentContact = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -238,9 +247,9 @@ const OrderEditScreen = () => {
       fieldName: 'contact',
       value: docContact && [docContact],
     });
-  };
+  }, [docContact, docRoute, isBlocked, navigation]);
 
-  const handlePresentOutlet = () => {
+  const handlePresentOutlet = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -264,9 +273,9 @@ const OrderEditScreen = () => {
       clause: params,
       value: docOutlet && [docOutlet],
     });
-  };
+  }, [docContact?.id, docOutlet, docRoute, isBlocked, navigation]);
 
-  const handlePresentDepart = () => {
+  const handlePresentDepart = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -276,32 +285,37 @@ const OrderEditScreen = () => {
       fieldName: 'depart',
       value: docDepart && [docDepart],
     });
-  };
+  }, [docDepart, isBlocked, navigation]);
+
+  const handleChangeStatus = useCallback(() => {
+    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+  }, [dispatch, docStatus]);
+
+  const handleChangeNumber = useCallback(
+    (text) => dispatch(appActions.setFormParams({ number: text.trim() })),
+    [dispatch],
+  );
 
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
-          <>
-            <View style={[styles.directionRow, localStyles.switchContainer]}>
-              <Text>Черновик:</Text>
-              <Switch
-                value={docStatus === 'DRAFT' || !docStatus}
-                onValueChange={() => {
-                  dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-                }}
-              />
-            </View>
-          </>
-        )}
-        <Input
-          label="Номер"
-          value={docNumber}
-          onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          disabled={isBlocked}
-        />
+        <View
+          style={[
+            localStyles.switchContainer,
+            localStyles.border,
+            { borderColor: colors.primary, backgroundColor: colors.card },
+          ]}
+        >
+          <RadioGroup
+            options={statusList}
+            onChange={handleChangeStatus}
+            activeButtonId={statusList.find((i) => i.id === docStatus)?.id}
+            directionRow={true}
+          />
+        </View>
+        <Input label="Номер" value={docNumber} onChangeText={handleChangeNumber} disabled={isBlocked} />
         <SelectableInput
           label="Дата отгрузки"
           value={getDateString(docOnDate || '')}
@@ -340,8 +354,13 @@ export default OrderEditScreen;
 
 const localStyles = StyleSheet.create({
   switchContainer: {
+    marginVertical: 10,
+  },
+  border: {
     marginHorizontal: 10,
-    alignItems: 'center',
-    flexDirection: 'row',
+    marginVertical: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 2,
   },
 });

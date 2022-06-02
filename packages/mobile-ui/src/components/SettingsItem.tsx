@@ -30,6 +30,7 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
               keyboardType={'numeric'}
               clearInput={true}
+              autoCapitalize="none"
             />
           ) : (
             <Input
@@ -51,6 +52,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingHorizontal: 12,
+    fontSize: 20,
   },
   settingsContainer: {
     flexDirection: 'column',
@@ -62,7 +64,7 @@ const localStyles = StyleSheet.create({
   },
   subHeading: {
     width: '85%',
-    fontSize: 14,
+    fontSize: 15,
   },
 });
 

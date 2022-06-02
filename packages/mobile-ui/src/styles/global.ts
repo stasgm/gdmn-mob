@@ -81,6 +81,9 @@ const globalStyles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  textLow: {
+    fontSize: 15,
+  },
   textBold: {
     fontWeight: 'bold',
   },
@@ -92,6 +95,7 @@ const globalStyles = StyleSheet.create({
     margin: 3,
     fontSize: 18,
     textAlign: 'center',
+    color: colors.text,
   },
   content: {
     height: '100%',
@@ -161,18 +165,19 @@ const globalStyles = StyleSheet.create({
     flexDirection: 'row',
   },
   name: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: 'bold',
   },
   number: {
-    fontSize: 12,
+    fontSize: 14,
   },
   textDescription: {
-    fontSize: 12,
+    fontSize: 14,
     textAlign: 'right',
   },
   field: {
-    opacity: 0.5,
+    // opacity: 0.7,
+    fontSize: 15,
   },
   lightText: {
     fontSize: 15,
@@ -189,9 +194,6 @@ const globalStyles = StyleSheet.create({
     alignItems: 'flex-end',
     marginRight: 4,
   },
-  colorRed: {
-    color: '#e91e63',
-  },
   marginBottom5: {
     marginBottom: 5,
   },
@@ -202,6 +204,21 @@ const globalStyles = StyleSheet.create({
     fontSize: 5,
     textAlign: 'left',
   },
+
+  buttonNext: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+  },
+  buttonPrev: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+  },
+  textReference: {
+    textDecorationLine: 'underline',
+  },
+  textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
 });
 
 export default globalStyles;

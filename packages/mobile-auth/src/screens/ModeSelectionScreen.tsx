@@ -18,11 +18,11 @@ const ModeSelectionScreen = (props: Props) => {
       <AppScreen>
         <View style={localStyles.container}>
           <PrimeButton icon={'presentation-play'} onPress={onSetDemoMode}>
-            {'Демо режим'}
+            {'Начать работу'}
           </PrimeButton>
         </View>
         <TouchableOpacity onPress={onSetServerMode} style={localStyles.serverMode}>
-          <Text style={localStyles.serverModeText}>Подключиться к серверу...</Text>
+          <Text style={localStyles.serverModeText}>Подключиться к серверу компании »</Text>
         </TouchableOpacity>
       </AppScreen>
     </>

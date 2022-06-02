@@ -57,11 +57,11 @@ export const styles = StyleSheet.create({
     margin: 3,
   },
   name: {
-    fontSize: 14,
+    fontSize: 17,
     fontWeight: 'bold',
   },
   number: {
-    fontSize: 12,
+    fontSize: 17,
   },
   searchBar: {
     elevation: 0,
@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
     padding: 10,
   },
   field: {
-    opacity: 0.5,
+    opacity: 0.7,
   },
   input: {
     height: 40,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -21,6 +21,8 @@ const ReturnItem = ({ docId, item, readonly = false }: IProps) => {
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -32,8 +34,8 @@ const ReturnItem = ({ docId, item, readonly = false }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>
+          <Text style={styles.name}>{item.good.name}</Text>
+          <Text style={textStyle}>
             {item.quantity} {good?.valueName} x {(item.priceFromSellBill || 0).toString()} р.
           </Text>
         </View>

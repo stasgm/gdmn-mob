@@ -13,9 +13,10 @@ type Props = {
   options: IListItem[];
   activeButtonId?: string;
   onChange: (option: IListItem) => void;
+  directionRow?: boolean;
 };
 
-const RadioGroup = ({ options, onChange, activeButtonId }: Props) => {
+const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) => {
   const onPress = useCallback(
     (option) => {
       if (option.id === activeButtonId) {
@@ -27,7 +28,12 @@ const RadioGroup = ({ options, onChange, activeButtonId }: Props) => {
   );
 
   return (
-    <View>
+    <View
+      style={{
+        flexDirection: directionRow ? 'row' : 'column',
+        justifyContent: directionRow ? 'space-between' : 'center',
+      }}
+    >
       {options.map((option) => {
         return (
           <TouchableHighlight
@@ -41,7 +47,7 @@ const RadioGroup = ({ options, onChange, activeButtonId }: Props) => {
           >
             <>
               <Circle active={activeButtonId === option.id} />
-              <Text style={localStyles.radioText}>{option.value}</Text>
+              <Text style={[localStyles.radioText, { flex: directionRow ? 0 : 1 }]}>{option.value}</Text>
             </>
           </TouchableHighlight>
         );

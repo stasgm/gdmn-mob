@@ -62,7 +62,7 @@ const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
           <Text style={styles.name}>{item.name || item.name}</Text>
           {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
               <Text style={styles.field}>
                 {model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length}
               </Text>
@@ -97,12 +97,13 @@ const SelectGroupScreen = () => {
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
 
   const syncDate = useSelector((state) => state.app.syncDate);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   useEffect(() => {
-    if (syncDate && getDateString(syncDate) !== getDateString(new Date())) {
+    if (syncDate && getDateString(syncDate) !== getDateString(new Date()) && !isDemo) {
       return Alert.alert('Внимание!', 'В справочнике устаревшие данные, требуется синхронизация', [{ text: 'OK' }]);
     }
-  }, [syncDate]);
+  }, [syncDate, isDemo]);
 
   const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact.id;
 

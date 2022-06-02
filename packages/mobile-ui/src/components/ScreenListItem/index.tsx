@@ -9,6 +9,7 @@ import styles from '../../styles/global';
 import { getStatusColor } from './constants';
 export interface IListItemProps {
   children?: ReactNode;
+  info?: ReactNode;
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -23,6 +24,7 @@ export interface IListItemProps {
 
 const ScreenListItem = ({
   children,
+  info,
   title,
   subtitle,
   status,
@@ -53,6 +55,7 @@ const ScreenListItem = ({
               )}
             </View>
           </View>
+          {info && <View>{info}</View>}
           <View>
             {errorMessage && (
               <Text style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>

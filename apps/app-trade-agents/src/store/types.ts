@@ -65,9 +65,7 @@ export interface IOutlet extends INamedEntity, IReferenceData {
   lon: number; // долгота
 }
 //Задолженности
-export interface IDebt extends IEntity {
-  id: string;
-  contact: INamedEntity; //организация-плательщик
+export interface IDebt extends INamedEntity {
   ondate: string; //на дату
   saldo: number; //Задолженность
   saldoDebt: number; //Просроченная задолженность

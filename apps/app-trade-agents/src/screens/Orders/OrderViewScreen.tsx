@@ -1,10 +1,10 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
   MenuButton,
@@ -17,9 +17,9 @@ import {
 
 import { sleep } from '@lib/client-api';
 
-import { getDateString } from '@lib/mobile-app';
+import { formatValue, getDateString } from '@lib/mobile-app';
 
-import { IOrderDocument, IOrderLine } from '../../store/types';
+import { IDebt, IOrderDocument, IOrderLine } from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -31,6 +31,8 @@ import { navBackButton } from '../../components/navigateOptions';
 
 import OrderItem from './components/OrderItem';
 
+const keyExtractor = (item: IOrderLine) => item.id;
+
 const OrderViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
@@ -38,11 +40,21 @@ const OrderViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
 
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+
   const [del, setDel] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
   const isBlocked = order?.status !== 'DRAFT';
+
+  const debt =
+    refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === order?.head?.contact.id) || undefined;
+
+  const debtTextStyle = useMemo(
+    () => [styles.textLow, { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text }],
+    [colors.notification, colors.text, debt?.saldoDebt],
+  );
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {
@@ -117,6 +129,15 @@ const OrderViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const renderItem = useCallback(
+    ({ item }: { item: IOrderLine }) => (
+      <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
+        <OrderItem docId={order?.id} item={item} readonly={isBlocked} />
+      </SwipeLineItem>
+    ),
+    [isBlocked, order?.id],
+  );
+
   if (del) {
     return (
       <View style={styles.container}>
@@ -136,12 +157,6 @@ const OrderViewScreen = () => {
     }
   }
 
-  const renderItem = ({ item }: { item: IOrderLine }) => (
-    <SwipeLineItem docId={order.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
-      <OrderItem docId={order.id} item={item} readonly={isBlocked} />
-    </SwipeLineItem>
-  );
-
   return (
     <View style={[styles.container]}>
       <InfoBlock
@@ -150,16 +165,27 @@ const OrderViewScreen = () => {
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
-        <View style={styles.rowCenter}>
-          <Text>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+        <View style={localStyles.infoBlock}>
+          <Text style={textStyle}>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
             order.head?.onDate,
           )}`}</Text>
-          {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+
+          <Text style={textStyle}>
+            {(debt?.saldo && debt?.saldo < 0
+              ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
+              : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
+          </Text>
+          <View style={styles.rowCenter}>
+            <Text style={debtTextStyle}>
+              {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
+            </Text>
+            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+          </View>
         </View>
       </InfoBlock>
       <FlatList
         data={order.lines}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
@@ -175,5 +201,8 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  infoBlock: {
+    flexDirection: 'column',
   },
 });

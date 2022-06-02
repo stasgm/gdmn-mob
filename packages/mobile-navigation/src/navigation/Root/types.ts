@@ -21,6 +21,10 @@ type ProfileStackParamList = {
   Profile: undefined;
 };
 
+type InformationStackParamList = {
+  Information: undefined;
+};
+
 type ReferenceStackParamList = {
   ReferenceList: undefined;
   ReferenceView: { name: string };
@@ -40,6 +44,7 @@ export {
   DocumentsStackParamList,
   MessagesStackParamList,
   ProfileStackParamList,
+  InformationStackParamList,
   ReferenceStackParamList,
   SettingsStackParamList,
   TabsStackParams,

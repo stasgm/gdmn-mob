@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
@@ -7,7 +7,7 @@ import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen } f
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString } from '@lib/mobile-app';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -27,6 +27,7 @@ const RouteDetailScreen = () => {
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -36,6 +37,27 @@ const RouteDetailScreen = () => {
 
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
 
+  //TODO получить адрес item.outlet.id
+  const outlet = point
+    ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
+    : undefined;
+
+  const contact = outlet
+    ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
+    : undefined;
+
+  const debt = contact
+    ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === contact.id)
+    : undefined;
+
+  const saldo = debt?.saldo ?? 0;
+  const saldoDebt = debt?.saldoDebt ?? 0;
+
+  const debtTextStyle = useMemo(
+    () => [styles.textLow, { color: saldoDebt > 0 ? colors.notification : colors.text }],
+    [colors.notification, colors.text, saldoDebt],
+  );
+
   if (!point) {
     return (
       <View style={styles.content}>
@@ -43,10 +65,6 @@ const RouteDetailScreen = () => {
       </View>
     );
   }
-  //TODO получить адрес item.outlet.id
-  const outlet = point
-    ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
-    : undefined;
 
   if (!outlet) {
     return (
@@ -55,22 +73,6 @@ const RouteDetailScreen = () => {
       </View>
     );
   }
-
-  const contact = outlet
-    ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
-    : undefined;
-
-  const debtSaldo = contact
-    ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.contact.id === contact.id)
-    : undefined;
-
-  const debt: IDebt = {
-    id: '1',
-    contact: contact as INamedEntity,
-    ondate: '2021-01-01',
-    saldo: debtSaldo?.saldo || 0,
-    saldoDebt: 0,
-  };
 
   const handleNewVisit = async () => {
     setProcess(true);
@@ -113,21 +115,28 @@ const RouteDetailScreen = () => {
         <>
           {outlet && (
             <>
-              <Text>{outlet.address}</Text>
-              <Text>{outlet.phoneNumber}</Text>
+              <Text style={textStyle}>{outlet.address}</Text>
+              <Text style={textStyle}>{outlet.phoneNumber}</Text>
             </>
           )}
         </>
       </InfoBlock>
       <InfoBlock
-        colorLabel={debt.saldo > 0 ? colors.notification : '#a91160'}
+        colorLabel={'#a91160'}
         title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
       >
         <>
           {contact && (
             <>
-              <Text>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text>{debt.saldo < 0 ? `Предоплата: ${Math.abs(debt.saldo)}` : `Задолженность: ${debt.saldo}`}</Text>
+              <Text style={textStyle}>{`Условия оплаты: ${contact.paycond}`}</Text>
+              <Text style={textStyle}>
+                {saldo < 0
+                  ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(saldo) ?? 0)}`
+                  : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldo)}`}
+              </Text>
+              <Text style={debtTextStyle}>
+                {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
+              </Text>
             </>
           )}
         </>

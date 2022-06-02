@@ -51,7 +51,6 @@ const MapScreen = () => {
 
   const routeList = docSelectors
     .selectByDocType<IRouteDocument>('route')
-    // .filter((i) => getDateString(i.documentDate) === getDateString(new Date()))
     ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
 
   const currentList: IListItem[] = useMemo(() => {
@@ -83,18 +82,27 @@ const MapScreen = () => {
 
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
-      const initialList: ILocation[] = selectedItem.lines.map((e) => {
-        const outlet = outlets.find((i) => i.id === e.outlet.id);
-        const res: ILocation = {
-          number: e.ordNumber,
-          id: `${e.id}${e.outlet.id}`,
-          name: e.outlet.name,
-          coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
-        };
-        return res;
-      });
+      /** Если есть хотя бы один магазин без координат, найдем его */
+      const itemForOutletWithoutCoords = selectedItem.lines.find((item) =>
+        outlets.find((i) => i.id === item.outlet.id && (!i.lat || !i.lon)),
+      );
 
-      dispatch(geoActions.addMany(initialList));
+      /** item для которого нет магазина */
+      const itemWithoutOutlet = selectedItem.lines.find((item) => !outlets.find((i) => i.id === item.outlet.id));
+
+      if (!itemForOutletWithoutCoords && !itemWithoutOutlet) {
+        const initialList: ILocation[] = selectedItem.lines.map((e) => {
+          const outlet = outlets.find((i) => i.id === e.outlet.id)!;
+
+          return {
+            number: e.ordNumber,
+            id: `${e.id}${e.outlet.id}`,
+            name: e.outlet.name,
+            coords: { latitude: outlet.lat, longitude: outlet.lon },
+          };
+        });
+        dispatch(geoActions.addMany(initialList));
+      }
     } else {
       dispatch(geoActions.init());
     }
@@ -287,6 +295,17 @@ const MapScreen = () => {
           </View>
         </View>
       ) : null}
+      {selectedItem && !list.length ? (
+        <>
+          <View style={localStyles.statusContainerError}>
+            <View style={localStyles.routeWidth}>
+              <Text style={localStyles.routeError}>
+                Невозможно отобразить точки маршрута: не для всех магазинов в маршруте указаны координаты.
+              </Text>
+            </View>
+          </View>
+        </>
+      ) : null}
       <View style={[localStyles.buttonContainer]}>
         <TouchableOpacity onPress={movePrevPoint} style={[localStyles.bubble, localStyles.button]} disabled={loading}>
           <MaterialCommunityIcons name="chevron-left" size={35} color="#000" />
@@ -312,11 +331,7 @@ const MapScreen = () => {
         onDismiss={handleDismissRoute}
         onApply={handleApplyRoute}
       >
-        <RadioGroup
-          options={currentList}
-          onChange={(option) => setNewSelectedRoute(option)}
-          activeButtonId={newSelectedRoute?.id}
-        />
+        <RadioGroup options={currentList} onChange={setNewSelectedRoute} activeButtonId={newSelectedRoute?.id} />
       </BottomSheet>
       <Snackbar
         visible={barVisible}

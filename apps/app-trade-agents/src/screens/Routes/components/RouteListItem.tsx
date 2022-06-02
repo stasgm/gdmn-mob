@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { View, Text, TouchableHighlight } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -16,6 +16,8 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteList'>>();
 
   const todayStr = new Date(item.documentDate).getDate() === new Date().getDate() ? ' (сегодня)' : '';
+
+  const { colors } = useTheme();
 
   return (
     <TouchableHighlight
@@ -34,11 +36,11 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
             <Text style={styles.name}>{`${getDateString(item.documentDate)}${todayStr}`}</Text>
             <View style={styles.directionRow}>
               <Text style={styles.field}>{item.lines.length}</Text>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
             </View>
           </View>
           <View style={styles.directionRow}>
-            <Text style={styles.field}>{item.head.agent.name}</Text>
+            <Text style={[styles.field, { color: colors.text }]}>{item.head.agent.name}</Text>
           </View>
         </View>
       </View>

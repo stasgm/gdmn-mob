@@ -145,6 +145,7 @@ const AuthNavigator: React.FC = () => {
 
   const onSetDemoMode = useCallback(async () => {
     await authDispatch(authActions.setDemoMode());
+
     api.config.debug = api.config.debug ? { ...api.config.debug, isMock: true } : { isMock: true };
   }, [authDispatch]);
 

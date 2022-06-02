@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
@@ -13,6 +13,7 @@ import {
   RadioGroup,
   ScreenListItem,
   IListItemProps,
+  globalStyles as styles,
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId } from '@lib/mobile-app';
 
@@ -30,6 +31,13 @@ interface IVisitProps {
   route: INamedEntity;
 }
 
+const keyExtractor = (item: IListItemProps) => item.id;
+
+const listDocumentType: IListItem[] = [
+  { id: 'order', value: 'Заявка' },
+  { id: 'return', value: 'Возврат' },
+];
+
 const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation() as any;
   const loading = useSelector((state) => state.documents.loading);
@@ -37,10 +45,12 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
 
+  const { colors } = useTheme();
+
   const [process, setProcess] = useState(false);
 
-  const dateBegin = new Date(visit.head.dateBegin);
-  const dateEnd = visit.head.dateEnd ? new Date(visit.head.dateEnd) : undefined;
+  const dateBegin = useMemo(() => new Date(visit.head.dateBegin), [visit.head.dateBegin]);
+  const dateEnd = useMemo(() => (visit.head.dateEnd ? new Date(visit.head.dateEnd) : undefined), [visit.head.dateEnd]);
 
   // Подразделение по умолчанию
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
@@ -104,7 +114,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     });
   }, [navigation]);
 
-  const handleNewOrder = () => {
+  const handleNewOrder = useCallback(() => {
     if (!orderType) {
       return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
     }
@@ -133,9 +143,9 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     dispatch(documentActions.addDocument(newOrder));
 
     navigation.navigate('OrderView', { id: newOrder.id });
-  };
+  }, [contact, defaultDepart, dispatch, navigation, orderType, outlet, route, visit.head.takenType]);
 
-  const handleNewReturn = () => {
+  const handleNewReturn = useCallback(() => {
     if (!returnType) {
       return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
     }
@@ -162,17 +172,28 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     dispatch(documentActions.addDocument(newReturn));
 
     navigation.navigate('ReturnView', { id: newReturn.id });
-  };
+  }, [contact, dispatch, navigation, outlet, returnType, route]);
 
-  const visitTextBegin = `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
-    !dateEnd ? 'тся' : 'лся'
-  } ${getTimeProcess(visit.head.dateBegin, visit.head.dateEnd)})`;
-  const visitTextEnd = dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`;
+  const visitTextBegin = useMemo(
+    () =>
+      `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
+        !dateEnd ? 'тся' : 'лся'
+      } ${getTimeProcess(visit.head.dateBegin, visit.head.dateEnd)})`,
+    [dateBegin, dateEnd, visit.head.dateBegin, visit.head.dateEnd],
+  );
+
+  const visitTextEnd = useMemo(
+    () => dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`,
+    [dateEnd],
+  );
 
   const docTypeRef = useRef<BottomSheetModal>(null);
-  const handleDismissDocType = () => docTypeRef.current?.dismiss();
 
-  const handleApplyDocType = () => {
+  const handleDismissDocType = useCallback(() => docTypeRef.current?.dismiss(), []);
+
+  const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
+
+  const handleApplyDocType = useCallback(() => {
     docTypeRef.current?.dismiss();
 
     switch (selectedDocType.id) {
@@ -183,19 +204,12 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
       default:
         return;
     }
-  };
+  }, [handleNewOrder, handleNewReturn, selectedDocType.id]);
 
-  const listDocumentType: IListItem[] = [
-    { id: 'order', value: 'Заявка' },
-    { id: 'return', value: 'Возврат' },
-  ];
-
-  const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
-
-  const handlePresentDocType = () => {
+  const handlePresentDocType = useCallback(() => {
     setSelectedDocType(listDocumentType[0]);
     docTypeRef.current?.present();
-  };
+  }, []);
 
   const orders: IListItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
@@ -212,14 +226,17 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     });
   }, [orderDocs]);
 
-  const renderOrderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = orderDocs.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="OrderView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
-      </SwipeListItem>
-    ) : null;
-  };
+  const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
+    ({ item }) => {
+      const doc = orderDocs.find((r) => r.id === item.id);
+      return doc ? (
+        <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
+          <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
+        </SwipeListItem>
+      ) : null;
+    },
+    [navigation, orderDocs],
+  );
 
   const returns: IListItemProps[] = useMemo(() => {
     return returnDocs.map((i) => {
@@ -239,7 +256,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const renderReturnItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = returnDocs.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} edit={true} copy={true} del={true} routeName="ReturnView">
+      <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
         <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
@@ -254,13 +271,15 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const handleSendDocs = useSendDocs(readyDocs);
 
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+
   return (
     <>
       <View style={localStyles.container}>
         <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
-            <Text>{visitTextBegin}</Text>
-            {dateEnd && <Text>{visitTextEnd}</Text>}
+            <Text style={textStyle}>{visitTextBegin}</Text>
+            {dateEnd && <Text style={textStyle}>{visitTextEnd}</Text>}
             {
               <>
                 {!dateEnd && (
@@ -281,7 +300,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           <InfoBlock colorLabel="#567d06" title="Заявки">
             <FlatList
               data={orders}
-              keyExtractor={(_, i) => String(i)}
+              keyExtractor={keyExtractor}
               renderItem={renderOrderItem}
               scrollEventThrottle={400}
               ItemSeparatorComponent={ItemSeparator}
@@ -292,7 +311,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           <InfoBlock colorLabel={'#c98f10'} title="Возвраты">
             <FlatList
               data={returns}
-              keyExtractor={(_, i) => String(i)}
+              keyExtractor={keyExtractor}
               renderItem={renderReturnItem}
               scrollEventThrottle={400}
               ItemSeparatorComponent={ItemSeparator}
@@ -323,11 +342,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         onDismiss={handleDismissDocType}
         onApply={handleApplyDocType}
       >
-        <RadioGroup
-          options={listDocumentType}
-          onChange={(option) => setSelectedDocType(option)}
-          activeButtonId={selectedDocType?.id}
-        />
+        <RadioGroup options={listDocumentType} onChange={setSelectedDocType} activeButtonId={selectedDocType?.id} />
       </BottomSheet>
     </>
   );
@@ -336,7 +351,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 24,
   },
 });
 

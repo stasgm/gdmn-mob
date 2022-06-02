@@ -1,13 +1,15 @@
 import React from 'react';
+
 import { useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer';
 
 import { INavItem, RootDrawerParamList } from './types';
 
 import SettingsNavigator from './Root/SettingsNavigator';
 import ReferencesNavigator from './Root/ReferencesNavigator';
 import ProfileNavigator from './Root/ProfileNavigator';
+import InformationNavigator from './Root/InformationNavigator';
 import { DrawerContent } from './drawerContent';
 
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
@@ -30,6 +32,12 @@ const baseNavList: INavItem[] = [
     component: ProfileNavigator,
     icon: 'account-circle-outline',
     title: 'Профиль',
+  },
+  {
+    name: 'InformationNav',
+    component: InformationNavigator,
+    icon: 'information-outline',
+    title: 'О программе',
   },
 ];
 
@@ -59,6 +67,7 @@ const DrawerNavigator = ({ onSyncClick, ...props }: IProps) => {
           options={{
             headerShown: false,
             title: item.title,
+            drawerLabelStyle: { fontSize: 16 },
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
           }}
         />

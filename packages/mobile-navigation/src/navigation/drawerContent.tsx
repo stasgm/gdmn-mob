@@ -5,6 +5,7 @@ import { Avatar, Caption, Divider, Drawer, Title } from 'react-native-paper';
 import Animated from 'react-native-reanimated';
 import { useSelector } from '@lib/store';
 import { useTheme } from '@react-navigation/native';
+import { PrimeButton } from '@lib/mobile-ui';
 
 const getDateString = (_date: string | Date) => {
   if (!_date) {
@@ -28,6 +29,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
   const user = useSelector((state) => state.auth.user);
   const company = useSelector((state) => state.auth.company);
+  const isDemo = useSelector((state) => state.auth.isDemo);
 
   const syncDate = useSelector((state) => state.app.syncDate) as Date;
 
@@ -49,7 +51,7 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
             </Title>
           </View>
         </View>
-        <Caption style={styles.caption}>{company?.name || ''}</Caption>
+        <Caption style={[styles.caption, { color: colors.text }]}>{company?.name || ''}</Caption>
       </View>
       <Divider />
       <DrawerContentScrollView {...props}>
@@ -66,19 +68,18 @@ export function DrawerContent({ onSync, syncing, ...props }: Props) {
           </Drawer.Section>
         </Animated.View>
       </DrawerContentScrollView>
-      <View style={styles.systemInfo}>
-        <TouchableOpacity onPress={onSync}>
-          <Avatar.Icon size={50} icon="cloud-refresh" style={{ backgroundColor: colors.primary }} />
-        </TouchableOpacity>
-        {!!syncDate && (
-          <View style={styles.updateSection}>
-            <Caption style={styles.caption}>Дата синхронизации:</Caption>
-            <Caption style={styles.caption}>
-              {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
-            </Caption>
+      {!isDemo && (
+        <PrimeButton icon="cloud-sync-outline" onPress={onSync} outlined>
+          <View>
+            <Caption style={{ color: colors.text, fontSize: 16 }}>Синхронизировать</Caption>
+            {!!syncDate && (
+              <Caption style={[styles.caption, { color: colors.text }]}>
+                {getDateString(syncDate)} {new Date(syncDate).toLocaleTimeString()}
+              </Caption>
+            )}
           </View>
-        )}
-      </View>
+        </PrimeButton>
+      )}
     </>
   );
 }
@@ -112,8 +113,8 @@ const styles = StyleSheet.create({
   },
   caption: {
     textAlign: 'center',
-    fontSize: 14,
-    lineHeight: 14,
+    fontSize: 16,
+    lineHeight: 16,
   },
   updateSection: {
     alignItems: 'flex-end',
