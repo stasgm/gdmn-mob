@@ -62,7 +62,7 @@ const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
           <Text style={styles.name}>{item.name || item.name}</Text>
           {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={15} />
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
               <Text style={styles.field}>
                 {model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length}
               </Text>

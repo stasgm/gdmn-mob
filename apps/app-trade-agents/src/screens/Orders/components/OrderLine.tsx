@@ -135,7 +135,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                 </View>
                 <MaterialCommunityIcons name={'chevron-down' as Icon} size={24} color="black" />
               </View>
-              <Text style={localStyles.text}>Для данного товара нет упаковки</Text>
+              <Text style={[localStyles.text, { color: colors.text }]}>Для данного товара нет упаковки</Text>
             </>
           )}
           <ItemSeparator />
