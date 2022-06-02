@@ -10,6 +10,7 @@ export interface IHeadMessage {
   producer: INamedEntity;
   consumer: INamedEntity;
   dateTime: string;
+  order: number;
   replyTo?: string;
 }
 

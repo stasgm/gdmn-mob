@@ -362,7 +362,7 @@ export const getFiles = (params: AddProcess): IFiles => {
 
   const sorted = files
     .map<[string, IMessage]>((fn) => [fn, makeMessageSync(readMessageFile(pathDb, fn))])
-    .sort((a, b) => new Date(a[1].head.dateTime).getTime() - new Date(b[1].head.dateTime).getTime());
+    .sort((a, b) => a[1].head.order - b[1].head.order);
 
   const limitDataVolume = Math.min(
     params.maxDataVolume ?? defMaxDataVolume,
@@ -396,6 +396,7 @@ export const makeMessageSync = (message: IDBMessage): IMessage => {
       consumer,
       producer,
       dateTime: message.head.dateTime,
+      order: message.head.order,
     },
     status: message.status,
     body: message.body,
@@ -411,6 +412,7 @@ export const makeDBNewMessageSync = (message: NewMessage, producerId: string): I
       consumerId: message.head.consumer.id,
       producerId,
       dateTime: new Date().toISOString(),
+      order: message.head.order,
       replyTo: message.head.replyTo,
     },
     status: message.status,
