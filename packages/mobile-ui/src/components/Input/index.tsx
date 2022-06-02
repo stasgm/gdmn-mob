@@ -33,6 +33,7 @@ interface Props {
   editable?: boolean;
   disabled?: boolean;
   clearInput?: boolean;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
 }
 
 const Input = ({
@@ -49,6 +50,7 @@ const Input = ({
   disabled,
   onEndEditing,
   clearInput,
+  autoCapitalize,
 }: Props) => {
   const { colors } = useTheme();
 
@@ -92,6 +94,7 @@ const Input = ({
           disabled={disabled}
           editable={editable}
           children={undefined}
+          autoCapitalize={autoCapitalize}
         />
       </View>
     </View>
