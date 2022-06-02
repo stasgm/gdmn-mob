@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { View, Text, TouchableHighlight } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,6 +18,8 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
   const todayStr = new Date(item.documentDate).getDate() === new Date().getDate() ? ' (сегодня)' : '';
 
   const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   return (
     <TouchableHighlight
@@ -40,7 +42,7 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
             </View>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{item.head.agent.name}</Text>
+            <Text style={textStyle}>{item.head.agent.name}</Text>
           </View>
         </View>
       </View>

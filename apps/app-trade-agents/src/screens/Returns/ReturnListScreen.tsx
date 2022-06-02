@@ -144,6 +144,8 @@ const ReturnListScreen = () => {
     ) : null;
   };
 
+  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
+
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
@@ -156,7 +158,7 @@ const ReturnListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={colorStyle}
             />
           </View>
           <ItemSeparator />

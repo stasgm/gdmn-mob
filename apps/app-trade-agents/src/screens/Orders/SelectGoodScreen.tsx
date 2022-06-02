@@ -103,6 +103,8 @@ const SelectGoodScreen = () => {
     );
   }, [model, searchQuery]);
 
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
   return (
     <AppScreen>
       <SubTitle style={styles.title}>{goodRef.description || goodRef.name}</SubTitle>
@@ -116,7 +118,7 @@ const SelectGoodScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />

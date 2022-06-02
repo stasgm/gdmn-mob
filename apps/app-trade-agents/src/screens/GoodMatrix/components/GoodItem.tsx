@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -16,6 +16,8 @@ const GoodItem = ({ item }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'GoodList'>>();
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -28,7 +30,7 @@ const GoodItem = ({ item }: IProps) => {
         </View>
         <View style={styles.details}>
           <Text style={[styles.name]}>{item?.name}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>{(item?.priceFsn || 0).toString()} р.</Text>
+          <Text style={textStyle}>{(item?.priceFsn || 0).toString()} р.</Text>
         </View>
       </View>
     </TouchableOpacity>

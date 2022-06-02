@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { View, Text, TouchableHighlight } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -45,6 +45,8 @@ const RouteItem = ({ item, routeId }: IItem) => {
 
   const status = visits.length === 0 ? 0 : visits.find((visit) => visit.head.dateEnd) ? 2 : 1;
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <TouchableHighlight
       activeOpacity={0.7}
@@ -62,7 +64,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
             <Text style={styles.name}>{item.outlet.name}</Text>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{address}</Text>
+            <Text style={textStyle}>{address}</Text>
             <View style={styles.directionRow}>
               <Text style={styles.field}>{item.comment}</Text>
             </View>
@@ -70,7 +72,7 @@ const RouteItem = ({ item, routeId }: IItem) => {
         </View>
         <View style={styles.bottomButtons}>
           {status ? <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" /> : null}
-          <Text style={[styles.field, { color: colors.text }]}>
+          <Text style={textStyle}>
             {status === 2 && lastVisit[0].head.dateEnd && getDateString(lastVisit[0].head.dateEnd)}
           </Text>
         </View>

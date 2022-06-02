@@ -286,7 +286,7 @@ const MapScreen = () => {
             <Text style={localStyles.routeName}>
               Маршрут №{selectedItem?.number} на {getDateString(selectedItem?.documentDate)}
             </Text>
-            {currentPoint ? <Text style={localStyles.routeName}>{currentPoint?.name}</Text> : null}
+            {currentPoint ? <Text style={localStyles.outletName}>{currentPoint?.name}</Text> : null}
           </View>
           <View>
             <TouchableOpacity onPress={handlePresentRoute} disabled={loading}>

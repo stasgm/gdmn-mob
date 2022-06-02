@@ -253,11 +253,13 @@ function SellBillScreen() {
     setLoading(false);
   }, [dispatch, docDateBegin, docDateEnd, docGood, isDemo, outletId, serverName, serverPort, unmounted, userToken]);
 
+  const viewStyle = useMemo(() => colors.primary, [colors.primary]);
+
   return (
     <AppScreen style={localStyles.appScreen}>
       <View style={localStyles.title}>
         <SubTitle>Поиск накладных</SubTitle>
-        {loading ? <ActivityIndicator size="small" color={colors.primary} /> : <View style={localStyles.blank} />}
+        {loading ? <ActivityIndicator size="small" color={viewStyle} /> : <View style={localStyles.blank} />}
       </View>
       <Divider />
       <SelectableInput
@@ -283,7 +285,7 @@ function SellBillScreen() {
       {sellBills &&
         (sellBills?.length ? (
           <View style={localStyles.sellBill}>
-            <InfoBlock colorLabel={colors.primary} title="Накладные">
+            <InfoBlock colorLabel={viewStyle} title="Накладные">
               <View style={localStyles.list}>
                 <FlatList
                   data={bills}

@@ -101,6 +101,8 @@ const ContactListScreen = () => {
 
   const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
 
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
   return (
     <AppScreen>
       {filterVisible && (
@@ -112,7 +114,7 @@ const ContactListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />

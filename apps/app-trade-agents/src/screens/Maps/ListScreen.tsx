@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import { useScrollToTop, useTheme } from '@react-navigation/native';
@@ -16,16 +16,21 @@ import localStyles from './styles';
 
 const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
   const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const viewStyle = useMemo(
+    () => [
+      styles.icon,
+      item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
+    ],
+    [item.number, selected],
+  );
+
   return (
     <TouchableHighlight onPress={onPress} style={styles.flexDirectionRow} activeOpacity={0.4} underlayColor="#DDDDDD">
       <>
         <View style={styles.item}>
-          <View
-            style={[
-              styles.icon,
-              item.number === 0 ? localStyles.myLocationMark : selected ? localStyles.selectedMark : localStyles.mark,
-            ]}
-          >
+          <View style={viewStyle}>
             <Text style={styles.lightText}>{item.number}</Text>
           </View>
         </View>
@@ -35,9 +40,7 @@ const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => voi
           </View>
           <View style={styles.flexDirectionRow}>
             <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
-            <Text
-              style={[styles.field, { color: colors.text }]}
-            >{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+            <Text style={textStyle}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
           </View>
         </View>
       </>

@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     position: 'absolute',
-    top: 41,
+    top: 48,
     left: 0,
     width: '100%',
     backgroundColor: 'rgba(255,255,255,0.6)',
@@ -98,6 +98,10 @@ const styles = StyleSheet.create({
   routeName: {
     textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  outletName: {
+    textAlign: 'center',
     fontSize: 16,
   },
   routeError: {

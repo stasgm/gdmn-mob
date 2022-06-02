@@ -43,6 +43,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
   const qtyRef = useRef<TextInput>(null);
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+  const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
 
   return (
     <>
@@ -55,7 +56,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
             </View>
           </View>
           <ItemSeparator />
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <View style={viewStyle}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
               <Text style={textStyle}>{item.priceFromSellBill?.toString()}</Text>
@@ -64,7 +65,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
           {item.quantityFromSellBill && (
             <>
-              <View style={[styles.item, { backgroundColor: colors.background }]}>
+              <View style={viewStyle}>
                 <View style={styles.details}>
                   <Text style={styles.name}>Количество из накладной</Text>
                   <Text style={textStyle}>{item.quantityFromSellBill.toString()}</Text>
@@ -73,7 +74,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
               <ItemSeparator />
             </>
           )}
-          <View style={[styles.item, { backgroundColor: colors.background }]}>
+          <View style={viewStyle}>
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
               <TextInput

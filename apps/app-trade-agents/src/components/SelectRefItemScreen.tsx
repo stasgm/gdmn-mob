@@ -167,13 +167,17 @@ const LineItem = React.memo(
   ({ item, isChecked, onCheck }: { item: INamedEntity; isChecked: boolean; onCheck: (id: INamedEntity) => void }) => {
     const { colors } = useTheme();
 
+    const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
+    const checkboxStyle = useMemo(() => colors.primary, [colors.primary]);
+    const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
+
     return (
       <TouchableOpacity onPress={() => onCheck(item)}>
-        <View style={[styles.item, { backgroundColor: colors.background }]}>
-          <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
+        <View style={viewStyle}>
+          <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={checkboxStyle} />
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
+              <Text style={textStyle}>{item.name || item.id}</Text>
             </View>
           </View>
         </View>

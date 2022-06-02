@@ -60,6 +60,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   }, [pack]);
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+  const textPackStyle = useMemo(() => [localStyles.text, { color: colors.text }], [colors.text]);
 
   return (
     <>
@@ -133,7 +134,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                 </View>
                 <MaterialCommunityIcons name={'chevron-down' as Icon} size={24} color="black" />
               </View>
-              <Text style={[localStyles.text, { color: colors.text }]}>Для данного товара нет упаковки</Text>
+              <Text style={textPackStyle}>Для данного товара нет упаковки</Text>
             </>
           )}
           <ItemSeparator />

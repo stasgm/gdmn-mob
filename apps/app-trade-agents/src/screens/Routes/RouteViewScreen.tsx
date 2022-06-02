@@ -37,6 +37,8 @@ const RouteViewScreen = () => {
 
   const { colors } = useTheme();
 
+  const viewStyle = useMemo(() => colors.primary, [colors.primary]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
@@ -195,7 +197,7 @@ const RouteViewScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={viewStyle}
             />
           </View>
           <ItemSeparator />

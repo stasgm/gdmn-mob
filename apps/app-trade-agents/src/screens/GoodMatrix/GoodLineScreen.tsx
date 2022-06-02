@@ -22,11 +22,13 @@ interface IProperty {
 
 const LineItem = React.memo(({ item }: { item: IProperty }) => {
   const { colors } = useTheme();
+  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <View style={styles.item}>
       <View style={styles.details}>
         <Text style={styles.name}>{item.title}</Text>
-        <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.value}</Text>
+        <Text style={textStyle}>{item.value}</Text>
       </View>
     </View>
   );

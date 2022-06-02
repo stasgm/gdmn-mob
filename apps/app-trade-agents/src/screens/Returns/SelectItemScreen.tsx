@@ -54,6 +54,10 @@ const SelectItemScreen = () => {
   const refList = React.useRef<FlatList<INamedEntity>>(null);
   useScrollToTop(refList);
 
+  const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
+  const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
+  const subTitleStyle = useMemo(() => [styles.title, { backgroundColor: colors.background }], [colors.background]);
+
   const renderItem = ({ item }: { item: INamedEntity }) => {
     return (
       <TouchableOpacity
@@ -65,13 +69,13 @@ const SelectItemScreen = () => {
           });
         }}
       >
-        <View style={[styles.item, { backgroundColor: colors.background }]}>
+        <View style={viewStyle}>
           <View style={[styles.icon]}>
             <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
           </View>
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={[styles.name, { color: colors.text }]}>{item.name || item.id}</Text>
+              <Text style={textStyle}>{item.name || item.id}</Text>
             </View>
           </View>
         </View>
@@ -81,7 +85,7 @@ const SelectItemScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={[styles.title, { backgroundColor: colors.background }]}>{list?.name}</SubTitle>
+      <SubTitle style={subTitleStyle}>{list?.name}</SubTitle>
       <Divider />
       {filterVisible && (
         <>

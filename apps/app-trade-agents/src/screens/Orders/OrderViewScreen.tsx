@@ -138,12 +138,14 @@ const OrderViewScreen = () => {
     [isBlocked, order?.id],
   );
 
+  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
+
   if (del) {
     return (
       <View style={styles.container}>
         <View style={localStyles.del}>
           <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colors.primary} />
+          <ActivityIndicator size="small" color={colorStyle} />
         </View>
       </View>
     );

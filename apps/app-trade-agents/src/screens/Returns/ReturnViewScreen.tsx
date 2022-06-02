@@ -41,6 +41,7 @@ const ReturnViewScreen = () => {
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+  const viewStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [del, setDel] = useState(false);
 
@@ -123,7 +124,7 @@ const ReturnViewScreen = () => {
       <View style={styles.container}>
         <View style={localStyles.del}>
           <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colors.primary} />
+          <ActivityIndicator size="small" color={viewStyle} />
         </View>
       </View>
     );

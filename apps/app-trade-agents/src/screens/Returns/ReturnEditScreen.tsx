@@ -230,12 +230,17 @@ const ReturnEditScreen = () => {
     });
   };
 
+  const viewStyle = useMemo(
+    () => [localStyles.switchContainer, localStyles.border, { borderColor: colors.primary }],
+    [colors.primary],
+  );
+
   return (
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
       <Divider />
       <ScrollView>
-        <View style={[localStyles.switchContainer, localStyles.border, { borderColor: colors.primary }]}>
+        <View style={viewStyle}>
           <RadioGroup
             options={statusList}
             onChange={() => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { docSelectors, refSelectors } from '@lib/store';
@@ -49,13 +49,16 @@ const RouteTotal = ({ routeId }: IItem) => {
       }, 0),
   }));
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const textTotalStyle = useMemo(() => [styles.textTotal, { color: colors.notification }], [colors.notification]);
+
   const renderTotalItem = ({ item }: { item: IRouteTotalLine }) => (
     <View style={styles.itemNoMargin}>
       <View style={styles.details}>
         <View style={styles.directionRow}>
-          <Text style={[styles.field, { color: colors.text }]}>{item.group.name}</Text>
+          <Text style={textStyle}>{item.group.name}</Text>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{item.quantity}</Text>
+            <Text style={textStyle}>{item.quantity}</Text>
           </View>
         </View>
       </View>
@@ -69,9 +72,7 @@ const RouteTotal = ({ routeId }: IItem) => {
       <FlatList data={totalList} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
       <Divider />
       <View style={styles.bottomTotal}>
-        <Text style={[styles.textTotal, { color: colors.notification }]}>
-          {totalList?.reduce((prev, item) => prev + item.quantity, 0)}
-        </Text>
+        <Text style={textTotalStyle}>{totalList?.reduce((prev, item) => prev + item.quantity, 0)}</Text>
       </View>
     </View>
   );

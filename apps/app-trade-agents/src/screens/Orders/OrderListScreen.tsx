@@ -146,6 +146,8 @@ const OrderListScreen = () => {
     ) : null;
   };
 
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -158,7 +160,7 @@ const OrderListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />
