@@ -1,9 +1,7 @@
 import { DrawerItem } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { Linking } from 'react-native';
 
-import ProfileScreen from '../../screens/ProfileScreen';
 import InformationScreen from '../../screens/InformationScreen';
 
 import { InformationStackParamList } from './types';

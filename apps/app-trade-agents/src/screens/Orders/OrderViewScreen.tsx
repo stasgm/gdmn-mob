@@ -169,7 +169,12 @@ const OrderViewScreen = () => {
               : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
           </Text>
           <View style={styles.rowCenter}>
-            <Text style={[styles.textLow, { color: colors.notification }]}>
+            <Text
+              style={[
+                styles.textLow,
+                { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text },
+              ]}
+            >
               {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
             </Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}

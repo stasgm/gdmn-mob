@@ -3,6 +3,7 @@
     "name": "GDMN Агент",
     "slug": "gdmn-sales-representative",
     "version": "0.3.0",
+    "githubUrl": "https://github.com/stasgm/gdmn-mob/tree/dev/docs/gdmn-app-trade-agents/docs",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
