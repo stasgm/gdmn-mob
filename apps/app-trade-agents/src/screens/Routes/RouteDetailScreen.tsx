@@ -24,7 +24,7 @@ const RouteDetailScreen = () => {
   const { colors } = useTheme();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
-  const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
+  const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
@@ -141,18 +141,14 @@ const RouteDetailScreen = () => {
           )}
         </>
       </InfoBlock>
-      {visits.length > 0 && !process ? (
-        <>
-          {visits.map((visit) => (
-            <Visit
-              key={visit.id}
-              item={visit}
-              outlet={outlet as INamedEntity}
-              contact={contact as INamedEntity}
-              route={{ id: routeId, name: '' }}
-            />
-          ))}
-        </>
+      {visit && !process ? (
+        <Visit
+          key={visit.id}
+          item={visit}
+          outlet={outlet as INamedEntity}
+          contact={contact as INamedEntity}
+          route={{ id: routeId, name: '' }}
+        />
       ) : (
         <PrimeButton icon="play-circle-outline" onPress={handleNewVisit} disabled={process}>
           Начать визит

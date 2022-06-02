@@ -13,7 +13,7 @@ import { getDateString } from '@lib/mobile-app';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IOrderDocument, IGoodGroup, IMGroupModel } from '../../store/types';
 import { getGroupModelByContact } from '../../utils/helpers';
-import { unknownGroup } from '../../utils/constants';
+import { UNKNOWN_GROUP } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
@@ -115,7 +115,7 @@ const SelectGroupScreen = () => {
 
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const groups = refGroup.data.concat(unknownGroup);
+  const groups = refGroup.data.concat(UNKNOWN_GROUP);
 
   const model = useMemo(
     () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice),

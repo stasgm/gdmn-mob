@@ -73,14 +73,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     // TODO Вынести в async actions
     setProcess(true);
 
-    // let coords: ICoords;
-
-    // try {
     const coords = await getCurrentPosition();
-    // } catch (e) {
-    //   // setMessage(e.message);
-    //   // setBarVisible(true);
-    // }
 
     const date = new Date().toISOString();
 
@@ -296,7 +289,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
             }
           </>
         </InfoBlock>
-        {orders.length !== 0 && (
+        {orders.length > 0 && (
           <InfoBlock colorLabel="#567d06" title="Заявки">
             <FlatList
               data={orders}
@@ -307,7 +300,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
             />
           </InfoBlock>
         )}
-        {returnDocs.length !== 0 && (
+        {returnDocs.length > 0 && (
           <InfoBlock colorLabel={'#c98f10'} title="Возвраты">
             <FlatList
               data={returns}
@@ -324,7 +317,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           Добавить документ
         </PrimeButton>
       ) : (
-        readyDocs?.length > 0 && (
+        readyDocs?.length && (
           <PrimeButton
             icon={!loading ? 'file-send' : 'block-helper'}
             onPress={handleSendDocs}

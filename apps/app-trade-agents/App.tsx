@@ -2,7 +2,7 @@ import { Linking, TouchableOpacity } from 'react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Provider } from 'react-redux';
 import { dialCall, MobileApp } from '@lib/mobile-app';
-import { INavItem } from '@lib/mobile-navigation';
+import { INavItem, GDMN_PHONE, GDMN_EMAIL, GDMN_SITE_ADDRESS } from '@lib/mobile-navigation';
 
 import {
   appActions,
@@ -139,21 +139,23 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const [mode, setMode] = useState(0);
+  const [infoWindow, setInfoWindow] = useState(0);
+
+  const handleSetInfoWindow_1 = useCallback(() => setInfoWindow(1), []);
+  const handleSetInfoWindow_2 = useCallback(() => setInfoWindow(2), []);
+  const handleSetInfoWindow_3 = useCallback(() => setInfoWindow(3), []);
 
   useEffect(() => {
     if (isDemo) {
       //Если включен демо режим, то запускаем получение данных из мока
       getMessages();
       if (connectionStatus === 'connected') {
-        setMode(1);
+        handleSetInfoWindow_1();
       }
     }
-  }, [isDemo, getMessages, connectionStatus]);
+  }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1]);
 
   const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
-
-  console.log('connectionStatus', connectionStatus);
 
   return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>
@@ -166,7 +168,7 @@ const Root = () => {
           : 'Пожалуйста, подождите..'}
       </Caption>
     </AppScreen>
-  ) : mode === 1 ? (
+  ) : infoWindow === 1 ? (
     <AppScreen>
       <Text style={styles.textInfo}>
         {
@@ -176,50 +178,50 @@ const Root = () => {
       <TouchableOpacity
         style={styles.buttonPrev}
         onPress={() => {
-          setMode(0);
+          setInfoWindow(0);
           dispatch(appActions.loadGlobalDataFromDisc());
         }}
       >
         <Text style={styles.textInfo}>{'« Назад'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNext} onPress={() => setMode(2)}>
+      <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_2}>
         <Text style={styles.textInfo}>{'Далее »'}</Text>
       </TouchableOpacity>
     </AppScreen>
-  ) : mode === 2 ? (
+  ) : infoWindow === 2 ? (
     <AppScreen>
       <Text style={styles.textInfo}>
         {
           'Вы находитесь в демонстрационном режиме и работаете с вымышленными данными.\n\nДля подключения приложения к торговой или складской системе вашего предприятия обратитесь в компанию ООО Амперсант (торговая марка Golden Software)\n'
         }
       </Text>
-      <TouchableOpacity onPress={() => dialCall('+375172561759')}>
-        <Text style={styles.textInfo}>{'Телефон: +375 17 256 17 59\n'}</Text>
+      <TouchableOpacity onPress={() => dialCall(GDMN_PHONE)}>
+        <Text style={styles.textInfo}>{`Телефон: ${GDMN_PHONE}\n`}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => Linking.openURL('mailto:support@gsbelarus.com')}>
-        <Text style={styles.textInfo}>{'Email: support@gsbelarus.com\n'}</Text>
+      <TouchableOpacity onPress={() => Linking.openURL(`mailto:${GDMN_EMAIL}`)}>
+        <Text style={styles.textInfo}>{`Email: ${GDMN_EMAIL}\n`}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => Linking.openURL('http://gsbelarus.com')}>
-        <Text style={[styles.textInfo, styles.textReference]}>http://gsbelarus.com</Text>
+      <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
+        <Text style={[styles.textInfo, styles.textReference]}>{GDMN_SITE_ADDRESS}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonPrev} onPress={() => setMode(1)}>
+      <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_1}>
         <Text style={styles.textInfo}>{'« Назад'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.buttonNext} onPress={() => setMode(3)}>
+      <TouchableOpacity style={styles.buttonNext} onPress={handleSetInfoWindow_3}>
         <Text style={styles.textInfo}>{'Далее »'}</Text>
       </TouchableOpacity>
     </AppScreen>
-  ) : mode === 3 ? (
+  ) : infoWindow === 3 ? (
     <AppScreen>
       <Text style={styles.textInfo}>
         {
           'Подробную информацию об использовании приложения вы найдете в справочной системе.\n\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Агент!\n\n'
         }
       </Text>
-      <TouchableOpacity style={styles.buttonPrev} onPress={() => setMode(2)}>
+      <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
         <Text style={styles.textInfo}>{'« Назад'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setMode(0)}>
+      <TouchableOpacity onPress={() => setInfoWindow(0)}>
         <Text style={[styles.textInfo, styles.textReference, styles.textBold]}>Приступить к работе в демо режиме</Text>
       </TouchableOpacity>
     </AppScreen>

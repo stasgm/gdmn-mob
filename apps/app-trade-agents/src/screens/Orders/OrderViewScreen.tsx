@@ -17,7 +17,9 @@ import {
 
 import { sleep } from '@lib/client-api';
 
-import { formatValue, getDateString } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString } from '@lib/mobile-app';
+
+import { IDocument } from '@lib/types';
 
 import { IDebt, IOrderDocument, IOrderLine } from '../../store/types';
 
@@ -66,6 +68,25 @@ const OrderViewScreen = () => {
     navigation.navigate('OrderEdit', { id });
   }, [navigation, id]);
 
+  const handleCopyOrder = useCallback(() => {
+    const newDocDate = new Date().toISOString();
+    const newId = generateId();
+
+    const newDoc: IDocument = {
+      ...order,
+      id: newId,
+      number: 'б\\н',
+      status: 'DRAFT',
+      documentDate: newDocDate,
+      creationDate: newDocDate,
+      editionDate: newDocDate,
+    };
+
+    docDispatch(documentActions.addDocument(newDoc));
+
+    navigation.navigate('OrderView', { id: newId });
+  }, [order, docDispatch, navigation]);
+
   const handleDelete = useCallback(async () => {
     if (!id) {
       return;
@@ -100,6 +121,10 @@ const OrderViewScreen = () => {
         onPress: handleEditOrderHead,
       },
       {
+        title: 'Копировать заявку',
+        onPress: handleCopyOrder,
+      },
+      {
         title: 'Удалить заявку',
         type: 'destructive',
         onPress: handleDelete,
@@ -109,7 +134,7 @@ const OrderViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddOrderLine, handleDelete, handleEditOrderHead]);
+  }, [showActionSheet, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
 
   const renderRight = useCallback(
     () =>
