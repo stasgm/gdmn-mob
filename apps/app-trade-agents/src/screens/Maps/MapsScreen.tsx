@@ -82,18 +82,23 @@ const MapScreen = () => {
 
   const initLocations = useCallback(() => {
     if (selectedItem && !!outlets) {
-      const isWithoutCoords = selectedItem.lines.find((item) =>
+      /** Если есть хотя бы один магазин без координат, найдем его */
+      const itemForOutletWithoutCoords = selectedItem.lines.find((item) =>
         outlets.find((i) => i.id === item.outlet.id && (!i.lat || !i.lon)),
       );
-      if (!isWithoutCoords) {
+
+      /** item для которого нет магазина */
+      const itemWithoutOutlet = selectedItem.lines.find((item) => !outlets.find((i) => i.id === item.outlet.id));
+
+      if (!itemForOutletWithoutCoords && !itemWithoutOutlet) {
         const initialList: ILocation[] = selectedItem.lines.map((e) => {
-          const outlet = outlets.find((i) => i.id === e.outlet.id);
+          const outlet = outlets.find((i) => i.id === e.outlet.id)!;
 
           return {
             number: e.ordNumber,
             id: `${e.id}${e.outlet.id}`,
             name: e.outlet.name,
-            coords: { latitude: outlet?.lat || DEFAULT_LATITUDE, longitude: outlet?.lon || DEFAULT_LONGITUDE },
+            coords: { latitude: outlet.lat, longitude: outlet.lon },
           };
         });
         dispatch(geoActions.addMany(initialList));

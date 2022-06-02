@@ -13,6 +13,7 @@ import {
   RadioGroup,
   ScreenListItem,
   IListItemProps,
+  globalStyles as styles,
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId } from '@lib/mobile-app';
 
@@ -270,13 +271,15 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const handleSendDocs = useSendDocs(readyDocs);
 
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+
   return (
     <>
       <View style={localStyles.container}>
         <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
-            <Text style={[localStyles.text, { color: colors.text }]}>{visitTextBegin}</Text>
-            {dateEnd && <Text style={{ color: colors.text }}>{visitTextEnd}</Text>}
+            <Text style={textStyle}>{visitTextBegin}</Text>
+            {dateEnd && <Text style={textStyle}>{visitTextEnd}</Text>}
             {
               <>
                 {!dateEnd && (
@@ -348,9 +351,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  text: {
-    fontSize: 15,
   },
 });
 

@@ -2,7 +2,7 @@ import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
 import { ItemSeparator } from '@lib/mobile-ui';
 import { useTheme } from '@react-navigation/native';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, TextInput, View, Text } from 'react-native';
 
 import { IReturnLine } from '../../../store/types';
@@ -42,6 +42,8 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
 
   const qtyRef = useRef<TextInput>(null);
 
+  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <>
       <ScrollView>
@@ -49,18 +51,14 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
           <View style={[styles.item]}>
             <View style={styles.details}>
               <Text style={styles.name}>Наименование</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {item ? item.good.name || 'товар не найден' : ''}
-              </Text>
+              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={[styles.item, { backgroundColor: colors.background }]}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {item.priceFromSellBill?.toString()}
-              </Text>
+              <Text style={textStyle}>{item.priceFromSellBill?.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
@@ -69,9 +67,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
               <View style={[styles.item, { backgroundColor: colors.background }]}>
                 <View style={styles.details}>
                   <Text style={styles.name}>Количество из накладной</Text>
-                  <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                    {item.quantityFromSellBill.toString()}
-                  </Text>
+                  <Text style={textStyle}>{item.quantityFromSellBill.toString()}</Text>
                 </View>
               </View>
               <ItemSeparator />
@@ -81,7 +77,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
             <View style={styles.details}>
               <Text style={styles.name}>Количество</Text>
               <TextInput
-                style={[styles.number, styles.field, { color: colors.text }]}
+                style={textStyle}
                 editable={true}
                 ref={qtyRef}
                 keyboardType="numeric"

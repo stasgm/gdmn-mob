@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
@@ -39,6 +39,9 @@ const ReturnViewScreen = () => {
   const { id } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
 
   const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+
   const [del, setDel] = useState(false);
 
   const returnDoc = docSelectors.selectByDocId<IReturnDocument>(id);
@@ -149,9 +152,7 @@ const ReturnViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(returnDoc.status)}
       >
         <View style={styles.directionRow}>
-          <Text style={[styles.textLow, { color: colors.text }]}>{`№ ${returnDoc.number} от ${getDateString(
-            returnDoc.documentDate,
-          )}`}</Text>
+          <Text style={textStyle}>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
           {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
         </View>
       </InfoBlock>

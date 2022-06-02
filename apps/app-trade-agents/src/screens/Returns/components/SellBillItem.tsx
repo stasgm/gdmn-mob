@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useTheme } from '@react-navigation/native';
@@ -32,6 +32,9 @@ const SellBillItem = ({ item }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SellBill'>>();
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const textNameStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -55,12 +58,10 @@ const SellBillItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{`№ ${item.number} ${getDateString(
-            item.documentdate,
-          )}`}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>{`Договор №${item.contract}`}</Text>
-          <Text style={[styles.field, { color: colors.text }]}>{item.departName}</Text>
-          <Text style={[styles.name, { color: colors.text }]}>
+          <Text style={textNameStyle}>{`№ ${item.number} ${getDateString(item.documentdate)}`}</Text>
+          <Text style={textStyle}>{`Договор №${item.contract}`}</Text>
+          <Text style={textStyle}>{item.departName}</Text>
+          <Text style={textNameStyle}>
             {item.quantity} {item.valueName} x {item.price} р.
           </Text>
         </View>

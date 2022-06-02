@@ -4,7 +4,7 @@ import { ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTheme } from '@react-navigation/native';
@@ -59,6 +59,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
+  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <>
       <ScrollView>
@@ -66,16 +68,14 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <View style={[styles.item]}>
             <View style={styles.details}>
               <Text style={styles.name}>Наименование</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                {item ? item.good.name || 'товар не найден' : ''}
-              </Text>
+              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field, { color: colors.text }]}>{item.good.priceFsn.toString()}</Text>
+              <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
@@ -83,7 +83,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
             <View style={styles.details}>
               <Text style={styles.name}>Количество мест</Text>
               <TextInput
-                style={[styles.number, styles.field, { color: colors.text }]}
+                style={textStyle}
                 editable={true}
                 keyboardType="numeric"
                 onChangeText={handelQuantityChange}
@@ -100,9 +100,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
                 <View style={styles.details}>
                   <Text style={styles.name}>Упаковка</Text>
-                  <Text style={[styles.number, styles.field, { color: colors.text }]}>
-                    {pack ? pack.name || 'упаковка не найдена' : ''}
-                  </Text>
+                  <Text style={textStyle}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
                 </View>
                 <MaterialCommunityIcons
                   name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}

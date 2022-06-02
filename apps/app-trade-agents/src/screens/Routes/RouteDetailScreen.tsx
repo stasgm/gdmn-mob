@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
@@ -27,6 +27,7 @@ const RouteDetailScreen = () => {
   const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -36,25 +37,10 @@ const RouteDetailScreen = () => {
 
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
 
-  if (!point) {
-    return (
-      <View style={styles.content}>
-        <SubTitle style={styles.title}>Визит не найден</SubTitle>
-      </View>
-    );
-  }
   //TODO получить адрес item.outlet.id
   const outlet = point
     ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
     : undefined;
-
-  if (!outlet) {
-    return (
-      <View style={styles.content}>
-        <SubTitle style={styles.title}>{`Магазин ${point.outlet.name} не найден в справочниках`}</SubTitle>
-      </View>
-    );
-  }
 
   const contact = outlet
     ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
@@ -66,6 +52,27 @@ const RouteDetailScreen = () => {
 
   const saldo = debt?.saldo ?? 0;
   const saldoDebt = debt?.saldoDebt ?? 0;
+
+  const debtTextStyle = useMemo(
+    () => [styles.textLow, { color: saldoDebt > 0 ? colors.notification : colors.text }],
+    [colors.notification, colors.text, saldoDebt],
+  );
+
+  if (!point) {
+    return (
+      <View style={styles.content}>
+        <SubTitle style={styles.title}>Визит не найден</SubTitle>
+      </View>
+    );
+  }
+
+  if (!outlet) {
+    return (
+      <View style={styles.content}>
+        <SubTitle style={styles.title}>{`Магазин ${point.outlet.name} не найден в справочниках`}</SubTitle>
+      </View>
+    );
+  }
 
   const handleNewVisit = async () => {
     setProcess(true);
@@ -108,8 +115,8 @@ const RouteDetailScreen = () => {
         <>
           {outlet && (
             <>
-              <Text style={[styles.textLow, { color: colors.text }]}>{outlet.address}</Text>
-              <Text style={[styles.textLow, { color: colors.text }]}>{outlet.phoneNumber}</Text>
+              <Text style={textStyle}>{outlet.address}</Text>
+              <Text style={textStyle}>{outlet.phoneNumber}</Text>
             </>
           )}
         </>
@@ -121,13 +128,13 @@ const RouteDetailScreen = () => {
         <>
           {contact && (
             <>
-              <Text style={[styles.textLow, { color: colors.text }]}>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text style={[styles.textLow, { color: colors.text }]}>
+              <Text style={textStyle}>{`Условия оплаты: ${contact.paycond}`}</Text>
+              <Text style={textStyle}>
                 {saldo < 0
                   ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(saldo) ?? 0)}`
                   : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldo)}`}
               </Text>
-              <Text style={[styles.textLow, { color: saldoDebt > 0 ? colors.notification : colors.text }]}>
+              <Text style={debtTextStyle}>
                 {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
               </Text>
             </>

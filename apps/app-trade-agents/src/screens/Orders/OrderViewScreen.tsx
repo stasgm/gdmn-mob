@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -40,6 +40,8 @@ const OrderViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
 
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+
   const [del, setDel] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
@@ -48,6 +50,11 @@ const OrderViewScreen = () => {
 
   const debt =
     refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === order?.head?.contact.id) || undefined;
+
+  const debtTextStyle = useMemo(
+    () => [styles.textLow, { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text }],
+    [colors.notification, colors.text, debt?.saldoDebt],
+  );
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {
@@ -159,22 +166,17 @@ const OrderViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
         <View style={localStyles.infoBlock}>
-          <Text style={[styles.textLow, { color: colors.text }]}>{`№ ${order.number} от ${getDateString(
-            order.documentDate,
-          )} на ${getDateString(order.head?.onDate)}`}</Text>
+          <Text style={textStyle}>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+            order.head?.onDate,
+          )}`}</Text>
 
-          <Text style={[styles.textLow, { color: colors.text }]}>
+          <Text style={textStyle}>
             {(debt?.saldo && debt?.saldo < 0
               ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
               : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
           </Text>
           <View style={styles.rowCenter}>
-            <Text
-              style={[
-                styles.textLow,
-                { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text },
-              ]}
-            >
+            <Text style={debtTextStyle}>
               {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
             </Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}

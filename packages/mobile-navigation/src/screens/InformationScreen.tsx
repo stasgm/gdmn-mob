@@ -1,14 +1,23 @@
 import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import { DrawerButton } from '@lib/mobile-ui/src/components/AppBar';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
-import { dialCall } from '@lib/mobile-app';
 import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
+
+const dialCall = (number: string) => {
+  let phoneNumber = '';
+  if (Platform.OS === 'android') {
+    phoneNumber = `tel:${number}`;
+  } else {
+    phoneNumber = `telprompt:${number}`;
+  }
+  Linking.openURL(phoneNumber);
+};
 
 const InformationScreen = () => {
   const { colors } = useTheme();
