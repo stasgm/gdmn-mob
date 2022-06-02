@@ -86,6 +86,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                 style={[styles.number, styles.field, { color: colors.text }]}
                 editable={true}
                 keyboardType="numeric"
+                autoCapitalize="none"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
                 ref={qtyRef}

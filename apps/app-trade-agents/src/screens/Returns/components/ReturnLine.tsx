@@ -85,6 +85,7 @@ const ReturnLine = ({ item, onSetLine }: IProps) => {
                 editable={true}
                 ref={qtyRef}
                 keyboardType="numeric"
+                autoCapitalize="none"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
                 autoFocus={true}

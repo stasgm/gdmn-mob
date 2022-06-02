@@ -30,6 +30,7 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
               onChangeText={(text) => onValueChange(text !== '' ? Number(text) : 0)}
               keyboardType={'numeric'}
               clearInput={true}
+              autoCapitalize="none"
             />
           ) : (
             <Input

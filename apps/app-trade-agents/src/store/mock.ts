@@ -534,7 +534,7 @@ export const messageAgent: IMessage<MessageType>[] = [
             {
               id: '184963314',
               good: { id: '807686297', name: 'Сосиски молочные' },
-              package: { id: '1607786773', name: '2 кг. - 3 кг.(5)' },
+              package: { id: '1607786772', name: '500 гр.-700  гр.(10)' },
             },
             {
               id: '184913315',
@@ -552,10 +552,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 id: '807686298',
                 name: 'Сосиски докторские',
               },
-              package: {
-                id: '1607786790',
-                name: '500 гр.-700  гр.(5)',
-              },
+              package: { id: '1607786773', name: '2 кг. - 3 кг.(5)' },
             },
             {
               id: '184913318',
