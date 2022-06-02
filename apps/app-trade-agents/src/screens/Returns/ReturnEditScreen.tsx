@@ -18,12 +18,11 @@ import { IDocumentType } from '@lib/types';
 
 import { generateId } from '@lib/mobile-app';
 
-import { IListItem } from '@lib/mobile-types';
-
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
+import { statusList } from '../../utils/constants';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
@@ -230,11 +229,6 @@ const ReturnEditScreen = () => {
       value: docOutlet && [docOutlet],
     });
   };
-
-  const statusList: IListItem[] = [
-    { id: 'DRAFT', value: 'Черновик' },
-    { id: 'READY', value: 'Готов' },
-  ];
 
   return (
     <AppInputScreen>

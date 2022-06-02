@@ -326,11 +326,7 @@ const MapScreen = () => {
         onDismiss={handleDismissRoute}
         onApply={handleApplyRoute}
       >
-        <RadioGroup
-          options={currentList}
-          onChange={(option) => setNewSelectedRoute(option)}
-          activeButtonId={newSelectedRoute?.id}
-        />
+        <RadioGroup options={currentList} onChange={setNewSelectedRoute} activeButtonId={newSelectedRoute?.id} />
       </BottomSheet>
       <Snackbar
         visible={barVisible}

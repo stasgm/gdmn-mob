@@ -31,6 +31,8 @@ import { navBackButton } from '../../components/navigateOptions';
 
 import OrderItem from './components/OrderItem';
 
+const keyExtractor = (item: IOrderLine) => item.id;
+
 const OrderViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
@@ -120,6 +122,15 @@ const OrderViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const renderItem = useCallback(
+    ({ item }: { item: IOrderLine }) => (
+      <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
+        <OrderItem docId={order?.id} item={item} readonly={isBlocked} />
+      </SwipeLineItem>
+    ),
+    [isBlocked, order?.id],
+  );
+
   if (del) {
     return (
       <View style={styles.container}>
@@ -138,12 +149,6 @@ const OrderViewScreen = () => {
       );
     }
   }
-
-  const renderItem = ({ item }: { item: IOrderLine }) => (
-    <SwipeLineItem docId={order.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
-      <OrderItem docId={order.id} item={item} readonly={isBlocked} />
-    </SwipeLineItem>
-  );
 
   return (
     <View style={[styles.container]}>
@@ -173,7 +178,7 @@ const OrderViewScreen = () => {
       </InfoBlock>
       <FlatList
         data={order.lines}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}

@@ -1,3 +1,4 @@
+import { IListItem } from '@lib/mobile-types';
 import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
 
@@ -34,6 +35,11 @@ const getStatusColor = (status: StatusType) => {
 
   return statusColor;
 };
+
+const statusList: IListItem[] = [
+  { id: 'DRAFT', value: 'Черновик' },
+  { id: 'READY', value: 'Готов' },
+];
 
 const backGroup = { id: '3', name: 'Настройки бэк-офиса', sortOrder: 3 };
 
@@ -78,4 +84,4 @@ const appSettings: Settings = {
   },
 };
 
-export { getStatusColor, appSettings, ONE_SECOND_IN_MS, unknownGroup };
+export { getStatusColor, appSettings, ONE_SECOND_IN_MS, unknownGroup, statusList };

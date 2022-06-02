@@ -9,14 +9,13 @@ import { docSelectors, documentActions, refSelectors, useSelector, appActions, u
 import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
-import { IListItem } from '@lib/mobile-types';
-
 import { generateId, getDateString } from '@lib/mobile-app';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
+import { statusList } from '../../utils/constants';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
@@ -202,31 +201,37 @@ const OrderEditScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const isBlocked = docStatus !== 'DRAFT' || !!docRoute;
+  const isBlocked = useMemo(() => docStatus !== 'DRAFT' || !!docRoute, [docRoute, docStatus]);
 
-  const statusName = id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ';
+  const statusName = useMemo(
+    () => (id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ'),
+    [id, isBlocked],
+  );
 
   // Окно календаря для выбора даты
   const [showOnDate, setShowOnDate] = useState(false);
 
-  const handleApplyOnDate = (_event: any, selectedOnDate: Date | undefined) => {
-    //Закрываем календарь и записываем выбранную дату
-    setShowOnDate(false);
+  const handleApplyOnDate = useCallback(
+    (_event: any, selectedOnDate: Date | undefined) => {
+      //Закрываем календарь и записываем выбранную дату
+      setShowOnDate(false);
 
-    if (selectedOnDate) {
-      dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
-    }
-  };
+      if (selectedOnDate) {
+        dispatch(appActions.setFormParams({ onDate: selectedOnDate.toISOString().slice(0, 10) }));
+      }
+    },
+    [dispatch],
+  );
 
-  const handlePresentOnDate = () => {
+  const handlePresentOnDate = useCallback(() => {
     if (docStatus !== 'DRAFT') {
       return;
     }
 
     setShowOnDate(true);
-  };
+  }, [docStatus]);
 
-  const handlePresentContact = () => {
+  const handlePresentContact = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -242,9 +247,9 @@ const OrderEditScreen = () => {
       fieldName: 'contact',
       value: docContact && [docContact],
     });
-  };
+  }, [docContact, docRoute, isBlocked, navigation]);
 
-  const handlePresentOutlet = () => {
+  const handlePresentOutlet = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -268,9 +273,9 @@ const OrderEditScreen = () => {
       clause: params,
       value: docOutlet && [docOutlet],
     });
-  };
+  }, [docContact?.id, docOutlet, docRoute, isBlocked, navigation]);
 
-  const handlePresentDepart = () => {
+  const handlePresentDepart = useCallback(() => {
     if (isBlocked) {
       return;
     }
@@ -280,12 +285,16 @@ const OrderEditScreen = () => {
       fieldName: 'depart',
       value: docDepart && [docDepart],
     });
-  };
+  }, [docDepart, isBlocked, navigation]);
 
-  const statusList: IListItem[] = [
-    { id: 'DRAFT', value: 'Черновик' },
-    { id: 'READY', value: 'Готов' },
-  ];
+  const handleChangeStatus = useCallback(() => {
+    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+  }, [dispatch, docStatus]);
+
+  const handleChangeNumber = useCallback(
+    (text) => dispatch(appActions.setFormParams({ number: text.trim() })),
+    [dispatch],
+  );
 
   return (
     <AppInputScreen>
@@ -301,19 +310,12 @@ const OrderEditScreen = () => {
         >
           <RadioGroup
             options={statusList}
-            onChange={() => {
-              dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-            }}
+            onChange={handleChangeStatus}
             activeButtonId={statusList.find((i) => i.id === docStatus)?.id}
             directionRow={true}
           />
         </View>
-        <Input
-          label="Номер"
-          value={docNumber}
-          onChangeText={(text) => dispatch(appActions.setFormParams({ number: text.trim() }))}
-          disabled={isBlocked}
-        />
+        <Input label="Номер" value={docNumber} onChangeText={handleChangeNumber} disabled={isBlocked} />
         <SelectableInput
           label="Дата отгрузки"
           value={getDateString(docOnDate || '')}

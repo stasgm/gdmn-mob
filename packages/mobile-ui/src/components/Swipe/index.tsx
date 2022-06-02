@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef } from 'react';
+import React, { ReactNode, useCallback, useRef } from 'react';
 import { View, Animated, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
@@ -12,24 +12,21 @@ export interface ListItemProps {
   del?: boolean;
 }
 
+type ButtonType = 'edit' | 'copy' | 'delete';
+
 const SwipeItem = ({ children, onPress, edit = true, copy = true, del = true }: ListItemProps) => {
   const AnimatedIcon = Animated.createAnimatedComponent(MaterialCommunityIcons);
-
-  let ref = useRef(null);
-
-  const updateRef = (_ref: any) => {
-    ref = _ref;
-  };
+  const ref = useRef(null);
 
   const renderRightActions = (progress: unknown) => (
     <View style={localStyles.swipeViewItem}>
-      {edit && renderRightAction('edit', 'file-document-edit', '#ffab00', 120, progress)}
-      {copy && renderRightAction('copy', 'content-copy', '#00aaff', 120, progress)}
-      {del && renderRightAction('delete', 'delete-forever', '#dd2c00', 60, progress)}
+      {edit && renderRightAction('edit', 'file-document-edit', '#ffab00', 400, progress)}
+      {copy && renderRightAction('copy', 'content-copy', '#00aaff', 400, progress)}
+      {del && renderRightAction('delete', 'delete-forever', '#dd2c00', 240, progress)}
     </View>
   );
 
-  const renderRightAction = (name: 'edit' | 'copy' | 'delete', icon: any, color: any, x: any, progress: any) => {
+  const renderRightAction = (name: ButtonType, icon: any, color: any, x: any, progress: any) => {
     const trans: Animated.AnimatedInterpolation = progress.interpolate({
       inputRange: [0, 1, 2],
       outputRange: [x, 0, 1],
@@ -40,8 +37,8 @@ const SwipeItem = ({ children, onPress, edit = true, copy = true, del = true }: 
         <RectButton
           style={[localStyles.rightAction, { backgroundColor: color }]}
           onPress={() => {
+            (ref.current as unknown as Swipeable)?.close();
             onPress(name);
-            (ref as unknown as Swipeable).close();
           }}
         >
           <AnimatedIcon name={icon} size={30} color="#fff" style={localStyles.actionIcon} />
@@ -51,7 +48,7 @@ const SwipeItem = ({ children, onPress, edit = true, copy = true, del = true }: 
   };
 
   return (
-    <Swipeable friction={2} renderRightActions={(progress) => renderRightActions(progress)} ref={updateRef}>
+    <Swipeable friction={2} renderRightActions={renderRightActions} ref={ref}>
       <View>{children}</View>
     </Swipeable>
   );
@@ -69,7 +66,7 @@ const localStyles = StyleSheet.create({
   },
   swipeViewItem: {
     flexDirection: 'row',
-    width: 120,
+    width: 200,
   },
 });
 
