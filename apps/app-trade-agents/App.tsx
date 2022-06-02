@@ -7,7 +7,6 @@ import { INavItem } from '@lib/mobile-navigation';
 import {
   appActions,
   appSelectors,
-  // authActions,
   authSelectors,
   referenceActions,
   documentActions,
@@ -154,6 +153,8 @@ const Root = () => {
 
   const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
 
+  console.log('connectionStatus', connectionStatus);
+
   return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
@@ -172,7 +173,13 @@ const Root = () => {
           'Добро пожаловать в GDMN Агент!\n\nНаше приложение облегчает труд торгового агента и позволяет выполнить следующие действия:\n\n1. Оформить заявку на поставку товаров\n\n2. Оформить возврат непроданных товаров\n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
         }
       </Text>
-      <TouchableOpacity style={styles.buttonPrev} onPress={() => setMode(0)}>
+      <TouchableOpacity
+        style={styles.buttonPrev}
+        onPress={() => {
+          setMode(0);
+          dispatch(appActions.loadGlobalDataFromDisc());
+        }}
+      >
         <Text style={styles.textInfo}>{'« Назад'}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.buttonNext} onPress={() => setMode(2)}>
@@ -217,12 +224,7 @@ const Root = () => {
       </TouchableOpacity>
     </AppScreen>
   ) : (
-    <MobileApp
-      items={navItems}
-      loadingErrors={[tradeLoadingError]}
-      onClearLoadingErrors={onClearLoadingErrors}
-      onGetMessages={isDemo ? getMessages : undefined}
-    />
+    <MobileApp items={navItems} loadingErrors={[tradeLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
   );
 };
 
