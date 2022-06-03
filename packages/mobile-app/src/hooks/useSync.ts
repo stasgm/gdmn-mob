@@ -139,7 +139,9 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
             if (getMessagesResponse.type === 'GET_MESSAGES') {
               await Promise.all(
-                getMessagesResponse.messageList?.map((message) => processMessage(message, errList, okList, params)),
+                getMessagesResponse.messageList
+                  .sort((a, b) => a.head.order - b.head.order)
+                  ?.map((message) => processMessage(message, errList, okList, params)),
               );
             } else {
               errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
