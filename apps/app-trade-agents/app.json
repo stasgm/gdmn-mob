@@ -26,7 +26,7 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.gsbelarus.salesrepresentative",
+      "package": "com.gsbelarus.salesrepresentative2",
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       "versionCode": 10
     }
