@@ -25,6 +25,7 @@ const newMessage: Config = {
           id: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта получателя')),
           name: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта получателя')),
         }),
+        order: Joi.number().required().error(new InvalidParameterException('Некорректный формат поля сортировки')),
         version: Joi.number().optional(),
         dateTime: Joi.string().optional(),
       }),
