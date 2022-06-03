@@ -56,6 +56,7 @@ export const messageAgent: IMessage<MessageType>[] = [
       consumer: user2,
       producer: user,
       dateTime: '2021-09-17T11:26:37.617Z',
+      order: 1,
     },
     status: 'READY',
     body: {
@@ -1050,6 +1051,7 @@ export const messageAgent: IMessage<MessageType>[] = [
       consumer: user2,
       producer: user,
       dateTime: '2021-09-17T11:26:37.893Z',
+      order: 2,
     },
     status: 'READY',
     body: {
@@ -1543,6 +1545,7 @@ export const messageAgent: IMessage<MessageType>[] = [
       consumer: user2,
       producer: user,
       dateTime: '2021-09-17T11:26:37.970Z',
+      order: 3,
     },
     status: 'READY',
     body: {
