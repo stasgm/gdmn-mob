@@ -317,7 +317,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           Добавить документ
         </PrimeButton>
       ) : (
-        readyDocs?.length && (
+        readyDocs.length > 0 && (
           <PrimeButton
             icon={!loading ? 'file-send' : 'block-helper'}
             onPress={handleSendDocs}

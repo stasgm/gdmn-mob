@@ -51,7 +51,7 @@ const OrderViewScreen = () => {
   const isBlocked = order?.status !== 'DRAFT';
 
   const debt =
-    refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === order?.head?.contact.id) || undefined;
+    refSelectors.selectByName<IDebt>('debt')?.data?.find((item) => item.id === order?.head?.contact.id) || undefined;
 
   const debtTextStyle = useMemo(
     () => [styles.textLow, { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text }],

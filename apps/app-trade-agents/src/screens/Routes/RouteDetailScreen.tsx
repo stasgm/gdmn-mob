@@ -1,8 +1,7 @@
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
-import { INamedEntity } from '@lib/types';
 import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -37,18 +36,20 @@ const RouteDetailScreen = () => {
 
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
 
-  //TODO получить адрес item.outlet.id
-  const outlet = point
-    ? refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === point.outlet.id)
-    : undefined;
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const contact = outlet
-    ? refSelectors.selectByName<IContact>('contact').data?.find((item) => item.id === outlet?.company.id)
-    : undefined;
+  const outlet = useMemo(() => (point ? outlets?.find((e) => e.id === point?.outlet.id) : undefined), [point, outlets]);
 
-  const debt = contact
-    ? refSelectors.selectByName<IDebt>('debt').data.find((item) => item.id === contact.id)
-    : undefined;
+  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
+
+  const contact = useMemo(
+    () => (outlet ? contacts?.find((item) => item.id === outlet.company.id) : undefined),
+    [contacts, outlet],
+  );
+
+  const debts = refSelectors.selectByName<IDebt>('debt')?.data;
+
+  const debt = useMemo(() => (contact ? debts?.find((item) => item.id === contact.id) : undefined), [contact, debts]);
 
   const saldo = debt?.saldo ?? 0;
   const saldoDebt = debt?.saldoDebt ?? 0;
@@ -58,23 +59,7 @@ const RouteDetailScreen = () => {
     [colors.notification, colors.text, saldoDebt],
   );
 
-  if (!point) {
-    return (
-      <View style={styles.content}>
-        <SubTitle style={styles.title}>Визит не найден</SubTitle>
-      </View>
-    );
-  }
-
-  if (!outlet) {
-    return (
-      <View style={styles.content}>
-        <SubTitle style={styles.title}>{`Магазин ${point.outlet.name} не найден в справочниках`}</SubTitle>
-      </View>
-    );
-  }
-
-  const handleNewVisit = async () => {
+  const handleNewVisit = useCallback(async () => {
     setProcess(true);
 
     let coords: ICoords | undefined;
@@ -102,12 +87,34 @@ const RouteDetailScreen = () => {
       };
       dispatch(documentActions.addDocument(newVisit));
     } catch (e) {
-      // setMessage(e.message);
-      // setBarVisible(true);
       // console.log('err', e);
     }
     setProcess(false);
-  };
+  }, [dispatch, id]);
+
+  if (!point) {
+    return (
+      <View style={styles.content}>
+        <SubTitle style={styles.title}>Точки маршрута не найдены</SubTitle>
+      </View>
+    );
+  }
+
+  if (!outlet) {
+    return (
+      <View style={styles.content}>
+        <SubTitle style={styles.title}>{`Магазин ${point.outlet.name} не найден в справочниках`}</SubTitle>
+      </View>
+    );
+  }
+
+  if (!contact) {
+    return (
+      <View style={styles.content}>
+        <SubTitle style={styles.title}>Организация не найдена в справочниках</SubTitle>
+      </View>
+    );
+  }
 
   return (
     <AppScreen style={styles.contentTop}>
@@ -123,7 +130,7 @@ const RouteDetailScreen = () => {
       </InfoBlock>
       <InfoBlock
         colorLabel={'#a91160'}
-        title={`Договор №${contact?.contractNumber || '-'} от ${contact ? getDateString(contact.contractDate) : '-'}`}
+        title={`Договор №${contact.contractNumber || '-'} от ${getDateString(contact.contractDate)}`}
       >
         <>
           {contact && (
@@ -142,13 +149,7 @@ const RouteDetailScreen = () => {
         </>
       </InfoBlock>
       {visit && !process ? (
-        <Visit
-          key={visit.id}
-          item={visit}
-          outlet={outlet as INamedEntity}
-          contact={contact as INamedEntity}
-          route={{ id: routeId, name: '' }}
-        />
+        <Visit key={visit.id} item={visit} outlet={outlet} contact={contact} route={{ id: routeId, name: '' }} />
       ) : (
         <PrimeButton icon="play-circle-outline" onPress={handleNewVisit} disabled={process}>
           Начать визит

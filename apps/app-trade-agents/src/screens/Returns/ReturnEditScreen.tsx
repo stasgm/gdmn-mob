@@ -22,7 +22,7 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
-import { statusList } from '../../utils/constants';
+import { STATUS_LIST } from '../../utils/constants';
 
 const ReturnEditScreen = () => {
   const id = useRoute<RouteProp<ReturnsStackParamList, 'ReturnEdit'>>().params?.id;
@@ -242,11 +242,11 @@ const ReturnEditScreen = () => {
       <ScrollView>
         <View style={viewStyle}>
           <RadioGroup
-            options={statusList}
+            options={STATUS_LIST}
             onChange={() => {
               dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
             }}
-            activeButtonId={statusList.find((i) => i.id === docStatus)?.id}
+            activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
             directionRow={true}
           />
         </View>

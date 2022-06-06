@@ -15,7 +15,7 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
-import { statusList } from '../../utils/constants';
+import { STATUS_LIST } from '../../utils/constants';
 
 const OrderEditScreen = () => {
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
@@ -312,9 +312,9 @@ const OrderEditScreen = () => {
       <ScrollView>
         <View style={viewStyle}>
           <RadioGroup
-            options={statusList}
+            options={STATUS_LIST}
             onChange={handleChangeStatus}
-            activeButtonId={statusList.find((i) => i.id === docStatus)?.id}
+            activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
             directionRow={true}
           />
         </View>

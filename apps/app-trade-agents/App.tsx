@@ -17,7 +17,13 @@ import {
   useSelector,
 } from '@lib/store';
 
-import { globalStyles as styles, AppScreen, Theme as defaultTheme, Provider as UIProvider } from '@lib/mobile-ui';
+import {
+  globalStyles as styles,
+  AppScreen,
+  Theme as defaultTheme,
+  Provider as UIProvider,
+  PrimeButton,
+} from '@lib/mobile-ui';
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
@@ -141,6 +147,7 @@ const Root = () => {
 
   const [infoWindow, setInfoWindow] = useState(0);
 
+  const handleSetInfoWindow_0 = useCallback(() => setInfoWindow(0), []);
   const handleSetInfoWindow_1 = useCallback(() => setInfoWindow(1), []);
   const handleSetInfoWindow_2 = useCallback(() => setInfoWindow(2), []);
   const handleSetInfoWindow_3 = useCallback(() => setInfoWindow(3), []);
@@ -221,9 +228,9 @@ const Root = () => {
       <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
         <Text style={styles.textInfo}>{'« Назад'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setInfoWindow(0)}>
-        <Text style={[styles.textInfo, styles.textReference, styles.textBold]}>Приступить к работе в демо режиме</Text>
-      </TouchableOpacity>
+      <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
+        {'Начать работу'}
+      </PrimeButton>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} loadingErrors={[tradeLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />

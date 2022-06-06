@@ -5,8 +5,12 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "start:js": "node ./dist/src/index.js",
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
+    "build": "yarn clean-dist && tsc",
+    "clean-dist": "rimraf ./dist",
+    "nodemon:start": "yarn build && nodemon ./dist/src/index.js --watch",
     "prettier:check": "prettier --check \"src/**/*.ts\"",
     "prettier:fix": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"./src/**/*.ts\"",
