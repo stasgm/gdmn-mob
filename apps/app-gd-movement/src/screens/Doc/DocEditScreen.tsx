@@ -9,13 +9,13 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
   Menu,
-  BackButton,
   SelectableInput,
   Input,
   SaveButton,
   globalStyles as styles,
   SubTitle,
   AppScreen,
+  RadioGroup,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
@@ -25,8 +25,9 @@ import { IDocumentType } from '@lib/types';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocFormParam, IMovementDocument } from '../../store/types';
-import { contactTypes } from '../../utils/constants';
+import { contactTypes, STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
+import { navBackButton } from '../../components/navigateOptions';
 
 export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
@@ -192,12 +193,14 @@ export const DocEditScreen = () => {
     docStatus,
   ]);
 
+  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => <SaveButton onPress={handleSave} />,
+      headerLeft: () => navBackButton,
+      headerRight: renderRight,
     });
-  }, [dispatch, handleSave, navigation]);
+  }, [navigation, renderRight]);
 
   const isBlocked = docStatus !== 'DRAFT';
 
@@ -351,13 +354,28 @@ export const DocEditScreen = () => {
     }
   };
 
+  const handleChangeStatus = useCallback(() => {
+    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
+  }, [dispatch, docStatus]);
+
+  const handleChangeNumber = useCallback((text) => dispatch(appActions.setFormParams({ number: text })), [dispatch]);
+
+  const viewStyle = useMemo(
+    () => [
+      localStyles.switchContainer,
+      localStyles.border,
+      { borderColor: colors.primary, backgroundColor: colors.card },
+    ],
+    [colors.card, colors.primary],
+  );
+
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
-          {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
+          {/* {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
             <>
               <View style={[styles.directionRow, localStyles.switchContainer]}>
                 <Text>Черновик:</Text>
@@ -369,11 +387,19 @@ export const DocEditScreen = () => {
                 />
               </View>
             </>
-          )}
+          )} */}
+          <View style={viewStyle}>
+            <RadioGroup
+              options={STATUS_LIST}
+              onChange={handleChangeStatus}
+              activeButtonId={STATUS_LIST.find((i) => i.id === docStatus)?.id}
+              directionRow={true}
+            />
+          </View>
           <Input
             label="Номер"
             value={docNumber}
-            onChangeText={(text) => dispatch(appActions.setFormParams({ number: text }))}
+            onChangeText={handleChangeNumber}
             disabled={isBlocked}
             clearInput={true}
           />

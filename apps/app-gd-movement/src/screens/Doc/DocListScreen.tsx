@@ -8,7 +8,6 @@ import {
   AppScreen,
   ItemSeparator,
   Status,
-  DrawerButton,
   SubTitle,
   AddButton,
   ScreenListItem,
@@ -30,6 +29,7 @@ import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
+import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -188,6 +188,46 @@ export const DocListScreen = () => {
     [newFilteredList],
   );
 
+  // const [visibleType, setVisibleType] = useState(false);
+  // const [visibleStatus, setVisibleStatus] = useState(false);
+  // const [visibleDate, setVisibleDate] = useState(false);
+
+  // const handleSelectType = () => {
+  //   return setVisibleType(true);
+  // };
+  // const handleSelectStatus = () => {
+  //   return setVisibleStatus(true);
+  // };
+
+  // const handleSelectDate = () => {
+  //   return setVisibleDate(true);
+  // };
+
+  // const handleDismissType = () => {
+  //   return setVisibleType(false);
+  // };
+  // const handleDismissStatus = () => {
+  //   return setVisibleStatus(false);
+  // };
+  // const handleDismissDate = () => {
+  //   return setVisibleDate(false);
+  // };
+
+  // const handleApplyType = useCallback((option) => {
+  //   setVisibleType(false);
+  //   setType(option);
+  // }, []);
+
+  // const handleApplyStatus = useCallback((option) => {
+  //   setVisibleStatus(false);
+  //   setStatus(option.id);
+  // }, []);
+
+  // const handleApplyDate = useCallback((option) => {
+  //   setVisibleDate(false);
+  //   setDate(option);
+  // }, []);
+
   const handleAddDocument = useCallback(() => {
     navigation.navigate('DocEdit');
   }, [navigation]);
@@ -198,62 +238,27 @@ export const DocListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+        />
+        <AddButton onPress={handleAddDocument} />
+      </View>
+    ),
+    [colors.card, filterVisible, handleAddDocument],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <IconButton
-            icon="card-search-outline"
-            style={filterVisible && { backgroundColor: colors.card }}
-            size={26}
-            onPress={() => setFilterVisible((prev) => !prev)}
-          />
-          <AddButton onPress={handleAddDocument} />
-        </View>
-      ),
+      // headerLeft: () => navBackDrawer,
+      // headerRight: () => renderRight,
     });
-  }, [colors.card, filterVisible, handleAddDocument, navigation]);
-
-  const [visibleType, setVisibleType] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [visibleDate, setVisibleDate] = useState(false);
-
-  const handleSelectType = () => {
-    return setVisibleType(true);
-  };
-  const handleSelectStatus = () => {
-    return setVisibleStatus(true);
-  };
-
-  const handleSelectDate = () => {
-    return setVisibleDate(true);
-  };
-
-  const handleDismissType = () => {
-    return setVisibleType(false);
-  };
-  const handleDismissStatus = () => {
-    return setVisibleStatus(false);
-  };
-  const handleDismissDate = () => {
-    return setVisibleDate(false);
-  };
-
-  const handleApplyType = useCallback((option) => {
-    setVisibleType(false);
-    setType(option);
-  }, []);
-
-  const handleApplyStatus = useCallback((option) => {
-    setVisibleStatus(false);
-    setStatus(option.id);
-  }, []);
-
-  const handleApplyDate = useCallback((option) => {
-    setVisibleDate(false);
-    setDate(option);
-  }, []);
+  }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list?.find((r) => r.id === item.id);
@@ -277,7 +282,7 @@ export const DocListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[styles.containerCenter, localStyles.container]}>
+      {/* <View style={[styles.containerCenter, localStyles.container]}>
         <Menu
           key={'MenuType'}
           title="Тип"
@@ -320,7 +325,7 @@ export const DocListScreen = () => {
           isActive={date.id !== 'new'}
           iconName={'chevron-down'}
         />
-      </View>
+      </View> */}
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

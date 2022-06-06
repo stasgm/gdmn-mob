@@ -6,7 +6,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
-  BackButton,
   MenuButton,
   useActionSheet,
   globalStyles as styles,
@@ -23,6 +22,7 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { DocItem } from '../../components/DocItem';
+import { navBackButton } from '../../components/navigateOptions';
 
 export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -80,18 +80,22 @@ export const DocViewScreen = () => {
     ]);
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
 
+  const renderRight = useCallback(
+    () =>
+      !isBlocked && (
+        <View style={styles.buttons}>
+          <ScanButton onPress={handleDoScan} />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
+    [actionsMenu, handleDoScan, isBlocked],
+  );
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () =>
-        !isBlocked && (
-          <View style={styles.buttons}>
-            <ScanButton onPress={handleDoScan} />
-            <MenuButton actionsMenu={actionsMenu} />
-          </View>
-        ),
+      headerLeft: () => navBackButton,
+      headerRight: () => renderRight,
     });
-  }, [navigation, handleAddDocLine, actionsMenu, handleDoScan, isBlocked]);
+  }, [navigation, renderRight]);
 
   if (!doc) {
     return (

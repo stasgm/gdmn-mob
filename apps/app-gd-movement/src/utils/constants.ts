@@ -54,6 +54,11 @@ export const dataTypes: IListItem[] = [
   },
 ];
 
+export const STATUS_LIST: IListItem[] = [
+  { id: 'DRAFT', value: 'Черновик' },
+  { id: 'READY', value: 'Готов' },
+];
+
 export const getStatusColor = (status: StatusType) => {
   let statusColor: typeof statusColors[number];
 
