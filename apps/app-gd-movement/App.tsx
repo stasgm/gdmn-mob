@@ -141,27 +141,7 @@ const Root = () => {
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
-      {authLoading || loading || appLoading || invLoading || appDataLoading ? (
-        <AppScreen>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Caption style={styles.title}>
-            {appDataLoading || invLoading
-              ? 'Загрузка данных...'
-              : appLoading
-              ? 'Синхронизация данных..'
-              : 'Пожалуйста, подождите..'}
-          </Caption>
-        </AppScreen>
-      ) : // (
-      //   <MobileApp
-      //     items={navItems}
-      //     loadingErrors={[invLoadingError]}
-      //     onClearLoadingErrors={onClearLoadingErrors}
-      //     onGetMessages={isDemo ? getMessages : undefined}
-      //   />
-      // )}
-
-      infoWindow === 1 ? (
+      {infoWindow === 1 ? (
         <AppScreen>
           <Text style={styles.textInfo}>
             {
@@ -217,6 +197,17 @@ const Root = () => {
           <PrimeButton icon={'presentation-play'} onPress={handleSetInfoWindow_0}>
             {'Начать работу'}
           </PrimeButton>
+        </AppScreen>
+      ) : authLoading || loading || appLoading || invLoading || appDataLoading ? (
+        <AppScreen>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Caption style={styles.title}>
+            {appDataLoading || invLoading
+              ? 'Загрузка данных...'
+              : appLoading
+              ? 'Синхронизация данных..'
+              : 'Пожалуйста, подождите..'}
+          </Caption>
         </AppScreen>
       ) : (
         <MobileApp
