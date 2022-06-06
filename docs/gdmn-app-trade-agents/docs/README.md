@@ -163,7 +163,7 @@
 
 Нажав на иконку удаления, позиция будет удалена.
 
-<img src="img/3.Orders/3.Swipe.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.GoodSwipe.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.GoodSwipeDelete.jpg" alt="drawing" height="400"/>
 
 
 ### Статус документа
@@ -180,9 +180,9 @@
 
 ### Порядок работы
 
-Вернемся на экран просмотра списка заявок, выбрав пункт бокового меню **Заявки**:
+Вернемся на экран просмотра заявки:
 
-<img src="img/3.Docs/3.DocsList.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.OrderViewGood.jpg" alt="drawing" height="400"/>
 
 При создании документ имеет статус **Черновик** (красный цвет).
 
@@ -190,7 +190,7 @@
 
 Документ перейдет в состояние **Готов к отправке** (зеленый цвет) - редактировать данные нельзя.
 
-<img src="img/3.Docs/3.PrihodEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.PrihodEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocsReady.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.OrderEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderEditReady.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrdersReady.jpg" alt="drawing" height="400"/>
 
 Пока документ не отправлен, его можно вернуть из статуса **Готов к отправке** в статус **Черновик** и отредактировать данные.
 
@@ -198,17 +198,17 @@
 
 После отправки документ перейдет в статус **Отправлен** (желтый цвет) - редактирование невозможно.
 
-<img src="img/3.Docs/3.DocsSentSync.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DocsSent.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.DocsSentSync.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrdersSent.jpg" alt="drawing" height="400"/>
 
 Далее необходимо подождать 1-2 минуту и синхронизировать данные снова для получения ответа обработки, цвет станет синим.
 
-<img src="img/3.Docs/3.DocsProcessed.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.DocsProcessed.jpg" alt="drawing" height="400"/>
 
 ### Удаление документа
 
 Если пальцем смахнуть по документу влево, то появится дополнительное меню.
 
-<img src="img/3.Docs/3.Swipe.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.Swipe.jpg" alt="drawing" height="400"/>
 
 Используя пункты меню можно:
 - перейти на редактирование шапки документа (если статус **Черновик**)
@@ -252,7 +252,7 @@
 
 <img src="img/4.Returns/4.Returns.jpg" alt="drawing" height="400"/>
 
-По нажатию на иконку **+** в верхнем правом углу переходим в окно добавления возврата. Обязательные поля для заполнения: Номер документа, Организация и Магазин.
+По нажатию на иконку **+** в верхнем правом углу переходим на экран добавления возврата. Обязательные поля для заполнения: Номер документа, Организация и Магазин.
 
 <img src="img/4.Returns/4.ReturnAdd.jpg" alt="drawing" height="400"/>
 
@@ -268,7 +268,7 @@
 
 В отличии от заявок, в возврат есть возможность добавить товар только из накладной.
 
-По нажатию на иконку **+** в верхнем правом углу переходим в экран поиска товаров из накладной. Указываем даты начала и окончания, и выбираем необходимый товар.
+По нажатию на иконку **+** в верхнем правом углу переходим в экран поиска товаров из накладной. Указываем даты начала и окончания, и выбираем необходимый товар. По умолчанию период поиска берется за 30 дней до текущей даты, количество дней поиска можно изменять через настройки бэк-офиса в пункте бокового меню **Настройки**.
 
 <img src="img/4.Returns/4.ReturnSellBill.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReturnSellBillAdd.jpg" alt="drawing" height="400"/>
 
@@ -286,7 +286,7 @@
 
 <img src="img/4.Returns/4.Position.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.PositionError.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.PositionGood.jpg" alt="drawing" height="400"/>
 
-После добавления попадаем в экран просмотра накладной.
+После добавления попадаем в экран просмотра документа возврата.
 
 <img src="img/4.Returns/4.ReturnViewSellBill.jpg" alt="drawing" height="400"/>
 
@@ -295,10 +295,6 @@
 <img src="img/4.Returns/4.ReturnEditDraft.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReturnEditReady.jpg" alt="drawing" height="400"/> <img src="img/4.Returns/4.ReturnViewReady.jpg" alt="drawing" height="400"/>
 
 Пока возврат не отправлен, он доступен для редактирования. Для этого нужно зайти в него и временно вернуть статус **Черновик**. После отправления возврата редактирование невозможно, цвет полосы становится желтым.
-
-Вернемся на экран просмотра всех заявок:
-
-<img src="img/4.Returns/4.ReturnsReady.jpg" alt="drawing" height="400"/>
 
 Для отправления заявки необходимо нажать на кнопку синхронизации, расположенную в боковом меню.
 
@@ -324,39 +320,31 @@
 | Активные        | Документы, дата которых не менее текущей даты |
 | Архив           | Документы, дата которых меньше текущей даты |
 
-<img src="img/5.Routes/5.Routes.jpg" alt="drawing" height="400"/>
-
 При выборе (нажатием на строку) необходимого маршрута откроется экран с торговыми точками, запланированными для посещения.
 
-<img src="img/5.Routes/5.Route.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.Routes.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.Route.jpg" alt="drawing" height="400"/>
 
 После нажатия на торговую точку откроется экран с визитом выбранного объекта.
 
-<img src="img/5.Routes/5.Visit.jpg" alt="drawing" height="400"/>
-
 Нажимаем на кнопку **Начать визит** (в этот момент один раз телефон попросит разрешение на получение геокоординаты, которая будет записана в визит данной точки).
 
-<img src="img/5.Routes/5.VisitStart.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.Visit.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitStart.jpg" alt="drawing" height="400"/>
 
-Из экрана визита пользователь имеет возможность создать доступные в визите документы - заявку и возврат). Для создания заявки нажимаем на кнопку **Добавить документ** и выбираем тип документа **Заявка**.
-
-<img src="img/5.Routes/5.TypeOrder.jpg" alt="drawing" height="400"/>
+Из экрана визита пользователь имеет возможность создать доступные в визите документы - заявку и возврат. Для создания заявки нажимаем на кнопку **Добавить документ** и выбираем тип документа **Заявка**.
 
 После добавления заявки откроется экран просмотра документа.
 
-<img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
+ <img src="img/5.Routes/5.TypeOrder.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
 
-Добавим товар.
+Добавим товар, выбрав иконку **+**.
 
 <img src="img/5.Routes/5.Group.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderGood.jpg" alt="drawing" height="400"/>
 
 Аналогично создаем документ возврата. Для создания нажимаем на кнопку **Добавить документ** и выбираем тип документа **Возврат**.
 
-<img src="img/5.Routes/5.TypeReturn.jpg" alt="drawing" height="400"/>
-
 После добавления возврата откроется экран просмотра документа.
 
-<img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.TypeReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderView.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.OrderEdit.jpg" alt="drawing" height="400"/>
 
 Добавим товар из накладной.
 
@@ -364,19 +352,17 @@
 
 <img src="img/5.Routes/5.SellBillPosition.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ReturnSellBill.jpg" alt="drawing" height="400"/>
 
-После создания необходимых документов завершаем визит нажатием на кнопку **Завершить визит**.
-
-<img src="img/5.Routes/5.VisitOrderReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitEnd.jpg" alt="drawing" height="400"/>
+После создания необходимых документов завершаем визит нажатием на кнопку **Завершить визит**. У всех документов будет изменен статус на **Готов к отправке** и отобразится кнопка **Отправить**.
 
 Отправим данные визита нажатием на кнопку **Отправить**.
 
-<img src="img/5.Routes/5.VisitSent.jpg" alt="drawing" height="400"/>
+<img src="img/5.Routes/5.VisitOrderReturn.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitEnd.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.VisitSent.jpg" alt="drawing" height="400"/>
 
 Данный визит в окне просмотра визитов отобразится как завершенный (кружок с галочкой). Активный визит обозначается кружком с треугольником.
 
 <img src="img/5.Routes/5.RouteVisit.jpg" alt="drawing" height="400"/>
 
-Заявки и возвраты из визитов отображаются в окнах **Заявки** и **Возвраты**.
+Заявки и возвраты из визитов также можно просмотреть в пунктах бокового меню **Заявки** и **Возвраты**.
 
 <img src="img/5.Routes/5.OrdersVisit.jpg" alt="drawing" height="400"/> <img src="img/5.Routes/5.ReturnsVisit.jpg" alt="drawing" height="400"/>
 
@@ -390,7 +376,7 @@
 
 Во кладке **Карта** отображены все точки маршрута на карте. Кнопками < и > можно, приближаясь к точкам, перемещаться между объектами. Так же кнопками можно получить свою текущую координату и отобразить все объекты на экране.
 
-В верхней части экрана указано название маршрута, который в данный момент отображается на карте. Для смены маршрута необходимо нажать на иконку смены маршрута (справа от названия маршрута), после чего в нижней части экрана появится окно с выбором маршрута. Выберем второй маршрут.
+В верхней части экрана указано название маршрута, который в данный момент отображается на карте. Для смены маршрута необходимо нажать на иконку смены маршрута (справа от названия маршрута), после чего в нижней части экрана появится экран с выбором маршрута. Выберем второй маршрут.
 
 <img src="img/6.Maps/6.MapRoutes.jpg" alt="drawing" height="400"/> <img src="img/6.Maps/6.NewRoute.jpg" alt="drawing" height="400"/>
 
@@ -415,3 +401,8 @@
 Также этот экран позволяет удалить все справочники и документы. Для этого необходимо нажать на иконку меню, расположенную в правом верхнем углу, и выбрать пункт **Удалить все справочники и документы**.
 
 <img src="img/9.Profile/9.ClearData.jpg" alt="drawing" height="400"/>
+
+## 11. О программе
+На данном экране можно узнать информацию о приложении и о контактных данных разработчика, перейдя по ссылке **Документация** ознакомиться с полным функционалом приложения.
+
+<img src="img/10.About/1.About.jpg" alt="drawing" height="400"/>
