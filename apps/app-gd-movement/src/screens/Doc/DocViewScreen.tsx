@@ -1,6 +1,6 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -28,6 +28,12 @@ export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
+
+  const { colors } = useTheme();
+
+  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
+
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
@@ -92,8 +98,8 @@ export const DocViewScreen = () => {
   );
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => navBackButton,
-      headerRight: () => renderRight,
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
   }, [navigation, renderRight]);
 
@@ -120,13 +126,13 @@ export const DocViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
         <>
-          <Text style={styles.rowCenter}>
+          <Text style={[styles.rowCenter, textStyle]}>
             {(doc.documentType.remainsField === 'fromContact'
               ? doc.head.fromContact?.name
               : doc.head.toContact?.name) || ''}
           </Text>
           <View style={styles.rowCenter}>
-            <Text>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+            <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
 
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>

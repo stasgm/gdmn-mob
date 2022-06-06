@@ -32,6 +32,9 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.good.barcode;
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const barcodeTextStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -54,7 +57,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
+          <Text style={styles.name}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={[styles.field, { color: colors.text }]}>
               {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}

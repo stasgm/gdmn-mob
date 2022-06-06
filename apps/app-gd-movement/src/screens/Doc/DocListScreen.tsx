@@ -220,45 +220,45 @@ export const DocListScreen = () => {
     [newFilteredList],
   );
 
-  // const [visibleType, setVisibleType] = useState(false);
-  // const [visibleStatus, setVisibleStatus] = useState(false);
-  // const [visibleDate, setVisibleDate] = useState(false);
+  const [visibleType, setVisibleType] = useState(false);
+  const [visibleStatus, setVisibleStatus] = useState(false);
+  const [visibleDate, setVisibleDate] = useState(false);
 
-  // const handleSelectType = () => {
-  //   return setVisibleType(true);
-  // };
-  // const handleSelectStatus = () => {
-  //   return setVisibleStatus(true);
-  // };
+  const handleSelectType = () => {
+    return setVisibleType(true);
+  };
+  const handleSelectStatus = () => {
+    return setVisibleStatus(true);
+  };
 
-  // const handleSelectDate = () => {
-  //   return setVisibleDate(true);
-  // };
+  const handleSelectDate = () => {
+    return setVisibleDate(true);
+  };
 
-  // const handleDismissType = () => {
-  //   return setVisibleType(false);
-  // };
-  // const handleDismissStatus = () => {
-  //   return setVisibleStatus(false);
-  // };
-  // const handleDismissDate = () => {
-  //   return setVisibleDate(false);
-  // };
+  const handleDismissType = () => {
+    return setVisibleType(false);
+  };
+  const handleDismissStatus = () => {
+    return setVisibleStatus(false);
+  };
+  const handleDismissDate = () => {
+    return setVisibleDate(false);
+  };
 
-  // const handleApplyType = useCallback((option) => {
-  //   setVisibleType(false);
-  //   setType(option);
-  // }, []);
+  const handleApplyType = useCallback((option) => {
+    setVisibleType(false);
+    setType(option);
+  }, []);
 
-  // const handleApplyStatus = useCallback((option) => {
-  //   setVisibleStatus(false);
-  //   setStatus(option.id);
-  // }, []);
+  const handleApplyStatus = useCallback((option) => {
+    setVisibleStatus(false);
+    setStatus(option.id);
+  }, []);
 
-  // const handleApplyDate = useCallback((option) => {
-  //   setVisibleDate(false);
-  //   setDate(option);
-  // }, []);
+  const handleApplyDate = useCallback((option) => {
+    setVisibleDate(false);
+    setDate(option);
+  }, []);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
@@ -285,7 +285,7 @@ export const DocListScreen = () => {
 
   return (
     <AppScreen>
-      {/* <View style={[styles.containerCenter, localStyles.container]}>
+      <View style={[styles.containerCenter, localStyles.container]}>
         <Menu
           key={'MenuType'}
           title="Тип"
@@ -328,7 +328,7 @@ export const DocListScreen = () => {
           isActive={date.id !== 'new'}
           iconName={'chevron-down'}
         />
-      </View> */}
+      </View>
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>

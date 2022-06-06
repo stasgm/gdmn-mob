@@ -25,7 +25,7 @@ import {
   PrimeButton,
 } from '@lib/mobile-ui';
 
-import { ActivityIndicator, Caption, useTheme, Text } from 'react-native-paper';
+import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
 import { IDocument, IReferences } from '@lib/types';
 
@@ -63,7 +63,6 @@ const Root = () => {
   );
 
   const dispatch = useDispatch();
-  const { colors } = useTheme();
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
@@ -200,7 +199,7 @@ const Root = () => {
         </AppScreen>
       ) : authLoading || loading || appLoading || invLoading || appDataLoading ? (
         <AppScreen>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
           <Caption style={styles.title}>
             {appDataLoading || invLoading
               ? 'Загрузка данных...'

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider, useTheme } from 'react-native-paper';
+import { Divider /*, useTheme*/ } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
@@ -197,7 +197,7 @@ export const DocEditScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => navBackButton,
+      headerLeft: navBackButton,
       headerRight: renderRight,
     });
   }, [navigation, renderRight]);
@@ -416,7 +416,7 @@ export const DocEditScreen = () => {
             disabled={isBlocked}
           />
           {!!documentType?.fromType && docFromContactType && (
-            <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
+            <View style={[localStyles.border, { borderColor: isBlocked ? colors.card : colors.primary }]}>
               <View style={localStyles.contactType}>
                 <Menu
                   key={'fromType'}
@@ -441,7 +441,7 @@ export const DocEditScreen = () => {
             </View>
           )}
           {!!documentType?.toType && docToContactType && (
-            <View style={[localStyles.border, { borderColor: isBlocked ? colors.disabled : colors.primary }]}>
+            <View style={[localStyles.border, { borderColor: isBlocked ? colors.card : colors.primary }]}>
               <View style={[localStyles.contactType]}>
                 <Menu
                   key={'toType'}
