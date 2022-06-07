@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, Switch, View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Divider /*, useTheme*/ } from 'react-native-paper';
 
@@ -7,16 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import {
-  Menu,
-  SelectableInput,
-  Input,
-  SaveButton,
-  globalStyles as styles,
-  SubTitle,
-  AppScreen,
-  RadioGroup,
-} from '@lib/mobile-ui';
+import { Menu, SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString } from '@lib/mobile-app';

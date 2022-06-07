@@ -2,10 +2,11 @@ import React, { useLayoutEffect } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { BackButton, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 import { IRemGood } from '../../store/app/types';
+import { navBackButton } from '../../components/navigateOptions';
 
 const LineItem = React.memo(({ item }: { item: IRemGood }) => {
   return (
@@ -60,7 +61,7 @@ const GoodLineScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
     ('');
   }, [navigation, colors.card]);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
@@ -18,6 +18,7 @@ interface IProps {
 
 const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
+  const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
@@ -52,7 +53,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }
 
   return (
-    <View style={[styles.content, { backgroundColor: colors.card }]}>
+    <View style={viewStyle}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{

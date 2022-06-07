@@ -31,8 +31,6 @@ export const DocViewScreen = () => {
 
   const { colors } = useTheme();
 
-  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
-
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
@@ -96,6 +94,7 @@ export const DocViewScreen = () => {
       ),
     [actionsMenu, handleDoScan, isBlocked],
   );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,

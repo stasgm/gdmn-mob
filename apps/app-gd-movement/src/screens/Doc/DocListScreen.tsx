@@ -56,6 +56,8 @@ export const DocListScreen = () => {
 
   const [date, setDate] = useState(dataTypes[0]);
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
 
   const handleAddDocument = useCallback(() => {
@@ -267,12 +269,12 @@ export const DocListScreen = () => {
         <SwipeListItem renderItem={item} item={doc} routeName="DocView">
           <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })}>
             <View>
-              <Text style={[styles.field, { color: colors.text }]}>
+              <Text style={textStyle}>
                 {(doc.documentType.remainsField === 'fromContact'
                   ? doc.head.fromContact?.name
                   : doc.head.toContact?.name) || ''}
               </Text>
-              <Text style={[styles.field, { color: colors.text }]}>
+              <Text style={textStyle}>
                 № {doc.number} на {getDateString(doc.documentDate)}
               </Text>
             </View>
@@ -280,7 +282,7 @@ export const DocListScreen = () => {
         </SwipeListItem>
       ) : null;
     },
-    [colors.text, list, navigation],
+    [list, navigation, textStyle],
   );
 
   return (

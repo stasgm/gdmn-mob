@@ -4,11 +4,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { DocLine } from '../../components/DocLine';
 import { IMovementLine } from '../../store/types';
+import { navBackButton } from '../../components/navigateOptions';
 
 export const DocLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList | DocStackParamList, 'DocLine'>>();
@@ -25,16 +26,21 @@ export const DocLineScreen = () => {
     navigation.goBack();
   }, [navigation, line, docId, dispatch, mode]);
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <SaveButton onPress={handleSave} />
+      </View>
+    ),
+    [handleSave],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <SaveButton onPress={handleSave} />
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, handleSave]);
+  }, [navigation, renderRight]);
 
   return (
     <View style={[styles.container]}>
