@@ -112,3 +112,4 @@ log/*
 
 # yarn
 yarn-error.log
+apps/app-trade-agents/app.config.js
