@@ -21,7 +21,7 @@ const RouteTotal = ({ routeId }: IItem) => {
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
   const goods = refSelectors.selectByName<IGood>('good')?.data;
-  const firstLevelGroups = groups?.filter((item) => !item.parent);
+  const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order')?.filter((e) => e.head.route?.id === routeId);
 
@@ -29,26 +29,26 @@ const RouteTotal = ({ routeId }: IItem) => {
     return [...prev, ...order.lines];
   }, []);
 
-  const totalList: IRouteTotalLine[] = firstLevelGroups?.map((firstGr) => ({
-    group: {
-      id: firstGr.id,
-      name: firstGr.name,
-    },
-    quantity: orderLines
-      .filter((l) =>
-        goods.find(
-          (g) =>
-            g.id === l.good.id &&
-            (g.goodgroup.id === firstGr.id ||
-              groups.find((group) => group.parent?.id === firstGr.id && group.id === g.goodgroup.id)),
-        ),
-      )
-      .reduce((s: number, line) => {
-        // const good = goods.find((g) => g.id === line.good.id);
-        // return round(s + round(line.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1)));
-        return round(s + round(line.quantity));
-      }, 0),
-  }));
+  const totalList: IRouteTotalLine[] = firstLevelGroups
+    ?.map((firstGr) => ({
+      group: {
+        id: firstGr.id,
+        name: firstGr.name,
+      },
+      quantity: orderLines
+        .filter((l) =>
+          goods.find(
+            (g) =>
+              g.id === l.good.id &&
+              (g.goodgroup.id === firstGr.id ||
+                groups.find((group) => group.parent?.id === firstGr.id && group.id === g.goodgroup.id)),
+          ),
+        )
+        .reduce((s: number, line) => {
+          return round(s + round(line.quantity));
+        }, 0),
+    }))
+    .filter((i) => i.quantity > 0);
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
   const textTotalStyle = useMemo(() => [styles.textTotal, { color: colors.notification }], [colors.notification]);
