@@ -45,6 +45,7 @@ const RouteTotal = ({ routeId }: IItem) => {
           ),
         )
         .reduce((s: number, line) => {
+          // return round(s + round(line.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1)));
           return round(s + round(line.quantity));
         }, 0),
     }))
