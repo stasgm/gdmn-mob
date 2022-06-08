@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
@@ -9,12 +9,16 @@ import { IRemGood } from '../../store/app/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 const LineItem = React.memo(({ item }: { item: IRemGood }) => {
+  const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <View>
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Алиас</Text>
-          <Text style={[styles.number, styles.field]}>{item?.good?.alias}</Text>
+          <Text style={textStyle}>{item?.good?.alias}</Text>
         </View>
       </View>
       <ItemSeparator />
@@ -22,7 +26,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Штрих-код</Text>
-          <Text style={[styles.number, styles.field]}>{item?.good?.barcode}</Text>
+          <Text style={textStyle}>{item?.good?.barcode}</Text>
         </View>
       </View>
       <ItemSeparator />
@@ -30,7 +34,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Цена</Text>
-          <Text style={[styles.number, styles.field]}>{item?.price} р</Text>
+          <Text style={textStyle}>{item?.price} р</Text>
         </View>
       </View>
       <ItemSeparator />
@@ -38,7 +42,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Покупная цена</Text>
-          <Text style={[styles.number, styles.field]}>{item?.buyingPrice || '0'} р</Text>
+          <Text style={textStyle}>{item?.buyingPrice || '0'} р</Text>
         </View>
       </View>
       <ItemSeparator />
@@ -46,7 +50,7 @@ const LineItem = React.memo(({ item }: { item: IRemGood }) => {
       <View style={styles.item}>
         <View style={styles.details}>
           <Text style={styles.name}>Остаток</Text>
-          <Text style={[styles.number, styles.field]}>{`${item?.remains}  ${item.good.valueName}`}</Text>
+          <Text style={textStyle}>{`${item?.remains}  ${item.good.valueName}`}</Text>
         </View>
       </View>
     </View>
@@ -57,14 +61,11 @@ const GoodLineScreen = () => {
   const navigation = useNavigation();
   const remainsItem = useRoute<RouteProp<RemainsStackParamList, 'GoodLine'>>().params?.item;
 
-  const { colors } = useTheme();
-
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
     });
-    ('');
-  }, [navigation, colors.card]);
+  }, [navigation]);
 
   return (
     <>

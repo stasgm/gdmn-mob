@@ -16,6 +16,8 @@ import { navBackButton } from './navigateOptions';
 export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { colors } = useTheme();
+
   const {
     refName,
     isMulti,
@@ -144,6 +146,7 @@ export const SelectRefItemScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

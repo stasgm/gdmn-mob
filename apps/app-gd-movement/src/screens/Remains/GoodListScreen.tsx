@@ -131,6 +131,7 @@ const GoodListScreen = () => {
           style={filterVisible && { backgroundColor: colors.card }}
           size={26}
           onPress={() => setFilterVisible((prev) => !prev)}
+          color={colors.primary}
         />
         <Menu
           key={'MenuType'}
@@ -145,7 +146,7 @@ const GoodListScreen = () => {
         />
       </View>
     ),
-    [colors.card, filterVisible, handleApply, rem.id, remainsList, visibleMenu],
+    [colors, filterVisible, handleApply, rem.id, remainsList, visibleMenu],
   );
 
   useLayoutEffect(() => {
@@ -169,6 +170,7 @@ const GoodListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
@@ -47,6 +47,8 @@ const Good = ({ item }: { item: INamedEntity }) => {
 
 export const SelectGoodScreen = () => {
   const navigation = useNavigation();
+
+  const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -98,6 +100,7 @@ export const SelectGoodScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

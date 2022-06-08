@@ -78,6 +78,8 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
 
+  const { colors } = useTheme();
+
   const [filterVisible, setFilterVisible] = useState(false);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
@@ -185,6 +187,7 @@ export const SelectRemainsScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />
