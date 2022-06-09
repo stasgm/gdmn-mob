@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
@@ -25,6 +24,8 @@ export const DocItem = ({ docId, item, readonly = false }: IProps) => {
 
   const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -36,9 +37,9 @@ export const DocItem = ({ docId, item, readonly = false }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
+          <Text style={styles.name}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
-            <Text style={[styles.field, { color: colors.text }]}>
+            <Text style={textStyle}>
               {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
             </Text>
             {/* <Text style={[styles.field, { color: colors.text }]}>

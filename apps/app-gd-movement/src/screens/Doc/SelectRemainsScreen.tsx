@@ -3,7 +3,7 @@ import { View, FlatList, TouchableOpacity, Text, RefreshControl } from 'react-na
 import { Searchbar, Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
-import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
+import { AppScreen, ScanButton, ItemSeparator, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -18,6 +18,7 @@ import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
+import { navBackButton } from '../../components/navigateOptions';
 
 interface IFilteredList {
   searchQuery: string;
@@ -31,6 +32,12 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
   const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.good.barcode;
+
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const barcodeTextStyle = useMemo(
+    () => [styles.number, styles.flexDirectionRow, { color: colors.text }],
+    [colors.text],
+  );
 
   return (
     <TouchableOpacity
@@ -54,15 +61,13 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item.good.name}</Text>
+          <Text style={styles.name}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
-            <Text style={[styles.field, { color: colors.text }]}>
+            <Text style={textStyle}>
               {item.remains} {item.good.valueName} - {formatValue({ type: 'number', decimals: 2 }, item.price ?? 0)}{' '}
               руб.
             </Text>
-            {barcode && (
-              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.good.barcode}</Text>
-            )}
+            {barcode && <Text style={barcodeTextStyle}>{item.good.barcode}</Text>}
           </View>
         </View>
       </View>
@@ -72,7 +77,9 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 
 export const SelectRemainsScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
+
   const { colors } = useTheme();
+
   const [filterVisible, setFilterVisible] = useState(false);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
@@ -143,17 +150,22 @@ export const SelectRemainsScreen = () => {
     navigation.navigate('ScanBarcode', { docId: docId });
   }, [navigation, docId]);
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />
+        {isScanerReader && <ScanButton onPress={handleScanner} />}
+      </View>
+    ),
+    [handleScanner, isScanerReader],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />
-          {isScanerReader && <ScanButton onPress={handleScanner} />}
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, filterVisible, colors.card, handleScanner, isScanerReader]);
+  }, [navigation, renderRight]);
 
   const refList = useRef<FlatList<IRemGood>>(null);
   useScrollToTop(refList);
@@ -175,6 +187,7 @@ export const SelectRemainsScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

@@ -1,27 +1,23 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
-import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+import { Searchbar, Divider, Checkbox } from 'react-native-paper';
+import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData } from '@lib/types';
-import { appActions, refSelectors, useSelector } from '@lib/store';
-import {
-  AppScreen,
-  BackButton,
-  ItemSeparator,
-  SaveButton,
-  SearchButton,
-  SubTitle,
-  globalStyles as styles,
-} from '@lib/mobile-ui';
+import { appActions, refSelectors } from '@lib/store';
+import { AppScreen, ItemSeparator, SaveButton, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-app';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
 
+import { navBackButton } from './navigateOptions';
+
 export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { colors } = useTheme();
+
   const {
     refName,
     isMulti,
@@ -52,7 +48,7 @@ export const SelectRefItemScreen = () => {
 
   const title = refObj?.description || refObj?.name;
 
-  const formParams = useSelector((state) => state.app.formParams);
+  // const formParams = useSelector((state) => state.app.formParams);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -105,32 +101,37 @@ export const SelectRefItemScreen = () => {
     [checkedItem, handleSelectItem, refFieldName],
   );
 
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />
+        {isMulti && (
+          <SaveButton
+            onPress={() => {
+              if (!checkedItem) {
+                Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
+                return;
+              }
+              // const newFormParams: IFormParam = {
+              //   ...formParams,
+              //   [fieldName]: checkedItem,
+              // };
+              dispatch(appActions.setFormParams({ [fieldName]: checkedItem }));
+              navigation.goBack();
+            }}
+          />
+        )}
+      </View>
+    ),
+    [checkedItem, dispatch, fieldName, filterVisible, isMulti, navigation],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />
-          {isMulti && (
-            <SaveButton
-              onPress={() => {
-                if (!checkedItem) {
-                  Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
-                  return;
-                }
-                // const newFormParams: IFormParam = {
-                //   ...formParams,
-                //   [fieldName]: checkedItem,
-                // };
-                dispatch(appActions.setFormParams({ [fieldName]: checkedItem }));
-                navigation.goBack();
-              }}
-            />
-          )}
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [checkedItem, fieldName, isMulti, navigation, formParams, filterVisible, dispatch]);
+  }, [navigation, renderRight]);
 
   return (
     <AppScreen>
@@ -145,6 +146,7 @@ export const SelectRefItemScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />
@@ -174,14 +176,16 @@ const LineItem = React.memo(
     refFieldName: string;
   }) => {
     const { colors } = useTheme();
+    const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
+    const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
 
     return (
       <TouchableOpacity onPress={() => onCheck(item)}>
-        <View style={[styles.item, { backgroundColor: colors.background }]}>
+        <View style={viewStyle}>
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={[styles.name, { color: colors.text }]}>{item[refFieldName] || item.id}</Text>
+              <Text style={textStyle}>{item[refFieldName] || item.id}</Text>
             </View>
           </View>
         </View>

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
-import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
@@ -15,6 +15,7 @@ import { generateId } from '@lib/mobile-app';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/app/types';
+import { navBackButton } from '../../components/navigateOptions';
 
 const Good = ({ item }: { item: INamedEntity }) => {
   const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectGoodItem'>>();
@@ -46,6 +47,7 @@ const Good = ({ item }: { item: INamedEntity }) => {
 
 export const SelectGoodScreen = () => {
   const navigation = useNavigation();
+
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,12 +70,17 @@ export const SelectGoodScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />,
+    [],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />,
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, filterVisible, colors.card]);
+  }, [navigation, renderRight]);
 
   const refList = React.useRef<FlatList<INamedEntity>>(null);
   useScrollToTop(refList);
@@ -93,6 +100,7 @@ export const SelectGoodScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

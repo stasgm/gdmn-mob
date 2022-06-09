@@ -1,5 +1,5 @@
 import { useTheme } from '@react-navigation/native';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -24,6 +24,8 @@ interface IProps {
 
 const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
+  const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
+
   const [scanned, setScanned] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
 
@@ -49,11 +51,7 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
   }, [scanned, ref]);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.content, { backgroundColor: colors.card }]}
-      focusable={true}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle} focusable={true}>
       <View style={styles.camera}>
         <View style={styles.header}>
           <IconButton icon="arrow-left" color={'#FFF'} size={30} style={styles.transparent} onPress={onCancel} />

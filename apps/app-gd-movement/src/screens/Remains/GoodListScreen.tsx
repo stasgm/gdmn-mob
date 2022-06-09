@@ -3,7 +3,7 @@ import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, BackButton, ItemSeparator, SubTitle, globalStyles, Menu } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SubTitle, globalStyles, Menu } from '@lib/mobile-ui';
 
 import { refSelectors, useSelector } from '@lib/store';
 
@@ -15,6 +15,8 @@ import { RemainsStackParamList } from '../../navigation/Root/types';
 
 import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { getRemGoodListByContact } from '../../utils/helpers';
+
+import { navBackButton } from '../../components/navigateOptions';
 
 import GoodItem from './components/GoodItem';
 
@@ -121,32 +123,38 @@ const GoodListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const renderRight = useCallback(
+    () => (
+      <View style={globalStyles.buttons}>
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+          color={colors.primary}
+        />
+        <Menu
+          key={'MenuType'}
+          visible={visibleMenu}
+          onChange={handleApply}
+          onDismiss={() => setVisibleMenu(false)}
+          onPress={() => setVisibleMenu(true)}
+          options={remainsList}
+          activeOptionId={rem.id}
+          iconName="filter-outline"
+          iconSize={25}
+        />
+      </View>
+    ),
+    [colors, filterVisible, handleApply, rem.id, remainsList, visibleMenu],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () => (
-        <View style={globalStyles.buttons}>
-          <IconButton
-            icon="card-search-outline"
-            style={filterVisible && { backgroundColor: colors.card }}
-            size={26}
-            onPress={() => setFilterVisible((prev) => !prev)}
-          />
-          <Menu
-            key={'MenuType'}
-            visible={visibleMenu}
-            onChange={handleApply}
-            onDismiss={() => setVisibleMenu(false)}
-            onPress={() => setVisibleMenu(true)}
-            options={remainsList}
-            activeOptionId={rem.id}
-            iconName="filter-outline"
-            iconSize={25}
-          />
-        </View>
-      ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, filterVisible, colors.card, visibleMenu, remainsList, rem.id, handleApply]);
+  }, [navigation, renderRight]);
 
   const renderItem = ({ item }: { item: IRemGood }) => <GoodItem item={item} />;
 
@@ -162,6 +170,7 @@ const GoodListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

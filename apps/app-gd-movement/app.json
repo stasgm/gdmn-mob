@@ -3,6 +3,7 @@
     "name": "GDMN Склад",
     "slug": "gdmn-gd-movement",
     "version": "1.0.0",
+    "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "splash": {

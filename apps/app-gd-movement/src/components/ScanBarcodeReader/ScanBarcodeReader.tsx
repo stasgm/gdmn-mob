@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -37,7 +37,9 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
 
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
+
   const { colors } = useTheme();
+  const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IMovementLine>();
@@ -88,10 +90,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
   ]);
 
   return isFocused ? (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.content, { backgroundColor: colors.card }]}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
       <View style={styles.camera}>
         <View style={styles.header}>
           <IconButton

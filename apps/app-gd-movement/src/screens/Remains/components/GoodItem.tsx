@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
-import { useTheme } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
@@ -19,6 +18,12 @@ const GoodItem = ({ item }: IProps) => {
 
   const barcode = !!item.good.barcode;
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const barcodeTextStyle = useMemo(
+    () => [styles.number, styles.flexDirectionRow, { color: colors.text }],
+    [colors.text],
+  );
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -30,14 +35,12 @@ const GoodItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name, { color: colors.text }]}>{item?.good.name}</Text>
+          <Text style={styles.name}>{item?.good.name}</Text>
           <View style={[styles.directionRow]}>
-            <Text style={[styles.field, { color: colors.text }]}>
+            <Text style={textStyle}>
               {item.remains} {item.good.valueName} - {(item?.price || 0).toString()} р.
             </Text>
-            {barcode && (
-              <Text style={[styles.number, styles.flexDirectionRow, { color: colors.text }]}>{item.good.barcode}</Text>
-            )}
+            {barcode && <Text style={barcodeTextStyle}>{item.good.barcode}</Text>}
           </View>
         </View>
       </View>

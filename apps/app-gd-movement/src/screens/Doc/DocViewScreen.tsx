@@ -1,12 +1,11 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
-  BackButton,
   MenuButton,
   useActionSheet,
   globalStyles as styles,
@@ -23,11 +22,16 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { DocItem } from '../../components/DocItem';
+import { navBackButton } from '../../components/navigateOptions';
 
 export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
+
+  const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
@@ -80,18 +84,23 @@ export const DocViewScreen = () => {
     ]);
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
 
+  const renderRight = useCallback(
+    () =>
+      !isBlocked && (
+        <View style={styles.buttons}>
+          <ScanButton onPress={handleDoScan} />
+          <MenuButton actionsMenu={actionsMenu} />
+        </View>
+      ),
+    [actionsMenu, handleDoScan, isBlocked],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
-      headerRight: () =>
-        !isBlocked && (
-          <View style={styles.buttons}>
-            <ScanButton onPress={handleDoScan} />
-            <MenuButton actionsMenu={actionsMenu} />
-          </View>
-        ),
+      headerLeft: navBackButton,
+      headerRight: renderRight,
     });
-  }, [navigation, handleAddDocLine, actionsMenu, handleDoScan, isBlocked]);
+  }, [navigation, renderRight]);
 
   if (!doc) {
     return (
@@ -116,13 +125,13 @@ export const DocViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
         <>
-          <Text style={styles.rowCenter}>
+          <Text style={[styles.rowCenter, textStyle]}>
             {(doc.documentType.remainsField === 'fromContact'
               ? doc.head.fromContact?.name
               : doc.head.toContact?.name) || ''}
           </Text>
           <View style={styles.rowCenter}>
-            <Text>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+            <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
 
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>

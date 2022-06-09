@@ -8,7 +8,6 @@ import {
   AppScreen,
   ItemSeparator,
   Status,
-  DrawerButton,
   SubTitle,
   AddButton,
   ScreenListItem,
@@ -30,6 +29,7 @@ import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
+import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -56,7 +56,41 @@ export const DocListScreen = () => {
 
   const [date, setDate] = useState(dataTypes[0]);
 
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+
+  const handleAddDocument = useCallback(() => {
+    navigation.navigate('DocEdit');
+  }, [navigation]);
+
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
+  const renderRight = useCallback(
+    () => (
+      <View style={styles.buttons}>
+        <IconButton
+          icon="card-search-outline"
+          style={filterVisible && { backgroundColor: colors.card }}
+          size={26}
+          onPress={() => setFilterVisible((prev) => !prev)}
+        />
+        <AddButton onPress={handleAddDocument} />
+      </View>
+    ),
+    [colors.card, filterVisible, handleAddDocument],
+  );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: navBackDrawer,
+      headerRight: renderRight,
+    });
+  }, [navigation, renderRight]);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -188,33 +222,6 @@ export const DocListScreen = () => {
     [newFilteredList],
   );
 
-  const handleAddDocument = useCallback(() => {
-    navigation.navigate('DocEdit');
-  }, [navigation]);
-
-  useEffect(() => {
-    if (!filterVisible && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [filterVisible, searchQuery]);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
-      headerRight: () => (
-        <View style={styles.buttons}>
-          <IconButton
-            icon="card-search-outline"
-            style={filterVisible && { backgroundColor: colors.card }}
-            size={26}
-            onPress={() => setFilterVisible((prev) => !prev)}
-          />
-          <AddButton onPress={handleAddDocument} />
-        </View>
-      ),
-    });
-  }, [colors.card, filterVisible, handleAddDocument, navigation]);
-
   const [visibleType, setVisibleType] = useState(false);
   const [visibleStatus, setVisibleStatus] = useState(false);
   const [visibleDate, setVisibleDate] = useState(false);
@@ -255,25 +262,28 @@ export const DocListScreen = () => {
     setDate(option);
   }, []);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list?.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="DocView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })}>
-          <View>
-            <Text style={[styles.field, { color: colors.text }]}>
-              {(doc.documentType.remainsField === 'fromContact'
-                ? doc.head.fromContact?.name
-                : doc.head.toContact?.name) || ''}
-            </Text>
-            <Text style={[styles.field, { color: colors.text }]}>
-              № {doc.number} на {getDateString(doc.documentDate)}
-            </Text>
-          </View>
-        </ScreenListItem>
-      </SwipeListItem>
-    ) : null;
-  };
+  const renderItem: ListRenderItem<IListItemProps> = useCallback(
+    ({ item }) => {
+      const doc = list?.find((r) => r.id === item.id);
+      return doc ? (
+        <SwipeListItem renderItem={item} item={doc} routeName="DocView">
+          <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })}>
+            <View>
+              <Text style={textStyle}>
+                {(doc.documentType.remainsField === 'fromContact'
+                  ? doc.head.fromContact?.name
+                  : doc.head.toContact?.name) || ''}
+              </Text>
+              <Text style={textStyle}>
+                № {doc.number} на {getDateString(doc.documentDate)}
+              </Text>
+            </View>
+          </ScreenListItem>
+        </SwipeListItem>
+      ) : null;
+    },
+    [list, navigation, textStyle],
+  );
 
   return (
     <AppScreen>
@@ -330,6 +340,7 @@ export const DocListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

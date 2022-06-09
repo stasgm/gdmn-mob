@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
@@ -6,6 +6,8 @@ import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
+
+import { useTheme } from '@react-navigation/native';
 
 import { IMovementLine } from '../store/types';
 
@@ -19,6 +21,10 @@ interface IProps {
 }
 
 export const DocLine = ({ item, onSetLine }: IProps) => {
+  const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
@@ -75,28 +81,28 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           <View style={[styles.item]}>
             <View style={styles.details}>
               <Text style={styles.name}>Наименование</Text>
-              <Text style={[styles.number, styles.field]}>{item ? item.good.name || 'товар не найден' : ''}</Text>
+              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Цена</Text>
-              <Text style={[styles.number, styles.field]}>{price.toString()}</Text>
+              <Text style={textStyle}>{price.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Покупная цена</Text>
-              <Text style={[styles.number, styles.field]}>{buyingPrice.toString()}</Text>
+              <Text style={textStyle}>{buyingPrice.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Остаток</Text>
-              <Text style={[styles.number, styles.field]}>{remains.toString()}</Text>
+              <Text style={textStyle}>{remains.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
@@ -105,7 +111,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
             <View style={localStyles.details}>
               <View style={localStyles.new}>
                 <Text style={styles.name}>EID</Text>
-                <Text style={[styles.number, styles.field]}>{item?.EID || 'Не указан'}</Text>
+                <Text style={textStyle}>{item?.EID || 'Не указан'}</Text>
               </View>
               <View style={localStyles.button}>
                 {item?.EID && (

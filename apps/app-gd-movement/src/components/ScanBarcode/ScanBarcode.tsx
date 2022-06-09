@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -26,7 +26,10 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
+
   const { colors } = useTheme();
+
+  const cameraStyle = useMemo(() => [styles.camera, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
@@ -84,7 +87,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={[styles.camera, { backgroundColor: colors.card }]}
+        style={cameraStyle}
       >
         <View style={styles.header}>
           <IconButton
