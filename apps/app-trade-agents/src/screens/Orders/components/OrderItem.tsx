@@ -37,7 +37,9 @@ const OrderItem = ({ docId, item, readonly = false }: IProps) => {
           <Text style={styles.name}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
             <Text style={textStyle}>
-              {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()} {' кг '} x{' '}
+              {/* {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()} x{' '} */}
+              {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()}
+              {'кг  x  '}
               {(good?.priceFsn || 0).toString()} р.
             </Text>
             {/* <Text style={textStyle}>
