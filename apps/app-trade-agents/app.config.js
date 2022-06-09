@@ -1,15 +1,3 @@
-/*
-
-ПЕРЕІМЕНОВАТЬ в *.js файл
-
-странно, но при формировании aab файла не подхватывался ключ гугл апі
-із process.env
-
-пока просто прописываем прямо в js фале
-
-*/
-
-
 import 'dotenv/config';
 
 export default ({ config }) => ({
@@ -19,8 +7,7 @@ export default ({ config }) => ({
     config: {
       ...config.android.config,
       googleMaps: {
-        apiKey: '___________________GOOGLE MAPS API KEY________________',
-        // apiKey: process.env.GOOGLE_API_KEY,
+        apiKey: process.env.GOOGLE_API_KEY,
       },
     },
   },
