@@ -87,61 +87,25 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
+              <Text style={styles.name}>Вес</Text>
               <Text style={textStyle}>{price.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Покупная цена</Text>
+              <Text style={styles.name}>Ед. изм.</Text>
               <Text style={textStyle}>{buyingPrice.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
           <View style={styles.item}>
             <View style={styles.details}>
-              <Text style={styles.name}>Остаток</Text>
+              <Text style={styles.name}>Номер партии</Text>
               <Text style={textStyle}>{remains.toString()}</Text>
             </View>
           </View>
           <ItemSeparator />
-
-          <View style={styles.item}>
-            <View style={localStyles.details}>
-              <View style={localStyles.new}>
-                <Text style={styles.name}>EID</Text>
-                <Text style={textStyle}>{item?.EID || 'Не указан'}</Text>
-              </View>
-              <View style={localStyles.button}>
-                {item?.EID && (
-                  <TouchableOpacity>
-                    <IconButton icon="close" size={20} onPress={() => setGoodEID(undefined)} />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество</Text>
-              <TextInput
-                style={[styles.number, styles.field]}
-                editable={true}
-                keyboardType="numeric"
-                onChangeText={handleQuantityChange}
-                returnKeyType="done"
-                ref={currRef}
-                value={goodQty}
-              />
-            </View>
-          </View>
-          <View>
-            <PrimeButton icon="barcode-scan" onPress={handleDoScan}>
-              Сканировать EID
-            </PrimeButton>
-          </View>
         </View>
       </ScrollView>
     </>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "GDMN Отгрузка",
     "slug": "gdmn-fp-movement",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "githubUrl": "https://github.com/stasgm/gdmn-mob",
     "orientation": "default",
     "icon": "./assets/icon.png",

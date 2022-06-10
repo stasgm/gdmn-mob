@@ -114,7 +114,7 @@ export const MovementEditScreen = () => {
 
       dispatch(documentActions.addDocument(newDoc));
 
-      navigation.dispatch(StackActions.replace('DocView', { id: newDoc.id }));
+      navigation.dispatch(StackActions.replace('MovementView', { id: newDoc.id }));
     } else {
       if (!doc) {
         return;

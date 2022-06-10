@@ -82,7 +82,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
-          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13, BarCodeScanner.Constants.BarCodeType.ean8],
+          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.code128],
         }}
         autoFocus="on"
         whiteBalance="auto"

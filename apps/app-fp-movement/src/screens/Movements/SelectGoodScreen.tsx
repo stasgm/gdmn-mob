@@ -13,18 +13,18 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { generateId } from '@lib/mobile-app';
 
-import { InventoryStackParamList } from '../../navigation/Root/types';
+import { MovementStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/app/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 const Good = ({ item }: { item: INamedEntity }) => {
-  const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectGoodItem'>>();
-  const { docId } = useRoute<RouteProp<InventoryStackParamList, 'SelectGoodItem'>>().params;
+  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'SelectGoodItem'>>();
+  const { docId } = useRoute<RouteProp<MovementStackParamList, 'SelectGoodItem'>>().params;
 
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('InventoryLine', {
+        navigation.navigate('MovementLine', {
           mode: 0,
           docId,
           item: { id: generateId(), good: { id: item.id, name: item.name }, quantity: 0 },

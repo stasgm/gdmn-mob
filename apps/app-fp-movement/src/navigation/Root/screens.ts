@@ -7,9 +7,13 @@ import {
   MovementLineScreen,
   SelectGoodScreen,
   SelectRemainsScreen,
-} from '../../screens/Movement';
+} from '../../screens/Movements';
 
-import ScanBarcodeScreen from '../../screens/Movement/ScanBarcodeScreen';
+import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
+
+import { OrderListScreen } from '../../screens/Orders/OrderListScreen';
+
+import ScanOrderScreen from '../../screens/Orders/ScanOrderScreen';
 
 export const movementScreens = {
   MovementEdit: { title: 'Перемещение', component: MovementEditScreen },
@@ -25,4 +29,12 @@ export const movementScreens = {
 
 export const movementListScreens = {
   MovementList: { title: 'Перемещение', component: MovementListScreen },
+};
+
+export const orderScreens = {
+  ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
+};
+
+export const orderListScreens = {
+  OrderList: { title: 'Заявки', component: OrderListScreen },
 };

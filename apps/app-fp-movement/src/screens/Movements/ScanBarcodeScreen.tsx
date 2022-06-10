@@ -12,7 +12,7 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { DocStackParamList } from '../../navigation/Root/types';
+import { MovementStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IMovementDocument } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
@@ -21,8 +21,8 @@ import { unknownGood } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 
 const ScanBarcodeScreen = () => {
-  const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
+  const docId = useRoute<RouteProp<MovementStackParamList, 'ScanBarcode'>>().params?.docId;
+  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
@@ -38,7 +38,7 @@ const ScanBarcodeScreen = () => {
 
   const handleSaveScannedItem = useCallback(
     (item: IMovementLine) => {
-      navigation.navigate('DocLine', {
+      navigation.navigate('MovementLine', {
         mode: 0,
         docId,
         item: item,
@@ -48,7 +48,7 @@ const ScanBarcodeScreen = () => {
   );
 
   const handleShowRemains = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', { docId });
+    navigation.navigate('SelectGoodItem', { docId });
   }, [docId, navigation]);
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
@@ -87,6 +87,7 @@ const ScanBarcodeScreen = () => {
           return;
         }
 
+        console.log('brc', brc);
         return {
           good: { id: remItem.good.id, name: remItem.good.name },
           id: generateId(),

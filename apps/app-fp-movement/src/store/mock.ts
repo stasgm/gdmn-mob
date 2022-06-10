@@ -60,6 +60,13 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '187034695',
               name: 'movement',
               description: 'Внутреннее перемещение',
+              isRemains: false,
+            },
+            {
+              id: '187034695',
+              name: 'order',
+              description: 'Заявка',
+              isRemains: false,
             },
           ],
         },
@@ -117,11 +124,20 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               isFrac: 1,
               weightCode: '',
             },
+            // {
+            //   id: '111159486',
+            //   name: 'Тетрадь',
+            //   alias: '36985',
+            //   barcode: '3329687853219',
+            //   valueName: 'шт',
+            //   isFrac: 1,
+            //   weightCode: '',
+            // },
             {
               id: '111159486',
               name: 'Тетрадь',
               alias: '36985',
-              barcode: '3329687853219',
+              barcode: '000728150222185822562386150222',
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
@@ -754,6 +770,192 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           ],
         },
       },
+    },
+  },
+  {
+    id: '1f511750-17aa-11ec-951e-7fdefda6eb8e',
+    head: {
+      appSystem,
+      company: companies[2] as INamedEntity,
+      consumer: user2,
+      producer: user2,
+      dateTime: '2021-09-17T11:26:37.893Z',
+      order: 2,
+    },
+    status: 'READY',
+    body: {
+      type: 'DOCS',
+      version: 1,
+      payload: [
+        {
+          id: '21b5e719-f3dc-411e-ab83-16735d95f1d2',
+          documentType: {
+            name: 'order',
+            id: '147033366',
+            description: '05. Заявка1 (организация)',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            contact: {
+              id: '1788296478',
+              name: 'ООО "ЕдаЭксперт"',
+            },
+            onDate: new Date().toISOString(),
+            outlet: {
+              id: '819293369',
+              name: 'Магазин "ЕдаЭксперт" № 1',
+            },
+            depart: {
+              id: '357852117',
+              name: 'Магазин-склад',
+            },
+          },
+          lines: [
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e89',
+              good: {
+                id: '857817085',
+                name: 'Колбаса вареная докторская',
+                priceFsn: 4.82,
+              },
+              quantity: 2,
+              packagekey: {
+                id: '1617776619',
+                name: 'Мал. батон 5',
+              },
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e88',
+              good: {
+                id: '857817085',
+                name: 'Колбаса вареная докторская',
+                priceFsn: 4.82,
+              },
+              quantity: 2,
+              packagekey: {
+                id: '1617776621',
+                name: 'Мал. батон 10',
+              },
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
+        },
+        {
+          id: '21b5e719-f3dc-411e-ab83-16735d95f1d3',
+          documentType: {
+            name: 'order',
+            id: '147033366',
+            description: '05. Заявка1 (организация)',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            contact: {
+              id: '1788296478',
+              name: 'ООО "ЕдаЭксперт"',
+            },
+            onDate: new Date().toISOString(),
+            outlet: {
+              id: '498076351',
+              name: 'Магазин "ЕдаЭксперт" № 2',
+            },
+            depart: {
+              id: '357852117',
+              name: 'Магазин-склад',
+            },
+          },
+          lines: [
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e87',
+              good: {
+                id: '1572500926',
+                name: 'Ветчина вар.',
+                priceFsn: 4.37,
+              },
+              quantity: 2,
+              packagekey: {
+                id: '615762858',
+                name: 'Большой батон 5',
+              },
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e86',
+              good: {
+                id: '1572500926',
+                name: 'Ветчина вар.',
+                priceFsn: 4.37,
+              },
+              quantity: 2,
+              packagekey: {
+                id: '615762859',
+                name: 'Большой батон 10',
+              },
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
+        },
+        {
+          id: '21b5e719-f3dc-411e-ab83-16735d95f1d5',
+          documentType: {
+            name: 'order',
+            id: '147033366',
+            description: '05. Заявка1 (организация)',
+          },
+          number: '1',
+          documentDate: new Date().toISOString(),
+          status: 'DRAFT',
+          head: {
+            contact: {
+              id: '147042924',
+              name: 'ОАО "МаркетКомпани"',
+            },
+            onDate: new Date().toISOString(),
+            outlet: {
+              id: '1121464445',
+              name: 'Магазин "МаркетКомпани" № 2',
+            },
+            depart: {
+              id: '357852117',
+              name: 'Магазин-склад',
+            },
+          },
+          lines: [
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e85',
+              good: {
+                id: '147035338',
+                name: 'Колбаски баварские',
+                priceFsn: 20.42,
+              },
+              quantity: 2,
+              packagekey: {
+                id: '1811739170',
+                name: '2 кг',
+              },
+            },
+            {
+              id: 'ab0d8341-1d64-4dc8-bd42-f030af280e84',
+              good: {
+                id: '147035339',
+                name: 'Колбаски балканские',
+                priceFsn: 20.27,
+              },
+              quantity: 2,
+              packagekey: {
+                id: '1811739170',
+                name: '2 кг',
+              },
+            },
+          ],
+          creationDate: new Date().toISOString(),
+          editionDate: new Date().toISOString(),
+        },
+      ] as any[],
     },
   },
 ];

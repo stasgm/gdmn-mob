@@ -1,21 +1,21 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { useNavigation, useTheme } from '@react-navigation/native';
+
 import { IconButton, Searchbar } from 'react-native-paper';
 
+import { useSelector } from '@lib/store';
 import {
   globalStyles as styles,
-  AppScreen,
+  AddButton,
+  FilterButtons,
   ItemSeparator,
   Status,
+  AppScreen,
   SubTitle,
-  AddButton,
   ScreenListItem,
   IListItemProps,
-  FilterButtons,
 } from '@lib/mobile-ui';
-
-import { useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -26,128 +26,66 @@ import SwipeListItem from '../../components/SwipeListItem';
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
-export interface DocListProps {
-  orders: IListItemProps[];
-}
-
-interface IFilteredList {
-  searchQuery: string;
-  list: IMovementDocument[];
-}
-
-export interface DocListSectionProps {
+export interface MovementListSectionProps {
   title: string;
 }
-export type SectionDataProps = SectionListData<IListItemProps, DocListSectionProps>[];
+
+export type SectionDataProps = SectionListData<IListItemProps, MovementListSectionProps>[];
 
 export const MovementListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementList'>>();
 
-  const { loading } = useSelector((state) => state.documents);
+  const loading = useSelector((state) => state.documents.loading);
+  const movements = useSelector((state) => state.documents.list) as IMovementDocument[];
   const { colors } = useTheme();
+
+  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
-
-  const movements = useSelector((state) => state.documents.list) as IMovementDocument[];
-
-  const list = movements.filter((i) => i.documentType?.name === 'movement');
-  // .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
-
-  const handleAddDocument = useCallback(() => {
-    navigation.navigate('MovementEdit');
-  }, [navigation]);
-
-  useEffect(() => {
-    if (!filterVisible && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [filterVisible, searchQuery]);
-
-  const [filteredList, setFilteredList] = useState<IFilteredList>({
-    searchQuery: '',
-    list,
-  });
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (!searchQuery) {
-        setFilteredList({ searchQuery, list });
-      }
-    }, [list, searchQuery]),
-  );
-
-  useEffect(() => {
-    if (searchQuery !== filteredList.searchQuery) {
-      if (!searchQuery) {
-        setFilteredList({
-          searchQuery,
-          list,
-        });
-      } else {
-        const lower = searchQuery.toLowerCase();
-
-        const fn = ({ head, documentDate, number, documentType }: IMovementDocument) =>
-          (documentType.remainsField === 'fromContact'
-            ? head.fromContact?.name?.toLowerCase().includes(lower)
-            : head.toContact?.name?.toLowerCase().includes(lower)) ||
-          documentType?.description?.toLowerCase().includes(lower) ||
-          number.toLowerCase().includes(lower) ||
-          getDateString(documentDate).toLowerCase().includes(lower);
-
-        let gr;
-
-        if (
-          filteredList.searchQuery &&
-          searchQuery.length > filteredList.searchQuery.length &&
-          searchQuery.startsWith(filteredList.searchQuery)
-        ) {
-          gr = filteredList.list.filter(fn);
-        } else {
-          gr = list.filter(fn);
-        }
-
-        setFilteredList({
-          searchQuery,
-          list: gr,
-        });
-      }
-    }
-  }, [filteredList, searchQuery, list]);
+  const list = movements
+    ?.filter((i) =>
+      i.documentType?.name === 'movement'
+        ? i?.head?.fromDepart.name || i?.head?.toDepart.name || i.number || i.documentDate
+          ? i?.head?.fromDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            i?.head?.toDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+          : true
+        : false,
+    )
+    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [status, setStatus] = useState<Status>('all');
 
-  const newFilteredList: IListItemProps[] = useMemo(() => {
-    if (!filteredList.list.length) {
-      return [];
-    }
+  const filteredList: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
-        ? filteredList.list
+        ? list
         : status === 'active'
-        ? filteredList.list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? filteredList.list.filter((e) => e.status === status)
+        ? list.filter((e) => e.status !== 'PROCESSED')
+        : status === 'archive'
+        ? list.filter((e) => e.status === 'PROCESSED')
         : [];
 
-    return res.map((i) => {
-      return {
-        id: i.id,
-        title: i.documentType.description || '',
-        documentDate: getDateString(i.documentDate),
-        status: i.status,
-        documentType: i.documentType.name,
-        lineCount: i.lines.length,
-        errorMessage: i.errorMessage,
-      };
-    });
-  }, [filteredList.list, status]);
+    return res.map(
+      (i) =>
+        ({
+          id: i.id,
+          title: i.documentType.description || '',
+          documentDate: getDateString(i.documentDate),
+          status: i.status,
+          // subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+          lineCount: i.lines.length,
+          errorMessage: i.errorMessage,
+        } as IListItemProps),
+    );
+  }, [status, list]);
 
   const sections = useMemo(
     () =>
-      newFilteredList?.reduce<SectionDataProps>((prev, item) => {
+      filteredList.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
@@ -164,8 +102,18 @@ export const MovementListScreen = () => {
           },
         ];
       }, []),
-    [newFilteredList],
+    [filteredList],
   );
+
+  const handleAddDocument = useCallback(() => {
+    navigation.navigate('MovementEdit');
+  }, [navigation]);
+
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
 
   const renderRight = useCallback(
     () => (
@@ -190,7 +138,7 @@ export const MovementListScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list?.find((r) => r.id === item.id);
+    const doc = list.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="MovementView">
         <ScreenListItem {...item} onSelectItem={() => navigation.navigate('MovementView', { id: item.id })}>
@@ -206,6 +154,8 @@ export const MovementListScreen = () => {
     ) : null;
   };
 
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -218,7 +168,7 @@ export const MovementListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />
@@ -232,7 +182,7 @@ export const MovementListScreen = () => {
         renderSectionHeader={({ section }) => (
           <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
         )}
-        refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
+        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>

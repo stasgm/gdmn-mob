@@ -15,7 +15,7 @@ import { formatValue, generateId } from '@lib/mobile-app';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getRemGoodListByContact } from '../../utils/helpers';
-import { DocStackParamList } from '../../navigation/Root/types';
+import { MovementStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
 import { navBackButton } from '../../components/navigateOptions';
@@ -29,8 +29,8 @@ const keyExtractor = (item: IRemGood) => String(item.good.id);
 
 const GoodRemains = ({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
-  const { docId } = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params;
+  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'SelectRemainsItem'>>();
+  const { docId } = useRoute<RouteProp<MovementStackParamList, 'SelectRemainsItem'>>().params;
   const barcode = !!item.good.barcode;
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
@@ -42,7 +42,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('DocLine', {
+        navigation.navigate('MovementLine', {
           mode: 0,
           docId,
           item: {
@@ -76,7 +76,7 @@ const GoodRemains = ({ item }: { item: IRemGood }) => {
 };
 
 export const SelectRemainsScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'SelectRemainsItem'>>();
+  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'SelectRemainsItem'>>();
 
   const { colors } = useTheme();
 
@@ -84,7 +84,7 @@ export const SelectRemainsScreen = () => {
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
-  const docId = useRoute<RouteProp<DocStackParamList, 'SelectRemainsItem'>>().params?.docId;
+  const docId = useRoute<RouteProp<MovementStackParamList, 'SelectRemainsItem'>>().params?.docId;
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
   const goods = refSelectors.selectByName<IGood>('good').data;

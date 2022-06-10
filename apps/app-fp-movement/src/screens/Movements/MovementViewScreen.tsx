@@ -41,7 +41,7 @@ export const MovementViewScreen = () => {
   const isBlocked = doc?.status !== 'DRAFT';
 
   const handleAddDocLine = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', {
+    navigation.navigate('SelectGoodItem', {
       docId: id,
     });
   }, [navigation, id]);
