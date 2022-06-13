@@ -7,7 +7,7 @@ import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { MovementStackParamList } from '../../navigation/Root/types';
-import { DocLine } from '../../components/DocLine';
+import { MovementLine } from '../../components/MovementLine';
 import { IMovementLine } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
@@ -45,7 +45,7 @@ export const MovementLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <DocLine item={line} onSetLine={setLine} />
+      <MovementLine item={line} onSetLine={setLine} />
     </View>
   );
 };

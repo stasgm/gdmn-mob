@@ -161,10 +161,6 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
                       {itemLine?.good.name}
                     </Text>
                     <Text style={styles.barcode}>{itemLine?.barcode}</Text>
-                    <Text style={styles.barcode}>
-                      цена: {itemLine?.price || 0} р., остаток: {itemLine?.remains}
-                    </Text>
-                    <Text style={styles.barcode}>количество: {itemLine?.quantity}</Text>
                   </View>
                 </TouchableOpacity>
               </View>

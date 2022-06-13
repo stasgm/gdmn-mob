@@ -4,12 +4,10 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IMovementLine } from '../store/types';
-import { IGood } from '../store/app/types';
 import { MovementStackParamList } from '../navigation/Root/types';
 
 interface IProps {
@@ -18,11 +16,9 @@ interface IProps {
   readonly?: boolean;
 }
 
-export const DocItem = ({ docId, item, readonly = false }: IProps) => {
+export const MovementItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'ScanBarcode'>>();
-
-  const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
@@ -39,12 +35,7 @@ export const DocItem = ({ docId, item, readonly = false }: IProps) => {
         <View style={styles.details}>
           <Text style={styles.name}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
-            <Text style={textStyle}>
-              {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
-            </Text>
-            {/* <Text style={[styles.field, { color: colors.text }]}>
-              {Math.floor(item.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1) * 1000) / 1000} кг
-            </Text>             */}
+            <Text style={textStyle}>{(item.weight || 0).toString()} кг</Text>
           </View>
         </View>
       </View>

@@ -25,6 +25,7 @@ import { IMovementDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
+import { getBarcode } from '../../utils/helpers';
 
 export interface MovementListSectionProps {
   title: string;
@@ -155,6 +156,10 @@ export const MovementListScreen = () => {
   };
 
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
+  const a = '000728150222185822562386150222';
+  const b = getBarcode(a);
+  console.log('b', b);
 
   return (
     <AppScreen>

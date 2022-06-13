@@ -21,7 +21,7 @@ import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
-import { DocItem } from '../../components/DocItem';
+import { MovementItem } from '../../components/MovementItem';
 import { navBackButton } from '../../components/navigateOptions';
 
 export const MovementViewScreen = () => {
@@ -113,7 +113,7 @@ export const MovementViewScreen = () => {
 
   const renderItem = ({ item }: { item: IMovementLine }) => (
     <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
-      <DocItem docId={doc.id} item={item} readonly={isBlocked} />
+      <MovementItem docId={doc.id} item={item} readonly={isBlocked} />
     </SwipeLineItem>
   );
 

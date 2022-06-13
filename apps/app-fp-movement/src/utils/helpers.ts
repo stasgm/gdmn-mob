@@ -1,7 +1,7 @@
 import { log } from '@lib/mobile-app';
 
 import { IGood, IMGoodData, IMGoodRemain, IModelRem, IRemainsData, IRemGood } from '../store/app/types';
-import { IMovementDocument } from '../store/types';
+import { IBarcode, IMovementDocument } from '../store/types';
 
 export const getNextDocNumber = (documents: IMovementDocument[]) => {
   return (
@@ -112,6 +112,30 @@ const getRemainsByGoodId = (remains: IRemainsData[]) => {
     }
     return p;
   }, {});
+};
+
+export const getBarcode = (barcode: string) => {
+  const weight = barcode.slice(0, 6);
+  const day = barcode.slice(6, 8);
+  const month = barcode.slice(8, 10);
+  const year = '20' + barcode.slice(10, 12);
+  const hours = barcode.slice(12, 14);
+  const minutes = barcode.slice(14, 16);
+  const shcode = barcode.slice(16, 20);
+  const numReceived = barcode.slice(24, 30);
+
+  const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hours), Number(minutes)).toISOString();
+
+  const barcodeObj: IBarcode = {
+    barcode: barcode,
+    weight: Number(weight),
+    workDate: date,
+    shcode: shcode,
+    numReceived: numReceived,
+  };
+
+  console.log('w', barcodeObj);
+  return barcodeObj;
 };
 
 export { getRemGoodByContact, getRemGoodListByContact };

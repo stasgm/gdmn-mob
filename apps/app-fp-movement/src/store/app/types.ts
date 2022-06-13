@@ -1,5 +1,9 @@
 import { INamedEntity } from '@lib/types';
 
+export interface ICodeEntity extends INamedEntity {
+  shcode: string;
+}
+
 export type AppInventoryState = {
   readonly model: IModelData<IMDGoodRemains>;
   readonly loading: boolean;
@@ -57,20 +61,9 @@ export interface IRemainsData {
 }
 
 // Товары
-export interface IGood extends INamedEntity {
-  alias: string;
-  barcode?: string;
-  vat?: string; //НДС
-  weightCode?: string; //
-  goodGroup: INamedEntity; // группа товаров  //goodgroup или goodGroup
+export interface IGood extends ICodeEntity {
   valueName?: string; // Наименование ед. изм.
   invWeight?: number; // Вес единицы товара
-  price?: number; //Цена
-  priceFso?: number; // цена ФСО
-  priceFsn?: number; // цена ФСН
-  priceFsoSklad?: number; // цена ФСО склад
-  priceFsnSklad?: number; // цена ФСН склад
-  buyingPrice?: number;
   scale?: number; //количество единиц в месте
 }
 

@@ -4,14 +4,14 @@ import { ThunkAction } from 'redux-thunk';
 import { INamedEntity, IEntity, IDocument, MandateProps, IHead, StatusType, IReferenceData } from '@lib/types';
 import { IFormParam } from '@lib/store';
 
-import { IGood } from './app/types';
+import { ICodeEntity, IGood } from './app/types';
 
 export interface IMovementFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
-  fromDepart?: Department;
-  toDepart?: Department;
+  fromDepart?: ICodeEntity;
+  toDepart?: ICodeEntity;
   comment?: string;
 }
 
@@ -27,31 +27,26 @@ export interface IContact extends INamedEntity, IReferenceData {
 }
 
 export interface IMovementHead extends IHead {
-  fromDepart: Department;
-  toDepart: Department; //Подразделение
+  fromDepart: ICodeEntity;
+  toDepart: ICodeEntity; //Подразделение
   comment?: string; // Комvентарий
 }
 
 export interface IMovementLine extends IEntity {
-  good: INamedEntity;
-  quantity: number;
-  price?: number;
-  buyingPrice?: number;
-  remains?: number;
-  barcode?: string;
-  EID?: string;
-  docType?: string;
+  good: IGood;
+  weight: number;
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  barcode?: string; // технологический код
 }
 
 export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
 
 export interface IOrderHead extends IHead {
-  contact: INamedEntity; //организация-плательщик
-  outlet: INamedEntity; // магазин –подразделение организации плательщика
-  route?: INamedEntity; // 	Маршрут
-  depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
+  contact: ICodeEntity; //организация-плательщик
+  outlet: ICodeEntity; // магазин –подразделение организации плательщика
   onDate: string; //  Дата отгрузки
-  takenOrder?: TakeOrderType; //тип взятия заявки
+  shcode: string;
 }
 
 export interface IOrderLine extends IEntity {
@@ -70,3 +65,11 @@ export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyActio
   unknown,
   A
 >;
+
+export interface IBarcode {
+  barcode?: string;
+  weight: number;
+  workDate: string;
+  shcode: string;
+  numReceived: string; // Номер партии
+}
