@@ -1,8 +1,10 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { Dialog, Button, TextInput } from 'react-native-paper';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
@@ -39,6 +41,8 @@ export const MovementViewScreen = () => {
   const doc = docSelectors.selectByDocId<IMovementDocument>(id);
 
   const isBlocked = doc?.status !== 'DRAFT';
+
+  const [barcode, setBarcode] = useState(false);
 
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectGoodItem', {
@@ -142,6 +146,18 @@ export const MovementViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      {barcode ? (
+        <Dialog visible={barcode} onDismiss={() => setBarcode(false)}>
+          <Dialog.Title>Укажите причину отказа</Dialog.Title>
+          <Dialog.Content>
+            <TextInput value={refuseReason} onChangeText={setRefuseReason} />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setBarcode(false)}>Отмена</Button>
+            <Button onPress={handleRefuse}>Сохранить</Button>
+          </Dialog.Actions>
+        </Dialog>
+      ) : null}
     </View>
   );
 };
