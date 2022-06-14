@@ -46,7 +46,7 @@ export interface IOrderHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
   onDate: string; //  Дата отгрузки
-  shcode: string;
+  barcode: string;
 }
 
 export interface IOrderLine extends IEntity {
@@ -55,7 +55,43 @@ export interface IOrderLine extends IEntity {
   packagekey?: INamedEntity; // Вид упаковки
 }
 
-export type IOrderDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
+export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
+
+export interface ITempHead extends IHead {
+  contact: ICodeEntity; //организация-плательщик
+  outlet: ICodeEntity; // магазин –подразделение организации плательщика
+  depart: ICodeEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
+  onDate: string; // Дата отгрузки
+  barcode: string; // штрих-код заявки, по которой создан
+}
+
+export interface ITempLine extends IEntity {
+  good: IGood; // товар
+  weight: number; //вес
+  packagekey?: INamedEntity; // Вид упаковки
+}
+
+export type ITempDocument = MandateProps<IDocument<ITempHead, ITempLine>, 'head' | 'lines'>;
+
+export interface IOtvesHead extends IHead {
+  contact: ICodeEntity; //организация-плательщик
+  outlet: ICodeEntity; // магазин –подразделение организации плательщика
+  depart: ICodeEntity; // подразделеніе сотрудника (кладовщик, работающий с терминалом)
+  onDate: string; // Дата отгрузки
+  barcode: string; // штрих-код заявки, по которой создан
+  ovСode: string; // штрих-код документа-отвеса
+}
+
+export interface IOtvesLine extends IEntity {
+  good: IGood; // товар
+  weight: number; //вес
+  workDate: string; // Дата производства
+  numReceived: string; // Номер партии
+  barcode: string; // технологический код
+  order: number; // порядковый номер сканирования в документе
+}
+
+export type IOtvesDocument = MandateProps<IDocument<IOtvesHead, IOtvesLine>, 'head' | 'lines'>;
 
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 

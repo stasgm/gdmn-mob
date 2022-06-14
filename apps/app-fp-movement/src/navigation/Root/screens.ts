@@ -5,8 +5,6 @@ import {
   MovementEditScreen,
   MovementViewScreen,
   MovementLineScreen,
-  SelectGoodScreen,
-  SelectRemainsScreen,
 } from '../../screens/Movements';
 
 import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
@@ -20,8 +18,6 @@ export const movementScreens = {
   MovementView: { title: 'Перемещение', component: MovementViewScreen },
   MovementLine: { title: 'Позиция перемещения', component: MovementLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
-  SelectGoodItem: { title: 'Выбор товара', component: SelectGoodScreen },
-  SelectRemainsItem: { title: 'Выбор из остатков', component: SelectRemainsScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
   //
   // ScanBarcodeReader: ScanBarcodeReaderScreen,

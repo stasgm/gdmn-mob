@@ -66,7 +66,16 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '187034695',
               name: 'order',
               description: 'Заявка',
-              isRemains: false,
+            },
+            {
+              id: '187891695',
+              name: 'temp',
+              description: 'Отвес',
+            },
+            {
+              id: '188521695',
+              name: 'otves',
+              description: 'Внешний документ (отвес)',
             },
           ],
         },
@@ -809,6 +818,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '357852117',
               name: 'Магазин-склад',
             },
+            barcode: '100620220032467496',
           },
           lines: [
             {

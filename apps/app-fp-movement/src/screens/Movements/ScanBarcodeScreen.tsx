@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
@@ -17,12 +17,18 @@ import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
 
+import BarcodeDialog from './components/BarcodeDialog';
+
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<MovementStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const isScanerReader = settings.scannerUse?.data;
+
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [error, setError] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -41,10 +47,6 @@ const ScanBarcodeScreen = () => {
     [docId, navigation],
   );
 
-  const handleShowRemains = useCallback(() => {
-    navigation.navigate('SelectGoodItem', { docId });
-  }, [docId, navigation]);
-
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
   const goods = refSelectors.selectByName<IGood>('good').data;
@@ -53,26 +55,17 @@ const ScanBarcodeScreen = () => {
     (brc: string): IMovementLine | undefined => {
       const barc = getBarcode(brc);
 
-      const remItem = goods.find((item) => item.shcode === barc.shcode);
+      const good = goods.find((item) => item.shcode === barc.shcode);
       // Находим товар из модели остатков по баркоду, если баркод не найден, то
       //   если выбор из остатков, то undefined,
       //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
-      if (!remItem) {
+      if (!good) {
         return;
       }
 
-      const a = {
-        good: { id: remItem.id, name: remItem.name, shcode: remItem.shcode },
-        id: generateId(),
-        weight: barc.weight,
-        barcode: barc.barcode,
-        workDate: barc.workDate,
-        numReceived: barc.numReceived,
-      };
-      console.log('a', a);
       console.log('brc', brc);
       return {
-        good: { id: remItem.id, name: remItem.name, shcode: remItem.shcode },
+        good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
@@ -84,22 +77,88 @@ const ScanBarcodeScreen = () => {
     [goods],
   );
 
+  const handleGetBarcode = useCallback(
+    (brc: string) => {
+      const barc = getBarcode(brc);
+      console.log('brc', brc);
+
+      console.log('123');
+
+      const good = goods.find((item) => item.shcode === barc.shcode);
+
+      if (good) {
+        const barcodeItem = {
+          good: { id: good.id, name: good.name, shcode: good.shcode },
+          id: generateId(),
+          weight: barc.weight,
+          barcode: barc.barcode,
+          workDate: barc.workDate,
+          numReceived: barc.numReceived,
+        };
+        setError(false);
+        navigation.navigate('MovementLine', {
+          mode: 0,
+          docId: docId,
+          item: barcodeItem,
+        });
+      } else {
+        setError(true);
+        // return;
+      }
+    },
+
+    [goods, docId, navigation],
+  );
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+  };
+
+  const handleDismisDialog = () => {
+    setVisibleDialog(false);
+  };
+
+  const handleSearchBarcode = () => {
+    handleGetBarcode(barcode);
+    // setBarcode('');
+  };
+
+  const handleDismissBarcode = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    setError(false);
+  };
+
   if (!document) {
     return <Text style={globalStyles.title}>Документ не найден</Text>;
   }
 
-  return isScanerReader ? (
-    <ScanBarcodeReader
-      onSave={(item) => handleSaveScannedItem(item)}
-      onShowRemains={handleShowRemains}
-      getScannedObject={getScannedObject}
-    />
-  ) : (
-    <ScanBarcode
-      onSave={(item) => handleSaveScannedItem(item)}
-      onShowRemains={handleShowRemains}
-      getScannedObject={getScannedObject}
-    />
+  return (
+    <>
+      {isScanerReader ? (
+        <ScanBarcodeReader
+          onSave={(item) => handleSaveScannedItem(item)}
+          onShowRemains={handleShowDialog}
+          // onShowRemains={handleShowRemains}
+          getScannedObject={getScannedObject}
+        />
+      ) : (
+        <ScanBarcode
+          onSave={(item) => handleSaveScannedItem(item)}
+          onShowRemains={handleShowDialog}
+          getScannedObject={getScannedObject}
+        />
+      )}
+      <BarcodeDialog
+        visibleDialog={visibleDialog}
+        onDismissDialog={handleDismisDialog}
+        barcode={barcode}
+        onChangeBarcode={setBarcode}
+        onDismiss={handleDismissBarcode}
+        onSearch={handleSearchBarcode}
+        error={error}
+      />
+    </>
   );
 };
 

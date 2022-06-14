@@ -1,15 +1,23 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, TouchableOpacity, Vibration, Text } from 'react-native';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Vibration,
+  Keyboard,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Camera } from 'expo-camera';
 
-import { useIsFocused, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
+import { ISettingsOption } from '@lib/types';
+import { useSelector } from '@lib/store';
 
-import { globalStyles } from '@lib/mobile-ui';
-
-import { IMovementLine } from '../../store/types';
-import { ONE_SECOND_IN_MS } from '../../utils/constants';
+import { IMovementLine } from '../../../../store/types';
+import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
@@ -19,38 +27,41 @@ interface IProps {
   getScannedObject: (brc: string) => IMovementLine | undefined;
 }
 
-const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
-  const isFocused = useIsFocused();
+export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
+  const ref = useRef<TextInput>(null);
 
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [flashMode, setFlashMode] = useState(false);
+  const settings = useSelector((state) => state.settings?.data);
+  const weightSettingsWeightCode = (settings?.weightCode as ISettingsOption<string>) || '';
+  const weightSettingsCountCode = (settings?.countCode as ISettingsOption<number>).data || 0;
+  const weightSettingsCountWeight = (settings?.countWeight as ISettingsOption<number>).data || 0;
+
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
 
   const { colors } = useTheme();
-
-  const cameraStyle = useMemo(() => [styles.camera, { backgroundColor: colors.card }], [colors.card]);
+  const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
+  const [itemLine, setItemLine] = useState<IMovementLine>();
 
-  console.log('barcode', barcode);
-  useEffect(() => {
-    const permission = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    permission();
-  }, []);
+  const isFocused = useIsFocused();
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
     setBarcode(data);
   };
 
-  useEffect(() => {
-    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
-  }, [vibroMode]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!scanned && ref?.current) {
+        ref?.current &&
+          setTimeout(() => {
+            ref.current?.focus();
+            ref.current?.clear();
+          }, ONE_SECOND_IN_MS);
+      }
+    }, [scanned, ref]),
+  );
 
   useEffect(() => {
     if (!scanned) {
@@ -68,36 +79,20 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
-  }, [barcode, scanned, vibroMode, getScannedObject]);
-
-  if (hasPermission === null) {
-    return <View />;
-  }
-
-  if (hasPermission === false) {
-    return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
-  }
+  }, [
+    barcode,
+    scanned,
+    vibroMode,
+    weightSettingsWeightCode,
+    weightSettingsCountCode,
+    weightSettingsCountWeight,
+    getScannedObject,
+  ]);
 
   return isFocused ? (
-    <View style={[styles.content]}>
-      <Camera
-        flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
-        barCodeScannerSettings={{
-          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.code128, BarCodeScanner.Constants.BarCodeType.ean128],
-        }}
-        autoFocus="on"
-        whiteBalance="auto"
-        onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
-        style={cameraStyle}
-      >
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
+      <View style={styles.camera}>
         <View style={styles.header}>
-          <IconButton
-            icon={flashMode ? 'flash' : 'flash-off'}
-            size={30}
-            color={'#FFF'}
-            style={styles.transparent}
-            onPress={() => setFlashMode(!flashMode)}
-          />
           <IconButton
             icon={vibroMode ? 'vibrate' : 'vibrate-off'}
             size={30}
@@ -115,16 +110,15 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
         </View>
         {!scanned ? (
           <View style={[styles.scannerContainer, styles.notScannedContainer]}>
-            <View style={styles.notScannedHeader}>
-              <View style={styles.notScannedFrame}>
-                <View style={[styles.border, styles.borderTop, styles.borderLeft]} />
-                <View style={[styles.border, styles.borderTop, styles.borderRight]} />
-              </View>
-              <View style={styles.notScannedFrame}>
-                <View style={[styles.border, styles.borderBottom, styles.borderLeft]} />
-                <View style={[styles.border, styles.borderBottom, styles.borderRight]} />
-              </View>
-            </View>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <TextInput
+                style={styles.scanFocus}
+                autoFocus={true}
+                ref={ref}
+                showSoftInputOnFocus={false}
+                onChangeText={(text) => handleBarCodeScanned(text)}
+              />
+            </TouchableWithoutFeedback>
           </View>
         ) : (
           <View style={styles.scannerContainer}>
@@ -175,17 +169,15 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
         )}
         {!scanned && (
           <View style={styles.footer}>
-            <>
-              <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
-              <Text style={styles.text}>Наведите рамку на штрихкод</Text>
-            </>
+            <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />
+            <Text style={styles.text}>Отсканируйте штрихкод</Text>
           </View>
         )}
-      </Camera>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   ) : (
     <></>
   );
 };
 
-export default ScanBarcode;
+export default ScanBarcodeReader;

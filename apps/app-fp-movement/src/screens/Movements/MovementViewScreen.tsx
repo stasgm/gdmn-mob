@@ -4,9 +4,7 @@ import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { Dialog, Button, TextInput } from 'react-native-paper';
-
-import { docSelectors, documentActions, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -17,7 +15,7 @@ import {
   ScanButton,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { MovementStackParamList } from '../../navigation/Root/types';
@@ -25,6 +23,10 @@ import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
 import { MovementItem } from '../../components/MovementItem';
 import { navBackButton } from '../../components/navigateOptions';
+import { getBarcode } from '../../utils/helpers';
+import { IGood } from '../../store/app/types';
+
+import BarcodeDialog from './components/BarcodeDialog';
 
 export const MovementViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -42,13 +44,52 @@ export const MovementViewScreen = () => {
 
   const isBlocked = doc?.status !== 'DRAFT';
 
-  const [barcode, setBarcode] = useState(false);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [error, setError] = useState(false);
 
-  const handleAddDocLine = useCallback(() => {
-    navigation.navigate('SelectGoodItem', {
-      docId: id,
-    });
-  }, [navigation, id]);
+  const goods = refSelectors.selectByName<IGood>('good').data;
+
+  const handleGetBarcode = useCallback(
+    (brc: string) => {
+      const barc = getBarcode(brc);
+      console.log('brc', brc);
+
+      console.log('123');
+
+      const good = goods.find((item) => item.shcode === barc.shcode);
+
+      if (good) {
+        const barcodeItem = {
+          good: { id: good.id, name: good.name, shcode: good.shcode },
+          id: generateId(),
+          weight: barc.weight,
+          barcode: barc.barcode,
+          workDate: barc.workDate,
+          numReceived: barc.numReceived,
+        };
+        setError(false);
+        navigation.navigate('MovementLine', {
+          mode: 0,
+          docId: id,
+          item: barcodeItem,
+        });
+      } else {
+        setError(true);
+        // return;
+      }
+    },
+
+    [goods, id, navigation],
+  );
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+  };
+
+  const handleDismisDialog = () => {
+    setVisibleDialog(false);
+  };
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('MovementEdit', { id });
@@ -70,8 +111,8 @@ export const MovementViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
-        title: 'Добавить товар',
-        onPress: handleAddDocLine,
+        title: 'Найти штрих-код',
+        onPress: handleShowDialog,
       },
       {
         title: 'Редактировать данные',
@@ -87,7 +128,7 @@ export const MovementViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, handleDelete, handleEditDocHead]);
 
   const renderRight = useCallback(
     () =>
@@ -121,6 +162,17 @@ export const MovementViewScreen = () => {
     </SwipeLineItem>
   );
 
+  const handleSearchBarcode = () => {
+    handleGetBarcode(barcode);
+    // setBarcode('');
+  };
+
+  const handleDismissBarcode = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    setError(false);
+  };
+
   return (
     <View style={[styles.container]}>
       <InfoBlock
@@ -146,18 +198,15 @@ export const MovementViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-      {barcode ? (
-        <Dialog visible={barcode} onDismiss={() => setBarcode(false)}>
-          <Dialog.Title>Укажите причину отказа</Dialog.Title>
-          <Dialog.Content>
-            <TextInput value={refuseReason} onChangeText={setRefuseReason} />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setBarcode(false)}>Отмена</Button>
-            <Button onPress={handleRefuse}>Сохранить</Button>
-          </Dialog.Actions>
-        </Dialog>
-      ) : null}
+      <BarcodeDialog
+        visibleDialog={visibleDialog}
+        onDismissDialog={handleDismisDialog}
+        barcode={barcode}
+        onChangeBarcode={setBarcode}
+        onDismiss={handleDismissBarcode}
+        onSearch={handleSearchBarcode}
+        error={error}
+      />
     </View>
   );
 };

@@ -4,30 +4,31 @@ import { Text } from 'react-native';
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
-import { useSelector, refSelectors } from '@lib/store';
+import { useSelector, refSelectors, docSelectors, documentActions, useDispatch } from '@lib/store';
 
-import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
+import { IDocumentType, INamedEntity, IReference, ISettingsOption } from '@lib/types';
 
 import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
-import { IMovementLine, IOrderDocument, IOrderLine } from '../../store/types';
-import { ScanBarcode, ScanBarcodeReader } from '../../components';
+import { IMovementLine, IOrderDocument, IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
-import { getRemGoodByContact } from '../../utils/helpers';
+import { getNextDocNumber, getRemGoodByContact } from '../../utils/helpers';
 import { unknownGood } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
+
+import { ScanBarcode } from './components/ScanBarcode';
+import { ScanBarcodeReader } from './components/ScanBarcodeReader';
 
 const ScanOrderScreen = () => {
   const docId = useRoute<RouteProp<OrderStackParamList, 'ScanOrder'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'ScanOrder'>>();
   const settings = useSelector((state) => state.settings?.data);
 
-  const weightSettingsWeightCode = (settings.weightCode as ISettingsOption<string>) || '';
-  const weightSettingsCountCode = (settings.countCode as ISettingsOption<number>).data || 0;
-  const weightSettingsCountWeight = (settings.countWeight as ISettingsOption<number>).data || 0;
+  const dispatch = useDispatch();
+
   const isScanerReader = settings.scannerUse?.data;
 
   useLayoutEffect(() => {
@@ -37,8 +38,8 @@ const ScanOrderScreen = () => {
   }, [navigation]);
 
   const handleSaveScannedItem = useCallback(
-    (item: IOrderLine) => {
-      navigation.navigate('OrderLine', {
+    (item: ITempDocument) => {
+      navigation.navigate('TempView', {
         mode: 0,
         docId,
         item: item,
@@ -53,77 +54,59 @@ const ScanOrderScreen = () => {
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
 
+  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+  const temps = docSelectors.selectByDocType<ITempDocument>('temp');
+  const otvess = docSelectors.selectByDocType<IOtvesDocument>('otves');
+
+  console.log('orders', orders.length);
+
   const goods = refSelectors.selectByName<IGood>('good').data;
-  const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
-  // const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-  // const documentType = useMemo(
-  //   () => documentTypes.find((d) => d.id === document.documentType.id),
-  //   [document.documentType.id, documentTypes],
-  // );
+  const tempType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documentType')
+    ?.data.find((t) => t.name === 'temp');
 
-  const contactId = document?.head?.contact?.id;
-
-  const [goodRemains] = useState<IMGoodData<IMGoodRemain>>(() => getRemGoodByContact(goods, remains[contactId]));
+  const otvesType = refSelectors
+    .selectByName<IReference<IDocumentType>>('documentType')
+    ?.data.find((t) => t.name === 'otves');
 
   const getScannedObject = useCallback(
     (brc: string): IMovementLine | undefined => {
-      let charFrom = 0;
-      let charTo = weightSettingsWeightCode.data.length;
+      console.log('brc', brc);
+      const order = orders.find((item) => item.head.barcode === brc);
 
-      if (brc.substring(charFrom, charTo) !== weightSettingsWeightCode.data) {
-        const remItem = goodRemains[brc] || { good: { ...unknownGood, barcode: brc } };
-        // Находим товар из модели остатков по баркоду, если баркод не найден, то
-        //   если выбор из остатков, то undefined,
-        //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
-        if (!remItem) {
-          return;
-        }
-
-        return {
-          good: { id: remItem.good.id, name: remItem.good.name },
-          id: generateId(),
-          quantity: 1,
-          price: remItem.remains?.length ? remItem.remains[0].price : 0,
-          buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
-          remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
-          barcode: remItem.good.barcode,
-        };
-      }
-
-      charFrom = charTo;
-      charTo = charFrom + weightSettingsCountCode;
-      const code = Number(brc.substring(charFrom, charTo)).toString();
-
-      charFrom = charTo;
-      charTo = charFrom + weightSettingsCountWeight;
-
-      const qty = Number(brc.substring(charFrom, charTo)) / 1000;
-
-      const remItem = Object.values(goodRemains)?.find((item: IMGoodRemain) => item.good.weightCode === code) || {
-        good: { ...unknownGood, barcode: brc },
-      };
-
-      if (!remItem) {
+      if (!order) {
         return;
       }
 
-      return {
-        good: { id: remItem.good.id, name: remItem.good.name } as INamedEntity,
+      const tempDoc: ITempDocument = {
         id: generateId(),
-        quantity: qty,
-        price: remItem.remains?.length ? remItem.remains[0].price : 0,
-        buyingPrice: remItem.remains?.length ? remItem.remains[0].buyingPrice : 0,
-        remains: remItem.remains?.length ? remItem.remains?.[0].q : 0,
-        barcode: remItem.good.barcode,
+        documentType: tempType,
+        number: getNextDocNumber(temps),
+        documentDate: new Date().toISOString(),
+        status: 'DRAFT',
+        head: {
+          // comment: order.head.
+          barcode: order.head.barcode,
+          contact: order.head.contact,
+          //  depart: ,
+          outlet: order.head.outlet,
+        },
+        lines: order.lines,
+        creationDate: new Date().toISOString(),
+        editionDate: new Date().toISOString(),
       };
+
+      dispatch(documentActions.addDocument(tempDoc));
+
+      // navigation.navigate('MovementView', { id });
     },
-    [goodRemains, weightSettingsCountCode, weightSettingsCountWeight, weightSettingsWeightCode.data],
+    [dispatch, orders, tempType, temps],
   );
 
-  if (!document) {
-    return <Text style={globalStyles.title}>Документ не найден</Text>;
-  }
+  // if (!document) {
+  //   return <Text style={globalStyles.title}>Документ не найден</Text>;
+  // }
 
   return isScanerReader ? (
     <ScanBarcodeReader
@@ -133,7 +116,7 @@ const ScanOrderScreen = () => {
     />
   ) : (
     <ScanBarcode
-      onSave={(item) => handleSaveScannedItem(item)}
+      onSave={(item) => getScannedObject(item)}
       onShowRemains={handleShowRemains}
       getScannedObject={getScannedObject}
     />

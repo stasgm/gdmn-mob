@@ -4,7 +4,7 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { useSelector } from '@lib/store';
+import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -21,7 +21,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMovementDocument } from '../../store/types';
+import { IMovementDocument, ITempDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
@@ -40,6 +40,9 @@ export const OrderListScreen = () => {
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+
+  const temps = docSelectors.selectByDocType<ITempDocument>('temp');
+  console.log('temps', temps);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
