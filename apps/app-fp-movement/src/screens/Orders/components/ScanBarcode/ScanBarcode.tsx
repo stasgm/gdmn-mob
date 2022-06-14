@@ -8,15 +8,15 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 
-import { IMovementLine } from '../../../../store/types';
+import { ITempDocument } from '../../../../store/types';
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: IMovementLine) => void;
+  onSave: (item: ITempDocument) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => IMovementLine | undefined;
+  getScannedObject: (brc: string) => ITempDocument | undefined;
 }
 
 const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
@@ -32,9 +32,9 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const cameraStyle = useMemo(() => [styles.camera, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
+  const [itemLine, setItemLine] = useState<ITempDocument | undefined>(undefined);
 
-  console.log('barcode', barcode);
+  // console.log('barcode', barcode);
   useEffect(() => {
     const permission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -44,8 +44,9 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   }, []);
 
   const handleBarCodeScanned = (data: string) => {
+    const brc = data.replace(']C1', '');
     setScanned(true);
-    setBarcode(data);
+    setBarcode(brc);
   };
 
   useEffect(() => {
@@ -53,9 +54,11 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   }, [vibroMode]);
 
   useEffect(() => {
+    console.log('12');
     if (!scanned) {
       return;
     }
+    console.log('125');
 
     if (!barcode && scanned) {
       setItemLine(undefined);
@@ -64,7 +67,9 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: IMovementLine | undefined = getScannedObject(barcode);
+    console.log('12345');
+    const scannedObj: ITempDocument | undefined = getScannedObject(barcode);
+    console.log('san', scannedObj);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
@@ -83,7 +88,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
-          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.code128, BarCodeScanner.Constants.BarCodeType.ean128],
+          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.code128],
         }}
         autoFocus="on"
         whiteBalance="auto"
@@ -154,7 +159,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
             {scanned && itemLine && (
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[styles.buttons, itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
+                  style={[styles.buttons, itemLine.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
                   onPress={() => {
                     onSave(itemLine);
                     setScanned(false);
@@ -164,9 +169,9 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={styles.goodInfo}>
                     <Text style={styles.goodName} numberOfLines={3}>
-                      {itemLine?.good.name}
+                      {itemLine?.head.outlet.name}
                     </Text>
-                    <Text style={styles.barcode}>{itemLine?.barcode}</Text>
+                    <Text style={styles.barcode}>{itemLine?.head.barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>

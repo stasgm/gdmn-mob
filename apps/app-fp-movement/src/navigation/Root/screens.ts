@@ -9,7 +9,7 @@ import {
 
 import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
 
-import { OrderListScreen } from '../../screens/Orders/OrderListScreen';
+import { OrderListScreen, OrderViewScreen } from '../../screens/Orders';
 
 import ScanOrderScreen from '../../screens/Orders/ScanOrderScreen';
 
@@ -28,6 +28,7 @@ export const movementListScreens = {
 };
 
 export const orderScreens = {
+  OrderView: { title: 'Заявка', component: OrderViewScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
 };
 

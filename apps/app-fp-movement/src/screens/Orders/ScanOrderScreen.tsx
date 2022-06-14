@@ -14,8 +14,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { IMovementLine, IOrderDocument, IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
-import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
-import { getNextDocNumber, getRemGoodByContact } from '../../utils/helpers';
+import { IGood } from '../../store/app/types';
+import { getNextDocNumber } from '../../utils/helpers';
 import { unknownGood } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 
@@ -37,28 +37,13 @@ const ScanOrderScreen = () => {
     });
   }, [navigation]);
 
-  const handleSaveScannedItem = useCallback(
-    (item: ITempDocument) => {
-      navigation.navigate('TempView', {
-        mode: 0,
-        docId,
-        item: item,
-      });
-    },
-    [docId, navigation],
-  );
-
-  const handleShowRemains = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', { docId });
-  }, [docId, navigation]);
-
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
   const temps = docSelectors.selectByDocType<ITempDocument>('temp');
   const otvess = docSelectors.selectByDocType<IOtvesDocument>('otves');
 
-  console.log('orders', orders.length);
+  console.log('orders', orders);
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
@@ -70,8 +55,28 @@ const ScanOrderScreen = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'otves');
 
+  const handleSaveScannedItem = useCallback(
+    (item: ITempDocument) => {
+      const otvesDoc: IOtvesDocument = {
+        ...item,
+        documentType: otvesType,
+        lines: [],
+      };
+      navigation.navigate('OrderView', {
+        id: item.id,
+      });
+      dispatch(documentActions.addDocument(item));
+      dispatch(documentActions.addDocument(otvesDoc));
+    },
+    [otvesType, navigation, dispatch],
+  );
+
+  const handleShowRemains = useCallback(() => {
+    navigation.navigate('SelectRemainsItem', { docId });
+  }, [docId, navigation]);
+
   const getScannedObject = useCallback(
-    (brc: string): IMovementLine | undefined => {
+    (brc: string): ITempDocument | undefined => {
       console.log('brc', brc);
       const order = orders.find((item) => item.head.barcode === brc);
 
@@ -97,8 +102,8 @@ const ScanOrderScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      dispatch(documentActions.addDocument(tempDoc));
-
+      // dispatch(documentActions.addDocument(tempDoc));
+      return tempDoc;
       // navigation.navigate('MovementView', { id });
     },
     [dispatch, orders, tempType, temps],
@@ -116,7 +121,7 @@ const ScanOrderScreen = () => {
     />
   ) : (
     <ScanBarcode
-      onSave={(item) => getScannedObject(item)}
+      onSave={(item) => handleSaveScannedItem(item)}
       onShowRemains={handleShowRemains}
       getScannedObject={getScannedObject}
     />

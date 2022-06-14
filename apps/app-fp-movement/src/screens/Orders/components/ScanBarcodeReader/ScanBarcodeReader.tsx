@@ -16,15 +16,15 @@ import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native
 import { ISettingsOption } from '@lib/types';
 import { useSelector } from '@lib/store';
 
-import { IMovementLine } from '../../../../store/types';
+import { IMovementLine, ITempDocument } from '../../../../store/types';
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: IMovementLine) => void;
+  onSave: (item: ITempDocument) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => IMovementLine | undefined;
+  getScannedObject: (brc: string) => ITempDocument | undefined;
 }
 
 export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
@@ -42,7 +42,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IMovementLine>();
+  const [itemLine, setItemLine] = useState<ITempDocument>();
 
   const isFocused = useIsFocused();
 
@@ -75,7 +75,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: IMovementLine | undefined = getScannedObject(barcode);
+    const scannedObj: ITempDocument | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
@@ -148,7 +148,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
             {scanned && itemLine && (
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={[styles.buttons, itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
+                  style={[styles.buttons, itemLine.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
                   onPress={() => {
                     onSave(itemLine);
                     setScanned(false);
@@ -158,9 +158,9 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   <View style={styles.goodInfo}>
                     <Text style={styles.goodName} numberOfLines={3}>
-                      {itemLine?.good.name}
+                      {itemLine?.head.outlet.name}
                     </Text>
-                    <Text style={styles.barcode}>{itemLine?.barcode}</Text>
+                    <Text style={styles.barcode}>{itemLine?.head.barcode}</Text>
                   </View>
                 </TouchableOpacity>
               </View>

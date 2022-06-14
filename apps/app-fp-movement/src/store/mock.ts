@@ -347,6 +347,10 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           description: 'Подразделение',
           data: [
             {
+              id: '176459265',
+              name: 'Подразделение №0',
+            },
+            {
               id: '176424776',
               name: 'Подразделение №1',
             },
@@ -964,6 +968,30 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           editionDate: new Date().toISOString(),
         },
       ] as any[],
+    },
+  },
+  {
+    id: '1f5cd720-17aa-11ec-951e-7fdefda6eb8e',
+    head: {
+      appSystem,
+      company: companies[2] as INamedEntity,
+      consumer: user2,
+      producer: user2,
+      dateTime: '2021-09-17T11:26:37.970Z',
+      order: 3,
+    },
+    status: 'READY',
+    body: {
+      type: 'SETTINGS',
+      version: 1,
+      payload: [
+        {
+          depart: {
+            id: '176459265',
+            name: 'Подразделение №0',
+          },
+        },
+      ] as any,
     },
   },
 ];

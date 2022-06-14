@@ -37,6 +37,7 @@ export type MovementParamList = RefParamList & {
 export type MovementStackParamList = { MovementList: undefined } & MovementParamList;
 
 export type OrderParamList = RefParamList & {
+  OrderView: { id: string };
   ScanOrder: { docId?: string; docType?: string };
 };
 

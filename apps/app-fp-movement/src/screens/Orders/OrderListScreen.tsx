@@ -21,7 +21,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMovementDocument, ITempDocument } from '../../store/types';
+import { ITempDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
@@ -36,20 +36,23 @@ export const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderList'>>();
 
   const loading = useSelector((state) => state.documents.loading);
-  const movements = useSelector((state) => state.documents.list) as IMovementDocument[];
+  const movements = useSelector((state) => state.documents.list) as ITempDocument[];
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
-  const temps = docSelectors.selectByDocType<ITempDocument>('temp');
-  console.log('temps', temps);
+  // const movements = useSelector((state) => state.documents.list) as ITempDocument[];
+  const temps = useSelector((state) => state.documents.list) as ITempDocument[];
+
+  // const temps = docSelectors.selectByDocType<ITempDocument>('temp');
+  console.log('temps', temps.find((item) => item.documentType.name === 'temp')?.id);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = movements
+  const list = temps
     ?.filter((i) =>
-      i.documentType?.name === 'order'
+      i.documentType?.name === 'temp'
         ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
           ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -143,8 +146,8 @@ export const OrderListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="MovementView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('MovementView', { id: item.id })} />
+      <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

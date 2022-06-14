@@ -19,6 +19,7 @@ import { IMovementFormParam, IMovementDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
+import { messageFpMovement } from '../../store/mock';
 
 export const MovementEditScreen = () => {
   const id = useRoute<RouteProp<MovementStackParamList, 'MovementEdit'>>().params?.id;
@@ -32,6 +33,10 @@ export const MovementEditScreen = () => {
   // const documents = useSelector((state) => state.documents.list) as IMovementDocument[];
   const movements = docSelectors.selectByDocType<IMovementDocument>('movement');
   const doc = movements?.find((e) => e.id === id);
+
+  // const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  const defaultDepart = messageFpMovement.find((item) => item.body.type === 'SETTINGS')?.body.payload[0].depart;
+  console.log('def', defaultDepart);
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -76,12 +81,12 @@ export const MovementEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          // depart: defaultDepart,
+          fromDepart: defaultDepart,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc]);
+  }, [dispatch, doc, defaultDepart]);
 
   const handleSave = useCallback(() => {
     if (!movementType) {
@@ -271,12 +276,7 @@ export const MovementEditScreen = () => {
             onPress={handlePresentDate}
             disabled={docStatus !== 'DRAFT'}
           />
-          <SelectableInput
-            label={'Откуда'}
-            value={docFromDepart?.name}
-            onPress={handleFromDepart}
-            disabled={isBlocked}
-          />
+          <SelectableInput label={'Откуда'} value={docFromDepart?.name} onPress={handleFromDepart} disabled={true} />
 
           <SelectableInput label={'Куда'} value={docToDepart?.name} onPress={handleToDepart} disabled={isBlocked} />
           <Input
