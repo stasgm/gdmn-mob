@@ -7,25 +7,25 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IMovementLine } from '../store/types';
-import { MovementStackParamList } from '../navigation/Root/types';
+import { IMoveLine } from '../../../store/types';
+import { MoveStackParamList } from '../../../navigation/Root/types';
 
 interface IProps {
   docId: string;
-  item: IMovementLine;
+  item: IMoveLine;
   readonly?: boolean;
 }
 
-export const MovementItem = ({ docId, item, readonly = false }: IProps) => {
+export const MoveItem = ({ docId, item, readonly = false }: IProps) => {
   const { colors } = useTheme();
-  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'ScanBarcode'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   return (
     <TouchableOpacity
       onPress={() => {
-        !readonly && navigation.navigate('MovementLine', { mode: 1, docId, item });
+        !readonly && navigation.navigate('MoveLine', { mode: 1, docId, item });
       }}
     >
       <View style={[styles.item]}>

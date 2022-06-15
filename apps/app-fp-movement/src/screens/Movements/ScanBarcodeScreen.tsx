@@ -10,8 +10,8 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { MovementStackParamList } from '../../navigation/Root/types';
-import { IMovementLine, IMovementDocument } from '../../store/types';
+import { MoveStackParamList } from '../../navigation/Root/types';
+import { IMoveLine, IMoveDocument } from '../../store/types';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
@@ -20,8 +20,8 @@ import { navBackButton } from '../../components/navigateOptions';
 import BarcodeDialog from './components/BarcodeDialog';
 
 const ScanBarcodeScreen = () => {
-  const docId = useRoute<RouteProp<MovementStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'ScanBarcode'>>();
+  const docId = useRoute<RouteProp<MoveStackParamList, 'ScanBarcode'>>().params?.docId;
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const isScanerReader = settings.scannerUse?.data;
@@ -37,8 +37,8 @@ const ScanBarcodeScreen = () => {
   }, [navigation]);
 
   const handleSaveScannedItem = useCallback(
-    (item: IMovementLine) => {
-      navigation.navigate('MovementLine', {
+    (item: IMoveLine) => {
+      navigation.navigate('MoveLine', {
         mode: 0,
         docId,
         item: item,
@@ -47,12 +47,12 @@ const ScanBarcodeScreen = () => {
     [docId, navigation],
   );
 
-  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
+  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMoveDocument;
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const getScannedObject = useCallback(
-    (brc: string): IMovementLine | undefined => {
+    (brc: string): IMoveLine | undefined => {
       const barc = getBarcode(brc);
 
       const good = goods.find((item) => item.shcode === barc.shcode);
@@ -63,7 +63,6 @@ const ScanBarcodeScreen = () => {
         return;
       }
 
-      console.log('brc', brc);
       return {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
@@ -80,9 +79,6 @@ const ScanBarcodeScreen = () => {
   const handleGetBarcode = useCallback(
     (brc: string) => {
       const barc = getBarcode(brc);
-      console.log('brc', brc);
-
-      console.log('123');
 
       const good = goods.find((item) => item.shcode === barc.shcode);
 
@@ -96,7 +92,7 @@ const ScanBarcodeScreen = () => {
           numReceived: barc.numReceived,
         };
         setError(false);
-        navigation.navigate('MovementLine', {
+        navigation.navigate('MoveLine', {
           mode: 0,
           docId: docId,
           item: barcodeItem,

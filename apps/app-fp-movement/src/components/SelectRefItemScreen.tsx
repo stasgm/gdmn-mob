@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } fro
 import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import { INamedEntity } from '@lib/types';
+// import { INamedEntity } from '@lib/types';
 import { appActions, refSelectors } from '@lib/store';
 import { AppScreen, ItemSeparator, SaveButton, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
 
@@ -10,6 +10,8 @@ import { extraPredicate } from '@lib/mobile-app';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
+
+import { ICodeEntity } from '../store/app/types';
 
 import { navBackButton } from './navigateOptions';
 
@@ -24,7 +26,7 @@ export const SelectRefItemScreen = () => {
     fieldName,
     value,
     clause,
-    refFieldName = 'name',
+    refFieldName = 'name' || 'shcode',
   } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<any>(refName);
@@ -51,8 +53,8 @@ export const SelectRefItemScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [filteredList, setFilteredList] = useState<INamedEntity[]>();
-  const [checkedItem, setCheckedItem] = useState<INamedEntity[]>(value || []);
+  const [filteredList, setFilteredList] = useState<ICodeEntity[]>();
+  const [checkedItem, setCheckedItem] = useState<ICodeEntity[]>(value || []);
 
   useEffect(() => {
     if (!list) {
@@ -73,17 +75,17 @@ export const SelectRefItemScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  const refList = React.useRef<FlatList<INamedEntity>>(null);
+  const refList = React.useRef<FlatList<ICodeEntity>>(null);
   useScrollToTop(refList);
 
   const handleSelectItem = useCallback(
-    (item: INamedEntity) => {
+    (item: ICodeEntity) => {
       if (isMulti) {
-        setCheckedItem((prev) => [...(prev as INamedEntity[]), { id: item.id, name: item.name }]);
+        setCheckedItem((prev) => [...(prev as ICodeEntity[]), { id: item.id, name: item.name, shcode: item.shcode }]);
       } else {
         dispatch(
           appActions.setFormParams({
-            [fieldName]: { id: item.id, name: item.name },
+            [fieldName]: { id: item.id, name: item.name, shcode: item.shcode },
           }),
         );
         navigation.goBack();
@@ -93,7 +95,7 @@ export const SelectRefItemScreen = () => {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: INamedEntity }) => {
+    ({ item }: { item: ICodeEntity }) => {
       const isChecked = !!checkedItem?.find((i) => i.id === item.id);
       return <LineItem item={item} isChecked={isChecked} onCheck={handleSelectItem} />;
     },
@@ -163,7 +165,7 @@ export const SelectRefItemScreen = () => {
 };
 
 const LineItem = React.memo(
-  ({ item, isChecked, onCheck }: { item: INamedEntity; isChecked: boolean; onCheck: (id: INamedEntity) => void }) => {
+  ({ item, isChecked, onCheck }: { item: ICodeEntity; isChecked: boolean; onCheck: (id: ICodeEntity) => void }) => {
     const { colors } = useTheme();
     const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
     const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
@@ -174,7 +176,7 @@ const LineItem = React.memo(
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={textStyle}>{item.name || item.id}</Text>
+              <Text style={textStyle}>{item.name || item.shcode || item.id}</Text>
             </View>
           </View>
         </View>

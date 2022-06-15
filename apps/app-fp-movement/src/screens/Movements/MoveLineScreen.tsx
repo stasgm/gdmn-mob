@@ -6,17 +6,18 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
-import { MovementStackParamList } from '../../navigation/Root/types';
-import { MovementLine } from '../../components/MovementLine';
-import { IMovementLine } from '../../store/types';
+import { MoveStackParamList } from '../../navigation/Root/types';
+
+import { IMoveLine } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
-export const MovementLineScreen = () => {
-  const navigation =
-    useNavigation<StackNavigationProp<MovementStackParamList | MovementStackParamList, 'MovementLine'>>();
+import { MoveLine } from './components/MoveLine';
+
+export const MoveLineScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList | MoveStackParamList, 'MoveLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, item } = useRoute<RouteProp<MovementStackParamList, 'MovementLine'>>().params;
-  const [line, setLine] = useState<IMovementLine>(item);
+  const { mode, docId, item } = useRoute<RouteProp<MoveStackParamList, 'MoveLine'>>().params;
+  const [line, setLine] = useState<IMoveLine>(item);
 
   const handleSave = useCallback(() => {
     dispatch(
@@ -45,7 +46,7 @@ export const MovementLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <MovementLine item={line} onSetLine={setLine} />
+      <MoveLine item={line} onSetLine={setLine} />
     </View>
   );
 };

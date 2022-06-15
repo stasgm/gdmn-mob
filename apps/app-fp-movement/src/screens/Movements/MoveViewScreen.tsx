@@ -17,30 +17,32 @@ import {
 
 import { generateId, getDateString } from '@lib/mobile-app';
 
-import { IMovementDocument, IMovementLine } from '../../store/types';
-import { MovementStackParamList } from '../../navigation/Root/types';
+import { IMoveDocument, IMoveLine } from '../../store/types';
+import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
-import { MovementItem } from '../../components/MovementItem';
+
 import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
+import { MoveItem } from './components/MoveItem';
+
 import BarcodeDialog from './components/BarcodeDialog';
 
-export const MovementViewScreen = () => {
+export const MoveViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementView'>>();
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
-  const id = useRoute<RouteProp<MovementStackParamList, 'MovementView'>>().params?.id;
+  const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
 
   // const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
-  const doc = docSelectors.selectByDocId<IMovementDocument>(id);
+  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -53,9 +55,6 @@ export const MovementViewScreen = () => {
   const handleGetBarcode = useCallback(
     (brc: string) => {
       const barc = getBarcode(brc);
-      console.log('brc', brc);
-
-      console.log('123');
 
       const good = goods.find((item) => item.shcode === barc.shcode);
 
@@ -69,7 +68,7 @@ export const MovementViewScreen = () => {
           numReceived: barc.numReceived,
         };
         setError(false);
-        navigation.navigate('MovementLine', {
+        navigation.navigate('MoveLine', {
           mode: 0,
           docId: id,
           item: barcodeItem,
@@ -92,7 +91,7 @@ export const MovementViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('MovementEdit', { id });
+    navigation.navigate('MoveEdit', { id });
   }, [navigation, id]);
 
   const handleDoScan = useCallback(() => {
@@ -156,11 +155,30 @@ export const MovementViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IMovementLine }) => (
-    <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
-      <MovementItem docId={doc.id} item={item} readonly={isBlocked} />
-    </SwipeLineItem>
-  );
+  const lines = doc.lines;
+  const a = lines.reduce((line1, line2) => {
+    if (line1.good.shcode === line2.good.shcode && line1.id !== line2.id) {
+      return line1;
+    } else {
+      return { ...line1, weight: line1.weight + line2.weight };
+    }
+  });
+  console.log('qwerty', a);
+
+  const renderItem = ({ item }: { item: IMoveLine }) => {
+    // let q: number;
+    const good = doc.lines.find((i) => i.good.shcode === item.good.shcode && i.id !== item.id);
+    // console.log('good', good);
+    // for (const line of doc.lines) {
+    // if (good) {
+    return (
+      <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="MoveLine">
+        <MoveItem docId={doc.id} item={item} readonly={isBlocked} />
+      </SwipeLineItem>
+    );
+    // }
+    // }
+  };
 
   const handleSearchBarcode = () => {
     handleGetBarcode(barcode);

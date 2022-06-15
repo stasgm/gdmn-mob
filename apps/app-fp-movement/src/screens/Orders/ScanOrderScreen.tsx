@@ -13,10 +13,7 @@ import { generateId } from '@lib/mobile-app';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
-import { IMovementLine, IOrderDocument, IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
-import { IGood } from '../../store/app/types';
-import { getNextDocNumber } from '../../utils/helpers';
-import { unknownGood } from '../../utils/constants';
+import { IOrderDocument, IOtvesDocument, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 import { ScanBarcode } from './components/ScanBarcode';
@@ -40,12 +37,8 @@ const ScanOrderScreen = () => {
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
-  const temps = docSelectors.selectByDocType<ITempDocument>('temp');
-  const otvess = docSelectors.selectByDocType<IOtvesDocument>('otves');
-
-  console.log('orders', orders);
-
-  const goods = refSelectors.selectByName<IGood>('good').data;
+  const tempList = docSelectors.selectByDocType<ITempDocument>('temp');
+  const otvesList = docSelectors.selectByDocType<IOtvesDocument>('otves');
 
   const tempType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -59,16 +52,24 @@ const ScanOrderScreen = () => {
     (item: ITempDocument) => {
       const otvesDoc: IOtvesDocument = {
         ...item,
+        id: generateId(),
         documentType: otvesType,
         lines: [],
       };
+      console.log('otvesDoc', otvesDoc);
+
+      if (otvesList.find((i) => i.head.barcode === item.head.barcode)) {
+        return;
+      }
+
+      dispatch(documentActions.addDocument(item));
+      dispatch(documentActions.addDocument(otvesDoc));
+
       navigation.navigate('OrderView', {
         id: item.id,
       });
-      dispatch(documentActions.addDocument(item));
-      dispatch(documentActions.addDocument(otvesDoc));
     },
-    [otvesType, navigation, dispatch],
+    [otvesType, otvesList, dispatch, navigation],
   );
 
   const handleShowRemains = useCallback(() => {
@@ -77,7 +78,6 @@ const ScanOrderScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string): ITempDocument | undefined => {
-      console.log('brc', brc);
       const order = orders.find((item) => item.head.barcode === brc);
 
       if (!order) {
@@ -87,26 +87,29 @@ const ScanOrderScreen = () => {
       const tempDoc: ITempDocument = {
         id: generateId(),
         documentType: tempType,
-        number: getNextDocNumber(temps),
+        number: order.number,
         documentDate: new Date().toISOString(),
         status: 'DRAFT',
         head: {
           // comment: order.head.
           barcode: order.head.barcode,
           contact: order.head.contact,
-          //  depart: ,
+          depart: order.head.depart,
           outlet: order.head.outlet,
+          onDate: order.head.onDate,
         },
         lines: order.lines,
         creationDate: new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
+      console.log('tempDoc', tempDoc);
+
       // dispatch(documentActions.addDocument(tempDoc));
       return tempDoc;
       // navigation.navigate('MovementView', { id });
     },
-    [dispatch, orders, tempType, temps],
+    [orders, tempType],
   );
 
   // if (!document) {

@@ -1,4 +1,4 @@
-export { MovementListScreen } from './MovementListScreen';
-export { MovementEditScreen } from './MovementEditScreen';
-export { MovementLineScreen } from './MovementLineScreen';
-export { MovementViewScreen } from './MovementViewScreen';
+export { MoveListScreen } from './MoveListScreen';
+export { MoveEditScreen } from './MoveEditScreen';
+export { MoveLineScreen } from './MoveLineScreen';
+export { MoveViewScreen } from './MoveViewScreen';

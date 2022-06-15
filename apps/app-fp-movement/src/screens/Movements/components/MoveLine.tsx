@@ -8,16 +8,16 @@ import { useTheme } from '@react-navigation/native';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMovementLine } from '../store/types';
+import { IMoveLine } from '../../../store/types';
 
-import { ONE_SECOND_IN_MS } from '../utils/constants';
+import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 
 interface IProps {
-  item: IMovementLine;
-  onSetLine: (value: IMovementLine) => void;
+  item: IMoveLine;
+  onSetLine: (value: IMoveLine) => void;
 }
 
-export const MovementLine = ({ item }: IProps) => {
+export const MoveLine = ({ item }: IProps) => {
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);

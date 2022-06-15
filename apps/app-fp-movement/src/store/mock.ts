@@ -29,38 +29,9 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           description: 'Типы документов',
           data: [
             {
-              id: '147037014',
-              name: 'prihod',
-              description: 'Приход',
-              isRemains: false,
-              remainsField: 'toContact',
-              fromDescription: 'Откуда',
-              fromType: 'contact',
-              fromRequired: true,
-              toDescription: 'Куда',
-              toType: 'department',
-              toRequired: true,
-              sortOrder: 1,
-            },
-            {
-              id: '187034606',
-              name: 'inventory',
-              description: 'Инвентаризация',
-              isRemains: true,
-              remainsField: 'toContact',
-              fromDescription: '',
-              fromType: '',
-              fromRequired: false,
-              toDescription: 'Место',
-              toType: 'department',
-              toRequired: true,
-              sortOrder: 2,
-            },
-            {
               id: '187034695',
-              name: 'movement',
+              name: 'move',
               description: 'Внутреннее перемещение',
-              isRemains: false,
             },
             {
               id: '187034695',
@@ -93,9 +64,9 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               sortOrder: 0,
               name: 'Наименование',
             },
-            alias: {
+            shcode: {
               sortOrder: 0,
-              name: 'Алиас',
+              name: 'Код',
             },
             barcode: {
               sortOrder: 0,
@@ -105,13 +76,13 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               sortOrder: 0,
               name: 'Ед изм',
             },
-            inFrac: {
+            invWeight: {
               sortOrder: 0,
               name: 'Вес единицы',
             },
-            weightCode: {
+            scale: {
               sortOrder: 0,
-              name: 'Весовой товар',
+              name: 'Кол-во в упаковке',
             },
           },
           data: [
@@ -395,337 +366,101 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             },
           ],
         },
-        remains: {
-          id: '187037529',
-          name: 'remains',
-          visible: false,
-          description: 'Остатки ТМЦ',
+        outlet: {
+          id: '1366948561',
+          name: 'outlet',
+          visible: true,
+          description: 'Магазины',
           data: [
             {
-              '176424776': [
-                {
-                  goodId: '111159486',
-                  price: 13.13,
-                  buyingPrice: 13,
-                  q: 13,
-                },
-                {
-                  goodId: '147067795',
-                  price: 1.77,
-                  buyingPrice: 1.28,
-                  q: 11,
-                },
-                {
-                  goodId: '111852486',
-                  price: 13.5,
-                  buyingPrice: 12.28,
-                  q: 2,
-                },
-              ],
-              '147030694': [
-                {
-                  goodId: '147067755',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 3,
-                },
-                {
-                  goodId: '147067788',
-                  price: 11.11,
-                  buyingPrice: 12.28,
-                  q: 11,
-                },
-                {
-                  goodId: '111159486',
-                  price: 13.13,
-                  buyingPrice: 13,
-                  q: 13,
-                },
-                {
-                  goodId: '147067790',
-                  price: 9.82,
-                  buyingPrice: 9.28,
-                  q: 2,
-                },
-                {
-                  goodId: '147067791',
-                  price: 1.77,
-                  buyingPrice: 1.28,
-                  q: 11,
-                },
-                {
-                  goodId: '147067792',
-                  price: 13.5,
-                  buyingPrice: 12.28,
-                  q: 2,
-                },
-              ],
-              '147016473': [
-                {
-                  goodId: '153367898',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 2.567,
-                },
-                {
-                  goodId: '153359485',
-                  price: 19.01,
-                  buyingPrice: 19.28,
-                  q: 4.5,
-                },
-                {
-                  goodId: '172067346',
-                  price: 11.31,
-                  buyingPrice: 12.58,
-                  q: 5.75,
-                },
-                {
-                  goodId: '147066838',
-                  price: 14.65,
-                  buyingPrice: 14.83,
-                  q: 7.8,
-                },
-              ],
-              '147030695': [
-                {
-                  goodId: '147066840',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 2.567,
-                },
-                {
-                  goodId: '157381934',
-                  price: 18.75,
-                  buyingPrice: 18.28,
-                  q: 7.8,
-                },
-                {
-                  goodId: '172067346',
-                  price: 9.9,
-                  buyingPrice: 9.28,
-                  q: 9.2,
-                },
-                {
-                  goodId: '147067756',
-                  price: 10.57,
-                  buyingPrice: 10.28,
-                  q: 7.652,
-                },
-              ],
-              '147030696': [
-                {
-                  goodId: '153367898',
-                  price: 19.01,
-                  buyingPrice: 19.28,
-                  q: 2.567,
-                },
-                {
-                  goodId: '147066836',
-                  price: 16.01,
-                  buyingPrice: 16.28,
-                  q: 5.4,
-                },
-                {
-                  goodId: '147066838',
-                  price: 17.01,
-                  buyingPrice: 18.28,
-                  q: 8.74,
-                },
-                {
-                  goodId: '157381934',
-                  price: 18.01,
-                  buyingPrice: 19.28,
-                  q: 9.2,
-                },
-              ],
-              '147016471': [
-                {
-                  goodId: '147067793',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 2,
-                },
-                {
-                  goodId: '147067794',
-                  price: 14,
-                  buyingPrice: 13.65,
-                  q: 3,
-                },
-                {
-                  goodId: '147067795',
-                  price: 2.01,
-                  buyingPrice: 2.28,
-                  q: 4,
-                },
-              ],
-              '147016507': [
-                {
-                  goodId: '147066836',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 6,
-                },
-                {
-                  goodId: '147066837',
-                  price: 13.5,
-                  buyingPrice: 14.28,
-                  q: 5.5,
-                },
-                {
-                  goodId: '147066838',
-                  price: 17.45,
-                  buyingPrice: 17.8,
-                  q: 3.7,
-                },
-                {
-                  goodId: '172067346',
-                  price: 9.01,
-                  buyingPrice: 9.28,
-                  q: 4.5,
-                },
-                {
-                  goodId: '153359485',
-                  price: 12.21,
-                  buyingPrice: 12.28,
-                  q: 12.56,
-                },
-              ],
-              '147016513': [
-                {
-                  goodId: '147066839',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 2.567,
-                },
-                {
-                  goodId: '185970902',
-                  price: 11.6,
-                  buyingPrice: 12.68,
-                  q: 13.5,
-                },
-                {
-                  goodId: '157381934',
-                  price: 15.43,
-                  buyingPrice: 15.68,
-                  q: 5,
-                },
-              ],
-              '147093200': [
-                {
-                  goodId: '147067795',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 3,
-                },
-                {
-                  goodId: '147067792',
-                  price: 11.01,
-                  buyingPrice: 12.28,
-                  q: 13,
-                },
-                {
-                  goodId: '147067789',
-                  price: 12.85,
-                  buyingPrice: 12.65,
-                  q: 5,
-                },
-                {
-                  goodId: '111159486',
-                  price: 6.95,
-                  buyingPrice: 6.5,
-                  q: 3,
-                },
-              ],
-              '147093201': [
-                {
-                  goodId: '172067346',
-                  price: 11.01,
-                  buyingPrice: 12.1,
-                  q: 2.567,
-                },
-                {
-                  goodId: '147067756',
-                  price: 21.01,
-                  buyingPrice: 22.26,
-                  q: 7.5,
-                },
-                {
-                  goodId: '185970902',
-                  price: 15.06,
-                  buyingPrice: 15.25,
-                  q: 5,
-                },
-                {
-                  goodId: '153367898',
-                  price: 5.03,
-                  buyingPrice: 5.28,
-                  q: 6.54,
-                },
-                {
-                  goodId: '147066840',
-                  price: 10.52,
-                  buyingPrice: 10.08,
-                  q: 4.33,
-                },
-              ],
-              '147257062': [
-                {
-                  goodId: '111852486',
-                  price: 11.01,
-                  buyingPrice: 12.28,
-                  q: 2,
-                },
-                {
-                  goodId: '153359486',
-                  price: 25.01,
-                  buyingPrice: 24.28,
-                  q: 3,
-                },
-                {
-                  goodId: '147067755',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 5,
-                },
-                {
-                  goodId: '147067788',
-                  price: 35.48,
-                  buyingPrice: 35.48,
-                  q: 4,
-                },
-                {
-                  goodId: '147067793',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 3,
-                },
-              ],
-              '147527919': [
-                {
-                  goodId: '147066838',
-                  price: 21.01,
-                  buyingPrice: 22.28,
-                  q: 2.567,
-                },
-                {
-                  goodId: '157381934',
-                  price: 16.01,
-                  buyingPrice: 16.28,
-                  q: 8,
-                },
-                {
-                  goodId: '147066840',
-                  price: 14.74,
-                  buyingPrice: 13.56,
-                  q: 7.82,
-                },
-                {
-                  goodId: '185970902',
-                  price: 25.01,
-                  buyingPrice: 24.28,
-                  q: 10.56,
-                },
-              ],
+              id: '3121846445',
+              name: 'Магазин "МаркетКомпани" № 1',
+              company: {
+                id: '147042924',
+                name: 'ОАО "МаркетКомпани"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Лесная, 27',
+            },
+            {
+              id: '1121464445',
+              name: 'Магазин "МаркетКомпани" № 2',
+              company: {
+                id: '147042924',
+                name: 'ОАО "МаркетКомпани"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Садовая, 15',
+            },
+            {
+              id: '1367139123',
+              name: 'Магазин "МаркетКомпани" № 3',
+              company: {
+                id: '147042924',
+                name: 'ОАО "МаркетКомпани"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Центральная, 102',
+            },
+            {
+              id: '819293369',
+              name: 'Магазин "ЕдаЭксперт" № 1',
+              company: {
+                id: '1788296478',
+                name: 'ООО "ЕдаЭксперт"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Набережная, 42',
+            },
+            {
+              id: '498076351',
+              name: 'Магазин "ЕдаЭксперт" № 2',
+              company: {
+                id: '1788296478',
+                name: 'ООО "ЕдаЭксперт"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Луговая, 41 Б',
+            },
+            {
+              id: '1854869537',
+              name: 'Магазин "ЕдаЭксперт" № 3',
+              company: {
+                id: '1788296478',
+                name: 'ООО "ЕдаЭксперт"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Полевая, 20/2',
+            },
+            {
+              id: '1673741713',
+              name: 'Магазин "ЕдаЭксперт" № 4',
+              company: {
+                id: '1788296478',
+                name: 'ООО "ЕдаЭксперт"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Солнечная, 7 Б',
+            },
+            {
+              id: '1822992103',
+              name: 'Магазин "ЕдаЭксперт" № 5',
+              company: {
+                id: '1788296478',
+                name: 'ООО "ЕдаЭксперт"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Речная, 74',
+            },
+            {
+              id: '1475086884',
+              name: 'ООО "ПродуктМаг" Магазин № 1',
+              company: {
+                id: '1908473665',
+                name: 'ООО "ПродуктМаг"',
+              },
+              phoneNumber: '',
+              address: 'г. Минск ул. Озерная, 18',
             },
           ],
         },

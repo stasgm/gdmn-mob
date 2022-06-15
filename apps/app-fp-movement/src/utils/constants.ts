@@ -128,7 +128,6 @@ export const appSettings: Settings = {
 
 export const unknownGood: IGood = {
   id: 'unknown',
-  alias: 'unknown',
   name: 'Неизвестный товар',
-  goodGroup: { id: 'unknown', name: 'Неизвестная группа' },
+  shcode: '',
 };

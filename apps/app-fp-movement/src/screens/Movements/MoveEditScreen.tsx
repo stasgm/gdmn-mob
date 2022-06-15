@@ -14,33 +14,30 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
-import { MovementStackParamList } from '../../navigation/Root/types';
-import { IMovementFormParam, IMovementDocument } from '../../store/types';
+import { MoveStackParamList } from '../../navigation/Root/types';
+import { IMoveFormParam, IMoveDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
-import { messageFpMovement } from '../../store/mock';
 
-export const MovementEditScreen = () => {
-  const id = useRoute<RouteProp<MovementStackParamList, 'MovementEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementEdit'>>();
+export const MoveEditScreen = () => {
+  const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
-  const formParams = useSelector((state) => state.app.formParams as IMovementFormParam);
+  const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
 
-  // const documents = useSelector((state) => state.documents.list) as IMovementDocument[];
-  const movements = docSelectors.selectByDocType<IMovementDocument>('movement');
+  // const documents = useSelector((state) => state.documents.list) as IMoveDocument[];
+  const movements = docSelectors.selectByDocType<IMoveDocument>('move');
   const doc = movements?.find((e) => e.id === id);
 
-  // const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
-  const defaultDepart = messageFpMovement.find((item) => item.body.type === 'SETTINGS')?.body.payload[0].depart;
-  console.log('def', defaultDepart);
-
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
+  // const defaultDepart = messageFpMovement.find((item) => item.body.type === 'SETTINGS')?.body.payload[0].depart;
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'movement');
+    ?.data.find((t) => t.name === 'move');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
@@ -101,7 +98,7 @@ export const MovementEditScreen = () => {
     const createdDate = new Date().toISOString();
 
     if (!id) {
-      const newDoc: IMovementDocument = {
+      const newDoc: IMoveDocument = {
         id: docId,
         documentType: movementType,
         number: docNumber && docNumber.trim(),
@@ -119,7 +116,7 @@ export const MovementEditScreen = () => {
 
       dispatch(documentActions.addDocument(newDoc));
 
-      navigation.dispatch(StackActions.replace('MovementView', { id: newDoc.id }));
+      navigation.dispatch(StackActions.replace('MoveView', { id: newDoc.id }));
     } else {
       if (!doc) {
         return;
@@ -127,7 +124,7 @@ export const MovementEditScreen = () => {
 
       const updatedDate = new Date().toISOString();
 
-      const updatedDoc: IMovementDocument = {
+      const updatedDoc: IMoveDocument = {
         ...doc,
         id,
         number: docNumber && docNumber.trim(),
@@ -147,7 +144,7 @@ export const MovementEditScreen = () => {
       };
 
       dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-      navigation.navigate('MovementView', { id });
+      navigation.navigate('MoveView', { id });
     }
   }, [
     dispatch,

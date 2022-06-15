@@ -21,22 +21,22 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMovementDocument } from '../../store/types';
+import { IMoveDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
-import { MovementStackParamList } from '../../navigation/Root/types';
+import { MoveStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
-export interface MovementListSectionProps {
+export interface MoveListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, MovementListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, MoveListSectionProps>[];
 
-export const MovementListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<MovementStackParamList, 'MovementList'>>();
+export const MoveListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveList'>>();
 
   const loading = useSelector((state) => state.documents.loading);
-  const movements = useSelector((state) => state.documents.list) as IMovementDocument[];
+  const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
@@ -46,7 +46,7 @@ export const MovementListScreen = () => {
 
   const list = movements
     ?.filter((i) =>
-      i.documentType?.name === 'movement'
+      i.documentType?.name === 'move'
         ? i?.head?.fromDepart.name || i?.head?.toDepart.name || i.number || i.documentDate
           ? i?.head?.fromDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             i?.head?.toDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -106,7 +106,7 @@ export const MovementListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('MovementEdit');
+    navigation.navigate('MoveEdit');
   }, [navigation]);
 
   useEffect(() => {
@@ -140,8 +140,8 @@ export const MovementListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="MovementView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('MovementView', { id: item.id })}>
+      <SwipeListItem renderItem={item} item={doc} routeName="MoveView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('MoveView', { id: item.id })}>
           <View>
             <Text style={textStyle}>Откуда: {doc.head.fromDepart?.name || ''}</Text>
             <Text style={textStyle}>Куда: {doc.head.toDepart?.name || ''}</Text>

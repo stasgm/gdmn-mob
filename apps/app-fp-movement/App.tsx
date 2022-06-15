@@ -33,7 +33,7 @@ import { sleep } from '@lib/client-api';
 
 import { TouchableOpacity, Linking } from 'react-native';
 
-import { MovementNavigator } from './src/navigation/MovementNavigator';
+import { MoveNavigator } from './src/navigation/MoveNavigator';
 
 import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
 
@@ -46,10 +46,10 @@ const Root = () => {
   const navItems: INavItem[] = useMemo(
     () => [
       {
-        name: 'Movement',
+        name: 'Move',
         title: 'Перемещение',
         icon: 'file-document-outline',
-        component: MovementNavigator,
+        component: MoveNavigator,
       },
       {
         name: 'Order',

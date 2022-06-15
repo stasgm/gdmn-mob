@@ -21,7 +21,7 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IOrderDocument, IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
+import { IOrderDocument, IOrderLine, IOtvesDocument } from '../../store/types';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
@@ -35,27 +35,19 @@ import OrderItem from './components/OrderItem';
 
 const keyExtractor = (item: IOrderLine) => item.id;
 
-const OrderViewScreen = () => {
+const OtvesViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderView'>>();
-  const id = useRoute<RouteProp<OrderStackParamList, 'OrderView'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OtvesView'>>();
+  const id = useRoute<RouteProp<OrderStackParamList, 'OtvesView'>>().params?.id;
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const [del, setDel] = useState(false);
 
-  const order = docSelectors.selectByDocId<ITempDocument>(id);
-  const otvesId = docSelectors
-    .selectByDocType<IOtvesDocument>('otves')
-    .find((item) => item.head.barcode === order.head.barcode)?.id;
-
-  console.log('otv', otvesId);
-
-  console.log('aa', docSelectors.selectByDocType<IOtvesDocument>('otves'));
-
-  // const a = 'cf8b2dc571';
+  const order = docSelectors.selectByDocId<IOtvesDocument>(id);
+  console.log('or', order);
 
   const isBlocked = order?.status !== 'DRAFT';
 
@@ -64,14 +56,6 @@ const OrderViewScreen = () => {
       docId: id,
     });
   }, [navigation, id]);
-
-  console.log('otvesId', otvesId);
-
-  const handleOtvesDoc = useCallback(() => {
-    navigation.navigate('OtvesView', {
-      id: otvesId,
-    });
-  }, [navigation, otvesId]);
 
   const handleEditOrderHead = useCallback(() => {
     navigation.navigate('OrderEdit', { id });
@@ -121,10 +105,6 @@ const OrderViewScreen = () => {
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Перейти на внешний документ',
-        onPress: handleOtvesDoc,
-      },
       {
         title: 'Добавить товар',
         onPress: handleAddOrderLine,
@@ -225,7 +205,7 @@ const OrderViewScreen = () => {
   );
 };
 
-export default OrderViewScreen;
+export default OtvesViewScreen;
 
 const localStyles = StyleSheet.create({
   del: {

@@ -34,7 +34,6 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<ITempDocument | undefined>(undefined);
 
-  // console.log('barcode', barcode);
   useEffect(() => {
     const permission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -54,11 +53,9 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   }, [vibroMode]);
 
   useEffect(() => {
-    console.log('12');
     if (!scanned) {
       return;
     }
-    console.log('125');
 
     if (!barcode && scanned) {
       setItemLine(undefined);
@@ -67,9 +64,8 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    console.log('12345');
     const scannedObj: ITempDocument | undefined = getScannedObject(barcode);
-    console.log('san', scannedObj);
+
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }

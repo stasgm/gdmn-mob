@@ -49,41 +49,15 @@ const BarcodeDialog = ({
       ) : null}
 
       <Dialog.Actions style={{ borderColor: colors.primary }}>
-        <Button labelStyle={{ color: colors.primary }} onPress={onDismiss}>
+        <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onDismiss}>
           Отмена
         </Button>
-        <Button labelStyle={{ color: colors.primary }} onPress={onSearch}>
+        <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onSearch}>
           Найти
         </Button>
       </Dialog.Actions>
     </Dialog>
-    // {/* </View> */}
-
-    // <View style={styles.container}>
-    //   <Dialog.Container visible={visibleDialog}>
-    //     <Dialog.Title>Введите штрих-код</Dialog.Title>
-    //     {/* <Dialog.Description>Do you want to delete this account? You cannot undo this action.</Dialog.Description> */}
-    //     <TextInput
-    //       placeholderTextColor={colors.primary}
-    //       style={{ color: colors.primary }}
-    //       value={barcode}
-    //       onChangeText={(text) => onChangeBarcode(text)}
-    //     />
-    //     <Input value={barcode} onChangeText={(text) => onChangeBarcode(text)} />
-    //     <Dialog.Button style={{ color: colors.primary }} label="Отмена" onPress={onDismiss} />
-    //     <Dialog.Button style={{ color: colors.primary }} label="Найти" onPress={onSearch} />
-    //   </Dialog.Container>
-    // </View>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
 
 export default BarcodeDialog;

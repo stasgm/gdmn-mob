@@ -6,7 +6,7 @@ import { IFormParam } from '@lib/store';
 
 import { ICodeEntity, IGood } from './app/types';
 
-export interface IMovementFormParam extends IFormParam {
+export interface IMoveFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
@@ -26,13 +26,13 @@ export interface IContact extends INamedEntity, IReferenceData {
   phoneNumber: string; // Номер телефона
 }
 
-export interface IMovementHead extends IHead {
+export interface IMoveHead extends IHead {
   fromDepart: ICodeEntity;
   toDepart: ICodeEntity; //Подразделение
   comment?: string; // Комvентарий
 }
 
-export interface IMovementLine extends IEntity {
+export interface IMoveLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
@@ -40,7 +40,7 @@ export interface IMovementLine extends IEntity {
   barcode?: string; // технологический код
 }
 
-export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
+export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
 
 export interface IOrderHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
@@ -101,11 +101,3 @@ export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyActio
   unknown,
   A
 >;
-
-export interface IBarcode {
-  barcode?: string;
-  weight: number;
-  workDate: string;
-  shcode: string;
-  numReceived: string; // Номер партии
-}
