@@ -265,6 +265,9 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const handleSendDocs = useSendDocs(readyDocs);
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+  const orderListStyle = useMemo(() => [{ paddingBottom: returns.length ? 20 : 0 }], [returns.length]);
+  const returnViewStyle = useMemo(() => [{ paddingBottom: returns.length > 1 ? 15 : 0 }], [returns.length]);
+  const returnListStyle = useMemo(() => [{ paddingBottom: returns.length > 2 ? 20 : 0 }], [returns.length]);
 
   return (
     <>
@@ -290,26 +293,34 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           </>
         </InfoBlock>
         {orders.length > 0 && (
-          <InfoBlock colorLabel="#567d06" title="Заявки">
-            <FlatList
-              data={orders}
-              keyExtractor={keyExtractor}
-              renderItem={renderOrderItem}
-              scrollEventThrottle={400}
-              ItemSeparatorComponent={ItemSeparator}
-            />
-          </InfoBlock>
+          <View style={localStyles.orderView}>
+            <InfoBlock colorLabel="#567d06" title="Заявки">
+              <View style={[localStyles.list, orderListStyle]}>
+                <FlatList
+                  data={orders}
+                  keyExtractor={keyExtractor}
+                  renderItem={renderOrderItem}
+                  scrollEventThrottle={400}
+                  ItemSeparatorComponent={ItemSeparator}
+                />
+              </View>
+            </InfoBlock>
+          </View>
         )}
         {returnDocs.length > 0 && (
-          <InfoBlock colorLabel={'#c98f10'} title="Возвраты">
-            <FlatList
-              data={returns}
-              keyExtractor={keyExtractor}
-              renderItem={renderReturnItem}
-              scrollEventThrottle={400}
-              ItemSeparatorComponent={ItemSeparator}
-            />
-          </InfoBlock>
+          <View style={[localStyles.returnView, returnViewStyle]}>
+            <InfoBlock colorLabel={'#c98f10'} title="Возвраты">
+              <View style={[localStyles.list, returnListStyle]}>
+                <FlatList
+                  data={returns}
+                  keyExtractor={keyExtractor}
+                  renderItem={renderReturnItem}
+                  scrollEventThrottle={400}
+                  ItemSeparatorComponent={ItemSeparator}
+                />
+              </View>
+            </InfoBlock>
+          </View>
         )}
       </View>
       {!dateEnd ? (
@@ -344,6 +355,18 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 const localStyles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  orderView: {
+    flex: 1,
+    display: 'flex',
+  },
+  returnView: {
+    flex: 1,
+    display: 'flex',
+    paddingTop: 25,
+  },
+  list: {
+    maxHeight: 180,
   },
 });
 

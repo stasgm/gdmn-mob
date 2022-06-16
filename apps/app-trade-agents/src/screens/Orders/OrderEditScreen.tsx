@@ -102,7 +102,7 @@ const OrderEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: newNumber,
-          onDate: new Date().toISOString(),
+          onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           depart: defaultDepart,

@@ -114,6 +114,11 @@ export interface IOrderLine extends IEntity {
   packagekey?: INamedEntity; // Вид упаковки
 }
 
+export interface IOrderTotalLine {
+  group: INamedEntity;
+  quantity: number;
+  price: number;
+}
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
 // export type IOrderDocument = IDocument<IOrderHead, IOrderLine[]>;
 
