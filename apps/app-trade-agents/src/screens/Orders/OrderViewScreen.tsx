@@ -202,10 +202,11 @@ const OrderViewScreen = () => {
               ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
               : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
           </Text>
+          <Text style={debtTextStyle}>
+            {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
+          </Text>
           <View style={styles.rowCenter}>
-            <Text style={debtTextStyle}>
-              {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
-            </Text>
+            <Text style={textStyle}>Количество дней: {debt?.dayLeft}</Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </View>

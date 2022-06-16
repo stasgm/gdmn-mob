@@ -69,6 +69,7 @@ export interface IDebt extends INamedEntity {
   ondate: string; //на дату
   saldo: number; //Задолженность
   saldoDebt: number; //Просроченная задолженность
+  dayLeft?: number;
 }
 
 //Подразделения-склады

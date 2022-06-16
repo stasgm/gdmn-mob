@@ -144,6 +144,7 @@ const RouteDetailScreen = () => {
               <Text style={debtTextStyle}>
                 {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
               </Text>
+              <Text style={textStyle}>Количество дней: {debt?.dayLeft}</Text>
             </>
           )}
         </>
