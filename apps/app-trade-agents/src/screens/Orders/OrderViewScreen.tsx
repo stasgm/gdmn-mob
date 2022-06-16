@@ -21,7 +21,7 @@ import { formatValue, generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IDebt, IOrderDocument, IOrderLine } from '../../store/types';
+import { IDebt, IOrderDocument, IOrderLine, IOutlet } from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -32,6 +32,7 @@ import SwipeLineItem from '../../components/SwipeLineItem';
 import { navBackButton } from '../../components/navigateOptions';
 
 import OrderItem from './components/OrderItem';
+import OrderTotal from './components/OrderTotal';
 
 const keyExtractor = (item: IOrderLine) => item.id;
 
@@ -57,6 +58,10 @@ const OrderViewScreen = () => {
     () => [styles.textLow, { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text }],
     [colors.notification, colors.text, debt?.saldoDebt],
   );
+
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === order.head.outlet.id);
+
+  const address = outlet ? outlet.address : '';
 
   const handleAddOrderLine = useCallback(() => {
     navigation.navigate('SelectGroupItem', {
@@ -197,15 +202,18 @@ const OrderViewScreen = () => {
             order.head?.onDate,
           )}`}</Text>
 
+          <Text style={textStyle}>Адрес: {address}</Text>
+
           <Text style={textStyle}>
             {(debt?.saldo && debt?.saldo < 0
               ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
               : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
           </Text>
+          <Text style={debtTextStyle}>
+            {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
+          </Text>
           <View style={styles.rowCenter}>
-            <Text style={debtTextStyle}>
-              {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
-            </Text>
+            <Text style={textStyle}>Количество дней: {debt?.dayLeft}</Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </View>
@@ -217,6 +225,7 @@ const OrderViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <OrderTotal orderId={id} />
     </View>
   );
 };
