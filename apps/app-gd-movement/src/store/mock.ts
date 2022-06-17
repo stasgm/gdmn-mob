@@ -751,4 +751,143 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       },
     },
   },
+  {
+    id: '1f511750-17aa-11ec-951e-7fdefda6eb8e',
+    head: {
+      appSystem,
+      company: companies[2] as INamedEntity,
+      consumer: user2,
+      producer: user2,
+      dateTime: '2021-09-17T11:26:37.893Z',
+      order: 2,
+    },
+    status: 'READY',
+    body: {
+      type: 'DOCS',
+      version: 1,
+      payload: [
+        {
+          creationDate: '2022-06-17T10:08:44.709Z',
+          documentDate: '2022-06-17T10:08:37.386Z',
+          documentType: {
+            description: 'Приход',
+            fromDescription: 'Откуда',
+            fromRequired: true,
+            fromType: 'contact',
+            id: '147037014',
+            isRemains: false,
+            name: 'prihod',
+            remainsField: 'toContact',
+            sortOrder: 1,
+            toDescription: 'Куда',
+            toRequired: true,
+            toType: 'department',
+          },
+          editionDate: '2022-06-17T10:08:44.709Z',
+          head: {
+            fromContact: {
+              id: '147016507',
+              name: 'ООО "ЕдаЭксперт"',
+              phoneNumber: '8-017-101-01-01',
+            },
+            fromContactType: {
+              id: 'contact',
+              value: 'Организация',
+            },
+            toContact: {
+              id: '147030694',
+              name: 'Подразделение №2',
+            },
+            toContactType: {
+              id: 'department',
+              value: 'Подразделение',
+            },
+          },
+          id: '4a7cd7f882',
+          lines: [
+            {
+              buyingPrice: 13,
+              good: {
+                id: '111159486',
+                name: 'Тетрадь',
+              },
+              id: '9705e6428c',
+              price: 13.13,
+              quantity: 3,
+              remains: 13,
+            },
+            {
+              buyingPrice: 9.28,
+              good: {
+                id: '147067790',
+                name: 'Штамп',
+              },
+              id: '77f483bbfb',
+              price: 9.82,
+              quantity: 9,
+              remains: 2,
+            },
+          ],
+          number: '1',
+          status: 'DRAFT',
+        },
+        {
+          creationDate: '2022-06-17T10:19:33.749Z',
+          documentDate: '2022-06-17T10:19:25.878Z',
+          documentType: {
+            description: 'Инвентаризация',
+            fromDescription: '',
+            fromRequired: false,
+            fromType: '',
+            id: '187034606',
+            isRemains: true,
+            name: 'inventory',
+            remainsField: 'toContact',
+            sortOrder: 2,
+            toDescription: 'Место',
+            toRequired: true,
+            toType: 'department',
+          },
+          editionDate: '2022-06-17T10:19:33.749Z',
+          head: {
+            toContact: {
+              id: '147016473',
+              name: 'Подразделение №3',
+            },
+            toContactType: {
+              id: 'department',
+              value: 'Подразделение',
+            },
+          },
+          id: '5cca26ea67',
+          lines: [
+            {
+              buyingPrice: 12.58,
+              good: {
+                id: '172067346',
+                name: 'Колбаса Докторская',
+              },
+              id: '43a19e38ff',
+              price: 11.31,
+              quantity: 6,
+              remains: 5.75,
+            },
+            {
+              buyingPrice: 14.83,
+              good: {
+                id: '147066838',
+                name: 'Колбаса для гриля',
+              },
+              id: 'fe2cfaf836',
+              price: 14.65,
+              quantity: 9,
+              remains: 7.8,
+            },
+          ],
+          number: '2',
+          status: 'DRAFT',
+        },
+      ] as any[],
+    },
+  },
 ];

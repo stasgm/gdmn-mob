@@ -23,7 +23,8 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.gsbelarus.gdmovement"
+      "package": "com.gsbelarus.gdmovement",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
