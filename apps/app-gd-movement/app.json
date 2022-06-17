@@ -24,7 +24,8 @@
     },
     "android": {
       "package": "com.gsbelarus.gdmovement",
-      "versionCode": 1
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"
