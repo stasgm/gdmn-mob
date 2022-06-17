@@ -213,7 +213,7 @@ const OrderViewScreen = () => {
             {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
           </Text>
           <View style={styles.rowCenter}>
-            <Text style={textStyle}>Количество дней: {debt?.dayLeft}</Text>
+            <Text style={textStyle}>Количество дней: {debt?.dayLeft || 0}</Text>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </View>
