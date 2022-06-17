@@ -30,6 +30,7 @@ export interface IOrderFormParam extends IFormParam {
   onDate?: string;
   status?: StatusType;
   route?: INamedEntity;
+  comment?: string;
 }
 
 export interface IReturnFormParam extends IFormParam {
@@ -106,6 +107,7 @@ export interface IOrderHead extends IHead {
   depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
+  comment?: string;
 }
 
 export interface IOrderLine extends IEntity {

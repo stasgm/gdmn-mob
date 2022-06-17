@@ -9,14 +9,14 @@ import { useTheme } from '@react-navigation/native';
 import { IGood, IGoodGroup, IOrderDocument, IOrderLine, IOrderTotalLine } from '../../../store/types';
 
 export interface IItem {
-  orderId: string;
+  orders: any;
 }
 
 const round = (num: number) => {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 };
 
-const OrderTotal = ({ orderId }: IItem) => {
+const OrdersTotal = ({ orders }: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
@@ -101,4 +101,4 @@ const OrderTotal = ({ orderId }: IItem) => {
   );
 };
 
-export default OrderTotal;
+export default OrdersTotal;
