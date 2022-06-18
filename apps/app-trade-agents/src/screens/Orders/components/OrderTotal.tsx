@@ -71,7 +71,7 @@ const OrderTotal = ({ orderId }: IItem) => {
         {/* <View style={styles.directionRow}> */}
         <Text style={textStyle}>{item.group.name}</Text>
         <View style={styles.directionRow}>
-          <Text style={textStyle}>{`${item.quantity || 0} кг / ${item.price || 0} р.`}</Text>
+          <Text style={textStyle}>{`${item.quantity || 0} кг x ${item.price || 0} р.`}</Text>
         </View>
         {/* </View> */}
       </View>
@@ -80,7 +80,7 @@ const OrderTotal = ({ orderId }: IItem) => {
 
   return (
     <View style={styles.total}>
-      <Text style={styles.textTotal}>Итого вес, кг / стоимость, р.:</Text>
+      <Text style={styles.textTotal}>Итого вес, кг x стоимость, р.:</Text>
       <Divider />
       <FlatList data={totalList} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
       <Divider />
