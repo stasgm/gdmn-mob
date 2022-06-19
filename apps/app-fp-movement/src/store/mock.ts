@@ -34,7 +34,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               description: 'Внутреннее перемещение',
             },
             {
-              id: '187034695',
+              id: '187034696',
               name: 'order',
               description: 'Заявка',
             },
