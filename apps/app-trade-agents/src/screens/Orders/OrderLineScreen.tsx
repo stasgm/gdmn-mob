@@ -1,14 +1,14 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { documentActions, useDispatch } from '@lib/store';
+import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { OrdersStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
-import { IOrderLine } from '../../store/types';
+import { IOrderLine, IPackageGood } from '../../store/types';
 
 import { navBackButton } from '../../components/navigateOptions';
 
@@ -21,7 +21,15 @@ const OrderLineScreen = () => {
 
   const [line, setLine] = useState<IOrderLine>(item);
 
+  const packages = refSelectors
+    .selectByName<IPackageGood>('packageGood')
+    ?.data?.filter((e) => e.good.id === item.good.id);
+
   const handleSave = useCallback(() => {
+    if (!line.packagekey && packages.length > 0) {
+      Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
+      return;
+    }
     dispatch(
       mode === 0
         ? documentActions.addDocumentLine({ docId, line })
@@ -29,7 +37,7 @@ const OrderLineScreen = () => {
     );
 
     navigation.goBack();
-  }, [navigation, line, docId, dispatch, mode]);
+  }, [packages.length, dispatch, mode, docId, line, navigation]);
 
   const renderRight = useCallback(
     () => (

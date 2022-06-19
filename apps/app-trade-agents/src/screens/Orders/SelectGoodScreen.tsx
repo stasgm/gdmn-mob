@@ -4,7 +4,7 @@ import { AppScreen, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
-import { View, FlatList, TouchableOpacity, Text } from 'react-native';
+import { View, FlatList, TouchableOpacity, Text, Alert } from 'react-native';
 import { Searchbar, IconButton, Divider } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -21,16 +21,30 @@ const Good = ({ item }: { item: IGood }) => {
 
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
 
+  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
+  const good = doc.lines.find((i) => i.good.id === item.id);
+
+  const handleNavigate = () => {
+    if (good) {
+      Alert.alert('Внимание!', 'Данный товар уже добавлен в позицию документа', [
+        {
+          text: 'Редактировать',
+          onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      navigation.navigate('OrderLine', {
+        mode: 0,
+        docId,
+        item: { id: generateId(), good: item, quantity: 0 },
+      });
+    }
+  };
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('OrderLine', {
-          mode: 0,
-          docId,
-          item: { id: generateId(), good: item, quantity: 0 },
-        });
-      }}
-    >
+    <TouchableOpacity onPress={handleNavigate}>
       <View style={styles.item}>
         <View style={[styles.icon]}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
