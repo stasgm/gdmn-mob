@@ -28,6 +28,8 @@ import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
+import OrdersTotal from './components/OrdersTotal';
+
 export interface OrderListSectionProps {
   title: string;
 }
@@ -196,29 +198,30 @@ const OrderListScreen = () => {
         //     </View>
         // ) : null
         // }
-        renderSectionFooter={(item) =>
-          status === 'all' ? (
-            // <Text>{section.section.data.length}</Text>
-            <View style={{ backgroundColor: '#edebeb' }} /*style={[styles.total /*, localStyles.header*]}*/>
-              <Divider style={{ backgroundColor: colors.primary }} />
-              <View style={[localStyles.header, { alignItems: 'center' }]}>
-                <View style={[styles.icon, { backgroundColor: colors.primary /*'#06567D'*/ }]}>
-                  <MaterialCommunityIcons name="percent-outline" size={20} color={'#FFF'} />
-                </View>
-                <View style={{ flexDirection: 'column', margin: 5 }}>
-                  {/* <View style={styles.directionRow}> */}
-                  <Text style={textStyle1}>Количество принятых заявок: {item.section.data.length}</Text>
-                  {/* </View> */}
-                  {/* <View style={styles.directionRow}> */}
-                  <Text style={textStyle1}>
-                    Количество одобренных заявок: {item.section.data.filter((i) => i.status === 'PROCESSED').length}
-                  </Text>
-                  {/* </View> */}
-                </View>
-              </View>
-            </View>
-          ) : null
-        }
+        renderSectionFooter={(item) => (
+          // status === 'all' ? (
+          //   // <Text>{section.section.data.length}</Text>
+          //   <View style={{ backgroundColor: '#edebeb' }} /*style={[styles.total /*, localStyles.header*]}*/>
+          //     <Divider style={{ backgroundColor: colors.primary }} />
+          //     <View style={[localStyles.header, { alignItems: 'center' }]}>
+          //       <View style={[styles.icon, { backgroundColor: colors.primary /*'#06567D'*/ }]}>
+          //         <MaterialCommunityIcons name="percent-outline" size={20} color={'#FFF'} />
+          //       </View>
+          //       <View style={{ flexDirection: 'column', margin: 5 }}>
+          //         {/* <View style={styles.directionRow}> */}
+          //         <Text style={textStyle1}>Количество принятых заявок: {item.section.data.length}</Text>
+          //         {/* </View> */}
+          //         {/* <View style={styles.directionRow}> */}
+          //         <Text style={textStyle1}>
+          //           Количество одобренных заявок: {item.section.data.filter((i) => i.status === 'PROCESSED').length}
+          //         </Text>
+          //         {/* </View> */}
+          //       </View>
+          //     </View>
+          //   </View>
+          // ) : null
+          <OrdersTotal orders={item.section} />
+        )}
       />
     </AppScreen>
   );
