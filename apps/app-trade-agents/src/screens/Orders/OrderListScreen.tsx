@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View, StyleSheet } from 'react-native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { Divider, IconButton, Searchbar } from 'react-native-paper';
+import { IconButton, Searchbar } from 'react-native-paper';
 
 import { useSelector } from '@lib/store';
 import {
@@ -21,14 +21,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { IOrderDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
-import OrdersTotal from './components/OrdersTotal';
+import OrderListTotal from './components/OrderListTotal';
 
 export interface OrderListSectionProps {
   title: string;
@@ -44,8 +42,6 @@ const OrderListScreen = () => {
   const { colors } = useTheme();
 
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
-  const textStyle1 = useMemo(() => [{ fontSize: 16 }, { color: colors.text }], [colors.text]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -183,59 +179,10 @@ const OrderListScreen = () => {
         )}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        // renderSectionFooter={() =>
-        //   status === 'all' ? (
-        //     <View style={styles.total}>
-        //       <Divider />
-        //       <View style={styles.directionRow}>
-        //         {/* <Text style={textStyle}>Количество принятых заявок: {sections.}</Text> */}
-        //         {/* <Text style={textStyle}>{sections.map((i) => i.).length}</Text> */}
-        //       </View>
-        //       <View style={styles.directionRow}>
-        //         <Text style={textStyle}>Количество одобренных заявок:</Text>
-        //         {/* <Text style={textStyle}>{processedList}</Text> */}
-        //       </View>
-        //     </View>
-        // ) : null
-        // }
-        renderSectionFooter={(item) => (
-          // status === 'all' ? (
-          //   // <Text>{section.section.data.length}</Text>
-          //   <View style={{ backgroundColor: '#edebeb' }} /*style={[styles.total /*, localStyles.header*]}*/>
-          //     <Divider style={{ backgroundColor: colors.primary }} />
-          //     <View style={[localStyles.header, { alignItems: 'center' }]}>
-          //       <View style={[styles.icon, { backgroundColor: colors.primary /*'#06567D'*/ }]}>
-          //         <MaterialCommunityIcons name="percent-outline" size={20} color={'#FFF'} />
-          //       </View>
-          //       <View style={{ flexDirection: 'column', margin: 5 }}>
-          //         {/* <View style={styles.directionRow}> */}
-          //         <Text style={textStyle1}>Количество принятых заявок: {item.section.data.length}</Text>
-          //         {/* </View> */}
-          //         {/* <View style={styles.directionRow}> */}
-          //         <Text style={textStyle1}>
-          //           Количество одобренных заявок: {item.section.data.filter((i) => i.status === 'PROCESSED').length}
-          //         </Text>
-          //         {/* </View> */}
-          //       </View>
-          //     </View>
-          //   </View>
-          // ) : null
-          <OrdersTotal orders={item.section} />
-        )}
+        renderSectionFooter={(item) => (status === 'all' && sections ? <OrderListTotal orders={item.section} /> : null)}
       />
     </AppScreen>
   );
 };
 
 export default OrderListScreen;
-
-const localStyles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    // backgroundColor: '#e1e1e1',
-    backgroundColor: '#edebeb',
-    // justifyContent: 'space-around',
-    margin: 3,
-    paddingVertical: 6,
-  },
-});

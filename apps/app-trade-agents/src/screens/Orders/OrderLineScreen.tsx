@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
@@ -21,31 +21,50 @@ const OrderLineScreen = () => {
 
   const [line, setLine] = useState<IOrderLine>(item);
 
+  const [loading, setLoading] = useState(false);
+
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  const handleSave = useCallback(() => {
-    if (!line.packagekey && packages.length > 0) {
-      Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
-      return;
-    }
-    dispatch(
-      mode === 0
-        ? documentActions.addDocumentLine({ docId, line })
-        : documentActions.updateDocumentLine({ docId, line }),
-    );
+  // const handleSave = useCallback(() => {
+  //   if (!line.packagekey && packages.length > 0) {
+  //     Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
+  //     return;
+  //   }
+  //   dispatch(
+  //     mode === 0
+  //       ? documentActions.addDocumentLine({ docId, line })
+  //       : documentActions.updateDocumentLine({ docId, line }),
+  //   );
 
-    navigation.goBack();
-  }, [packages.length, dispatch, mode, docId, line, navigation]);
+  //   navigation.goBack();
+  // }, [line, packages.length, dispatch, mode, docId, navigation]);
+
+  useEffect(() => {
+    if (loading) {
+      if (!line.packagekey && packages.length > 0) {
+        Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
+        setLoading(false);
+        return;
+      }
+      dispatch(
+        mode === 0
+          ? documentActions.addDocumentLine({ docId, line })
+          : documentActions.updateDocumentLine({ docId, line }),
+      );
+
+      navigation.goBack();
+    }
+  }, [dispatch, docId, line, loading, mode, navigation, packages.length]);
 
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SaveButton onPress={handleSave} />
+        <SaveButton onPress={() => setLoading(true)} disabled={loading} />
       </View>
     ),
-    [handleSave],
+    [loading],
   );
 
   useLayoutEffect(() => {

@@ -132,8 +132,7 @@ const OrderEditScreen = () => {
         id: docId,
         documentType: orderType,
         number: docNumber,
-        // documentDate: newOrderDate,
-        documentDate: new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toISOString(),
+        documentDate: newOrderDate,
         status: 'DRAFT',
         head: {
           contact: docContact,
