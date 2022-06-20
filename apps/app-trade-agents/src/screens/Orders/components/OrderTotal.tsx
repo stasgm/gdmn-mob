@@ -29,6 +29,7 @@ const OrderTotal = ({ orderId }: IItem) => {
     return [...prev, ...order.lines];
   }, []);
 
+  console.log('ore', orderLines);
   const totalList: IOrderTotalLine[] = firstLevelGroups
     ?.map((firstGr) => ({
       group: {
