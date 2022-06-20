@@ -225,7 +225,7 @@ const OrderViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <OrderTotal orderId={id} />
+      {order.lines.length ? <OrderTotal orderId={id} /> : null}
     </View>
   );
 };

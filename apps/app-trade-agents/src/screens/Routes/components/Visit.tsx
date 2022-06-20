@@ -101,6 +101,21 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     setProcess(false);
   }, [docDispatch, visit, orderDocs, returnDocs]);
 
+  const handleReopenVisit = useCallback(async () => {
+    const date = new Date().toISOString();
+
+    const updatedVisit: IVisitDocument = {
+      ...visit,
+      head: {
+        ...visit.head,
+        dateEnd: undefined,
+        endGeoPoint: undefined,
+      },
+      editionDate: date,
+    };
+    await docDispatch(documentActions.updateDocuments([updatedVisit]));
+  }, [docDispatch, visit]);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
@@ -113,6 +128,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     }
 
     const newOrderDate = new Date().toISOString();
+    const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
 
     const newOrder: IOrderDocument = {
       id: generateId(),
@@ -124,7 +140,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         contact,
         outlet,
         route,
-        onDate: newOrderDate,
+        onDate: newOnDate,
         takenOrder: visit.head.takenType,
         depart: defaultDepart,
       },
@@ -278,7 +294,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
             {dateEnd && <Text style={textStyle}>{visitTextEnd}</Text>}
             {
               <>
-                {!dateEnd && (
+                {!dateEnd ? (
                   <PrimeButton
                     icon={!process ? 'stop-circle-outline' : 'block-helper'}
                     onPress={handleCloseVisit}
@@ -287,6 +303,17 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
                   >
                     Завершить визит
                   </PrimeButton>
+                ) : (
+                  readyDocs.length <= 0 && (
+                    <PrimeButton
+                      icon={!process ? 'play-circle-outline' : 'block-helper'}
+                      onPress={handleReopenVisit}
+                      outlined={true}
+                      disabled={process}
+                    >
+                      Возообновить визит
+                    </PrimeButton>
+                  )
                 )}
               </>
             }

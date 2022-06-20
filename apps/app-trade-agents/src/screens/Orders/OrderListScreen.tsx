@@ -26,6 +26,8 @@ import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
+import OrderListTotal from './components/OrderListTotal';
+
 export interface OrderListSectionProps {
   title: string;
 }
@@ -38,6 +40,8 @@ const OrderListScreen = () => {
   const loading = useSelector((state) => state.documents.loading);
   const orders = useSelector((state) => state.documents.list) as IOrderDocument[];
   const { colors } = useTheme();
+
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -99,6 +103,7 @@ const OrderListScreen = () => {
           {
             title: sectionTitle,
             data: [item],
+            // key: [item].length,
           },
         ];
       }, []),
@@ -146,8 +151,6 @@ const OrderListScreen = () => {
     ) : null;
   };
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
-
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -176,6 +179,7 @@ const OrderListScreen = () => {
         )}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionFooter={(item) => (status === 'all' && sections ? <OrderListTotal orders={item.section} /> : null)}
       />
     </AppScreen>
   );
