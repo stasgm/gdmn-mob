@@ -16,18 +16,18 @@ import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native
 import { ISettingsOption } from '@lib/types';
 import { useSelector } from '@lib/store';
 
-import { IMoveLine } from '../../store/types';
-import { ONE_SECOND_IN_MS } from '../../utils/constants';
+import { IMoveLine } from '../../../../store/types';
+import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
   onSave: (item: IMoveLine) => void;
-  onShowRemains: () => void;
+  onSearchBarcode: () => void;
   getScannedObject: (brc: string) => IMoveLine | undefined;
 }
 
-export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
+export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject }: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const settings = useSelector((state) => state.settings?.data);
@@ -105,7 +105,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={onShowRemains}
+            onPress={onSearchBarcode}
           />
         </View>
         {!scanned ? (

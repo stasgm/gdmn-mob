@@ -20,7 +20,6 @@ import { generateId, getDateString } from '@lib/mobile-app';
 import { IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
-import SwipeLineItem from '../../components/SwipeLineItem';
 
 import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
@@ -29,7 +28,10 @@ import { IGood } from '../../store/app/types';
 import { MoveItem } from './components/MoveItem';
 
 import BarcodeDialog from './components/BarcodeDialog';
-import { Item } from './components/Item';
+
+const round = (num: number) => {
+  return Math.round((num + Number.EPSILON) * 1000) / 1000;
+};
 
 export const MoveViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -74,9 +76,10 @@ export const MoveViewScreen = () => {
           docId: id,
           item: barcodeItem,
         });
+        setVisibleDialog(false);
+        setBarcode('');
       } else {
         setError(true);
-        // return;
       }
     },
 
@@ -105,14 +108,25 @@ export const MoveViewScreen = () => {
     }
 
     dispatch(documentActions.removeDocument(id));
+
     navigation.goBack();
   }, [dispatch, id, navigation]);
+
+  const hanldeCancelLastScan = useCallback(() => {
+    const lastId = doc.lines[doc.lines.length - 1].id;
+    console.log('lastId', lastId);
+    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+  }, [dispatch, doc.lines, id]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
         title: 'Найти штрих-код',
         onPress: handleShowDialog,
+      },
+      {
+        title: 'Отменить последнее сканирование',
+        onPress: hanldeCancelLastScan,
       },
       {
         title: 'Редактировать данные',
@@ -128,7 +142,7 @@ export const MoveViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -156,34 +170,27 @@ export const MoveViewScreen = () => {
     );
   }
 
-  // const lines = doc.lines;
-  // const a = lines.reduce((line1, line2) => {
-  //   if (line1.good.shcode === line2.good.shcode && line1.id !== line2.id) {
-  //     return line1;
-  //   } else {
-  //     return { ...line1, weight: line1.weight + line2.weight };
-  //   }
-  // });
-  // console.log('qwerty', a);
+  const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
+    if (!sum.length) {
+      sum.push(line);
+    }
 
-  const renderItem = ({ item }: { item: IMoveLine }) => {
-    // let q: number;
-    // const good = doc.lines?.find((i) => i.good.shcode === item.good.shcode && i.id !== item.id);
-    // console.log('good', good);
-    // for (const line of doc.lines) {
-    // if (good) {
-    return (
-      <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="MoveLine">
-        <MoveItem docId={doc.id} item={item} readonly={isBlocked} />
-      </SwipeLineItem>
-    );
-    // }
-    // }
-  };
+    if (sum.find((i) => i.id !== line.id)) {
+      const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
+      if (lineSum) {
+        const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
+        sum.splice(sum.indexOf(lineSum), 1, lineTotal);
+      } else {
+        sum.push(line);
+      }
+    }
+    return sum;
+  }, []);
+
+  const renderItem = ({ item }: { item: IMoveLine }) => <MoveItem item={item} />;
 
   const handleSearchBarcode = () => {
     handleGetBarcode(barcode);
-    // setBarcode('');
   };
 
   const handleDismissBarcode = () => {
@@ -211,13 +218,12 @@ export const MoveViewScreen = () => {
         </>
       </InfoBlock>
       <FlatList
-        data={doc.lines}
+        data={linesList}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
-      <Item lines={doc.lines} doc={doc} />
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}

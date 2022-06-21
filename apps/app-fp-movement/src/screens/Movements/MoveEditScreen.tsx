@@ -198,13 +198,6 @@ export const MoveEditScreen = () => {
       return;
     }
 
-    // if (doc?.lines.length && documentType.remainsField === 'fromContact') {
-    //   Alert.alert('Внимание!', `Нельзя изменить поле ${documentType.fromDescription} при наличии позиций.`, [
-    //     { text: 'OK' },
-    //   ]);
-    //   return;
-    // }
-
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
       fieldName: 'fromDepart',
@@ -216,13 +209,6 @@ export const MoveEditScreen = () => {
     if (isBlocked) {
       return;
     }
-
-    // if (doc?.lines.length && documentType.remainsField === 'toContact') {
-    //   Alert.alert('Внимание!', `Нельзя изменить поле ${documentType.toDescription} при наличии позиций.`, [
-    //     { text: 'OK' },
-    //   ]);
-    //   return;
-    // }
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',

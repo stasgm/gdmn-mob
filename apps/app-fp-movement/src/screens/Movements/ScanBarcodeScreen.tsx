@@ -12,10 +12,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveLine, IMoveDocument } from '../../store/types';
-import { ScanBarcode, ScanBarcodeReader } from '../../components';
+
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
+
+import { ScanBarcode, ScanBarcodeReader } from './components';
 
 import BarcodeDialog from './components/BarcodeDialog';
 
@@ -97,9 +99,10 @@ const ScanBarcodeScreen = () => {
           docId: docId,
           item: barcodeItem,
         });
+        setVisibleDialog(false);
+        setBarcode('');
       } else {
         setError(true);
-        // return;
       }
     },
 
@@ -116,7 +119,6 @@ const ScanBarcodeScreen = () => {
 
   const handleSearchBarcode = () => {
     handleGetBarcode(barcode);
-    // setBarcode('');
   };
 
   const handleDismissBarcode = () => {
@@ -134,14 +136,13 @@ const ScanBarcodeScreen = () => {
       {isScanerReader ? (
         <ScanBarcodeReader
           onSave={(item) => handleSaveScannedItem(item)}
-          onShowRemains={handleShowDialog}
-          // onShowRemains={handleShowRemains}
+          onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
         />
       ) : (
         <ScanBarcode
           onSave={(item) => handleSaveScannedItem(item)}
-          onShowRemains={handleShowDialog}
+          onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
         />
       )}

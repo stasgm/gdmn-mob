@@ -8,18 +8,18 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 
-import { IMoveLine } from '../../store/types';
-import { ONE_SECOND_IN_MS } from '../../utils/constants';
+import { IMoveLine } from '../../../../store/types';
+import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
   onSave: (item: IMoveLine) => void;
-  onShowRemains: () => void;
+  onSearchBarcode: () => void;
   getScannedObject: (brc: string) => IMoveLine | undefined;
 }
 
-const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
+const ScanBarcode = ({ onSave, onSearchBarcode, getScannedObject }: IProps) => {
   const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -109,7 +109,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={onShowRemains}
+            onPress={onSearchBarcode}
           />
         </View>
         {!scanned ? (
