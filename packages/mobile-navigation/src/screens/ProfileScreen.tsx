@@ -43,6 +43,20 @@ const ProfileScreen = () => {
     ]);
   };
 
+  const handleClearSettings = () => {
+    Alert.alert('Вы уверены, что хотите удалить настройки пользователя?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          dispatch(authActions.setUserSettings({}));
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  };
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -51,11 +65,16 @@ const ProfileScreen = () => {
         onPress: handleClearData,
       },
       {
+        title: 'Удалить настройки пользователя',
+        type: 'destructive',
+        onPress: handleClearSettings,
+      },
+      {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [handleClearData, showActionSheet]);
+  }, [handleClearData, handleClearSettings, showActionSheet]);
 
   useLayoutEffect(() => {
     navigation.setOptions({

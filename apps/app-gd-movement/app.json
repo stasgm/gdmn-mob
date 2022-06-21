@@ -23,7 +23,9 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.gsbelarus.gdmovement"
+      "package": "com.gsbelarus.gdmovement",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/favicon.png"

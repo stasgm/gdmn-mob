@@ -45,6 +45,7 @@ const OrderEditScreen = () => {
     onDate: docOnDate,
     status: docStatus,
     route: docRoute,
+    comment: docComment,
   } = useMemo(() => {
     return formParams;
   }, [formParams]);
@@ -95,6 +96,7 @@ const OrderEditScreen = () => {
           status: order.status,
           route: order.head.route,
           depart: order.head.depart,
+          comment: order.head.comment,
         }),
       );
     } else {
@@ -102,7 +104,7 @@ const OrderEditScreen = () => {
       dispatch(
         appActions.setFormParams({
           number: newNumber,
-          onDate: new Date().toISOString(),
+          onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           depart: defaultDepart,
@@ -137,6 +139,7 @@ const OrderEditScreen = () => {
           onDate: docOnDate,
           outlet: docOutlet,
           depart: docDepart,
+          comment: docComment && docComment.trim(),
         },
         lines: [],
         creationDate: newOrderDate,
@@ -168,6 +171,7 @@ const OrderEditScreen = () => {
           outlet: docOutlet,
           onDate: docOnDate,
           depart: docDepart,
+          comment: docComment && docComment.trim(),
         },
         lines: order.lines,
         creationDate: order.creationDate || updatedOrderDate,
@@ -186,6 +190,7 @@ const OrderEditScreen = () => {
     docDocumentDate,
     id,
     docDepart,
+    docComment,
     dispatch,
     navigation,
     order,
@@ -338,6 +343,15 @@ const OrderEditScreen = () => {
           value={docDepart?.name}
           onPress={handlePresentDepart}
           disabled={isBlocked}
+        />
+        <Input
+          label="Комментарий"
+          value={docComment}
+          onChangeText={(text) => {
+            dispatch(appActions.setFormParams({ comment: text || '' }));
+          }}
+          disabled={isBlocked}
+          clearInput={true}
         />
       </ScrollView>
       {showOnDate && (

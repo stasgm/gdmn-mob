@@ -3,10 +3,11 @@ import { IconButton } from 'react-native-paper';
 
 interface IProps {
   onPress: () => void;
+  disabled?: boolean;
 }
 
-const SaveButton = ({ onPress }: IProps) => {
-  return <IconButton icon="check" size={30} onPress={onPress} />;
+const SaveButton = ({ onPress, disabled }: IProps) => {
+  return <IconButton icon="check" size={30} onPress={onPress} disabled={disabled} />;
 };
 
 export default SaveButton;

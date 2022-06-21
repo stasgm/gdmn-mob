@@ -30,6 +30,7 @@ export interface IOrderFormParam extends IFormParam {
   onDate?: string;
   status?: StatusType;
   route?: INamedEntity;
+  comment?: string;
 }
 
 export interface IReturnFormParam extends IFormParam {
@@ -69,6 +70,7 @@ export interface IDebt extends INamedEntity {
   ondate: string; //на дату
   saldo: number; //Задолженность
   saldoDebt: number; //Просроченная задолженность
+  dayLeft?: number;
 }
 
 //Подразделения-склады
@@ -105,12 +107,19 @@ export interface IOrderHead extends IHead {
   depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
+  comment?: string;
 }
 
 export interface IOrderLine extends IEntity {
   good: IGood;
   quantity: number;
   packagekey?: INamedEntity; // Вид упаковки
+}
+
+export interface IOrderTotalLine {
+  group: INamedEntity;
+  quantity?: number;
+  price?: number;
 }
 
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
