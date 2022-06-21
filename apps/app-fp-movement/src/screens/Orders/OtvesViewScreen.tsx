@@ -51,11 +51,11 @@ const OtvesViewScreen = () => {
 
   const isBlocked = order?.status !== 'DRAFT';
 
-  const handleAddOrderLine = useCallback(() => {
-    navigation.navigate('SelectGroupItem', {
-      docId: id,
-    });
-  }, [navigation, id]);
+  // const handleAddOrderLine = useCallback(() => {
+  //   navigation.navigate('SelectGroupItem', {
+  //     docId: id,
+  //   });
+  // }, [navigation, id]);
 
   const handleEditOrderHead = useCallback(() => {
     navigation.navigate('OrderEdit', { id });
@@ -105,10 +105,10 @@ const OtvesViewScreen = () => {
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Добавить товар',
-        onPress: handleAddOrderLine,
-      },
+      // {
+      //   title: 'Добавить товар',
+      //   onPress: handleAddOrderLine,
+      // },
       {
         title: 'Редактировать данные',
         onPress: handleEditOrderHead,
@@ -127,17 +127,17 @@ const OtvesViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
+  }, [showActionSheet, handleEditOrderHead, handleCopyOrder, handleDelete]);
 
   const renderRight = useCallback(
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <AddButton onPress={handleAddOrderLine} />
+          {/* <AddButton onPress={handleAddOrderLine} /> */}
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleAddOrderLine, isBlocked],
+    [actionsMenu, isBlocked],
   );
 
   useLayoutEffect(() => {

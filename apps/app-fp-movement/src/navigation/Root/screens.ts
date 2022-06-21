@@ -7,6 +7,7 @@ import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
 import { OrderListScreen, OrderViewScreen, OrderEditScreen, OtvesViewScreen } from '../../screens/Orders';
 
 import ScanOrderScreen from '../../screens/Orders/ScanOrderScreen';
+import ScanGoodScreen from '../../screens/Orders/ScanGoodScreen';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
@@ -27,6 +28,7 @@ export const orderScreens = {
   OrderEdit: { title: 'Заявка', component: OrderEditScreen },
   OtvesView: { title: 'Заявка', component: OtvesViewScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const orderListScreens = {

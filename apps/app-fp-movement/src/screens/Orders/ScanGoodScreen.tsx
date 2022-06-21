@@ -21,7 +21,7 @@ import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 import BarcodeDialog from '../../components/BarcodeDialog';
 
-const ScanBarcodeScreen = () => {
+const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<MoveStackParamList, 'ScanBarcode'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
@@ -159,4 +159,4 @@ const ScanBarcodeScreen = () => {
   );
 };
 
-export default ScanBarcodeScreen;
+export default ScanGoodScreen;

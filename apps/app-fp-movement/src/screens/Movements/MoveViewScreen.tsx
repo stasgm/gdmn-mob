@@ -25,9 +25,9 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import { MoveItem } from './components/MoveItem';
+import BarcodeDialog from '../../components/BarcodeDialog';
 
-import BarcodeDialog from './components/BarcodeDialog';
+import { MoveItem } from './components/MoveItem';
 
 const round = (num: number) => {
   return Math.round((num + Number.EPSILON) * 1000) / 1000;
@@ -114,7 +114,7 @@ export const MoveViewScreen = () => {
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc.lines[doc.lines.length - 1].id;
-    console.log('lastId', lastId);
+
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
   }, [dispatch, doc.lines, id]);
 

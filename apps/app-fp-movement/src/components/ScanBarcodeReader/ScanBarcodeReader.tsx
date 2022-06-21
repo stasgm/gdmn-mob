@@ -16,8 +16,8 @@ import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native
 import { ISettingsOption } from '@lib/types';
 import { useSelector } from '@lib/store';
 
-import { IMoveLine } from '../../../../store/types';
-import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
+import { IMoveLine } from '../../store/types';
+import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
 

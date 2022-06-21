@@ -4,7 +4,7 @@ import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
   MenuButton,
@@ -13,6 +13,7 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  ScanButton,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -31,6 +32,11 @@ import SwipeLineItem from '../../components/SwipeLineItem';
 
 import { navBackButton } from '../../components/navigateOptions';
 
+import { getBarcode } from '../../utils/helpers';
+import { IGood } from '../../store/app/types';
+
+import BarcodeDialog from '../../components/BarcodeDialog';
+
 import OrderItem from './components/OrderItem';
 
 const keyExtractor = (item: IOrderLine) => item.id;
@@ -39,6 +45,8 @@ const OrderViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
+  const dispatch = useDispatch();
+
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrderStackParamList, 'OrderView'>>().params?.id;
 
@@ -51,12 +59,6 @@ const OrderViewScreen = () => {
     .selectByDocType<IOtvesDocument>('otves')
     .find((item) => item.head.barcode === order.head.barcode)?.id;
 
-  console.log('otv', otvesId);
-
-  console.log('aa', docSelectors.selectByDocType<IOtvesDocument>('otves'));
-
-  // const a = 'cf8b2dc571';
-
   const isBlocked = order?.status !== 'DRAFT';
 
   const handleAddOrderLine = useCallback(() => {
@@ -65,7 +67,50 @@ const OrderViewScreen = () => {
     });
   }, [navigation, id]);
 
-  console.log('otvesId', otvesId);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [error, setError] = useState(false);
+
+  const goods = refSelectors.selectByName<IGood>('good').data;
+
+  const handleGetBarcode = useCallback(
+    (brc: string) => {
+      const barc = getBarcode(brc);
+
+      const good = goods.find((item) => item.shcode === barc.shcode);
+
+      if (good) {
+        const barcodeItem = {
+          good: { id: good.id, name: good.name, shcode: good.shcode },
+          id: generateId(),
+          weight: barc.weight,
+          barcode: barc.barcode,
+          workDate: barc.workDate,
+          numReceived: barc.numReceived,
+        };
+        setError(false);
+        navigation.navigate('OrderLine', {
+          mode: 0,
+          docId: id,
+          item: barcodeItem,
+        });
+        setVisibleDialog(false);
+        setBarcode('');
+      } else {
+        setError(true);
+      }
+    },
+
+    [goods, id, navigation],
+  );
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+  };
+
+  const handleDismisDialog = () => {
+    setVisibleDialog(false);
+  };
 
   const handleOtvesDoc = useCallback(() => {
     navigation.navigate('OtvesView', {
@@ -119,6 +164,16 @@ const OrderViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
+  const handleDoScan = useCallback(() => {
+    navigation.navigate('ScanGood', { docId: id });
+  }, [navigation, id]);
+
+  const hanldeCancelLastScan = useCallback(() => {
+    const lastId = order.lines[order.lines.length - 1].id;
+
+    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+  }, [dispatch, order.lines, id]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -126,8 +181,8 @@ const OrderViewScreen = () => {
         onPress: handleOtvesDoc,
       },
       {
-        title: 'Добавить товар',
-        onPress: handleAddOrderLine,
+        title: 'Найти штрих-код',
+        onPress: handleShowDialog,
       },
       {
         title: 'Редактировать данные',
@@ -147,17 +202,17 @@ const OrderViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
+  }, [showActionSheet, handleOtvesDoc, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
 
   const renderRight = useCallback(
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <AddButton onPress={handleAddOrderLine} />
+          <ScanButton onPress={handleDoScan} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleAddOrderLine, isBlocked],
+    [actionsMenu, handleDoScan, isBlocked],
   );
 
   useLayoutEffect(() => {
@@ -166,6 +221,16 @@ const OrderViewScreen = () => {
       headerRight: renderRight,
     });
   }, [navigation, renderRight]);
+
+  const handleSearchBarcode = () => {
+    handleGetBarcode(barcode);
+  };
+
+  const handleDismissBarcode = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    setError(false);
+  };
 
   const renderItem = useCallback(
     ({ item }: { item: IOrderLine }) => (
@@ -220,6 +285,15 @@ const OrderViewScreen = () => {
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+      />
+      <BarcodeDialog
+        visibleDialog={visibleDialog}
+        onDismissDialog={handleDismisDialog}
+        barcode={barcode}
+        onChangeBarcode={setBarcode}
+        onDismiss={handleDismissBarcode}
+        onSearch={handleSearchBarcode}
+        error={error}
       />
     </View>
   );
