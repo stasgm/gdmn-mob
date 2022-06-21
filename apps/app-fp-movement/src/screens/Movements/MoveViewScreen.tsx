@@ -29,6 +29,7 @@ import { IGood } from '../../store/app/types';
 import { MoveItem } from './components/MoveItem';
 
 import BarcodeDialog from './components/BarcodeDialog';
+import { Item } from './components/Item';
 
 export const MoveViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -155,19 +156,19 @@ export const MoveViewScreen = () => {
     );
   }
 
-  const lines = doc.lines;
-  const a = lines.reduce((line1, line2) => {
-    if (line1.good.shcode === line2.good.shcode && line1.id !== line2.id) {
-      return line1;
-    } else {
-      return { ...line1, weight: line1.weight + line2.weight };
-    }
-  });
-  console.log('qwerty', a);
+  // const lines = doc.lines;
+  // const a = lines.reduce((line1, line2) => {
+  //   if (line1.good.shcode === line2.good.shcode && line1.id !== line2.id) {
+  //     return line1;
+  //   } else {
+  //     return { ...line1, weight: line1.weight + line2.weight };
+  //   }
+  // });
+  // console.log('qwerty', a);
 
   const renderItem = ({ item }: { item: IMoveLine }) => {
     // let q: number;
-    const good = doc.lines.find((i) => i.good.shcode === item.good.shcode && i.id !== item.id);
+    // const good = doc.lines?.find((i) => i.good.shcode === item.good.shcode && i.id !== item.id);
     // console.log('good', good);
     // for (const line of doc.lines) {
     // if (good) {
@@ -216,6 +217,7 @@ export const MoveViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <Item lines={doc.lines} doc={doc} />
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}
