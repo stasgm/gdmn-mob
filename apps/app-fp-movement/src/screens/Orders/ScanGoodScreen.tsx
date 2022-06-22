@@ -10,8 +10,8 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { IMoveLine, IMoveDocument } from '../../store/types';
+import { OrderStackParamList } from '../../navigation/Root/types';
+import { IMoveLine, IMoveDocument, IOtvesLine } from '../../store/types';
 
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
@@ -22,8 +22,9 @@ import { ScanBarcode, ScanBarcodeReader } from '../../components';
 import BarcodeDialog from '../../components/BarcodeDialog';
 
 const ScanGoodScreen = () => {
-  const docId = useRoute<RouteProp<MoveStackParamList, 'ScanBarcode'>>().params?.docId;
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'ScanBarcode'>>();
+  const docId = useRoute<RouteProp<OrderStackParamList, 'ScanGood'>>().params?.docId;
+  const tempId = useRoute<RouteProp<OrderStackParamList, 'ScanGood'>>().params?.tempId;
+  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'ScanGood'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const isScanerReader = settings.scannerUse?.data;
@@ -39,14 +40,15 @@ const ScanGoodScreen = () => {
   }, [navigation]);
 
   const handleSaveScannedItem = useCallback(
-    (item: IMoveLine) => {
-      navigation.navigate('MoveLine', {
+    (item: IOtvesLine) => {
+      navigation.navigate('OrderLine', {
         mode: 0,
         docId,
         item: item,
+        tempId,
       });
     },
-    [docId, navigation],
+    [docId, navigation, tempId],
   );
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMoveDocument;
@@ -85,7 +87,7 @@ const ScanGoodScreen = () => {
       const good = goods.find((item) => item.shcode === barc.shcode);
 
       if (good) {
-        const barcodeItem = {
+        const barcodeItem: IOtvesLine = {
           good: { id: good.id, name: good.name, shcode: good.shcode },
           id: generateId(),
           weight: barc.weight,
@@ -94,10 +96,11 @@ const ScanGoodScreen = () => {
           numReceived: barc.numReceived,
         };
         setError(false);
-        navigation.navigate('MoveLine', {
+        navigation.navigate('OrderLine', {
           mode: 0,
           docId: docId,
           item: barcodeItem,
+          tempId: tempId,
         });
         setVisibleDialog(false);
         setBarcode('');
@@ -106,7 +109,7 @@ const ScanGoodScreen = () => {
       }
     },
 
-    [goods, docId, navigation],
+    [goods, navigation, docId, tempId],
   );
 
   const handleShowDialog = () => {

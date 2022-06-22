@@ -94,6 +94,16 @@ export const MoveViewScreen = () => {
     setVisibleDialog(false);
   };
 
+  const handleSearchBarcode = () => {
+    handleGetBarcode(barcode);
+  };
+
+  const handleDismissBarcode = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    setError(false);
+  };
+
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('MoveEdit', { id });
   }, [navigation, id]);
@@ -188,16 +198,6 @@ export const MoveViewScreen = () => {
   }, []);
 
   const renderItem = ({ item }: { item: IMoveLine }) => <MoveItem item={item} />;
-
-  const handleSearchBarcode = () => {
-    handleGetBarcode(barcode);
-  };
-
-  const handleDismissBarcode = () => {
-    setVisibleDialog(false);
-    setBarcode('');
-    setError(false);
-  };
 
   return (
     <View style={[styles.container]}>

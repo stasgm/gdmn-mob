@@ -6,7 +6,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
-  AddButton,
   MenuButton,
   useActionSheet,
   globalStyles as styles,
@@ -22,7 +21,7 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IOrderDocument, IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
+import { IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
@@ -61,11 +60,11 @@ const OrderViewScreen = () => {
 
   const isBlocked = order?.status !== 'DRAFT';
 
-  const handleAddOrderLine = useCallback(() => {
-    navigation.navigate('SelectGroupItem', {
-      docId: id,
-    });
-  }, [navigation, id]);
+  // const handleAddOrderLine = useCallback(() => {
+  //   navigation.navigate('SelectGroupItem', {
+  //     docId: id,
+  //   });
+  // }, [navigation, id]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -169,10 +168,10 @@ const OrderViewScreen = () => {
   }, [navigation, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = order.lines[order.lines.length - 1].id;
+    const lastId = order?.lines[order?.lines.length - 1].id;
 
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
-  }, [dispatch, order.lines, id]);
+  }, [dispatch, order?.lines, id]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -202,7 +201,7 @@ const OrderViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleOtvesDoc, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
+  }, [showActionSheet, handleOtvesDoc, handleEditOrderHead, handleCopyOrder, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -280,7 +279,7 @@ const OrderViewScreen = () => {
         </View>
       </InfoBlock>
       <FlatList
-        data={order.lines}
+        data={order?.lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}

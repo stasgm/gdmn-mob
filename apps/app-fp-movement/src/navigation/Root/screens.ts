@@ -4,7 +4,13 @@ import { MoveListScreen, MoveEditScreen, MoveViewScreen, MoveLineScreen } from '
 
 import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
 
-import { OrderListScreen, OrderViewScreen, OrderEditScreen, OtvesViewScreen } from '../../screens/Orders';
+import {
+  OrderListScreen,
+  OrderViewScreen,
+  OrderEditScreen,
+  OtvesViewScreen,
+  OrderLineScreen,
+} from '../../screens/Orders';
 
 import ScanOrderScreen from '../../screens/Orders/ScanOrderScreen';
 import ScanGoodScreen from '../../screens/Orders/ScanGoodScreen';
@@ -27,6 +33,7 @@ export const orderScreens = {
   OrderView: { title: 'Заявка', component: OrderViewScreen },
   OrderEdit: { title: 'Заявка', component: OrderEditScreen },
   OtvesView: { title: 'Заявка', component: OtvesViewScreen },
+  OrderLine: { title: 'Позиция заявки', component: OrderLineScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
