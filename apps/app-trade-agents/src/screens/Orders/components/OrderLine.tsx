@@ -23,12 +23,15 @@ type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 const OrderLine = ({ item, onSetLine }: IProps) => {
   const { colors } = useTheme();
 
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
-  const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey);
-  const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
+
+  const defaultPack = packages.find((i) => i.isDefault)?.package;
+
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
+  const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey || defaultPack);
+  const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
 
   const qtyRef = useRef<TextInput>(null);
 

@@ -1,8 +1,8 @@
-import React, { useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
-import { Divider } from 'react-native-paper';
+import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { AppScreen, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
@@ -23,16 +23,23 @@ interface IProp {
   item: IGoodGroup;
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
+  searchQuery?: string;
 }
 
-const Group = ({ model, item, expendGroup, setExpend }: IProp) => {
+const Group = ({ model, item, expendGroup, setExpend, searchQuery }: IProp) => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
 
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const nextLevelGroups = model[item.id]?.children?.map((gr) => gr.group) || [];
+  const nextLevelGroupsList = useMemo(() => model[item.id]?.children?.map((gr) => gr.group) || [], [item.id, model]);
+
+  const nextLevelGroups = useMemo(() => {
+    return nextLevelGroupsList?.filter((i) =>
+      i.name ? i.name.toUpperCase().includes(searchQuery?.toUpperCase() || '') : true,
+    );
+  }, [nextLevelGroupsList, searchQuery]);
 
   const isExpand = expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup);
 
@@ -94,6 +101,12 @@ const SelectGroupScreen = () => {
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
   const dispatch = useDispatch();
 
+  const { colors } = useTheme();
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
 
   const syncDate = useSelector((state) => state.app.syncDate);
@@ -126,9 +139,28 @@ const SelectGroupScreen = () => {
 
   const [expend, setExpend] = useState<IGoodGroup | undefined>(firstLevelGroups[0]);
 
+  useEffect(() => {
+    if (!filterVisible && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [filterVisible, searchQuery]);
+
+  const renderRight = useCallback(
+    () => (
+      <IconButton
+        icon="card-search-outline"
+        style={filterVisible && { backgroundColor: colors.card }}
+        size={26}
+        onPress={() => setFilterVisible((prev) => !prev)}
+      />
+    ),
+    [colors.card, filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
+      headerRight: renderRight,
     });
 
     if (formParams?.groupId) {
@@ -136,7 +168,7 @@ const SelectGroupScreen = () => {
       setExpend(expandGroup);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation, formParams?.groupId]);
+  }, [navigation, formParams?.groupId, renderRight]);
 
   const handleSetExpand = (group: IGoodGroup | undefined) => {
     setExpend(group);
@@ -152,13 +184,34 @@ const SelectGroupScreen = () => {
   useScrollToTop(refListGroups);
 
   const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group model={model} item={item} expendGroup={expend?.id} setExpend={(group) => handleSetExpand(group)} />
+    <Group
+      model={model}
+      item={item}
+      expendGroup={expend?.id}
+      setExpend={(group) => handleSetExpand(group)}
+      searchQuery={searchQuery}
+    />
   );
 
   return (
     <AppScreen>
       <SubTitle style={styles.title}>{refGroup.description || refGroup.name}</SubTitle>
       <Divider />
+      {filterVisible && (
+        <>
+          <View style={styles.flexDirectionRow}>
+            <Searchbar
+              placeholder="Поиск"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={[styles.flexGrow, styles.searchBar]}
+              autoFocus
+              selectionColor={searchStyle}
+            />
+          </View>
+          <ItemSeparator />
+        </>
+      )}
       <FlatList
         ref={refListGroups}
         data={firstLevelGroups}
