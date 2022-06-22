@@ -28,6 +28,11 @@ const Good = ({ item }: { item: IGood }) => {
     if (good) {
       Alert.alert('Внимание!', 'Данный товар уже добавлен в позицию документа', [
         {
+          text: 'Добавить',
+          onPress: () =>
+            navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } }),
+        },
+        {
           text: 'Редактировать',
           onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
         },
@@ -36,11 +41,7 @@ const Good = ({ item }: { item: IGood }) => {
         },
       ]);
     } else {
-      navigation.navigate('OrderLine', {
-        mode: 0,
-        docId,
-        item: { id: generateId(), good: item, quantity: 0 },
-      });
+      navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
     }
   };
   return (
