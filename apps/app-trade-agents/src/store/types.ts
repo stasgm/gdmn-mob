@@ -98,6 +98,7 @@ export type IPackage = INamedEntity;
 export interface IPackageGood extends IEntity {
   good: INamedEntity;
   package: INamedEntity;
+  isDefault?: number;
 }
 
 export interface IOrderHead extends IHead {
