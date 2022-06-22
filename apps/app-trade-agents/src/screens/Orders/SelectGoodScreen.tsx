@@ -28,16 +28,17 @@ const Good = ({ item }: { item: IGood }) => {
     if (good) {
       Alert.alert('Внимание!', 'Данный товар уже добавлен в позицию документа', [
         {
+          text: 'Отмена',
+        },
+        {
           text: 'Добавить',
           onPress: () =>
             navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } }),
         },
+
         {
           text: 'Редактировать',
           onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
-        },
-        {
-          text: 'Отмена',
         },
       ]);
     } else {

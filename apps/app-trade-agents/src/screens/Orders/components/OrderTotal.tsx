@@ -57,16 +57,10 @@ const OrderTotal = ({ orderId }: IItem) => {
           ),
         )
         ?.reduce((s: number, line) => {
-          return round(s + round(line.good.priceFsn));
+          return round(s + round((line.quantity / (line.good.invWeight || 1)) * line.good.priceFsn));
         }, 0),
     }))
     .filter((i) => i.quantity > 0);
-
-  const totalQuantity = orderLines
-    ?.map((i) => (i.quantity / (i.good.invWeight || 1)) * i.good.priceFsn)
-    ?.reduce((sum: number, a) => {
-      return round(sum + a);
-    });
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
@@ -78,7 +72,7 @@ const OrderTotal = ({ orderId }: IItem) => {
             <Text style={textStyle}>{item.group.name}</Text>
           </View>
           <View style={localStyles.quantity}>
-            <Text style={textStyle}>{`${item.quantity || 0} кг x ${item.price || 0} р.`}</Text>
+            <Text style={textStyle}>{`${item.quantity || 0} кг / ${item.price || 0} р.`}</Text>
           </View>
         </View>
       </View>
@@ -90,7 +84,7 @@ const OrderTotal = ({ orderId }: IItem) => {
       {totalList.length ? (
         <View style={[localStyles.margins, localStyles.total]}>
           <Text style={styles.textTotal}>Итого:</Text>
-          <Text style={styles.textTotal}>Вес {' x '} стоимость:</Text>
+          <Text style={styles.textTotal}>Вес {' / '} сумма:</Text>
         </View>
       ) : null}
       <Divider style={{ backgroundColor: colors.primary }} />
@@ -104,13 +98,9 @@ const OrderTotal = ({ orderId }: IItem) => {
       <View style={[localStyles.margins]}>
         <View style={localStyles.content}>
           <Text style={styles.textTotal}>
-            {round(totalList?.reduce((prev, item) => prev + round(item?.quantity || 0), 0)) || 0} кг х{' '}
+            {round(totalList?.reduce((prev, item) => prev + round(item?.quantity || 0), 0)) || 0} кг /{' '}
             {round(totalList?.reduce((prev, item) => prev + round(item?.price || 0), 0)) || 0} р.
           </Text>
-        </View>
-        <View style={localStyles.sum}>
-          <Text style={styles.textTotal}>Сумма: </Text>
-          <Text style={textStyle}>{round(totalQuantity)} р.</Text>
         </View>
       </View>
     </View>
@@ -141,11 +131,5 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 5,
-  },
-  sum: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: 2,
   },
 });
