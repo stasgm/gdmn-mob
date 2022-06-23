@@ -57,7 +57,11 @@ const OrderTotal = ({ orderId }: IItem) => {
           ),
         )
         ?.reduce((s: number, line) => {
-          return round(s + round((line.quantity / (line.good.invWeight || 1)) * line.good.priceFsn));
+          return round(
+            s +
+              round((line.quantity / (line.good.invWeight || 1)) * line.good.priceFsn) +
+              round((line.good.priceFsn * Number(line.good.vat || 0)) / 100),
+          );
         }, 0),
     }))
     .filter((i) => i.quantity > 0);
