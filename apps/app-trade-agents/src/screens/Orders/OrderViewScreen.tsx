@@ -59,7 +59,7 @@ const OrderViewScreen = () => {
     [colors.notification, colors.text, debt?.saldoDebt],
   );
 
-  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === order.head.outlet.id);
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === order?.head?.outlet.id);
 
   const address = outlet ? outlet.address : '';
 
