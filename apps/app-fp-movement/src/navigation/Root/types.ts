@@ -43,7 +43,7 @@ export type OrderParamList = RefParamList & {
   OrderEdit: { id: string };
   OtvesView: { id: string };
   ScanOrder: { docId?: string; docType?: string };
-  ScanGood: { docId?: string; tempId?: string; docType?: string };
+  ScanGood: { docId: string; tempId: string; docType?: string };
 };
 
 export type OrderStackParamList = { OrderList: undefined } & OrderParamList;

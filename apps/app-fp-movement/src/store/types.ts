@@ -51,7 +51,7 @@ export interface IOrderHead extends IHead {
 
 export interface IOrderLine extends IEntity {
   good: IGood;
-  quantity: number;
+  weight: number;
   packagekey?: INamedEntity; // Вид упаковки
 }
 

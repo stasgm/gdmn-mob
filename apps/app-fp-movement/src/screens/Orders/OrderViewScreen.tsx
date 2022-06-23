@@ -54,10 +54,12 @@ const OrderViewScreen = () => {
   const [del, setDel] = useState(false);
 
   const order = docSelectors.selectByDocId<ITempDocument>(id);
-  const otvesId = docSelectors
-    .selectByDocType<IOtvesDocument>('otves')
-    .find((item) => item.head.barcode === order.head.barcode)?.id;
+  const otvesId =
+    docSelectors.selectByDocType<IOtvesDocument>('otves').find((item) => item.head?.barcode === order?.head?.barcode)
+      ?.id || '-1';
 
+  console.log('order', order);
+  console.log('ot', otvesId);
   const isBlocked = order?.status !== 'DRAFT';
 
   // const handleAddOrderLine = useCallback(() => {
@@ -90,8 +92,9 @@ const OrderViewScreen = () => {
         setError(false);
         navigation.navigate('OrderLine', {
           mode: 0,
-          docId: id,
+          docId: otvesId,
           item: barcodeItem,
+          tempId: id,
         });
         setVisibleDialog(false);
         setBarcode('');
@@ -100,7 +103,7 @@ const OrderViewScreen = () => {
       }
     },
 
-    [goods, id, navigation],
+    [goods, id, navigation, otvesId],
   );
 
   const handleShowDialog = () => {
@@ -150,7 +153,8 @@ const OrderViewScreen = () => {
         text: 'Да',
         onPress: async () => {
           const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+          const res1 = await docDispatch(documentActions.removeDocument(otvesId));
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS' && res1.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
             setDel(true);
             await sleep(500);
             navigation.goBack();
@@ -161,11 +165,11 @@ const OrderViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id, navigation, otvesId]);
 
   const handleDoScan = useCallback(() => {
-    navigation.navigate('ScanGood', { docId: id });
-  }, [navigation, id]);
+    navigation.navigate('ScanGood', { docId: otvesId, tempId: id });
+  }, [navigation, id, otvesId]);
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = order?.lines[order?.lines.length - 1].id;
@@ -265,13 +269,13 @@ const OrderViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(order?.status || 'DRAFT')}
-        title={order.head.outlet?.name}
+        title={order?.head?.outlet?.name}
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
         <View style={localStyles.infoBlock}>
           <Text style={textStyle}>
-            {`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(order.head?.onDate)}`}
+            {`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(order?.head?.onDate)}`}
           </Text>
           <View style={styles.rowCenter}>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}

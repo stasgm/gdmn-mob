@@ -6,6 +6,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { globalStyles as styles } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
+import { getDateString } from '@lib/mobile-app';
+
 import { IGood, IOrderLine } from '../../../store/types';
 import { OrderStackParamList } from '../../../navigation/Root/types';
 
@@ -36,16 +38,13 @@ const OrderItem = ({ docId, item, readonly = false }: IProps) => {
         <View style={styles.details}>
           <Text style={styles.name}>{item.good.name}</Text>
           <View style={[styles.directionRow]}>
-            <Text style={textStyle}>
-              {/* {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()} x{' '} */}
-              {item.quantity} {(good?.scale || 1) === 1 ? '' : 'уп. x ' + (good?.scale || 1).toString()}
-              {'кг  x  '}
-              {(good?.priceFsn || 0).toString()} р.
-            </Text>
-            {/* <Text style={textStyle}>
-              {Math.floor(item.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1) * 1000) / 1000} кг
-            </Text> */}
+            <Text style={textStyle}>Вес: {(item.weight || 0).toString()} кг</Text>
           </View>
+          <Text style={textStyle}>Номер партии: {item.numReceived || ''}</Text>
+
+          <Text style={textStyle}>
+            Дата: {getDateString(item.workDate) || ''} {new Date(item.workDate).toLocaleTimeString() || ''}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>

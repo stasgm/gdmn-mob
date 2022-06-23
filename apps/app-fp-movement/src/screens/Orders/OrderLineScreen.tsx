@@ -3,22 +3,28 @@ import { View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
-import { documentActions, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
-import { IOtvesLine } from '../../store/types';
+import { IOtvesLine, ITempDocument, ITempLine } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 import { OrderLine } from './components/OrderLine';
 
-export const OtrderLineScreen = () => {
+const round = (num: number) => {
+  return Math.round((num + Number.EPSILON) * 100) / 100;
+};
+
+export const OrderLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList | OrderStackParamList, 'OrderLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, item } = useRoute<RouteProp<OrderStackParamList, 'OrderLine'>>().params;
+  const { mode, docId, tempId, item } = useRoute<RouteProp<OrderStackParamList, 'OrderLine'>>().params;
   const [line, setLine] = useState<IOtvesLine>(item);
 
+  const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
+  console.log('docId', docId);
   const handleSave = useCallback(() => {
     dispatch(
       mode === 0

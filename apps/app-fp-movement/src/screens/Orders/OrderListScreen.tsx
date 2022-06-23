@@ -41,7 +41,10 @@ export const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderList'>>();
 
   const loading = useSelector((state) => state.documents.loading);
-  // const movements = useSelector((state) => state.documents.list) as ITempDocument[];
+  const movements = useSelector((state) => state.documents.list).filter(
+    (i) => i.documentType.name !== 'order',
+  ) as ITempDocument[];
+  console.log('docs', movements);
   const { colors } = useTheme();
 
   const dispatch = useDispatch();
