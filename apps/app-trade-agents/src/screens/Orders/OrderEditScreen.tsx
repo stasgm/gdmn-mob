@@ -350,7 +350,7 @@ const OrderEditScreen = () => {
           onChangeText={(text) => {
             dispatch(appActions.setFormParams({ comment: text || '' }));
           }}
-          disabled={isBlocked}
+          disabled={docStatus !== 'DRAFT'}
           clearInput={true}
         />
       </ScrollView>

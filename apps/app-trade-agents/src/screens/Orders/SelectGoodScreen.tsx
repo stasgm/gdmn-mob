@@ -22,31 +22,37 @@ const Good = ({ item }: { item: IGood }) => {
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
 
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
-  const good = doc.lines.find((i) => i.good.id === item.id);
+
+  const good = doc.lines?.find((i) => i.good.id === item.id);
+
+  const iconStyle = { backgroundColor: good ? '#06567D' : '#E91E63' };
 
   const handleNavigate = () => {
     if (good) {
       Alert.alert('Внимание!', 'Данный товар уже добавлен в позицию документа', [
         {
+          text: 'Отмена',
+        },
+        {
+          text: 'Добавить',
+          onPress: () =>
+            navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } }),
+        },
+
+        {
           text: 'Редактировать',
           onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
         },
-        {
-          text: 'Отмена',
-        },
       ]);
     } else {
-      navigation.navigate('OrderLine', {
-        mode: 0,
-        docId,
-        item: { id: generateId(), good: item, quantity: 0 },
-      });
+      navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
     }
   };
+
   return (
     <TouchableOpacity onPress={handleNavigate}>
       <View style={styles.item}>
-        <View style={[styles.icon]}>
+        <View style={[styles.icon, iconStyle]}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
