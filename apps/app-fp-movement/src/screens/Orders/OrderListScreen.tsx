@@ -41,10 +41,7 @@ export const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderList'>>();
 
   const loading = useSelector((state) => state.documents.loading);
-  const movements = useSelector((state) => state.documents.list).filter(
-    (i) => i.documentType.name !== 'order',
-  ) as ITempDocument[];
-  console.log('docs', movements);
+
   const { colors } = useTheme();
 
   const dispatch = useDispatch();
@@ -170,7 +167,6 @@ export const OrderListScreen = () => {
         };
 
         if (otvesList.find((i) => i.head.barcode === tempDoc.head.barcode)) {
-          console.log('1');
           // dispatch(documentActions.removeDocument('08b6266e38'));
 
           return;

@@ -32,7 +32,6 @@ const OrderEditScreen = () => {
   const outlet1 = order?.head.outlet;
   const onDate1 = order?.head.onDate;
 
-  console.log('order', order?.head.barcode);
   const orderType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'order');

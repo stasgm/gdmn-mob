@@ -26,10 +26,7 @@ const ScanGoodScreen = () => {
   const tempId = useRoute<RouteProp<OrderStackParamList, 'ScanGood'>>().params?.tempId;
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'ScanGood'>>();
   const settings = useSelector((state) => state.settings?.data);
-  const params = useRoute<RouteProp<OrderStackParamList, 'ScanGood'>>().params;
-  console.log('params', params);
 
-  console.log('doc', docId, 'temp', tempId);
   const isScanerReader = settings.scannerUse?.data;
 
   const [visibleDialog, setVisibleDialog] = useState(false);

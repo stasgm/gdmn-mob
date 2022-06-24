@@ -47,7 +47,6 @@ const OtvesViewScreen = () => {
   const [del, setDel] = useState(false);
 
   const order = docSelectors.selectByDocId<IOtvesDocument>(id);
-  console.log('or', order);
 
   const isBlocked = order?.status !== 'DRAFT';
 

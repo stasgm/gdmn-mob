@@ -58,8 +58,6 @@ const OrderViewScreen = () => {
     docSelectors.selectByDocType<IOtvesDocument>('otves').find((item) => item.head?.barcode === order?.head?.barcode)
       ?.id || '-1';
 
-  console.log('order', order);
-  console.log('ot', otvesId);
   const isBlocked = order?.status !== 'DRAFT';
 
   // const handleAddOrderLine = useCallback(() => {

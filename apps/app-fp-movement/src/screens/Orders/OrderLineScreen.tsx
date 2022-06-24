@@ -1,5 +1,5 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
@@ -8,13 +8,13 @@ import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
-import { IOtvesLine, ITempDocument, ITempLine } from '../../store/types';
+import { IOtvesLine, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 import { OrderLine } from './components/OrderLine';
 
 const round = (num: number) => {
-  return Math.round((num + Number.EPSILON) * 100) / 100;
+  return Math.round((num + Number.EPSILON) * 1000) / 1000;
 };
 
 export const OrderLineScreen = () => {
@@ -24,15 +24,43 @@ export const OrderLineScreen = () => {
   const [line, setLine] = useState<IOtvesLine>(item);
 
   const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
-  console.log('docId', docId);
+
   const handleSave = useCallback(() => {
+    for (const tempLine of tempLines) {
+      if (line.good.id === tempLine.good.id) {
+        console.log('123');
+        const newLine = { ...tempLine, weight: round(tempLine.weight - line.weight) };
+        if (newLine.weight > 0) {
+          dispatch(
+            documentActions.updateDocumentLine({
+              docId: tempId,
+              line: newLine,
+            }),
+          );
+        } else if (newLine.weight === 0) {
+          dispatch(documentActions.removeDocumentLine({ docId: tempId, lineId: tempLine.id }));
+        } else {
+          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+            {
+              text: 'Да',
+              onPress: async () => {
+                dispatch(documentActions.removeDocumentLine({ docId: tempId, lineId: tempLine.id }));
+              },
+            },
+            {
+              text: 'Отмена',
+            },
+          ]);
+        }
+      }
+    }
     dispatch(
       mode === 0
         ? documentActions.addDocumentLine({ docId, line })
         : documentActions.updateDocumentLine({ docId, line }),
     );
     navigation.goBack();
-  }, [navigation, line, docId, dispatch, mode]);
+  }, [dispatch, docId, line, mode, navigation, tempId, tempLines]);
 
   const renderRight = useCallback(
     () => (
