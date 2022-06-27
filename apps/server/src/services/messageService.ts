@@ -23,13 +23,15 @@ const addOne = async ({
   producerId,
   appSystemId,
   companyId,
+  deviceId,
 }: {
   msgObject: NewMessage;
   producerId: string;
   appSystemId: string;
   companyId: string;
+  deviceId: string;
 }): Promise<string> => {
-  const { messages, companies, appSystems, users } = getDb();
+  const { messages, companies, appSystems, users, devices } = getDb();
 
   if (!companies.findById(companyId)) {
     throw new DataNotFoundException('Компания не найдена');
@@ -45,12 +47,17 @@ const addOne = async ({
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  const newMessage = await makeDBNewMessage(msgObject, producerId);
+  /* if (!devices.findById(deviceId)) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }*/
+
+  const newMessage = await makeDBNewMessage(msgObject, producerId, deviceId);
 
   const fileInfo: IFileMessageInfo = {
     id: newMessage.id,
     producerId,
     consumerId: newMessage.head.consumerId,
+    deviceId,
   };
 
   return await messages.insert(newMessage, { companyId, appSystemName: appSystem.name }, fileInfo);
@@ -61,24 +68,32 @@ const addOne = async ({
  * @param param0 appSystemId - ИД подсистемы
  * companyId - ИД организации
  * consumerId - ИД получателя
+ * deviceId - ИД устройства
  * @return массив сообщений
  * */
 const FindMany = async ({
   appSystemName,
   companyId,
   consumerId,
+  deviceId,
 }: {
   appSystemName: string;
   companyId: string;
   consumerId: string;
+  deviceId: string;
 }) => {
-  const { messages, users } = getDb();
+  const { messages, users, devices } = getDb();
 
   if (!users.findById(consumerId)) {
     throw new DataNotFoundException('Получатель не найден');
   }
+
+  /*if (!devices.findById(deviceId)) {
+    throw new DataNotFoundException('Устройство не найдено');
+  }*/
+
   try {
-    const messageList = await messages.readByConsumerId({ companyId, appSystemName }, consumerId);
+    const messageList = await messages.readByConsumerId({ companyId, appSystemName }, consumerId, deviceId);
     const pr = messageList.map(async (i) => await makeMessage(i));
     return Promise.all(pr);
   } catch (err) {
@@ -122,13 +137,18 @@ export const makeMessage = async (message: IDBMessage): Promise<IMessage> => {
       producer: users.getNamedItem(message.head.producerId),
       dateTime: message.head.dateTime,
       order: message.head.order,
+      deviceId: message.head.deviceId,
     },
     status: message.status,
     body: message.body,
   };
 };
 
-export const makeDBNewMessage = async (message: NewMessage, producerId: string): Promise<IDBMessage> => {
+export const makeDBNewMessage = async (
+  message: NewMessage,
+  producerId: string,
+  deviceId: string,
+): Promise<IDBMessage> => {
   return {
     id: generateId(),
     head: {
@@ -136,6 +156,7 @@ export const makeDBNewMessage = async (message: NewMessage, producerId: string):
       companyId: message.head.company.id,
       consumerId: message.head.consumer.id,
       producerId,
+      deviceId,
       dateTime: new Date().toISOString(),
       order: message.head.order,
     },
