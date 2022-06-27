@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
-import { AppScreen, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { globalStyles, AppScreen, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
@@ -59,6 +59,12 @@ const Good = ({ item }: { item: IGood }) => {
           <View style={styles.directionRow}>
             <Text style={styles.name}>{item.name || item.id}</Text>
           </View>
+          {good ? (
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <Text style={globalStyles.field}>{good?.quantity} кг</Text>
+            </View>
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>
