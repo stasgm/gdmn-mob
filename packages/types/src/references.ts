@@ -1,4 +1,4 @@
-import { IEntity } from './common';
+import { IEntity, INamedEntity } from './common';
 
 interface IReferenceData extends IEntity {
   [fieldName: string]: any;

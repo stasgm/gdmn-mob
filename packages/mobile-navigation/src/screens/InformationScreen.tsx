@@ -30,7 +30,6 @@ const InformationScreen = () => {
       headerLeft: () => <DrawerButton />,
     });
   }, [navigation]);
-  console.log('Constants.manifest?.extra?.documentationUrl', Constants.manifest?.extra?.documentationUrl);
 
   return (
     <View style={localStyles.container}>

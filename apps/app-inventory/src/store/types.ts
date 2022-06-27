@@ -15,6 +15,7 @@ import {
 export interface IFormParam {
   [fieldName: string]: unknown;
 }
+
 export interface IInventoryFormParam extends IFormParam {
   number?: string;
   documentDate?: string;

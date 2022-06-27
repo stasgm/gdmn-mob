@@ -277,6 +277,7 @@ const OrderEditScreen = () => {
       fieldName: 'outlet',
       clause: params,
       value: docOutlet && [docOutlet],
+      descrFieldName: 'address',
     });
   }, [docContact?.id, docOutlet, docRoute, isBlocked, navigation]);
 

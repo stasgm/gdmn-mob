@@ -1,13 +1,15 @@
-import { INamedEntity } from '@lib/types';
+import { IReferenceData } from '@lib/types';
 
 import { IGood, IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
   fieldName: string;
-  value?: INamedEntity[];
+  value?: IReferenceData[];
   clause?: Record<string, string>;
   isMulti?: boolean;
+  refFieldName?: string;
+  descrFieldName?: string;
 };
 
 export type RefParamList = {

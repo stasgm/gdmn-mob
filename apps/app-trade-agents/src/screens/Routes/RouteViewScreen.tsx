@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+
 import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, Alert, RefreshControl, Text } from 'react-native';
 import { Divider, IconButton, Searchbar } from 'react-native-paper';
@@ -30,6 +31,7 @@ interface IFilteredList {
 const keyExtractor = (item: IRouteLine) => String(item.id);
 
 const RouteViewScreen = () => {
+  console.log('0000000');
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
@@ -45,7 +47,7 @@ const RouteViewScreen = () => {
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
   const route = docSelectors.selectByDocId<IRouteDocument>(id);
-  const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
+  const routeLineList = useMemo(() => route?.lines.sort((a, b) => a.ordNumber - b.ordNumber), [route?.lines]);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -89,25 +91,35 @@ const RouteViewScreen = () => {
 
   const docs = useSelector((state) => state.documents.list);
 
-  const visitList = (docs as IVisitDocument[])
-    ?.filter((e) => e.documentType.name === 'visit' && routeLineList?.find((line) => line.id === e.head.routeLineId))
-    .map((doc) => doc.id);
-
-  const orderList = (docs as IOrderDocument[])
-    ?.filter((e) => e.documentType.name === 'order' && e.head.route?.id === id)
-    .map((doc) => doc.id);
-
-  const returnList = (docs as IReturnDocument[])
-    ?.filter((e) => e.documentType.name === 'return' && e.head.route?.id === id)
-    .map((doc) => doc.id);
-
   const geoList = useAppSelector((state) => state.geo?.list?.filter((g) => g.routeId === id));
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
-      const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
-      dispatch(actions.geoActions.removeMany(geoList));
+      const delDocList: string[] = [];
+
+      (docs as IVisitDocument[] | IReturnDocument[] | IOrderDocument[])?.forEach((doc) => {
+        switch (doc.documentType.name) {
+          case 'visit': {
+            if (routeLineList?.find((line) => line.id === doc.head.routeLineId)) {
+              delDocList.push(doc.id);
+            }
+            break;
+          }
+          case 'order':
+          case 'return': {
+            if (doc.head.route?.id === id) {
+              delDocList.push(doc.id);
+            }
+            break;
+          }
+        }
+      });
+
+      delDocList.push(id);
+
+      const res = await docDispatch(documentActions.removeDocuments(delDocList));
       if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
+        dispatch(actions.geoActions.removeMany(geoList));
         navigation.goBack();
       }
     };
@@ -115,15 +127,13 @@ const RouteViewScreen = () => {
     Alert.alert('Вы уверены, что хотите удалить маршрут и его документы?', '', [
       {
         text: 'Да',
-        onPress: async () => {
-          deleteRoute();
-        },
+        onPress: deleteRoute,
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [dispatch, docDispatch, geoList, id, navigation, orderList, returnList, visitList]);
+  }, [dispatch, docDispatch, docs, geoList, id, navigation, routeLineList]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -182,7 +192,12 @@ const RouteViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />;
+  const renderItem = ({ item }: { item: IRouteLine }) => {
+    console.log(111111111111111);
+    return <RouteItem item={item} routeId={route.id} />;
+  };
+
+  console.log(222222);
 
   return (
     <AppScreen>

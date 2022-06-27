@@ -227,6 +227,7 @@ const ReturnEditScreen = () => {
       fieldName: 'outlet',
       clause: params,
       value: docOutlet && [docOutlet],
+      descrFieldName: 'address',
     });
   };
 
