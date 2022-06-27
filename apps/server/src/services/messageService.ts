@@ -47,9 +47,9 @@ const addOne = async ({
     throw new DataNotFoundException('Подсистема не найдена');
   }
 
-  /* if (!devices.findById(deviceId)) {
+  if (!devices.data.find((el: any) => el.uid === deviceId)) {
     throw new DataNotFoundException('Устройство не найдено');
-  }*/
+  }
 
   const newMessage = await makeDBNewMessage(msgObject, producerId, deviceId);
 
@@ -88,9 +88,9 @@ const FindMany = async ({
     throw new DataNotFoundException('Получатель не найден');
   }
 
-  /*if (!devices.findById(deviceId)) {
+  if (!devices.data.find((el: any) => el.uid === deviceId)) {
     throw new DataNotFoundException('Устройство не найдено');
-  }*/
+  }
 
   try {
     const messageList = await messages.readByConsumerId({ companyId, appSystemName }, consumerId, deviceId);
