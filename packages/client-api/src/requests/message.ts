@@ -16,6 +16,7 @@ class Message extends BaseRequest {
     consumer: INamedEntity,
     message: IMessage['body'],
     order: number,
+    deviceId: string,
   ) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
@@ -29,7 +30,7 @@ class Message extends BaseRequest {
 
     try {
       const body: NewMessage = {
-        head: { company, consumer, appSystem, order },
+        head: { company, consumer, appSystem, order, deviceId },
         status: 'READY',
         body: message,
       };

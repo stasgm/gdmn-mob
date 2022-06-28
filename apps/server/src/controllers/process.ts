@@ -5,6 +5,7 @@ import { AddProcess, InterruptProcess, CancelProcess, UpdateProcess, PrepareProc
 import { processService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
+import { InvalidParameterException } from '../exceptions';
 
 /**
  * API 1
@@ -12,10 +13,14 @@ import { created, ok } from '../utils/apiHelpers';
  */
 export const addProcess = async (ctx: Context) => {
   const { appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles } = ctx.request.body as AddProcess;
+  const deviceId = ctx.query.deviceId;
+  if (typeof deviceId !== 'string') {
+    throw new InvalidParameterException('Не указан идентификатор устройства');
+  }
 
   created(
     ctx,
-    processService.addOne({ appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles }),
+    processService.addOne({ appSystemId, companyId, consumerId, producerIds, maxDataVolume, maxFiles, deviceId }),
     'addProcess',
   );
 };
@@ -33,7 +38,7 @@ export const updateProcess = async (ctx: Context) =>
  * @param ctx
  * @returns
  */
-export const prepareProcess = async (ctx: Context) =>
+export const prepareProcess = async (ctx: Context) => {
   ok(
     ctx,
     processService.prepareById({
@@ -43,6 +48,7 @@ export const prepareProcess = async (ctx: Context) =>
     }),
     'prepareProcess',
   );
+};
 
 /**
  * API 4

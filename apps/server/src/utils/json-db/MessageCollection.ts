@@ -20,7 +20,7 @@ import { CollectionItem } from './CollectionItem';
  */
 
 export const messageFileName2params = (fileName: string): IFileMessageInfo => {
-  const re = /(.+)_from_(.+)_to_(.+)\.json/gi;
+  const re = /(.+)_from_(.+)_to_(.+)_dev_(.+)\.json/gi;
   const match = re.exec(fileName);
 
   if (!match) {
@@ -31,11 +31,12 @@ export const messageFileName2params = (fileName: string): IFileMessageInfo => {
     id: match[1],
     producerId: match[2],
     consumerId: match[3],
+    deviceId: match[4],
   };
 };
 
-export const params2messageFileName = ({ id, producerId, consumerId }: IFileMessageInfo) =>
-  `${id}_from_${producerId}_to_${consumerId}.json`;
+export const params2messageFileName = ({ id, producerId, consumerId, deviceId }: IFileMessageInfo) =>
+  `${id}_from_${producerId}_to_${consumerId}_dev_${deviceId}.json`;
 
 /**
  * @template T
@@ -81,12 +82,12 @@ class CollectionMessage<T extends CollectionItem> {
   /**
    * Returns every entry in the collection.
    */
-  public async readByConsumerId(params: IAppSystemParams, consumerId: string): Promise<Array<T>> {
+  public async readByConsumerId(params: IAppSystemParams, consumerId: string, deviceId: string): Promise<Array<T>> {
     const filesInfoArr: IFileMessageInfo[] | undefined = await this._readDir(params);
 
     if (!filesInfoArr) return [];
 
-    const fileInfo = filesInfoArr.filter((item) => item.consumerId === consumerId);
+    const fileInfo = filesInfoArr.filter((item) => item.consumerId === consumerId && item.deviceId === deviceId);
 
     const pr = fileInfo.map(async (item) => {
       return await this._get(await this._Obj2FullFileName(params, item));
