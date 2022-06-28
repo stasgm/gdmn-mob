@@ -32,6 +32,7 @@ export type AddProcess = {
   companyId: string;
   appSystemId: string;
   consumerId: string;
+  deviceId: string;
   producerIds?: string[];
   maxFiles?: number;
   maxDataVolume?: number;
