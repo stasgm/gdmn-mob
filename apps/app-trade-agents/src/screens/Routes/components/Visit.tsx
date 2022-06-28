@@ -48,6 +48,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
+  const [sendLoading, setSendLoading] = useState(false);
 
   const dateBegin = useMemo(() => new Date(visit.head.dateBegin), [visit.head.dateBegin]);
   const dateEnd = useMemo(() => (visit.head.dateEnd ? new Date(visit.head.dateEnd) : undefined), [visit.head.dateEnd]);
@@ -102,6 +103,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   }, [docDispatch, visit, orderDocs, returnDocs]);
 
   const handleReopenVisit = useCallback(async () => {
+    setSendLoading(false);
     const date = new Date().toISOString();
 
     const updatedVisit: IVisitDocument = {
@@ -280,6 +282,10 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const handleSendDocs = useSendDocs(readyDocs);
 
+  const a = () => {
+    setSendLoading(true);
+    handleSendDocs();
+  };
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
   const orderListStyle = useMemo(() => [{ paddingBottom: returns.length ? 20 : 0 }], [returns.length]);
   const returnViewStyle = useMemo(() => [{ paddingBottom: returns.length > 1 ? 15 : 0 }], [returns.length]);
@@ -358,8 +364,8 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         readyDocs.length > 0 && (
           <PrimeButton
             icon={!loading ? 'file-send' : 'block-helper'}
-            onPress={handleSendDocs}
-            disabled={loading}
+            onPress={a}
+            disabled={sendLoading || loading}
             loadIcon={loading}
           >
             Отправить
