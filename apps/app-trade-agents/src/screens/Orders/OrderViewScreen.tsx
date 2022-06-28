@@ -13,11 +13,12 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  SendButton,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
 
-import { formatValue, generateId, getDateString } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString, useSendDocs } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
@@ -115,6 +116,8 @@ const OrderViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
+  const handleSendOrder = useSendDocs([order]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -145,11 +148,12 @@ const OrderViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
+          <SendButton onPress={handleSendOrder} />
           <AddButton onPress={handleAddOrderLine} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleAddOrderLine, isBlocked],
+    [actionsMenu, handleAddOrderLine, handleSendOrder, isBlocked],
   );
 
   useLayoutEffect(() => {

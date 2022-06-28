@@ -279,11 +279,11 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     ];
   }, [orderDocs, returnDocs]);
 
-  const handleSendDocs = useSendDocs(readyDocs);
+  const handleReadyDocs = useSendDocs(readyDocs);
 
-  const a = () => {
+  const handleSendDocs = () => {
     setSendLoading(true);
-    handleSendDocs();
+    handleReadyDocs();
   };
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
   const orderListStyle = useMemo(() => [{ paddingBottom: returns.length ? 20 : 0 }], [returns.length]);
@@ -363,7 +363,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         readyDocs.length > 0 && (
           <PrimeButton
             icon={!loading ? 'file-send' : 'block-helper'}
-            onPress={a}
+            onPress={handleSendDocs}
             disabled={sendLoading || loading}
             loadIcon={loading}
           >
