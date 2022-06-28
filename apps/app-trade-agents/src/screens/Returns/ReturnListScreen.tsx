@@ -138,7 +138,11 @@ const ReturnListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
+      <SwipeListItem
+        renderItem={item}
+        item={doc}
+        routeName={doc.status === 'DRAFT' || doc.status === 'READY' ? 'ReturnEdit' : 'ReturnView'}
+      >
         <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
