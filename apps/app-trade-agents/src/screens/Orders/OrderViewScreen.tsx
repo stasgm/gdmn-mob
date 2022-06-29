@@ -49,6 +49,7 @@ const OrderViewScreen = () => {
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const [del, setDel] = useState(false);
+  const [isSend, setIsSend] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
@@ -121,15 +122,22 @@ const OrderViewScreen = () => {
   const handleSendDoc = useSendDocs([order]);
 
   const handleSendOrder = useCallback(() => {
+    setIsSend(true);
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: () => {
+          setTimeout(() => {
+            setIsSend(false);
+          }, 10000);
           handleSendDoc();
         },
       },
       {
         text: 'Отмена',
+        onPress: () => {
+          setIsSend(false);
+        },
       },
     ]);
   }, [handleSendDoc]);
@@ -164,12 +172,12 @@ const OrderViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <SendButton onPress={handleSendOrder} disabled={docLoading} />
+          <SendButton onPress={handleSendOrder} disabled={isSend} />
           <AddButton onPress={handleAddOrderLine} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [handleSendOrder, actionsMenu, docLoading, handleAddOrderLine, isBlocked],
+    [isBlocked, handleSendOrder, isSend, handleAddOrderLine, actionsMenu],
   );
 
   useLayoutEffect(() => {
@@ -189,17 +197,6 @@ const OrderViewScreen = () => {
   );
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
-
-  if (docLoading) {
-    return (
-      <View style={styles.container}>
-        <View style={localStyles.del}>
-          <SubTitle style={styles.title}>Отправка документа</SubTitle>
-          <ActivityIndicator size="small" color={colorStyle} />
-        </View>
-      </View>
-    );
-  }
 
   if (del) {
     return (
