@@ -12,6 +12,7 @@ export interface IHeadMessage {
   dateTime: string;
   order: number;
   replyTo?: string;
+  deviceId: string;
 }
 
 export interface ICmdParams<T = any> {
@@ -94,6 +95,7 @@ export interface IFileMessageInfo {
   id: string;
   producerId: string;
   consumerId: string;
+  deviceId: string;
 }
 
 export interface ICheckTransafer {

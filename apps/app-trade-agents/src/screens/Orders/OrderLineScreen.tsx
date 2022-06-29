@@ -48,13 +48,29 @@ const OrderLineScreen = () => {
         setLoading(false);
         return;
       }
-      dispatch(
-        mode === 0
-          ? documentActions.addDocumentLine({ docId, line })
-          : documentActions.updateDocumentLine({ docId, line }),
-      );
-
-      navigation.goBack();
+      if (line.quantity) {
+        dispatch(
+          mode === 0
+            ? documentActions.addDocumentLine({ docId, line })
+            : documentActions.updateDocumentLine({ docId, line }),
+        );
+        navigation.goBack();
+      } else {
+        Alert.alert('Внимание!', 'В позиции не указан вес товара. Все равно продолжить сохранение?', [
+          {
+            text: 'Да',
+            onPress: () => {
+              dispatch(
+                mode === 0
+                  ? documentActions.addDocumentLine({ docId, line })
+                  : documentActions.updateDocumentLine({ docId, line }),
+              );
+              navigation.goBack();
+            },
+          },
+          { text: 'Отмена', onPress: () => setLoading(false) },
+        ]);
+      }
     }
   }, [dispatch, docId, line, loading, mode, navigation, packages.length]);
 

@@ -58,7 +58,11 @@ const OrderListScreen = () => {
           : true
         : false,
     )
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+    .sort(
+      (a, b) =>
+        new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+        new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+    );
 
   const [status, setStatus] = useState<Status>('all');
 
