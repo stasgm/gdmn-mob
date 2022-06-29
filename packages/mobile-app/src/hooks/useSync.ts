@@ -23,7 +23,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const authDispatch = useAuthThunkDispatch();
   const dispatch = useDispatch();
 
-  const { user, company } = useSelector((state) => state.auth);
+  const { user, company, config } = useSelector((state) => state.auth);
   const { list: documents } = useSelector((state) => state.documents);
   const { data: settings } = useSelector((state) => state.settings);
 
@@ -61,6 +61,8 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
     const okList: string[] = [];
 
     const consumer = user.erpUser;
+
+    const deviceId = config.deviceId!;
 
     /*
       Поддержка платформы:
@@ -111,6 +113,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
               consumer,
               sendingDocsMessage,
               getNextOrder(),
+              deviceId,
             );
 
             if (sendMessageResponse.type === 'SEND_MESSAGE') {
@@ -183,6 +186,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
               consumer,
               messageGetRef,
               getNextOrder(),
+              deviceId,
             );
 
             if (sendMesRefResponse?.type === 'ERROR') {
@@ -199,6 +203,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             consumer,
             messageGetDoc,
             getNextOrder(),
+            deviceId,
           );
 
           if (sendMesDocRespone.type === 'ERROR') {
@@ -235,6 +240,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             consumer,
             messageGetDepart,
             getNextOrder(),
+            deviceId,
           );
 
           if (sendMesDepartResponse.type === 'ERROR') {
