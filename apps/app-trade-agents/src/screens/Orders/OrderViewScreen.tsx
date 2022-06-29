@@ -43,7 +43,8 @@ const OrderViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
-  const appLoading = useSelector((state) => state.app.loading);
+  const docLoading = useSelector((state) => state.documents.loading);
+  console.log('load', docLoading);
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
@@ -117,20 +118,21 @@ const OrderViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
-  const handleSendOrder = useSendDocs([order]);
-  const a = useCallback(() => {
+  const handleSendDoc = useSendDocs([order]);
+
+  const handleSendOrder = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: () => {
-          handleSendOrder();
+          handleSendDoc();
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [handleSendOrder]);
+  }, [handleSendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -162,12 +164,12 @@ const OrderViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <SendButton onPress={a} />
+          <SendButton onPress={handleSendOrder} disabled={docLoading} />
           <AddButton onPress={handleAddOrderLine} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [a, actionsMenu, handleAddOrderLine, isBlocked],
+    [handleSendOrder, actionsMenu, docLoading, handleAddOrderLine, isBlocked],
   );
 
   useLayoutEffect(() => {
@@ -188,6 +190,17 @@ const OrderViewScreen = () => {
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
+  if (docLoading) {
+    return (
+      <View style={styles.container}>
+        <View style={localStyles.del}>
+          <SubTitle style={styles.title}>Отправка документа</SubTitle>
+          <ActivityIndicator size="small" color={colorStyle} />
+        </View>
+      </View>
+    );
+  }
+
   if (del) {
     return (
       <View style={styles.container}>
@@ -198,16 +211,7 @@ const OrderViewScreen = () => {
       </View>
     );
   } else {
-    if (appLoading) {
-      return (
-        <View style={styles.container}>
-          <View style={localStyles.del}>
-            <SubTitle style={styles.title}>Отправка документа</SubTitle>
-            <ActivityIndicator size="small" color={colorStyle} />
-          </View>
-        </View>
-      );
-    } else if (!order) {
+    if (!order) {
       return (
         <View style={styles.container}>
           <SubTitle style={styles.title}>Документ не найден</SubTitle>
