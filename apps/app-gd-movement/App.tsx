@@ -42,6 +42,7 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageGdMovement } from './src/store/mock';
 
 import RemainsNavigator from './src/navigation/RemainsNavigator';
+import { ScanNavigator } from './src/navigation/ScanNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -51,6 +52,12 @@ const Root = () => {
         title: 'Документы',
         icon: 'file-document-outline',
         component: DocNavigator,
+      },
+      {
+        name: 'Scan',
+        title: 'Сканирование',
+        icon: 'file-document-outline',
+        component: ScanNavigator,
       },
       {
         name: 'Remains',

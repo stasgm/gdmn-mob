@@ -56,6 +56,11 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               toRequired: true,
               sortOrder: 2,
             },
+            {
+              id: '189548606',
+              name: 'scan',
+              description: 'Сканирование',
+            },
           ],
         },
         good: {

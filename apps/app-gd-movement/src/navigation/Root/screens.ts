@@ -13,6 +13,8 @@ import ScanBarcodeScreen from '../../screens/Doc/ScanBarcodeScreen';
 
 import { ContactListScreen, GoodListScreen, GoodLineScreen } from '../../screens/Remains';
 
+import { ScanListScreen, ScanViewScreen, ScanEditScreen } from '../../screens/Scan';
+
 export const docScreens = {
   DocEdit: { title: 'Документ', component: DocEditScreen },
   DocView: { title: 'Документ', component: DocViewScreen },
@@ -36,4 +38,14 @@ export const remainsListScreens = {
 export const remainsScreens = {
   GoodList: { title: 'Остатки', component: GoodListScreen },
   GoodLine: { title: 'Позиция остатков', component: GoodLineScreen },
+};
+
+export const scanListScreens = {
+  ScanList: { title: 'Сканирование', component: ScanListScreen },
+};
+
+export const scanScreens = {
+  ScanView: { title: 'Документ', component: ScanViewScreen },
+  ScanEdit: { title: 'Документ', component: ScanEditScreen },
+  SelectRefItemScan: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
