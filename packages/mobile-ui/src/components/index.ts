@@ -1,5 +1,14 @@
 export { default as AppFallback } from './AppFallback';
-export { AddButton, BackButton, DrawerButton, MenuButton, SaveButton, SearchButton, ScanButton } from './AppBar';
+export {
+  AddButton,
+  BackButton,
+  DrawerButton,
+  MenuButton,
+  SaveButton,
+  SearchButton,
+  ScanButton,
+  SendButton,
+} from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';
 export { RadioGroup } from './RadioGroup';

@@ -149,7 +149,11 @@ const OrderListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
+      <SwipeListItem
+        renderItem={item}
+        item={doc}
+        routeName={doc.status === 'DRAFT' || doc.status === 'READY' ? 'OrderEdit' : 'OrderView'}
+      >
         <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
