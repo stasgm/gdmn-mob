@@ -15,6 +15,13 @@ export interface IMoveFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface IOrderFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  comment?: string;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;

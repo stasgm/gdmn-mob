@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
+import { Alert, View, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
@@ -12,8 +12,8 @@ import { IDocumentType, IReference } from '@lib/types';
 import { generateId, getDateString } from '@lib/mobile-app';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOutlet, IOrderFormParam, ITempDocument } from '../../store/types';
-import { getNextDocNumber } from '../../utils/helpers';
+import { IOrderDocument, IOrderFormParam, ITempDocument } from '../../store/types';
+
 import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 

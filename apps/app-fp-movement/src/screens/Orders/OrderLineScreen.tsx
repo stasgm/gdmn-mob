@@ -26,34 +26,35 @@ export const OrderLineScreen = () => {
   const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
 
   const handleSave = useCallback(() => {
-    for (const tempLine of tempLines) {
-      if (line.good.id === tempLine.good.id) {
-        console.log('123');
-        const newLine = { ...tempLine, weight: round(tempLine.weight - line.weight) };
-        if (newLine.weight > 0) {
-          dispatch(
-            documentActions.updateDocumentLine({
-              docId: tempId,
-              line: newLine,
-            }),
-          );
-        } else if (newLine.weight === 0) {
-          dispatch(documentActions.removeDocumentLine({ docId: tempId, lineId: tempLine.id }));
-        } else {
-          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
-            {
-              text: 'Да',
-              onPress: async () => {
-                dispatch(documentActions.removeDocumentLine({ docId: tempId, lineId: tempLine.id }));
-              },
+    // for (const tempLine of tempLines) {
+    const tempLine = tempLines.find((i) => line.good.id === i.good.id);
+    if (tempLine) {
+      console.log('123');
+      const newLine = { ...tempLine, weight: round(tempLine.weight - line.weight) };
+      if (newLine.weight > 0) {
+        dispatch(
+          documentActions.updateDocumentLine({
+            docId: tempId,
+            line: newLine,
+          }),
+        );
+      } else if (newLine.weight === 0) {
+        dispatch(documentActions.removeDocumentLine({ docId: tempId, lineId: tempLine.id }));
+      } else {
+        Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+          {
+            text: 'Да',
+            onPress: async () => {
+              dispatch(documentActions.removeDocumentLine({ docId: tempId, lineId: tempLine.id }));
             },
-            {
-              text: 'Отмена',
-            },
-          ]);
-        }
+          },
+          {
+            text: 'Отмена',
+          },
+        ]);
       }
     }
+    // }
     dispatch(
       mode === 0
         ? documentActions.addDocumentLine({ docId, line })
