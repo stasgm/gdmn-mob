@@ -47,5 +47,5 @@ export const scanListScreens = {
 export const scanScreens = {
   ScanView: { title: 'Документ', component: ScanViewScreen },
   ScanEdit: { title: 'Документ', component: ScanEditScreen },
-  SelectRefItemScan: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };

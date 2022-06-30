@@ -100,7 +100,7 @@ export const DocListScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (!searchQuery) {
-        setFilteredList({ searchQuery, list });
+        setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
       }
     }, [list, searchQuery]),
   );

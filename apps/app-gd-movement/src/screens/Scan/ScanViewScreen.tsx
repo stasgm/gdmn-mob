@@ -1,5 +1,5 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Text, View, FlatList, Modal, TextInput } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,14 +15,16 @@ import {
   ScanButton,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { generateId, getDateString } from '@lib/mobile-app';
 
-import { IMovementDocument, IMovementLine, IScanDocument } from '../../store/types';
+import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
-import { getStatusColor } from '../../utils/constants';
+import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 import SwipeLineItem from '../../components/SwipeLineItem';
-import { DocItem } from '../../components/DocItem';
 import { navBackButton } from '../../components/navigateOptions';
+import { ScanDataMatrix, ScanDataMatrixReader } from '../../components';
+
+import { ScanItem } from './components/ScanItem';
 
 export const ScanViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -33,25 +35,37 @@ export const ScanViewScreen = () => {
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
+  const [doScanned, setDoScanned] = useState(false);
+
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
 
   const doc = docSelectors.selectByDocId<IScanDocument>(id);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
-  const handleAddDocLine = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', {
-      docId: id,
-    });
-  }, [navigation, id]);
+  const currRef = useRef<TextInput>(null);
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+
+  useEffect(() => {
+    currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
+  }, []);
+
+  const handleEIDScanned = (data: string) => {
+    const line: IScanLine = { id: generateId(), barcode: data };
+    dispatch(documentActions.addDocumentLine({ docId: id, line }));
+  };
+
+  const handleDoScan = useCallback(() => {
+    setDoScanned(true);
+  }, []);
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('ScanEdit', { id });
   }, [navigation, id]);
 
-  const handleDoScan = useCallback(() => {
-    navigation.navigate('ScanBarcode', { docId: id });
-  }, [navigation, id]);
+  // const handleDoScan = useCallback(() => {
+  //   navigation.navigate('ScanBarcode', { docId: id });
+  // }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -64,10 +78,6 @@ export const ScanViewScreen = () => {
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Добавить товар',
-        onPress: handleAddDocLine,
-      },
       {
         title: 'Редактировать данные',
         onPress: handleEditDocHead,
@@ -82,7 +92,7 @@ export const ScanViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, handleDelete, handleEditDocHead]);
 
   const renderRight = useCallback(
     () =>
@@ -110,36 +120,53 @@ export const ScanViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IMovementLine }) => (
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
     <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
-      <DocItem docId={doc.id} item={item} readonly={isBlocked} />
+      <ScanItem docId={doc.id} item={item} readonly={isBlocked} index={index} />
     </SwipeLineItem>
   );
 
-  return (
-    <View style={[styles.container]}>
-      <InfoBlock
-        colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
-      >
-        <>
-          <Text style={[styles.rowCenter, textStyle]}>{doc?.head?.department?.name || ''}</Text>
-          <View style={styles.rowCenter}>
-            <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+  if (!doc) {
+    return (
+      <View style={styles.container}>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      </View>
+    );
+  }
 
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
-          </View>
-        </>
-      </InfoBlock>
-      <FlatList
-        data={doc.lines}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        scrollEventThrottle={400}
-        ItemSeparatorComponent={ItemSeparator}
-      />
-    </View>
+  return (
+    <>
+      <Modal animationType="slide" visible={doScanned}>
+        {isScanerReader ? (
+          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        ) : (
+          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        )}
+      </Modal>
+      <View style={[styles.container]}>
+        <InfoBlock
+          colorLabel={getStatusColor(doc?.status || 'DRAFT')}
+          title={doc?.head?.department?.name || ''}
+          onPress={handleEditDocHead}
+          disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        >
+          <>
+            {/* <Text style={[styles.rowCenter, textStyle]}>{doc?.head?.department?.name || ''}</Text> */}
+            <View style={styles.rowCenter}>
+              <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+
+              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+            </View>
+          </>
+        </InfoBlock>
+        <FlatList
+          data={doc.lines}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          scrollEventThrottle={400}
+          ItemSeparatorComponent={ItemSeparator}
+        />
+      </View>
+    </>
   );
 };

@@ -88,6 +88,7 @@ const ScanDataMatrixReader = ({ onSave, onCancel }: IProps) => {
                   style={[styles.buttons, styles.btnFind]}
                   onPress={() => {
                     onSave(barcode);
+                    setScanned(false);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />

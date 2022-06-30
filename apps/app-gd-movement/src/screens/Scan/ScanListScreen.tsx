@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
+import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -12,23 +12,18 @@ import {
   AddButton,
   ScreenListItem,
   IListItemProps,
-  Menu,
+  FilterButtons,
 } from '@lib/mobile-ui';
 
-import { docSelectors, refSelectors, useSelector } from '@lib/store';
+import { useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IListItem } from '@lib/mobile-types';
-
-import { IDocumentType } from '@lib/types';
-
 import { IScanDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { ScanStackParamList } from '../../navigation/Root/types';
-import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
 import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
@@ -54,13 +49,11 @@ export const ScanListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const [date, setDate] = useState(dataTypes[0]);
-
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
-  // const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+  const list = useSelector((state) => state.documents.list) as IScanDocument[];
 
-  const list = docSelectors.selectByDocType<IScanDocument>('scan');
+  // const list = docSelectors.selectByDocType<IScanDocument>('scan');
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ScanEdit');
@@ -99,13 +92,14 @@ export const ScanListScreen = () => {
     list,
   });
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     if (!searchQuery) {
-  //       setFilteredList({ searchQuery, list });
-  //     }
-  //   }, [list, searchQuery]),
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!searchQuery) {
+        // setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
+        setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name === 'scan') });
+      }
+    }, [list, searchQuery]),
+  );
 
   useEffect(() => {
     if (searchQuery !== filteredList.searchQuery) {
@@ -144,26 +138,6 @@ export const ScanListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-
-  const docTypes: IListItem[] = useMemo(
-    () =>
-      documentTypes
-        ? docContactTypes.concat(
-            documentTypes?.map(
-              (i) =>
-                ({
-                  id: i.name,
-                  value: i.description || '',
-                } as IListItem),
-            ),
-          )
-        : docContactTypes,
-    [documentTypes],
-  );
-
-  const [type, setType] = useState(docTypes[0]);
-
   const newFilteredList: IListItemProps[] = useMemo(() => {
     if (!filteredList.list.length) {
       return [];
@@ -177,15 +151,7 @@ export const ScanListScreen = () => {
         ? filteredList.list.filter((e) => e.status === status)
         : [];
 
-    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
-
-    newRes.sort((a, b) =>
-      date.id === 'new'
-        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-    );
-
-    return newRes.map((i) => {
+    return res.map((i) => {
       return {
         id: i.id,
         title: i.documentType.description || '',
@@ -196,7 +162,7 @@ export const ScanListScreen = () => {
         errorMessage: i.errorMessage,
       };
     });
-  }, [date.id, filteredList.list, status, type?.id]);
+  }, [filteredList.list, status]);
 
   const sections = useMemo(
     () =>
@@ -220,46 +186,6 @@ export const ScanListScreen = () => {
     [newFilteredList],
   );
 
-  const [visibleType, setVisibleType] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [visibleDate, setVisibleDate] = useState(false);
-
-  const handleSelectType = () => {
-    return setVisibleType(true);
-  };
-  const handleSelectStatus = () => {
-    return setVisibleStatus(true);
-  };
-
-  const handleSelectDate = () => {
-    return setVisibleDate(true);
-  };
-
-  const handleDismissType = () => {
-    return setVisibleType(false);
-  };
-  const handleDismissStatus = () => {
-    return setVisibleStatus(false);
-  };
-  const handleDismissDate = () => {
-    return setVisibleDate(false);
-  };
-
-  const handleApplyType = useCallback((option) => {
-    setVisibleType(false);
-    setType(option);
-  }, []);
-
-  const handleApplyStatus = useCallback((option) => {
-    setVisibleStatus(false);
-    setStatus(option.id);
-  }, []);
-
-  const handleApplyDate = useCallback((option) => {
-    setVisibleDate(false);
-    setDate(option);
-  }, []);
-
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
@@ -281,50 +207,7 @@ export const ScanListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[styles.containerCenter, localStyles.container]}>
-        <Menu
-          key={'MenuType'}
-          title="Тип"
-          visible={visibleType}
-          onChange={handleApplyType}
-          onDismiss={handleDismissType}
-          onPress={handleSelectType}
-          options={docTypes}
-          activeOptionId={type.id}
-          style={[styles.btnTab, styles.firstBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={type.id !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
-          key={'MenuStatus'}
-          title="Статус"
-          visible={visibleStatus}
-          onChange={handleApplyStatus}
-          onDismiss={handleDismissStatus}
-          onPress={handleSelectStatus}
-          options={statusTypes}
-          activeOptionId={status}
-          style={[styles.btnTab]}
-          menuStyle={localStyles.menu}
-          isActive={status !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
-          key={'MenuDataSort'}
-          title="Дата"
-          visible={visibleDate}
-          onChange={handleApplyDate}
-          onDismiss={handleDismissDate}
-          onPress={handleSelectDate}
-          options={dataTypes}
-          activeOptionId={date.id}
-          style={[styles.btnTab, styles.lastBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={date.id !== 'new'}
-          iconName={'chevron-down'}
-        />
-      </View>
+      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -354,14 +237,3 @@ export const ScanListScreen = () => {
     </AppScreen>
   );
 };
-
-const localStyles = StyleSheet.create({
-  container: {
-    marginBottom: 5,
-  },
-  menu: {
-    justifyContent: 'center',
-    marginLeft: 6,
-    width: '100%',
-  },
-});

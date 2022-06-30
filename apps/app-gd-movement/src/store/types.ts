@@ -72,14 +72,7 @@ export interface IScanHead extends IHead {
 }
 
 export interface IScanLine extends IEntity {
-  good: INamedEntity;
-  quantity: number;
-  price?: number;
-  buyingPrice?: number;
-  remains?: number;
   barcode?: string;
-  EID?: string;
-  docType?: string;
 }
 
 export type IScanDocument = MandateProps<IDocument<IScanHead, IScanLine>, 'head' | 'lines'>;

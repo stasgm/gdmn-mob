@@ -82,7 +82,7 @@ export const ScanEditScreen = () => {
     if (!scanType) {
       return Alert.alert('Ошибка!', 'Тип документа для сканирования не найден', [{ text: 'OK' }]);
     }
-    if (!docNumber || !docDate || docDepartment) {
+    if (!docNumber || !docDate || !docDepartment) {
       return Alert.alert('Внимание!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
@@ -176,7 +176,7 @@ export const ScanEditScreen = () => {
       return;
     }
 
-    navigation.navigate('SelectRefItemScan', {
+    navigation.navigate('SelectRefItem', {
       refName: 'department',
       fieldName: 'department',
       value: docDepartment && [docDepartment],
@@ -198,28 +198,12 @@ export const ScanEditScreen = () => {
     [colors.card, colors.primary],
   );
 
-  console.log('fff', formParams);
-  console.log('docD', docDepartment);
-
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
-          {/* {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
-            <>
-              <View style={[styles.directionRow, localStyles.switchContainer]}>
-                <Text>Черновик:</Text>
-                <Switch
-                  value={docStatus === 'DRAFT' || !docStatus}
-                  onValueChange={() => {
-                    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-                  }}
-                />
-              </View>
-            </>
-          )} */}
           <View style={viewStyle}>
             <RadioGroup
               options={STATUS_LIST}
