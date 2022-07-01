@@ -190,10 +190,10 @@ export const ScanListScreen = () => {
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
       return doc ? (
-        <SwipeListItem renderItem={item} item={doc} routeName="ScanView">
+        <SwipeListItem renderItem={item} item={doc} copy={false} edit={false} routeName="ScanView">
           <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}>
             <View>
-              <Text style={textStyle}>{doc.head.contact?.name || ''}</Text>
+              <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
               <Text style={textStyle}>
                 № {doc.number} на {getDateString(doc.documentDate)}
               </Text>

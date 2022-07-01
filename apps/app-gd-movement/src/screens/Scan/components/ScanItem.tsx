@@ -4,16 +4,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { IScanLine } from '../../../store/types';
-
 interface IProps {
   docId: string;
-  item: IScanLine;
   readonly?: boolean;
   index: number;
 }
 
-export const ScanItem = ({ item, index }: IProps) => {
+export const ScanItem = ({ index }: IProps) => {
   return (
     <View style={[styles.item]}>
       <View style={[styles.icon]}>
@@ -21,7 +18,6 @@ export const ScanItem = ({ item, index }: IProps) => {
       </View>
       <View style={styles.details}>
         <Text style={styles.name}>Сканирование {(index + 1)?.toString()}</Text>
-        <Text style={styles.field}>{item.barcode}</Text>
       </View>
     </View>
   );

@@ -189,9 +189,9 @@ const OrderViewScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: IOrderLine }) => (
-      <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
-        <OrderItem docId={order?.id} item={item} readonly={isBlocked} />
-      </SwipeLineItem>
+      // <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
+      <OrderItem docId={order?.id} item={item} readonly={isBlocked} />
+      // </SwipeLineItem>
     ),
     [isBlocked, order?.id],
   );

@@ -124,8 +124,8 @@ export const ScanViewScreen = () => {
   }
 
   const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
-    <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
-      <ScanItem docId={doc.id} item={item} readonly={isBlocked} index={index} />
+    <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} edit={false} routeName="DocLine">
+      <ScanItem docId={doc.id} readonly={isBlocked} index={index} />
     </SwipeLineItem>
   );
 

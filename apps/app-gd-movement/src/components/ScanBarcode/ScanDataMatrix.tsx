@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useIsFocused, useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { AutoFocus, Camera, FlashMode, WhiteBalance } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import { View, TouchableOpacity, Text, Vibration, TextInput } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
