@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useTheme } from '@react-navigation/native';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useIsFocused, useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Camera } from 'expo-camera';
-import { View, TouchableOpacity, Text, Vibration } from 'react-native';
+import { AutoFocus, Camera, FlashMode, WhiteBalance } from 'expo-camera';
+import { View, TouchableOpacity, Text, Vibration, TextInput } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
 import { globalStyles } from '@lib/mobile-ui';
@@ -17,6 +17,7 @@ interface IProps {
 }
 
 const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
+  const isFocused = useIsFocused();
   const { colors } = useTheme();
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -25,6 +26,8 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const [scanned, setScanned] = useState(false);
 
   const [barcode, setBarcode] = useState('');
+
+  const ref = useRef<TextInput>(null);
 
   useEffect(() => {
     const permission = async () => {
@@ -44,6 +47,13 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
 
+  useEffect(() => {
+    if (!scanned && ref?.current) {
+      ref.current.focus();
+      ref.current.clear();
+    }
+  }, [scanned, ref]);
+
   if (hasPermission === null) {
     return <View />;
   }
@@ -52,7 +62,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
   }
 
-  return (
+  return isFocused ? (
     <View style={viewStyle}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
@@ -128,6 +138,8 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         )}
       </Camera>
     </View>
+  ) : (
+    <></>
   );
 };
 

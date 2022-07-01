@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, TouchableOpacity, Vibration, Text, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, TouchableOpacity, Vibration, Text, TextInput } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';

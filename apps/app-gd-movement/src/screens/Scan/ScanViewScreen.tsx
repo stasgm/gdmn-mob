@@ -50,10 +50,13 @@ export const ScanViewScreen = () => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
   }, []);
 
-  const handleEIDScanned = (data: string) => {
-    const line: IScanLine = { id: generateId(), barcode: data };
-    dispatch(documentActions.addDocumentLine({ docId: id, line }));
-  };
+  const handleEIDScanned = useCallback(
+    (data: string) => {
+      const line: IScanLine = { id: generateId(), barcode: data };
+      dispatch(documentActions.addDocumentLine({ docId: id, line }));
+    },
+    [dispatch, id],
+  );
 
   const handleDoScan = useCallback(() => {
     setDoScanned(true);

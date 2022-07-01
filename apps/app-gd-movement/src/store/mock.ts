@@ -1,4 +1,4 @@
-import { companies, user2 } from '@lib/mock';
+import { companies, user2, device } from '@lib/mock';
 import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
 
 export const appSystem: IAppSystem = {
@@ -17,6 +17,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       producer: user2,
       dateTime: new Date().toISOString(),
       order: 1,
+      deviceId: device.id,
     },
     body: {
       type: 'REFS',
@@ -765,6 +766,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       producer: user2,
       dateTime: '2021-09-17T11:26:37.893Z',
       order: 2,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
