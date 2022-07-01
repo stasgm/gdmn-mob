@@ -6,14 +6,19 @@ import { messageService } from '../services';
 
 import { created, ok } from '../utils/apiHelpers';
 
-import { ForbiddenException } from '../exceptions';
+import { ForbiddenException, InvalidParameterException } from '../exceptions';
 
 const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const message = ctx.request.body as NewMessage;
   const user = ctx.state.user;
+  const deviceId = ctx.query.deviceId;
 
   if (user.company.id !== message.head.company.id) {
     throw new ForbiddenException('Пользователь не входит в организацию указанную в заголовке сообщения');
+  }
+
+  if (typeof deviceId !== 'string') {
+    throw new InvalidParameterException('Не указан идентификатор устройства');
   }
 
   const messageId = await messageService.addOne({
@@ -21,6 +26,7 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
     producerId: user.id,
     appSystemId: message.head.appSystem.id,
     companyId: message.head.company.id,
+    deviceId: deviceId,
   });
 
   const resultData = { uid: messageId, date: new Date() };
@@ -28,12 +34,17 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
 };
 
 const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
-  const { companyId, appSystemName } = ctx.query;
+  const { companyId, appSystemName, deviceId } = ctx.query;
+
+  if (typeof deviceId !== 'string') {
+    throw new InvalidParameterException('Не указан идентификатор устройства');
+  }
 
   const messageList = await messageService.FindMany({
     companyId: companyId as string,
     appSystemName: appSystemName as string,
     consumerId: ctx.state.user.id,
+    deviceId: deviceId,
   });
 
   ok(ctx as Context, messageList, 'getMessages: message is successfully received');
@@ -41,7 +52,7 @@ const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
   const { id: messageId } = ctx.params;
-  const { companyId, appSystemName } = ctx.query;
+  const { companyId, appSystemName, deviceId } = ctx.query;
 
   await messageService.deleteOne({ messageId, companyId: companyId as string, appSystemName: appSystemName as string });
 

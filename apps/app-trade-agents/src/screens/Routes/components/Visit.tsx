@@ -6,11 +6,9 @@ import { IDocumentType, INamedEntity } from '@lib/types';
 import { IListItem } from '@lib/mobile-types';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
-  BottomSheet,
   InfoBlock,
   ItemSeparator,
   PrimeButton,
-  RadioGroup,
   ScreenListItem,
   IListItemProps,
   globalStyles as styles,
@@ -48,6 +46,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
+  const [sendLoading, setSendLoading] = useState(false);
 
   const dateBegin = useMemo(() => new Date(visit.head.dateBegin), [visit.head.dateBegin]);
   const dateEnd = useMemo(() => (visit.head.dateEnd ? new Date(visit.head.dateEnd) : undefined), [visit.head.dateEnd]);
@@ -102,6 +101,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   }, [docDispatch, visit, orderDocs, returnDocs]);
 
   const handleReopenVisit = useCallback(async () => {
+    setSendLoading(false);
     const date = new Date().toISOString();
 
     const updatedVisit: IVisitDocument = {
@@ -198,9 +198,10 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
 
   const docTypeRef = useRef<BottomSheetModal>(null);
 
-  const handleDismissDocType = useCallback(() => docTypeRef.current?.dismiss(), []);
+  // const handleDismissDocType = useCallback(() => docTypeRef.current?.dismiss(), []);
 
-  const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
+  // const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
+  const selectedDocType = listDocumentType[0];
 
   const handleApplyDocType = useCallback(() => {
     docTypeRef.current?.dismiss();
@@ -215,10 +216,10 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     }
   }, [handleNewOrder, handleNewReturn, selectedDocType.id]);
 
-  const handlePresentDocType = useCallback(() => {
-    setSelectedDocType(listDocumentType[0]);
-    docTypeRef.current?.present();
-  }, []);
+  // const handlePresentDocType = useCallback(() => {
+  //   setSelectedDocType(listDocumentType[0]);
+  //   docTypeRef.current?.present();
+  // }, []);
 
   const orders: IListItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
@@ -239,10 +240,10 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     ({ item }) => {
       const doc = orderDocs.find((r) => r.id === item.id);
       return doc ? (
-        <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
-          <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
-        </SwipeListItem>
-      ) : null;
+        // <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
+      ) : // </SwipeListItem>
+      null;
     },
     [navigation, orderDocs],
   );
@@ -278,8 +279,12 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     ];
   }, [orderDocs, returnDocs]);
 
-  const handleSendDocs = useSendDocs(readyDocs);
+  const handleReadyDocs = useSendDocs(readyDocs);
 
+  const handleSendDocs = () => {
+    setSendLoading(true);
+    handleReadyDocs();
+  };
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
   const orderListStyle = useMemo(() => [{ paddingBottom: returns.length ? 20 : 0 }], [returns.length]);
   const returnViewStyle = useMemo(() => [{ paddingBottom: returns.length > 1 ? 15 : 0 }], [returns.length]);
@@ -351,7 +356,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         )}
       </View>
       {!dateEnd ? (
-        <PrimeButton icon="plus-circle-outline" onPress={handlePresentDocType}>
+        <PrimeButton icon="plus-circle-outline" onPress={handleApplyDocType}>
           Добавить документ
         </PrimeButton>
       ) : (
@@ -359,14 +364,14 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
           <PrimeButton
             icon={!loading ? 'file-send' : 'block-helper'}
             onPress={handleSendDocs}
-            disabled={loading}
+            disabled={sendLoading || loading}
             loadIcon={loading}
           >
             Отправить
           </PrimeButton>
         )
       )}
-      <BottomSheet
+      {/* <BottomSheet
         sheetRef={docTypeRef}
         title={'Тип документа'}
         snapPoints={['20%', '90%']}
@@ -374,7 +379,7 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
         onApply={handleApplyDocType}
       >
         <RadioGroup options={listDocumentType} onChange={setSelectedDocType} activeButtonId={selectedDocType?.id} />
-      </BottomSheet>
+      </BottomSheet> */}
     </>
   );
 };

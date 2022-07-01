@@ -4,7 +4,7 @@ import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, refSelectors, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   AddButton,
   MenuButton,
@@ -13,11 +13,12 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  SendButton,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
 
-import { formatValue, generateId, getDateString } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString, useSendDocs } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
@@ -42,10 +43,13 @@ const OrderViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
+  const docLoading = useSelector((state) => state.documents.loading);
+  console.log('load', docLoading);
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const [del, setDel] = useState(false);
+  const [isSend, setIsSend] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
@@ -115,6 +119,29 @@ const OrderViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
+  const handleSendDoc = useSendDocs([order]);
+
+  const handleSendOrder = useCallback(() => {
+    setIsSend(true);
+    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          setTimeout(() => {
+            setIsSend(false);
+          }, 10000);
+          handleSendDoc();
+        },
+      },
+      {
+        text: 'Отмена',
+        onPress: () => {
+          setIsSend(false);
+        },
+      },
+    ]);
+  }, [handleSendDoc]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -145,11 +172,12 @@ const OrderViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
+          <SendButton onPress={handleSendOrder} disabled={isSend} />
           <AddButton onPress={handleAddOrderLine} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleAddOrderLine, isBlocked],
+    [isBlocked, handleSendOrder, isSend, handleAddOrderLine, actionsMenu],
   );
 
   useLayoutEffect(() => {

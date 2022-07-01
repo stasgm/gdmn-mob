@@ -58,7 +58,11 @@ const OrderListScreen = () => {
           : true
         : false,
     )
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+    .sort(
+      (a, b) =>
+        new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+        new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+    );
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -145,7 +149,11 @@ const OrderListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
+      <SwipeListItem
+        renderItem={item}
+        item={doc}
+        routeName={doc.status === 'DRAFT' || doc.status === 'READY' ? 'OrderEdit' : 'OrderView'}
+      >
         <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
       </SwipeListItem>
     ) : null;

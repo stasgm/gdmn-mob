@@ -46,6 +46,7 @@ const OrderItem = ({ docId, item, readonly = false }: IProps) => {
               {Math.floor(item.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1) * 1000) / 1000} кг
             </Text> */}
           </View>
+          {item.packagekey ? <Text style={textStyle}>Упаковка: {item.packagekey?.name}</Text> : null}
         </View>
       </View>
     </TouchableOpacity>

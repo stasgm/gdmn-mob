@@ -56,7 +56,7 @@ const addOne = (companyData: NewCompanyData): ICompany => {
  * @returns Обновленный объект компании
  */
 const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
-  const { companies, users } = getDb();
+  const { companies, users, createFoldersForCompany } = getDb();
   const company = companies.findById(id);
 
   if (!company) {
@@ -96,6 +96,8 @@ const updateOne = (id: string, companyData: Partial<ICompany>): ICompany => {
   if (!updatedCompany) {
     throw new DataNotFoundException('Компания не найдена');
   }
+
+  createFoldersForCompany(updatedCompany);
 
   return makeCompany(updatedCompany);
 };
