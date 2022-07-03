@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Text, View, FlatList, Modal, TextInput } from 'react-native';
+import { Text, View, FlatList, Modal, TextInput, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString } from '@lib/mobile-app';
@@ -32,6 +34,10 @@ export const ScanViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanView'>>();
 
   const { colors } = useTheme();
+
+  const [delList, setDelList] = useState<string[]>([]);
+  // const [isChecked, setIsChecked] = useState(false);
+  const list: IScanLine[] = [];
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
@@ -79,6 +85,32 @@ export const ScanViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation]);
 
+  const handleList = useCallback(
+    (line: IScanLine) => {
+      const a = delList.find((i) => i === line.id);
+      if (a) {
+        const newList = delList.filter((i) => i !== a);
+        return setDelList(newList);
+      } else {
+        // setDelList(delList.push(item));
+        const newList = delList;
+        newList.push(line.id);
+        return setDelList(newList);
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocLine = useCallback(() => {
+    for (const item of delList) {
+      // const lineId = item;
+      // const newList = delList.filter((i) => i !== lineId);
+      // setDelList(newList);
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: item }));
+    }
+    setDelList([]);
+  }, [delList, dispatch, id]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
@@ -101,19 +133,40 @@ export const ScanViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <ScanButton onPress={handleDoScan} />
-          <MenuButton actionsMenu={actionsMenu} />
+          {delList.length > 0 ? (
+            <DeleteButton onPress={handleDeleteDocLine} />
+          ) : (
+            <>
+              <ScanButton onPress={handleDoScan} />
+              <MenuButton actionsMenu={actionsMenu} />
+            </>
+          )}
         </View>
       ),
-    [actionsMenu, handleDoScan, isBlocked],
+    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, isBlocked],
   );
 
+  // useEffect(() => {}, [delList]);
+  const renderLeft = useCallback(
+    () =>
+      !isBlocked &&
+      delList.length > 0 && (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <CloseButton onPress={() => setDelList([])} />
+
+          <View style={{ marginLeft: -6 }}>
+            <Text style={styles.title}>{delList.length.toString()}</Text>
+          </View>
+        </View>
+      ),
+    [delList.length, isBlocked],
+  );
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: delList.length > 0 ? renderLeft : navBackButton,
       headerRight: renderRight,
     });
-  }, [navigation, renderRight]);
+  }, [delList.length, navigation, renderLeft, renderRight]);
 
   if (!doc) {
     return (
@@ -123,11 +176,18 @@ export const ScanViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => (
-    <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} edit={false} routeName="DocLine">
-      <ScanItem docId={doc.id} readonly={isBlocked} index={index} />
-    </SwipeLineItem>
-  );
+  console.log('list', list);
+  console.log('dellist', delList);
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => {
+    // <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} edit={false} routeName="DocLine">
+    const isChecked = delList.includes(item.id);
+    return (
+      <TouchableOpacity onPress={() => handleList(item)}>
+        <ScanItem docId={doc.id} readonly={isBlocked} index={index} checked={isChecked} />
+      </TouchableOpacity>
+    );
+    // </SwipeLineItem>
+  };
 
   if (!doc) {
     return (
