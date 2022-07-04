@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -13,12 +13,15 @@ import { IGood } from '../store/app/types';
 import { DocStackParamList } from '../navigation/Root/types';
 
 interface IProps {
-  docId: string;
   item: IMovementLine;
+  checked?: boolean;
+  docId: string;
   readonly?: boolean;
+  onCheckItem: () => void;
+  isDelList?: boolean;
 }
 
-export const DocItem = ({ docId, item, readonly = false }: IProps) => {
+export const DocItem = ({ item, checked, docId, readonly = false, onCheckItem, isDelList }: IProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'ScanBarcode'>>();
 
@@ -29,12 +32,21 @@ export const DocItem = ({ docId, item, readonly = false }: IProps) => {
   return (
     <TouchableOpacity
       onPress={() => {
-        !readonly && navigation.navigate('DocLine', { mode: 1, docId, item });
+        isDelList ? onCheckItem() : navigation.navigate('DocLine', { mode: 1, docId, item });
       }}
+      onLongPress={onCheckItem}
+      disabled={readonly}
     >
       <View style={[styles.item]}>
-        <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+        <View style={styles.iconsWithCheck}>
+          <View style={[styles.icon]}>
+            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          </View>
+          {checked ? (
+            <View style={[styles.checkedIcon]}>
+              <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
+            </View>
+          ) : null}
         </View>
         <View style={styles.details}>
           <Text style={styles.name}>{item.good.name}</Text>
@@ -42,9 +54,6 @@ export const DocItem = ({ docId, item, readonly = false }: IProps) => {
             <Text style={textStyle}>
               {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
             </Text>
-            {/* <Text style={[styles.field, { color: colors.text }]}>
-              {Math.floor(item.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1) * 1000) / 1000} кг
-            </Text>             */}
           </View>
         </View>
       </View>

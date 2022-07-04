@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Text, View, FlatList, Modal, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, FlatList, Modal, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -15,14 +15,16 @@ import {
   ScanButton,
   DeleteButton,
   CloseButton,
+  SendButton,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, useSendDocs } from '@lib/mobile-app';
+
+import { sleep } from '@lib/client-api';
 
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
-import SwipeLineItem from '../../components/SwipeLineItem';
 import { navBackButton } from '../../components/navigateOptions';
 import { ScanDataMatrix, ScanDataMatrixReader } from '../../components';
 
@@ -31,15 +33,19 @@ import { ScanItem } from './components/ScanItem';
 export const ScanViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
+
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanView'>>();
 
   const { colors } = useTheme();
 
   const [delList, setDelList] = useState<string[]>([]);
-  // const [isChecked, setIsChecked] = useState(false);
-  const list: IScanLine[] = [];
+
+  const [del, setDel] = useState(false);
+  const [isSend, setIsSend] = useState(false);
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [doScanned, setDoScanned] = useState(false);
 
@@ -72,44 +78,83 @@ export const ScanViewScreen = () => {
     navigation.navigate('ScanEdit', { id });
   }, [navigation, id]);
 
-  // const handleDoScan = useCallback(() => {
-  //   navigation.navigate('ScanBarcode', { docId: id });
-  // }, [navigation, id]);
-
   const handleDelete = useCallback(() => {
     if (!id) {
       return;
     }
 
-    dispatch(documentActions.removeDocument(id));
-    navigation.goBack();
-  }, [dispatch, id, navigation]);
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          const res = await docDispatch(documentActions.removeDocument(id));
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            setDel(true);
+            await sleep(500);
+            navigation.goBack();
+          }
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
 
-  const handleList = useCallback(
-    (line: IScanLine) => {
-      const a = delList.find((i) => i === line.id);
-      if (a) {
-        const newList = delList.filter((i) => i !== a);
-        return setDelList(newList);
+    // dispatch(documentActions.removeDocument(id));
+    // navigation.goBack();
+  }, [docDispatch, id, navigation]);
+
+  const handelAddDeletelList = useCallback(
+    (lineId: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = delList.filter((i) => i !== checkedId);
+        setDelList(newList);
       } else {
-        // setDelList(delList.push(item));
-        const newList = delList;
-        newList.push(line.id);
-        return setDelList(newList);
+        setDelList([...delList, lineId]);
       }
     },
     [delList],
   );
 
   const handleDeleteDocLine = useCallback(() => {
-    for (const item of delList) {
-      // const lineId = item;
-      // const newList = delList.filter((i) => i !== lineId);
-      // setDelList(newList);
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: item }));
-    }
-    setDelList([]);
+    Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          for (const item of delList) {
+            dispatch(documentActions.removeDocumentLine({ docId: id, lineId: item }));
+          }
+          setDelList([]);
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
   }, [delList, dispatch, id]);
+
+  const handleSendDoc = useSendDocs([doc]);
+
+  const handleSendScanDoc = useCallback(() => {
+    setIsSend(true);
+    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          setTimeout(() => {
+            setIsSend(false);
+          }, 10000);
+          handleSendDoc();
+        },
+      },
+      {
+        text: 'Отмена',
+        onPress: () => {
+          setIsSend(false);
+        },
+      },
+    ]);
+  }, [handleSendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -137,56 +182,59 @@ export const ScanViewScreen = () => {
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
+              <SendButton onPress={handleSendScanDoc} disabled={isSend} />
               <ScanButton onPress={handleDoScan} />
               <MenuButton actionsMenu={actionsMenu} />
             </>
           )}
         </View>
       ),
-    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, isBlocked],
+    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendScanDoc, isBlocked, isSend],
   );
 
-  // useEffect(() => {}, [delList]);
   const renderLeft = useCallback(
-    () =>
-      !isBlocked &&
-      delList.length > 0 && (
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <CloseButton onPress={() => setDelList([])} />
-
-          <View style={{ marginLeft: -6 }}>
-            <Text style={styles.title}>{delList.length.toString()}</Text>
-          </View>
-        </View>
-      ),
+    () => !isBlocked && delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
     [delList.length, isBlocked],
   );
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: delList.length > 0 ? renderLeft : navBackButton,
       headerRight: renderRight,
+      title: delList.length > 0 ? `Выделено позиций: ${delList.length}` : 'Документ',
     });
   }, [delList.length, navigation, renderLeft, renderRight]);
 
-  if (!doc) {
+  if (del) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        <View style={styles.deleteView}>
+          <SubTitle style={styles.title}>Удаление</SubTitle>
+          <ActivityIndicator size="small" color={colorStyle} />
+        </View>
       </View>
     );
+  } else {
+    if (!doc) {
+      return (
+        <View style={styles.container}>
+          <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        </View>
+      );
+    }
   }
 
-  console.log('list', list);
-  console.log('dellist', delList);
   const renderItem = ({ item, index }: { item: IScanLine; index: number }) => {
-    // <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} edit={false} routeName="DocLine">
-    const isChecked = delList.includes(item.id);
+    const checkedId = delList.find((i) => i === item.id) || '';
     return (
-      <TouchableOpacity onPress={() => handleList(item)}>
-        <ScanItem docId={doc.id} readonly={isBlocked} index={index} checked={isChecked} />
-      </TouchableOpacity>
+      <ScanItem
+        readonly={isBlocked}
+        index={index}
+        checked={checkedId ? true : false}
+        onCheckItem={() => handelAddDeletelList(item.id, checkedId)}
+        isDelList={delList.length > 0 ? true : false}
+      />
     );
-    // </SwipeLineItem>
   };
 
   if (!doc) {

@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
+import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text, Alert } from 'react-native';
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -13,16 +13,17 @@ import {
   ScreenListItem,
   IListItemProps,
   FilterButtons,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
-import { useSelector } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
 import { IScanDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
@@ -42,7 +43,7 @@ export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionPr
 
 export const ScanListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
-
+  const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
 
@@ -54,10 +55,40 @@ export const ScanListScreen = () => {
   const list = useSelector((state) => state.documents.list) as IScanDocument[];
 
   // const list = docSelectors.selectByDocType<IScanDocument>('scan');
+  const [delList, setDelList] = useState<string[]>([]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ScanEdit');
   }, [navigation]);
+
+  const handelAddDeletelList = useCallback(
+    (lineId: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = delList.filter((i) => i !== checkedId);
+        setDelList(newList);
+      } else {
+        setDelList([...delList, lineId]);
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocs = useCallback(() => {
+    Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          for (const id of delList) {
+            dispatch(documentActions.removeDocument(id));
+          }
+          setDelList([]);
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [delList, dispatch]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -68,24 +99,36 @@ export const ScanListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-        <AddButton onPress={handleAddDocument} />
+        {delList.length > 0 ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <IconButton
+              icon="card-search-outline"
+              style={filterVisible && { backgroundColor: colors.card }}
+              size={26}
+              onPress={() => setFilterVisible((prev) => !prev)}
+            />
+            <AddButton onPress={handleAddDocument} />
+          </>
+        )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [colors.card, delList.length, filterVisible, handleAddDocument, handleDeleteDocs],
+  );
+
+  const renderLeft = useCallback(
+    () => delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList.length],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackDrawer,
+      headerLeft: delList.length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
+      title: delList.length > 0 ? `Выделено документов: ${delList.length}` : 'Сканирование',
     });
-  }, [navigation, renderRight]);
+  }, [delList.length, navigation, renderLeft, renderRight]);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -189,20 +232,25 @@ export const ScanListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
+      const checkedId = delList.find((i) => i === item.id) || '';
       return doc ? (
-        <SwipeListItem renderItem={item} item={doc} copy={false} edit={false} routeName="ScanView">
-          <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}>
-            <View>
-              <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
-              <Text style={textStyle}>
-                № {doc.number} на {getDateString(doc.documentDate)}
-              </Text>
-            </View>
-          </ScreenListItem>
-        </SwipeListItem>
+        <ScreenListItem
+          {...item}
+          onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}
+          onCheckItem={() => handelAddDeletelList(item.id, checkedId)}
+          isChecked={checkedId ? true : false}
+          isDelList={delList.length > 0 ? true : false}
+        >
+          <View>
+            <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
+            <Text style={textStyle}>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </Text>
+          </View>
+        </ScreenListItem>
       ) : null;
     },
-    [list, navigation, textStyle],
+    [delList, handelAddDeletelList, list, navigation, textStyle],
   );
 
   return (

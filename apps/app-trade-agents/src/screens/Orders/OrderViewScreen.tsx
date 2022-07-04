@@ -201,7 +201,7 @@ const OrderViewScreen = () => {
   if (del) {
     return (
       <View style={styles.container}>
-        <View style={localStyles.del}>
+        <View style={styles.deleteView}>
           <SubTitle style={styles.title}>Удаление</SubTitle>
           <ActivityIndicator size="small" color={colorStyle} />
         </View>
@@ -261,11 +261,6 @@ const OrderViewScreen = () => {
 export default OrderViewScreen;
 
 const localStyles = StyleSheet.create({
-  del: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   infoBlock: {
     flexDirection: 'column',
   },

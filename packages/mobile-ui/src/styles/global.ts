@@ -147,6 +147,20 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 30,
   },
+  checkedIcon: {
+    alignItems: 'center',
+    backgroundColor: '#587a20',
+    borderRadius: 8,
+    height: 15,
+    justifyContent: 'center',
+    width: 15,
+    marginLeft: -10,
+    marginTop: 15,
+  },
+  iconsWithCheck: {
+    flexDirection: 'row',
+    width: '9%',
+  },
   roundButton: {
     alignItems: 'center',
     backgroundColor: colors.primary,
@@ -219,6 +233,11 @@ const globalStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
+  deleteView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default globalStyles;

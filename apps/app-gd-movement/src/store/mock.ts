@@ -764,7 +764,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user2,
-      dateTime: '2021-09-17T11:26:37.893Z',
+      dateTime: new Date().toISOString(),
       order: 2,
       deviceId: device.id,
     },
@@ -774,8 +774,8 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       version: 1,
       payload: [
         {
-          creationDate: '2022-06-17T10:08:44.709Z',
-          documentDate: '2022-06-17T10:08:37.386Z',
+          creationDate: new Date().toISOString(),
+          documentDate: new Date().toISOString(),
           documentType: {
             description: 'Приход',
             fromDescription: 'Откуда',
@@ -790,7 +790,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             toRequired: true,
             toType: 'department',
           },
-          editionDate: '2022-06-17T10:08:44.709Z',
+          editionDate: new Date().toISOString(),
           head: {
             fromContact: {
               id: '147016507',
@@ -839,8 +839,8 @@ export const messageGdMovement: IMessage<MessageType>[] = [
           status: 'DRAFT',
         },
         {
-          creationDate: '2022-06-17T10:19:33.749Z',
-          documentDate: '2022-06-17T10:19:25.878Z',
+          creationDate: new Date().toISOString(),
+          documentDate: new Date().toISOString(),
           documentType: {
             description: 'Инвентаризация',
             fromDescription: '',
@@ -855,7 +855,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             toRequired: true,
             toType: 'department',
           },
-          editionDate: '2022-06-17T10:19:33.749Z',
+          editionDate: new Date().toISOString(),
           head: {
             toContact: {
               id: '147016473',
@@ -895,14 +895,14 @@ export const messageGdMovement: IMessage<MessageType>[] = [
           status: 'DRAFT',
         },
         {
-          creationDate: '2022-06-17T10:08:44.709Z',
-          documentDate: '2022-06-17T10:08:37.386Z',
+          creationDate: new Date().toISOString(),
+          documentDate: new Date().toISOString(),
           documentType: {
             id: '189548606',
             name: 'scan',
             description: 'Сканирование',
           },
-          editionDate: '2022-06-17T10:08:44.709Z',
+          editionDate: new Date().toISOString(),
           head: {
             department: {
               id: '176424776',
