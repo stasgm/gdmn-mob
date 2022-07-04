@@ -55,23 +55,25 @@ export const ScanListScreen = () => {
   const list = useSelector((state) => state.documents.list) as IScanDocument[];
 
   // const list = docSelectors.selectByDocType<IScanDocument>('scan');
-  const [delList, setDelList] = useState<string[]>([]);
+  const [delList, setDelList] = useState({});
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('ScanEdit');
   }, [navigation]);
 
   const handelAddDeletelList = useCallback(
-    (lineId: string, checkedId: string) => {
+    (lineId: string, status: string, checkedId: string) => {
       if (checkedId) {
-        const newList = delList.filter((i) => i !== checkedId);
+        const newList = Object.keys(delList).filter((i) => i !== checkedId);
         setDelList(newList);
       } else {
-        setDelList([...delList, lineId]);
+        setDelList({ ...delList, [lineId]: status });
       }
     },
     [delList],
   );
+
+  console.log('del', delList);
 
   const handleDeleteDocs = useCallback(() => {
     Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
@@ -99,7 +101,7 @@ export const ScanListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {delList.length > 0 ? (
+        {Object.values(delList).length > 0 ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
           <>
@@ -114,21 +116,22 @@ export const ScanListScreen = () => {
         )}
       </View>
     ),
-    [colors.card, delList.length, filterVisible, handleAddDocument, handleDeleteDocs],
+    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
   );
 
   const renderLeft = useCallback(
-    () => delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
-    [delList.length],
+    () => Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: delList.length > 0 ? renderLeft : navBackDrawer,
+      headerLeft: Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: delList.length > 0 ? `Выделено документов: ${delList.length}` : 'Сканирование',
+      title:
+        Object.values(delList).length > 0 ? `Выделено документов: ${Object.values(delList).length}` : 'Сканирование',
     });
-  }, [delList.length, navigation, renderLeft, renderRight]);
+  }, [delList, navigation, renderLeft, renderRight]);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -232,14 +235,18 @@ export const ScanListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
-      const checkedId = delList.find((i) => i === item.id) || '';
+      const checkedId = Object.keys(delList).find((i) => i === item.id) || '';
+      const ii = item.id;
+      // let a = [];
+      // const a = [item.id: item.status];
+      // console.log('a', a);
       return doc ? (
         <ScreenListItem
           {...item}
           onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}
-          onCheckItem={() => handelAddDeletelList(item.id, checkedId)}
+          onCheckItem={() => handelAddDeletelList(item.id, item.status, checkedId)}
           isChecked={checkedId ? true : false}
-          isDelList={delList.length > 0 ? true : false}
+          isDelList={Object.values(delList).length > 0 ? true : false}
         >
           <View>
             <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
