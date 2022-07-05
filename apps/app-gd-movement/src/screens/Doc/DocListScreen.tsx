@@ -99,7 +99,7 @@ export const DocListScreen = () => {
 
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
-    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SEND');
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
 
     if (statusList) {
       Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
@@ -115,7 +115,7 @@ export const DocListScreen = () => {
         },
       ]);
     } else {
-      Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
         {
           text: 'Да',
           onPress: () => {

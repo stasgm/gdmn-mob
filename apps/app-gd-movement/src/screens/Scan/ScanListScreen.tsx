@@ -83,7 +83,7 @@ export const ScanListScreen = () => {
 
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
-    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SEND');
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
 
     if (statusList) {
       Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
