@@ -89,8 +89,11 @@ export const MoveEditScreen = () => {
     if (!movementType) {
       return Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
     }
+    if (!docFromDepart) {
+      return Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
+    }
 
-    if (!(docNumber && docFromDepart && docToDepart && docDate)) {
+    if (!(docNumber && docToDepart && docDate)) {
       return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
     }
 
