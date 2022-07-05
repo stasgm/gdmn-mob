@@ -64,7 +64,15 @@ export const ScanListScreen = () => {
   const handelAddDeletelList = useCallback(
     (lineId: string, status: string, checkedId: string) => {
       if (checkedId) {
-        const newList = Object.keys(delList).filter((i) => i !== checkedId);
+        const newList = Object.entries(delList).reduce((sum, cur) => {
+          const curId = cur[0];
+          const curStatus = cur[1];
+          if (curId !== checkedId) {
+            return { ...sum, [curId]: curStatus };
+          } else {
+            return { ...sum };
+          }
+        }, {});
         setDelList(newList);
       } else {
         setDelList({ ...delList, [lineId]: status });
@@ -73,23 +81,37 @@ export const ScanListScreen = () => {
     [delList],
   );
 
-  console.log('del', delList);
-
   const handleDeleteDocs = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
-      {
-        text: 'Да',
-        onPress: () => {
-          for (const id of delList) {
-            dispatch(documentActions.removeDocument(id));
-          }
-          setDelList([]);
+    const docIds = Object.keys(delList);
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SEND');
+
+    if (statusList) {
+      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
         },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
   }, [delList, dispatch]);
 
   useEffect(() => {
@@ -101,7 +123,7 @@ export const ScanListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {Object.values(delList).length > 0 ? (
+        {delList && Object.values(delList).length > 0 ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
           <>
@@ -120,16 +142,18 @@ export const ScanListScreen = () => {
   );
 
   const renderLeft = useCallback(
-    () => Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
     [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
+      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
       title:
-        Object.values(delList).length > 0 ? `Выделено документов: ${Object.values(delList).length}` : 'Сканирование',
+        delList && Object.values(delList).length > 0
+          ? `Выделено документов: ${Object.values(delList).length}`
+          : 'Сканирование',
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
@@ -235,18 +259,14 @@ export const ScanListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
-      const checkedId = Object.keys(delList).find((i) => i === item.id) || '';
-      const ii = item.id;
-      // let a = [];
-      // const a = [item.id: item.status];
-      // console.log('a', a);
+      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
       return doc ? (
         <ScreenListItem
           {...item}
           onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}
-          onCheckItem={() => handelAddDeletelList(item.id, item.status, checkedId)}
+          onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
           isChecked={checkedId ? true : false}
-          isDelList={Object.values(delList).length > 0 ? true : false}
+          isDelList={delList && Object.values(delList).length > 0 ? true : false}
         >
           <View>
             <Text style={textStyle}>{doc.head.department?.name || ''}</Text>

@@ -1,5 +1,14 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text } from 'react-native';
+import {
+  StyleSheet,
+  SectionList,
+  ListRenderItem,
+  SectionListData,
+  View,
+  RefreshControl,
+  Text,
+  Alert,
+} from 'react-native';
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -13,9 +22,11 @@ import {
   ScreenListItem,
   IListItemProps,
   Menu,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
-import { refSelectors, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -26,7 +37,6 @@ import { IListItem } from '@lib/mobile-types';
 import { IDocumentType } from '@lib/types';
 
 import { IMovementDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
 import { navBackDrawer } from '../../components/navigateOptions';
@@ -47,6 +57,7 @@ export type SectionDataProps = SectionListData<IListItemProps, DocListSectionPro
 
 export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
+  const dispatch = useDispatch();
 
   const { loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
@@ -60,9 +71,64 @@ export const DocListScreen = () => {
 
   const list = useSelector((state) => state.documents.list) as IMovementDocument[];
 
+  const [delList, setDelList] = useState({});
+
   const handleAddDocument = useCallback(() => {
     navigation.navigate('DocEdit');
   }, [navigation]);
+
+  const handelAddDeletelList = useCallback(
+    (lineId: string, status: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = Object.entries(delList).reduce((sum, cur) => {
+          const curId = cur[0];
+          const curStatus = cur[1];
+          if (curId !== checkedId) {
+            return { ...sum, [curId]: curStatus };
+          } else {
+            return { ...sum };
+          }
+        }, {});
+        setDelList(newList);
+      } else {
+        setDelList({ ...delList, [lineId]: status });
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SEND');
+
+    if (statusList) {
+      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
+  }, [delList, dispatch]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -73,24 +139,39 @@ export const DocListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-        <AddButton onPress={handleAddDocument} />
+        {delList && Object.values(delList).length > 0 ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <IconButton
+              icon="card-search-outline"
+              style={filterVisible && { backgroundColor: colors.card }}
+              size={26}
+              onPress={() => setFilterVisible((prev) => !prev)}
+            />
+            <AddButton onPress={handleAddDocument} />
+          </>
+        )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+  );
+
+  const renderLeft = useCallback(
+    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackDrawer,
+      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
+      title:
+        delList && Object.values(delList).length > 0
+          ? `Выделено документов: ${Object.values(delList).length}`
+          : 'Документы',
     });
-  }, [navigation, renderRight]);
+  }, [delList, navigation, renderLeft, renderRight]);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -265,24 +346,29 @@ export const DocListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
+      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
       return doc ? (
-        <SwipeListItem renderItem={item} item={doc} routeName="DocView">
-          <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })}>
-            <View>
-              <Text style={textStyle}>
-                {(doc.documentType.remainsField === 'fromContact'
-                  ? doc.head.fromContact?.name
-                  : doc.head.toContact?.name) || ''}
-              </Text>
-              <Text style={textStyle}>
-                № {doc.number} на {getDateString(doc.documentDate)}
-              </Text>
-            </View>
-          </ScreenListItem>
-        </SwipeListItem>
+        <ScreenListItem
+          {...item}
+          onSelectItem={() => navigation.navigate('DocView', { id: item.id })}
+          onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
+          isChecked={checkedId ? true : false}
+          isDelList={delList && Object.values(delList).length > 0 ? true : false}
+        >
+          <View>
+            <Text style={textStyle}>
+              {(doc.documentType.remainsField === 'fromContact'
+                ? doc.head.fromContact?.name
+                : doc.head.toContact?.name) || ''}
+            </Text>
+            <Text style={textStyle}>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </Text>
+          </View>
+        </ScreenListItem>
       ) : null;
     },
-    [list, navigation, textStyle],
+    [delList, handelAddDeletelList, list, navigation, textStyle],
   );
 
   return (
