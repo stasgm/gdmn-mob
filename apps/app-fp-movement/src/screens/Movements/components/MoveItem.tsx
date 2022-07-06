@@ -31,7 +31,7 @@ export const MoveItem = ({ item }: IProps) => {
         <Text style={textStyle}>Номер партии: {item.numReceived || ''}</Text>
 
         <Text style={textStyle}>
-          Дата: {getDateString(item.workDate) || ''} {new Date(item.workDate).toLocaleTimeString() || ''}
+          Дата изготовления: {getDateString(item.workDate) || ''} {new Date(item.workDate).toLocaleTimeString() || ''}
         </Text>
       </View>
     </View>
