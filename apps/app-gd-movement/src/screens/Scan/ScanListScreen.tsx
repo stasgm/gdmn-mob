@@ -166,7 +166,12 @@ export const ScanListScreen = () => {
     React.useCallback(() => {
       if (!searchQuery) {
         // setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
-        setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name === 'scan') });
+        setFilteredList({
+          searchQuery,
+          list: list
+            .filter((i) => i.documentType.name === 'scan')
+            .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()),
+        });
       }
     }, [list, searchQuery]),
   );

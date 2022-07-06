@@ -53,13 +53,13 @@ const ScanBarcodeScreen = () => {
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
-  const goods = refSelectors.selectByName<IGood>('good').data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
   const documentType = useMemo(
-    () => documentTypes.find((d) => d.id === document.documentType.id),
-    [document.documentType.id, documentTypes],
+    () => documentTypes?.find((d) => d.id === document?.documentType.id),
+    [document?.documentType.id, documentTypes],
   );
 
   const contactId = useMemo(

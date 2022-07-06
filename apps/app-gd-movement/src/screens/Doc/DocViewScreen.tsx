@@ -125,10 +125,10 @@ export const DocViewScreen = () => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
-        onPress: () => {
-          setTimeout(() => {
-            setIsSend(false);
-          }, 10000);
+        onPress: async () => {
+          // setTimeout(() => {
+          //   setIsSend(false);
+          // }, 1);
           handleUseSendDoc();
         },
       },

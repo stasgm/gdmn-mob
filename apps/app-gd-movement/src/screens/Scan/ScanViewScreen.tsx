@@ -141,9 +141,9 @@ export const ScanViewScreen = () => {
       {
         text: 'Да',
         onPress: () => {
-          setTimeout(() => {
-            setIsSend(false);
-          }, 10000);
+          // setTimeout(() => {
+          //   setIsSend(false);
+          // }, 10000);
           handleSendDoc();
         },
       },
