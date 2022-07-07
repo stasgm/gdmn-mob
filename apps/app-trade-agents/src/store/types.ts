@@ -114,13 +114,13 @@ export interface IOrderHead extends IHead {
 export interface IOrderLine extends IEntity {
   good: IGood;
   quantity: number;
-  packagekey?: INamedEntity; // Вид упаковки
+  package?: INamedEntity; // Вид упаковки
 }
 
 export interface IOrderTotalLine {
   group: INamedEntity;
-  quantity?: number;
-  price?: number;
+  quantity: number;
+  s: number;
 }
 
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;

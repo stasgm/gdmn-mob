@@ -1,19 +1,28 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import { View, FlatList, Alert, RefreshControl, Text } from 'react-native';
+import { RouteProp, useIsFocused, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { View, FlatList, Alert, RefreshControl } from 'react-native';
 import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { globalStyles as styles, ItemSeparator, SubTitle, useActionSheet, MenuButton, AppScreen } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import {
+  globalStyles as styles,
+  ItemSeparator,
+  SubTitle,
+  useActionSheet,
+  MenuButton,
+  AppScreen,
+  EmptyList,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
+import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
@@ -28,10 +37,8 @@ interface IFilteredList {
   routeLineList: IRouteLine[] | undefined;
 }
 
-const keyExtractor = (item: IRouteLine) => String(item.id);
-
 const RouteViewScreen = () => {
-  console.log('0000000');
+  console.log('RouteViewScreen');
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
@@ -89,29 +96,24 @@ const RouteViewScreen = () => {
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
 
-  const docs = useSelector((state) => state.documents.list);
+  const orders = useFilteredDocList<IOrderDocument>('order');
+  const visits = useFilteredDocList<IVisitDocument>('visit');
 
-  const geoList = useAppSelector((state) => state.geo?.list?.filter((g) => g.routeId === id));
+  const geoList = useAppSelector((state) => state.geo?.list)?.filter((g) => g.routeId === id);
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
       const delDocList: string[] = [];
 
-      (docs as IVisitDocument[] | IReturnDocument[] | IOrderDocument[])?.forEach((doc) => {
-        switch (doc.documentType.name) {
-          case 'visit': {
-            if (routeLineList?.find((line) => line.id === doc.head.routeLineId)) {
-              delDocList.push(doc.id);
-            }
-            break;
-          }
-          case 'order':
-          case 'return': {
-            if (doc.head.route?.id === id) {
-              delDocList.push(doc.id);
-            }
-            break;
-          }
+      orders.forEach((o) => {
+        if (o.head.route?.id === id) {
+          delDocList.push(o.id);
+        }
+      });
+
+      visits.forEach((v) => {
+        if (routeLineList?.find((line) => line.id === v.head.routeLineId)) {
+          delDocList.push(v.id);
         }
       });
 
@@ -133,7 +135,7 @@ const RouteViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [dispatch, docDispatch, docs, geoList, id, navigation, routeLineList]);
+  }, [dispatch, docDispatch, geoList, id, navigation, orders, routeLineList, visits]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -182,7 +184,15 @@ const RouteViewScreen = () => {
     [filteredList.routeLineList],
   );
 
-  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
+  const renderItem = useCallback(
+    ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />,
+    [route.id],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!route) {
     return (
@@ -191,13 +201,6 @@ const RouteViewScreen = () => {
       </View>
     );
   }
-
-  const renderItem = ({ item }: { item: IRouteLine }) => {
-    console.log(111111111111111);
-    return <RouteItem item={item} routeId={route.id} />;
-  };
-
-  console.log(222222);
 
   return (
     <AppScreen>
@@ -226,12 +229,12 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         refreshControl={RC}
-        ListEmptyComponent={EC}
-        removeClippedSubviews={true} // Unmount compsonents when outside of window
-        initialNumToRender={13}
-        maxToRenderPerBatch={13} // Reduce number in each render batch
+        ListEmptyComponent={EmptyList}
+        // removeClippedSubviews={true} // Unmount compsonents when outside of window
+        initialNumToRender={9}
+        maxToRenderPerBatch={9} // Reduce number in each render batch
         updateCellsBatchingPeriod={50} // Increase time between renders
-        windowSize={11} // Reduce the window size
+        windowSize={9} // Reduce the window size
       />
       <RouteTotal routeId={id} />
     </AppScreen>

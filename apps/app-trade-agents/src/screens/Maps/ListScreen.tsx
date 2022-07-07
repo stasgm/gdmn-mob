@@ -1,10 +1,12 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
-import { FlatList, Text, TouchableHighlight, View } from 'react-native';
+import { FlatList, TouchableHighlight, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
-import { useScrollToTop, useTheme } from '@react-navigation/native';
+import { useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { ItemSeparator, globalStyles as styles, AppScreen } from '@lib/mobile-ui';
+import { ItemSeparator, globalStyles as styles, AppScreen, EmptyList, MediumText, LargeText } from '@lib/mobile-ui';
+
+import { keyExtractor } from '@lib/mobile-app';
 
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
@@ -15,9 +17,6 @@ import { navBackDrawer } from '../../components/navigateOptions';
 import localStyles from './styles';
 
 const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => void; selected: boolean }) => {
-  const { colors } = useTheme();
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
   const viewStyle = useMemo(
     () => [
       styles.icon,
@@ -31,16 +30,16 @@ const Item = ({ item, onPress, selected }: { item: ILocation; onPress: () => voi
       <>
         <View style={styles.item}>
           <View style={viewStyle}>
-            <Text style={styles.lightText}>{item.number}</Text>
+            <MediumText style={styles.lightText}>{item.number}</MediumText>
           </View>
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name}</Text>
+            <LargeText style={styles.textBold}>{item.name}</LargeText>
           </View>
           <View style={styles.flexDirectionRow}>
             <MaterialCommunityIcons name="map-marker-check-outline" size={15} />
-            <Text style={textStyle}>{`${item.coords.latitude}, ${item.coords.longitude}`}</Text>
+            <MediumText>{`${item.coords.latitude}, ${item.coords.longitude}`}</MediumText>
           </View>
         </View>
       </>
@@ -75,11 +74,11 @@ const ListScreen = () => {
       <FlatList
         ref={ref}
         data={list}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
-        ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

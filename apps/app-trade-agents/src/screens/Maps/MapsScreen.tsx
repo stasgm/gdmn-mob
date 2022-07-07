@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, LatLng, Polyline } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Snackbar } from 'react-native-paper';
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
-import { globalStyles as styles, Theme, BottomSheet, RadioGroup } from '@lib/mobile-ui';
-import { docSelectors, refSelectors } from '@lib/store';
+import { globalStyles as styles, Theme, BottomSheet, RadioGroup, AppActivityIndicator } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
 
 import { IListItem } from '@lib/mobile-types';
 
-import { getDateString } from '@lib/mobile-app';
-
-import { useTheme } from '@react-navigation/native';
+import { getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { useDispatch, useSelector } from '../../store';
 import { geoActions } from '../../store/geo/actions';
@@ -42,16 +40,15 @@ const MapScreen = () => {
   const [message, setMessage] = useState('');
 
   const dispatch = useDispatch();
-  const { colors } = useTheme();
 
   const [region, setRegion] = useState<Region>();
   const [loading, setLoading] = useState(false);
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const routeList = docSelectors
-    .selectByDocType<IRouteDocument>('route')
-    ?.sort((a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime());
+  const routeList = useFilteredDocList<IRouteDocument>('route').sort(
+    (a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+  );
 
   const currentList: IListItem[] = useMemo(() => {
     const newCurrentList = routeList.map((item) => ({
@@ -246,7 +243,7 @@ const MapScreen = () => {
     <View style={localStyles.containerMap}>
       {loading && (
         <View style={localStyles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <AppActivityIndicator size="large" />
         </View>
       )}
       <MapView

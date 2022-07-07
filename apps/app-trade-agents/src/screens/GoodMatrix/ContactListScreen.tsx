@@ -129,7 +129,6 @@ const ContactListScreen = () => {
           <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
         )}
         scrollEventThrottle={400}
-        onEndReached={() => ({})}
         ListEmptyComponent={!contacts || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
       />
     </AppScreen>

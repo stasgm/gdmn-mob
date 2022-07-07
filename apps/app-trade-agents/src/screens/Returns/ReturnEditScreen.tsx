@@ -6,7 +6,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
   appActions,
-  docSelectors,
   documentActions,
   refSelectors,
   useDispatch as useDocDispatch,
@@ -16,7 +15,7 @@ import {
 import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
 import { IDocumentType } from '@lib/types';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId, useFilteredDocList } from '@lib/mobile-app';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
@@ -32,7 +31,8 @@ const ReturnEditScreen = () => {
 
   const { colors } = useTheme();
 
-  const returns = docSelectors.selectByDocType<IReturnDocument>('return');
+  const returns = useFilteredDocList<IReturnDocument>('return');
+
   const returnDoc = returns?.find((e) => e.id === id);
 
   const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
@@ -65,8 +65,7 @@ const ReturnEditScreen = () => {
     if (!docContact && !!docOutlet) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['contact']: outlet?.company,
+          contact: outlet?.company,
         }),
       );
     }
@@ -77,8 +76,7 @@ const ReturnEditScreen = () => {
     if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['outlet']: undefined,
+          outlet: undefined,
         }),
       );
     }

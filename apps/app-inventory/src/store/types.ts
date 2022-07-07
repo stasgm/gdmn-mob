@@ -57,7 +57,7 @@ export interface IInventoryHead extends IHead {
 export interface IInventoryLine extends IEntity {
   good: INamedEntity;
   quantity: number;
-  packagekey?: INamedEntity; // Вид упаковки
+  package?: INamedEntity; // Вид упаковки
   price?: number;
   remains?: number;
   barcode?: string;
@@ -77,7 +77,7 @@ export interface IDocHead extends IHead {
 export interface IDocLine extends IEntity {
   good: INamedEntity;
   quantity: number;
-  packagekey?: INamedEntity; // Вид упаковки
+  package?: INamedEntity; // Вид упаковки
   price?: number;
   remains?: number;
   barcode?: string;

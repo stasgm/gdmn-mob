@@ -1,12 +1,22 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, View } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { View } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
-import { SubTitle, globalStyles as styles, InfoBlock, PrimeButton, AppScreen } from '@lib/mobile-ui';
+import {
+  SubTitle,
+  globalStyles as styles,
+  InfoBlock,
+  PrimeButton,
+  AppScreen,
+  MediumText,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { formatValue, generateId, getDateString } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
+
+import { INamedEntity } from '@lib/types';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -18,15 +28,21 @@ import { navBackButton } from '../../components/navigateOptions';
 import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
+  console.log('RouteDetailScreen');
+
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
   const { colors } = useTheme();
 
   const { routeId, id } = useRoute<RouteProp<RoutesStackParamList, 'RouteDetails'>>().params;
-  const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
+
+  const route = { id: routeId, name: '' } as INamedEntity;
+
+  const visit = useFilteredDocList<IVisitDocument>('visit').find(
+    (doc) => doc.head?.routeLineId === id,
+  ) as IVisitDocument;
 
   const [process, setProcess] = useState(false);
-  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -36,28 +52,16 @@ const RouteDetailScreen = () => {
 
   const point = docSelectors.selectByDocId<IRouteDocument>(routeId)?.lines.find((i) => i.id === id);
 
-  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
+  const outlet = point ? refSelectors.selectByRefId<IOutlet>('outlet', point?.outlet.id) : undefined;
 
-  const outlet = useMemo(() => (point ? outlets?.find((e) => e.id === point?.outlet.id) : undefined), [point, outlets]);
+  const contact = outlet ? refSelectors.selectByRefId<IContact>('contact', outlet.company.id) : undefined;
 
-  const contacts = refSelectors.selectByName<IContact>('contact')?.data;
-
-  const contact = useMemo(
-    () => (outlet ? contacts?.find((item) => item.id === outlet.company.id) : undefined),
-    [contacts, outlet],
-  );
-
-  const debts = refSelectors.selectByName<IDebt>('debt')?.data;
-
-  const debt = useMemo(() => (contact ? debts?.find((item) => item.id === contact.id) : undefined), [contact, debts]);
+  const debt = contact ? refSelectors.selectByRefId<IDebt>('debt', contact.id) : undefined;
 
   const saldo = debt?.saldo ?? 0;
   const saldoDebt = debt?.saldoDebt ?? 0;
 
-  const debtTextStyle = useMemo(
-    () => [styles.textLow, { color: saldoDebt > 0 ? colors.notification : colors.text }],
-    [colors.notification, colors.text, saldoDebt],
-  );
+  const debtTextStyle = [{ color: saldoDebt > 0 ? colors.notification : colors.text }];
 
   const handleNewVisit = useCallback(async () => {
     setProcess(true);
@@ -92,6 +96,8 @@ const RouteDetailScreen = () => {
     setProcess(false);
   }, [dispatch, id]);
 
+  const isFocused = useIsFocused();
+
   if (!point) {
     return (
       <View style={styles.content}>
@@ -116,14 +122,18 @@ const RouteDetailScreen = () => {
     );
   }
 
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <AppScreen style={styles.contentTop}>
       <InfoBlock colorLabel={'#06567D'} title={point.outlet.name}>
         <>
           {outlet && (
             <>
-              <Text style={textStyle}>{outlet.address}</Text>
-              <Text style={textStyle}>{outlet.phoneNumber}</Text>
+              <MediumText>{outlet.address}</MediumText>
+              <MediumText>{outlet.phoneNumber}</MediumText>
             </>
           )}
         </>
@@ -135,22 +145,22 @@ const RouteDetailScreen = () => {
         <>
           {contact && (
             <>
-              <Text style={textStyle}>{`Условия оплаты: ${contact.paycond}`}</Text>
-              <Text style={textStyle}>
+              <MediumText>{`Условия оплаты: ${contact.paycond}`}</MediumText>
+              <MediumText>
                 {saldo < 0
                   ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(saldo) ?? 0)}`
                   : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldo)}`}
-              </Text>
-              <Text style={debtTextStyle}>
+              </MediumText>
+              <MediumText style={debtTextStyle}>
                 {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
-              </Text>
-              <Text style={textStyle}>Количество дней: {debt?.dayLeft || 0}</Text>
+              </MediumText>
+              <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
             </>
           )}
         </>
       </InfoBlock>
       {visit && !process ? (
-        <Visit key={visit.id} item={visit} outlet={outlet} contact={contact} route={{ id: routeId, name: '' }} />
+        <Visit key={visit.id} visit={visit} outlet={outlet} contact={contact} route={route} />
       ) : (
         <PrimeButton icon="play-circle-outline" onPress={handleNewVisit} disabled={process}>
           Начать визит

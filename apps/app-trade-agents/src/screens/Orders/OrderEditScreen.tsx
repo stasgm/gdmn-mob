@@ -1,15 +1,23 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
-import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
+import { documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
+import {
+  AppInputScreen,
+  Input,
+  SelectableInput,
+  SaveButton,
+  SubTitle,
+  RadioGroup,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
@@ -18,13 +26,15 @@ import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
 const OrderEditScreen = () => {
+  console.log('OrderEditScreen');
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+  const orders = useFilteredDocList<IOrderDocument>('order');
+
   const order = orders?.find((e) => e.id === id);
 
   const orderType = refSelectors
@@ -63,8 +73,7 @@ const OrderEditScreen = () => {
     if (!docContact && !!docOutlet) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['contact']: outlet?.company,
+          contact: outlet?.company,
         }),
       );
     }
@@ -75,8 +84,7 @@ const OrderEditScreen = () => {
     if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['outlet']: undefined,
+          outlet: undefined,
         }),
       );
     }
@@ -310,6 +318,11 @@ const OrderEditScreen = () => {
     ],
     [colors.card, colors.primary],
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppInputScreen>

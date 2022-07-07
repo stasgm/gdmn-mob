@@ -637,6 +637,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '147035339',
                 name: 'Колбаски балканские',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
               },
               package: {
                 id: '1760463491',
@@ -648,6 +649,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '147035339',
                 name: 'Колбаски балканские',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
               },
               package: {
                 id: '1811739170',
@@ -659,6 +661,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211845',
                 name: 'Колб. изд. "Колбаса Мортаделла"',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
               },
               package: {
                 id: '273098057',
@@ -670,6 +673,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211845',
                 name: 'Колб. изд. "Колбаса Мортаделла"',
+                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
               },
               package: {
                 id: '273098058',
@@ -681,6 +685,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211846',
                 name: 'Колб. изд. "Колбаса Сливочная"',
+                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
               },
               package: {
                 id: '273098057',
@@ -692,6 +697,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211846',
                 name: 'Колб. изд. "Колбаса Сливочная"',
+                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
               },
               package: {
                 id: '273098058',
@@ -703,6 +709,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211847',
                 name: 'Колб. изд. "Колбаса Столичная"',
+                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
               },
               package: {
                 id: '273098057',
@@ -714,6 +721,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211847',
                 name: 'Колб. изд. "Колбаса Столичная"',
+                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
               },
               package: {
                 id: '273098058',
@@ -725,6 +733,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
               },
               package: {
                 id: '1617776619',
@@ -736,6 +745,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '1617776621',
@@ -747,6 +757,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '615762858',
@@ -758,6 +769,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '615762859',
@@ -769,6 +781,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500927',
                 name: 'Ветчина вар. Любительская',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '1617776619',
@@ -780,6 +793,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500927',
                 name: 'Ветчина вар. Любительская',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '1617776621',
@@ -791,6 +805,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500927',
                 name: 'Ветчина вар. Любительская',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '615762858',
@@ -802,6 +817,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500927',
                 name: 'Ветчина вар. Любительская',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
                 id: '615762859',
@@ -1217,10 +1233,11 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '857817085',
                 name: 'Колбаса вареная докторская',
+                goodgroup: { id: '690457770', name: '01. Колбасы вареные' },
                 priceFsn: 4.82,
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1617776619',
                 name: 'Мал. батон 5',
               },
@@ -1230,10 +1247,11 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '857817085',
                 name: 'Колбаса вареная докторская',
+                goodgroup: { id: '690457770', name: '01. Колбасы вареные' },
                 priceFsn: 4.82,
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1617776621',
                 name: 'Мал. батон 10',
               },
@@ -1273,10 +1291,11 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
                 priceFsn: 4.37,
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '615762858',
                 name: 'Большой батон 5',
               },
@@ -1286,10 +1305,11 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '1572500926',
                 name: 'Ветчина вар.',
+                goodgroup: { id: '690457773', name: '02. Ветчины' },
                 priceFsn: 4.37,
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '615762859',
                 name: 'Большой батон 10',
               },
@@ -1329,10 +1349,11 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '147035338',
                 name: 'Колбаски баварские',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
                 priceFsn: 20.42,
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1811739170',
                 name: '2 кг',
               },
@@ -1342,10 +1363,11 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '147035339',
                 name: 'Колбаски балканские',
+                goodgroup: { id: '690457778', name: '05. Продукты, колбаски' },
                 priceFsn: 20.27,
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1811739170',
                 name: '2 кг',
               },
@@ -1380,9 +1402,10 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '807686298',
                 name: 'Сосиски докторские',
+                goodgroup: { id: '690457771', name: '04. Сосиски' },
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1607786772',
                 name: '500 гр.-700  гр.(10)',
               },
@@ -1397,7 +1420,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: 'Сосиски сливочные',
               },
               quantity: 5,
-              packagekey: {
+              package: {
                 id: '1607786773',
                 name: '2 кг. - 3 кг.(5)',
               },
@@ -1437,7 +1460,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: 'Сосиски молочные',
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1607786791',
                 name: '2 кг. - 3 кг.(10)',
               },
@@ -1452,7 +1475,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: 'Сосиски молочные',
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1607786790',
                 name: '500 гр.-700  гр.(5)',
               },
@@ -1490,9 +1513,10 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '857817085',
                 name: 'Колбаса вареная докторская',
+                goodgroup: { id: '690457770', name: '01. Колбасы вареные' },
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '1617776619',
                 name: 'мал. батон 5',
               },
@@ -1505,9 +1529,10 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211845',
                 name: 'Колб. изд. "Колбаса Мортаделла"',
+                goodgroup: { id: '690457770', name: '01. Колбасы вареные' },
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '273098058',
                 name: '10',
               },
@@ -1520,9 +1545,10 @@ export const messageAgent: IMessage<MessageType>[] = [
               good: {
                 id: '955211847',
                 name: 'Колб. изд. "Колбаса Столичная"',
+                goodgroup: { id: '690457770', name: '01. Колбасы вареные' },
               },
               quantity: 2,
-              packagekey: {
+              package: {
                 id: '273098057',
                 name: '5',
               },

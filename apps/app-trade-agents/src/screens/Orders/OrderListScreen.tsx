@@ -1,10 +1,9 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -15,14 +14,15 @@ import {
   SubTitle,
   ScreenListItem,
   IListItemProps,
+  EmptyList,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
 import { IOrderDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
@@ -34,46 +34,80 @@ export interface OrderListSectionProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
+interface IFilteredList {
+  searchQuery: string;
+  orders: IOrderDocument[];
+}
+
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
+  console.log('OrderListScreen');
 
-  const loading = useSelector((state) => state.documents.loading);
-  const orders = useSelector((state) => state.documents.list) as IOrderDocument[];
+  const orderList = useFilteredDocList<IOrderDocument>('order').sort(
+    (a, b) =>
+      new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+      new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+  );
+
   const { colors } = useTheme();
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+  const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = orders
-    ?.filter((i) =>
-      i.documentType?.name === 'order'
-        ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate || i.head.onDate
-          ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase())
-          : true
-        : false,
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-        new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
-    );
+  const [filteredList, setFilteredList] = useState<IFilteredList>({
+    searchQuery: '',
+    orders: orderList,
+  });
+
+  useEffect(() => {
+    if (searchQuery !== filteredList.searchQuery) {
+      if (!searchQuery) {
+        setFilteredList({
+          searchQuery,
+          orders: orderList,
+        });
+      } else {
+        const lower = searchQuery.toLowerCase();
+
+        const fn = (i: IOrderDocument) =>
+          i?.head?.contact?.name.toUpperCase().includes(lower) ||
+          i?.head?.outlet?.name.toUpperCase().includes(lower) ||
+          i.number.toUpperCase().includes(lower) ||
+          getDateString(i.documentDate).toUpperCase().includes(lower) ||
+          getDateString(i.head.onDate).toUpperCase().includes(lower);
+
+        let newList;
+
+        if (
+          filteredList.searchQuery &&
+          searchQuery.length > filteredList.searchQuery.length &&
+          searchQuery.startsWith(filteredList.searchQuery)
+        ) {
+          newList = filteredList.orders?.filter(fn);
+        } else {
+          newList = orderList?.filter(fn);
+        }
+
+        setFilteredList({
+          searchQuery,
+          orders: newList,
+        });
+      }
+    }
+  }, [filteredList, orderList, searchQuery]);
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: IListItemProps[] = useMemo(() => {
+  const filteredListByStatus: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
-        ? list
+        ? filteredList.orders
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
+        ? filteredList.orders.filter((e) => e.status !== 'PROCESSED')
         : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        ? filteredList.orders.filter((e) => e.status === 'PROCESSED')
         : [];
 
     return res.map(
@@ -89,11 +123,11 @@ const OrderListScreen = () => {
           errorMessage: i.errorMessage,
         } as IListItemProps),
     );
-  }, [status, list]);
+  }, [status, filteredList.orders]);
 
   const sections = useMemo(
     () =>
-      filteredList.reduce<SectionDataProps>((prev, item) => {
+      filteredListByStatus.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
@@ -107,11 +141,10 @@ const OrderListScreen = () => {
           {
             title: sectionTitle,
             data: [item],
-            // key: [item].length,
           },
         ];
       }, []),
-    [filteredList],
+    [filteredListByStatus],
   );
 
   const handleAddDocument = useCallback(() => {
@@ -146,18 +179,29 @@ const OrderListScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem
-        renderItem={item}
-        item={doc}
-        routeName={doc.status === 'DRAFT' || doc.status === 'READY' ? 'OrderEdit' : 'OrderView'}
-      >
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
-      </SwipeListItem>
-    ) : null;
-  };
+  const handlePressOrder = useCallback((id: string) => navigation.navigate('OrderView', { id }), [navigation]);
+
+  const renderItem: ListRenderItem<IListItemProps> = useCallback(
+    ({ item }) => <ScreenListItem key={item.id} {...item} onSelectItem={() => handlePressOrder(item.id)} />,
+    [handlePressOrder],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const renderSectionFooter = useCallback(
+    (item) => (status === 'all' && sections ? <OrderListTotal sectionOrders={item.section} /> : null),
+    [sections, status],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
+  // const RC = useMemo(() => <RefreshControl refreshing={loading} title="загрузка данных..." />, [loading]);
 
   return (
     <AppScreen>
@@ -180,14 +224,12 @@ const OrderListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        renderSectionFooter={(item) => (status === 'all' && sections ? <OrderListTotal orders={item.section} /> : null)}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={RC}
+        ListEmptyComponent={EmptyList}
+        renderSectionFooter={renderSectionFooter}
       />
     </AppScreen>
   );

@@ -1,82 +1,44 @@
 import React, { useMemo } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { globalStyles as styles } from '@lib/mobile-ui';
-import { docSelectors, refSelectors } from '@lib/store';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { globalStyles as styles, ItemSeparator, MediumText } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
 import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { IGood, IGoodGroup, IOrderDocument, IOrderLine, IOrderTotalLine } from '../../../store/types';
+import { formatValue, round } from '@lib/mobile-app';
+
+import { IGoodGroup, IOrderDocument, IOrderTotalLine } from '../../../store/types';
+import { totalList, totalListByGroup } from '../../../utils/helpers';
 
 export interface IItem {
-  orderId: string;
+  order: IOrderDocument;
 }
 
-const round = (num: number) => {
-  return Math.round((num + Number.EPSILON) * 100) / 100;
-};
-
-const OrderTotal = ({ orderId }: IItem) => {
+const OrderTotal = ({ order }: IItem) => {
+  console.log('OrderTotal');
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
 
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order')?.filter((e) => e.id === orderId);
+  const totalListByOrder = useMemo(
+    () => totalListByGroup(firstLevelGroups, groups, order.lines),
+    [firstLevelGroups, groups, order.lines],
+  );
 
-  const orderLines = orders.reduce((prev: IOrderLine[], order) => {
-    return [...prev, ...order.lines];
-  }, []);
-
-  const totalList: IOrderTotalLine[] = firstLevelGroups
-    ?.map((firstGr) => ({
-      group: {
-        id: firstGr.id,
-        name: firstGr.name,
-      },
-      quantity: orderLines
-        ?.filter((l) =>
-          goods.find(
-            (g) =>
-              g.id === l.good.id &&
-              (g.goodgroup.id === firstGr.id ||
-                groups.find((group) => group.parent?.id === firstGr.id && group.id === g.goodgroup.id)),
-          ),
-        )
-        ?.reduce((s: number, line) => {
-          return round(s + round(line.quantity));
-        }, 0),
-      price: orderLines
-        ?.filter((l) =>
-          goods.find(
-            (g) =>
-              g.id === l.good.id &&
-              (g.goodgroup.id === firstGr.id ||
-                groups.find((group) => group.parent?.id === firstGr.id && group.id === g.goodgroup.id)),
-          ),
-        )
-        ?.reduce((s: number, line) => {
-          return round(
-            s +
-              round((line.quantity / (line.good.invWeight || 1)) * line.good.priceFsn) +
-              round((line.good.priceFsn * Number(line.good.vat || 0)) / 100),
-          );
-        }, 0),
-    }))
-    .filter((i) => i.quantity > 0);
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const total = useMemo(() => totalList(totalListByOrder), [totalListByOrder]);
 
   const renderTotalItem = ({ item }: { item: IOrderTotalLine }) => (
     <View style={styles.itemNoMargin}>
       <View style={styles.details}>
         <View style={styles.directionRow}>
           <View style={localStyles.groupWidth}>
-            <Text style={textStyle}>{item.group.name}</Text>
+            <MediumText>{item.group.name}</MediumText>
           </View>
           <View style={localStyles.quantity}>
-            <Text style={textStyle}>{`${item.quantity || 0} кг / ${item.price || 0} р.`}</Text>
+            <MediumText>{`${formatValue({ type: 'number', decimals: 3 }, round(item.quantity, 3))} кг. /`}</MediumText>
+            <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(item.s, 2))}`}</MediumText>
           </View>
         </View>
       </View>
@@ -87,24 +49,25 @@ const OrderTotal = ({ orderId }: IItem) => {
     <View>
       {totalList.length ? (
         <View style={[localStyles.margins, localStyles.total]}>
-          <Text style={styles.textTotal}>Итого:</Text>
-          <Text style={styles.textTotal}>Вес {' / '} сумма:</Text>
+          <MediumText style={styles.textTotal}>Итого:</MediumText>
+          <MediumText style={styles.textTotal}>вес {' / '} сумма:</MediumText>
         </View>
       ) : null}
       <Divider style={{ backgroundColor: colors.primary }} />
       <FlatList
-        data={totalList}
+        data={totalListByOrder}
         keyExtractor={(_, i) => String(i)}
         renderItem={renderTotalItem}
         style={localStyles.groupMargin}
+        ItemSeparatorComponent={ItemSeparator}
       />
       <Divider style={{ backgroundColor: colors.primary }} />
       <View style={[localStyles.margins]}>
         <View style={localStyles.content}>
-          <Text style={styles.textTotal}>
-            {round(totalList?.reduce((prev, item) => prev + round(item?.quantity || 0), 0)) || 0} кг /{' '}
-            {round(totalList?.reduce((prev, item) => prev + round(item?.price || 0), 0)) || 0} р.
-          </Text>
+          <MediumText style={styles.textTotal}>
+            {formatValue({ type: 'number', decimals: 3 }, round(total.quantity, 3))} кг. /{' '}
+            {formatValue({ type: 'currency', decimals: 2 }, round(total.s, 2))}
+          </MediumText>
         </View>
       </View>
     </View>
@@ -122,7 +85,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   groupWidth: {
-    width: '60%',
+    width: '62%',
   },
   groupMargin: {
     marginHorizontal: 5,

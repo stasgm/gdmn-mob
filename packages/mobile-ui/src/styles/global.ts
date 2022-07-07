@@ -54,6 +54,9 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     padding: 5,
   },
+  directionColumn: {
+    flexDirection: 'column',
+  },
   containerCenter: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -179,8 +182,10 @@ const globalStyles = StyleSheet.create({
     // opacity: 0.7,
     fontSize: 15,
   },
-  lightText: {
+  normalText: {
     fontSize: 15,
+  },
+  lightText: {
     color: '#fff',
   },
   textTotal: {
@@ -218,7 +223,10 @@ const globalStyles = StyleSheet.create({
   textReference: {
     textDecorationLine: 'underline',
   },
-  textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
+  textInfo: { fontSize: 18, textAlign: 'left', marginHorizontal: 10 },
+  groupWidth: {
+    width: '72%',
+  },
 });
 
 export default globalStyles;

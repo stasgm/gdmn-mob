@@ -1,17 +1,25 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { Divider, IconButton, Searchbar } from 'react-native-paper';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { AppScreen, ItemSeparator, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SubTitle,
+  globalStyles as styles,
+  EmptyList,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodMatrix, IOrderDocument, IGoodGroup, IMGroupModel } from '../../store/types';
+import { IGood, IGoodMatrix, IGoodGroup, IMGroupModel, IOrderDocument } from '../../store/types';
 import { getGroupModelByContact } from '../../utils/helpers';
 import { UNKNOWN_GROUP } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
@@ -19,21 +27,23 @@ import { navBackButton } from '../../components/navigateOptions';
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
 interface IProp {
+  docId: string;
   model: IMGroupModel;
   item: IGoodGroup;
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
+  onPressGroup: (groupId: string) => void;
   searchQuery?: string;
 }
 
-const Group = ({ model, item, expendGroup, setExpend, searchQuery }: IProp) => {
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
-  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
-
+const Group = ({ docId, model, item, expendGroup, setExpend, searchQuery, onPressGroup }: IProp) => {
+  console.log('Group');
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const nextLevelGroupsList = useMemo(() => model[item.id]?.children?.map((gr) => gr.group) || [], [item.id, model]);
+  const nextLevelGroupsList = useMemo(() => {
+    return model[item.id]?.children?.map((gr) => gr.group) || [];
+  }, [item.id, model]);
 
   const nextLevelGroups = useMemo(() => {
     return nextLevelGroupsList?.filter((i) =>
@@ -41,53 +51,72 @@ const Group = ({ model, item, expendGroup, setExpend, searchQuery }: IProp) => {
     );
   }, [nextLevelGroupsList, searchQuery]);
 
-  const isExpand = expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup);
+  const isExpand = useMemo(() => {
+    return expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup);
+  }, [expendGroup, item.id, nextLevelGroups]);
 
-  const icon = (nextLevelGroups?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon;
+  const icon = useMemo(
+    () => (nextLevelGroups?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon,
+    [isExpand, nextLevelGroups?.length],
+  );
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ item: grItem }: { item: IGoodGroup }) => (
-    <Group model={model} key={grItem.id} item={grItem} expendGroup={expendGroup} setExpend={setExpend} />
+  const renderGroup = useCallback(
+    ({ item: grItem }: { item: IGoodGroup }) => {
+      return (
+        <Group
+          docId={docId}
+          model={model}
+          key={grItem.id}
+          item={grItem}
+          expendGroup={expendGroup}
+          setExpend={setExpend}
+          onPressGroup={onPressGroup}
+        />
+      );
+    },
+    [docId, expendGroup, model, onPressGroup, setExpend],
+  );
+
+  const len = useMemo(
+    () => model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length,
+    [item.id, item.parent?.id, model],
+  );
+
+  const handlePressGroup = useCallback(
+    () =>
+      nextLevelGroups?.length && nextLevelGroups?.length > 0
+        ? setExpend(!isExpand ? item : undefined)
+        : onPressGroup(item.id),
+    [isExpand, item, nextLevelGroups?.length, onPressGroup, setExpend],
   );
 
   return (
     <>
-      <TouchableOpacity
-        style={styles.item}
-        onPress={() =>
-          nextLevelGroups?.length && nextLevelGroups?.length > 0
-            ? setExpend(!isExpand ? item : undefined)
-            : navigation.navigate('SelectGoodItem', {
-                docId,
-                groupId: item.id,
-              })
-        }
-      >
+      <TouchableOpacity style={styles.item} onPress={handlePressGroup}>
         <View style={styles.details}>
           <Text style={styles.name}>{item.name || item.name}</Text>
           {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <Text style={styles.field}>
-                {model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length}
-              </Text>
+              <Text style={styles.field}>{len}</Text>
             </View>
           )}
         </View>
         <MaterialCommunityIcons name={icon} size={24} color="black" />
       </TouchableOpacity>
-      {isExpand && (
+      {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && (
         <View style={localStyles.marginLeft}>
           {nextLevelGroups && nextLevelGroups?.length > 0 && (
             <FlatList
               ref={refListGroups}
               data={nextLevelGroups}
-              keyExtractor={(_, i) => String(i)}
+              keyExtractor={keyExtractor}
               renderItem={renderGroup}
               ItemSeparatorComponent={ItemSeparator}
-              ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
+              ListEmptyComponent={EmptyList}
             />
           )}
         </View>
@@ -97,8 +126,9 @@ const Group = ({ model, item, expendGroup, setExpend, searchQuery }: IProp) => {
 };
 
 const SelectGroupScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
+  console.log('SelectGroupScreen');
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
@@ -118,8 +148,6 @@ const SelectGroupScreen = () => {
     }
   }, [syncDate, isDemo]);
 
-  const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact.id;
-
   const formParams = useSelector((state) => state.app.formParams);
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data?.[0];
@@ -128,7 +156,9 @@ const SelectGroupScreen = () => {
 
   const refGroup = refSelectors.selectByName<IGoodGroup>('goodGroup');
 
-  const groups = refGroup.data.concat(UNKNOWN_GROUP);
+  const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
+
+  const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact.id;
 
   const model = useMemo(
     () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice),
@@ -170,28 +200,52 @@ const SelectGroupScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation, formParams?.groupId, renderRight]);
 
-  const handleSetExpand = (group: IGoodGroup | undefined) => {
-    setExpend(group);
-    dispatch(
-      appActions.setFormParams({
-        ...formParams,
-        ['groupId']: group?.id,
-      }),
-    );
-  };
+  const handleSetExpand = useCallback(
+    (group: IGoodGroup | undefined) => {
+      setExpend(group);
+      dispatch(
+        appActions.setFormParams({
+          groupId: group?.id,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const renderGroup = ({ item }: { item: IGoodGroup }) => (
-    <Group
-      model={model}
-      item={item}
-      expendGroup={expend?.id}
-      setExpend={(group) => handleSetExpand(group)}
-      searchQuery={searchQuery}
-    />
+  const pressGroup = useCallback(
+    (groupId: string) =>
+      navigation.navigate('SelectGoodItem', {
+        docId,
+        groupId,
+      }),
+    [docId, navigation],
   );
+
+  const handleExpend = useCallback((group: IGoodGroup | undefined) => handleSetExpand(group), [handleSetExpand]);
+
+  const renderGroup = useCallback(
+    ({ item }: { item: IGoodGroup }) => (
+      <Group
+        key={item.id}
+        docId={docId}
+        model={model}
+        item={item}
+        expendGroup={expend?.id}
+        setExpend={handleExpend}
+        searchQuery={searchQuery}
+        onPressGroup={pressGroup}
+      />
+    ),
+    [docId, expend?.id, handleExpend, model, pressGroup, searchQuery],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -215,10 +269,10 @@ const SelectGroupScreen = () => {
       <FlatList
         ref={refListGroups}
         data={firstLevelGroups}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderGroup}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={<Text style={styles.emptyList}>Список пуст</Text>}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

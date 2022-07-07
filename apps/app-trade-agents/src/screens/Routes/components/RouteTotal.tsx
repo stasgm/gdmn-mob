@@ -1,12 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, Text, FlatList } from 'react-native';
-import { globalStyles as styles } from '@lib/mobile-ui';
-import { docSelectors, refSelectors } from '@lib/store';
+import { globalStyles as styles, MediumText } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
 import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { IGood, IGoodGroup, IOrderDocument, IOrderLine, IRouteTotalLine } from '../../../store/types';
+import { formatValue, round, useFilteredDocList } from '@lib/mobile-app';
+
+import { IGoodGroup, IOrderDocument, IOrderLine, IRouteTotalLine } from '../../../store/types';
+import { totalList, totalListByGroup } from '../../../utils/helpers';
 
 export interface IItem {
   routeId: string;
@@ -15,66 +18,55 @@ export interface IItem {
 const RouteTotal = ({ routeId }: IItem) => {
   const { colors } = useTheme();
 
-  const round = (num: number) => {
-    return Math.round((num + Number.EPSILON) * 100) / 100;
-  };
-
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
-  const goods = refSelectors.selectByName<IGood>('good')?.data;
   const firstLevelGroups = groups?.filter((item) => !item.parent?.id);
 
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order')?.filter((e) => e.head.route?.id === routeId);
+  const orders = useFilteredDocList<IOrderDocument>('order');
 
-  const orderLines = orders.reduce((prev: IOrderLine[], order) => {
-    return [...prev, ...order.lines];
-  }, []);
+  const orderLines = useMemo(() => {
+    return orders?.reduce((prev: IOrderLine[], order) => {
+      if (order.head.route?.id === routeId) {
+        prev = [...prev, ...order.lines];
+      }
+      return prev;
+    }, []);
+  }, [orders, routeId]);
 
-  const totalList: IRouteTotalLine[] = firstLevelGroups
-    ?.map((firstGr) => ({
-      group: {
-        id: firstGr.id,
-        name: firstGr.name,
-      },
-      quantity: orderLines
-        .filter((l) =>
-          goods.find(
-            (g) =>
-              g.id === l.good.id &&
-              (g.goodgroup.id === firstGr.id ||
-                groups.find((group) => group.parent?.id === firstGr.id && group.id === g.goodgroup.id)),
-          ),
-        )
-        .reduce((s: number, line) => {
-          // return round(s + round(line.quantity * (good?.invWeight ?? 1) * (good?.scale ?? 1)));
-          return round(s + round(line.quantity));
-        }, 0),
-    }))
-    .filter((i) => i.quantity > 0);
+  const totalListByRoute = useMemo(
+    () => totalListByGroup(firstLevelGroups, groups, orderLines),
+    [firstLevelGroups, groups, orderLines],
+  );
 
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
-  const textTotalStyle = useMemo(() => [styles.textTotal, { color: colors.notification }], [colors.notification]);
+  const total = useMemo(() => totalList(totalListByRoute), [totalListByRoute]);
 
-  const renderTotalItem = ({ item }: { item: IRouteTotalLine }) => (
-    <View style={styles.itemNoMargin}>
-      <View style={styles.details}>
-        <View style={styles.directionRow}>
-          <Text style={textStyle}>{item.group.name}</Text>
+  const textTotalStyle = [styles.textTotal, { color: colors.notification }];
+
+  const renderTotalItem = useCallback(
+    ({ item }: { item: IRouteTotalLine }) => (
+      <View style={styles.itemNoMargin}>
+        <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={textStyle}>{item.quantity}</Text>
+            <View style={styles.groupWidth}>
+              <MediumText>{item.group.name}</MediumText>
+            </View>
+            <View style={styles.directionRow}>
+              <MediumText>{item.quantity}</MediumText>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    ),
+    [],
   );
 
   return (
     <View style={styles.total}>
-      <Text style={styles.textTotal}>Итого вес, кг.:</Text>
+      <Text style={styles.textTotal}>Итого вес, кг:</Text>
       <Divider />
-      <FlatList data={totalList} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
+      <FlatList data={totalListByRoute} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
       <Divider />
       <View style={styles.bottomTotal}>
-        <Text style={textTotalStyle}>{totalList?.reduce((prev, item) => prev + item.quantity, 0)}</Text>
+        <Text style={textTotalStyle}>{formatValue({ type: 'number', decimals: 3 }, round(total.quantity, 3))}</Text>
       </View>
     </View>
   );

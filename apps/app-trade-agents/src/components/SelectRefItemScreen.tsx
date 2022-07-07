@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, FlatList, Alert, TouchableOpacity, Text } from 'react-native';
+import { View, FlatList, Alert, TouchableOpacity } from 'react-native';
 import { Searchbar, Divider, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData } from '@lib/types';
 import { appActions, refSelectors } from '@lib/store';
-import { AppScreen, ItemSeparator, SaveButton, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SaveButton,
+  SearchButton,
+  SubTitle,
+  globalStyles as styles,
+  LargeText,
+} from '@lib/mobile-ui';
 
-import { extraPredicate } from '@lib/mobile-app';
+import { extraPredicate, keyExtractor } from '@lib/mobile-app';
 
 import { useDispatch } from '../store';
 
@@ -14,8 +22,6 @@ import { RefParamList } from '../navigation/Root/types';
 import { IOutlet } from '../store/types';
 
 import { navBackButton } from './navigateOptions';
-
-const keyExtractor = (item: IReferenceData) => item.id;
 
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
@@ -190,22 +196,21 @@ const LineItem = React.memo(
   }) => {
     const { colors } = useTheme();
 
-    const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
-    const textDescription = useMemo(() => [styles.textDescription, { color: colors.text }], [colors.text]);
     const checkboxStyle = useMemo(() => colors.primary, [colors.primary]);
     const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
+    const handleCheckItem = useCallback(() => onCheck(item), [item, onCheck]);
 
     return (
-      <TouchableOpacity onPress={() => onCheck(item)}>
+      <TouchableOpacity onPress={handleCheckItem}>
         <View style={viewStyle}>
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={checkboxStyle} />
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={textStyle}>{item[refFieldName] || item.id}</Text>
+              <LargeText style={styles.textBold}>{item[refFieldName] || item.id}</LargeText>
             </View>
             {descrFieldName ? (
               <View style={styles.rowCenter}>
-                <Text style={textDescription}>{item[descrFieldName]}</Text>
+                <LargeText style={styles.textDescription}>{item[descrFieldName]}</LargeText>
               </View>
             ) : null}
           </View>

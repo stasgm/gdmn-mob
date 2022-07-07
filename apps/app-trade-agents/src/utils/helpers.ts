@@ -1,4 +1,4 @@
-import { log } from '@lib/mobile-app';
+import { log, round } from '@lib/mobile-app';
 
 import {
   IGood,
@@ -9,6 +9,8 @@ import {
   IMGroup,
   IMGroupData,
   IMGroupModel,
+  IOrderLine,
+  IOrderTotalLine,
 } from '../store/types';
 
 import { UNKNOWN_GROUP } from './constants';
@@ -129,4 +131,46 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
   return parents;
 };
 
-export { getTimeProcess, twoDigits, getGoodMatrixByContact, getGroupModelByContact };
+const totalListByGroup = (
+  firstLevelGroups: IGoodGroup[],
+  groups: IGoodGroup[],
+  orderLines: IOrderLine[],
+): IOrderTotalLine[] =>
+  firstLevelGroups
+    ?.map((firstGr) => {
+      // console.log('orderLines', orderLines);
+      const linesByParentGroup = orderLines?.filter((l) =>
+        groups.find(
+          (group) => (group.parent?.id === firstGr.id || group.id === firstGr.id) && group.id === l.good.goodgroup.id,
+        ),
+      );
+
+      const { quantity, s } = linesByParentGroup?.reduce(
+        (prev: any, line) => {
+          const sum = round((round(line.quantity, 3) / (line.good.invWeight || 1)) * line.good.priceFsn);
+          return {
+            quantity: prev.quantity + round(line.quantity, 3),
+            s: prev.s + sum + round((sum * Number(line.good.vat || 0)) / 100),
+          };
+        },
+        { quantity: 0, s: 0 },
+      );
+
+      return {
+        group: {
+          id: firstGr.id,
+          name: firstGr.name,
+        },
+        quantity,
+        s,
+      };
+    })
+    .filter((i) => i.quantity > 0);
+
+const totalList = (list: IOrderTotalLine[]) =>
+  list?.reduce((prev, item) => ({ quantity: prev.quantity + (item.quantity || 0), s: prev.s + (item.s || 0) }), {
+    quantity: 0,
+    s: 0,
+  });
+
+export { getTimeProcess, twoDigits, getGoodMatrixByContact, getGroupModelByContact, totalListByGroup, totalList };

@@ -1,34 +1,19 @@
-import React, { useMemo } from 'react';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import React from 'react';
 import { View, Text, TouchableHighlight } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { StackNavigationProp } from '@react-navigation/stack';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles as styles, MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
 import { IRouteDocument } from '../../../store/types';
 import { getStatusColor } from '../../../utils/constants';
-import { RoutesStackParamList } from '../../../navigation/Root/types';
 
-const RouteListItem = ({ item }: { item: IRouteDocument }) => {
-  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteList'>>();
-
+const RouteListItem = ({ item, onPress }: { item: IRouteDocument; onPress: () => void }) => {
   const todayStr = new Date(item.documentDate).getDate() === new Date().getDate() ? ' (сегодня)' : '';
 
-  const { colors } = useTheme();
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
-
   return (
-    <TouchableHighlight
-      activeOpacity={0.7}
-      underlayColor="#DDDDDD"
-      onPress={() => {
-        navigation.navigate('RouteView', { id: item.id });
-      }}
-    >
+    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPress}>
       <View style={styles.item}>
         <View style={[styles.icon, { backgroundColor: getStatusColor(item?.status || 'DRAFT') }]}>
           <MaterialCommunityIcons name="routes" size={15} color="#FFF" />
@@ -42,7 +27,7 @@ const RouteListItem = ({ item }: { item: IRouteDocument }) => {
             </View>
           </View>
           <View style={styles.directionRow}>
-            <Text style={textStyle}>{item.head.agent.name}</Text>
+            <MediumText>{item.head.agent.name}</MediumText>
           </View>
         </View>
       </View>

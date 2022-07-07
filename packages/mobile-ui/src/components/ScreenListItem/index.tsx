@@ -1,10 +1,12 @@
 import React, { ReactNode } from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
 
 import styles from '../../styles/global';
+
+import { LargeText, MediumText } from '../AppText';
 
 import { getStatusColor } from './constants';
 export interface IListItemProps {
@@ -18,7 +20,7 @@ export interface IListItemProps {
   lineCount?: number;
   errorMessage?: string;
   id: string;
-  onSelectItem?: () => void;
+  onSelectItem: () => void;
   documentType?: string;
 }
 
@@ -43,12 +45,12 @@ const ScreenListItem = ({
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{title}</Text>
+            <LargeText style={styles.textBold}>{title}</LargeText>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{subtitle ? subtitle : children}</Text>
+            <MediumText>{subtitle ? subtitle : children}</MediumText>
             <View style={styles.rowCenter}>
-              <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
+              <MediumText>{lineCount}</MediumText>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
               {isFromRoute && (
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
@@ -57,9 +59,7 @@ const ScreenListItem = ({
           </View>
           {info && <View>{info}</View>}
           <View>
-            {errorMessage && (
-              <Text style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>
-            )}
+            {errorMessage && <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>}
           </View>
         </View>
       </View>

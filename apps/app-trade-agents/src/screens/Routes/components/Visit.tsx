@@ -1,49 +1,42 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { View, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
-import { IListItem } from '@lib/mobile-types';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   InfoBlock,
   ItemSeparator,
   PrimeButton,
   ScreenListItem,
   IListItemProps,
-  globalStyles as styles,
+  EmptyList,
+  MediumText,
 } from '@lib/mobile-ui';
-import { useSendDocs, getDateString, generateId } from '@lib/mobile-app';
+import { useSendDocs, getDateString, generateId, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
+
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useDispatch } from '../../../store';
-import { IOrderDocument, IReturnDocument, IVisitDocument } from '../../../store/types';
+import { IOrderDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getTimeProcess, twoDigits } from '../../../utils/helpers';
-import SwipeListItem from '../../../components/SwipeListItem';
 import { navBackButton } from '../../../components/navigateOptions';
+import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 interface IVisitProps {
-  item: IVisitDocument;
+  visit: IVisitDocument;
   outlet: INamedEntity;
   contact: INamedEntity;
   route: INamedEntity;
 }
 
-const keyExtractor = (item: IListItemProps) => item.id;
-
-const listDocumentType: IListItem[] = [
-  { id: 'order', value: 'Заявка' },
-  { id: 'return', value: 'Возврат' },
-];
-
-const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
-  const navigation = useNavigation() as any;
+const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
+  console.log('Visit');
+  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
   const loading = useSelector((state) => state.documents.loading);
 
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-
-  const { colors } = useTheme();
 
   const [process, setProcess] = useState(false);
   const [sendLoading, setSendLoading] = useState(false);
@@ -54,66 +47,68 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   // Подразделение по умолчанию
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
-  const docs = useSelector((state) => state.documents.list);
-
-  const orderDocs = (docs as IOrderDocument[])?.filter(
-    (e) => e.documentType.name === 'order' && e.head.route?.id === route.id && e.head.outlet?.id === outlet.id,
+  const orderDocs = useFilteredDocList<IOrderDocument>('order').filter(
+    (doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id,
   );
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
-  const returnDocs = (docs as IReturnDocument[])?.filter(
-    (e) => e.documentType.name === 'return' && e.head.route?.id === route.id && e.head.outlet?.id === outlet.id,
-  );
-
-  const returnType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'return');
-
-  const handleCloseVisit = useCallback(async () => {
+  const handleCloseVisit = useCallback(() => {
     // TODO Вынести в async actions
     setProcess(true);
 
-    const coords = await getCurrentPosition();
+    const updateDocs = async () => {
+      const coords = await getCurrentPosition();
 
-    const date = new Date().toISOString();
+      const date = new Date().toISOString();
 
-    const updatedVisit: IVisitDocument = {
-      ...visit,
-      head: {
-        ...visit.head,
-        dateEnd: date,
-        endGeoPoint: coords,
-      },
-      creationDate: visit.creationDate || date,
-      editionDate: date,
+      const updatedVisit: IVisitDocument = {
+        ...visit,
+        head: {
+          ...visit.head,
+          dateEnd: date,
+          endGeoPoint: coords,
+        },
+        creationDate: visit.creationDate || date,
+        editionDate: date,
+      };
+
+      const updatedOrders: IOrderDocument[] = [];
+      orderDocs.forEach((doc) => {
+        if (doc.status === 'DRAFT') {
+          updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
+        }
+      });
+
+      await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
     };
 
-    const updatedOrders: IOrderDocument[] = orderDocs
-      .filter((doc) => doc.status === 'DRAFT')
-      ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
-
-    const updatedReturns: IReturnDocument[] = returnDocs
-      .filter((doc) => doc.status === 'DRAFT')
-      ?.map((doc) => ({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date }));
-
-    await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders, ...updatedReturns]));
+    updateDocs();
 
     setProcess(false);
-  }, [docDispatch, visit, orderDocs, returnDocs]);
+  }, [docDispatch, visit, orderDocs]);
 
-  const handleReopenVisit = useCallback(async () => {
-    setSendLoading(false);
-    const date = new Date().toISOString();
+  const handleReopenVisit = useCallback(() => {
+    setProcess(true);
 
-    const updatedVisit: IVisitDocument = {
-      ...visit,
-      head: {
-        ...visit.head,
-        dateEnd: undefined,
-        endGeoPoint: undefined,
-      },
-      editionDate: date,
+    const updateVisit = async () => {
+      const date = new Date().toISOString();
+
+      const updatedVisit: IVisitDocument = {
+        ...visit,
+        head: {
+          ...visit.head,
+          dateEnd: undefined,
+          endGeoPoint: undefined,
+        },
+        editionDate: date,
+      };
+      await docDispatch(documentActions.updateDocuments([updatedVisit]));
     };
-    await docDispatch(documentActions.updateDocuments([updatedVisit]));
+
+    updateVisit();
+
+    setProcess(false);
   }, [docDispatch, visit]);
 
   useLayoutEffect(() => {
@@ -154,35 +149,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     navigation.navigate('OrderView', { id: newOrder.id });
   }, [contact, defaultDepart, dispatch, navigation, orderType, outlet, route, visit.head.takenType]);
 
-  const handleNewReturn = useCallback(() => {
-    if (!returnType) {
-      return Alert.alert('Ошибка!', 'Тип документа для возврата не найден', [{ text: 'OK' }]);
-    }
-
-    const newReturnDate = new Date().toISOString();
-
-    const newReturn: IReturnDocument = {
-      id: generateId(),
-      number: 'б\\н',
-      status: 'DRAFT',
-      documentDate: newReturnDate,
-      documentType: returnType,
-      head: {
-        contact,
-        outlet,
-        route,
-        reason: 'Брак',
-      },
-      lines: [],
-      creationDate: newReturnDate,
-      editionDate: newReturnDate,
-    };
-
-    dispatch(documentActions.addDocument(newReturn));
-
-    navigation.navigate('ReturnView', { id: newReturn.id });
-  }, [contact, dispatch, navigation, outlet, returnType, route]);
-
   const visitTextBegin = useMemo(
     () =>
       `Начат в ${dateBegin.getHours()}:${twoDigits(dateBegin.getMinutes())} (дли${
@@ -195,31 +161,6 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
     () => dateEnd && `Завершён в ${dateEnd.getHours()}:${twoDigits(dateEnd.getMinutes())}`,
     [dateEnd],
   );
-
-  const docTypeRef = useRef<BottomSheetModal>(null);
-
-  // const handleDismissDocType = useCallback(() => docTypeRef.current?.dismiss(), []);
-
-  // const [selectedDocType, setSelectedDocType] = useState(listDocumentType[0]);
-  const selectedDocType = listDocumentType[0];
-
-  const handleApplyDocType = useCallback(() => {
-    docTypeRef.current?.dismiss();
-
-    switch (selectedDocType.id) {
-      case 'order':
-        return handleNewOrder();
-      case 'return':
-        return handleNewReturn();
-      default:
-        return;
-    }
-  }, [handleNewOrder, handleNewReturn, selectedDocType.id]);
-
-  // const handlePresentDocType = useCallback(() => {
-  //   setSelectedDocType(listDocumentType[0]);
-  //   docTypeRef.current?.present();
-  // }, []);
 
   const orders: IListItemProps[] = useMemo(() => {
     return orderDocs.map((i) => {
@@ -237,66 +178,27 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
   }, [orderDocs]);
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => {
-      const doc = orderDocs.find((r) => r.id === item.id);
-      return doc ? (
-        // <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
-      ) : // </SwipeListItem>
-      null;
-    },
-    [navigation, orderDocs],
+    ({ item }) => <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />,
+    [navigation],
   );
 
-  const returns: IListItemProps[] = useMemo(() => {
-    return returnDocs.map((i) => {
-      const creationDate = new Date(i.editionDate || i.creationDate || 0);
-      return {
-        id: i.id,
-        title: `№ ${i.number} от ${getDateString(i.documentDate)}`,
-        documentDate: getDateString(i.documentDate),
-        status: i.status,
-        subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
-        isFromRoute: false,
-        lineCount: i.lines.length,
-      } as IListItemProps;
-    });
-  }, [returnDocs]);
-
-  const renderReturnItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = returnDocs.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="ReturnView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
-      </SwipeListItem>
-    ) : null;
-  };
-
-  const readyDocs = useMemo(() => {
-    return [
-      ...orderDocs.filter((doc) => doc.status === 'READY'),
-      ...returnDocs.filter((doc) => doc.status === 'READY'),
-    ];
-  }, [orderDocs, returnDocs]);
+  const readyDocs = orderDocs.filter((doc) => doc.status === 'READY');
 
   const handleReadyDocs = useSendDocs(readyDocs);
 
-  const handleSendDocs = () => {
+  const handleSendDocs = useCallback(() => {
     setSendLoading(true);
     handleReadyDocs();
-  };
-  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
-  const orderListStyle = useMemo(() => [{ paddingBottom: returns.length ? 20 : 0 }], [returns.length]);
-  const returnViewStyle = useMemo(() => [{ paddingBottom: returns.length > 1 ? 15 : 0 }], [returns.length]);
-  const returnListStyle = useMemo(() => [{ paddingBottom: returns.length > 2 ? 20 : 0 }], [returns.length]);
+    setSendLoading(false);
+  }, [handleReadyDocs]);
 
   return (
     <>
       <View style={localStyles.container}>
         <InfoBlock colorLabel="#7d0656" title="Визит">
           <>
-            <Text style={textStyle}>{visitTextBegin}</Text>
-            {dateEnd && <Text style={textStyle}>{visitTextEnd}</Text>}
+            <MediumText>{visitTextBegin}</MediumText>
+            {dateEnd && <MediumText>{visitTextEnd}</MediumText>}
             {
               <>
                 {!dateEnd ? (
@@ -324,62 +226,39 @@ const Visit = ({ item: visit, outlet, contact, route }: IVisitProps) => {
             }
           </>
         </InfoBlock>
-        {orders.length > 0 && (
-          <View style={localStyles.orderView}>
+        <View style={localStyles.orderView}>
+          {orders.length > 0 && (
             <InfoBlock colorLabel="#567d06" title="Заявки">
-              <View style={[localStyles.list, orderListStyle]}>
+              <View style={localStyles.list}>
                 <FlatList
                   data={orders}
                   keyExtractor={keyExtractor}
                   renderItem={renderOrderItem}
                   scrollEventThrottle={400}
                   ItemSeparatorComponent={ItemSeparator}
+                  ListEmptyComponent={EmptyList}
                 />
               </View>
             </InfoBlock>
-          </View>
-        )}
-        {returnDocs.length > 0 && (
-          <View style={[localStyles.returnView, returnViewStyle]}>
-            <InfoBlock colorLabel={'#c98f10'} title="Возвраты">
-              <View style={[localStyles.list, returnListStyle]}>
-                <FlatList
-                  data={returns}
-                  keyExtractor={keyExtractor}
-                  renderItem={renderReturnItem}
-                  scrollEventThrottle={400}
-                  ItemSeparatorComponent={ItemSeparator}
-                />
-              </View>
-            </InfoBlock>
-          </View>
+          )}
+        </View>
+        {!dateEnd ? (
+          <PrimeButton icon="plus-circle-outline" onPress={handleNewOrder}>
+            Добавить документ
+          </PrimeButton>
+        ) : (
+          readyDocs.length > 0 && (
+            <PrimeButton
+              icon={!loading ? 'file-send' : 'block-helper'}
+              onPress={handleSendDocs}
+              disabled={sendLoading || loading}
+              loadIcon={loading}
+            >
+              Отправить
+            </PrimeButton>
+          )
         )}
       </View>
-      {!dateEnd ? (
-        <PrimeButton icon="plus-circle-outline" onPress={handleApplyDocType}>
-          Добавить документ
-        </PrimeButton>
-      ) : (
-        readyDocs.length > 0 && (
-          <PrimeButton
-            icon={!loading ? 'file-send' : 'block-helper'}
-            onPress={handleSendDocs}
-            disabled={sendLoading || loading}
-            loadIcon={loading}
-          >
-            Отправить
-          </PrimeButton>
-        )
-      )}
-      {/* <BottomSheet
-        sheetRef={docTypeRef}
-        title={'Тип документа'}
-        snapPoints={['20%', '90%']}
-        onDismiss={handleDismissDocType}
-        onApply={handleApplyDocType}
-      >
-        <RadioGroup options={listDocumentType} onChange={setSelectedDocType} activeButtonId={selectedDocType?.id} />
-      </BottomSheet> */}
     </>
   );
 };
@@ -392,13 +271,8 @@ const localStyles = StyleSheet.create({
     flex: 1,
     display: 'flex',
   },
-  returnView: {
-    flex: 1,
-    display: 'flex',
-    paddingTop: 25,
-  },
   list: {
-    maxHeight: 180,
+    maxHeight: 240,
   },
 });
 
