@@ -1,10 +1,10 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, View, FlatList } from 'react-native';
+import { Text, View, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -13,9 +13,12 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  SendButton,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, useSendDocs } from '@lib/mobile-app';
+
+import { sleep } from '@lib/client-api';
 
 import { IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
@@ -36,11 +39,16 @@ const round = (num: number) => {
 export const MoveViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
+  const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
   const { colors } = useTheme();
 
+  const [del, setDel] = useState(false);
+  const [isSend, setIsSend] = useState(false);
+
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
 
@@ -117,16 +125,56 @@ export const MoveViewScreen = () => {
       return;
     }
 
-    dispatch(documentActions.removeDocument(id));
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          const res = await docDispatch(documentActions.removeDocument(id));
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            setDel(true);
+            await sleep(500);
+            navigation.goBack();
+          }
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
 
-    navigation.goBack();
-  }, [dispatch, id, navigation]);
+    // dispatch(documentActions.removeDocument(id));
+
+    // navigation.goBack();
+  }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc.lines[doc.lines.length - 1].id;
 
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
   }, [dispatch, doc.lines, id]);
+
+  const handleUseSendDoc = useSendDocs([doc]);
+
+  const handleSendDoc = useCallback(() => {
+    setIsSend(true);
+    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          // setTimeout(() => {
+          //   setIsSend(false);
+          // }, 1);
+          handleUseSendDoc();
+        },
+      },
+      {
+        text: 'Отмена',
+        onPress: () => {
+          setIsSend(false);
+        },
+      },
+    ]);
+  }, [handleUseSendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -158,11 +206,12 @@ export const MoveViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
+          <SendButton onPress={handleSendDoc} disabled={isSend} />
           <ScanButton onPress={handleDoScan} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleDoScan, isBlocked],
+    [actionsMenu, handleDoScan, handleSendDoc, isBlocked, isSend],
   );
 
   useLayoutEffect(() => {
@@ -172,12 +221,23 @@ export const MoveViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  if (!doc) {
+  if (del) {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        <View style={styles.deleteView}>
+          <SubTitle style={styles.title}>Удаление</SubTitle>
+          <ActivityIndicator size="small" color={colorStyle} />
+        </View>
       </View>
     );
+  } else {
+    if (!doc) {
+      return (
+        <View style={styles.container}>
+          <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        </View>
+      );
+    }
   }
 
   const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
