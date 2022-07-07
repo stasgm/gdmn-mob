@@ -6,3 +6,5 @@ export { default as SaveButton } from './SaveButton';
 export { default as SearchButton } from './SearchButton';
 export { default as SendButton } from './SendButton';
 export { ScanButton } from './ScanButton';
+export { DeleteButton } from './DeleteButton';
+export { CloseButton } from './CloseButton';

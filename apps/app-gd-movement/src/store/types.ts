@@ -26,6 +26,14 @@ export interface IDocFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface IScanFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  department?: Department;
+  comment?: string;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
@@ -57,6 +65,17 @@ export interface IMovementLine extends IEntity {
 }
 
 export type IMovementDocument = MandateProps<IDocument<IMovementHead, IMovementLine>, 'head' | 'lines'>;
+
+export interface IScanHead extends IHead {
+  department?: Department;
+  comment?: string; // Комvентарий
+}
+
+export interface IScanLine extends IEntity {
+  barcode?: string;
+}
+
+export type IScanDocument = MandateProps<IDocument<IScanHead, IScanLine>, 'head' | 'lines'>;
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
   ReturnType,

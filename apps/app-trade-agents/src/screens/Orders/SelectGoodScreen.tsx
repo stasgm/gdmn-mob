@@ -27,6 +27,7 @@ const Good = ({ item }: { item: IGood }) => {
 
   const iconStyle = { backgroundColor: good ? '#06567D' : '#E91E63' };
 
+  console.log('123');
   const handleNavigate = () => {
     if (good) {
       Alert.alert('Внимание!', 'Данный товар уже добавлен в позицию документа', [

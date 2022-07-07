@@ -1,12 +1,12 @@
-import { companies, user2, device } from '@lib/mock';
+import { companies, user2 } from '@lib/mock';
 import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
 
 export const appSystem: IAppSystem = {
-  id: 'gdmn-gd-movement',
-  name: 'gdmn-gd-movement',
+  id: 'gdmn-bc-movement',
+  name: 'gdmn-bc-movement',
 };
 
-export const messageGdMovement: IMessage<MessageType>[] = [
+export const messageBcMovement: IMessage<MessageType>[] = [
   {
     id: '147293377',
     status: 'READY',
@@ -17,7 +17,6 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       producer: user2,
       dateTime: new Date().toISOString(),
       order: 1,
-      deviceId: device.id,
     },
     body: {
       type: 'REFS',
@@ -45,17 +44,8 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             },
             {
               id: '187034606',
-              name: 'inventory',
+              name: 'bcMovement',
               description: 'Инвентаризация',
-              isRemains: true,
-              remainsField: 'toContact',
-              fromDescription: '',
-              fromType: '',
-              fromRequired: false,
-              toDescription: 'Место',
-              toType: 'department',
-              toRequired: true,
-              sortOrder: 2,
             },
             {
               id: '189548606',
@@ -764,9 +754,8 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       company: companies[2] as INamedEntity,
       consumer: user2,
       producer: user2,
-      dateTime: new Date().toISOString(),
+      dateTime: '2021-09-17T11:26:37.893Z',
       order: 2,
-      deviceId: device.id,
     },
     status: 'READY',
     body: {
@@ -774,8 +763,8 @@ export const messageGdMovement: IMessage<MessageType>[] = [
       version: 1,
       payload: [
         {
-          creationDate: new Date().toISOString(),
-          documentDate: new Date().toISOString(),
+          creationDate: '2022-06-17T10:08:44.709Z',
+          documentDate: '2022-06-17T10:08:37.386Z',
           documentType: {
             description: 'Приход',
             fromDescription: 'Откуда',
@@ -790,7 +779,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             toRequired: true,
             toType: 'department',
           },
-          editionDate: new Date().toISOString(),
+          editionDate: '2022-06-17T10:08:44.709Z',
           head: {
             fromContact: {
               id: '147016507',
@@ -810,7 +799,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
               value: 'Подразделение',
             },
           },
-          id: '4a7cd7f951',
+          id: '4a7cd7f882',
           lines: [
             {
               buyingPrice: 13,
@@ -839,8 +828,8 @@ export const messageGdMovement: IMessage<MessageType>[] = [
           status: 'DRAFT',
         },
         {
-          creationDate: new Date().toISOString(),
-          documentDate: new Date().toISOString(),
+          creationDate: '2022-06-17T10:19:33.749Z',
+          documentDate: '2022-06-17T10:19:25.878Z',
           documentType: {
             description: 'Инвентаризация',
             fromDescription: '',
@@ -855,7 +844,7 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             toRequired: true,
             toType: 'department',
           },
-          editionDate: new Date().toISOString(),
+          editionDate: '2022-06-17T10:19:33.749Z',
           head: {
             toContact: {
               id: '147016473',
@@ -892,62 +881,6 @@ export const messageGdMovement: IMessage<MessageType>[] = [
             },
           ],
           number: '2',
-          status: 'DRAFT',
-        },
-        {
-          creationDate: new Date().toISOString(),
-          documentDate: new Date().toISOString(),
-          documentType: {
-            id: '189548606',
-            name: 'scan',
-            description: 'Сканирование',
-          },
-          editionDate: new Date().toISOString(),
-          head: {
-            department: {
-              id: '176424776',
-              name: 'Подразделение №1',
-            },
-          },
-          id: '4a7cd7f882',
-          lines: [
-            {
-              id: '9705e64208c',
-              barcode:
-                'MDEwNDgxMTY0NDAwNjg2MjIxMlM1R2hNYTJKR05VWh05MTAwMDUdOTJyM2toTW5G Sk1XUU5mdEhmU3BxTTZvSjZnZkpHUkdMQnBBb2g1VG04Q2FyZSAwMTA0ODExNjQ0 MDA2ODYyMjEyUzhWeDViTTZIOU5OHTkxMDAwNR05MnRIQzdNVVFhQmFvZUtSY0dZ UW5jQTJiQ3F6UGc5bzlGaEI2TllqdGRuRTRVIDAxMDQ4MTE2NDQwMDY4NjIyMTJz YW56ZExzQ0d0R1kdOTEwMDA1HTkyZ2lkbnJuMkNtZTRiOE5rSEs3Sjh6SzFvN0Z2 QUttOTFXVlBFNFVkelFXRjYgMDEwNDgxMTY0NDAwNjg2MjIxMnNIOGFOYUY1Q2lI SB05MTAwMDUdOTJoRmYyQXJYTVdMZlRLYzN6OExrbXJGbTgxY0E4N2ZvVGNQc2VC QW9EQkdXcyAwMTA0ODExNjQ0MDA2ODYyMjEyU0pMUVE3UnhDZ0JpHTkxMDAwNR05 Mmdnd2dFRDFzcEdOWWNMdzJraGR3UnNTendiaERYWDVWdFFVTVBEUlBINlF3IDAx MDQ4MTE2NDQwMDY4NjIyMTJzS0Z0NUJ2aktzNWIdOTEwMDA1HTkyMnFuZThydWNk bXgxZTdxbUxBMVBpVTJ1U3VjVEhvNEFMZHczREFZaTdFOVcgMDEwNDgxMTY0NDAw Njg2MjIxMnNMY1VoVlBhRHd3cB05MTAwMDUdOTJ0cWVESjY0OGF3Z2MyY2lOYW1v Y1VhWFFldG1hQ1NTenI3M3hqc2NHVU1LeiAwMTA0ODExNjQ0MDA2ODYyMjEyVFdq OTVIYWlqOEhuHTkxMDAwNR05MnBVVk1TZTZ0d2piZzM0V21aeXBudlE3U3RrZkVx TXFMWUJNa3RmSEpKRXZFIDAxMDQ4MTE2NDQwMDY4NjIyMTJ0V2pDUEU5ZGlBanUd OTEwMDA1HTkyUlhoS0M1aDZIMkZmcXZXZ0taUzd2NHR3OGZYUkNMdHhZcVB6NDFj RHJManM=',
-            },
-            {
-              id: '77f480bbfb',
-              barcode: '↔0104604278005512215L-BE7DviugKG↔91EE07↔92g2JT/fX7Imukyq/obZW9JpMe9e4aOlhNx+ywwvpFm8s=',
-            },
-            {
-              id: '9705e6429c',
-              barcode: '↔0104604278003303215i_IpdqpL<?he↔91EE07↔92NuJ6AmWSjBCxXDdTTT19JYmo4Y+lpfk+/eLxtBXh/cQ=',
-            },
-            {
-              id: '77f484bbfb',
-              barcode:
-                'MDEwNDgxMTY0NDAwNjg2MjIxMlM1R2hNYTJKR05VWh05MTAwMDUdOTJyM2toTW5G Sk1XUU5mdEhmU3BxTTZvSjZnZkpHUkdMQnBBb2g1VG04Q2FyZSAwMTA0ODExNjQ0 MDA2ODYyMjEyUzhWeDViTTZIOU5OHTkxMDAwNR05MnRIQzdNVVFhQmFvZUtSY0dZ UW5jQTJiQ3F6UGc5bzlGaEI2TllqdGRuRTRVIDAxMDQ4MTE2NDQwMDY4NjIyMTJz YW56ZExzQ0d0R1kdOTEwMDA1HTkyZ2lkbnJuMkNtZTRiOE5rSEs3Sjh6SzFvN0Z2 QUttOTFXVlBFNFVkelFXRjYgMDEwNDgxMTY0NDAwNjg2MjIxMnNIOGFOYUY1Q2lI SB05MTAwMDUdOTJoRmYyQXJYTVdMZlRLYzN6OExrbXJGbTgxY0E4N2ZvVGNQc2VC QW9EQkdXcyAwMTA0ODExNjQ0MDA2ODYyMjEyU0pMUVE3UnhDZ0JpHTkxMDAwNR05 Mmdnd2dFRDFzcEdOWWNMdzJraGR3UnNTendiaERYWDVWdFFVTVBEUlBINlF3IDAx MDQ4MTE2NDQwMDY4NjIyMTJzS0Z0NUJ2aktzNWIdOTEwMDA1HTkyMnFuZThydWNk bXgxZTdxbUxBMVBpVTJ1U3VjVEhvNEFMZHczREFZaTdFOVcgMDEwNDgxMTY0NDAw Njg2MjIxMnNMY1VoVlBhRHd3cB05MTAwMDUdOTJ0cWVESjY0OGF3Z2MyY2lOYW1v Y1VhWFFldG1hQ1NTenI3M3hqc2NHVU1LeiAwMTA0ODExNjQ0MDA2ODYyMjEyVFdq OTVIYWlqOEhuHTkxMDAwNR05MnBVVk1TZTZ0d2piZzM0V21aeXBudlE3U3RrZkVx TXFMWUJNa3RmSEpKRXZFIDAxMDQ4MTE2NDQwMDY4NjIyMTJ0V2pDUEU5ZGlBanUd OTEwMDA1HTkyUlhoS0M1aDZIMkZmcXZXZ0taUzd2NHR3OGZYUkNMdHhZcVB6NDFj RHJManM=',
-            },
-            {
-              id: '9705e6430c',
-              barcode: '↔0104604278005512215L-BE7DviugKG↔91EE07↔92g2JT/fX7Imukyq/obZW9JpMe9e4aOlhNx+ywwvpFm8s=',
-            },
-            {
-              id: '77f485bbfb',
-              barcode:
-                'MDEwNDgxMTY0NDAwNjg2MjIxMlM1R2hNYTJKR05VWh05MTAwMDUdOTJyM2toTW5G Sk1XUU5mdEhmU3BxTTZvSjZnZkpHUkdMQnBBb2g1VG04Q2FyZSAwMTA0ODExNjQ0 MDA2ODYyMjEyUzhWeDViTTZIOU5OHTkxMDAwNR05MnRIQzdNVVFhQmFvZUtSY0dZ UW5jQTJiQ3F6UGc5bzlGaEI2TllqdGRuRTRVIDAxMDQ4MTE2NDQwMDY4NjIyMTJz YW56ZExzQ0d0R1kdOTEwMDA1HTkyZ2lkbnJuMkNtZTRiOE5rSEs3Sjh6SzFvN0Z2 QUttOTFXVlBFNFVkelFXRjYgMDEwNDgxMTY0NDAwNjg2MjIxMnNIOGFOYUY1Q2lI SB05MTAwMDUdOTJoRmYyQXJYTVdMZlRLYzN6OExrbXJGbTgxY0E4N2ZvVGNQc2VC QW9EQkdXcyAwMTA0ODExNjQ0MDA2ODYyMjEyU0pMUVE3UnhDZ0JpHTkxMDAwNR05 Mmdnd2dFRDFzcEdOWWNMdzJraGR3UnNTendiaERYWDVWdFFVTVBEUlBINlF3IDAx MDQ4MTE2NDQwMDY4NjIyMTJzS0Z0NUJ2aktzNWIdOTEwMDA1HTkyMnFuZThydWNk bXgxZTdxbUxBMVBpVTJ1U3VjVEhvNEFMZHczREFZaTdFOVcgMDEwNDgxMTY0NDAw Njg2MjIxMnNMY1VoVlBhRHd3cB05MTAwMDUdOTJ0cWVESjY0OGF3Z2MyY2lOYW1v Y1VhWFFldG1hQ1NTenI3M3hqc2NHVU1LeiAwMTA0ODExNjQ0MDA2ODYyMjEyVFdq OTVIYWlqOEhuHTkxMDAwNR05MnBVVk1TZTZ0d2piZzM0V21aeXBudlE3U3RrZkVx TXFMWUJNa3RmSEpKRXZFIDAxMDQ4MTE2NDQwMDY4NjIyMTJ0V2pDUEU5ZGlBanUd OTEwMDA1HTkyUlhoS0M1aDZIMkZmcXZXZ0taUzd2NHR3OGZYUkNMdHhZcVB6NDFj RHJManM=',
-            },
-            {
-              id: '77f500bbfb',
-              barcode: '↔0104604278003303215i_IpdqpL<?he↔91EE07↔92NuJ6AmWSjBCxXDdTTT19JYmo4Y+lpfk+/eLxtBXh/cQ=',
-            },
-            {
-              id: '9705e6446c',
-              barcode: '↔0104604278005512215L-BE7DviugKG↔91EE07↔92g2JT/fX7Imukyq/obZW9JpMe9e4aOlhNx+ywwvpFm8s=',
-            },
-          ],
-          number: '1',
           status: 'DRAFT',
         },
       ] as any[],
