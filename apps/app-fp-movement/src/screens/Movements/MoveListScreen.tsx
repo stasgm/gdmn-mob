@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { Alert, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { useSelector } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -15,6 +15,8 @@ import {
   SubTitle,
   ScreenListItem,
   IListItemProps,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -22,7 +24,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getDateString } from '@lib/mobile-app';
 
 import { IMoveDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
@@ -34,6 +35,7 @@ export type SectionDataProps = SectionListData<IListItemProps, MoveListSectionPr
 
 export const MoveListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveList'>>();
+  const dispatch = useDispatch();
 
   const loading = useSelector((state) => state.documents.loading);
   const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
@@ -56,6 +58,8 @@ export const MoveListScreen = () => {
         : false,
     )
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  const [delList, setDelList] = useState({});
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -109,6 +113,59 @@ export const MoveListScreen = () => {
     navigation.navigate('MoveEdit');
   }, [navigation]);
 
+  const handelAddDeletelList = useCallback(
+    (lineId: string, docStatus: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = Object.entries(delList).reduce((sum, cur) => {
+          const curId = cur[0];
+          const curStatus = cur[1];
+          if (curId !== checkedId) {
+            return { ...sum, [curId]: curStatus };
+          } else {
+            return { ...sum };
+          }
+        }, {});
+        setDelList(newList);
+      } else {
+        setDelList({ ...delList, [lineId]: docStatus });
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
+
+    if (statusList) {
+      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
+  }, [delList, dispatch]);
+
   useEffect(() => {
     if (!filterVisible && searchQuery) {
       setSearchQuery('');
@@ -118,40 +175,62 @@ export const MoveListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-        <AddButton onPress={handleAddDocument} />
+        {delList && Object.values(delList).length > 0 ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <IconButton
+              icon="card-search-outline"
+              style={filterVisible && { backgroundColor: colors.card }}
+              size={26}
+              onPress={() => setFilterVisible((prev) => !prev)}
+            />
+            <AddButton onPress={handleAddDocument} />
+          </>
+        )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+  );
+
+  const renderLeft = useCallback(
+    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackDrawer,
+      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
+      title:
+        delList && Object.values(delList).length > 0
+          ? `Выделено документов ?: ${Object.values(delList).length}`
+          : 'Документы ?',
     });
-  }, [navigation, renderRight]);
+  }, [delList, navigation, renderLeft, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
+    const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="MoveView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('MoveView', { id: item.id })}>
-          <View>
-            <Text style={textStyle}>Откуда: {doc.head.fromDepart?.name || ''}</Text>
-            <Text style={textStyle}>Куда: {doc.head.toDepart?.name || ''}</Text>
-            <Text style={textStyle}>
-              № {doc.number} на {getDateString(doc.documentDate)}
-            </Text>
-          </View>
-        </ScreenListItem>
-      </SwipeListItem>
-    ) : null;
+      // <SwipeListItem renderItem={item} item={doc} routeName="MoveView">
+      <ScreenListItem
+        {...item}
+        onSelectItem={() => navigation.navigate('MoveView', { id: item.id })}
+        onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
+        isChecked={checkedId ? true : false}
+        isDelList={delList && Object.values(delList).length > 0 ? true : false}
+      >
+        <View>
+          <Text style={textStyle}>Откуда: {doc.head.fromDepart?.name || ''}</Text>
+          <Text style={textStyle}>Куда: {doc.head.toDepart?.name || ''}</Text>
+          <Text style={textStyle}>
+            № {doc.number} на {getDateString(doc.documentDate)}
+          </Text>
+        </View>
+      </ScreenListItem>
+    ) : // </SwipeListItem>
+    null;
   };
 
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
