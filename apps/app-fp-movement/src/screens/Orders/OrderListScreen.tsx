@@ -52,8 +52,6 @@ export const OrderListScreen = () => {
   // const temps = useSelector((state) => state.documents.list) as ITempDocument[];
   const temps = docSelectors.selectByDocType<ITempDocument>('temp');
 
-  // const temps = docSelectors.selectByDocType<ITempDocument>('temp');
-
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 

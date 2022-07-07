@@ -5,15 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
-import {
-  AddButton,
-  MenuButton,
-  useActionSheet,
-  globalStyles as styles,
-  InfoBlock,
-  ItemSeparator,
-  SubTitle,
-} from '@lib/mobile-ui';
+import { MenuButton, useActionSheet, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
 
@@ -21,7 +13,7 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IOrderDocument, IOrderLine, IOtvesDocument } from '../../store/types';
+import { IOrderLine, IOtvesDocument } from '../../store/types';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
@@ -31,7 +23,7 @@ import SwipeLineItem from '../../components/SwipeLineItem';
 
 import { navBackButton } from '../../components/navigateOptions';
 
-import OrderItem from './components/OrderItem';
+import OtvesItem from './components/OtvesItem';
 
 const keyExtractor = (item: IOrderLine) => item.id;
 
@@ -149,7 +141,7 @@ const OtvesViewScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IOrderLine }) => (
       <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
-        <OrderItem docId={order?.id} item={item} readonly={isBlocked} />
+        <OtvesItem docId={order?.id} item={item} readonly={isBlocked} />
       </SwipeLineItem>
     ),
     [isBlocked, order?.id],

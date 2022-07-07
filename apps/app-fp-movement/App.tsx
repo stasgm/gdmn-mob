@@ -7,10 +7,12 @@ import ErrorBoundary from 'react-native-error-boundary';
 import {
   appActions,
   appSelectors,
+  authActions,
   authSelectors,
   documentActions,
   referenceActions,
   settingsActions,
+  useAuthThunkDispatch,
   useDispatch,
   useDocThunkDispatch,
   useRefThunkDispatch,
@@ -27,7 +29,7 @@ import {
 
 import { ActivityIndicator, Caption, Text } from 'react-native-paper';
 
-import { IDocument, IReferences } from '@lib/types';
+import { IDocument, IReferences, IUserSettings } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -75,6 +77,7 @@ const Root = () => {
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
+  const authDispatch = useAuthThunkDispatch();
 
   const getMessages = useCallback(async () => {
     await sleep(ONE_SECOND_IN_MS);
@@ -86,7 +89,12 @@ const Root = () => {
     await docDispatch(
       documentActions.setDocuments(messageFpMovement.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
     );
-  }, [docDispatch, refDispatch]);
+    await authDispatch(
+      authActions.setUserSettings(
+        messageFpMovement.find((m) => m.body.type === 'SETTINGS')?.body.payload as IUserSettings,
+      ),
+    );
+  }, [authDispatch, docDispatch, refDispatch]);
 
   useEffect(() => {
     if (appSettings && isInit) {

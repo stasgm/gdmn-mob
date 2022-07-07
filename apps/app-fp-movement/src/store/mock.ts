@@ -1,4 +1,4 @@
-import { companies, user2 } from '@lib/mock';
+import { companies, user2, device } from '@lib/mock';
 import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
 
 export const appSystem: IAppSystem = {
@@ -17,6 +17,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
       producer: user2,
       dateTime: new Date().toISOString(),
       order: 1,
+      deviceId: device.id,
     },
     body: {
       type: 'REFS',
@@ -113,9 +114,16 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             //   isFrac: 1,
             //   weightCode: '',
             // },
+            // {
+            //   id: '111159486',
+            //   name: 'Тетрадь',
+            //   alias: '36985',
+            //   shcode: '2256',
+            //   valueName: 'шт',
+            // },
             {
-              id: '111159486',
-              name: 'Тетрадь',
+              id: '857817085',
+              name: 'Колбаса вареная докторская',
               alias: '36985',
               shcode: '2256',
               valueName: 'шт',
@@ -527,6 +535,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
       producer: user2,
       dateTime: '2021-09-17T11:26:37.893Z',
       order: 2,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
@@ -567,7 +576,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Колбаса вареная докторская',
                 priceFsn: 4.82,
               },
-              quantity: 2,
+              weight: 2,
               packagekey: {
                 id: '1617776619',
                 name: 'Мал. батон 5',
@@ -580,7 +589,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Колбаса вареная докторская',
                 priceFsn: 4.82,
               },
-              quantity: 2,
+              weight: 2,
               packagekey: {
                 id: '1617776621',
                 name: 'Мал. батон 10',
@@ -623,7 +632,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Ветчина вар.',
                 priceFsn: 4.37,
               },
-              quantity: 2,
+              weight: 2,
               packagekey: {
                 id: '615762858',
                 name: 'Большой батон 5',
@@ -636,7 +645,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Ветчина вар.',
                 priceFsn: 4.37,
               },
-              quantity: 2,
+              weight: 2,
               packagekey: {
                 id: '615762859',
                 name: 'Большой батон 10',
@@ -679,7 +688,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Колбаски баварские',
                 priceFsn: 20.42,
               },
-              quantity: 2,
+              weight: 2,
               packagekey: {
                 id: '1811739170',
                 name: '2 кг',
@@ -692,7 +701,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Колбаски балканские',
                 priceFsn: 20.27,
               },
-              quantity: 2,
+              weight: 2,
               packagekey: {
                 id: '1811739170',
                 name: '2 кг',
@@ -714,19 +723,22 @@ export const messageFpMovement: IMessage<MessageType>[] = [
       producer: user2,
       dateTime: '2021-09-17T11:26:37.970Z',
       order: 3,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
       type: 'SETTINGS',
       version: 1,
-      payload: [
-        {
-          depart: {
+      payload: {
+        depart: {
+          description: 'Склад по умолчанию',
+          visible: true,
+          data: {
             id: '176459265',
             name: 'Подразделение №0',
           },
         },
-      ] as any,
+      },
     },
   },
 ];

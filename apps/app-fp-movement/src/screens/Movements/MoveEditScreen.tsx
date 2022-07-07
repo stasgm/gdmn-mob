@@ -34,7 +34,7 @@ export const MoveEditScreen = () => {
   const doc = movements?.find((e) => e.id === id);
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
-  // const defaultDepart = messageFpMovement.find((item) => item.body.type === 'SETTINGS')?.body.payload[0].depart;
+
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'move');
