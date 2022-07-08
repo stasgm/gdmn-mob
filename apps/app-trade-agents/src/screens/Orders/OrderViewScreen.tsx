@@ -4,7 +4,7 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, refSelectors, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
   AddButton,
   MenuButton,
@@ -16,6 +16,8 @@ import {
   SendButton,
   MediumText,
   AppActivityIndicator,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -42,7 +44,10 @@ const OrderViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
 
+  const dispatch = useDispatch();
+
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [delList, setDelList] = useState<string[]>([]);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
@@ -108,6 +113,35 @@ const OrderViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
+  const handleAddDeletelList = useCallback(
+    (lineId: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = delList.filter((i) => i !== checkedId);
+        setDelList(newList);
+      } else {
+        setDelList([...delList, lineId]);
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocLine = useCallback(() => {
+    Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          for (const item of delList) {
+            dispatch(documentActions.removeDocumentLine({ docId: id, lineId: item }));
+          }
+          setDelList([]);
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [delList, dispatch, id]);
+
   const handleSendDoc = useSendDocs([order]);
 
   const handleSendOrder = useCallback(() => {
@@ -162,20 +196,32 @@ const OrderViewScreen = () => {
       !isBlocked &&
       screenState !== 'deleting' && (
         <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
-          <SendButton onPress={handleSendOrder} disabled={screenState !== 'idle'} />
-          <AddButton onPress={handleAddOrderLine} />
-          <MenuButton actionsMenu={actionsMenu} />
+          {delList.length > 0 ? (
+            <DeleteButton onPress={handleDeleteDocLine} />
+          ) : (
+            <>
+              <SendButton onPress={handleSendOrder} disabled={screenState !== 'idle'} />
+              <AddButton onPress={handleAddOrderLine} />
+              <MenuButton actionsMenu={actionsMenu} />
+            </>
+          )}
         </View>
       ),
-    [isBlocked, screenState, handleSendOrder, handleAddOrderLine, actionsMenu],
+    [isBlocked, screenState, delList.length, handleDeleteDocLine, handleSendOrder, handleAddOrderLine, actionsMenu],
+  );
+
+  const renderLeft = useCallback(
+    () => !isBlocked && delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList.length, isBlocked],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: delList.length > 0 ? renderLeft : navBackButton,
       headerRight: renderRight,
+      title: delList.length > 0 ? `Выделено заявок: ${delList.length}` : 'Заявка',
     });
-  }, [navigation, renderRight]);
+  }, [delList.length, navigation, renderLeft, renderRight]);
 
   const handlePressOrderLine = useCallback(
     (item: IOrderLine) => !isBlocked && navigation.navigate('OrderLine', { mode: 1, docId: id, item }),
@@ -183,10 +229,21 @@ const OrderViewScreen = () => {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderLine }) => (
-      <OrderItem key={item.id} item={item} onPress={() => handlePressOrderLine(item)} />
-    ),
-    [handlePressOrderLine],
+    ({ item }: { item: IOrderLine }) => {
+      const checkedId = delList.find((i) => i === item.id) || '';
+
+      return (
+        <OrderItem
+          key={item.id}
+          item={item}
+          onPress={() => handlePressOrderLine(item)}
+          isChecked={checkedId ? true : false}
+          onLongPress={() => handleAddDeletelList(item.id, checkedId)}
+          isDelList={delList.length > 0 ? true : false}
+        />
+      );
+    },
+    [delList, handleAddDeletelList, handlePressOrderLine],
   );
 
   const isFocused = useIsFocused();

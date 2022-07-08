@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
@@ -16,11 +16,15 @@ import {
   IListItemProps,
   EmptyList,
   AppActivityIndicator,
+  CloseButton,
+  DeleteButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
+
+import { documentActions, useDispatch } from '@lib/store';
 
 import { IOrderDocument } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
@@ -43,6 +47,8 @@ const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
   console.log('OrderListScreen');
 
+  const dispatch = useDispatch();
+
   const orderList = useFilteredDocList<IOrderDocument>('order').sort(
     (a, b) =>
       new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
@@ -60,6 +66,14 @@ const OrderListScreen = () => {
     searchQuery: '',
     orders: orderList,
   });
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     if (!searchQuery) {
+  //       setFilteredList({ searchQuery, orders: orderList });
+  //     }
+  //   }, [orderList, searchQuery]),
+  // );
 
   useEffect(() => {
     if (searchQuery !== filteredList.searchQuery) {
@@ -147,6 +161,61 @@ const OrderListScreen = () => {
     [filteredListByStatus],
   );
 
+  const [delList, setDelList] = useState({});
+
+  const handleAddDeletelList = useCallback(
+    (lineId: string, lineStatus: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = Object.entries(delList).reduce((sum, cur) => {
+          const curId = cur[0];
+          const curStatus = cur[1];
+          if (curId !== checkedId) {
+            return { ...sum, [curId]: curStatus };
+          } else {
+            return { ...sum };
+          }
+        }, {});
+        setDelList(newList);
+      } else {
+        setDelList({ ...delList, [lineId]: lineStatus });
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
+
+    if (statusList) {
+      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
+  }, [delList, dispatch]);
+
   const handleAddDocument = useCallback(() => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
@@ -160,30 +229,55 @@ const OrderListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-        <AddButton onPress={handleAddDocument} />
+        {delList && Object.values(delList).length > 0 ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <IconButton
+              icon="card-search-outline"
+              style={filterVisible && { backgroundColor: colors.card }}
+              size={26}
+              onPress={() => setFilterVisible((prev) => !prev)}
+            />
+            <AddButton onPress={handleAddDocument} />
+          </>
+        )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+  );
+
+  const renderLeft = useCallback(
+    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackDrawer,
+      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
+      title:
+        delList && Object.values(delList).length > 0 ? `Выделено заявок: ${Object.values(delList).length}` : 'Заявки',
     });
-  }, [navigation, renderRight]);
+  }, [delList, navigation, renderLeft, renderRight]);
 
   const handlePressOrder = useCallback((id: string) => navigation.navigate('OrderView', { id }), [navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => <ScreenListItem key={item.id} {...item} onSelectItem={() => handlePressOrder(item.id)} />,
-    [handlePressOrder],
+    ({ item }) => {
+      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
+      return (
+        <ScreenListItem
+          key={item.id}
+          {...item}
+          onSelectItem={() => handlePressOrder(item.id)}
+          onCheckItem={() => handleAddDeletelList(item.id, item.status || '', checkedId)}
+          isChecked={checkedId ? true : false}
+          isDelList={delList && Object.values(delList).length > 0 ? true : false}
+        />
+      );
+    },
+    [delList, handleAddDeletelList, handlePressOrder],
   );
 
   const renderSectionHeader = useCallback(

@@ -8,14 +8,24 @@ import { IOrderLine } from '../../../store/types';
 interface IProps {
   item: IOrderLine;
   onPress: () => void;
+  onLongPress?: () => void;
+  isChecked?: boolean;
+  isDelList?: boolean;
 }
 
-const OrderItem = ({ item, onPress }: IProps) => {
+const OrderItem = ({ item, onPress, onLongPress, isChecked, isDelList }: IProps) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={isDelList ? onLongPress : onPress} onLongPress={onLongPress}>
       <View style={styles.item}>
-        <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+        <View style={[styles.iconsWithCheck]}>
+          <View style={[styles.icon]}>
+            <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          </View>
+          {isChecked ? (
+            <View style={[styles.checkedIcon]}>
+              <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
+            </View>
+          ) : null}
         </View>
         <View style={styles.details}>
           <LargeText style={styles.textBold}>{item.good.name}</LargeText>

@@ -238,8 +238,14 @@ const globalStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   textInfo: { fontSize: 18, textAlign: 'left', marginHorizontal: 10 },
+  // textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
   groupWidth: {
     width: '72%',
+  },
+  deleteView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

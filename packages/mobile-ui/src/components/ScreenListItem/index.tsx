@@ -21,6 +21,9 @@ export interface IListItemProps {
   errorMessage?: string;
   id: string;
   onSelectItem: () => void;
+  onCheckItem?: () => void;
+  isChecked?: boolean;
+  isDelList?: boolean;
   documentType?: string;
 }
 
