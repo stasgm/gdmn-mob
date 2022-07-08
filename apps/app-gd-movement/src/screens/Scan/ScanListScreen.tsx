@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text, Alert } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import {
@@ -15,13 +15,15 @@ import {
   FilterButtons,
   DeleteButton,
   CloseButton,
+  EmptyList,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IScanDocument } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
@@ -285,6 +287,16 @@ export const ScanListScreen = () => {
     [delList, handelAddDeletelList, list, navigation, textStyle],
   );
 
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -306,13 +318,11 @@ export const ScanListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );
