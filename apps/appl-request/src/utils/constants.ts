@@ -1,5 +1,5 @@
 import { StatusType, IDocument, IMessage, INamedEntity, IReferences, ICmd, ICmdParams, IAppSystem } from '@lib/types';
-import { companies, user2 } from '@lib/mock';
+import { companies, user2, device } from '@lib/mock';
 
 const statusColors = ['#E91E63', '#06567D', '#80B12C', '#FFA700', '#1F92CC'] as const;
 
@@ -53,6 +53,8 @@ export const messageRequest: IMessage<MessageType>[] = [
       consumer: user2,
       producer: user2,
       dateTime: '2021-10-26T15:37:31.658Z',
+      order: 1,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
@@ -153,6 +155,8 @@ export const messageRequest: IMessage<MessageType>[] = [
       consumer: user2,
       producer: user2,
       dateTime: '2021-10-26T15:37:33.527Z',
+      order: 2,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
@@ -640,6 +644,8 @@ export const messageRequest: IMessage<MessageType>[] = [
       consumer: user2,
       producer: user2,
       dateTime: '2021-10-26T15:37:33.581Z',
+      order: 3,
+      deviceId: device.id,
     },
     status: 'READY',
     body: { type: 'SETTINGS', version: 1, payload: {} },

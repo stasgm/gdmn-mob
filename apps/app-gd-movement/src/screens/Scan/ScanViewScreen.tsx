@@ -1,10 +1,10 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, View, FlatList, Alert, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Text, View, FlatList, Modal, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -13,26 +13,29 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
-  CloseButton,
   DeleteButton,
+  CloseButton,
   SendButton,
 } from '@lib/mobile-ui';
 
-import { getDateString, useSendDocs } from '@lib/mobile-app';
+import { generateId, getDateString, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
-import { IMovementDocument, IMovementLine } from '../../store/types';
-import { DocStackParamList } from '../../navigation/Root/types';
-import { getStatusColor } from '../../utils/constants';
-import { DocItem } from '../../components/DocItem';
+import { IScanDocument, IScanLine } from '../../store/types';
+import { ScanStackParamList } from '../../navigation/Root/types';
+import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
+import { ScanDataMatrix, ScanDataMatrixReader } from '../../components';
 
-export const DocViewScreen = () => {
+import { ScanItem } from './components/ScanItem';
+
+export const ScanViewScreen = () => {
   const showActionSheet = useActionSheet();
-  const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
-  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
+  const docDispatch = useDocThunkDispatch();
+
+  const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanView'>>();
 
   const { colors } = useTheme();
 
@@ -44,30 +47,42 @@ export const DocViewScreen = () => {
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
-  const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
+  const [doScanned, setDoScanned] = useState(false);
 
-  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument;
+  const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
+
+  const doc = docSelectors.selectByDocId<IScanDocument>(id);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
-  const handleAddDocLine = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', {
-      docId: id,
-    });
-  }, [navigation, id]);
+  const currRef = useRef<TextInput>(null);
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
-  const handleEditDocHead = useCallback(() => {
-    navigation.navigate('DocEdit', { id });
-  }, [navigation, id]);
+  useEffect(() => {
+    currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
+  }, []);
+
+  const handleEIDScanned = useCallback(
+    (data: string) => {
+      const line: IScanLine = { id: generateId(), barcode: data };
+      dispatch(documentActions.addDocumentLine({ docId: id, line }));
+    },
+    [dispatch, id],
+  );
 
   const handleDoScan = useCallback(() => {
-    navigation.navigate('ScanBarcode', { docId: id });
+    setDoScanned(true);
+  }, []);
+
+  const handleEditDocHead = useCallback(() => {
+    navigation.navigate('ScanEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
       return;
     }
+
     Alert.alert('Вы уверены, что хотите удалить документ?', '', [
       {
         text: 'Да',
@@ -118,18 +133,18 @@ export const DocViewScreen = () => {
     ]);
   }, [delList, dispatch, id]);
 
-  const handleUseSendDoc = useSendDocs([doc]);
+  const handleSendDoc = useSendDocs([doc]);
 
-  const handleSendDoc = useCallback(() => {
+  const handleSendScanDoc = useCallback(() => {
     setIsSend(true);
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
-        onPress: async () => {
+        onPress: () => {
           // setTimeout(() => {
           //   setIsSend(false);
-          // }, 1);
-          handleUseSendDoc();
+          // }, 10000);
+          handleSendDoc();
         },
       },
       {
@@ -139,14 +154,10 @@ export const DocViewScreen = () => {
         },
       },
     ]);
-  }, [handleUseSendDoc]);
+  }, [handleSendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      {
-        title: 'Добавить товар',
-        onPress: handleAddDocLine,
-      },
       {
         title: 'Редактировать данные',
         onPress: handleEditDocHead,
@@ -161,7 +172,7 @@ export const DocViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
+  }, [showActionSheet, handleDelete, handleEditDocHead]);
 
   const renderRight = useCallback(
     () =>
@@ -171,14 +182,14 @@ export const DocViewScreen = () => {
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
-              <SendButton onPress={handleSendDoc} disabled={isSend} />
+              <SendButton onPress={handleSendScanDoc} disabled={isSend} />
               <ScanButton onPress={handleDoScan} />
               <MenuButton actionsMenu={actionsMenu} />
             </>
           )}
         </View>
       ),
-    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendDoc, isBlocked, isSend],
+    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendScanDoc, isBlocked, isSend],
   );
 
   const renderLeft = useCallback(
@@ -193,28 +204,6 @@ export const DocViewScreen = () => {
       title: delList.length > 0 ? `Выделено позиций: ${delList.length}` : 'Документ',
     });
   }, [delList.length, navigation, renderLeft, renderRight]);
-
-  if (!doc) {
-    return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
-      </View>
-    );
-  }
-
-  const renderItem = ({ item }: { item: IMovementLine }) => {
-    const checkedId = delList.find((i) => i === item.id) || '';
-
-    return (
-      <DocItem
-        docId={doc.id}
-        item={item}
-        checked={checkedId ? true : false}
-        onCheckItem={() => handelAddDeletelList(item.id, checkedId)}
-        isDelList={delList.length > 0 ? true : false}
-      />
-    );
-  };
 
   if (del) {
     return (
@@ -235,34 +224,60 @@ export const DocViewScreen = () => {
     }
   }
 
-  return (
-    <View style={[styles.container]}>
-      <InfoBlock
-        colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.documentType.description || ''}
-        onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
-      >
-        <>
-          <Text style={[styles.rowCenter, textStyle]}>
-            {(doc.documentType.remainsField === 'fromContact'
-              ? doc.head.fromContact?.name
-              : doc.head.toContact?.name) || ''}
-          </Text>
-          <View style={styles.rowCenter}>
-            <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
-
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
-          </View>
-        </>
-      </InfoBlock>
-      <FlatList
-        data={doc.lines}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderItem}
-        scrollEventThrottle={400}
-        ItemSeparatorComponent={ItemSeparator}
+  const renderItem = ({ item, index }: { item: IScanLine; index: number }) => {
+    const checkedId = delList.find((i) => i === item.id) || '';
+    return (
+      <ScanItem
+        readonly={isBlocked}
+        index={index}
+        checked={checkedId ? true : false}
+        onCheckItem={() => handelAddDeletelList(item.id, checkedId)}
+        isDelList={delList.length > 0 ? true : false}
       />
-    </View>
+    );
+  };
+
+  if (!doc) {
+    return (
+      <View style={styles.container}>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      </View>
+    );
+  }
+
+  return (
+    <>
+      <Modal animationType="slide" visible={doScanned}>
+        {isScanerReader ? (
+          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        ) : (
+          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+        )}
+      </Modal>
+      <View style={[styles.container]}>
+        <InfoBlock
+          colorLabel={getStatusColor(doc?.status || 'DRAFT')}
+          title={doc?.head?.department?.name || ''}
+          onPress={handleEditDocHead}
+          disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        >
+          <>
+            {/* <Text style={[styles.rowCenter, textStyle]}>{doc?.head?.department?.name || ''}</Text> */}
+            <View style={styles.rowCenter}>
+              <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+
+              {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+            </View>
+          </>
+        </InfoBlock>
+        <FlatList
+          data={doc.lines}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={renderItem}
+          scrollEventThrottle={400}
+          ItemSeparatorComponent={ItemSeparator}
+        />
+      </View>
+    </>
   );
 };

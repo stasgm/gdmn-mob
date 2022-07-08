@@ -1,4 +1,4 @@
-import { companies, user, user2 } from '@lib/mock';
+import { companies, user, user2, device } from '@lib/mock';
 import { IAppSystem, IMessage, INamedEntity, MessageType } from '@lib/types';
 
 import { ISellBill } from './types';
@@ -57,6 +57,7 @@ export const messageAgent: IMessage<MessageType>[] = [
       producer: user,
       dateTime: '2021-09-17T11:26:37.617Z',
       order: 1,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
@@ -1068,6 +1069,7 @@ export const messageAgent: IMessage<MessageType>[] = [
       producer: user,
       dateTime: '2021-09-17T11:26:37.893Z',
       order: 2,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {
@@ -1572,6 +1574,7 @@ export const messageAgent: IMessage<MessageType>[] = [
       producer: user,
       dateTime: '2021-09-17T11:26:37.970Z',
       order: 3,
+      deviceId: device.id,
     },
     status: 'READY',
     body: {

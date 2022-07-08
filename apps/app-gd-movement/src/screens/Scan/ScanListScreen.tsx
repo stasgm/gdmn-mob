@@ -1,14 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import {
-  StyleSheet,
-  SectionList,
-  ListRenderItem,
-  SectionListData,
-  View,
-  RefreshControl,
-  Text,
-  Alert,
-} from 'react-native';
+import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text, Alert } from 'react-native';
 import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -21,24 +12,19 @@ import {
   AddButton,
   ScreenListItem,
   IListItemProps,
-  Menu,
+  FilterButtons,
   DeleteButton,
   CloseButton,
 } from '@lib/mobile-ui';
 
-import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IListItem } from '@lib/mobile-types';
-
-import { IDocumentType } from '@lib/types';
-
-import { IMovementDocument } from '../../store/types';
-import { DocStackParamList } from '../../navigation/Root/types';
-import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
+import { IScanDocument } from '../../store/types';
+import { ScanStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
@@ -47,34 +33,32 @@ export interface DocListProps {
 
 interface IFilteredList {
   searchQuery: string;
-  list: IMovementDocument[];
+  list: IScanDocument[];
 }
 
-export interface DocListSectionProps {
+export interface ScanListSectionProps {
   title: string;
 }
-export type SectionDataProps = SectionListData<IListItemProps, DocListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionProps>[];
 
-export const DocListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
+export const ScanListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
   const dispatch = useDispatch();
-
   const { loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const [date, setDate] = useState(dataTypes[0]);
-
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
-  const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+  const list = useSelector((state) => state.documents.list) as IScanDocument[];
 
+  // const list = docSelectors.selectByDocType<IScanDocument>('scan');
   const [delList, setDelList] = useState({});
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('DocEdit');
+    navigation.navigate('ScanEdit');
   }, [navigation]);
 
   const handelAddDeletelList = useCallback(
@@ -115,7 +99,7 @@ export const DocListScreen = () => {
         },
       ]);
     } else {
-      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
+      Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
         {
           text: 'Да',
           onPress: () => {
@@ -169,7 +153,7 @@ export const DocListScreen = () => {
       title:
         delList && Object.values(delList).length > 0
           ? `Выделено документов: ${Object.values(delList).length}`
-          : 'Документы',
+          : 'Сканирование',
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
@@ -181,7 +165,13 @@ export const DocListScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (!searchQuery) {
-        setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
+        // setFilteredList({ searchQuery, list: list.filter((i) => i.documentType.name !== 'scan') });
+        setFilteredList({
+          searchQuery,
+          list: list
+            .filter((i) => i.documentType.name === 'scan')
+            .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()),
+        });
       }
     }, [list, searchQuery]),
   );
@@ -196,11 +186,8 @@ export const DocListScreen = () => {
       } else {
         const lower = searchQuery.toLowerCase();
 
-        const fn = ({ head, documentDate, number, documentType }: IMovementDocument) =>
-          (documentType.remainsField === 'fromContact'
-            ? head.fromContact?.name?.toLowerCase().includes(lower)
-            : head.toContact?.name?.toLowerCase().includes(lower)) ||
-          documentType?.description?.toLowerCase().includes(lower) ||
+        const fn = ({ head, documentDate, number }: IScanDocument) =>
+          head.contact?.name?.toLowerCase().includes(lower) ||
           number.toLowerCase().includes(lower) ||
           getDateString(documentDate).toLowerCase().includes(lower);
 
@@ -226,26 +213,6 @@ export const DocListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
-
-  const docTypes: IListItem[] = useMemo(
-    () =>
-      documentTypes
-        ? docContactTypes.concat(
-            documentTypes?.map(
-              (i) =>
-                ({
-                  id: i.name,
-                  value: i.description || '',
-                } as IListItem),
-            ),
-          )
-        : docContactTypes,
-    [documentTypes],
-  );
-
-  const [type, setType] = useState(docTypes[0]);
-
   const newFilteredList: IListItemProps[] = useMemo(() => {
     if (!filteredList.list.length) {
       return [];
@@ -259,27 +226,18 @@ export const DocListScreen = () => {
         ? filteredList.list.filter((e) => e.status === status)
         : [];
 
-    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
-
-    newRes.sort((a, b) =>
-      date.id === 'new'
-        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
-        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
-    );
-
-    return newRes.map((i) => {
+    return res.map((i) => {
       return {
         id: i.id,
         title: i.documentType.description || '',
         documentDate: getDateString(i.documentDate),
         status: i.status,
         documentType: i.documentType.name,
-        isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
       };
     });
-  }, [date.id, filteredList.list, status, type?.id]);
+  }, [filteredList.list, status]);
 
   const sections = useMemo(
     () =>
@@ -303,46 +261,6 @@ export const DocListScreen = () => {
     [newFilteredList],
   );
 
-  const [visibleType, setVisibleType] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [visibleDate, setVisibleDate] = useState(false);
-
-  const handleSelectType = () => {
-    return setVisibleType(true);
-  };
-  const handleSelectStatus = () => {
-    return setVisibleStatus(true);
-  };
-
-  const handleSelectDate = () => {
-    return setVisibleDate(true);
-  };
-
-  const handleDismissType = () => {
-    return setVisibleType(false);
-  };
-  const handleDismissStatus = () => {
-    return setVisibleStatus(false);
-  };
-  const handleDismissDate = () => {
-    return setVisibleDate(false);
-  };
-
-  const handleApplyType = useCallback((option) => {
-    setVisibleType(false);
-    setType(option);
-  }, []);
-
-  const handleApplyStatus = useCallback((option) => {
-    setVisibleStatus(false);
-    setStatus(option.id);
-  }, []);
-
-  const handleApplyDate = useCallback((option) => {
-    setVisibleDate(false);
-    setDate(option);
-  }, []);
-
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
       const doc = list?.find((r) => r.id === item.id);
@@ -350,17 +268,13 @@ export const DocListScreen = () => {
       return doc ? (
         <ScreenListItem
           {...item}
-          onSelectItem={() => navigation.navigate('DocView', { id: item.id })}
+          onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}
           onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
           isChecked={checkedId ? true : false}
           isDelList={delList && Object.values(delList).length > 0 ? true : false}
         >
           <View>
-            <Text style={textStyle}>
-              {(doc.documentType.remainsField === 'fromContact'
-                ? doc.head.fromContact?.name
-                : doc.head.toContact?.name) || ''}
-            </Text>
+            <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
             <Text style={textStyle}>
               № {doc.number} на {getDateString(doc.documentDate)}
             </Text>
@@ -373,50 +287,7 @@ export const DocListScreen = () => {
 
   return (
     <AppScreen>
-      <View style={[styles.containerCenter, localStyles.container]}>
-        <Menu
-          key={'MenuType'}
-          title="Тип"
-          visible={visibleType}
-          onChange={handleApplyType}
-          onDismiss={handleDismissType}
-          onPress={handleSelectType}
-          options={docTypes}
-          activeOptionId={type.id}
-          style={[styles.btnTab, styles.firstBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={type.id !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
-          key={'MenuStatus'}
-          title="Статус"
-          visible={visibleStatus}
-          onChange={handleApplyStatus}
-          onDismiss={handleDismissStatus}
-          onPress={handleSelectStatus}
-          options={statusTypes}
-          activeOptionId={status}
-          style={[styles.btnTab]}
-          menuStyle={localStyles.menu}
-          isActive={status !== 'all'}
-          iconName={'chevron-down'}
-        />
-        <Menu
-          key={'MenuDataSort'}
-          title="Дата"
-          visible={visibleDate}
-          onChange={handleApplyDate}
-          onDismiss={handleDismissDate}
-          onPress={handleSelectDate}
-          options={dataTypes}
-          activeOptionId={date.id}
-          style={[styles.btnTab, styles.lastBtnTab]}
-          menuStyle={localStyles.menu}
-          isActive={date.id !== 'new'}
-          iconName={'chevron-down'}
-        />
-      </View>
+      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -446,14 +317,3 @@ export const DocListScreen = () => {
     </AppScreen>
   );
 };
-
-const localStyles = StyleSheet.create({
-  container: {
-    marginBottom: 5,
-  },
-  menu: {
-    justifyContent: 'center',
-    marginLeft: 6,
-    width: '100%',
-  },
-});

@@ -34,14 +34,29 @@ const ScreenListItem = ({
   isFromRoute,
   errorMessage,
   onSelectItem,
+  onCheckItem,
+  isChecked,
+  isDelList,
 }: IListItemProps) => {
   const { colors } = useTheme();
 
   return (
-    <TouchableOpacity onPress={onSelectItem}>
+    <TouchableOpacity
+      onPress={() => {
+        isDelList ? onCheckItem && onCheckItem() : onSelectItem && onSelectItem();
+      }}
+      onLongPress={onCheckItem}
+    >
       <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
-          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+        <View style={styles.iconsWithCheck}>
+          <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
+            <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+          </View>
+          {isChecked ? (
+            <View style={[styles.checkedIcon]}>
+              <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
+            </View>
+          ) : null}
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>

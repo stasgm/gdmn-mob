@@ -2,7 +2,9 @@ export { default as AppFallback } from './AppFallback';
 export {
   AddButton,
   BackButton,
+  CloseButton,
   DrawerButton,
+  DeleteButton,
   MenuButton,
   SaveButton,
   SearchButton,
