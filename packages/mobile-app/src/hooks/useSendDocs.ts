@@ -11,7 +11,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
 
-  const { user, company } = useSelector((state) => state.auth);
+  const { user, company, config } = useSelector((state) => state.auth);
 
   const docVersion = 1;
 
@@ -40,6 +40,8 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
     const errList: string[] = [];
 
     const consumer = user.erpUser;
+
+    const deviceId = config.deviceId!;
 
     const sendData = async () => {
       const getErpUser = await api.user.getUser(consumer.id);
@@ -77,6 +79,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
             consumer,
             sendingDocsMessage,
             getNextOrder(),
+            deviceId,
           );
 
           if (sendMessageResponse.type === 'SEND_MESSAGE') {

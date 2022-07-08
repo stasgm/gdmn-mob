@@ -26,6 +26,7 @@ const newMessage: Config = {
           name: Joi.string().required().error(new InvalidParameterException('Некорректный формат объекта получателя')),
         }),
         order: Joi.number().required().error(new InvalidParameterException('Некорректный формат поля сортировки')),
+        deviceId: Joi.string().required().error(new InvalidParameterException('Устройство не найдено')),
         version: Joi.number().optional(),
         dateTime: Joi.string().optional(),
       }),
