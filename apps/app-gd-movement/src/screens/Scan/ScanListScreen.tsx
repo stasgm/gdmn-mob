@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text, Alert } from 'react-native';
+import { SectionList, ListRenderItem, SectionListData, View, Alert } from 'react-native';
 import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -17,6 +17,7 @@ import {
   CloseButton,
   EmptyList,
   AppActivityIndicator,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
@@ -46,13 +47,13 @@ export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionPr
 export const ScanListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.documents);
+
   const { colors } = useTheme();
+
+  const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const list = useSelector((state) => state.documents.list) as IScanDocument[];
 
@@ -237,7 +238,7 @@ export const ScanListScreen = () => {
         documentType: i.documentType.name,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
-      };
+      } as IListItemProps;
     });
   }, [filteredList.list, status]);
 
@@ -269,6 +270,7 @@ export const ScanListScreen = () => {
       const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
       return doc ? (
         <ScreenListItem
+          key={item.id}
           {...item}
           onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}
           onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
@@ -276,15 +278,15 @@ export const ScanListScreen = () => {
           isDelList={delList && Object.values(delList).length > 0 ? true : false}
         >
           <View>
-            <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
-            <Text style={textStyle}>
+            <MediumText>{doc.head.department?.name || ''}</MediumText>
+            <MediumText>
               № {doc.number} на {getDateString(doc.documentDate)}
-            </Text>
+            </MediumText>
           </View>
         </ScreenListItem>
       ) : null;
     },
-    [delList, handelAddDeletelList, list, navigation, textStyle],
+    [delList, handelAddDeletelList, list, navigation],
   );
 
   const renderSectionHeader = useCallback(
@@ -309,7 +311,7 @@ export const ScanListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />

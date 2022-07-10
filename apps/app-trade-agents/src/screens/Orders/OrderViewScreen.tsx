@@ -219,7 +219,7 @@ const OrderViewScreen = () => {
     navigation.setOptions({
       headerLeft: delList.length > 0 ? renderLeft : navBackButton,
       headerRight: renderRight,
-      title: delList.length > 0 ? `Выделено заявок: ${delList.length}` : 'Заявка',
+      title: delList.length > 0 ? `Выделено позиций: ${delList.length}` : 'Заявка',
     });
   }, [delList.length, navigation, renderLeft, renderRight]);
 

@@ -1,13 +1,22 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider /*, useTheme*/ } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { Menu, SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup } from '@lib/mobile-ui';
+import {
+  Menu,
+  SelectableInput,
+  Input,
+  SaveButton,
+  SubTitle,
+  AppScreen,
+  RadioGroup,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
 import { generateId, getDateString } from '@lib/mobile-app';
@@ -360,25 +369,17 @@ export const DocEditScreen = () => {
     [colors.card, colors.primary],
   );
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }}>
         <SubTitle>{statusName}</SubTitle>
         <Divider />
         <ScrollView>
-          {/* {['DRAFT', 'READY'].includes(docStatus || 'DRAFT') && (
-            <>
-              <View style={[styles.directionRow, localStyles.switchContainer]}>
-                <Text>Черновик:</Text>
-                <Switch
-                  value={docStatus === 'DRAFT' || !docStatus}
-                  onValueChange={() => {
-                    dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
-                  }}
-                />
-              </View>
-            </>
-          )} */}
           <View style={viewStyle}>
             <RadioGroup
               options={STATUS_LIST}
