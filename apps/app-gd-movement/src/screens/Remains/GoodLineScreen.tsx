@@ -1,8 +1,8 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { AppActivityIndicator, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 import { IRemGood } from '../../store/app/types';
@@ -66,6 +66,11 @@ const GoodLineScreen = () => {
       headerLeft: navBackButton,
     });
   }, [navigation]);
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <>

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
-import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
+import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 

@@ -35,7 +35,7 @@ export const DocItem = ({ item, checked, readonly = false, onPress, onLongPress,
         </View>
         <View style={styles.details}>
           <LargeText style={styles.textBold}>{item.good.name}</LargeText>
-          <View style={[styles.directionRow]}>
+          <View style={styles.directionRow}>
             <MediumText>
               {item.quantity} {good?.valueName} x {(item.price || 0).toString()} р.
             </MediumText>

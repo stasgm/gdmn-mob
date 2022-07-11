@@ -1,12 +1,14 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { AppActivityIndicator, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
 import { IRefMetadata } from '@lib/types';
+
+import { keyExtractor } from '@lib/mobile-app';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
@@ -67,13 +69,18 @@ const GoodLineScreen = () => {
 
   const renderItem = ({ item }: { item: IProperty }) => <LineItem item={item} />;
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <>
       <SubTitle style={[styles.title]}>{matrixItem?.name}</SubTitle>
       <View style={[styles.content]}>
         <FlatList
           data={refData}
-          keyExtractor={(_, i) => String(i)}
+          keyExtractor={keyExtractor}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
         />

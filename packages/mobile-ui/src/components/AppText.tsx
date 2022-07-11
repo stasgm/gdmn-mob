@@ -9,7 +9,7 @@ interface IProps {
 
 export const LargeText = ({ children, style }: IProps) => {
   const { colors } = useTheme();
-  return <Text style={[localStyles.largeText, { color: colors.text }, style]}>{children}</Text>;
+  return <Text style={[localStyles.largeText, style]}>{children}</Text>;
 };
 
 export const MediumText = ({ children, style }: IProps) => {

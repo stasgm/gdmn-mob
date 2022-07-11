@@ -55,6 +55,9 @@ const OrderListScreen = () => {
       new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
   );
 
+  console.log('orderList', orderList);
+  console.log('orderList length', orderList.length);
+
   const { colors } = useTheme();
 
   const searchStyle = colors.primary;
@@ -67,50 +70,47 @@ const OrderListScreen = () => {
     orders: orderList,
   });
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     if (!searchQuery) {
-  //       setFilteredList({ searchQuery, orders: orderList });
-  //     }
-  //   }, [orderList, searchQuery]),
-  // );
-
-  useEffect(() => {
-    if (searchQuery !== filteredList.searchQuery) {
-      if (!searchQuery) {
-        setFilteredList({
-          searchQuery,
-          orders: orderList,
-        });
-      } else {
-        const lower = searchQuery.toLowerCase();
-
-        const fn = (i: IOrderDocument) =>
-          i?.head?.contact?.name.toUpperCase().includes(lower) ||
-          i?.head?.outlet?.name.toUpperCase().includes(lower) ||
-          i.number.toUpperCase().includes(lower) ||
-          getDateString(i.documentDate).toUpperCase().includes(lower) ||
-          getDateString(i.head.onDate).toUpperCase().includes(lower);
-
-        let newList;
-
-        if (
-          filteredList.searchQuery &&
-          searchQuery.length > filteredList.searchQuery.length &&
-          searchQuery.startsWith(filteredList.searchQuery)
-        ) {
-          newList = filteredList.orders?.filter(fn);
+  useEffect(
+    // React.useCallback(
+    () => {
+      if (searchQuery !== filteredList.searchQuery || filteredList.orders.length !== orderList.length) {
+        if (!searchQuery) {
+          setFilteredList({
+            searchQuery,
+            orders: orderList,
+          });
         } else {
-          newList = orderList?.filter(fn);
-        }
+          const lower = searchQuery.toLowerCase();
 
-        setFilteredList({
-          searchQuery,
-          orders: newList,
-        });
+          const fn = (i: IOrderDocument) =>
+            i?.head?.contact?.name.toUpperCase().includes(lower) ||
+            i?.head?.outlet?.name.toUpperCase().includes(lower) ||
+            i.number.toUpperCase().includes(lower) ||
+            getDateString(i.documentDate).toUpperCase().includes(lower) ||
+            getDateString(i.head.onDate).toUpperCase().includes(lower);
+
+          let newList;
+
+          if (
+            filteredList.searchQuery &&
+            searchQuery.length > filteredList.searchQuery.length &&
+            searchQuery.startsWith(filteredList.searchQuery)
+          ) {
+            newList = filteredList.orders?.filter(fn);
+          } else {
+            newList = orderList?.filter(fn);
+          }
+
+          setFilteredList({
+            searchQuery,
+            orders: newList,
+          });
+        }
       }
-    }
-  }, [filteredList, orderList, searchQuery]);
+    },
+    [filteredList, orderList, searchQuery],
+  );
+  // );
 
   const [status, setStatus] = useState<Status>('all');
 

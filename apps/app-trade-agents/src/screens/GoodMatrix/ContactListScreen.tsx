@@ -1,11 +1,18 @@
-import { getDateString } from '@lib/mobile-app';
-import { AppScreen, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
+import {
+  AppActivityIndicator,
+  AppScreen,
+  EmptyList,
+  globalStyles as styles,
+  ItemSeparator,
+  SubTitle,
+} from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IReference } from '@lib/types';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionList, SectionListData, View, Text, Alert } from 'react-native';
+import { SectionList, SectionListData, View, Alert } from 'react-native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { navBackDrawer } from '../../components/navigateOptions';
@@ -28,6 +35,8 @@ const ContactListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
+
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
 
@@ -101,7 +110,15 @@ const ContactListScreen = () => {
 
   const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -122,14 +139,12 @@ const ContactListScreen = () => {
       )}
       <SectionList
         sections={sections}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        scrollEventThrottle={400}
-        ListEmptyComponent={!contacts || !goodMatrix ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionHeader={renderSectionHeader}
+        // scrollEventThrottle={400}
+        ListEmptyComponent={!contacts || !goodMatrix ? EmptyList : null}
       />
     </AppScreen>
   );
