@@ -138,7 +138,6 @@ const totalListByGroup = (
 ): IOrderTotalLine[] =>
   firstLevelGroups
     ?.map((firstGr) => {
-      // console.log('orderLines', orderLines);
       const linesByParentGroup = orderLines?.filter((l) =>
         groups.find(
           (group) => (group.parent?.id === firstGr.id || group.id === firstGr.id) && group.id === l.good.goodgroup.id,

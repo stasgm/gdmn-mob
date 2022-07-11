@@ -37,7 +37,6 @@ interface IProp {
 }
 
 const Group = ({ docId, model, item, expendGroup, setExpend, searchQuery, onPressGroup }: IProp) => {
-  console.log('Group');
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
@@ -128,7 +127,7 @@ const Group = ({ docId, model, item, expendGroup, setExpend, searchQuery, onPres
 const SelectGroupScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
-  console.log('SelectGroupScreen');
+
   const dispatch = useDispatch();
 
   const { colors } = useTheme();

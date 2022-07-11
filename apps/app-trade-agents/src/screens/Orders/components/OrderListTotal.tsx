@@ -83,7 +83,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       <View style={[styles.directionRow, localStyles.margins]}>
         <MediumText style={styles.textTotal}>Общий вес, кг.: </MediumText>
         <MediumText style={styles.textTotal}>
-          {formatValue({ type: 'number', decimals: 3 }, round(total.quantity, 3))}
+          {formatValue({ type: 'number', decimals: 3 }, round(total?.quantity, 3))}
         </MediumText>
       </View>
       <Divider style={{ backgroundColor: colors.primary }} />

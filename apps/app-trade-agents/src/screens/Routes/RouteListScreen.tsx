@@ -17,7 +17,6 @@ import { RoutesStackParamList } from '../../navigation/Root/types';
 import RouteListItem from './components/RouteListItem';
 
 const RouteListScreen = () => {
-  console.log('RouteListScreen');
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteList'>>();
   const [status, setStatus] = useState<Status>('active');
 

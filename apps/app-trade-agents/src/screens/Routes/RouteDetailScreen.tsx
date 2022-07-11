@@ -28,8 +28,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import Visit from './components/Visit';
 
 const RouteDetailScreen = () => {
-  console.log('RouteDetailScreen');
-
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
   const { colors } = useTheme();

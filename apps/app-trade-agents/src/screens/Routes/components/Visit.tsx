@@ -31,7 +31,6 @@ interface IVisitProps {
 }
 
 const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
-  console.log('Visit');
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
   const loading = useSelector((state) => state.documents.loading);
 

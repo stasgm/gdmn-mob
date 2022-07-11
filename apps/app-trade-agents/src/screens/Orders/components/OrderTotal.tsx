@@ -16,7 +16,6 @@ export interface IItem {
 }
 
 const OrderTotal = ({ order }: IItem) => {
-  console.log('OrderTotal');
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
@@ -65,8 +64,8 @@ const OrderTotal = ({ order }: IItem) => {
       <View style={[localStyles.margins]}>
         <View style={localStyles.content}>
           <MediumText style={styles.textTotal}>
-            {formatValue({ type: 'number', decimals: 3 }, round(total.quantity, 3))} кг. /{' '}
-            {formatValue({ type: 'currency', decimals: 2 }, round(total.s, 2))}
+            {formatValue({ type: 'number', decimals: 3 }, round(total?.quantity, 3))} кг. /{' '}
+            {formatValue({ type: 'currency', decimals: 2 }, round(total?.s, 2))}
           </MediumText>
         </View>
       </View>

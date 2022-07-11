@@ -15,7 +15,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import OrderLine from './components/OrderLine';
 
 const OrderLineScreen = () => {
-  // console.log('OrderLineScreen');
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList | RoutesStackParamList, 'OrderLine'>>();
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;

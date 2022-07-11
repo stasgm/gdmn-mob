@@ -45,7 +45,6 @@ interface IFilteredList {
 
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
-  console.log('OrderListScreen');
 
   const dispatch = useDispatch();
 
@@ -54,9 +53,6 @@ const OrderListScreen = () => {
       new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
       new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
   );
-
-  console.log('orderList', orderList);
-  console.log('orderList length', orderList.length);
 
   const { colors } = useTheme();
 

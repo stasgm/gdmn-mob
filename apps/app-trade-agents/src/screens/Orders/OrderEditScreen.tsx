@@ -26,7 +26,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
 const OrderEditScreen = () => {
-  console.log('OrderEditScreen');
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderEdit'>>().params?.id;
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderEdit'>>();
   const dispatch = useDispatch();

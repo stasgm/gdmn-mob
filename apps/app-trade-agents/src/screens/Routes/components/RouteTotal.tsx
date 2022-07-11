@@ -66,7 +66,9 @@ const RouteTotal = ({ routeId }: IItem) => {
       <FlatList data={totalListByRoute} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
       <Divider />
       <View style={styles.bottomTotal}>
-        <Text style={textTotalStyle}>{formatValue({ type: 'number', decimals: 3 }, round(total.quantity, 3))}</Text>
+        <Text style={textTotalStyle}>
+          {total?.quantity ? formatValue({ type: 'number', decimals: 3 }, round(total?.quantity, 3)) : 0}
+        </Text>
       </View>
     </View>
   );

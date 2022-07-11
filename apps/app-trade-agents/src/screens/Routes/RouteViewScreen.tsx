@@ -38,7 +38,6 @@ interface IFilteredList {
 }
 
 const RouteViewScreen = () => {
-  console.log('RouteViewScreen');
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
@@ -185,8 +184,8 @@ const RouteViewScreen = () => {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />,
-    [route.id],
+    ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route?.id} />,
+    [route?.id],
   );
 
   const isFocused = useIsFocused();

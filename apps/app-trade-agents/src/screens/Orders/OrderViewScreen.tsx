@@ -38,7 +38,6 @@ import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
 
 const OrderViewScreen = () => {
-  console.log('OrderViewScreen');
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();

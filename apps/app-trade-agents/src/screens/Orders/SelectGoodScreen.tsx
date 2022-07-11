@@ -48,7 +48,6 @@ const Good = ({ item, onPress, quantity }: IProp) => {
 };
 
 const SelectGoodScreen = () => {
-  console.log('SelectGoodScreen');
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGoodItem'>>();
   const { colors } = useTheme();
   const { groupId, docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGoodItem'>>().params;
