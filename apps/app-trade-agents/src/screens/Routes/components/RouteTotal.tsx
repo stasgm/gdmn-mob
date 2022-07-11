@@ -6,7 +6,7 @@ import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { formatValue, round, useFilteredDocList } from '@lib/mobile-app';
+import { round, useFilteredDocList } from '@lib/mobile-app';
 
 import { IGoodGroup, IOrderDocument, IOrderLine, IRouteTotalLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -66,9 +66,7 @@ const RouteTotal = ({ routeId }: IItem) => {
       <FlatList data={totalListByRoute} keyExtractor={(_, i) => String(i)} renderItem={renderTotalItem} />
       <Divider />
       <View style={styles.bottomTotal}>
-        <Text style={textTotalStyle}>
-          {total?.quantity ? formatValue({ type: 'number', decimals: 3 }, round(total?.quantity, 3)) : 0}
-        </Text>
+        <Text style={textTotalStyle}>{round(total?.quantity, 3) || 0}</Text>
       </View>
     </View>
   );

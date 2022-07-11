@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, FlatList, SectionListData, StyleSheet } from 'react-native';
-import { globalStyles as styles, IListItemProps, MediumText } from '@lib/mobile-ui';
+import { globalStyles as styles, IListItemProps, LargeText, MediumText } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { Divider } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
-import { formatValue, round, useFilteredDocList } from '@lib/mobile-app';
+import { round, useFilteredDocList } from '@lib/mobile-app';
 
 import { IGoodGroup, IOrderDocument, IOrderLine, IOrderTotalLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -53,7 +53,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
               <MediumText>{item.group.name}</MediumText>
             </View>
             <View style={localStyles.quantity}>
-              <MediumText>{formatValue({ type: 'number', decimals: 3 }, round(item.quantity, 3))}</MediumText>
+              <MediumText>{round(item.quantity, 3)}</MediumText>
             </View>
           </View>
         </View>
@@ -68,7 +68,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       {totalListByOrders.length ? (
         <>
           <View style={[localStyles.margins, styles.rowCenter]}>
-            <MediumText style={styles.textTotal}>Итого вес, кг.:</MediumText>
+            <LargeText style={styles.textTotal}>Итого вес, кг.:</LargeText>
           </View>
           <Divider style={{ backgroundColor: colors.primary }} />
           <FlatList
@@ -81,19 +81,17 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
         </>
       ) : null}
       <View style={[styles.directionRow, localStyles.margins]}>
-        <MediumText style={styles.textTotal}>Общий вес, кг.: </MediumText>
-        <MediumText style={styles.textTotal}>
-          {formatValue({ type: 'number', decimals: 3 }, round(total?.quantity, 3))}
-        </MediumText>
+        <LargeText style={styles.textTotal}>Общий вес, кг.: </LargeText>
+        <MediumText style={styles.textTotal}>{round(total?.quantity, 3)}</MediumText>
       </View>
       <Divider style={{ backgroundColor: colors.primary }} />
       <View style={[styles.directionColumn, localStyles.margins]}>
         <View style={styles.itemNoMargin}>
-          <MediumText style={styles.textTotal}>Количество принятых заявок: </MediumText>
+          <LargeText style={styles.textTotal}>Количество принятых заявок: </LargeText>
           <MediumText>{sectionOrders.data.length}</MediumText>
         </View>
         <View style={styles.itemNoMargin}>
-          <MediumText style={styles.textTotal}>Количество одобренных заявок: </MediumText>
+          <LargeText style={styles.textTotal}>Количество одобренных заявок: </LargeText>
           <MediumText>{sectionOrders.data.filter((i) => i.status === 'PROCESSED').length}</MediumText>
         </View>
       </View>

@@ -36,7 +36,7 @@ const OrderTotal = ({ order }: IItem) => {
             <MediumText>{item.group.name}</MediumText>
           </View>
           <View style={localStyles.quantity}>
-            <MediumText>{`${formatValue({ type: 'number', decimals: 3 }, round(item.quantity, 3))} кг. /`}</MediumText>
+            <MediumText>{`${round(item.quantity, 3)} кг. /`}</MediumText>
             <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(item.s, 2))}`}</MediumText>
           </View>
         </View>
@@ -64,8 +64,7 @@ const OrderTotal = ({ order }: IItem) => {
       <View style={[localStyles.margins]}>
         <View style={localStyles.content}>
           <MediumText style={styles.textTotal}>
-            {formatValue({ type: 'number', decimals: 3 }, round(total?.quantity, 3))} кг. /{' '}
-            {formatValue({ type: 'currency', decimals: 2 }, round(total?.s, 2))}
+            {round(total?.quantity, 3)} кг. / {formatValue({ type: 'currency', decimals: 2 }, round(total?.s, 2))}
           </MediumText>
         </View>
       </View>

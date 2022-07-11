@@ -22,9 +22,9 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
-import { documentActions, useDispatch } from '@lib/store';
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 
 import { IOrderDocument } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
@@ -38,21 +38,37 @@ export interface OrderListSectionProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
-interface IFilteredList {
-  searchQuery: string;
-  orders: IOrderDocument[];
-}
+// interface IFilteredList {
+//   searchQuery: string;
+//   orders: IOrderDocument[];
+// }
 
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
   const dispatch = useDispatch();
 
-  const orderList = useFilteredDocList<IOrderDocument>('order').sort(
+  // const orderList = useFilteredDocList<IOrderDocument>('order').sort(
+  //   (a, b) =>
+  //     new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+  //     new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+  // );
+
+  const orderList = (
+    useSelector((state) => state.documents.list).filter((i) => i.documentType.name === 'order') as IOrderDocument[]
+  ).sort(
     (a, b) =>
       new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
       new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
   );
+
+  // const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+
+  // const orderList = list.sort(
+  //   (a, b) =>
+  //     new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+  //     new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+  // );
 
   const { colors } = useTheme();
 
@@ -61,51 +77,71 @@ const OrderListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const [filteredList, setFilteredList] = useState<IFilteredList>({
-    searchQuery: '',
-    orders: orderList,
-  });
+  // const [filteredList, setFilteredList] = useState<IFilteredList>({
+  //   searchQuery: '',
+  //   orders: orderList,
+  // });
 
-  useEffect(
-    // React.useCallback(
-    () => {
-      if (searchQuery !== filteredList.searchQuery || filteredList.orders.length !== orderList.length) {
-        if (!searchQuery) {
-          setFilteredList({
-            searchQuery,
-            orders: orderList,
-          });
-        } else {
-          const lower = searchQuery.toLowerCase();
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     if (!searchQuery && filteredList?.orders?.length && filteredList?.orders?.length !== orderList.length) {
+  //       setFilteredList({ searchQuery, orders: orderList });
+  //     }
+  //   }, [filteredList.orders.length, orderList, searchQuery]),
+  // );
 
-          const fn = (i: IOrderDocument) =>
-            i?.head?.contact?.name.toUpperCase().includes(lower) ||
-            i?.head?.outlet?.name.toUpperCase().includes(lower) ||
-            i.number.toUpperCase().includes(lower) ||
-            getDateString(i.documentDate).toUpperCase().includes(lower) ||
-            getDateString(i.head.onDate).toUpperCase().includes(lower);
+  // useEffect(
+  //   // React.useCallback(
+  //   () => {
+  //     if (!searchQuery && filteredList?.orders?.length && filteredList?.orders?.length !== orderList.length) {
+  //       setFilteredList({ searchQuery, orders: orderList });
+  //     }
+  //   },
+  //   [filteredList.orders.length, orderList, searchQuery],
+  //   // ),
+  // );
 
-          let newList;
+  // console.log('123', orderList[0]);
 
-          if (
-            filteredList.searchQuery &&
-            searchQuery.length > filteredList.searchQuery.length &&
-            searchQuery.startsWith(filteredList.searchQuery)
-          ) {
-            newList = filteredList.orders?.filter(fn);
-          } else {
-            newList = orderList?.filter(fn);
-          }
+  // useEffect(
+  //   // React.useCallback(
+  //   () => {
+  //     if (searchQuery !== filteredList.searchQuery) {
+  //       if (!searchQuery) {
+  //         setFilteredList({
+  //           searchQuery,
+  //           orders: orderList,
+  //         });
+  //       } else {
+  //         const lower = searchQuery.toLowerCase();
 
-          setFilteredList({
-            searchQuery,
-            orders: newList,
-          });
-        }
-      }
-    },
-    [filteredList, orderList, searchQuery],
-  );
+  //         const fn = (i: IOrderDocument) =>
+  //           i?.head?.contact?.name.toUpperCase().includes(lower) ||
+  //           i?.head?.outlet?.name.toUpperCase().includes(lower) ||
+  //           i.number.toUpperCase().includes(lower) ||
+  //           getDateString(i.documentDate).toUpperCase().includes(lower) ||
+  //           getDateString(i.head.onDate).toUpperCase().includes(lower);
+
+  //         let newList;
+
+  //         if (
+  //           filteredList.searchQuery &&
+  //           searchQuery.length > filteredList.searchQuery.length &&
+  //           searchQuery.startsWith(filteredList.searchQuery)
+  //         ) {
+  //           newList = filteredList.orders?.filter(fn);
+  //         } else {
+  //           newList = orderList?.filter(fn);
+  //         }
+
+  //         setFilteredList({
+  //           searchQuery,
+  //           orders: newList,
+  //         });
+  //       }
+  //     }
+  //   },
+  //   [filteredList, orderList, searchQuery],
   // );
 
   const [status, setStatus] = useState<Status>('all');
@@ -113,11 +149,11 @@ const OrderListScreen = () => {
   const filteredListByStatus: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
-        ? filteredList.orders
+        ? orderList
         : status === 'active'
-        ? filteredList.orders.filter((e) => e.status !== 'PROCESSED')
+        ? orderList.filter((e) => e.status !== 'PROCESSED')
         : status === 'archive'
-        ? filteredList.orders.filter((e) => e.status === 'PROCESSED')
+        ? orderList.filter((e) => e.status === 'PROCESSED')
         : [];
 
     return res.map(
@@ -133,7 +169,7 @@ const OrderListScreen = () => {
           errorMessage: i.errorMessage,
         } as IListItemProps),
     );
-  }, [status, filteredList.orders]);
+  }, [status, orderList]);
 
   const sections = useMemo(
     () =>
