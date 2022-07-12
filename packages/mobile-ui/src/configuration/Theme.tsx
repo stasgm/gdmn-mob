@@ -17,26 +17,5 @@ const theme = {
   roundness: 2,
   dark: false,
 };
-const CombinedDarkTheme = {
-  ...PaperDarkTheme,
-  ...NavigationDarkTheme,
-  colors: {
-    ...PaperDarkTheme.colors,
-    ...NavigationDarkTheme.colors,
-  },
-};
-
-// const theme = {
-//   ...DefaultTheme,
-//   roundness: 2,
-//   dark: false,
-//   colors: {
-//     ...DefaultTheme.colors,
-//     primary: colors.primary,
-//     accent: colors.accent,
-//     text: colors.text,
-//     placeholder: colors.placeholder,
-//   },
-// };
 
 export default theme;

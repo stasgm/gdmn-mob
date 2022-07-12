@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
+import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
@@ -27,10 +27,10 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  const defaultPack = packages.find((i) => i.isDefault)?.package;
+  const defaultPack = useMemo(() => packages.find((i) => i.isDefault)?.package, [packages]);
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
-  const [pack, setPack] = useState<INamedEntity | undefined>(item?.packagekey || defaultPack);
+  const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
   const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
 
   const qtyRef = useRef<TextInput>(null);
@@ -58,7 +58,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   }, [goodQty]);
 
   useEffect(() => {
-    onSetLine({ ...item, packagekey: pack });
+    onSetLine({ ...item, package: pack });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
@@ -94,7 +94,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
                 ref={qtyRef}
-                // autoFocus={isFocused}
                 value={goodQty}
               />
             </View>

@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { SectionList, ListRenderItem, SectionListData, View, RefreshControl, Text, Alert } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import { SectionList, ListRenderItem, SectionListData, View, Alert } from 'react-native';
+import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import {
@@ -15,13 +15,16 @@ import {
   FilterButtons,
   DeleteButton,
   CloseButton,
+  EmptyList,
+  AppActivityIndicator,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IScanDocument } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
@@ -44,13 +47,13 @@ export type SectionDataProps = SectionListData<IListItemProps, ScanListSectionPr
 export const ScanListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanList'>>();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.documents);
+
   const { colors } = useTheme();
+
+  const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const list = useSelector((state) => state.documents.list) as IScanDocument[];
 
@@ -235,7 +238,7 @@ export const ScanListScreen = () => {
         documentType: i.documentType.name,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
-      };
+      } as IListItemProps;
     });
   }, [filteredList.list, status]);
 
@@ -267,6 +270,7 @@ export const ScanListScreen = () => {
       const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
       return doc ? (
         <ScreenListItem
+          key={item.id}
           {...item}
           onSelectItem={() => navigation.navigate('ScanView', { id: item.id })}
           onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
@@ -274,16 +278,26 @@ export const ScanListScreen = () => {
           isDelList={delList && Object.values(delList).length > 0 ? true : false}
         >
           <View>
-            <Text style={textStyle}>{doc.head.department?.name || ''}</Text>
-            <Text style={textStyle}>
+            <MediumText>{doc.head.department?.name || ''}</MediumText>
+            <MediumText>
               № {doc.number} на {getDateString(doc.documentDate)}
-            </Text>
+            </MediumText>
           </View>
         </ScreenListItem>
       ) : null;
     },
-    [delList, handelAddDeletelList, list, navigation, textStyle],
+    [delList, handelAddDeletelList, list, navigation],
   );
+
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -297,7 +311,7 @@ export const ScanListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />
@@ -306,13 +320,11 @@ export const ScanListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

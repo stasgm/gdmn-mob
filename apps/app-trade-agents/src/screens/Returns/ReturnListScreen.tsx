@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
@@ -15,13 +15,13 @@ import {
   ScreenListItem,
   IListItemProps,
   SubTitle,
+  EmptyList,
 } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
 import { IReturnDocument } from '../../store/types';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface ReturnListSectionProps {
@@ -135,19 +135,11 @@ const ReturnListScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem
-        renderItem={item}
-        item={doc}
-        routeName={doc.status === 'DRAFT' || doc.status === 'READY' ? 'ReturnEdit' : 'ReturnView'}
-      >
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('ReturnView', { id: item.id })} />
-      </SwipeListItem>
-    ) : null;
-  };
+  const handlePressReturn = useCallback((id: string) => navigation.navigate('ReturnView', { id }), [navigation]);
 
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
+    <ScreenListItem {...item} onSelectItem={() => handlePressReturn(item.id)} />
+  );
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
   return (
@@ -179,7 +171,7 @@ const ReturnListScreen = () => {
         scrollEventThrottle={400}
         onEndReached={() => ({})}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { FlatList, View, Text, StyleSheet } from 'react-native';
+import { FlatList, View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { IconButton, Searchbar } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { AppActivityIndicator, AppScreen, EmptyList, ItemSeparator, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
+
+import { keyExtractor } from '@lib/mobile-app';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGood, IGoodMatrix } from '../../store/types';
@@ -15,8 +17,6 @@ import { getGoodMatrixByContact } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
 
 import GoodItem from './components/GoodItem';
-
-const keyExtractor = (item: IGood) => String(item.id);
 
 const GoodListScreen = () => {
   const { id } = useRoute<RouteProp<GoodMatrixStackParamList, 'GoodList'>>().params;
@@ -76,7 +76,10 @@ const GoodListScreen = () => {
 
   const renderItem = ({ item }: { item: IGood }) => <GoodItem item={item} />;
 
-  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -102,7 +105,7 @@ const GoodListScreen = () => {
         renderItem={renderItem}
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={EC}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

@@ -1,16 +1,24 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider /*, useTheme*/ } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SelectableInput, Input, SaveButton, SubTitle, AppScreen, RadioGroup } from '@lib/mobile-ui';
+import {
+  SelectableInput,
+  Input,
+  SaveButton,
+  SubTitle,
+  AppScreen,
+  RadioGroup,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors, docSelectors } from '@lib/store';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
@@ -28,7 +36,7 @@ export const ScanEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IScanFormParam);
 
-  const documents = useSelector((state) => state.documents.list) as IScanDocument[];
+  const documents = useFilteredDocList<IScanDocument>('scan');
 
   const scanType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -197,6 +205,11 @@ export const ScanEditScreen = () => {
     ],
     [colors.card, colors.primary],
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

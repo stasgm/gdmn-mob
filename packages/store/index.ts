@@ -1,4 +1,4 @@
-export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch } from './src';
+export { configureStore, useDispatch, useThunkDispatch, useSelector, AppDispatch, RootState } from './src';
 export { PersistedMiddleware, SaveDataToDisk, LoadDataFromDisk, AppStorage } from './src/types';
 export { IFormParam } from './src/app/types';
 export { default as authActions } from './src/auth';

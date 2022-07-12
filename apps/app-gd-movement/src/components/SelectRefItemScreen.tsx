@@ -13,6 +13,8 @@ import { RefParamList } from '../navigation/Root/types';
 
 import { navBackButton } from './navigateOptions';
 
+const keyExtractor = (item: IReferenceData) => item.id;
+
 export const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -47,8 +49,6 @@ export const SelectRefItemScreen = () => {
   }, [clause, refFieldName, refObj?.data]);
 
   const title = refObj?.description || refObj?.name;
-
-  // const formParams = useSelector((state) => state.app.formParams);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -112,10 +112,6 @@ export const SelectRefItemScreen = () => {
                 Alert.alert('Ошибка!', 'Необходимо выбрать элемент.', [{ text: 'OK' }]);
                 return;
               }
-              // const newFormParams: IFormParam = {
-              //   ...formParams,
-              //   [fieldName]: checkedItem,
-              // };
               dispatch(appActions.setFormParams({ [fieldName]: checkedItem }));
               navigation.goBack();
             }}
@@ -155,7 +151,7 @@ export const SelectRefItemScreen = () => {
       <FlatList
         ref={refList}
         data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />

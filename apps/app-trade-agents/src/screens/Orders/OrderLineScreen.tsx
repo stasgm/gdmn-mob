@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
 
 import { OrdersStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
@@ -21,33 +21,20 @@ const OrderLineScreen = () => {
 
   const [line, setLine] = useState<IOrderLine>(item);
 
-  const [loading, setLoading] = useState(false);
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  // const handleSave = useCallback(() => {
-  //   if (!line.packagekey && packages.length > 0) {
-  //     Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
-  //     return;
-  //   }
-  //   dispatch(
-  //     mode === 0
-  //       ? documentActions.addDocumentLine({ docId, line })
-  //       : documentActions.updateDocumentLine({ docId, line }),
-  //   );
-
-  //   navigation.goBack();
-  // }, [line, packages.length, dispatch, mode, docId, navigation]);
-
   useEffect(() => {
-    if (loading) {
-      if (!line.packagekey && packages.length > 0) {
+    if (screenState === 'saving') {
+      if (!line.package && packages.length > 0) {
         Alert.alert('Ошибка!', 'Не указана упаковка', [{ text: 'Ок' }]);
-        setLoading(false);
+        setScreenState('idle');
         return;
       }
+
       if (line.quantity) {
         dispatch(
           mode === 0
@@ -66,21 +53,22 @@ const OrderLineScreen = () => {
                   : documentActions.updateDocumentLine({ docId, line }),
               );
               navigation.goBack();
+              setScreenState('idle');
             },
           },
-          { text: 'Отмена', onPress: () => setLoading(false) },
+          { text: 'Отмена', onPress: () => setScreenState('idle') },
         ]);
       }
     }
-  }, [dispatch, docId, line, loading, mode, navigation, packages.length]);
+  }, [dispatch, docId, line, mode, navigation, packages.length, screenState]);
 
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SaveButton onPress={() => setLoading(true)} disabled={loading} />
+        <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
       </View>
     ),
-    [loading],
+    [screenState],
   );
 
   useLayoutEffect(() => {
@@ -90,8 +78,13 @@ const OrderLineScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <OrderLine item={line} onSetLine={setLine} />
     </View>
   );

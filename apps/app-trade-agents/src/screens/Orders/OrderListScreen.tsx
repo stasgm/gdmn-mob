@@ -1,10 +1,9 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
@@ -15,14 +14,19 @@ import {
   SubTitle,
   ScreenListItem,
   IListItemProps,
+  EmptyList,
+  AppActivityIndicator,
+  CloseButton,
+  DeleteButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
+
+import { documentActions, useDispatch, useSelector } from '@lib/store';
 
 import { IOrderDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
@@ -34,46 +38,122 @@ export interface OrderListSectionProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
+// interface IFilteredList {
+//   searchQuery: string;
+//   orders: IOrderDocument[];
+// }
+
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
-  const loading = useSelector((state) => state.documents.loading);
-  const orders = useSelector((state) => state.documents.list) as IOrderDocument[];
+  const dispatch = useDispatch();
+
+  // const orderList = useFilteredDocList<IOrderDocument>('order').sort(
+  //   (a, b) =>
+  //     new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+  //     new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+  // );
+
+  const orderList = (
+    useSelector((state) => state.documents.list).filter((i) => i.documentType.name === 'order') as IOrderDocument[]
+  ).sort(
+    (a, b) =>
+      new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+      new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+  );
+
+  // const list = useSelector((state) => state.documents.list) as IMovementDocument[];
+
+  // const orderList = list.sort(
+  //   (a, b) =>
+  //     new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+  //     new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+  // );
+
   const { colors } = useTheme();
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+  const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = orders
-    ?.filter((i) =>
-      i.documentType?.name === 'order'
-        ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate || i.head.onDate
-          ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase())
-          : true
-        : false,
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-        new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
-    );
+  // const [filteredList, setFilteredList] = useState<IFilteredList>({
+  //   searchQuery: '',
+  //   orders: orderList,
+  // });
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     if (!searchQuery && filteredList?.orders?.length && filteredList?.orders?.length !== orderList.length) {
+  //       setFilteredList({ searchQuery, orders: orderList });
+  //     }
+  //   }, [filteredList.orders.length, orderList, searchQuery]),
+  // );
+
+  // useEffect(
+  //   // React.useCallback(
+  //   () => {
+  //     if (!searchQuery && filteredList?.orders?.length && filteredList?.orders?.length !== orderList.length) {
+  //       setFilteredList({ searchQuery, orders: orderList });
+  //     }
+  //   },
+  //   [filteredList.orders.length, orderList, searchQuery],
+  //   // ),
+  // );
+
+  // console.log('123', orderList[0]);
+
+  // useEffect(
+  //   // React.useCallback(
+  //   () => {
+  //     if (searchQuery !== filteredList.searchQuery) {
+  //       if (!searchQuery) {
+  //         setFilteredList({
+  //           searchQuery,
+  //           orders: orderList,
+  //         });
+  //       } else {
+  //         const lower = searchQuery.toLowerCase();
+
+  //         const fn = (i: IOrderDocument) =>
+  //           i?.head?.contact?.name.toUpperCase().includes(lower) ||
+  //           i?.head?.outlet?.name.toUpperCase().includes(lower) ||
+  //           i.number.toUpperCase().includes(lower) ||
+  //           getDateString(i.documentDate).toUpperCase().includes(lower) ||
+  //           getDateString(i.head.onDate).toUpperCase().includes(lower);
+
+  //         let newList;
+
+  //         if (
+  //           filteredList.searchQuery &&
+  //           searchQuery.length > filteredList.searchQuery.length &&
+  //           searchQuery.startsWith(filteredList.searchQuery)
+  //         ) {
+  //           newList = filteredList.orders?.filter(fn);
+  //         } else {
+  //           newList = orderList?.filter(fn);
+  //         }
+
+  //         setFilteredList({
+  //           searchQuery,
+  //           orders: newList,
+  //         });
+  //       }
+  //     }
+  //   },
+  //   [filteredList, orderList, searchQuery],
+  // );
 
   const [status, setStatus] = useState<Status>('all');
 
-  const filteredList: IListItemProps[] = useMemo(() => {
+  const filteredListByStatus: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
-        ? list
+        ? orderList
         : status === 'active'
-        ? list.filter((e) => e.status !== 'PROCESSED')
+        ? orderList.filter((e) => e.status !== 'PROCESSED')
         : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        ? orderList.filter((e) => e.status === 'PROCESSED')
         : [];
 
     return res.map(
@@ -89,11 +169,11 @@ const OrderListScreen = () => {
           errorMessage: i.errorMessage,
         } as IListItemProps),
     );
-  }, [status, list]);
+  }, [status, orderList]);
 
   const sections = useMemo(
     () =>
-      filteredList.reduce<SectionDataProps>((prev, item) => {
+      filteredListByStatus.reduce<SectionDataProps>((prev, item) => {
         const sectionTitle = item.documentDate;
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
@@ -107,12 +187,66 @@ const OrderListScreen = () => {
           {
             title: sectionTitle,
             data: [item],
-            // key: [item].length,
           },
         ];
       }, []),
-    [filteredList],
+    [filteredListByStatus],
   );
+
+  const [delList, setDelList] = useState({});
+
+  const handleAddDeletelList = useCallback(
+    (lineId: string, lineStatus: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = Object.entries(delList).reduce((sum, cur) => {
+          const curId = cur[0];
+          const curStatus = cur[1];
+          if (curId !== checkedId) {
+            return { ...sum, [curId]: curStatus };
+          } else {
+            return { ...sum };
+          }
+        }, {});
+        setDelList(newList);
+      } else {
+        setDelList({ ...delList, [lineId]: lineStatus });
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
+
+    if (statusList) {
+      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
+  }, [delList, dispatch]);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('OrderEdit');
@@ -127,37 +261,73 @@ const OrderListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-        <AddButton onPress={handleAddDocument} />
+        {delList && Object.values(delList).length > 0 ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <IconButton
+              icon="card-search-outline"
+              style={filterVisible && { backgroundColor: colors.card }}
+              size={26}
+              onPress={() => setFilterVisible((prev) => !prev)}
+            />
+            <AddButton onPress={handleAddDocument} />
+          </>
+        )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+  );
+
+  const renderLeft = useCallback(
+    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackDrawer,
+      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
+      title:
+        delList && Object.values(delList).length > 0 ? `Выделено заявок: ${Object.values(delList).length}` : 'Заявки',
     });
-  }, [navigation, renderRight]);
+  }, [delList, navigation, renderLeft, renderRight]);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem
-        renderItem={item}
-        item={doc}
-        routeName={doc.status === 'DRAFT' || doc.status === 'READY' ? 'OrderEdit' : 'OrderView'}
-      >
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
-      </SwipeListItem>
-    ) : null;
-  };
+  const handlePressOrder = useCallback((id: string) => navigation.navigate('OrderView', { id }), [navigation]);
+
+  const renderItem: ListRenderItem<IListItemProps> = useCallback(
+    ({ item }) => {
+      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
+      return (
+        <ScreenListItem
+          key={item.id}
+          {...item}
+          onSelectItem={() => handlePressOrder(item.id)}
+          onCheckItem={() => handleAddDeletelList(item.id, item.status || '', checkedId)}
+          isChecked={checkedId ? true : false}
+          isDelList={delList && Object.values(delList).length > 0 ? true : false}
+        />
+      );
+    },
+    [delList, handleAddDeletelList, handlePressOrder],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const renderSectionFooter = useCallback(
+    (item) => (status === 'all' && sections ? <OrderListTotal sectionOrders={item.section} /> : null),
+    [sections, status],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
+  // const RC = useMemo(() => <RefreshControl refreshing={loading} title="загрузка данных..." />, [loading]);
 
   return (
     <AppScreen>
@@ -180,14 +350,12 @@ const OrderListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        renderSectionFooter={(item) => (status === 'all' && sections ? <OrderListTotal orders={item.section} /> : null)}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={RC}
+        ListEmptyComponent={EmptyList}
+        renderSectionFooter={renderSectionFooter}
       />
     </AppScreen>
   );

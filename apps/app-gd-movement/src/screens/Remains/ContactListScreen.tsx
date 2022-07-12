@@ -1,11 +1,18 @@
-import { getDateString } from '@lib/mobile-app';
-import { AppScreen, globalStyles as styles, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
+import {
+  AppActivityIndicator,
+  AppScreen,
+  EmptyList,
+  globalStyles as styles,
+  ItemSeparator,
+  SubTitle,
+} from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 import { IDepartment, IReference } from '@lib/types';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { SectionList, SectionListData, View, Text } from 'react-native';
+import { SectionList, SectionListData, View } from 'react-native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import { navBackDrawer } from '../../components/navigateOptions';
@@ -28,6 +35,7 @@ const ContactListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const department = refSelectors.selectByName<IDepartment>('department')?.data || [];
@@ -93,6 +101,16 @@ const ContactListScreen = () => {
 
   const renderItem = ({ item }: { item: IDepartment | IEmployee }) => <ContactItem item={item} />;
 
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <AppScreen>
       {filterVisible && (
@@ -104,7 +122,7 @@ const ContactListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colors.primary}
+              selectionColor={searchStyle}
             />
           </View>
           <ItemSeparator />
@@ -112,15 +130,13 @@ const ContactListScreen = () => {
       )}
       <SectionList
         sections={sections}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
+        renderSectionHeader={renderSectionHeader}
         scrollEventThrottle={400}
-        onEndReached={() => ({})}
-        ListEmptyComponent={!contacts || !remains ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        // onEndReached={() => ({})}
+        ListEmptyComponent={!contacts || !remains ? EmptyList : null}
       />
     </AppScreen>
   );

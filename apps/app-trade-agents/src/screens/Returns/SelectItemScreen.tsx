@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import { View, FlatList, TouchableOpacity, Text } from 'react-native';
+import { View, FlatList, TouchableOpacity } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Searchbar, Divider } from 'react-native-paper';
 
-import { AppScreen, ItemSeparator, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, SearchButton, SubTitle, globalStyles as styles, MediumText } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
-import { generateId } from '@lib/mobile-app';
+import { generateId, keyExtractor } from '@lib/mobile-app';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IReturnLine } from '../../store/types';
@@ -54,7 +54,6 @@ const SelectItemScreen = () => {
   const refList = React.useRef<FlatList<INamedEntity>>(null);
   useScrollToTop(refList);
 
-  const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
   const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
   const subTitleStyle = useMemo(() => [styles.title, { backgroundColor: colors.background }], [colors.background]);
 
@@ -75,7 +74,7 @@ const SelectItemScreen = () => {
           </View>
           <View style={styles.details}>
             <View style={styles.rowCenter}>
-              <Text style={textStyle}>{item.name || item.id}</Text>
+              <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
             </View>
           </View>
         </View>
@@ -105,7 +104,7 @@ const SelectItemScreen = () => {
       <FlatList
         ref={refList}
         data={filteredList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />

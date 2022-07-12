@@ -18,12 +18,11 @@ export type RefParamList = {
 
 export type InventoryParamList = RefParamList & {
   InventoryView: { id: string; docType?: string };
-  InventoryEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  InventoryEdit: { id: string; docType?: string } | undefined;
   InventoryLine: { mode: number; docId: string; item: IMovementLine; docType?: string };
   SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
-  // ScanBarcodeReader: { docId: string; docType?: string };
   InventoryLineEdit: {
     docId: string;
     prodId: string;
@@ -40,12 +39,11 @@ export type InventoryStackParamList = { InventoryList: undefined } & InventoryPa
 
 export type DocParamList = RefParamList & {
   DocView: { id: string; docType?: string };
-  DocEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  DocEdit: { id: string; docType?: string } | undefined;
   DocLine: { mode: number; docId: string; item: IMovementLine; docType?: string };
   SelectGoodItem: { docId: string; docType?: string };
   SelectRemainsItem: { docId: string; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
-  // // ScanBarcodeReader: { docId: string; docType?: string };
   DocLineEdit: {
     docId: string;
     prodId: string;
@@ -62,7 +60,7 @@ export type DocStackParamList = { DocList: undefined } & DocParamList;
 
 export type RemainsParamList = RefParamList & {
   GoodList: { id: string };
-  GoodLine: { item: any /*IMatrixDataNamed*/ };
+  GoodLine: { item: any };
 };
 
 export type RemainsStackParamList = { ContactList: undefined } & RemainsParamList;

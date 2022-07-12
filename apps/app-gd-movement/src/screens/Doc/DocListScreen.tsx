@@ -9,7 +9,7 @@ import {
   Text,
   Alert,
 } from 'react-native';
-import { useFocusEffect, useNavigation, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
 import {
@@ -24,13 +24,15 @@ import {
   Menu,
   DeleteButton,
   CloseButton,
+  EmptyList,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IListItem } from '@lib/mobile-types';
 
@@ -59,8 +61,10 @@ export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
   const dispatch = useDispatch();
 
-  const { loading } = useSelector((state) => state.documents);
+  // const { loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
+
+  const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -371,6 +375,16 @@ export const DocListScreen = () => {
     [delList, handelAddDeletelList, list, navigation, textStyle],
   );
 
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <AppScreen>
       <View style={[styles.containerCenter, localStyles.container]}>
@@ -435,13 +449,11 @@ export const DocListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={<RefreshControl refreshing={loading} title="идет загрузка данных..." />}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

@@ -1,18 +1,28 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
-import { View, FlatList, Alert, RefreshControl, Text } from 'react-native';
+
+import { RouteProp, useIsFocused, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { View, FlatList, Alert, RefreshControl } from 'react-native';
 import { Divider, IconButton, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { globalStyles as styles, ItemSeparator, SubTitle, useActionSheet, MenuButton, AppScreen } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import {
+  globalStyles as styles,
+  ItemSeparator,
+  SubTitle,
+  useActionSheet,
+  MenuButton,
+  AppScreen,
+  EmptyList,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
+import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IReturnDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
@@ -26,8 +36,6 @@ interface IFilteredList {
   searchQuery: string;
   routeLineList: IRouteLine[] | undefined;
 }
-
-const keyExtractor = (item: IRouteLine) => String(item.id);
 
 const RouteViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
@@ -45,7 +53,7 @@ const RouteViewScreen = () => {
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
   const route = docSelectors.selectByDocId<IRouteDocument>(id);
-  const routeLineList = route?.lines.sort((a, b) => a.ordNumber - b.ordNumber);
+  const routeLineList = useMemo(() => route?.lines.sort((a, b) => a.ordNumber - b.ordNumber), [route?.lines]);
 
   const [filteredList, setFilteredList] = useState<IFilteredList>({
     searchQuery: '',
@@ -87,27 +95,32 @@ const RouteViewScreen = () => {
   const ref = useRef<FlatList<IRouteLine>>(null);
   useScrollToTop(ref);
 
-  const docs = useSelector((state) => state.documents.list);
+  const orders = useFilteredDocList<IOrderDocument>('order');
+  const visits = useFilteredDocList<IVisitDocument>('visit');
 
-  const visitList = (docs as IVisitDocument[])
-    ?.filter((e) => e.documentType.name === 'visit' && routeLineList?.find((line) => line.id === e.head.routeLineId))
-    .map((doc) => doc.id);
-
-  const orderList = (docs as IOrderDocument[])
-    ?.filter((e) => e.documentType.name === 'order' && e.head.route?.id === id)
-    .map((doc) => doc.id);
-
-  const returnList = (docs as IReturnDocument[])
-    ?.filter((e) => e.documentType.name === 'return' && e.head.route?.id === id)
-    .map((doc) => doc.id);
-
-  const geoList = useAppSelector((state) => state.geo?.list?.filter((g) => g.routeId === id));
+  const geoList = useAppSelector((state) => state.geo?.list)?.filter((g) => g.routeId === id);
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
-      const res = await docDispatch(documentActions.removeDocuments([...visitList, ...orderList, ...returnList, id]));
-      dispatch(actions.geoActions.removeMany(geoList));
+      const delDocList: string[] = [];
+
+      orders.forEach((o) => {
+        if (o.head.route?.id === id) {
+          delDocList.push(o.id);
+        }
+      });
+
+      visits.forEach((v) => {
+        if (routeLineList?.find((line) => line.id === v.head.routeLineId)) {
+          delDocList.push(v.id);
+        }
+      });
+
+      delDocList.push(id);
+
+      const res = await docDispatch(documentActions.removeDocuments(delDocList));
       if (res.type === 'DOCUMENTS/REMOVE_MANY_SUCCESS') {
+        dispatch(actions.geoActions.removeMany(geoList));
         navigation.goBack();
       }
     };
@@ -115,15 +128,13 @@ const RouteViewScreen = () => {
     Alert.alert('Вы уверены, что хотите удалить маршрут и его документы?', '', [
       {
         text: 'Да',
-        onPress: async () => {
-          deleteRoute();
-        },
+        onPress: deleteRoute,
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [dispatch, docDispatch, geoList, id, navigation, orderList, returnList, visitList]);
+  }, [dispatch, docDispatch, geoList, id, navigation, orders, routeLineList, visits]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -172,7 +183,15 @@ const RouteViewScreen = () => {
     [filteredList.routeLineList],
   );
 
-  const EC = useMemo(() => <Text style={styles.emptyList}>Список пуст</Text>, []);
+  const renderItem = useCallback(
+    ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route?.id} />,
+    [route?.id],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!route) {
     return (
@@ -181,8 +200,6 @@ const RouteViewScreen = () => {
       </View>
     );
   }
-
-  const renderItem = ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route.id} />;
 
   return (
     <AppScreen>
@@ -211,12 +228,12 @@ const RouteViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         refreshControl={RC}
-        ListEmptyComponent={EC}
-        removeClippedSubviews={true} // Unmount compsonents when outside of window
-        initialNumToRender={13}
-        maxToRenderPerBatch={13} // Reduce number in each render batch
+        ListEmptyComponent={EmptyList}
+        // removeClippedSubviews={true} // Unmount compsonents when outside of window
+        initialNumToRender={9}
+        maxToRenderPerBatch={9} // Reduce number in each render batch
         updateCellsBatchingPeriod={50} // Increase time between renders
-        windowSize={11} // Reduce the window size
+        windowSize={9} // Reduce the window size
       />
       <RouteTotal routeId={id} />
     </AppScreen>
