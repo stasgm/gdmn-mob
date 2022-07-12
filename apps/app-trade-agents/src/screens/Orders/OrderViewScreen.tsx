@@ -249,6 +249,7 @@ const OrderViewScreen = () => {
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
+
   if (screenState === 'deleting') {
     return (
       <View style={styles.container}>

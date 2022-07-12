@@ -1,10 +1,10 @@
-import React, { useCallback, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
 
@@ -19,22 +19,26 @@ export const MoveLineScreen = () => {
   const { mode, docId, item } = useRoute<RouteProp<MoveStackParamList, 'MoveLine'>>().params;
   const [line, setLine] = useState<IMoveLine>(item);
 
-  const handleSave = useCallback(() => {
-    dispatch(
-      mode === 0
-        ? documentActions.addDocumentLine({ docId, line })
-        : documentActions.updateDocumentLine({ docId, line }),
-    );
-    navigation.goBack();
-  }, [navigation, line, docId, dispatch, mode]);
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+
+  useEffect(() => {
+    if (screenState === 'saving') {
+      dispatch(
+        mode === 0
+          ? documentActions.addDocumentLine({ docId, line })
+          : documentActions.updateDocumentLine({ docId, line }),
+      );
+      navigation.goBack();
+    }
+  }, [dispatch, docId, line, mode, navigation, screenState]);
 
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SaveButton onPress={handleSave} />
+        <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
       </View>
     ),
-    [handleSave],
+    [screenState],
   );
 
   useLayoutEffect(() => {
@@ -43,6 +47,11 @@ export const MoveLineScreen = () => {
       headerRight: renderRight,
     });
   }, [navigation, renderRight]);
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <View style={[styles.container]}>

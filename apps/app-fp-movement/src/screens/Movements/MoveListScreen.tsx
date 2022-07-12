@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { Alert, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -17,11 +17,14 @@ import {
   IListItemProps,
   DeleteButton,
   CloseButton,
+  AppActivityIndicator,
+  EmptyList,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IMoveDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
@@ -37,27 +40,31 @@ export const MoveListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveList'>>();
   const dispatch = useDispatch();
 
-  const loading = useSelector((state) => state.documents.loading);
-  const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
+  // const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
   const { colors } = useTheme();
+  const searchStyle = colors.primary;
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = movements
-    ?.filter((i) =>
-      i.documentType?.name === 'move'
-        ? i?.head?.fromDepart.name || i?.head?.toDepart.name || i.number || i.documentDate
-          ? i?.head?.fromDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i?.head?.toDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-          : true
-        : false,
-    )
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+  const list = (
+    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'move') as IMoveDocument[]
+  ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+
+  // const list = movements
+  //   ?.filter((i) =>
+  //     i.documentType?.name === 'move'
+  //       ? i?.head?.fromDepart.name || i?.head?.toDepart.name || i.number || i.documentDate
+  //         ? i?.head?.fromDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+  //           i?.head?.toDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+  //           i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+  //           getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+  //         : true
+  //       : false,
+  //   )
+  //   .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [delList, setDelList] = useState({});
 
@@ -209,31 +216,43 @@ export const MoveListScreen = () => {
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list.find((r) => r.id === item.id);
-    const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
-    return doc ? (
-      // <SwipeListItem renderItem={item} item={doc} routeName="MoveView">
-      <ScreenListItem
-        {...item}
-        onSelectItem={() => navigation.navigate('MoveView', { id: item.id })}
-        onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
-        isChecked={checkedId ? true : false}
-        isDelList={delList && Object.values(delList).length > 0 ? true : false}
-      >
-        <View>
-          <Text style={textStyle}>Откуда: {doc.head.fromDepart?.name || ''}</Text>
-          <Text style={textStyle}>Куда: {doc.head.toDepart?.name || ''}</Text>
-          <Text style={textStyle}>
-            № {doc.number} на {getDateString(doc.documentDate)}
-          </Text>
-        </View>
-      </ScreenListItem>
-    ) : // </SwipeListItem>
-    null;
-  };
+  const handlePressDoc = useCallback((id: string) => navigation.navigate('MoveView', { id }), [navigation]);
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+  const renderItem: ListRenderItem<IListItemProps> = useCallback(
+    ({ item }) => {
+      const doc = list.find((r) => r.id === item.id);
+      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
+      return doc ? (
+        <ScreenListItem
+          key={item.id}
+          {...item}
+          onSelectItem={() => handlePressDoc(item.id)}
+          onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
+          isChecked={checkedId ? true : false}
+          isDelList={delList && Object.values(delList).length > 0 ? true : false}
+        >
+          <View>
+            <MediumText>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
+            <MediumText style={textStyle}>Куда: {doc.head.toDepart?.name || ''}</MediumText>
+            <MediumText>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </MediumText>
+          </View>
+        </ScreenListItem>
+      ) : null;
+    },
+    [delList, handelAddDeletelList, handlePressDoc, list, textStyle],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -256,13 +275,11 @@ export const MoveListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );

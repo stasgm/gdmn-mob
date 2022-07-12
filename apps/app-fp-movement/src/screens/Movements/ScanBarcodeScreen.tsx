@@ -1,9 +1,9 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-import { Text } from 'react-native';
+import { View } from 'react-native';
 
-import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { globalStyles } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, SubTitle } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { generateId } from '@lib/mobile-app';
@@ -127,8 +127,17 @@ const ScanBarcodeScreen = () => {
     setError(false);
   };
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   if (!document) {
-    return <Text style={globalStyles.title}>Документ не найден</Text>;
+    return (
+      <View style={globalStyles.container}>
+        <SubTitle style={globalStyles.title}>Документ не найден</SubTitle>
+      </View>
+    );
   }
 
   return (

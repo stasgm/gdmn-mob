@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text, View, FlatList, Alert, ActivityIndicator } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { View, FlatList, Alert } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -14,9 +14,11 @@ import {
   SubTitle,
   ScanButton,
   SendButton,
+  AppActivityIndicator,
+  MediumText,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, useSendDocs } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
@@ -42,20 +44,14 @@ export const MoveViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
-  const { colors } = useTheme();
-
-  const [del, setDel] = useState(false);
-  const [isSend, setIsSend] = useState(false);
-
-  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
-  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
+  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
 
   // const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
 
-  const isBlocked = doc?.status !== 'DRAFT';
+  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -129,10 +125,10 @@ export const MoveViewScreen = () => {
       {
         text: 'Да',
         onPress: async () => {
+          setScreenState('deleting');
+          await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            setDel(true);
-            await sleep(500);
             navigation.goBack();
           }
         },
@@ -141,10 +137,6 @@ export const MoveViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-
-    // dispatch(documentActions.removeDocument(id));
-
-    // navigation.goBack();
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
@@ -156,21 +148,21 @@ export const MoveViewScreen = () => {
   const handleUseSendDoc = useSendDocs([doc]);
 
   const handleSendDoc = useCallback(() => {
-    setIsSend(true);
+    setScreenState('sending');
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
-          // setTimeout(() => {
-          //   setIsSend(false);
-          // }, 1);
+          setTimeout(() => {
+            setScreenState('idle');
+          }, 10000);
           handleUseSendDoc();
         },
       },
       {
         text: 'Отмена',
         onPress: () => {
-          setIsSend(false);
+          setScreenState('idle');
         },
       },
     ]);
@@ -205,13 +197,13 @@ export const MoveViewScreen = () => {
   const renderRight = useCallback(
     () =>
       !isBlocked && (
-        <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} disabled={isSend} />
+        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
+          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           <ScanButton onPress={handleDoScan} />
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleDoScan, handleSendDoc, isBlocked, isSend],
+    [actionsMenu, handleDoScan, handleSendDoc, isBlocked, screenState],
   );
 
   useLayoutEffect(() => {
@@ -220,25 +212,6 @@ export const MoveViewScreen = () => {
       headerRight: renderRight,
     });
   }, [navigation, renderRight]);
-
-  if (del) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.deleteView}>
-          <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colorStyle} />
-        </View>
-      </View>
-    );
-  } else {
-    if (!doc) {
-      return (
-        <View style={styles.container}>
-          <SubTitle style={styles.title}>Документ не найден</SubTitle>
-        </View>
-      );
-    }
-  }
 
   const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
     if (!sum.length) {
@@ -257,7 +230,37 @@ export const MoveViewScreen = () => {
     return sum;
   }, []);
 
-  const renderItem = ({ item }: { item: IMoveLine }) => <MoveItem item={item} />;
+  const renderItem = useCallback(({ item }: { item: IMoveLine }) => <MoveItem key={item.id} item={item} />, []);
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
+  if (screenState === 'deleting') {
+    return (
+      <View style={styles.container}>
+        <View style={styles.containerCenter}>
+          <SubTitle style={styles.title}>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : // : screenState === 'sending'
+                // ? 'Отправка документа...'
+                ''}
+          </SubTitle>
+          <AppActivityIndicator />
+        </View>
+      </View>
+    );
+  }
+
+  if (!doc) {
+    return (
+      <View style={styles.container}>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container]}>
@@ -268,10 +271,10 @@ export const MoveViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
         <>
-          <Text style={[styles.rowCenter, textStyle]}>Откуда: {doc.head.fromDepart?.name || ''}</Text>
-          <Text style={[styles.rowCenter, textStyle]}>Куда: {doc.head.toDepart?.name || ''}</Text>
+          <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
+          <MediumText style={styles.rowCenter}>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           <View style={styles.rowCenter}>
-            <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+            <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
 
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
@@ -279,10 +282,14 @@ export const MoveViewScreen = () => {
       </InfoBlock>
       <FlatList
         data={linesList}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        scrollEventThrottle={400}
+        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
       />
       <BarcodeDialog
         visibleDialog={visibleDialog}
