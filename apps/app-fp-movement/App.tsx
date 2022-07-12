@@ -42,7 +42,7 @@ import { store, useSelector as useInvSelector, appInventoryActions } from './src
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 import { messageFpMovement } from './src/store/mock';
-import { OrderNavigator } from './src/navigation/OrderNavigator';
+// import { OrderNavigator } from './src/navigation/OrderNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -53,12 +53,12 @@ const Root = () => {
         icon: 'file-document-outline',
         component: MoveNavigator,
       },
-      {
-        name: 'Order',
-        title: 'Заявки',
-        icon: 'clipboard-list-outline',
-        component: OrderNavigator,
-      },
+      // {
+      //   name: 'Order',
+      //   title: 'Заявки',
+      //   icon: 'clipboard-list-outline',
+      //   component: OrderNavigator,
+      // },
     ],
     [],
   );
@@ -151,7 +151,7 @@ const Root = () => {
         <AppScreen>
           <Text style={styles.textInfo}>
             {
-              'Добро пожаловать в GDMN Отгрузка!\n\nНаше приложение облегчает процесс инвентаризации и позволяет выполнить следующие действия: \n\n1. Оформить инвентаризацию товаров\n\n2. Оформить приход товаров' // \n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
+              'Добро пожаловать в GDMN Отгрузка!\n\nНаше приложение облегчает процесс перемещения готовой продукции и позволяет выполнить следующие действия: \n\n1. Оформить внутреннее перемещение товаров\n\n2. Создать отвес-накладную по готовой заявке' // \n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
             }
           </Text>
           <TouchableOpacity

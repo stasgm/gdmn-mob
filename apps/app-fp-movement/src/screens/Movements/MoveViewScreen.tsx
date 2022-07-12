@@ -266,7 +266,7 @@ export const MoveViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.documentType.description || ''}
+        title={`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
@@ -274,8 +274,6 @@ export const MoveViewScreen = () => {
           <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
           <MediumText style={styles.rowCenter}>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           <View style={styles.rowCenter}>
-            <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </>

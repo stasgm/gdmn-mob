@@ -64,9 +64,7 @@ export const MoveLine = ({ item }: IProps) => {
           <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Дата производства</Text>
-              <Text style={textStyle}>
-                {`${getDateString(item.workDate)} ${new Date(item.workDate).toLocaleTimeString()}` || ''}
-              </Text>
+              <Text style={textStyle}>{`${getDateString(item.workDate)}` || ''}</Text>
             </View>
           </View>
           <ItemSeparator />

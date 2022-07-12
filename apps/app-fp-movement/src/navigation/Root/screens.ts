@@ -17,7 +17,7 @@ import ScanGoodScreen from '../../screens/Orders/ScanGoodScreen';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
-  MoveView: { title: 'Перемещение', component: MoveViewScreen },
+  MoveView: { title: 'Документ', component: MoveViewScreen },
   MoveLine: { title: 'Позиция перемещения', component: MoveLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },

@@ -211,8 +211,8 @@ export const MoveListScreen = () => {
       headerRight: renderRight,
       title:
         delList && Object.values(delList).length > 0
-          ? `Выделено документов ?: ${Object.values(delList).length}`
-          : 'Документы ?',
+          ? `Выделено документов: ${Object.values(delList).length}`
+          : 'Документы',
     });
   }, [delList, navigation, renderLeft, renderRight]);
 

@@ -42,9 +42,7 @@ const OtvesItem = ({ docId, item, readonly = false }: IProps) => {
           </View>
           <Text style={textStyle}>Номер партии: {item.numReceived || ''}</Text>
 
-          <Text style={textStyle}>
-            Дата: {getDateString(item.workDate) || ''} {new Date(item.workDate).toLocaleTimeString() || ''}
-          </Text>
+          <Text style={textStyle}>Дата: {getDateString(item.workDate) || ''}</Text>
         </View>
       </View>
     </TouchableOpacity>

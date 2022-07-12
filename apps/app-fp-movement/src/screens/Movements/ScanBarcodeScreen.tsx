@@ -58,9 +58,7 @@ const ScanBarcodeScreen = () => {
       const barc = getBarcode(brc);
 
       const good = goods.find((item) => item.shcode === barc.shcode);
-      // Находим товар из модели остатков по баркоду, если баркод не найден, то
-      //   если выбор из остатков, то undefined,
-      //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
+
       if (!good) {
         return;
       }
