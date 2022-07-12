@@ -47,6 +47,7 @@ const Root = () => {
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const isDemo = useSelector((state) => state.auth.isDemo);
+  const connectionStatus = useSelector((state) => state.auth.connectionStatus);
 
   const refDispatch = useRefThunkDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -60,6 +61,16 @@ const Root = () => {
       documentActions.setDocuments(messageRequest.find((m) => m.body.type === 'DOCS')?.body.payload as IDocument[]),
     );
   }, [refDispatch, docDispatch]);
+
+  useEffect(() => {
+    if (isDemo) {
+      //Если включен демо режим, то запускаем получение данных из мока
+      getMessages();
+      // if (connectionStatus === 'connected') {
+      //   handleSetInfoWindow_1();
+      // }
+    }
+  }, [isDemo, getMessages, connectionStatus]);
 
   useEffect(() => {
     // console.log('useEffect loadGlobalDataFromDisc');
@@ -94,7 +105,7 @@ const Root = () => {
       </Caption>
     </AppScreen>
   ) : (
-    <MobileApp items={navItems} onGetMessages={isDemo ? getMessages : undefined} />
+    <MobileApp items={navItems} />
   );
 };
 

@@ -216,12 +216,7 @@ const Root = () => {
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp
-          items={navItems}
-          loadingErrors={[invLoadingError]}
-          onClearLoadingErrors={onClearLoadingErrors}
-          onGetMessages={isDemo ? getMessages : undefined}
-        />
+        <MobileApp items={navItems} loadingErrors={[invLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
       )}
     </ErrorBoundary>
   );
