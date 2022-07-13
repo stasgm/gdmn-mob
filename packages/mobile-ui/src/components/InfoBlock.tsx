@@ -11,9 +11,10 @@ interface IProps {
   children: React.ReactElement;
   onPress?: () => void;
   disabled?: boolean;
+  isBlocked?: boolean;
 }
 
-const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress }: IProps) => {
+const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress, isBlocked = false }: IProps) => {
   return (
     <View style={[styles.flexDirectionRow, localStyles.box]}>
       <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
@@ -28,7 +29,8 @@ const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress }: I
           <Text style={localStyles.titleText}>{title}</Text>
           <Divider />
           <View style={localStyles.infoContainer}>
-            <View style={{ alignSelf: 'center', flexGrow: 1 }}>{children}</View>
+            <View style={{ alignSelf: 'center', flexGrow: 1, width: '80%' }}>{children}</View>
+            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} style={localStyles.iconEdit} /> : null}
             {!disabled && onPress ? (
               <MaterialCommunityIcons name="file-document-edit-outline" size={20} style={localStyles.iconEdit} />
             ) : null}

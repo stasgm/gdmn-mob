@@ -44,8 +44,6 @@ export const MoveListScreen = () => {
   const { colors } = useTheme();
   const searchStyle = colors.primary;
 
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
-
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
@@ -84,7 +82,7 @@ export const MoveListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: i.documentType.description || '',
+          title: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
           // subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
@@ -233,15 +231,12 @@ export const MoveListScreen = () => {
         >
           <View>
             <MediumText>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-            <MediumText style={textStyle}>Куда: {doc.head.toDepart?.name || ''}</MediumText>
-            <MediumText>
-              № {doc.number} на {getDateString(doc.documentDate)}
-            </MediumText>
+            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           </View>
         </ScreenListItem>
       ) : null;
     },
-    [delList, handelAddDeletelList, handlePressDoc, list, textStyle],
+    [delList, handelAddDeletelList, handlePressDoc, list],
   );
 
   const renderSectionHeader = useCallback(

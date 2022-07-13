@@ -2,8 +2,6 @@ import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, FlatList, Alert } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
   MenuButton,
@@ -269,12 +267,12 @@ export const MoveViewScreen = () => {
         title={`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        isBlocked={isBlocked}
       >
         <>
           <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-          <MediumText style={styles.rowCenter}>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           <View style={styles.rowCenter}>
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
+            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
           </View>
         </>
       </InfoBlock>
