@@ -24,6 +24,10 @@ const SplashScreen = (props: Props) => {
   const { onCheckDevice, onBreakConnection } = props;
   const { error, loading, status } = useSelector((state) => state.auth);
 
+  const user = useSelector((state) => state.auth.user);
+  const device = useSelector((state) => state.auth.device);
+  console.log('userSplash', user);
+  console.log('deviceSplash', device);
   return (
     <>
       <AppScreen>

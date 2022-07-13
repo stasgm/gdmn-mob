@@ -27,6 +27,7 @@ export const SelectRefItemScreen = () => {
     value,
     clause,
     refFieldName = 'name' || 'shcode',
+    // descrFieldName,
   } = useRoute<RouteProp<RefParamList, 'SelectRefItem'>>().params;
 
   const refObj = refSelectors.selectByName<any>(refName);
@@ -62,7 +63,11 @@ export const SelectRefItemScreen = () => {
     }
     setFilteredList(
       list
-        .filter((i) => i[refFieldName]?.toUpperCase().includes(searchQuery.toUpperCase()))
+        .filter(
+          (i) => i[refFieldName]?.toUpperCase().includes(searchQuery.toUpperCase()),
+          // ||
+          // i[descrFieldName]?.toUpperCase().includes(searchQuery.toUpperCase()),
+        )
         .sort((a) => {
           return checkedItem?.find((v) => v.id === a.id) ? -1 : 1;
         }),
