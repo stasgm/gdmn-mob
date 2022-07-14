@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useIsFocused, useTheme } from '@react-navigation/native';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
-import { View, TouchableOpacity, Text, Vibration, TextInput } from 'react-native';
+import { View, TouchableOpacity, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
 import { globalStyles } from '@lib/mobile-ui';
@@ -17,7 +17,6 @@ interface IProps {
 }
 
 const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
-  const isFocused = useIsFocused();
   const { colors } = useTheme();
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -27,8 +26,6 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
 
   const [barcode, setBarcode] = useState('');
 
-  const ref = useRef<TextInput>(null);
-
   useEffect(() => {
     const permission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -37,22 +34,18 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = (data: string) => {
-    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
-    setScanned(true);
-    setBarcode(data);
-  };
+  const handleBarCodeScanned = useCallback(
+    (data: string) => {
+      vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
+      setScanned(true);
+      setBarcode(data);
+    },
+    [vibroMode],
+  );
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
-
-  useEffect(() => {
-    if (!scanned && ref?.current) {
-      ref.current.focus();
-      ref.current.clear();
-    }
-  }, [scanned, ref]);
 
   if (hasPermission === null) {
     return <View />;
@@ -62,9 +55,10 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
   }
 
-  return isFocused ? (
+  return (
     <View style={viewStyle}>
       <Camera
+        key={`${scanned}`}
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],
@@ -138,8 +132,6 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
         )}
       </Camera>
     </View>
-  ) : (
-    <></>
   );
 };
 
