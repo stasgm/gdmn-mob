@@ -25,8 +25,6 @@ const OrderItem = ({ docId, item, readonly = false }: IProps) => {
 
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
-  console.log('item', item);
-
   return (
     // <TouchableOpacity
     //   onPress={() => {

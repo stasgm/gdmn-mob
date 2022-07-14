@@ -1,15 +1,17 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
-import { IOtvesLine, ITempDocument } from '../../store/types';
+import { IOtvesDocument, IOtvesLine, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
+
+import { getBarcode } from '../../utils/helpers';
 
 import { OrderLine } from './components/OrderLine';
 
@@ -24,12 +26,13 @@ export const OrderLineScreen = () => {
   const [line, setLine] = useState<IOtvesLine>(item);
 
   const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
+  const otvesLines = docSelectors.selectByDocId<IOtvesDocument>(docId)?.lines;
 
   const handleSave = useCallback(() => {
     // for (const tempLine of tempLines) {
-    const tempLine = tempLines.find((i) => line.good.id === i.good.id);
+    const tempLine = tempLines?.find((i) => line.good.id === i.good.id);
+
     if (tempLine) {
-      console.log('123');
       const newLine = { ...tempLine, weight: round(tempLine.weight - line.weight) };
       if (newLine.weight > 0) {
         dispatch(
@@ -53,14 +56,31 @@ export const OrderLineScreen = () => {
           },
         ]);
       }
+      dispatch(
+        mode === 0
+          ? documentActions.addDocumentLine({ docId, line })
+          : documentActions.updateDocumentLine({ docId, line }),
+      );
+      navigation.goBack();
+    } else {
+      Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+        {
+          text: 'Да',
+          onPress: async () => {
+            dispatch(
+              mode === 0
+                ? documentActions.addDocumentLine({ docId, line })
+                : documentActions.updateDocumentLine({ docId, line }),
+            );
+            navigation.goBack();
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
     }
     // }
-    dispatch(
-      mode === 0
-        ? documentActions.addDocumentLine({ docId, line })
-        : documentActions.updateDocumentLine({ docId, line }),
-    );
-    navigation.goBack();
   }, [dispatch, docId, line, mode, navigation, tempId, tempLines]);
 
   const renderRight = useCallback(
@@ -79,6 +99,10 @@ export const OrderLineScreen = () => {
     });
   }, [navigation, renderRight]);
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
   return (
     <View style={[styles.container]}>
       <OrderLine item={line} onSetLine={setLine} />

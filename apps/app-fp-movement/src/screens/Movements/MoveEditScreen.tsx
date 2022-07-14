@@ -225,6 +225,7 @@ export const MoveEditScreen = () => {
       refName: 'depart',
       fieldName: 'toDepart',
       value: docToDepart && [docToDepart],
+      descrFieldName: 'shcode',
     });
   };
 

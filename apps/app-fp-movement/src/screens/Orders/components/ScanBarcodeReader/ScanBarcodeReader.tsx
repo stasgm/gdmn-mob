@@ -13,10 +13,8 @@ import {
 import { IconButton } from 'react-native-paper';
 
 import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
-import { ISettingsOption } from '@lib/types';
-import { useSelector } from '@lib/store';
 
-import { IMovementLine, ITempDocument } from '../../../../store/types';
+import { ITempDocument } from '../../../../store/types';
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
@@ -29,11 +27,6 @@ interface IProps {
 
 export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const ref = useRef<TextInput>(null);
-
-  const settings = useSelector((state) => state.settings?.data);
-  const weightSettingsWeightCode = (settings?.weightCode as ISettingsOption<string>) || '';
-  const weightSettingsCountCode = (settings?.countCode as ISettingsOption<number>).data || 0;
-  const weightSettingsCountWeight = (settings?.countWeight as ISettingsOption<number>).data || 0;
 
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -79,15 +72,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
-  }, [
-    barcode,
-    scanned,
-    vibroMode,
-    weightSettingsWeightCode,
-    weightSettingsCountCode,
-    weightSettingsCountWeight,
-    getScannedObject,
-  ]);
+  }, [barcode, scanned, vibroMode, getScannedObject]);
 
   return isFocused ? (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>

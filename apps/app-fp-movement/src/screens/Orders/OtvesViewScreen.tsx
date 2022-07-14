@@ -1,11 +1,19 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
-import { MenuButton, useActionSheet, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import {
+  MenuButton,
+  useActionSheet,
+  globalStyles as styles,
+  InfoBlock,
+  ItemSeparator,
+  SubTitle,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
 
@@ -148,6 +156,11 @@ const OtvesViewScreen = () => {
   );
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (del) {
     return (

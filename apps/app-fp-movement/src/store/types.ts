@@ -70,6 +70,7 @@ export interface ITempHead extends IHead {
   depart: ICodeEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
   onDate: string; // Дата отгрузки
   barcode: string; // штрих-код заявки, по которой создан
+  orderId: string;
 }
 
 export interface ITempLine extends IEntity {
@@ -86,7 +87,8 @@ export interface IOtvesHead extends IHead {
   depart: ICodeEntity; // подразделеніе сотрудника (кладовщик, работающий с терминалом)
   onDate: string; // Дата отгрузки
   barcode: string; // штрих-код заявки, по которой создан
-  ovСode: string; // штрих-код документа-отвеса
+  // ovСode?: string; // штрих-код документа-отвеса
+  orderId: string;
 }
 
 export interface IOtvesLine extends IEntity {

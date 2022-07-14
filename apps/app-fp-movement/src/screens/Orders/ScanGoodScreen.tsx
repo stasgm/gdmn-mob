@@ -1,9 +1,9 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { Text } from 'react-native';
 
-import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { globalStyles } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { generateId } from '@lib/mobile-app';
@@ -11,7 +11,7 @@ import { generateId } from '@lib/mobile-app';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
-import { IMoveLine, IMoveDocument, IOtvesLine } from '../../store/types';
+import { IMoveLine, IOtvesLine, IOtvesDocument } from '../../store/types';
 
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
@@ -51,7 +51,7 @@ const ScanGoodScreen = () => {
     [docId, navigation, tempId],
   );
 
-  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMoveDocument;
+  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOtvesDocument;
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
@@ -129,6 +129,11 @@ const ScanGoodScreen = () => {
     setBarcode('');
     setError(false);
   };
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!document) {
     return <Text style={globalStyles.title}>Документ не найден</Text>;

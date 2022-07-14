@@ -104,3 +104,9 @@ export const unknownGood: IGood = {
   name: 'Неизвестный товар',
   shcode: '',
 };
+
+export const tempType = {
+  id: '187891695',
+  name: 'temp',
+  description: 'Отвес',
+};

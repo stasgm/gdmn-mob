@@ -1,16 +1,18 @@
 // import { INamedEntity } from '@lib/types';
-import { ICodeEntity } from '../../store/app/types';
+
+import { IReferenceData } from '@lib/types';
 
 import { IMoveLine, IOtvesLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
   fieldName: string;
-  value?: ICodeEntity[];
+  value?: IReferenceData[];
   clause?: Record<string, string>;
   isMulti?: boolean;
   docType?: string;
   refFieldName?: string;
+  descrFieldName?: string;
 };
 
 export type RefParamList = {

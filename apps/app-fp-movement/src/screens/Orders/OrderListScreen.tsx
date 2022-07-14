@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { Alert, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
@@ -16,6 +16,7 @@ import {
   ScreenListItem,
   IListItemProps,
   ScanButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -29,6 +30,7 @@ import SwipeListItem from '../../components/SwipeListItem';
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 import BarcodeDialog from '../../components/BarcodeDialog';
+import { tempType } from '../../utils/constants';
 // import { getBarcode } from '../../utils/helpers';
 
 export interface OrderListSectionProps {
@@ -124,18 +126,28 @@ export const OrderListScreen = () => {
   const [barcode, setBarcode] = useState('');
   const [error, setError] = useState(false);
 
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
-  const tempType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'temp');
+  // const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+  const orders = useSelector((state) => state.documents.list).filter(
+    (i) => i.documentType?.name === 'order',
+  ) as IOrderDocument[];
+  // const tempType = refSelectors
+  //   .selectByName<IReference<IDocumentType>>('documentType')
+  //   ?.data.find((t) => t.name === 'temp');
   const otvesType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'otves');
-  const otvesList = docSelectors.selectByDocType<IOtvesDocument>('otves');
+  // const otvesList = docSelectors.selectByDocType<IOtvesDocument>('otves');
+  const otvesList = useSelector((state) => state.documents.list).filter(
+    (i) => i.documentType?.name === 'otves',
+  ) as IOtvesDocument[];
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
       // const barc = getBarcode(brc);
+      if (!otvesType) {
+        return Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
+      }
+
       const order = orders.find((item) => item.head.barcode === brc);
 
       if (order) {
@@ -152,6 +164,7 @@ export const OrderListScreen = () => {
             depart: order.head.depart,
             outlet: order.head.outlet,
             onDate: order.head.onDate,
+            orderId: order.id,
           },
           lines: order.lines,
           creationDate: new Date().toISOString(),
@@ -161,6 +174,7 @@ export const OrderListScreen = () => {
           ...tempDoc,
           id: generateId(),
           documentType: otvesType,
+          head: tempDoc.head,
           lines: [],
         };
 
@@ -185,7 +199,7 @@ export const OrderListScreen = () => {
       }
     },
 
-    [dispatch, navigation, orders, otvesList, otvesType, tempType],
+    [dispatch, navigation, orders, otvesList, otvesType],
   );
 
   const handleShowDialog = () => {
@@ -245,6 +259,11 @@ export const OrderListScreen = () => {
   };
 
   const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

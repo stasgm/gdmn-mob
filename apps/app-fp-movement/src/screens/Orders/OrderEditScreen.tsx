@@ -1,12 +1,20 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { Alert, View, StyleSheet, ScrollView } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
+import {
+  AppInputScreen,
+  Input,
+  SelectableInput,
+  SaveButton,
+  SubTitle,
+  RadioGroup,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
 import { generateId, getDateString } from '@lib/mobile-app';
@@ -24,7 +32,7 @@ const OrderEditScreen = () => {
 
   const { colors } = useTheme();
 
-  const temps = docSelectors.selectByDocType<ITempDocument>('temp');
+  const temps = docSelectors.selectByDocType<ITempDocument>('move');
   const order = temps?.find((e) => e.id === id);
 
   const number1 = order?.number;
@@ -177,6 +185,11 @@ const OrderEditScreen = () => {
     ],
     [colors.card, colors.primary],
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppInputScreen>

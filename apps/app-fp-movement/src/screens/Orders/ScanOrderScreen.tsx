@@ -1,20 +1,24 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Text } from 'react-native';
+import React, { useCallback, useLayoutEffect } from 'react';
+// import { Alert, Text } from 'react-native';
 
-import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { globalStyles } from '@lib/mobile-ui';
+// import { globalStyles } from '@lib/mobile-ui';
 import { useSelector, refSelectors, docSelectors, documentActions, useDispatch } from '@lib/store';
 
-import { IDocumentType, INamedEntity, IReference, ISettingsOption } from '@lib/types';
+import { IDocumentType, IReference } from '@lib/types';
 
 import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { AppActivityIndicator } from '@lib/mobile-ui';
+
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOtvesDocument, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
+
+import { tempType } from '../../utils/constants';
 
 import { ScanBarcode } from './components/ScanBarcode';
 import { ScanBarcodeReader } from './components/ScanBarcodeReader';
@@ -34,15 +38,15 @@ const ScanOrderScreen = () => {
     });
   }, [navigation]);
 
-  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
+  // const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
-  const tempList = docSelectors.selectByDocType<ITempDocument>('temp');
+  // const tempList = docSelectors.selectByDocType<ITempDocument>('temp');
   const otvesList = docSelectors.selectByDocType<IOtvesDocument>('otves');
 
-  const tempType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'temp');
+  // const tempType = refSelectors
+  //   .selectByName<IReference<IDocumentType>>('documentType')
+  //   ?.data.find((t) => t.name === 'move');
 
   const otvesType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -50,10 +54,14 @@ const ScanOrderScreen = () => {
 
   const handleSaveScannedItem = useCallback(
     (item: ITempDocument) => {
+      if (!otvesType) {
+        return;
+      }
       const otvesDoc: IOtvesDocument = {
         ...item,
         id: generateId(),
         documentType: otvesType,
+        head: item.head,
         lines: [],
       };
       console.log('otvesDoc', otvesDoc);
@@ -84,6 +92,10 @@ const ScanOrderScreen = () => {
         return;
       }
 
+      // if (!tempType) {
+      //   return;
+      // }
+
       const tempDoc: ITempDocument = {
         id: generateId(),
         documentType: tempType,
@@ -97,6 +109,7 @@ const ScanOrderScreen = () => {
           depart: order.head.depart,
           outlet: order.head.outlet,
           onDate: order.head.onDate,
+          orderId: order.id,
         },
         lines: order.lines,
         creationDate: new Date().toISOString(),
@@ -109,12 +122,17 @@ const ScanOrderScreen = () => {
       return tempDoc;
       // navigation.navigate('MovementView', { id });
     },
-    [orders, tempType],
+    [orders],
   );
 
   // if (!document) {
   //   return <Text style={globalStyles.title}>Документ не найден</Text>;
   // }
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return isScanerReader ? (
     <ScanBarcodeReader

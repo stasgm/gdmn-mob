@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -13,6 +13,7 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -26,8 +27,6 @@ import { IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
 import { OrderStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
-
-import SwipeLineItem from '../../components/SwipeLineItem';
 
 import { navBackButton } from '../../components/navigateOptions';
 
@@ -235,15 +234,16 @@ const OrderViewScreen = () => {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderLine }) => (
-      <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
-        <OrderItem docId={order?.id} item={item} readonly={isBlocked} />
-      </SwipeLineItem>
-    ),
+    ({ item }: { item: IOrderLine }) => <OrderItem docId={order?.id} item={item} readonly={isBlocked} />,
     [isBlocked, order?.id],
   );
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (del) {
     return (

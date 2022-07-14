@@ -30,7 +30,7 @@ export interface IEmployee extends INamedEntity {
 }
 
 export interface IBarcode {
-  barcode?: string;
+  barcode: string;
   weight: number;
   workDate: string;
   shcode: string;
