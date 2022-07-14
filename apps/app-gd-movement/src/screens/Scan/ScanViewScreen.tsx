@@ -254,7 +254,7 @@ export const ScanViewScreen = () => {
           <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
         )}
       </Modal>
-      <View style={[styles.container]}>
+      <View style={styles.container}>
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc?.head?.department?.name || ''}

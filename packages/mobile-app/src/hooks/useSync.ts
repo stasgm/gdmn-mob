@@ -17,7 +17,7 @@ import { Alert } from 'react-native';
 
 import { getNextOrder } from './orderCounter';
 
-const useSync = (onSync?: () => Promise<any>): (() => void) => {
+const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>): (() => void) => {
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
@@ -130,21 +130,25 @@ const useSync = (onSync?: () => Promise<any>): (() => void) => {
               errList.push(`Документы не отправлены: ${sendMessageResponse.message}`);
             }
           }
-
-          //2. Получаем все сообщения для мобильного
-          const getMessagesResponse = await api.message.getMessages(params);
-
-          //Если сообщения получены успешно, то
-          //  справочники: очищаем старые и записываем в хранилище новые данные
-          //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
-          if (getMessagesResponse.type === 'GET_MESSAGES') {
-            await Promise.all(
-              getMessagesResponse.messageList
-                .sort((a, b) => a.head.order - b.head.order)
-                ?.map((message) => processMessage(message, errList, okList, params)),
-            );
+          //Для загрузки демо данных
+          if (onGetMessages) {
+            await onGetMessages();
           } else {
-            errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
+            //2. Получаем все сообщения для мобильного
+            const getMessagesResponse = await api.message.getMessages(params);
+
+            //Если сообщения получены успешно, то
+            //  справочники: очищаем старые и записываем в хранилище новые данные
+            //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
+            if (getMessagesResponse.type === 'GET_MESSAGES') {
+              await Promise.all(
+                getMessagesResponse.messageList
+                  .sort((a, b) => a.head.order - b.head.order)
+                  ?.map((message) => processMessage(message, errList, okList, params)),
+              );
+            } else {
+              errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
+            }
           }
 
           //Формируем запрос на получение документов для следующего раза

@@ -106,7 +106,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
       ]);
     } else {
       Alert.alert('Внимание!', 'Отправка прошла успешно!', [{ text: 'OK' }]);
-      dispatch(appActions.setSyncDate(new Date()));
+      // dispatch(appActions.setSyncDate(new Date()));
     }
 
     sendData();

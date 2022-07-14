@@ -27,9 +27,7 @@ type Props = DrawerContentComponentProps & ICutsomProps;
 
 export function DrawerContent({ onSync, syncing, ...props }: Props) {
   const { colors } = useTheme();
-  const user = useSelector((state) => state.auth.user);
-  const company = useSelector((state) => state.auth.company);
-  const isDemo = useSelector((state) => state.auth.isDemo);
+  const { user, company, isDemo } = useSelector((state) => state.auth);
 
   const syncDate = useSelector((state) => state.app.syncDate) as Date;
 
