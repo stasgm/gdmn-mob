@@ -44,7 +44,6 @@ const Root = () => {
   const { colors } = useTheme();
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
-  const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
@@ -95,14 +94,12 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  return authLoading || loading || appLoading || appDataLoading ? (
+  return authLoading || loading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary}>
         <></>
       </ActivityIndicator>
-      <Caption style={styles.title}>
-        {appDataLoading ? 'Загрузка данных...' : appLoading ? 'Синхронизация данных..' : 'Пожалуйста, подождите..'}
-      </Caption>
+      <Caption style={styles.title}>{appDataLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}</Caption>
     </AppScreen>
   ) : (
     <MobileApp items={navItems} />
