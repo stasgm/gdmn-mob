@@ -14,8 +14,12 @@ import { IconButton } from 'react-native-paper';
 
 import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
 
+import { MediumText } from '@lib/mobile-ui';
+
 import { IMoveLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
+
+import MoveTotal from '../../screens/Movements/components/MoveTotal';
 
 import styles from './styles';
 
@@ -23,9 +27,10 @@ interface IProps {
   onSave: (item: IMoveLine) => void;
   onSearchBarcode: () => void;
   getScannedObject: (brc: string) => IMoveLine | undefined;
+  lines?: IMoveLine[];
 }
 
-export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject }: IProps) => {
+export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject, lines }: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const [vibroMode, setVibroMode] = useState(false);
@@ -153,6 +158,20 @@ export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject }:
             )}
           </View>
         )}
+        {itemLine ? (
+          <View style={{ marginHorizontal: 8, marginVertical: 5 }}>
+            <MediumText>{itemLine?.good.name}</MediumText>
+            <MediumText>{itemLine?.barcode}</MediumText>
+          </View>
+        ) : null}
+
+        {lines?.length ? (
+          // <View>
+          //   <MediumText>Общий вес (кг): {lines?.length}</MediumText>
+          //   <MediumText>Количество позиций: {lineSum?.weight}</MediumText>
+          // </View>
+          <MoveTotal lines={lines} scan={true} />
+        ) : null}
         {!scanned && (
           <View style={styles.footer}>
             <IconButton icon={'barcode-scan'} color={'#FFF'} size={40} />

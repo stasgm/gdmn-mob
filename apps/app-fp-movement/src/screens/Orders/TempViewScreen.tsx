@@ -4,7 +4,13 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import {
+  docSelectors,
+  documentActions,
+  refSelectors,
+  // useDispatch,
+  useDocThunkDispatch,
+} from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -22,7 +28,7 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IOrderLine, IOtvesDocument, ITempDocument } from '../../store/types';
+import { ITempLine, IOtvesDocument, IOtvesLine, ITempDocument } from '../../store/types';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
@@ -35,18 +41,18 @@ import { IGood } from '../../store/app/types';
 
 import BarcodeDialog from '../../components/BarcodeDialog';
 
-import OrderItem from './components/OrderItem';
+import TempItem from './components/TempItem';
 
-const keyExtractor = (item: IOrderLine) => item.id;
+const keyExtractor = (item: ITempLine) => item.id;
 
-const OrderViewScreen = () => {
+const TempViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderView'>>();
-  const id = useRoute<RouteProp<OrderStackParamList, 'OrderView'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'TempView'>>();
+  const id = useRoute<RouteProp<OrderStackParamList, 'TempView'>>().params?.id;
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
@@ -79,16 +85,17 @@ const OrderViewScreen = () => {
       const good = goods.find((item) => item.shcode === barc.shcode);
 
       if (good) {
-        const barcodeItem = {
+        const barcodeItem: IOtvesLine = {
           good: { id: good.id, name: good.name, shcode: good.shcode },
           id: generateId(),
           weight: barc.weight,
           barcode: barc.barcode,
           workDate: barc.workDate,
           numReceived: barc.numReceived,
+          quantPack: barc.quantPack,
         };
         setError(false);
-        navigation.navigate('OrderLine', {
+        navigation.navigate('OtvesLine', {
           mode: 0,
           docId: otvesId,
           item: barcodeItem,
@@ -119,8 +126,8 @@ const OrderViewScreen = () => {
   }, [navigation, otvesId]);
 
   const handleEditOrderHead = useCallback(() => {
-    navigation.navigate('OrderEdit', { id });
-  }, [navigation, id]);
+    navigation.navigate('OrderEdit', { id: otvesId });
+  }, [navigation, otvesId]);
 
   const handleCopyOrder = useCallback(() => {
     const newDocDate = new Date().toISOString();
@@ -138,7 +145,7 @@ const OrderViewScreen = () => {
 
     docDispatch(documentActions.addDocument(newDoc));
 
-    navigation.navigate('OrderView', { id: newId });
+    navigation.navigate('TempView', { id: newId });
   }, [order, docDispatch, navigation]);
 
   const handleDelete = useCallback(async () => {
@@ -169,11 +176,11 @@ const OrderViewScreen = () => {
     navigation.navigate('ScanGood', { docId: otvesId, tempId: id });
   }, [navigation, id, otvesId]);
 
-  const hanldeCancelLastScan = useCallback(() => {
-    const lastId = order?.lines[order?.lines.length - 1].id;
+  // const hanldeCancelLastScan = useCallback(() => {
+  //   const lastId = order?.lines[order?.lines.length - 1].id;
 
-    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
-  }, [dispatch, order?.lines, id]);
+  //   dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+  // }, [dispatch, order?.lines, id]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -234,7 +241,7 @@ const OrderViewScreen = () => {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderLine }) => <OrderItem docId={order?.id} item={item} readonly={isBlocked} />,
+    ({ item }: { item: ITempLine }) => <TempItem docId={order?.id} item={item} readonly={isBlocked} />,
     [isBlocked, order?.id],
   );
 
@@ -273,9 +280,7 @@ const OrderViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
         <View style={localStyles.infoBlock}>
-          <Text style={textStyle}>
-            {`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(order?.head?.onDate)}`}
-          </Text>
+          <Text style={textStyle}>{`№ ${order.number} на ${getDateString(order?.head?.onDate)}`}</Text>
           <View style={styles.rowCenter}>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
@@ -301,7 +306,7 @@ const OrderViewScreen = () => {
   );
 };
 
-export default OrderViewScreen;
+export default TempViewScreen;
 
 const localStyles = StyleSheet.create({
   del: {

@@ -1,7 +1,7 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 // import { Alert, Text } from 'react-native';
 
-import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 
 // import { globalStyles } from '@lib/mobile-ui';
 import { useSelector, refSelectors, docSelectors, documentActions, useDispatch } from '@lib/store';
@@ -20,11 +20,13 @@ import { navBackButton } from '../../components/navigateOptions';
 
 import { tempType } from '../../utils/constants';
 
+import { ICodeEntity } from '../../store/app/types';
+
 import { ScanBarcode } from './components/ScanBarcode';
 import { ScanBarcodeReader } from './components/ScanBarcodeReader';
 
 const ScanOrderScreen = () => {
-  const docId = useRoute<RouteProp<OrderStackParamList, 'ScanOrder'>>().params?.docId;
+  // const docId = useRoute<RouteProp<OrderStackParamList, 'ScanOrder'>>().params?.docId;
   const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'ScanOrder'>>();
   const settings = useSelector((state) => state.settings?.data);
 
@@ -73,7 +75,7 @@ const ScanOrderScreen = () => {
       dispatch(documentActions.addDocument(item));
       dispatch(documentActions.addDocument(otvesDoc));
 
-      navigation.navigate('OrderView', {
+      navigation.navigate('TempView', {
         id: item.id,
       });
     },
@@ -81,8 +83,10 @@ const ScanOrderScreen = () => {
   );
 
   const handleShowRemains = useCallback(() => {
-    navigation.navigate('SelectRemainsItem', { docId });
-  }, [docId, navigation]);
+    navigation.navigate('SelectRemainsItem');
+  }, [navigation]);
+
+  const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
   const getScannedObject = useCallback(
     (brc: string): ITempDocument | undefined => {
@@ -106,7 +110,7 @@ const ScanOrderScreen = () => {
           // comment: order.head.
           barcode: order.head.barcode,
           contact: order.head.contact,
-          depart: order.head.depart,
+          depart: depart,
           outlet: order.head.outlet,
           onDate: order.head.onDate,
           orderId: order.id,
@@ -122,7 +126,7 @@ const ScanOrderScreen = () => {
       return tempDoc;
       // navigation.navigate('MovementView', { id });
     },
-    [orders],
+    [depart, orders],
   );
 
   // if (!document) {

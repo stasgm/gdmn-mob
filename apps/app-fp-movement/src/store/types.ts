@@ -97,7 +97,7 @@ export interface IOtvesLine extends IEntity {
   workDate: string; // Дата производства
   numReceived: string; // Номер партии
   barcode: string; // технологический код
-  order: number; // порядковый номер сканирования в документе
+  quantPack: number; // порядковый номер сканирования в документе
 }
 
 export type IOtvesDocument = MandateProps<IDocument<IOtvesHead, IOtvesLine>, 'head' | 'lines'>;

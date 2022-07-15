@@ -11,18 +11,18 @@ import { OrderStackParamList } from '../../navigation/Root/types';
 import { IOtvesDocument, IOtvesLine, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
-import { getBarcode } from '../../utils/helpers';
+// import { getBarcode } from '../../utils/helpers';
 
-import { OrderLine } from './components/OrderLine';
+import { OtvesLine } from './components/OtvesLine';
 
 const round = (num: number) => {
   return Math.round((num + Number.EPSILON) * 1000) / 1000;
 };
 
-export const OrderLineScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList | OrderStackParamList, 'OrderLine'>>();
+export const OtvesLineScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<OrderStackParamList | OrderStackParamList, 'OtvesLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, tempId, item } = useRoute<RouteProp<OrderStackParamList, 'OrderLine'>>().params;
+  const { mode, docId, tempId, item } = useRoute<RouteProp<OrderStackParamList, 'OtvesLine'>>().params;
   const [line, setLine] = useState<IOtvesLine>(item);
 
   const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
@@ -31,7 +31,9 @@ export const OrderLineScreen = () => {
   const handleSave = useCallback(() => {
     // for (const tempLine of tempLines) {
     const tempLine = tempLines?.find((i) => line.good.id === i.good.id);
+    const otvesLine = otvesLines.find((i) => i.barcode === line.barcode);
 
+    console.log('otv', otvesLine);
     if (tempLine) {
       const newLine = { ...tempLine, weight: round(tempLine.weight - line.weight) };
       if (newLine.weight > 0) {
@@ -81,7 +83,7 @@ export const OrderLineScreen = () => {
       ]);
     }
     // }
-  }, [dispatch, docId, line, mode, navigation, tempId, tempLines]);
+  }, [dispatch, docId, line, mode, navigation, otvesLines, tempId, tempLines]);
 
   const renderRight = useCallback(
     () => (
@@ -105,7 +107,7 @@ export const OrderLineScreen = () => {
   }
   return (
     <View style={[styles.container]}>
-      <OrderLine item={line} onSetLine={setLine} />
+      <OtvesLine item={line} onSetLine={setLine} />
     </View>
   );
 };

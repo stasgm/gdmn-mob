@@ -13,6 +13,7 @@ import {
   ItemSeparator,
   SubTitle,
   AppActivityIndicator,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -21,19 +22,19 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IOrderLine, IOtvesDocument } from '../../store/types';
+import { Divider } from 'react-native-paper';
+
+import { IOtvesDocument, IOtvesLine } from '../../store/types';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
 
-import SwipeLineItem from '../../components/SwipeLineItem';
-
 import { navBackButton } from '../../components/navigateOptions';
 
 import OtvesItem from './components/OtvesItem';
 
-const keyExtractor = (item: IOrderLine) => item.id;
+const keyExtractor = (item: IOtvesLine) => item.id;
 
 const OtvesViewScreen = () => {
   const { colors } = useTheme();
@@ -76,7 +77,7 @@ const OtvesViewScreen = () => {
 
     docDispatch(documentActions.addDocument(newDoc));
 
-    navigation.navigate('OrderView', { id: newId });
+    navigation.navigate('TempView', { id: newId });
   }, [order, docDispatch, navigation]);
 
   const handleDelete = useCallback(async () => {
@@ -147,13 +148,11 @@ const OtvesViewScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem = useCallback(
-    ({ item }: { item: IOrderLine }) => (
-      <SwipeLineItem docId={order?.id} item={item} readonly={isBlocked} copy={false} routeName="OrderLine">
-        <OtvesItem docId={order?.id} item={item} readonly={isBlocked} />
-      </SwipeLineItem>
-    ),
+    ({ item }: { item: IOtvesLine }) => <OtvesItem docId={order?.id} item={item} readonly={isBlocked} />,
     [isBlocked, order?.id],
   );
+
+  const lineSum = order.lines?.reduce((sum, line) => ({ weight: sum.weight + (line.weight || 0) }), { weight: 0 });
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
@@ -190,9 +189,7 @@ const OtvesViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(order.status)}
       >
         <View style={localStyles.infoBlock}>
-          <Text style={textStyle}>
-            {`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(order.head?.onDate)}`}
-          </Text>
+          <Text style={textStyle}>{`№ ${order.number} на ${getDateString(order.head?.onDate)}`}</Text>
           <View style={styles.rowCenter}>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
@@ -205,6 +202,26 @@ const OtvesViewScreen = () => {
         scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
+      <Divider style={{ backgroundColor: colors.primary }} />
+      <View style={[localStyles.margins]}>
+        <View style={localStyles.content}>
+          <MediumText style={styles.textTotal}>Общий вес (кг): {lineSum.weight}</MediumText>
+          <MediumText style={styles.textTotal}>Общее количество: {order.lines.length}</MediumText>
+        </View>
+      </View>
+      <View style={styles.itemNoMargin}>
+        <View style={styles.details}>
+          <View style={styles.directionRow}>
+            <View style={localStyles.groupWidth}>
+              <MediumText>Общий вес: </MediumText>
+            </View>
+            <View style={localStyles.quantity}>
+              <MediumText style={styles.textTotal}>{lineSum.weight}</MediumText>
+              <MediumText style={styles.textTotal}>{order.lines.length}</MediumText>
+            </View>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };
@@ -219,5 +236,27 @@ const localStyles = StyleSheet.create({
   },
   infoBlock: {
     flexDirection: 'column',
+  },
+  margins: {
+    marginHorizontal: 8,
+    marginVertical: 5,
+  },
+  content: {
+    alignItems: 'flex-end',
+  },
+  groupWidth: {
+    width: '62%',
+  },
+  groupMargin: {
+    marginHorizontal: 5,
+  },
+  quantity: {
+    alignItems: 'flex-end',
+    width: '35%',
+  },
+  total: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
   },
 });

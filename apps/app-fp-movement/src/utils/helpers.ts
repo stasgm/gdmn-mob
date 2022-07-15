@@ -17,6 +17,7 @@ export const getBarcode = (barcode: string) => {
   // const hours = barcode.slice(12, 14);
   // const minutes = barcode.slice(14, 16);
   const shcode = barcode.slice(16, 20);
+  const quantPack = barcode.slice(16, 20);
   const numReceived = barcode.slice(24, 30);
 
   const date = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
@@ -27,6 +28,7 @@ export const getBarcode = (barcode: string) => {
     workDate: date,
     shcode: shcode,
     numReceived: numReceived,
+    quantPack: Number(quantPack),
   };
 
   console.log('w', barcodeObj);

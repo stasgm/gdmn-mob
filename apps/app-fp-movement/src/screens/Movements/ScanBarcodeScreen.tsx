@@ -145,6 +145,7 @@ const ScanBarcodeScreen = () => {
           onSave={(item) => handleSaveScannedItem(item)}
           onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
+          lines={document.lines}
         />
       ) : (
         <ScanBarcode

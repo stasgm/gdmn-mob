@@ -31,10 +31,11 @@ import { IGood } from '../../store/app/types';
 import BarcodeDialog from '../../components/BarcodeDialog';
 
 import { MoveItem } from './components/MoveItem';
+import MoveTotal from './components/MoveTotal';
 
-const round = (num: number) => {
-  return Math.round((num + Number.EPSILON) * 1000) / 1000;
-};
+// const round = (num: number) => {
+//   return Math.round((num + Number.EPSILON) * 1000) / 1000;
+// };
 
 export const MoveViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -211,22 +212,23 @@ export const MoveViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
-    if (!sum.length) {
-      sum.push(line);
-    }
+  //////////////////////// Не удалять //////////////////////////////////
+  // const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
+  //   if (!sum.length) {
+  //     sum.push(line);
+  //   }
 
-    if (sum.find((i) => i.id !== line.id)) {
-      const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
-      if (lineSum) {
-        const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
-        sum.splice(sum.indexOf(lineSum), 1, lineTotal);
-      } else {
-        sum.push(line);
-      }
-    }
-    return sum;
-  }, []);
+  //   if (sum.find((i) => i.id !== line.id)) {
+  //     const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
+  //     if (lineSum) {
+  //       const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
+  //       sum.splice(sum.indexOf(lineSum), 1, lineTotal);
+  //     } else {
+  //       sum.push(line);
+  //     }
+  //   }
+  //   return sum;
+  // }, []);
 
   const renderItem = useCallback(({ item }: { item: IMoveLine }) => <MoveItem key={item.id} item={item} />, []);
 
@@ -277,7 +279,7 @@ export const MoveViewScreen = () => {
         </>
       </InfoBlock>
       <FlatList
-        data={linesList}
+        data={doc.lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         // scrollEventThrottle={400}
@@ -287,6 +289,8 @@ export const MoveViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
+      {doc.lines.length ? <MoveTotal lines={doc.lines} /> : null}
+
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}

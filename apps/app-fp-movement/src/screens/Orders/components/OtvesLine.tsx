@@ -17,7 +17,7 @@ interface IProps {
   onSetLine: (value: IOtvesLine) => void;
 }
 
-export const OrderLine = ({ item }: IProps) => {
+export const OtvesLine = ({ item }: IProps) => {
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);

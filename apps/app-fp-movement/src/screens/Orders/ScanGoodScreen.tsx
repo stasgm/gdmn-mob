@@ -11,7 +11,7 @@ import { generateId } from '@lib/mobile-app';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { OrderStackParamList } from '../../navigation/Root/types';
-import { IMoveLine, IOtvesLine, IOtvesDocument } from '../../store/types';
+import { IOtvesLine, IOtvesDocument } from '../../store/types';
 
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
@@ -41,7 +41,7 @@ const ScanGoodScreen = () => {
 
   const handleSaveScannedItem = useCallback(
     (item: IOtvesLine) => {
-      navigation.navigate('OrderLine', {
+      navigation.navigate('OtvesLine', {
         mode: 0,
         docId,
         item: item,
@@ -56,7 +56,7 @@ const ScanGoodScreen = () => {
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const getScannedObject = useCallback(
-    (brc: string): IMoveLine | undefined => {
+    (brc: string): IOtvesLine | undefined => {
       const barc = getBarcode(brc);
 
       const good = goods.find((item) => item.shcode === barc.shcode);
@@ -74,6 +74,7 @@ const ScanGoodScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
+        quantPack: barc.quantPack,
       };
     },
 
@@ -94,9 +95,10 @@ const ScanGoodScreen = () => {
           barcode: barc.barcode,
           workDate: barc.workDate,
           numReceived: barc.numReceived,
+          quantPack: barc.quantPack,
         };
         setError(false);
-        navigation.navigate('OrderLine', {
+        navigation.navigate('OtvesLine', {
           mode: 0,
           docId: docId,
           item: barcodeItem,

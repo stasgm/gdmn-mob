@@ -1,5 +1,5 @@
 export { OrderListScreen } from './OrderListScreen';
-export { default as OrderViewScreen } from './OrderViewScreen';
+export { default as TempViewScreen } from './TempViewScreen';
 export { default as OrderEditScreen } from './OrderEditScreen';
 export { default as OtvesViewScreen } from './OtvesViewScreen';
-export { OrderLineScreen } from './OrderLineScreen';
+export { OtvesLineScreen } from './OtvesLineScreen';

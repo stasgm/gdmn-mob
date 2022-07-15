@@ -40,11 +40,11 @@ export type MoveParamList = RefParamList & {
 export type MoveStackParamList = { MoveList: undefined } & MoveParamList;
 
 export type OrderParamList = RefParamList & {
-  OrderLine: { mode: number; docId: string; tempId: string; item: IOtvesLine; docType?: string };
-  OrderView: { id: string };
+  OtvesLine: { mode: number; docId: string; tempId: string; item: IOtvesLine; docType?: string };
+  TempView: { id: string };
   OrderEdit: { id: string };
   OtvesView: { id: string };
-  ScanOrder: { docId?: string; docType?: string };
+  ScanOrder: undefined;
   ScanGood: { docId: string; tempId: string; docType?: string };
 };
 

@@ -35,4 +35,5 @@ export interface IBarcode {
   workDate: string;
   shcode: string;
   numReceived: string; // Номер партии
+  quantPack: number;
 }

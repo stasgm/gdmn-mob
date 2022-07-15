@@ -31,6 +31,7 @@ import { OrderStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 import BarcodeDialog from '../../components/BarcodeDialog';
 import { tempType } from '../../utils/constants';
+import { ICodeEntity } from '../../store/app/types';
 // import { getBarcode } from '../../utils/helpers';
 
 export interface OrderListSectionProps {
@@ -89,7 +90,7 @@ export const OrderListScreen = () => {
           title: i.documentType.description || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+          subtitle: `№ ${i.number} на ${getDateString(i.head?.onDate)}`,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
         } as IListItemProps),
@@ -141,6 +142,8 @@ export const OrderListScreen = () => {
     (i) => i.documentType?.name === 'otves',
   ) as IOtvesDocument[];
 
+  const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
+
   const handleGetBarcode = useCallback(
     (brc: string) => {
       // const barc = getBarcode(brc);
@@ -161,7 +164,7 @@ export const OrderListScreen = () => {
             // comment: order.head.
             barcode: order.head.barcode,
             contact: order.head.contact,
-            depart: order.head.depart,
+            depart: depart,
             outlet: order.head.outlet,
             onDate: order.head.onDate,
             orderId: order.id,
@@ -187,7 +190,7 @@ export const OrderListScreen = () => {
         dispatch(documentActions.addDocument(tempDoc));
         dispatch(documentActions.addDocument(otvesDoc));
 
-        navigation.navigate('OrderView', {
+        navigation.navigate('TempView', {
           id: tempDoc.id,
         });
 
@@ -199,7 +202,7 @@ export const OrderListScreen = () => {
       }
     },
 
-    [dispatch, navigation, orders, otvesList, otvesType],
+    [depart, dispatch, navigation, orders, otvesList, otvesType],
   );
 
   const handleShowDialog = () => {
@@ -252,8 +255,8 @@ export const OrderListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="OrderView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />
+      <SwipeListItem renderItem={item} item={doc} routeName="TempView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('TempView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };
