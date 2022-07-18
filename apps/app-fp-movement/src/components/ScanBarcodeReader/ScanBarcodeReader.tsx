@@ -24,13 +24,13 @@ import MoveTotal from '../../screens/Movements/components/MoveTotal';
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: IMoveLine) => void;
+  // onSave: (item: IMoveLine) => void;
   onSearchBarcode: () => void;
   getScannedObject: (brc: string) => IMoveLine | undefined;
   lines?: IMoveLine[];
 }
 
-export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject, lines }: IProps) => {
+export const ScanBarcodeReader = ({ /*onSave,*/ onSearchBarcode, getScannedObject, lines }: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const [vibroMode, setVibroMode] = useState(false);
@@ -41,6 +41,7 @@ export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject, l
 
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IMoveLine>();
+  const [dubLicateLine, setDublicateLine] = useState<IMoveLine>();
 
   const isFocused = useIsFocused();
 
@@ -60,6 +61,14 @@ export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject, l
       }
     }, [scanned, ref]),
   );
+
+  useEffect(() => {
+    if (scanned && itemLine) {
+      // onSave(itemLine);
+      setScanned(false);
+      setItemLine(undefined);
+    }
+  }, [itemLine, /*onSave,*/ scanned]);
 
   useEffect(() => {
     if (!scanned) {
@@ -136,7 +145,7 @@ export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject, l
                 </View>
               </View>
             )}
-            {scanned && itemLine && (
+            {/* {scanned && itemLine && (
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
                   style={[styles.buttons, itemLine.good.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
@@ -155,7 +164,7 @@ export const ScanBarcodeReader = ({ onSave, onSearchBarcode, getScannedObject, l
                   </View>
                 </TouchableOpacity>
               </View>
-            )}
+            )} */}
           </View>
         )}
         {itemLine ? (

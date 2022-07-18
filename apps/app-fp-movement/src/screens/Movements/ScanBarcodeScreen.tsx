@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
 import { AppActivityIndicator, globalStyles, SubTitle } from '@lib/mobile-ui';
-import { useSelector, refSelectors } from '@lib/store';
+import { useSelector, refSelectors, useDispatch, documentActions } from '@lib/store';
 
 import { generateId } from '@lib/mobile-app';
 
@@ -26,6 +26,8 @@ const ScanBarcodeScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'ScanBarcode'>>();
   const settings = useSelector((state) => state.settings?.data);
 
+  const dispatch = useDispatch();
+
   const isScanerReader = settings.scannerUse?.data;
 
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -40,13 +42,14 @@ const ScanBarcodeScreen = () => {
 
   const handleSaveScannedItem = useCallback(
     (item: IMoveLine) => {
-      navigation.navigate('MoveLine', {
-        mode: 0,
-        docId,
-        item: item,
-      });
+      // navigation.navigate('MoveLine', {
+      //   mode: 0,
+      //   docId,
+      //   item: item,
+      // });
+      dispatch(documentActions.addDocumentLine({ docId, line: item }));
     },
-    [docId, navigation],
+    [dispatch, docId],
   );
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMoveDocument;
@@ -55,15 +58,24 @@ const ScanBarcodeScreen = () => {
 
   const getScannedObject = useCallback(
     (brc: string): IMoveLine | undefined => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        return;
+      }
       const barc = getBarcode(brc);
 
       const good = goods.find((item) => item.shcode === barc.shcode);
+      const a = document.lines.find((i) => i.barcode === barc.barcode);
 
       if (!good) {
         return;
       }
 
-      return {
+      if (a) {
+        console.log('123');
+        return;
+      }
+
+      const i = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
@@ -71,9 +83,13 @@ const ScanBarcodeScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
       };
+
+      dispatch(documentActions.addDocumentLine({ docId, line: i }));
+
+      return i;
     },
 
-    [goods],
+    [dispatch, docId, document.lines, goods],
   );
 
   const handleGetBarcode = useCallback(
@@ -142,7 +158,7 @@ const ScanBarcodeScreen = () => {
     <>
       {isScanerReader ? (
         <ScanBarcodeReader
-          onSave={(item) => handleSaveScannedItem(item)}
+          // onSave={(item) => handleSaveScannedItem(item)}
           onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
           lines={document.lines}
