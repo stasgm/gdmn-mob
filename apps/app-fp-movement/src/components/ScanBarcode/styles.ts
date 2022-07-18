@@ -55,6 +55,10 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     paddingRight: 10,
   },
+  textWhite: {
+    color: '#fff',
+    fontSize: 18,
+  },
   goodName: {
     color: '#fff',
     fontSize: 18,

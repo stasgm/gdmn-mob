@@ -11,7 +11,7 @@ import { generateId } from '@lib/mobile-app';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { MoveStackParamList } from '../../navigation/Root/types';
-import { IMoveLine, IMoveDocument } from '../../store/types';
+import { IMoveDocument } from '../../store/types';
 
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
@@ -20,6 +20,9 @@ import { navBackButton } from '../../components/navigateOptions';
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 import BarcodeDialog from '../../components/BarcodeDialog';
+import { IScanerObject } from '../../components/ScanBarcode/ScanBarcode';
+
+import MoveTotal from './components/MoveTotal';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<MoveStackParamList, 'ScanBarcode'>>().params?.docId;
@@ -40,42 +43,34 @@ const ScanBarcodeScreen = () => {
     });
   }, [navigation]);
 
-  const handleSaveScannedItem = useCallback(
-    (item: IMoveLine) => {
-      // navigation.navigate('MoveLine', {
-      //   mode: 0,
-      //   docId,
-      //   item: item,
-      // });
-      dispatch(documentActions.addDocumentLine({ docId, line: item }));
-    },
-    [dispatch, docId],
-  );
-
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMoveDocument;
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
+  const [scanObject, setScanObject] = useState<IScanerObject>({ item: undefined, state: 'scan', barcode: '' });
+
   const getScannedObject = useCallback(
-    (brc: string): IMoveLine | undefined => {
+    (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
         return;
       }
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === barc.shcode);
-      const a = document.lines.find((i) => i.barcode === barc.barcode);
+      const good = goods.find((item) => item.shcode === brc);
 
       if (!good) {
+        setScanObject({ item: undefined, state: 'notFound', barcode: brc });
         return;
       }
 
-      if (a) {
-        console.log('123');
+      const line = document.lines.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        setScanObject({ item: line, state: 'added', barcode: brc });
         return;
       }
 
-      const i = {
+      const newLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
@@ -84,13 +79,15 @@ const ScanBarcodeScreen = () => {
         numReceived: barc.numReceived,
       };
 
-      dispatch(documentActions.addDocumentLine({ docId, line: i }));
+      dispatch(documentActions.addDocumentLine({ docId, line: newLine }));
 
-      return i;
+      setScanObject({ item: newLine, state: 'scan', barcode: brc });
     },
 
     [dispatch, docId, document.lines, goods],
   );
+
+  const handleClearScan = () => setScanObject({ item: undefined, state: 'scan', barcode: '' });
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -165,11 +162,14 @@ const ScanBarcodeScreen = () => {
         />
       ) : (
         <ScanBarcode
-          onSave={(item) => handleSaveScannedItem(item)}
           onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
+          // lines={document.lines}
+          scanObject={scanObject}
+          clearScan={handleClearScan}
         />
       )}
+      {document.lines?.length ? <MoveTotal lines={document.lines} scan={true} /> : null}
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}

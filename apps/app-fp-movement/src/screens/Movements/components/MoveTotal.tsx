@@ -17,7 +17,7 @@ export interface IItem {
 const MoveTotal = ({ lines, scan = false }: IItem) => {
   const { colors } = useTheme();
 
-  const lineSum = lines?.reduce((sum, line) => ({ weight: sum.weight + (line.weight || 0) }), { weight: 0 });
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
 
   return (
     <View>
@@ -34,7 +34,7 @@ const MoveTotal = ({ lines, scan = false }: IItem) => {
               <MediumText>Общий вес (кг)</MediumText>
             </View>
             <View style={localStyles.quantity}>
-              <MediumText>{`${round(lineSum.weight, 3)}`}</MediumText>
+              <MediumText>{`${round(lineSum, 3)}`}</MediumText>
             </View>
 
             {/* <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(, 2))}`}</MediumText> */}
