@@ -123,7 +123,7 @@ class User extends BaseRequest {
     }
   };
 
-  getUser = async (userId: string) => {
+  getUser = async (userId: string, authFunc?: () => void) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
       const user = mockUsers.find((item) => item.id === userId);
@@ -144,13 +144,20 @@ class User extends BaseRequest {
     try {
       const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
       const resData = res.data;
+      authFunc && authFunc();
+      // if (authFunc) {
+      //   //   //&& resData.status === 401
+      //   console.log('authFunc');
+      //   authFunc();
+      // }
 
-      if (resData.result) {
-        return {
-          type: 'GET_USER',
-          user: resData.data,
-        } as types.IGetUserResponse;
-      }
+      // if (resData.result) {
+      //   return {
+      //     type: 'GET_USER',
+      //     user: resData.data,
+      //   } as types.IGetUserResponse;
+      // }
+      // console.log('Необходима авторизация');
 
       return {
         type: 'ERROR',

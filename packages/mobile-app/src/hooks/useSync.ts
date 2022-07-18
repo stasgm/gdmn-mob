@@ -70,9 +70,10 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       - обработка сообщение
     */
     const syncData = async () => {
+      const authMiddleware = () => authDispatch(authActions.logout());
       // Загрузка данных
       try {
-        const getErpUser = await api.user.getUser(consumer.id);
+        const getErpUser = await api.user.getUser(consumer.id, authMiddleware);
 
         let appSystem: IAppSystem | undefined;
         if (getErpUser.type === 'ERROR') {

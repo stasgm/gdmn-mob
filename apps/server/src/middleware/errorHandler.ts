@@ -17,6 +17,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
         result: false,
         error: error.message || 'Неизвестная ошибка',
         data: error.name || 'InnerErrorException',
+        status: error.status || 500,
       };
 
       ctx.status = 200;

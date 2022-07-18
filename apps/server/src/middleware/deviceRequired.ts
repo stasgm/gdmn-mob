@@ -33,7 +33,7 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
       (el: any) => el.deviceId === device.id && el.userId === user.id,
     );
     if (!deviceBinding) {
-      throw new UnauthorizedException('Связанное устройство не найдено');
+      throw new UnauthorizedException('Связанное устройство пользователя не найдено');
     }
 
     if (deviceBinding.state === 'BLOCKED') {
