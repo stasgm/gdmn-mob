@@ -346,7 +346,7 @@ export const MoveViewScreen = () => {
       </InfoBlock>
 
       <TextInput
-        style={{ width: 1 }}
+        style={{ width: 1, height: 1 }}
         key={key}
         autoFocus={true}
         selectionColor="transparent"
