@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     elevation: 8,
     flexDirection: 'row',
     justifyContent: 'center',
-    minHeight: 100,
+    minHeight: 80,
   },
   buttonsContainer: {
     margin: 10,
@@ -83,6 +83,10 @@ const styles = StyleSheet.create({
   },
   scanFocus: {
     width: 0,
+  },
+  textWhite: {
+    color: '#fff',
+    fontSize: 18,
   },
 });
 

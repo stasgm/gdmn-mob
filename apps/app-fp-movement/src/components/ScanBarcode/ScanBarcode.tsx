@@ -76,8 +76,8 @@ const ScanBarcode = ({ onSearchBarcode, getScannedObject, scanObject, clearScan 
           barCodeTypes: [
             BarCodeScanner.Constants.BarCodeType.code128,
             BarCodeScanner.Constants.BarCodeType.ean128,
-            BarCodeScanner.Constants.BarCodeType.ean13,
-            BarCodeScanner.Constants.BarCodeType.ean8,
+            // BarCodeScanner.Constants.BarCodeType.ean13,
+            // BarCodeScanner.Constants.BarCodeType.ean8,
           ],
         }}
         autoFocus="on"

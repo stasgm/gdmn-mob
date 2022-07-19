@@ -56,7 +56,7 @@ const ScanBarcodeScreen = () => {
       }
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === brc);
+      const good = goods.find((item) => item.shcode === barc.shcode);
 
       if (!good) {
         setScanObject({ item: undefined, state: 'notFound', barcode: brc });
@@ -91,6 +91,9 @@ const ScanBarcodeScreen = () => {
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        return;
+      }
       const barc = getBarcode(brc);
 
       const good = goods.find((item) => item.shcode === barc.shcode);
@@ -158,7 +161,8 @@ const ScanBarcodeScreen = () => {
           // onSave={(item) => handleSaveScannedItem(item)}
           onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
-          lines={document.lines}
+          scanObject={scanObject}
+          clearScan={handleClearScan}
         />
       ) : (
         <ScanBarcode

@@ -31,6 +31,6 @@ export const getBarcode = (barcode: string) => {
     quantPack: Number(quantPack),
   };
 
-  console.log('w', barcodeObj);
+  // console.log('w', barcodeObj);
   return barcodeObj;
 };
