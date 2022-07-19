@@ -35,6 +35,8 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const docVersion = 1;
   const setVersion = 1;
 
+  const authMiddleware = () => authDispatch(authActions.logout());
+
   const sync = () => {
     if (!user || !user.erpUser) {
       Alert.alert(
@@ -70,7 +72,6 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
       - обработка сообщение
     */
     const syncData = async () => {
-      const authMiddleware = () => authDispatch(authActions.logout());
       // Загрузка данных
       try {
         const getErpUser = await api.user.getUser(consumer.id, authMiddleware);
@@ -115,6 +116,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
               sendingDocsMessage,
               getNextOrder(),
               deviceId,
+              authMiddleware,
             );
 
             if (sendMessageResponse.type === 'SEND_MESSAGE') {
@@ -136,7 +138,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             await onGetMessages();
           } else {
             //2. Получаем все сообщения для мобильного
-            const getMessagesResponse = await api.message.getMessages(params);
+            const getMessagesResponse = await api.message.getMessages(params, authMiddleware);
 
             //Если сообщения получены успешно, то
             //  справочники: очищаем старые и записываем в хранилище новые данные
@@ -188,6 +190,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
               messageGetRef,
               getNextOrder(),
               deviceId,
+              authMiddleware,
             );
 
             if (sendMesRefResponse?.type === 'ERROR') {
@@ -205,6 +208,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             messageGetDoc,
             getNextOrder(),
             deviceId,
+            authMiddleware,
           );
 
           if (sendMesDocRespone.type === 'ERROR') {
@@ -242,6 +246,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             messageGetDepart,
             getNextOrder(),
             deviceId,
+            authMiddleware,
           );
 
           if (sendMesDepartResponse.type === 'ERROR') {
@@ -304,7 +309,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (setRefResponse.type === 'REFERENCES/SET_ALL_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id, params);
+            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
@@ -318,7 +323,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
           //Если удачно сохранились справочники, удаляем сообщение в json
           if (addRefResponse.type === 'REFERENCES/ADD_SUCCESS') {
-            const removeMess = await api.message.removeMessage(msg.id, params);
+            const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
             if (removeMess.type === 'ERROR') {
               errList.push(`Справочники добавлены, но сообщение на сервере не удалено: ${removeMess.message}`);
             }
@@ -345,7 +350,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setDocResponse.type === 'DOCUMENTS/SET_ALL_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id, params);
+          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
           if (removeMess.type === 'ERROR') {
             errList.push(`Документы загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }
@@ -374,7 +379,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         //Если удачно сохранились документы, удаляем сообщение в json
         if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
-          const removeMess = await api.message.removeMessage(msg.id, params);
+          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
           if (removeMess.type === 'ERROR') {
             errList.push(`Настройки пользователя загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
           }

@@ -144,20 +144,17 @@ class User extends BaseRequest {
     try {
       const res = await this.api.axios.get<IResponse<IUser>>(`/users/${userId}`);
       const resData = res.data;
-      authFunc && authFunc();
-      // if (authFunc) {
-      //   //   //&& resData.status === 401
-      //   console.log('authFunc');
-      //   authFunc();
-      // }
 
-      // if (resData.result) {
-      //   return {
-      //     type: 'GET_USER',
-      //     user: resData.data,
-      //   } as types.IGetUserResponse;
-      // }
-      // console.log('Необходима авторизация');
+      if (authFunc && resData.status === 401) {
+        authFunc();
+      }
+
+      if (resData.result) {
+        return {
+          type: 'GET_USER',
+          user: resData.data,
+        } as types.IGetUserResponse;
+      }
 
       return {
         type: 'ERROR',
@@ -171,7 +168,7 @@ class User extends BaseRequest {
     }
   };
 
-  getUsers = async (params?: Record<string, string | number>) => {
+  getUsers = async (params?: Record<string, string | number>, authFunc?: () => void) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -195,8 +192,12 @@ class User extends BaseRequest {
     }
 
     try {
-      const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`); ///${this.api.config.version}
+      const res = await this.api.axios.get<IResponse<IUser[]>>(`/users${paramText}`);
       const resData = res.data;
+
+      if (authFunc && resData.status === 401) {
+        authFunc();
+      }
 
       if (resData.result) {
         return {
