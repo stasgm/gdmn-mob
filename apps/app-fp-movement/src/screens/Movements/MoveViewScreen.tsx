@@ -1,5 +1,5 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { View, FlatList, Alert } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { View, FlatList, Alert, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
@@ -10,7 +10,7 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
-  ScanButton,
+  // ScanButton,
   SendButton,
   AppActivityIndicator,
   MediumText,
@@ -22,7 +22,7 @@ import { sleep } from '@lib/client-api';
 
 import { IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
-import { getStatusColor } from '../../utils/constants';
+import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
@@ -33,9 +33,11 @@ import BarcodeDialog from '../../components/BarcodeDialog';
 import { MoveItem } from './components/MoveItem';
 import MoveTotal from './components/MoveTotal';
 
-// const round = (num: number) => {
-//   return Math.round((num + Number.EPSILON) * 1000) / 1000;
-// };
+export interface IScanerObject {
+  item?: IMoveLine;
+  barcode: string;
+  state: 'scan' | 'added' | 'notFound';
+}
 
 export const MoveViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -47,8 +49,9 @@ export const MoveViewScreen = () => {
 
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
 
-  // const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
+
+  const lines = useMemo(() => doc.lines.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc.lines]);
 
   const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
@@ -111,9 +114,9 @@ export const MoveViewScreen = () => {
     navigation.navigate('MoveEdit', { id });
   }, [navigation, id]);
 
-  const handleDoScan = useCallback(() => {
-    navigation.navigate('ScanBarcode', { docId: id });
-  }, [navigation, id]);
+  // const handleDoScan = useCallback(() => {
+  //   navigation.navigate('ScanBarcode', { docId: id });
+  // }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -198,11 +201,11 @@ export const MoveViewScreen = () => {
       !isBlocked && (
         <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          <ScanButton onPress={handleDoScan} />
+          {/* <ScanButton onPress={handleDoScan} /> */}
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleDoScan, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, handleSendDoc, isBlocked, screenState],
   );
 
   useLayoutEffect(() => {
@@ -231,6 +234,69 @@ export const MoveViewScreen = () => {
   // }, []);
 
   const renderItem = useCallback(({ item }: { item: IMoveLine }) => <MoveItem key={item.id} item={item} />, []);
+
+  const [scanned, setScanned] = useState(false);
+
+  const ref = useRef<TextInput>(null);
+
+  const getScannedObject = useCallback(
+    (brc: string) => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        return;
+      }
+      const barc = getBarcode(brc);
+
+      const good = goods.find((item) => item.shcode === barc.shcode);
+
+      if (!good) {
+        Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+        setScanned(false);
+        return;
+      }
+
+      const line = doc.lines.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
+        setScanned(false);
+        return;
+      }
+
+      const newLine: IMoveLine = {
+        good: { id: good.id, name: good.name, shcode: good.shcode },
+        id: generateId(),
+        weight: barc.weight,
+        barcode: barc.barcode,
+        workDate: barc.workDate,
+        numReceived: barc.numReceived,
+        sortOrder: doc.lines.length + 1,
+      };
+
+      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+
+      setScanned(false);
+    },
+
+    [dispatch, id, doc.lines, goods],
+  );
+
+  const [key, setKey] = useState(1);
+
+  const setScan = (brc: string) => {
+    setKey(key + 1);
+    setScanned(true);
+    getScannedObject(brc);
+  };
+
+  useEffect(() => {
+    if (!scanned && ref?.current) {
+      ref?.current &&
+        setTimeout(() => {
+          ref.current?.focus();
+          ref.current?.clear();
+        }, ONE_SECOND_IN_MS);
+    }
+  }, [scanned, ref]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -278,8 +344,18 @@ export const MoveViewScreen = () => {
           </View>
         </>
       </InfoBlock>
+
+      <TextInput
+        style={{ width: 1 }}
+        key={key}
+        autoFocus={true}
+        selectionColor="transparent"
+        ref={ref}
+        showSoftInputOnFocus={false}
+        onChangeText={(text) => !scanned && setScan(text)}
+      />
       <FlatList
-        data={doc.lines}
+        data={lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         // scrollEventThrottle={400}
@@ -290,7 +366,6 @@ export const MoveViewScreen = () => {
         windowSize={7} // Reduce the window size
       />
       {doc.lines.length ? <MoveTotal lines={doc.lines} /> : null}
-
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}

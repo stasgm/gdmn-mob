@@ -100,10 +100,10 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '153359486',
               name: 'Книга',
               alias: '86427',
-              barcode: '9789854480947',
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1765',
             },
             // {
             //   id: '111159486',
@@ -135,6 +135,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               barcode: '3329687853210',
               valueName: 'шт',
               isFrac: 1,
+              shcode: '1544',
               weightCode: '',
             },
             {

@@ -45,6 +45,7 @@ export interface IMoveLine extends IEntity {
   workDate: string; // Дата производства
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
+  sortOrder?: number; // порядок сортировки
 }
 
 export type IMoveDocument = MandateProps<IDocument<IMoveHead, IMoveLine>, 'head' | 'lines'>;
