@@ -20,6 +20,6 @@ const docListsEq = (a: IDocument[], b: IDocument[] | undefined) => {
 };
 
 export function useFilteredDocList<D extends IDocument>(documentType: string): D[] {
-  const filterFunc = (doc: IDocument) => doc.documentType.name === documentType;
+  const filterFunc = (doc: IDocument) => doc.documentType?.name === documentType;
   return useSelector((state) => state.documents.list.filter(filterFunc) as D[], docListsEq);
 }

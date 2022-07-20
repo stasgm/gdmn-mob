@@ -56,7 +56,7 @@ const ScreenListItem = ({
             <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
           </View>
           {isChecked ? (
-            <View style={[styles.checkedIcon]}>
+            <View style={styles.checkedIcon}>
               <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
             </View>
           ) : null}
@@ -66,7 +66,8 @@ const ScreenListItem = ({
             <LargeText style={styles.textBold}>{title}</LargeText>
           </View>
           <View style={styles.directionRow}>
-            <MediumText>{subtitle ? subtitle : children}</MediumText>
+            {subtitle ? <MediumText>{subtitle}</MediumText> : null}
+            {children ? <View style={{ width: '95%' }}>{children}</View> : null}
             <View style={styles.rowCenter}>
               <MediumText>{lineCount}</MediumText>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />

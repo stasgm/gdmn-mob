@@ -5,7 +5,7 @@ import {
   ListRenderItem,
   SectionListData,
   View,
-  RefreshControl,
+  // RefreshControl,
   Text,
   Alert,
 } from 'react-native';
@@ -64,7 +64,7 @@ export const DocListScreen = () => {
   // const { loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
 
-  const searchStyle = colors.primary;
+  // const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -281,7 +281,7 @@ export const DocListScreen = () => {
         isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
         errorMessage: i.errorMessage,
-      };
+      } as IListItemProps;
     });
   }, [date.id, filteredList.list, status, type?.id]);
 
