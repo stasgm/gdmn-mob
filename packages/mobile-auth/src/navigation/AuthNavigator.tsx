@@ -92,7 +92,7 @@ const AuthNavigator: React.FC = () => {
 
   const login = useCallback(
     async (credentials: IUserCredentials) => {
-      const res = await authDispatch(authActions.login(credentials));
+      const res = await authDispatch(authActions.login(credentials, Constants.manifest?.extra?.slug, logout));
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
         await authDispatch(
           authActions.getDeviceByUid(
