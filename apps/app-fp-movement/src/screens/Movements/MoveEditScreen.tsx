@@ -35,6 +35,8 @@ export const MoveEditScreen = () => {
 
   const { colors } = useTheme();
 
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+
   const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
 
   const movements = useFilteredDocList<IMoveDocument>('move');
@@ -93,69 +95,81 @@ export const MoveEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, doc, defaultDepart]);
 
-  const handleSave = useCallback(() => {
-    if (!movementType) {
-      return Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
-    }
-    if (!docFromDepart) {
-      return Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
-    }
-
-    if (!(docNumber && docToDepart && docDate)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
-
-    const docId = !id ? generateId() : id;
-    const createdDate = new Date().toISOString();
-
-    if (!id) {
-      const newDoc: IMoveDocument = {
-        id: docId,
-        documentType: movementType,
-        number: docNumber && docNumber.trim(),
-        documentDate: docDate,
-        status: 'DRAFT',
-        head: {
-          comment: docComment && docComment.trim(),
-          fromDepart: docFromDepart,
-          toDepart: docToDepart,
-        },
-        lines: [],
-        creationDate: createdDate,
-        editionDate: createdDate,
-      };
-
-      dispatch(documentActions.addDocument(newDoc));
-
-      navigation.dispatch(StackActions.replace('MoveView', { id: newDoc.id }));
-    } else {
-      if (!doc) {
+  // const handleSave = useCallback(() => {
+  useEffect(() => {
+    if (screenState === 'saving') {
+      if (!movementType) {
+        Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
+      }
+      if (!docFromDepart) {
+        Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
+        setScreenState('idle');
         return;
       }
 
-      const updatedDate = new Date().toISOString();
+      if (!(docNumber && docToDepart && docDate)) {
+        Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
+      }
 
-      const updatedDoc: IMoveDocument = {
-        ...doc,
-        id,
-        number: docNumber && docNumber.trim(),
-        status: docStatus || 'DRAFT',
-        documentDate: docDate,
-        documentType: movementType,
-        errorMessage: undefined,
-        head: {
-          ...doc.head,
-          comment: docComment && docComment.trim(),
-          fromDepart: docFromDepart,
-          toDepart: docToDepart,
-        },
-        lines: doc.lines,
-        creationDate: doc.creationDate || updatedDate,
-        editionDate: updatedDate,
-      };
+      const docId = !id ? generateId() : id;
+      const createdDate = new Date().toISOString();
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-      navigation.navigate('MoveView', { id });
+      if (!id) {
+        const newDoc: IMoveDocument = {
+          id: docId,
+          documentType: movementType,
+          number: docNumber && docNumber.trim(),
+          documentDate: docDate,
+          status: 'DRAFT',
+          head: {
+            comment: docComment && docComment.trim(),
+            fromDepart: docFromDepart,
+            toDepart: docToDepart,
+          },
+          lines: [],
+          creationDate: createdDate,
+          editionDate: createdDate,
+        };
+
+        dispatch(documentActions.addDocument(newDoc));
+
+        navigation.dispatch(StackActions.replace('MoveView', { id: newDoc.id }));
+        // setScreenState('idle');
+      } else {
+        if (!doc) {
+          setScreenState('idle');
+          return;
+        }
+
+        const updatedDate = new Date().toISOString();
+
+        const updatedDoc: IMoveDocument = {
+          ...doc,
+          id,
+          number: docNumber && docNumber.trim(),
+          status: docStatus || 'DRAFT',
+          documentDate: docDate,
+          documentType: movementType,
+          errorMessage: undefined,
+          head: {
+            ...doc.head,
+            comment: docComment && docComment.trim(),
+            fromDepart: docFromDepart,
+            toDepart: docToDepart,
+          },
+          lines: doc.lines,
+          creationDate: doc.creationDate || updatedDate,
+          editionDate: updatedDate,
+        };
+
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
+        navigation.navigate('MoveView', { id });
+        // setScreenState('idle');
+      }
     }
   }, [
     dispatch,
@@ -169,10 +183,18 @@ export const MoveEditScreen = () => {
     id,
     movementType,
     navigation,
+    screenState,
   ]);
 
-  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+  const renderRight = useCallback(
+    () => (
+      // <SaveButton onPress={handleSave} />,
+      <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
+    ),
+    [screenState],
+  );
 
+  console.log('state', screenState);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,

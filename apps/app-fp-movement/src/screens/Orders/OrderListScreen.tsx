@@ -58,6 +58,10 @@ export const OrderListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
+  // const otvesTypes = refSelectors
+  // .selectByName<IReference<IDocumentType>>('documentType')
+  // ?.data.filter((i) => i.);
+
   const list = temps
     ?.filter((i) =>
       i.documentType?.name === 'temp'
