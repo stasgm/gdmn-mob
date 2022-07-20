@@ -44,7 +44,7 @@ export type OrderParamList = RefParamList & {
   TempView: { id: string };
   OrderEdit: { id: string };
   OtvesView: { id: string };
-  ScanOrder: undefined;
+  ScanOrder: { id: string };
   ScanGood: { docId: string; tempId: string; docType?: string };
 };
 

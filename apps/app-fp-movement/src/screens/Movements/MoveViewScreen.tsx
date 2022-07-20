@@ -242,6 +242,8 @@ export const MoveViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
+        Alert.alert('Внимание!', 'Штрих-код не определен! Повоторите сканирование!', [{ text: 'OK' }]);
+        setScanned(false);
         return;
       }
       const barc = getBarcode(brc);

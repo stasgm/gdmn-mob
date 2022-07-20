@@ -1,13 +1,12 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { Alert, ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
-  AddButton,
   FilterButtons,
   ItemSeparator,
   Status,
@@ -15,23 +14,23 @@ import {
   SubTitle,
   ScreenListItem,
   IListItemProps,
-  ScanButton,
   AppActivityIndicator,
+  Menu,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { getDateString } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
-import { IOrderDocument, IOtvesDocument, ITempDocument } from '../../store/types';
+import { IListItem } from '@lib/mobile-types';
+
+import { ITempDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
-import BarcodeDialog from '../../components/BarcodeDialog';
-import { tempType } from '../../utils/constants';
-import { ICodeEntity } from '../../store/app/types';
+
 // import { getBarcode } from '../../utils/helpers';
 
 export interface OrderListSectionProps {
@@ -46,8 +45,6 @@ export const OrderListScreen = () => {
   const loading = useSelector((state) => state.documents.loading);
 
   const { colors } = useTheme();
-
-  const dispatch = useDispatch();
 
   // const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
@@ -123,109 +120,23 @@ export const OrderListScreen = () => {
     [filteredList],
   );
 
-  const handleAddDocument = useCallback(() => {
-    navigation.navigate('ScanOrder');
-  }, [navigation]);
-
-  const [visibleDialog, setVisibleDialog] = useState(false);
-  const [barcode, setBarcode] = useState('');
-  const [error, setError] = useState(false);
-
-  // const orders = docSelectors.selectByDocType<IOrderDocument>('order');
-  const orders = useSelector((state) => state.documents.list).filter(
-    (i) => i.documentType?.name === 'order',
-  ) as IOrderDocument[];
-  // const tempType = refSelectors
-  //   .selectByName<IReference<IDocumentType>>('documentType')
-  //   ?.data.find((t) => t.name === 'temp');
-  const otvesType = refSelectors
-    .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'otves');
-  // const otvesList = docSelectors.selectByDocType<IOtvesDocument>('otves');
-  const otvesList = useSelector((state) => state.documents.list).filter(
-    (i) => i.documentType?.name === 'otves',
-  ) as IOtvesDocument[];
-
-  const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
-
-  const handleGetBarcode = useCallback(
-    (brc: string) => {
-      // const barc = getBarcode(brc);
-      if (!otvesType) {
-        return Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
-      }
-
-      const order = orders.find((item) => item.head.barcode === brc);
-
-      if (order) {
-        const tempDoc: ITempDocument = {
-          id: generateId(),
-          documentType: tempType,
-          number: order.number,
-          documentDate: new Date().toISOString(),
-          status: 'DRAFT',
-          head: {
-            // comment: order.head.
-            barcode: order.head.barcode,
-            contact: order.head.contact,
-            depart: depart,
-            outlet: order.head.outlet,
-            onDate: order.head.onDate,
-            orderId: order.id,
-          },
-          lines: order.lines,
-          creationDate: new Date().toISOString(),
-          editionDate: new Date().toISOString(),
-        };
-        const otvesDoc: IOtvesDocument = {
-          ...tempDoc,
-          id: generateId(),
-          documentType: otvesType,
-          head: tempDoc.head,
-          lines: [],
-        };
-
-        if (otvesList.find((i) => i.head.barcode === tempDoc.head.barcode)) {
-          // dispatch(documentActions.removeDocument('08b6266e38'));
-
-          return;
-        }
-
-        dispatch(documentActions.addDocument(tempDoc));
-        dispatch(documentActions.addDocument(otvesDoc));
-
-        navigation.navigate('TempView', {
-          id: tempDoc.id,
-        });
-
-        setError(false);
-        setVisibleDialog(false);
-        setBarcode('');
-      } else {
-        setError(true);
-      }
+  const handleAddDocument = useCallback(
+    (name) => {
+      navigation.navigate('ScanOrder', { id: name });
+      setVisible(false);
     },
-
-    [depart, dispatch, navigation, orders, otvesList, otvesType],
+    [navigation],
   );
 
-  const handleShowDialog = () => {
-    setVisibleDialog(true);
-  };
+  const typeList: IDocumentType[] = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
 
-  const handleDismisDialog = () => {
-    setVisibleDialog(false);
-  };
+  const a: IListItem[] = typeList
+    .filter((i) => i.isShip && i.name !== 'shipFree')
+    .map((i) => {
+      return { id: i.name || '', value: i.description || '' };
+    });
 
-  const handleSearchBarcode = () => {
-    handleGetBarcode(barcode);
-  };
-
-  const handleDismissBarcode = () => {
-    setVisibleDialog(false);
-    setBarcode('');
-    setError(false);
-  };
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -242,11 +153,19 @@ export const OrderListScreen = () => {
           size={26}
           onPress={() => setFilterVisible((prev) => !prev)}
         />
-        <ScanButton onPress={handleAddDocument} />
-        <AddButton onPress={handleShowDialog} />
+        <Menu
+          key={'MenuType'}
+          visible={visible}
+          onChange={handleAddDocument}
+          onDismiss={() => setVisible(false)}
+          onPress={() => setVisible(true)}
+          options={a}
+          iconName={'plus'}
+          iconSize={30}
+        />
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [a, colors.card, filterVisible, handleAddDocument, visible],
   );
 
   useLayoutEffect(() => {
@@ -300,15 +219,6 @@ export const OrderListScreen = () => {
         )}
         refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-      />
-      <BarcodeDialog
-        visibleDialog={visibleDialog}
-        onDismissDialog={handleDismisDialog}
-        barcode={barcode}
-        onChangeBarcode={setBarcode}
-        onDismiss={handleDismissBarcode}
-        onSearch={handleSearchBarcode}
-        error={error}
       />
     </AppScreen>
   );

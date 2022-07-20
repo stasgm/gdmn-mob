@@ -194,7 +194,6 @@ export const MoveEditScreen = () => {
     [screenState],
   );
 
-  console.log('state', screenState);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,

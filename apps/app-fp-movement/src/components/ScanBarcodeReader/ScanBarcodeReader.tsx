@@ -105,7 +105,6 @@ export const ScanBarcodeReader = ({ /*onSave,*/ onSearchBarcode, getScannedObjec
     // setScanned(true);
   };
 
-  console.log('scanObject.state', scanObject.state);
   return (
     //isFocused ?
     <KeyboardAvoidingView key={key} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
