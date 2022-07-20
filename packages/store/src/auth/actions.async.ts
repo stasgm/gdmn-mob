@@ -20,6 +20,9 @@ export const useAuthThunkDispatch = () => useDispatch<AuthDispatch>();
 
 const getDeviceByUid = (
   uid: string,
+  erpUserId?: string,
+  appSystemName?: string,
+  logout?: () => void,
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
@@ -31,6 +34,16 @@ const getDeviceByUid = (
     const response = await api.device.getDevices({ uid });
 
     if (response.type === 'GET_DEVICES') {
+      //Проверка на совпадение подсистемы приложения с подсистемой пользователя
+      if (erpUserId && appSystemName && logout) {
+        const getErpUser = await api.user.getUser(erpUserId, logout);
+        if (getErpUser.type === 'ERROR' || appSystemName !== getErpUser.user.appSystem?.name) {
+          return dispatch(
+            actions.getDeviceByUidAsync.failure('Подсистема пользователя не совпадает с подсистемой приложения'),
+          );
+        }
+      }
+
       return dispatch(actions.getDeviceByUidAsync.success(response.devices[0]));
     }
 
