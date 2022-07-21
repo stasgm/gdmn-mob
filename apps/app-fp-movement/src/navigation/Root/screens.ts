@@ -15,6 +15,8 @@ import {
 import ScanOrderScreen from '../../screens/Orders/ScanOrderScreen';
 import ScanGoodScreen from '../../screens/Orders/ScanGoodScreen';
 
+import { ShipmentListScreen, ShipmentEditScreen, ShipmentViewScreen, ShipmentLineScreen } from '../../screens/Shipment';
+
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
   MoveView: { title: 'Документ', component: MoveViewScreen },
@@ -40,4 +42,18 @@ export const orderScreens = {
 
 export const orderListScreens = {
   OrderList: { title: 'Заявки', component: OrderListScreen },
+};
+
+export const shipmentScreens = {
+  ShipmentEdit: { title: 'Заявка', component: ShipmentEditScreen },
+  ShipmentView: { title: 'Заявка', component: ShipmentViewScreen },
+  ShipmentLine: { title: 'Позиция заявки', component: ShipmentLineScreen },
+  SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
+  ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
+  //
+  // ScanBarcodeReader: ScanBarcodeReaderScreen,
+};
+
+export const shipmentListScreens = {
+  ShipmentList: { title: 'Заявки', component: ShipmentListScreen },
 };

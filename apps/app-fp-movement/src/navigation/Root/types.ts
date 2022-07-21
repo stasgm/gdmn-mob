@@ -49,3 +49,23 @@ export type OrderParamList = RefParamList & {
 };
 
 export type OrderStackParamList = { OrderList: undefined } & OrderParamList;
+
+export type ShipmentParamList = RefParamList & {
+  ShipmentView: { id: string; docType?: string };
+  ShipmentEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  ShipmentLine: { mode: number; docId: string; item: IMoveLine; docType?: string };
+  ScanBarcode: { docId: string; docType?: string };
+  // // ScanBarcodeReader: { docId: string; docType?: string };
+  ShipmentLineEdit: {
+    docId: string;
+    prodId: string;
+    quantity?: number;
+    lineId?: number;
+    price?: number;
+    remains?: number;
+    modeCor?: boolean;
+    docType?: string;
+  };
+};
+
+export type ShipmentStackParamList = { ShipmentList: undefined } & ShipmentParamList;

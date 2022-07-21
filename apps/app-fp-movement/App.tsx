@@ -42,7 +42,8 @@ import { store, useSelector as useInvSelector, appInventoryActions } from './src
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 import { messageFpMovement } from './src/store/mock';
-// import { OrderNavigator } from './src/navigation/OrderNavigator';
+import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
+import { OrderNavigator } from './src/navigation/OrderNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -53,12 +54,18 @@ const Root = () => {
         icon: 'file-document-outline',
         component: MoveNavigator,
       },
-      // {
-      //   name: 'Order',
-      //   title: 'Заявки',
-      //   icon: 'clipboard-list-outline',
-      //   component: OrderNavigator,
-      // },
+      {
+        name: 'Order',
+        title: 'Отвесы',
+        icon: 'clipboard-list-outline',
+        component: OrderNavigator,
+      },
+      {
+        name: 'Order',
+        title: 'Заявки',
+        icon: 'clipboard-list-outline',
+        component: ShipmentNavigator,
+      },
     ],
     [],
   );
