@@ -11,7 +11,6 @@ import { LargeText, MediumText } from '../AppText';
 import { getStatusColor } from './constants';
 export interface IListItemProps {
   children?: ReactNode;
-  info?: ReactNode;
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -29,7 +28,6 @@ export interface IListItemProps {
 
 const ScreenListItem = ({
   children,
-  info,
   title,
   subtitle,
   status,
@@ -76,10 +74,9 @@ const ScreenListItem = ({
               )}
             </View>
           </View>
-          {info && <View>{info}</View>}
-          <View>
-            {errorMessage && <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>}
-          </View>
+          {errorMessage ? (
+            <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>
