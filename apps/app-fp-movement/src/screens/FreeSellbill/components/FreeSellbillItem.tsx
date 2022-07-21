@@ -12,7 +12,7 @@ interface IProps {
   item: IMoveLine;
 }
 
-export const ShipmentItem = ({ item }: IProps) => {
+export const FreeSellbillItem = ({ item }: IProps) => {
   return (
     <View style={styles.item}>
       <View style={styles.icon}>

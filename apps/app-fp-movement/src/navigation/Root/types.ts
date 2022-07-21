@@ -50,13 +50,13 @@ export type OrderParamList = RefParamList & {
 
 export type OrderStackParamList = { OrderList: undefined } & OrderParamList;
 
-export type ShipmentParamList = RefParamList & {
-  ShipmentView: { id: string; docType?: string };
-  ShipmentEdit: { id: string; docType?: string } | undefined; //itemId: string;
-  ShipmentLine: { mode: number; docId: string; item: IMoveLine; docType?: string };
+export type FreeSellbillParamList = RefParamList & {
+  FreeSellbillView: { id: string; docType?: string };
+  FreeSellbillEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  FreeSellbillLine: { mode: number; docId: string; item: IMoveLine; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
   // // ScanBarcodeReader: { docId: string; docType?: string };
-  ShipmentLineEdit: {
+  FreeSellbillLineEdit: {
     docId: string;
     prodId: string;
     quantity?: number;
@@ -68,4 +68,4 @@ export type ShipmentParamList = RefParamList & {
   };
 };
 
-export type ShipmentStackParamList = { ShipmentList: undefined } & ShipmentParamList;
+export type FreeSellbillStackParamList = { FreeSellbillList: undefined } & FreeSellbillParamList;

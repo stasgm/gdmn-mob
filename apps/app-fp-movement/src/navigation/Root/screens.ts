@@ -15,7 +15,12 @@ import {
 import ScanOrderScreen from '../../screens/Orders/ScanOrderScreen';
 import ScanGoodScreen from '../../screens/Orders/ScanGoodScreen';
 
-import { ShipmentListScreen, ShipmentEditScreen, ShipmentViewScreen, ShipmentLineScreen } from '../../screens/Shipment';
+import {
+  FreeSellbillListScreen,
+  FreeSellbillEditScreen,
+  FreeSellbillViewScreen,
+  FreeSellbillLineScreen,
+} from '../../screens/FreeSellbill';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
@@ -44,16 +49,16 @@ export const orderListScreens = {
   OrderList: { title: 'Заявки', component: OrderListScreen },
 };
 
-export const shipmentScreens = {
-  ShipmentEdit: { title: 'Заявка', component: ShipmentEditScreen },
-  ShipmentView: { title: 'Заявка', component: ShipmentViewScreen },
-  ShipmentLine: { title: 'Позиция заявки', component: ShipmentLineScreen },
+export const freeSellbillScreens = {
+  FreeSellbillEdit: { title: 'Заявка', component: FreeSellbillEditScreen },
+  FreeSellbillView: { title: 'Заявка', component: FreeSellbillViewScreen },
+  FreeSellbillLine: { title: 'Позиция заявки', component: FreeSellbillLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
   //
   // ScanBarcodeReader: ScanBarcodeReaderScreen,
 };
 
-export const shipmentListScreens = {
-  ShipmentList: { title: 'Заявки', component: ShipmentListScreen },
+export const freeSellbillListScreens = {
+  FreeSellbillList: { title: 'Заявки', component: FreeSellbillListScreen },
 };

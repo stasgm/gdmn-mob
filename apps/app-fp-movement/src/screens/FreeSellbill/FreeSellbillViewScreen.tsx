@@ -20,8 +20,8 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
-import { IShipmentDocument, IShipmentLine } from '../../store/types';
-import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { IFreeSellbillDocument, IFreeSellbillLine } from '../../store/types';
+import { FreeSellbillStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { navBackButton } from '../../components/navigateOptions';
@@ -30,26 +30,26 @@ import { IGood } from '../../store/app/types';
 
 import BarcodeDialog from '../../components/BarcodeDialog';
 
-import { ShipmentItem } from './components/ShipmentItem';
-import ShipmentTotal from './components/ShipmentTotal';
+import { FreeSellbillItem } from './components/FreeSellbillItem';
+import FreeSellbillTotal from './components/FreeSellbillTotal';
 
 export interface IScanerObject {
-  item?: IShipmentLine;
+  item?: IFreeSellbillLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const ShipmentViewScreen = () => {
+export const FreeSellbillViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentView'>>();
+  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillView'>>();
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
-  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
+  const id = useRoute<RouteProp<FreeSellbillStackParamList, 'FreeSellbillView'>>().params?.id;
 
-  const doc = docSelectors.selectByDocId<IShipmentDocument>(id);
+  const doc = docSelectors.selectByDocId<IFreeSellbillDocument>(id);
 
   const lines = useMemo(() => doc.lines.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc.lines]);
 
@@ -77,7 +77,7 @@ export const ShipmentViewScreen = () => {
           numReceived: barc.numReceived,
         };
         setError(false);
-        navigation.navigate('ShipmentLine', {
+        navigation.navigate('FreeSellbillLine', {
           mode: 0,
           docId: id,
           item: barcodeItem,
@@ -111,7 +111,7 @@ export const ShipmentViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('ShipmentEdit', { id });
+    navigation.navigate('FreeSellbillEdit', { id });
   }, [navigation, id]);
 
   // const handleDoScan = useCallback(() => {
@@ -215,7 +215,10 @@ export const ShipmentViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem = useCallback(({ item }: { item: IShipmentLine }) => <ShipmentItem key={item.id} item={item} />, []);
+  const renderItem = useCallback(
+    ({ item }: { item: IFreeSellbillLine }) => <FreeSellbillItem key={item.id} item={item} />,
+    [],
+  );
 
   const [scanned, setScanned] = useState(false);
 
@@ -230,10 +233,11 @@ export const ShipmentViewScreen = () => {
       }
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === barc.shcode);
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
         Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+        console.log('barc', barc);
         setScanned(false);
         return;
       }
@@ -246,7 +250,7 @@ export const ShipmentViewScreen = () => {
         return;
       }
 
-      const newLine: IShipmentLine = {
+      const newLine: IFreeSellbillLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
@@ -316,17 +320,14 @@ export const ShipmentViewScreen = () => {
     <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
+        title={doc.head.depart.name || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
-        <>
-          <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-          <View style={styles.rowCenter}>
-            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
-          </View>
-        </>
+        <View style={styles.directionColumn}>
+          <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+        </View>
       </InfoBlock>
 
       <TextInput
@@ -349,7 +350,7 @@ export const ShipmentViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {doc.lines.length ? <ShipmentTotal lines={doc.lines} /> : null}
+      {doc.lines.length ? <FreeSellbillTotal lines={doc.lines} /> : null}
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}

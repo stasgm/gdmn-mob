@@ -26,7 +26,7 @@ import { IDocumentType, IReference } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
 
-import { ITempDocument } from '../../store/types';
+import { IOtvesDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
 import { OrderStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
@@ -50,7 +50,7 @@ export const OrderListScreen = () => {
 
   // const movements = useSelector((state) => state.documents.list) as ITempDocument[];
   // const temps = useSelector((state) => state.documents.list) as ITempDocument[];
-  const temps = docSelectors.selectByDocType<ITempDocument>('temp');
+  const temps = docSelectors.selectByDocType<IOtvesDocument>('otves');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -61,7 +61,7 @@ export const OrderListScreen = () => {
 
   const list = temps
     ?.filter((i) =>
-      i.documentType?.name === 'temp'
+      i.documentType?.name === 'otves'
         ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
           ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -178,8 +178,8 @@ export const OrderListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="TempView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('TempView', { id: item.id })} />
+      <SwipeListItem renderItem={item} item={doc} routeName="OtvesView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OtvesView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

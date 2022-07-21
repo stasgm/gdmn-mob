@@ -22,6 +22,14 @@ export interface IOrderFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface IFreeSellbillFormParam extends IFormParam {
+  number?: string;
+  documentDate?: string;
+  status?: StatusType;
+  depart?: ICodeEntity;
+  comment?: string;
+}
+
 //Подразделения-склады
 export type Department = INamedEntity;
 export type DepartmentType = INamedEntity;
@@ -103,18 +111,19 @@ export interface IOtvesLine extends IEntity {
 
 export type IOtvesDocument = MandateProps<IDocument<IOtvesHead, IOtvesLine>, 'head' | 'lines'>;
 
-export interface IShipmentHead extends IHead {
+export interface IFreeSellbillHead extends IHead {
   depart: ICodeEntity;
   comment?: string; // Комvентарий
 }
-export interface IShipmentLine extends IEntity {
+export interface IFreeSellbillLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
   numReceived: string; // Номер партии
   barcode?: string; // технологический код
+  sortOrder?: number; // порядок сортировки
 }
-export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
+export type IFreeSellbillDocument = MandateProps<IDocument<IFreeSellbillHead, IFreeSellbillLine>, 'head' | 'lines'>;
 
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 

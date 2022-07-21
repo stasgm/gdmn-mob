@@ -42,7 +42,7 @@ import { store, useSelector as useInvSelector, appInventoryActions } from './src
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 import { messageFpMovement } from './src/store/mock';
-import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
+import { FreeSellbillNavigator } from './src/navigation/FreeSellbillNavigator';
 import { OrderNavigator } from './src/navigation/OrderNavigator';
 
 const Root = () => {
@@ -55,16 +55,16 @@ const Root = () => {
         component: MoveNavigator,
       },
       {
-        name: 'Order',
+        name: 'Otves',
         title: 'Отвесы',
         icon: 'clipboard-list-outline',
         component: OrderNavigator,
       },
       {
-        name: 'Order',
+        name: 'FreeSellbill',
         title: 'Заявки',
         icon: 'clipboard-list-outline',
-        component: ShipmentNavigator,
+        component: FreeSellbillNavigator,
       },
     ],
     [],

@@ -19,25 +19,24 @@ import {
   CloseButton,
   AppActivityIndicator,
   EmptyList,
-  MediumText,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString, keyExtractor } from '@lib/mobile-app';
 
-import { IShipmentDocument } from '../../store/types';
-import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { IFreeSellbillDocument } from '../../store/types';
+import { FreeSellbillStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
-export interface ShipmentListSectionProps {
+export interface FreeSellbillListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, ShipmentListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, FreeSellbillListSectionProps>[];
 
-export const ShipmentListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
+export const FreeSellbillListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillList'>>();
   const dispatch = useDispatch();
 
   // const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
@@ -50,7 +49,7 @@ export const ShipmentListScreen = () => {
   const list = (
     useSelector((state) => state.documents.list)?.filter(
       (i) => i.documentType?.name === 'shipFree',
-    ) as IShipmentDocument[]
+    ) as IFreeSellbillDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   // const list = movements
@@ -84,10 +83,10 @@ export const ShipmentListScreen = () => {
       (i) =>
         ({
           id: i.id,
-          title: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
+          title: i.head.depart.name || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          // subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+          subtitle: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
         } as IListItemProps),
@@ -117,7 +116,7 @@ export const ShipmentListScreen = () => {
   );
 
   const handleAddDocument = useCallback(() => {
-    navigation.navigate('ShipmentEdit');
+    navigation.navigate('FreeSellbillEdit');
   }, [navigation]);
 
   const handelAddDeletelList = useCallback(
@@ -210,13 +209,11 @@ export const ShipmentListScreen = () => {
       headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
       title:
-        delList && Object.values(delList).length > 0
-          ? `Выделено документов: ${Object.values(delList).length}`
-          : 'Документы',
+        delList && Object.values(delList).length > 0 ? `Выделено заявок: ${Object.values(delList).length}` : 'Заявки',
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
-  const handlePressDoc = useCallback((id: string) => navigation.navigate('ShipmentView', { id }), [navigation]);
+  const handlePressDoc = useCallback((id: string) => navigation.navigate('FreeSellbillView', { id }), [navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => {
@@ -230,12 +227,7 @@ export const ShipmentListScreen = () => {
           onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
           isChecked={checkedId ? true : false}
           isDelList={delList && Object.values(delList).length > 0 ? true : false}
-        >
-          <View>
-            <MediumText>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
-          </View>
-        </ScreenListItem>
+        />
       ) : null;
     },
     [delList, handelAddDeletelList, handlePressDoc, list],

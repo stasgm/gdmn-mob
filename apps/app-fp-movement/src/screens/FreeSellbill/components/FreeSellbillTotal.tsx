@@ -14,7 +14,7 @@ export interface IItem {
   scan?: boolean;
 }
 
-const ShipmentTotal = ({ lines, scan = false }: IItem) => {
+const FreeSellbillTotal = ({ lines, scan = false }: IItem) => {
   const { colors } = useTheme();
 
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
@@ -57,7 +57,7 @@ const ShipmentTotal = ({ lines, scan = false }: IItem) => {
   );
 };
 
-export default ShipmentTotal;
+export default FreeSellbillTotal;
 
 const localStyles = StyleSheet.create({
   margins: {

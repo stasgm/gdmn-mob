@@ -22,37 +22,36 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { IMoveFormParam, IMoveDocument } from '../../store/types';
+import { FreeSellbillStackParamList } from '../../navigation/Root/types';
+import { IFreeSellbillFormParam, IFreeSellbillDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
 
-export const ShipmentEditScreen = () => {
-  const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveEdit'>>();
+export const FreeSellbillEditScreen = () => {
+  const id = useRoute<RouteProp<FreeSellbillStackParamList, 'FreeSellbillEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
-  const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
+  const formParams = useSelector((state) => state.app.formParams as IFreeSellbillFormParam);
 
-  const movements = useFilteredDocList<IMoveDocument>('move');
+  const sellbills = useFilteredDocList<IFreeSellbillDocument>('shipFree');
 
-  const doc = movements?.find((e) => e.id === id);
+  const doc = sellbills?.find((e) => e.id === id);
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
 
-  const movementType = refSelectors
+  const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'move');
+    ?.data.find((t) => t.name === 'shipFree');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
-    fromDepart: docFromDepart,
-    toDepart: docToDepart,
+    depart: docDepart,
     documentDate: docDate,
     number: docNumber,
     comment: docComment,
@@ -77,18 +76,17 @@ export const ShipmentEditScreen = () => {
           documentDate: doc.documentDate,
           status: doc.status,
           comment: doc.head.comment,
-          fromDepart: doc.head.fromDepart,
-          toDepart: doc.head.toDepart,
+          depart: doc.head.depart,
         }),
       );
     } else {
-      const newNumber = getNextDocNumber(movements);
+      const newNumber = getNextDocNumber(sellbills);
       dispatch(
         appActions.setFormParams({
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart: defaultDepart,
+          depart: defaultDepart,
         }),
       );
     }
@@ -98,18 +96,18 @@ export const ShipmentEditScreen = () => {
   // const handleSave = useCallback(() => {
   useEffect(() => {
     if (screenState === 'saving') {
-      if (!movementType) {
-        Alert.alert('Внимание!', 'Тип документа для перемещений не найден.', [{ text: 'OK' }]);
+      if (!sellbillType) {
+        Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
-      if (!docFromDepart) {
+      if (!docDepart) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docToDepart && docDate)) {
+      if (!(docNumber && docDepart && docDate)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -119,16 +117,15 @@ export const ShipmentEditScreen = () => {
       const createdDate = new Date().toISOString();
 
       if (!id) {
-        const newDoc: IMoveDocument = {
+        const newDoc: IFreeSellbillDocument = {
           id: docId,
-          documentType: movementType,
+          documentType: sellbillType,
           number: docNumber && docNumber.trim(),
           documentDate: docDate,
           status: 'DRAFT',
           head: {
             comment: docComment && docComment.trim(),
-            fromDepart: docFromDepart,
-            toDepart: docToDepart,
+            depart: docDepart,
           },
           lines: [],
           creationDate: createdDate,
@@ -137,7 +134,7 @@ export const ShipmentEditScreen = () => {
 
         dispatch(documentActions.addDocument(newDoc));
 
-        navigation.dispatch(StackActions.replace('MoveView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('FreeSellbillView', { id: newDoc.id }));
         // setScreenState('idle');
       } else {
         if (!doc) {
@@ -147,19 +144,18 @@ export const ShipmentEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IMoveDocument = {
+        const updatedDoc: IFreeSellbillDocument = {
           ...doc,
           id,
           number: docNumber && docNumber.trim(),
           status: docStatus || 'DRAFT',
           documentDate: docDate,
-          documentType: movementType,
+          documentType: sellbillType,
           errorMessage: undefined,
           head: {
             ...doc.head,
             comment: docComment && docComment.trim(),
-            fromDepart: docFromDepart,
-            toDepart: docToDepart,
+            depart: docDepart,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
@@ -167,24 +163,11 @@ export const ShipmentEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-        navigation.navigate('MoveView', { id });
+        navigation.navigate('FreeSellbillView', { id });
         // setScreenState('idle');
       }
     }
-  }, [
-    dispatch,
-    doc,
-    docComment,
-    docDate,
-    docFromDepart,
-    docNumber,
-    docStatus,
-    docToDepart,
-    id,
-    movementType,
-    navigation,
-    screenState,
-  ]);
+  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, sellbillType]);
 
   const renderRight = useCallback(
     () => (
@@ -225,28 +208,15 @@ export const ShipmentEditScreen = () => {
     setShowDate(true);
   };
 
-  const handleFromDepart = () => {
+  const handleDepart = () => {
     if (isBlocked) {
       return;
     }
 
     navigation.navigate('SelectRefItem', {
       refName: 'depart',
-      fieldName: 'fromDepart',
-      value: docFromDepart && [docFromDepart],
-    });
-  };
-
-  const handleToDepart = () => {
-    if (isBlocked) {
-      return;
-    }
-
-    navigation.navigate('SelectRefItem', {
-      refName: 'depart',
-      fieldName: 'toDepart',
-      value: docToDepart && [docToDepart],
-      descrFieldName: 'shcode',
+      fieldName: 'depart',
+      value: docDepart && [docDepart],
     });
   };
 
@@ -297,9 +267,8 @@ export const ShipmentEditScreen = () => {
             onPress={handlePresentDate}
             disabled={docStatus !== 'DRAFT'}
           />
-          <SelectableInput label={'Откуда'} value={docFromDepart?.name} onPress={handleFromDepart} disabled={true} />
+          <SelectableInput label={'Подразделение'} value={docDepart?.name} onPress={handleDepart} disabled={true} />
 
-          <SelectableInput label={'Куда'} value={docToDepart?.name} onPress={handleToDepart} disabled={isBlocked} />
           <Input
             label="Комментарий"
             value={docComment}
