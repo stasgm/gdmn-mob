@@ -9,7 +9,7 @@ import { AppInventoryActionType } from './app/actions';
 import { appInvMiddlewareFactory } from './app/middleware';
 
 export { default as appInventoryActions } from './app';
-export { useAppInventoryThunkDispatch } from './app/actions.async';
+// export { useAppInventoryThunkDispatch } from './app/actions.async';
 
 type TActions = AppInventoryActionType;
 

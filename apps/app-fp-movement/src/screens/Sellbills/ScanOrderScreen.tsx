@@ -16,23 +16,25 @@ import { AppActivityIndicator } from '@lib/mobile-ui';
 
 import { Alert } from 'react-native';
 
-import { OrderStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOtvesDocument, ITempDocument } from '../../store/types';
+import { SellbillStackParamList } from '../../navigation/Root/types';
+import { IOrderDocument, ISellbillDocument, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 import { tempType } from '../../utils/constants';
 
-import { ICodeEntity } from '../../store/app/types';
+import { ICodeEntity, IOrder } from '../../store/app/types';
 
 import BarcodeDialog from '../../components/BarcodeDialog';
+
+import { actions as orderActions } from '../../store/app/actions';
 
 import { ScanBarcode } from './components/ScanBarcode';
 import { ScanBarcodeReader } from './components/ScanBarcodeReader';
 
 const ScanOrderScreen = () => {
-  const docId = useRoute<RouteProp<OrderStackParamList, 'ScanOrder'>>().params?.id;
+  const docId = useRoute<RouteProp<SellbillStackParamList, 'ScanOrder'>>().params?.id;
   console.log('id', docId);
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'ScanOrder'>>();
+  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'ScanOrder'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const dispatch = useDispatch();
@@ -52,8 +54,10 @@ const ScanOrderScreen = () => {
   // const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+
+  // console.log('orders', orders);
   // const tempList = docSelectors.selectByDocType<ITempDocument>('temp');
-  const otvesList = docSelectors.selectByDocType<IOtvesDocument>('otves');
+  const sellbills = docSelectors.selectByDocType<ISellbillDocument>('otves');
 
   // const tempType = refSelectors
   //   .selectByName<IReference<IDocumentType>>('documentType')
@@ -63,42 +67,49 @@ const ScanOrderScreen = () => {
   //   .selectByName<IReference<IDocumentType>>('documentType')
   //   ?.data.find((t) => t.name === 'otves');
 
-  const otvesType = refSelectors
+  const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === docId);
 
+  // const docTypes = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
+  // const sellbillType: IDocumentType = docTypes.find((t) => t.name === docId);
+
   const handleSaveScannedItem = useCallback(
-    (item: ITempDocument) => {
-      if (!otvesType) {
+    (item: ISellbillDocument) => {
+      if (!sellbillType) {
         return;
       }
-      const otvesDoc: IOtvesDocument = {
+      const sellbillDoc: ISellbillDocument = {
         ...item,
-        id: generateId(),
-        documentType: otvesType,
-        head: item.head,
         lines: [],
       };
-      console.log('otvesDoc', otvesDoc);
+      console.log('otvesDoc', sellbillDoc);
 
-      if (otvesList.find((i) => i.head.barcode === item.head.barcode)) {
+      const orderr: IOrder = {
+        id: item.head.orderId,
+        lines: item.lines,
+      };
+
+      dispatch(orderActions.addOrder(orderr));
+
+      if (sellbills.find((i) => i.head.barcode === item.head.barcode)) {
         return;
       }
 
-      dispatch(documentActions.addDocument(item));
-      dispatch(documentActions.addDocument(otvesDoc));
+      dispatch(documentActions.addDocument(sellbillDoc));
+      // dispatch(documentActions.addDocument(sellbillDoc));
 
-      navigation.navigate('TempView', {
+      navigation.navigate('SellbillView', {
         id: item.id,
       });
     },
-    [otvesType, otvesList, dispatch, navigation],
+    [sellbillType, dispatch, sellbills, navigation],
   );
 
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
   const getScannedObject = useCallback(
-    (brc: string): ITempDocument | undefined => {
+    (brc: string): ISellbillDocument | undefined => {
       const order = orders.find((item) => item.head.barcode === brc);
 
       if (!order) {
@@ -108,10 +119,13 @@ const ScanOrderScreen = () => {
       // if (!tempType) {
       //   return;
       // }
+      if (!sellbillType) {
+        return;
+      }
 
-      const tempDoc: ITempDocument = {
+      const sellbillDoc: ISellbillDocument = {
         id: generateId(),
-        documentType: tempType,
+        documentType: sellbillType,
         number: order.number,
         documentDate: new Date().toISOString(),
         status: 'DRAFT',
@@ -129,13 +143,10 @@ const ScanOrderScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      console.log('tempDoc', tempDoc);
-
-      // dispatch(documentActions.addDocument(tempDoc));
-      return tempDoc;
+      return sellbillDoc;
       // navigation.navigate('MovementView', { id });
     },
-    [depart, orders],
+    [depart, orders, sellbillType],
   );
 
   // if (!document) {
@@ -144,7 +155,7 @@ const ScanOrderScreen = () => {
   const handleGetBarcode = useCallback(
     (brc: string) => {
       // const barc = getBarcode(brc);
-      if (!otvesType) {
+      if (!sellbillType) {
         return Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
       }
 
@@ -170,15 +181,15 @@ const ScanOrderScreen = () => {
           creationDate: new Date().toISOString(),
           editionDate: new Date().toISOString(),
         };
-        const otvesDoc: IOtvesDocument = {
+        const otvesDoc: ISellbillDocument = {
           ...tempDoc,
           id: generateId(),
-          documentType: otvesType,
+          documentType: sellbillType,
           head: tempDoc.head,
           lines: [],
         };
 
-        if (otvesList.find((i) => i.head.barcode === tempDoc.head.barcode)) {
+        if (sellbills.find((i) => i.head.barcode === tempDoc.head.barcode)) {
           // dispatch(documentActions.removeDocument('08b6266e38'));
 
           return;
@@ -199,7 +210,7 @@ const ScanOrderScreen = () => {
       }
     },
 
-    [depart, dispatch, navigation, orders, otvesList, otvesType],
+    [depart, dispatch, navigation, orders, sellbillType, sellbills],
   );
 
   const handleShowDialog = () => {

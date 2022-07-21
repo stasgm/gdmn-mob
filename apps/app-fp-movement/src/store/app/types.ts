@@ -1,10 +1,11 @@
-import { INamedEntity } from '@lib/types';
+import { IEntity, INamedEntity } from '@lib/types';
 
 export interface ICodeEntity extends INamedEntity {
   shcode: string;
 }
 
 export type AppInventoryState = {
+  readonly list: IOrder[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
@@ -36,4 +37,8 @@ export interface IBarcode {
   shcode: string;
   numReceived: string; // Номер партии
   quantPack: number;
+}
+
+export interface IOrder<K extends IEntity = IEntity> extends IEntity {
+  lines?: K[];
 }

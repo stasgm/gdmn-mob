@@ -49,8 +49,8 @@ export const SellbillListScreen = () => {
   // const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   // const movements = useSelector((state) => state.documents.list) as ITempDocument[];
-  // const temps = useSelector((state) => state.documents.list) as ITempDocument[];
-  const temps = docSelectors.selectByDocType<ISellbillDocument>('otves');
+  const sellbills = useSelector((state) => state.documents.list) as ISellbillDocument[];
+  // const temps = docSelectors.selectByDocType<ISellbillDocument>('otves');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -59,9 +59,9 @@ export const SellbillListScreen = () => {
   // .selectByName<IReference<IDocumentType>>('documentType')
   // ?.data.filter((i) => i.);
 
-  const list = temps
+  const list = sellbills
     ?.filter((i) =>
-      i.documentType?.name === 'otves'
+      i.documentType?.name === 'otves' || i.documentType.name === 'otvesCurr'
         ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
           ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -121,8 +121,8 @@ export const SellbillListScreen = () => {
   );
 
   const handleAddDocument = useCallback(
-    (name) => {
-      navigation.navigate('ScanOrder', { id: name });
+    (item: IListItem) => {
+      navigation.navigate('ScanOrder', { id: item.id });
       setVisible(false);
     },
     [navigation],

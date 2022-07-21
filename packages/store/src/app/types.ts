@@ -8,6 +8,7 @@ export interface IAppState {
   errorList: string[];
   formParams?: IFormParam;
   syncDate?: Date;
+  list?: [];
   readonly loadingData: boolean;
   readonly loadingError: string;
 }

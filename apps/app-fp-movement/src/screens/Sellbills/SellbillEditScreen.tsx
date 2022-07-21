@@ -24,14 +24,12 @@ const SellbillEditScreen = () => {
 
   const { colors } = useTheme();
 
-  // const temps = docSelectors.selectByDocType<ISellbillDocument>('otves');
   const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
-  // const sellbill = temps?.find((e) => e.id === id);
 
-  const number1 = sellbill?.number;
-  const contact1 = sellbill?.head.contact;
-  const outlet1 = sellbill?.head.outlet;
-  const onDate1 = sellbill?.head.onDate;
+  const number = sellbill?.number;
+  const contact = sellbill?.head.contact;
+  const outlet = sellbill?.head.outlet;
+  const onDate = sellbill?.head.onDate;
 
   const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
@@ -152,10 +150,10 @@ const SellbillEditScreen = () => {
             directionRow={true}
           />
         </View>
-        <Input label="Номер" value={number1} disabled={true} />
-        <Input label="Дата отгрузки" value={getDateString(onDate1 || '')} disabled={true} />
-        <Input label="Организация" value={contact1?.name} disabled={true} />
-        <Input label="Магазин" value={outlet1?.name} disabled={true} />
+        <Input label="Номер" value={number} disabled={true} />
+        <Input label="Дата отгрузки" value={getDateString(onDate || '')} disabled={true} />
+        <Input label="Организация" value={contact?.name} disabled={true} />
+        <Input label="Магазин" value={outlet?.name} disabled={true} />
         <Input label="Склад" value={depart?.name} disabled={true} />
       </ScrollView>
     </AppInputScreen>
