@@ -13,7 +13,6 @@ import {
   AppScreen,
 } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
-import Constants from 'expo-constants';
 
 const SettingsSceen = () => {
   const navigation = useNavigation();
@@ -89,7 +88,7 @@ const SettingsSceen = () => {
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
         <View>
-          <Text style={[styles.title]}>Параметры связи с сервером</Text>
+          <Text style={styles.title}>Параметры связи с сервером</Text>
           <Divider />
           <View style={styles.details}>
             <Text style={styles.name}>Путь к серверу</Text>
@@ -97,19 +96,16 @@ const SettingsSceen = () => {
           </View>
         </View>
         <View>
-          <View>
-            {parents.map((group, groupKey) => {
-              const list = Object.entries(settsData)
-                .filter(([_, item]) => item?.visible && item.group?.id === group.id)
-                .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
-              return (
-                <View key={groupKey}>
-                  <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
-                  <Divider />
-                </View>
-              );
-            })}
-          </View>
+          {parents.map((group, groupKey) => {
+            const list = Object.entries(settsData)
+              .filter(([_, item]) => item?.visible && item.group?.id === group.id)
+              .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
+            return (
+              <View key={groupKey}>
+                <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
+              </View>
+            );
+          })}
         </View>
       </KeyboardAwareScrollView>
     </AppScreen>

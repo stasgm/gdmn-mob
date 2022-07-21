@@ -39,6 +39,7 @@ export const initialState: Readonly<AuthState> = {
   isDemo: useMockup,
   isInit: false,
   isConfigFirst: true,
+  isLogout: false,
 };
 
 const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, action): AuthState => {
@@ -54,6 +55,9 @@ const reducer: Reducer<AuthState, AuthActionType> = (state = initialState, actio
 
     case getType(actions.setIsConfigFirst):
       return { ...state, isConfigFirst: action.payload };
+
+    case getType(actions.setIsLogOut):
+      return { ...state, isLogout: action.payload };
 
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };

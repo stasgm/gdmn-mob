@@ -17,4 +17,5 @@ export type AuthState = {
   readonly error: boolean;
   readonly status: string;
   readonly isConfigFirst: boolean;
+  readonly isLogout: boolean;
 };

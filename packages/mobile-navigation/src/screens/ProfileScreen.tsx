@@ -1,25 +1,29 @@
 import React, { useCallback, useLayoutEffect } from 'react';
-import { Alert, View, Text, StyleSheet } from 'react-native';
-import { Avatar, Divider } from 'react-native-paper';
+import { Alert, View, StyleSheet } from 'react-native';
+import { Avatar, Divider, Switch } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
 
-import { DrawerButton, MenuButton } from '@lib/mobile-ui/src/components/AppBar';
-import { PrimeButton, DescriptionItem } from '@lib/mobile-ui/src/components';
+import {
+  DrawerButton,
+  MenuButton,
+  PrimeButton,
+  DescriptionItem,
+  MediumText,
+  AppScreen,
+  useActionSheet,
+  globalStyles,
+  LargeText,
+} from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
-import { useActionSheet } from '@lib/mobile-ui';
 import { useTheme } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
 
-  const user = useSelector((state) => state.auth.user);
-  const company = useSelector((state) => state.auth.company);
-  const device = useSelector((state) => state.auth.device);
-  const isDemo = useSelector((state) => state.auth.isDemo);
-  const loading = useSelector((state) => state.auth.loading);
+  const { user, company, device, isDemo, loading, isLogout } = useSelector((state) => state.auth);
 
   const userSettings = user?.settings;
 
@@ -90,57 +94,84 @@ const ProfileScreen = () => {
 
   const visibleList = userSettings && Object.entries(userSettings).filter(([_, item]) => item.visible);
 
+  const handleUpdate = (value: boolean) => {
+    dispatch(authActions.setIsLogOut(!value));
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={[styles.profileContainer]}>
-        <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="badge-account-horizontal-outline" style={{ backgroundColor: colors.primary }} />
-        </View>
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileInfoTextUser}>{user?.firstName || ''}</Text>
-          <Text style={styles.profileInfoTextUser}>
-            {!user?.firstName && !user?.lastName ? user?.name : user?.lastName || ''}
-          </Text>
-          <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{company?.name || ''}</Text>
-        </View>
-      </View>
-      <Divider />
-      <View style={[styles.profileContainer]}>
-        <View style={styles.profileIcon}>
-          <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.primary }} />
-        </View>
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileInfoTextUser}>{device?.name || ''}</Text>
-          <Text style={[styles.profileInfoTextCompany, { color: colors.text }]}>{device?.state || ''}</Text>
-        </View>
-      </View>
-      {!!visibleList?.length && (
-        <View>
-          <Text style={[styles.title]}>Настройки пользователя</Text>
-          <View style={[styles.descriptionContainer]}>
-            {visibleList.map(([key, item]) => {
-              return (
-                <View key={key}>
-                  <Divider />
-                  <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
-                </View>
-              );
-            })}
+    <AppScreen>
+      <View style={styles.container}>
+        <View style={styles.profileContainer}>
+          <View style={styles.profileIcon}>
+            <Avatar.Icon
+              size={50}
+              icon="badge-account-horizontal-outline"
+              style={{ backgroundColor: colors.primary }}
+            />
+          </View>
+          <View style={styles.profileInfo}>
+            {user?.firstName ? <MediumText style={globalStyles.textBold}>{user?.firstName}</MediumText> : null}
+            <MediumText style={globalStyles.textBold}>
+              {!user?.firstName && !user?.lastName ? user?.name : user?.lastName || 'ffffff'}
+            </MediumText>
+            <MediumText>{company?.name || ''}</MediumText>
           </View>
         </View>
-      )}
-      <View>
-        <PrimeButton outlined onPress={handleLogout} disabled={loading}>
-          {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
-        </PrimeButton>
+        <Divider />
+        <View style={styles.profileContainer}>
+          <View style={styles.profileIcon}>
+            <Avatar.Icon size={50} icon="devices" style={{ backgroundColor: colors.primary }} />
+          </View>
+          <View style={styles.profileInfo}>
+            <MediumText style={globalStyles.textBold}>{device?.name || ''}</MediumText>
+            <MediumText>{device?.state || ''}</MediumText>
+          </View>
+        </View>
+        <Divider />
+        <View style={[styles.containerSet, { borderColor: colors.primary }]}>
+          <MediumText style={styles.subHeading}>{'Не выходить из профиля'}</MediumText>
+          <Switch color={colors.primary} value={!isLogout} onValueChange={handleUpdate} />
+        </View>
+        <Divider />
+        {!!visibleList?.length && (
+          <View>
+            <LargeText style={styles.title}>Настройки пользователя</LargeText>
+            <View style={styles.descriptionContainer}>
+              {visibleList.map(([key, item]) => {
+                return (
+                  <View key={key}>
+                    <Divider />
+                    <DescriptionItem description={item.description} data={item.data}></DescriptionItem>
+                  </View>
+                );
+              })}
+            </View>
+            <Divider />
+          </View>
+        )}
+        <View>
+          <PrimeButton outlined onPress={handleLogout} disabled={loading}>
+            {isDemo ? 'Выйти из демо режима' : 'Сменить пользователя'}
+          </PrimeButton>
+        </View>
       </View>
-    </View>
+    </AppScreen>
   );
 };
 
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+  containerSet: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    fontSize: 20,
+  },
+  subHeading: {
+    width: '85%',
+    fontSize: 15,
+  },
   container: {
     flex: 1,
     margin: 10,
@@ -156,7 +187,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   descriptionContainer: {
-    // alignItems: 'flex-start',
     flexDirection: 'column',
     justifyContent: 'space-between',
     marginVertical: 5,
@@ -169,14 +199,6 @@ const styles = StyleSheet.create({
   profileInfo: {
     flex: 1,
     justifyContent: 'center',
-  },
-  profileInfoTextCompany: {
-    fontSize: 15,
-    fontWeight: '300',
-  },
-  profileInfoTextUser: {
-    fontSize: 17,
-    fontWeight: 'bold',
   },
   title: {
     alignItems: 'center',
