@@ -7,10 +7,10 @@ import { useTheme } from '@react-navigation/native';
 
 import { round } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../../store/types';
+import { IFreeSellbillLine } from '../../../store/types';
 
 export interface IItem {
-  lines: IMoveLine[];
+  lines: IFreeSellbillLine[];
   scan?: boolean;
 }
 

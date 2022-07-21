@@ -6,10 +6,10 @@ import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../../store/types';
+import { IFreeSellbillLine } from '../../../store/types';
 
 interface IProps {
-  item: IMoveLine;
+  item: IFreeSellbillLine;
 }
 
 export const FreeSellbillItem = ({ item }: IProps) => {

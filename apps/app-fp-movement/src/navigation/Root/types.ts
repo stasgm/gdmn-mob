@@ -2,7 +2,7 @@
 
 import { IReferenceData } from '@lib/types';
 
-import { IMoveLine, IOtvesLine } from '../../store/types';
+import { IMoveLine, ISellbillLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -39,16 +39,16 @@ export type MoveParamList = RefParamList & {
 
 export type MoveStackParamList = { MoveList: undefined } & MoveParamList;
 
-export type OrderParamList = RefParamList & {
-  OtvesLine: { mode: number; docId: string; tempId: string; item: IOtvesLine; docType?: string };
+export type SellbillParamList = RefParamList & {
+  SellbillLine: { mode: number; docId: string; tempId: string; item: ISellbillLine; docType?: string };
   TempView: { id: string };
-  OrderEdit: { id: string };
-  OtvesView: { id: string };
+  SellbillEdit: { id: string };
+  SellbillView: { id: string };
   ScanOrder: { id: string };
   ScanGood: { docId: string; tempId: string; docType?: string };
 };
 
-export type OrderStackParamList = { OrderList: undefined } & OrderParamList;
+export type SellbillStackParamList = { SellbillList: undefined } & SellbillParamList;
 
 export type FreeSellbillParamList = RefParamList & {
   FreeSellbillView: { id: string; docType?: string };

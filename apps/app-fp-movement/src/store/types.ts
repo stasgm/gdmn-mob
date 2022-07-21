@@ -15,7 +15,7 @@ export interface IMoveFormParam extends IFormParam {
   comment?: string;
 }
 
-export interface IOrderFormParam extends IFormParam {
+export interface ISellbillFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
@@ -90,7 +90,7 @@ export interface ITempLine extends IEntity {
 
 export type ITempDocument = MandateProps<IDocument<ITempHead, ITempLine>, 'head' | 'lines'>;
 
-export interface IOtvesHead extends IHead {
+export interface ISellbillHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
   depart: ICodeEntity; // подразделеніе сотрудника (кладовщик, работающий с терминалом)
@@ -100,16 +100,17 @@ export interface IOtvesHead extends IHead {
   orderId: string;
 }
 
-export interface IOtvesLine extends IEntity {
+export interface ISellbillLine extends IEntity {
   good: IGood; // товар
   weight: number; //вес
   workDate: string; // Дата производства
   numReceived: string; // Номер партии
   barcode: string; // технологический код
   quantPack: number; // порядковый номер сканирования в документе
+  sortOrder?: number; // порядок сортировки
 }
 
-export type IOtvesDocument = MandateProps<IDocument<IOtvesHead, IOtvesLine>, 'head' | 'lines'>;
+export type ISellbillDocument = MandateProps<IDocument<ISellbillHead, ISellbillLine>, 'head' | 'lines'>;
 
 export interface IFreeSellbillHead extends IHead {
   depart: ICodeEntity;

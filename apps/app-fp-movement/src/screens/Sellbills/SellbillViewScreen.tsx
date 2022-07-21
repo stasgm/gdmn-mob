@@ -24,32 +24,32 @@ import { IDocument } from '@lib/types';
 
 import { Divider } from 'react-native-paper';
 
-import { IOtvesDocument, IOtvesLine } from '../../store/types';
+import { ISellbillDocument, ISellbillLine } from '../../store/types';
 
-import { OrderStackParamList } from '../../navigation/Root/types';
+import { SellbillStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
 
 import { navBackButton } from '../../components/navigateOptions';
 
-import OtvesItem from './components/OtvesItem';
+import SellbillItem from './components/SellbillItem';
 
-const keyExtractor = (item: IOtvesLine) => item.id;
+const keyExtractor = (item: ISellbillLine) => item.id;
 
-const OtvesViewScreen = () => {
+const SellbillViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OtvesView'>>();
-  const id = useRoute<RouteProp<OrderStackParamList, 'OtvesView'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillView'>>();
+  const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillView'>>().params?.id;
 
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const [del, setDel] = useState(false);
 
-  const order = docSelectors.selectByDocId<IOtvesDocument>(id);
+  const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
 
-  const isBlocked = order?.status !== 'DRAFT';
+  const isBlocked = sellbill?.status !== 'DRAFT';
 
   // const handleAddOrderLine = useCallback(() => {
   //   navigation.navigate('SelectGroupItem', {
@@ -57,16 +57,16 @@ const OtvesViewScreen = () => {
   //   });
   // }, [navigation, id]);
 
-  const handleEditOrderHead = useCallback(() => {
-    navigation.navigate('OrderEdit', { id });
+  const handleEditSellbillHead = useCallback(() => {
+    navigation.navigate('SellbillEdit', { id });
   }, [navigation, id]);
 
-  const handleCopyOrder = useCallback(() => {
+  const handleCopySellbill = useCallback(() => {
     const newDocDate = new Date().toISOString();
     const newId = generateId();
 
     const newDoc: IDocument = {
-      ...order,
+      ...sellbill,
       id: newId,
       number: 'б\\н',
       status: 'DRAFT',
@@ -78,7 +78,7 @@ const OtvesViewScreen = () => {
     docDispatch(documentActions.addDocument(newDoc));
 
     navigation.navigate('TempView', { id: newId });
-  }, [order, docDispatch, navigation]);
+  }, [sellbill, docDispatch, navigation]);
 
   const handleDelete = useCallback(async () => {
     if (!id) {
@@ -111,11 +111,11 @@ const OtvesViewScreen = () => {
       // },
       {
         title: 'Редактировать данные',
-        onPress: handleEditOrderHead,
+        onPress: handleEditSellbillHead,
       },
       {
         title: 'Копировать заявку',
-        onPress: handleCopyOrder,
+        onPress: handleCopySellbill,
       },
       {
         title: 'Удалить заявку',
@@ -127,7 +127,7 @@ const OtvesViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleEditOrderHead, handleCopyOrder, handleDelete]);
+  }, [showActionSheet, handleEditSellbillHead, handleCopySellbill, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -148,11 +148,11 @@ const OtvesViewScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem = useCallback(
-    ({ item }: { item: IOtvesLine }) => <OtvesItem docId={order?.id} item={item} readonly={isBlocked} />,
-    [isBlocked, order?.id],
+    ({ item }: { item: ISellbillLine }) => <SellbillItem docId={sellbill?.id} item={item} readonly={isBlocked} />,
+    [isBlocked, sellbill?.id],
   );
 
-  const lineSum = order.lines?.reduce((sum, line) => ({ weight: sum.weight + (line.weight || 0) }), { weight: 0 });
+  const lineSum = sellbill.lines?.reduce((sum, line) => ({ weight: sum.weight + (line.weight || 0) }), { weight: 0 });
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
@@ -171,7 +171,7 @@ const OtvesViewScreen = () => {
       </View>
     );
   } else {
-    if (!order) {
+    if (!sellbill) {
       return (
         <View style={styles.container}>
           <SubTitle style={styles.title}>Документ не найден</SubTitle>
@@ -183,20 +183,20 @@ const OtvesViewScreen = () => {
   return (
     <View style={[styles.container]}>
       <InfoBlock
-        colorLabel={getStatusColor(order?.status || 'DRAFT')}
-        title={order.head.outlet?.name}
-        onPress={handleEditOrderHead}
-        disabled={!['DRAFT', 'READY'].includes(order.status)}
+        colorLabel={getStatusColor(sellbill?.status || 'DRAFT')}
+        title={sellbill.head.outlet?.name || ''}
+        onPress={handleEditSellbillHead}
+        disabled={!['DRAFT', 'READY'].includes(sellbill.status)}
       >
         <View style={localStyles.infoBlock}>
-          <Text style={textStyle}>{`№ ${order.number} на ${getDateString(order.head?.onDate)}`}</Text>
+          <Text style={textStyle}>{`№ ${sellbill.number} на ${getDateString(sellbill.head?.onDate)}`}</Text>
           <View style={styles.rowCenter}>
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </View>
       </InfoBlock>
       <FlatList
-        data={order.lines}
+        data={sellbill.lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}
@@ -206,7 +206,7 @@ const OtvesViewScreen = () => {
       <View style={[localStyles.margins]}>
         <View style={localStyles.content}>
           <MediumText style={styles.textTotal}>Общий вес (кг): {lineSum.weight}</MediumText>
-          <MediumText style={styles.textTotal}>Общее количество: {order.lines.length}</MediumText>
+          <MediumText style={styles.textTotal}>Общее количество: {sellbill.lines.length}</MediumText>
         </View>
       </View>
       <View style={styles.itemNoMargin}>
@@ -217,7 +217,7 @@ const OtvesViewScreen = () => {
             </View>
             <View style={localStyles.quantity}>
               <MediumText style={styles.textTotal}>{lineSum.weight}</MediumText>
-              <MediumText style={styles.textTotal}>{order.lines.length}</MediumText>
+              <MediumText style={styles.textTotal}>{sellbill.lines.length}</MediumText>
             </View>
           </View>
         </View>
@@ -226,7 +226,7 @@ const OtvesViewScreen = () => {
   );
 };
 
-export default OtvesViewScreen;
+export default SellbillViewScreen;
 
 const localStyles = StyleSheet.create({
   del: {
@@ -247,16 +247,16 @@ const localStyles = StyleSheet.create({
   groupWidth: {
     width: '62%',
   },
-  groupMargin: {
-    marginHorizontal: 5,
-  },
+  // groupMargin: {
+  //   marginHorizontal: 5,
+  // },
   quantity: {
     alignItems: 'flex-end',
     width: '35%',
   },
-  total: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
-  },
+  // total: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   marginBottom: 5,
+  // },
 });

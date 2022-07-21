@@ -26,21 +26,21 @@ import { IDocumentType, IReference } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
 
-import { IOtvesDocument } from '../../store/types';
+import { ISellbillDocument } from '../../store/types';
 import SwipeListItem from '../../components/SwipeListItem';
-import { OrderStackParamList } from '../../navigation/Root/types';
+import { SellbillStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
 // import { getBarcode } from '../../utils/helpers';
 
-export interface OrderListSectionProps {
+export interface SellbillListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, SellbillListSectionProps>[];
 
-export const OrderListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderList'>>();
+export const SellbillListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillList'>>();
 
   const loading = useSelector((state) => state.documents.loading);
 
@@ -50,7 +50,7 @@ export const OrderListScreen = () => {
 
   // const movements = useSelector((state) => state.documents.list) as ITempDocument[];
   // const temps = useSelector((state) => state.documents.list) as ITempDocument[];
-  const temps = docSelectors.selectByDocType<IOtvesDocument>('otves');
+  const temps = docSelectors.selectByDocType<ISellbillDocument>('otves');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -178,8 +178,8 @@ export const OrderListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="OtvesView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OtvesView', { id: item.id })} />
+      <SwipeListItem renderItem={item} item={doc} routeName="SellbillView">
+        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('SellbillView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

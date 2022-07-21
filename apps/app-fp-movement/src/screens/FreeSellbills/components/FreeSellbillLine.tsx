@@ -8,13 +8,13 @@ import { useTheme } from '@react-navigation/native';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../../store/types';
+import { IFreeSellbillLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 
 interface IProps {
-  item: IMoveLine;
-  onSetLine: (value: IMoveLine) => void;
+  item: IFreeSellbillLine;
+  onSetLine: (value: IFreeSellbillLine) => void;
 }
 
 export const FreeSellbillLine = ({ item }: IProps) => {

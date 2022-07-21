@@ -6,27 +6,28 @@ import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigat
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
 
-import { OrderStackParamList } from '../../navigation/Root/types';
+import { SellbillStackParamList } from '../../navigation/Root/types';
 
-import { IOtvesDocument, IOtvesLine, ITempDocument } from '../../store/types';
+import { ISellbillDocument, ISellbillLine, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 // import { getBarcode } from '../../utils/helpers';
 
-import { OtvesLine } from './components/OtvesLine';
+import { SellbillLine } from './components/SellbillLine';
 
 const round = (num: number) => {
   return Math.round((num + Number.EPSILON) * 1000) / 1000;
 };
 
-export const OtvesLineScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList | OrderStackParamList, 'OtvesLine'>>();
+export const SellbillLineScreen = () => {
+  const navigation =
+    useNavigation<StackNavigationProp<SellbillStackParamList | SellbillStackParamList, 'SellbillLine'>>();
   const dispatch = useDispatch();
-  const { mode, docId, tempId, item } = useRoute<RouteProp<OrderStackParamList, 'OtvesLine'>>().params;
-  const [line, setLine] = useState<IOtvesLine>(item);
+  const { mode, docId, tempId, item } = useRoute<RouteProp<SellbillStackParamList, 'SellbillLine'>>().params;
+  const [line, setLine] = useState<ISellbillLine>(item);
 
   const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
-  const otvesLines = docSelectors.selectByDocId<IOtvesDocument>(docId)?.lines;
+  const otvesLines = docSelectors.selectByDocId<ISellbillDocument>(docId)?.lines;
 
   const handleSave = useCallback(() => {
     // for (const tempLine of tempLines) {
@@ -107,7 +108,7 @@ export const OtvesLineScreen = () => {
   }
   return (
     <View style={[styles.container]}>
-      <OtvesLine item={line} onSetLine={setLine} />
+      <SellbillLine item={line} onSetLine={setLine} />
     </View>
   );
 };

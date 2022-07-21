@@ -43,7 +43,7 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 import { messageFpMovement } from './src/store/mock';
 import { FreeSellbillNavigator } from './src/navigation/FreeSellbillNavigator';
-import { OrderNavigator } from './src/navigation/OrderNavigator';
+import { SellbillNavigator } from './src/navigation/SellbillNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -58,7 +58,7 @@ const Root = () => {
         name: 'Otves',
         title: 'Отвесы',
         icon: 'clipboard-list-outline',
-        component: OrderNavigator,
+        component: SellbillNavigator,
       },
       {
         name: 'FreeSellbill',
