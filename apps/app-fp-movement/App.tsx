@@ -37,7 +37,7 @@ import { TouchableOpacity, Linking } from 'react-native';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
-import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
+import { store, useSelector as useFpSelector, fpMovementActions } from './src/store';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
@@ -78,7 +78,7 @@ const Root = () => {
   const appDataLoading = appSelectors.selectLoading();
   const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
-  const invLoading = useInvSelector((state) => state.appInventory.loading);
+  const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
 
@@ -131,7 +131,7 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
+  const fpLoadingError = useFpSelector<string>((state) => state.fpMovement.loadingError);
 
   const [infoWindow, setInfoWindow] = useState(0);
 
@@ -150,7 +150,7 @@ const Root = () => {
     }
   }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1]);
 
-  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
+  const onClearLoadingErrors = () => dispatch(fpMovementActions.setLoadingError(''));
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
@@ -211,11 +211,11 @@ const Root = () => {
             {'Начать работу'}
           </PrimeButton>
         </AppScreen>
-      ) : authLoading || loading || appLoading || invLoading || appDataLoading ? (
+      ) : authLoading || loading || appLoading || fpLoading || appDataLoading ? (
         <AppScreen>
           <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
           <Caption style={styles.title}>
-            {appDataLoading || invLoading
+            {appDataLoading || fpLoading
               ? 'Загрузка данных...'
               : appLoading
               ? 'Синхронизация данных..'
@@ -225,7 +225,7 @@ const Root = () => {
       ) : (
         <MobileApp
           items={navItems}
-          loadingErrors={[invLoadingError]}
+          loadingErrors={[fpLoadingError]}
           onClearLoadingErrors={onClearLoadingErrors}
           onGetMessages={isDemo ? getMessages : undefined}
         />

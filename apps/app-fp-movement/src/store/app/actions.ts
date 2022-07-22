@@ -1,17 +1,17 @@
 import { IEntity } from '@lib/types';
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { AppInventoryState, IOrder } from './types';
+import { FpMovementState, IOrder } from './types';
 
-const init = createAction('APP_INVENTORY/INIT')();
-const addOrder = createAction('APP_INVENTORY/ADD_ONE')<IOrder>();
-const updateOrderLine = createAction('APP_INVENTORY/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
-const removeOrderLine = createAction('APP_INVENTORY/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
+const init = createAction('APP_FP_MOVEMENT/INIT')();
+const addOrder = createAction('APP_FP_MOVEMENT/ADD_ONE')<IOrder>();
+const updateOrderLine = createAction('APP_FP_MOVEMENT/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
+const removeOrderLine = createAction('APP_FP_MOVEMENT/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
 
-const loadData = createAction('APP_INVENTORY/LOAD_DATA')<AppInventoryState>();
-const setLoading = createAction('APP_INVENTORY/SET_LOADING')<boolean>();
-const setLoadingData = createAction('APP_INVENTORY/SET_LOADING_DATA')<boolean>();
-const setLoadingError = createAction('APP_INVENTORY/SET_LOADING_ERROR')<string>();
+const loadData = createAction('APP_FP_MOVEMENT/LOAD_DATA')<FpMovementState>();
+const setLoading = createAction('APP_FP_MOVEMENT/SET_LOADING')<boolean>();
+const setLoadingData = createAction('APP_FP_MOVEMENT/SET_LOADING_DATA')<boolean>();
+const setLoadingError = createAction('APP_FP_MOVEMENT/SET_LOADING_ERROR')<string>();
 
 export const actions = {
   init,
@@ -24,4 +24,4 @@ export const actions = {
   removeOrderLine,
 };
 
-export type AppInventoryActionType = ActionType<typeof actions>;
+export type FpMovementActionType = ActionType<typeof actions>;

@@ -51,7 +51,7 @@ export const MoveViewScreen = () => {
 
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
 
-  const lines = useMemo(() => doc.lines.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc.lines]);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
   const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
@@ -142,10 +142,10 @@ export const MoveViewScreen = () => {
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = doc.lines?.[doc.lines.length - 1]?.id;
+    const lastId = doc?.lines?.[doc?.lines?.length - 1]?.id;
 
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
-  }, [dispatch, doc.lines, id]);
+  }, [dispatch, doc?.lines, id]);
 
   const handleUseSendDoc = useSendDocs([doc]);
 
@@ -256,7 +256,7 @@ export const MoveViewScreen = () => {
         return;
       }
 
-      const line = doc.lines.find((i) => i.barcode === barc.barcode);
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
@@ -271,7 +271,7 @@ export const MoveViewScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
-        sortOrder: doc.lines.length + 1,
+        sortOrder: doc?.lines?.length + 1,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -279,7 +279,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [dispatch, id, doc.lines, goods],
+    [dispatch, id, doc?.lines, goods],
   );
 
   const [key, setKey] = useState(1);
@@ -309,6 +309,7 @@ export const MoveViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
+          {/* <View style={localStyles.del}> */}
           <SubTitle style={styles.title}>
             {screenState === 'deleting'
               ? 'Удаление документа...'
@@ -367,7 +368,7 @@ export const MoveViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {doc.lines.length ? <MoveTotal lines={doc.lines} /> : null}
+      {doc?.lines?.length ? <MoveTotal lines={doc?.lines} /> : null}
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}

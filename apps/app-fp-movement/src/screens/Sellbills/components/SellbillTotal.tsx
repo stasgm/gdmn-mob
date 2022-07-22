@@ -7,17 +7,14 @@ import { useTheme } from '@react-navigation/native';
 
 import { round } from '@lib/mobile-app';
 
-import { ISellbillLine } from '../../../store/types';
-
 export interface IItem {
-  lines: ISellbillLine[];
+  quantity: number;
+  weight: number;
   scan?: boolean;
 }
 
-const SellbillTotal = ({ lines, scan = false }: IItem) => {
+const SellbillTotal = ({ weight, quantity, scan = false }: IItem) => {
   const { colors } = useTheme();
-
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
 
   return (
     <View>
@@ -34,7 +31,7 @@ const SellbillTotal = ({ lines, scan = false }: IItem) => {
               <MediumText>Общий вес (кг)</MediumText>
             </View>
             <View style={localStyles.quantity}>
-              <MediumText>{`${round(lineSum, 3)}`}</MediumText>
+              <MediumText>{`${round(quantity, 3)}` || 0}</MediumText>
             </View>
 
             {/* <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(, 2))}`}</MediumText> */}
@@ -45,7 +42,7 @@ const SellbillTotal = ({ lines, scan = false }: IItem) => {
               <MediumText>Количество позиций</MediumText>
             </View>
             <View style={localStyles.quantity}>
-              <MediumText>{lines.length}</MediumText>
+              <MediumText>{weight || 0}</MediumText>
             </View>
 
             {/* <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(, 2))}`}</MediumText> */}

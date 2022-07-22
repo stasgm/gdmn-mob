@@ -51,28 +51,13 @@ const ScanOrderScreen = () => {
     });
   }, [navigation]);
 
-  // const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOrderDocument;
-
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
-  // console.log('orders', orders);
-  // const tempList = docSelectors.selectByDocType<ITempDocument>('temp');
   const sellbills = docSelectors.selectByDocType<ISellbillDocument>('otves');
-
-  // const tempType = refSelectors
-  //   .selectByName<IReference<IDocumentType>>('documentType')
-  //   ?.data.find((t) => t.name === 'move');
-
-  // const otvesType = refSelectors
-  //   .selectByName<IReference<IDocumentType>>('documentType')
-  //   ?.data.find((t) => t.name === 'otves');
 
   const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === docId);
-
-  // const docTypes = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
-  // const sellbillType: IDocumentType = docTypes.find((t) => t.name === docId);
 
   const handleSaveScannedItem = useCallback(
     (item: ISellbillDocument) => {
@@ -85,25 +70,26 @@ const ScanOrderScreen = () => {
       };
       console.log('otvesDoc', sellbillDoc);
 
-      const orderr: IOrder = {
-        id: item.head.orderId,
-        lines: item.lines,
+      const order = orders.find((i) => i.id === item.head.orderId)!;
+
+      const newOrder: IOrder = {
+        id: order.id,
+        lines: order.lines,
       };
 
-      dispatch(orderActions.addOrder(orderr));
+      dispatch(orderActions.addOrder(newOrder));
 
       if (sellbills.find((i) => i.head.barcode === item.head.barcode)) {
         return;
       }
 
       dispatch(documentActions.addDocument(sellbillDoc));
-      // dispatch(documentActions.addDocument(sellbillDoc));
 
       navigation.navigate('SellbillView', {
         id: item.id,
       });
     },
-    [sellbillType, dispatch, sellbills, navigation],
+    [sellbillType, orders, dispatch, sellbills, navigation],
   );
 
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
@@ -116,9 +102,6 @@ const ScanOrderScreen = () => {
         return;
       }
 
-      // if (!tempType) {
-      //   return;
-      // }
       if (!sellbillType) {
         return;
       }
@@ -130,7 +113,6 @@ const ScanOrderScreen = () => {
         documentDate: new Date().toISOString(),
         status: 'DRAFT',
         head: {
-          // comment: order.head.
           barcode: order.head.barcode,
           contact: order.head.contact,
           depart: depart,
@@ -138,23 +120,18 @@ const ScanOrderScreen = () => {
           onDate: order.head.onDate,
           orderId: order.id,
         },
-        lines: order.lines,
+        lines: [],
         creationDate: new Date().toISOString(),
         editionDate: new Date().toISOString(),
       };
 
       return sellbillDoc;
-      // navigation.navigate('MovementView', { id });
     },
     [depart, orders, sellbillType],
   );
 
-  // if (!document) {
-  //   return <Text style={globalStyles.title}>Документ не найден</Text>;
-  // }
   const handleGetBarcode = useCallback(
     (brc: string) => {
-      // const barc = getBarcode(brc);
       if (!sellbillType) {
         return Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
       }
@@ -169,7 +146,6 @@ const ScanOrderScreen = () => {
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
           head: {
-            // comment: order.head.
             barcode: order.head.barcode,
             contact: order.head.contact,
             depart: depart,
@@ -190,8 +166,6 @@ const ScanOrderScreen = () => {
         };
 
         if (sellbills.find((i) => i.head.barcode === tempDoc.head.barcode)) {
-          // dispatch(documentActions.removeDocument('08b6266e38'));
-
           return;
         }
 

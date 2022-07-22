@@ -4,22 +4,22 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { configureStore } from '@lib/store';
 import { loadDataFromDisk, saveDataToDisk } from '@lib/mobile-app';
 
-import appInventoryReducer from './app/reducer';
-import { AppInventoryActionType } from './app/actions';
-import { appInvMiddlewareFactory } from './app/middleware';
+import fpMovementReducer from './app/reducer';
+import { FpMovementActionType } from './app/actions';
+import { appFpMiddlewareFactory } from './app/middleware';
 
-export { default as appInventoryActions } from './app';
+export { default as fpMovementActions } from './app';
 // export { useAppInventoryThunkDispatch } from './app/actions.async';
 
-type TActions = AppInventoryActionType;
+type TActions = FpMovementActionType;
 
 export const reducers = {
-  appInventory: appInventoryReducer,
+  fpMovement: fpMovementReducer,
 };
 
 const appReducer = combineReducers(reducers);
 
-export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers, [], [appInvMiddlewareFactory]);
+export const { store } = configureStore(loadDataFromDisk, saveDataToDisk, reducers, [], [appFpMiddlewareFactory]);
 
 export type AppState = ReturnType<typeof appReducer>;
 export type AppThunk = ThunkAction<void, AppState, null, Action<any>>;

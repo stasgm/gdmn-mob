@@ -13,7 +13,7 @@ import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@rea
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -26,7 +26,7 @@ import {
 
 import { sleep } from '@lib/client-api';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, round } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
@@ -40,12 +40,12 @@ import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { navBackButton } from '../../components/navigateOptions';
 
-import SellbillTotal from '../Movements/components/SellbillTotal';
-
-import { IGood, IOrder } from '../../store/app/types';
-import { useSelector as useAppSelector } from '../../store/index';
+import { IGood } from '../../store/app/types';
+import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
 import { getBarcode } from '../../utils/helpers';
+
+import SellbillTotal from './components/SellbillTotal';
 
 import SellbillItem from './components/SellbillItem';
 import TempItem from './components/TempItem';
@@ -53,15 +53,15 @@ import TempItem from './components/TempItem';
 const lineTypes: IListItem[] = [
   {
     id: 'order',
-    value: 'Заявки',
+    value: 'заявлено',
   },
   {
     id: 'sellbill',
-    value: 'Отвесы',
+    value: 'отвешено',
   },
 ];
 
-const keyExtractor = (item: ISellbillLine) => item.id;
+const keyExtractor = (item: ISellbillLine | ITempLine) => item.id;
 
 const SellbillViewScreen = () => {
   const { colors } = useTheme();
@@ -70,6 +70,7 @@ const SellbillViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillView'>>();
   const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillView'>>().params?.id;
   const dispatch = useDispatch();
+  const fpDispatch = useFpDispatch();
   const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
@@ -78,14 +79,12 @@ const SellbillViewScreen = () => {
 
   const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
 
-  const lines = useAppSelector((state) => state.appInventory.list).find((i) => i.id === sellbill.head.orderId) || [];
-  const lines2 = useSelector((state) => state.app.list) as IOrder[];
+  const order = useFpSelector((state) => state.fpMovement.list).find((i) => i.id === sellbill.head.orderId);
+  const lines = order?.lines as ITempLine[];
+
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
-  console.log('list', lines);
-  console.log('list2', lines2);
-
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<(ISellbillLine | ITempLine)[]>([]);
   const isBlocked = sellbill?.status !== 'DRAFT';
 
   // const handleAddOrderLine = useCallback(() => {
@@ -100,8 +99,9 @@ const SellbillViewScreen = () => {
     } else if (lineType === 'order') {
       setList(lines);
     }
-    console.log('list useEffect', list);
   }, [lineType, lines, list, sellbill.lines]);
+
+  const lineSum = list?.reduce((sum: number, line: ISellbillLine | ITempLine) => sum + (line.weight || 0), 0);
 
   const handleEditSellbillHead = useCallback(() => {
     navigation.navigate('SellbillEdit', { id });
@@ -149,12 +149,22 @@ const SellbillViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
+  const hanldeCancelLastScan = useCallback(() => {
+    const lastId = sellbill.lines?.[sellbill.lines.length - 1]?.id;
+
+    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+  }, [dispatch, id, sellbill.lines]);
+
   const actionsMenu = useCallback(() => {
     showActionSheet([
       // {
       //   title: 'Добавить товар',
       //   onPress: handleAddOrderLine,
       // },
+      {
+        title: 'Отменить последнее сканирование',
+        onPress: hanldeCancelLastScan,
+      },
       {
         title: 'Редактировать данные',
         onPress: handleEditSellbillHead,
@@ -173,7 +183,7 @@ const SellbillViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, handleEditSellbillHead, handleCopySellbill, handleDelete]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditSellbillHead, handleCopySellbill, handleDelete]);
 
   const renderRight = useCallback(
     () =>
@@ -195,7 +205,7 @@ const SellbillViewScreen = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: ISellbillLine | ITempLine }) =>
-      lineType === 'selbill' ? (
+      lineType === 'sellbill' ? (
         <SellbillItem docId={sellbill?.id} item={item} readonly={isBlocked} />
       ) : (
         <TempItem item={item} readonly={isBlocked} />
@@ -234,6 +244,8 @@ const SellbillViewScreen = () => {
         return;
       }
 
+      const tempLine = lines?.find((i) => good.id === i.good.id);
+
       const newLine: ISellbillLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
@@ -245,12 +257,56 @@ const SellbillViewScreen = () => {
         sortOrder: sellbill.lines.length + 1,
       };
 
-      dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+      console.log('newLine', newLine);
+
+      if (tempLine && order) {
+        const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight) };
+        if (newLine.weight > 0) {
+          fpDispatch(
+            fpMovementActions.updateOrderLine({
+              docId: order?.id,
+              line: newTempLine,
+            }),
+          );
+          setScanned(false);
+        } else if (newLine.weight === 0) {
+          fpDispatch(fpMovementActions.removeOrderLine({ docId: order?.id, lineId: tempLine.id }));
+        } else {
+          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+            {
+              text: 'Да',
+              onPress: async () => {
+                fpDispatch(fpMovementActions.removeOrderLine({ docId: order?.id, lineId: tempLine.id }));
+              },
+            },
+            {
+              text: 'Отмена',
+            },
+          ]);
+        }
+        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+        setScanned(false);
+      } else {
+        Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+          {
+            text: 'Да',
+            onPress: async () => {
+              dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+            },
+          },
+          {
+            text: 'Отмена',
+          },
+        ]);
+        setScanned(false);
+      }
+
+      // dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       setScanned(false);
     },
 
-    [goods, sellbill.lines, dispatch, id],
+    [goods, sellbill.lines, lines, order, dispatch, id, fpDispatch],
   );
 
   const [key, setKey] = useState(1);
@@ -350,7 +406,7 @@ const SellbillViewScreen = () => {
       />
       <FlatList
         // data={sellbill.lines}
-        data={lineType === 'order' ? list.lines : list}
+        data={list}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         scrollEventThrottle={400}
@@ -358,7 +414,7 @@ const SellbillViewScreen = () => {
       />
 
       {/* <Divider style={{ backgroundColor: colors.primary }} /> */}
-      {sellbill.lines.length ? <SellbillTotal lines={sellbill.lines} /> : null}
+      <SellbillTotal quantity={lineSum} weight={list.length} />
     </View>
   );
 };

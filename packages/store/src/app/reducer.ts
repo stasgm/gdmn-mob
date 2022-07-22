@@ -9,7 +9,6 @@ export const initialState: Readonly<IAppState> = {
   errorMessage: '',
   formParams: {},
   errorList: [],
-  list: [],
   loadingData: false,
   loadingError: '',
 };

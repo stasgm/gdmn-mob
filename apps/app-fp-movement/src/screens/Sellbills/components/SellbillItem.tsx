@@ -10,7 +10,7 @@ import { ISellbillLine, ITempLine } from '../../../store/types';
 
 interface IProps {
   docId: string;
-  item: ISellbillLine | ITempLine;
+  item: ISellbillLine;
   readonly?: boolean;
 }
 

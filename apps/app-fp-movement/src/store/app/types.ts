@@ -4,17 +4,13 @@ export interface ICodeEntity extends INamedEntity {
   shcode: string;
 }
 
-export type AppInventoryState = {
+export type FpMovementState = {
   readonly list: IOrder[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
   readonly loadingError: string;
 };
-
-export interface IModelData<T = unknown> {
-  [id: string]: T;
-}
 
 // Товары
 export interface IGood extends ICodeEntity {
