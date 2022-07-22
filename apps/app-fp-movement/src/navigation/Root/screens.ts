@@ -1,8 +1,8 @@
 import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
 
-import { MoveListScreen, MoveEditScreen, MoveViewScreen, MoveLineScreen } from '../../screens/Movements';
+import { MoveListScreen, MoveEditScreen, MoveViewScreen, MoveLineScreen } from '../../store/screens/Movements';
 
-import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
+import ScanBarcodeScreen from '../../store/screens/Movements/ScanBarcodeScreen';
 
 import {
   SellbillListScreen,
@@ -10,17 +10,17 @@ import {
   SellbillEditScreen,
   SellbillViewScreen,
   SellbillLineScreen,
-} from '../../screens/Sellbills';
+} from '../../store/screens/Sellbills';
 
-import ScanOrderScreen from '../../screens/Sellbills/ScanOrderScreen';
-import ScanGoodScreen from '../../screens/Sellbills/ScanGoodScreen';
+import ScanOrderScreen from '../../store/screens/Sellbills/ScanOrderScreen';
+import ScanGoodScreen from '../../store/screens/Sellbills/ScanGoodScreen';
 
 import {
   FreeSellbillListScreen,
   FreeSellbillEditScreen,
   FreeSellbillViewScreen,
   FreeSellbillLineScreen,
-} from '../../screens/FreeSellbills';
+} from '../../store/screens/FreeSellbills';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
