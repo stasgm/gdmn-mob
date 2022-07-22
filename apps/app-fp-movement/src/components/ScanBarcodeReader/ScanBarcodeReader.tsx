@@ -18,13 +18,13 @@ import { MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../store/types';
+import { IMoveLine, ISellbillLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
 
 export interface IScanerObject {
-  item?: IMoveLine;
+  item?: IMoveLine | ISellbillLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
@@ -105,7 +105,6 @@ export const ScanBarcodeReader = ({ /*onSave,*/ onSearchBarcode, getScannedObjec
     // setScanned(true);
   };
 
-  console.log('scanObject.state', scanObject.state);
   return (
     //isFocused ?
     <KeyboardAvoidingView key={key} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>

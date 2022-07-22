@@ -11,32 +11,31 @@ import { IDepartment, IDocumentType, IReference } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { OrderStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IOrderFormParam, IOtvesDocument } from '../../store/types';
+import { SellbillStackParamList } from '../../navigation/Root/types';
+import { ISellbillFormParam, ISellbillDocument } from '../../store/types';
 
 import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
-const OrderEditScreen = () => {
-  const id = useRoute<RouteProp<OrderStackParamList, 'OrderEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'OrderEdit'>>();
+const SellbillEditScreen = () => {
+  const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
-  const temps = docSelectors.selectByDocType<IOtvesDocument>('otves');
-  const otves = temps?.find((e) => e.id === id);
+  const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
 
-  const number1 = otves?.number;
-  const contact1 = otves?.head.contact;
-  const outlet1 = otves?.head.outlet;
-  const onDate1 = otves?.head.onDate;
+  const number = sellbill?.number;
+  const contact = sellbill?.head.contact;
+  const outlet = sellbill?.head.outlet;
+  const onDate = sellbill?.head.onDate;
 
-  const otvesType = refSelectors
+  const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'otves');
 
-  const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
+  const formParams = useSelector((state) => state.app.formParams as ISellbillFormParam);
 
   // Подразделение по умолчанию
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as IDepartment;
@@ -54,12 +53,12 @@ const OrderEditScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    if (otves) {
+    if (sellbill) {
       dispatch(
         appActions.setFormParams({
-          documentDate: otves.documentDate,
-          status: otves.status,
-          depart: otves.head.depart,
+          documentDate: sellbill.documentDate,
+          status: sellbill.status,
+          depart: sellbill.head.depart,
         }),
       );
     } else {
@@ -71,10 +70,10 @@ const OrderEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, otves]);
+  }, [dispatch, sellbill]);
 
   const handleSave = useCallback(() => {
-    if (!otvesType) {
+    if (!sellbillType) {
       return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
     }
 
@@ -83,26 +82,26 @@ const OrderEditScreen = () => {
     }
 
     if (id) {
-      if (!otves) {
+      if (!sellbill) {
         return;
       }
 
-      const updatedOrderDate = new Date().toISOString();
+      const updatedSellbillDate = new Date().toISOString();
 
-      const updatedOrder: IOrderDocument = {
-        ...otves,
+      const updatedSellbill: ISellbillDocument = {
+        ...sellbill,
         id,
         status: docStatus || 'DRAFT',
         documentDate: docDocumentDate,
-        documentType: otvesType,
-        creationDate: otves.creationDate || updatedOrderDate,
-        editionDate: updatedOrderDate,
+        documentType: sellbillType,
+        creationDate: sellbill.creationDate || updatedSellbillDate,
+        editionDate: updatedSellbillDate,
       };
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
+      dispatch(documentActions.updateDocument({ docId: id, document: updatedSellbill }));
       navigation.navigate('TempView', { id });
     }
-  }, [otvesType, docDocumentDate, id, otves, docStatus, dispatch, navigation]);
+  }, [sellbillType, docDocumentDate, id, sellbill, docStatus, dispatch, navigation]);
 
   const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
 
@@ -151,17 +150,17 @@ const OrderEditScreen = () => {
             directionRow={true}
           />
         </View>
-        <Input label="Номер" value={number1} disabled={true} />
-        <Input label="Дата отгрузки" value={getDateString(onDate1 || '')} disabled={true} />
-        <Input label="Организация" value={contact1?.name} disabled={true} />
-        <Input label="Магазин" value={outlet1?.name} disabled={true} />
+        <Input label="Номер" value={number} disabled={true} />
+        <Input label="Дата отгрузки" value={getDateString(onDate || '')} disabled={true} />
+        <Input label="Организация" value={contact?.name} disabled={true} />
+        <Input label="Магазин" value={outlet?.name} disabled={true} />
         <Input label="Склад" value={depart?.name} disabled={true} />
       </ScrollView>
     </AppInputScreen>
   );
 };
 
-export default OrderEditScreen;
+export default SellbillEditScreen;
 
 const localStyles = StyleSheet.create({
   switchContainer: {

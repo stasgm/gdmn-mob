@@ -1,22 +1,19 @@
 import { Reducer } from 'redux';
 import { getType } from 'typesafe-actions';
 
-import { actions, AppInventoryActionType } from './actions';
+import { actions, FpMovementActionType } from './actions';
 
-import { AppInventoryState } from './types';
+import { FpMovementState } from './types';
 
-export const initialState: Readonly<AppInventoryState> = {
-  model: {},
+export const initialState: Readonly<FpMovementState> = {
+  list: [],
   loading: false,
   loadingData: false,
   errorMessage: '',
   loadingError: '',
 };
 
-const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
-  state = initialState,
-  action,
-): AppInventoryState => {
+const reducer: Reducer<FpMovementState, FpMovementActionType> = (state = initialState, action): FpMovementState => {
   switch (action.type) {
     case getType(actions.init):
       return initialState;
@@ -30,27 +27,42 @@ const reducer: Reducer<AppInventoryState, AppInventoryActionType> = (
     case getType(actions.setLoadingData):
       return { ...state, loadingData: action.payload };
 
-    case getType(actions.setModelAsync.request):
-      return { ...state, loading: true, errorMessage: '' };
-
-    case getType(actions.setModelAsync.success):
-      return {
-        ...state,
-        loading: false,
-        model: action.payload,
-      };
-
-    case getType(actions.setModelAsync.failure):
-      return {
-        ...state,
-        loading: false,
-        errorMessage: action.payload || 'error',
-      };
-
     case getType(actions.setLoadingError):
       return {
         ...state,
         loadingError: action.payload,
+      };
+
+    case getType(actions.addOrder):
+      return {
+        ...state,
+        list: [...(state.list || []), action.payload],
+      };
+
+    case getType(actions.updateOrderLine):
+      return {
+        ...state,
+        list: state.list.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: doc?.lines?.map((line) => (line.id === action.payload.line.id ? action.payload.line : line)),
+              }
+            : doc,
+        ),
+      };
+
+    case getType(actions.removeOrderLine):
+      return {
+        ...state,
+        list: state.list.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: doc?.lines?.filter((line) => line.id !== action.payload.lineId),
+              }
+            : doc,
+        ),
       };
 
     default:

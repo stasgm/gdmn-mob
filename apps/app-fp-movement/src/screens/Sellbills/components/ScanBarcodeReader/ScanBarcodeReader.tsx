@@ -14,15 +14,15 @@ import { IconButton } from 'react-native-paper';
 
 import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
 
-import { ITempDocument } from '../../../../store/types';
+import { ISellbillDocument } from '../../../../store/types';
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: ITempDocument) => void;
+  onSave: (item: ISellbillDocument) => void;
   onShowRemains: () => void;
-  getScannedObject: (brc: string) => ITempDocument | undefined;
+  getScannedObject: (brc: string) => ISellbillDocument | undefined;
 }
 
 export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
@@ -35,7 +35,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<ITempDocument>();
+  const [itemLine, setItemLine] = useState<ISellbillDocument>();
 
   const isFocused = useIsFocused();
 
@@ -68,7 +68,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: ITempDocument | undefined = getScannedObject(barcode);
+    const scannedObj: ISellbillDocument | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
@@ -125,7 +125,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.text}>{barcode}</Text>
-                    <Text style={styles.text}>{'Товар не найден'}</Text>
+                    <Text style={styles.text}>{'Заявка не найдена'}</Text>
                   </View>
                 </View>
               </View>

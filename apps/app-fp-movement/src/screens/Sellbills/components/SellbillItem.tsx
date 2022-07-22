@@ -6,15 +6,15 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IOtvesLine } from '../../../store/types';
+import { ISellbillLine, ITempLine } from '../../../store/types';
 
 interface IProps {
   docId: string;
-  item: IOtvesLine;
+  item: ISellbillLine;
   readonly?: boolean;
 }
 
-const OtvesItem = ({ item }: IProps) => {
+const SellbillItem = ({ item }: IProps) => {
   const { colors } = useTheme();
 
   // const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
@@ -39,4 +39,4 @@ const OtvesItem = ({ item }: IProps) => {
   );
 };
 
-export default OtvesItem;
+export default SellbillItem;

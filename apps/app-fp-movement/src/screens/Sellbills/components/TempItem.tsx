@@ -7,7 +7,6 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 import { ITempLine } from '../../../store/types';
 
 interface IProps {
-  docId: string;
   item: ITempLine;
   readonly?: boolean;
 }

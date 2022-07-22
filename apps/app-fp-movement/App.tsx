@@ -37,12 +37,13 @@ import { TouchableOpacity, Linking } from 'react-native';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
-import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
+import { store, useSelector as useFpSelector, fpMovementActions } from './src/store';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 import { messageFpMovement } from './src/store/mock';
-// import { OrderNavigator } from './src/navigation/OrderNavigator';
+import { FreeSellbillNavigator } from './src/navigation/FreeSellbillNavigator';
+import { SellbillNavigator } from './src/navigation/SellbillNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -53,12 +54,18 @@ const Root = () => {
         icon: 'file-document-outline',
         component: MoveNavigator,
       },
-      // {
-      //   name: 'Order',
-      //   title: 'Заявки',
-      //   icon: 'clipboard-list-outline',
-      //   component: OrderNavigator,
-      // },
+      {
+        name: 'Otves',
+        title: 'Отвесы',
+        icon: 'clipboard-list-outline',
+        component: SellbillNavigator,
+      },
+      {
+        name: 'FreeSellbill',
+        title: 'Заявки',
+        icon: 'clipboard-list-outline',
+        component: FreeSellbillNavigator,
+      },
     ],
     [],
   );
@@ -70,7 +77,7 @@ const Root = () => {
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
   const isLogged = authSelectors.isLoggedWithCompany();
-  const invLoading = useInvSelector((state) => state.appInventory.loading);
+  const fpLoading = useFpSelector((state) => state.fpMovement.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
   const connectionStatus = useSelector((state) => state.auth.connectionStatus);
 
@@ -123,7 +130,7 @@ const Root = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const invLoadingError = useInvSelector<string>((state) => state.appInventory.loadingError);
+  const fpLoadingError = useFpSelector<string>((state) => state.fpMovement.loadingError);
 
   const [infoWindow, setInfoWindow] = useState(0);
 
@@ -142,7 +149,7 @@ const Root = () => {
     }
   }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1]);
 
-  const onClearLoadingErrors = () => dispatch(appInventoryActions.setLoadingError(''));
+  const onClearLoadingErrors = () => dispatch(fpMovementActions.setLoadingError(''));
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
@@ -203,17 +210,17 @@ const Root = () => {
             {'Начать работу'}
           </PrimeButton>
         </AppScreen>
-      ) : authLoading || loading || invLoading || appDataLoading ? (
+      ) : authLoading || loading || fpLoading || appDataLoading ? (
         <AppScreen>
           <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
           <Caption style={styles.title}>
-            {appDataLoading || invLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
+            {appDataLoading || fpLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
           </Caption>
         </AppScreen>
       ) : (
         <MobileApp
           items={navItems}
-          loadingErrors={[invLoadingError]}
+          loadingErrors={[fpLoadingError]}
           onClearLoadingErrors={onClearLoadingErrors}
           onGetMessages={isDemo ? getMessages : undefined}
         />

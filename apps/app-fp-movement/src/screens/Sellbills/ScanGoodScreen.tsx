@@ -10,8 +10,8 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { OrderStackParamList } from '../../navigation/Root/types';
-import { IOtvesLine, IOtvesDocument } from '../../store/types';
+import { SellbillStackParamList } from '../../navigation/Root/types';
+import { ISellbillLine, ISellbillDocument } from '../../store/types';
 
 import { IGood } from '../../store/app/types';
 import { getBarcode } from '../../utils/helpers';
@@ -22,9 +22,9 @@ import { ScanBarcode, ScanBarcodeReader } from '../../components';
 import BarcodeDialog from '../../components/BarcodeDialog';
 
 const ScanGoodScreen = () => {
-  const docId = useRoute<RouteProp<OrderStackParamList, 'ScanGood'>>().params?.docId;
-  const tempId = useRoute<RouteProp<OrderStackParamList, 'ScanGood'>>().params?.tempId;
-  const navigation = useNavigation<StackNavigationProp<OrderStackParamList, 'ScanGood'>>();
+  const docId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.docId;
+  const tempId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.tempId;
+  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'ScanGood'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const isScanerReader = settings.scannerUse?.data;
@@ -40,8 +40,8 @@ const ScanGoodScreen = () => {
   }, [navigation]);
 
   const handleSaveScannedItem = useCallback(
-    (item: IOtvesLine) => {
-      navigation.navigate('OtvesLine', {
+    (item: ISellbillLine) => {
+      navigation.navigate('SellbillLine', {
         mode: 0,
         docId,
         item: item,
@@ -51,12 +51,12 @@ const ScanGoodScreen = () => {
     [docId, navigation, tempId],
   );
 
-  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IOtvesDocument;
+  const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as ISellbillDocument;
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const getScannedObject = useCallback(
-    (brc: string): IOtvesLine | undefined => {
+    (brc: string): ISellbillLine | undefined => {
       const barc = getBarcode(brc);
 
       const good = goods.find((item) => item.shcode === barc.shcode);
@@ -88,7 +88,7 @@ const ScanGoodScreen = () => {
       const good = goods.find((item) => item.shcode === barc.shcode);
 
       if (good) {
-        const barcodeItem: IOtvesLine = {
+        const barcodeItem: ISellbillLine = {
           good: { id: good.id, name: good.name, shcode: good.shcode },
           id: generateId(),
           weight: barc.weight,
@@ -98,7 +98,7 @@ const ScanGoodScreen = () => {
           quantPack: barc.quantPack,
         };
         setError(false);
-        navigation.navigate('OtvesLine', {
+        navigation.navigate('SellbillLine', {
           mode: 0,
           docId: docId,
           item: barcodeItem,

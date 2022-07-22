@@ -32,6 +32,7 @@ export interface IDocumentType extends INamedEntity {
   toType?: string;
   toRequired?: boolean;
   sortOrder?: number;
+  isShip?: number;
 }
 
 interface IDocument<T = IHead, K extends IEntity = IEntity> extends IEntity {

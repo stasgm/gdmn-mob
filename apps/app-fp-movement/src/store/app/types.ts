@@ -1,19 +1,16 @@
-import { INamedEntity } from '@lib/types';
+import { IEntity, INamedEntity } from '@lib/types';
 
 export interface ICodeEntity extends INamedEntity {
   shcode: string;
 }
 
-export type AppInventoryState = {
+export type FpMovementState = {
+  readonly list: IOrder[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
   readonly loadingError: string;
 };
-
-export interface IModelData<T = unknown> {
-  [id: string]: T;
-}
 
 // Товары
 export interface IGood extends ICodeEntity {
@@ -36,4 +33,8 @@ export interface IBarcode {
   shcode: string;
   numReceived: string; // Номер партии
   quantPack: number;
+}
+
+export interface IOrder<K extends IEntity = IEntity> extends IEntity {
+  lines?: K[];
 }

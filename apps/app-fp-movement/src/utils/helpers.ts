@@ -1,7 +1,7 @@
-import { IMoveDocument, ITempDocument } from '../store/types';
+import { IMoveDocument, IFreeSellbillDocument, ITempDocument } from '../store/types';
 import { IBarcode } from '../store/app/types';
 
-export const getNextDocNumber = (documents: IMoveDocument[] | ITempDocument[]) => {
+export const getNextDocNumber = (documents: IMoveDocument[] | ITempDocument[] | IFreeSellbillDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))

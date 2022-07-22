@@ -9,18 +9,19 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
+  SubTitle,
+  // ScanButton,
   SendButton,
   AppActivityIndicator,
   MediumText,
-  LargeText,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
-import { IMoveDocument, IMoveLine } from '../../store/types';
-import { MoveStackParamList } from '../../navigation/Root/types';
+import { IFreeSellbillDocument, IFreeSellbillLine } from '../../store/types';
+import { FreeSellbillStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { navBackButton } from '../../components/navigateOptions';
@@ -29,30 +30,30 @@ import { IGood } from '../../store/app/types';
 
 import BarcodeDialog from '../../components/BarcodeDialog';
 
-import { MoveItem } from './components/MoveItem';
-import MoveTotal from './components/MoveTotal';
+import { FreeSellbillItem } from './components/FreeSellbillItem';
+import FreeSellbillTotal from './components/FreeSellbillTotal';
 
 export interface IScanerObject {
-  item?: IMoveLine;
+  item?: IFreeSellbillLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const MoveViewScreen = () => {
+export const FreeSellbillViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
+  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillView'>>();
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
-  const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
+  const id = useRoute<RouteProp<FreeSellbillStackParamList, 'FreeSellbillView'>>().params?.id;
 
-  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
+  const doc = docSelectors.selectByDocId<IFreeSellbillDocument>(id);
 
-  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+  const lines = useMemo(() => doc.lines.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc.lines]);
 
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT' || screenState !== 'idle', [doc?.status, screenState]);
+  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -76,7 +77,7 @@ export const MoveViewScreen = () => {
           numReceived: barc.numReceived,
         };
         setError(false);
-        navigation.navigate('MoveLine', {
+        navigation.navigate('FreeSellbillLine', {
           mode: 0,
           docId: id,
           item: barcodeItem,
@@ -110,8 +111,12 @@ export const MoveViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('MoveEdit', { id });
+    navigation.navigate('FreeSellbillEdit', { id });
   }, [navigation, id]);
+
+  // const handleDoScan = useCallback(() => {
+  //   navigation.navigate('ScanBarcode', { docId: id });
+  // }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -137,10 +142,10 @@ export const MoveViewScreen = () => {
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = doc?.lines?.[doc?.lines?.length - 1]?.id;
+    const lastId = doc.lines?.[doc.lines.length - 1]?.id;
 
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
-  }, [dispatch, doc?.lines, id]);
+  }, [dispatch, doc.lines, id]);
 
   const handleUseSendDoc = useSendDocs([doc]);
 
@@ -194,13 +199,13 @@ export const MoveViewScreen = () => {
   const renderRight = useCallback(
     () =>
       !isBlocked && (
-        <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} />
+        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
+          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {/* <ScanButton onPress={handleDoScan} /> */}
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked],
+    [actionsMenu, handleSendDoc, isBlocked, screenState],
   );
 
   useLayoutEffect(() => {
@@ -210,25 +215,10 @@ export const MoveViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  //////////////////////// Не удалять //////////////////////////////////
-  // const linesList = doc.lines?.reduce((sum: IMoveLine[], line) => {
-  //   if (!sum.length) {
-  //     sum.push(line);
-  //   }
-
-  //   if (sum.find((i) => i.id !== line.id)) {
-  //     const lineSum = sum.find((i) => i.good.id === line.good.id && i.numReceived === line.numReceived);
-  //     if (lineSum) {
-  //       const lineTotal: IMoveLine = { ...lineSum, weight: round(lineSum.weight + line.weight) };
-  //       sum.splice(sum.indexOf(lineSum), 1, lineTotal);
-  //     } else {
-  //       sum.push(line);
-  //     }
-  //   }
-  //   return sum;
-  // }, []);
-
-  const renderItem = useCallback(({ item }: { item: IMoveLine }) => <MoveItem key={item.id} item={item} />, []);
+  const renderItem = useCallback(
+    ({ item }: { item: IFreeSellbillLine }) => <FreeSellbillItem key={item.id} item={item} />,
+    [],
+  );
 
   const [scanned, setScanned] = useState(false);
 
@@ -247,11 +237,12 @@ export const MoveViewScreen = () => {
 
       if (!good) {
         Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
+        console.log('barc', barc);
         setScanned(false);
         return;
       }
 
-      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+      const line = doc.lines.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
@@ -259,14 +250,14 @@ export const MoveViewScreen = () => {
         return;
       }
 
-      const newLine: IMoveLine = {
+      const newLine: IFreeSellbillLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
-        sortOrder: doc?.lines?.length + 1,
+        sortOrder: doc.lines.length + 1,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -274,7 +265,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [dispatch, id, doc?.lines, goods],
+    [dispatch, id, doc.lines, goods],
   );
 
   const [key, setKey] = useState(1);
@@ -304,8 +295,14 @@ export const MoveViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
-          <AppActivityIndicator style={{}} />
+          <SubTitle style={styles.title}>
+            {screenState === 'deleting'
+              ? 'Удаление документа...'
+              : // : screenState === 'sending'
+                // ? 'Отправка документа...'
+                ''}
+          </SubTitle>
+          <AppActivityIndicator />
         </View>
       </View>
     );
@@ -313,27 +310,24 @@ export const MoveViewScreen = () => {
 
   if (!doc) {
     return (
-      <View style={[styles.container, styles.alignItemsCenter]}>
-        <LargeText>Документ не найден</LargeText>
+      <View style={styles.container}>
+        <SubTitle style={styles.title}>Документ не найден</SubTitle>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}
+        title={doc.head.depart.name || ''}
         onPress={handleEditDocHead}
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
-        <>
-          <MediumText style={styles.rowCenter}>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-          <View style={styles.rowCenter}>
-            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
-          </View>
-        </>
+        <View style={styles.directionColumn}>
+          <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
+        </View>
       </InfoBlock>
 
       <TextInput
@@ -356,7 +350,7 @@ export const MoveViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {doc?.lines?.length ? <MoveTotal lines={doc?.lines} /> : null}
+      {doc.lines.length ? <FreeSellbillTotal lines={doc.lines} /> : null}
       <BarcodeDialog
         visibleDialog={visibleDialog}
         onDismissDialog={handleDismisDialog}
