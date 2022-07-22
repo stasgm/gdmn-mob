@@ -8,7 +8,7 @@ const Stack = createStackNavigator<MoveStackParamList>();
 
 export const MoveNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="MoveList" screenOptions={{ headerShown: true, title: 'Перемещение' }}>
+    <Stack.Navigator initialRouteName="MoveList" screenOptions={{ headerShown: true, headerBackTitleVisible: false }}>
       {Object.entries({ ...moveListScreens, ...moveScreens }).map(([name, { title, component }]) => (
         <Stack.Screen name={name as keyof MoveStackParamList} component={component} key={name} options={{ title }} />
       ))}

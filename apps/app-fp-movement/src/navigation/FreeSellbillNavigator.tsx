@@ -8,7 +8,10 @@ const Stack = createStackNavigator<FreeSellbillStackParamList>();
 
 export const FreeSellbillNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="FreeSellbillList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
+    <Stack.Navigator
+      initialRouteName="FreeSellbillList"
+      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
+    >
       {Object.entries({ ...freeSellbillListScreens, ...freeSellbillScreens }).map(([name, { title, component }]) => (
         <Stack.Screen
           name={name as keyof FreeSellbillStackParamList}

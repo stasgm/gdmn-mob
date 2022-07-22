@@ -24,12 +24,10 @@ import {
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
-  MoveView: { title: 'Документ', component: MoveViewScreen },
+  MoveView: { title: 'Перемещение', component: MoveViewScreen },
   MoveLine: { title: 'Позиция перемещения', component: MoveLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
-  //
-  // ScanBarcodeReader: ScanBarcodeReaderScreen,
 };
 
 export const moveListScreens = {
@@ -38,27 +36,25 @@ export const moveListScreens = {
 
 export const sellbillScreens = {
   TempView: { title: 'Заявка', component: TempViewScreen },
-  SellbillEdit: { title: 'Заявка', component: SellbillEditScreen },
-  SellbillView: { title: 'Отвес', component: SellbillViewScreen },
+  SellbillEdit: { title: 'Отвес по заявке', component: SellbillEditScreen },
+  SellbillView: { title: 'Отвес по заявке', component: SellbillViewScreen },
   SellbillLine: { title: 'Позиция отвеса', component: SellbillLineScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const sellbillListScreens = {
-  SellbillList: { title: 'Заявки', component: SellbillListScreen },
+  SellbillList: { title: 'Отвесы по заявке', component: SellbillListScreen },
 };
 
 export const freeSellbillScreens = {
-  FreeSellbillEdit: { title: 'Заявка', component: FreeSellbillEditScreen },
-  FreeSellbillView: { title: 'Заявка', component: FreeSellbillViewScreen },
-  FreeSellbillLine: { title: 'Позиция заявки', component: FreeSellbillLineScreen },
+  FreeSellbillEdit: { title: 'Отвес', component: FreeSellbillEditScreen },
+  FreeSellbillView: { title: 'Отвес', component: FreeSellbillViewScreen },
+  FreeSellbillLine: { title: 'Позиция отвеса', component: FreeSellbillLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
-  //
-  // ScanBarcodeReader: ScanBarcodeReaderScreen,
 };
 
 export const freeSellbillListScreens = {
-  FreeSellbillList: { title: 'Заявки', component: FreeSellbillListScreen },
+  FreeSellbillList: { title: 'Отвесы', component: FreeSellbillListScreen },
 };

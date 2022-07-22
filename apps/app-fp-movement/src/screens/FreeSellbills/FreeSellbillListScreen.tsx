@@ -209,7 +209,7 @@ export const FreeSellbillListScreen = () => {
       headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
       title:
-        delList && Object.values(delList).length > 0 ? `Выделено заявок: ${Object.values(delList).length}` : 'Заявки',
+        delList && Object.values(delList).length > 0 ? `Выделено отвесов: ${Object.values(delList).length}` : 'Отвесы',
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
