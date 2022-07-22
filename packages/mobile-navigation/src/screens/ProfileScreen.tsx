@@ -130,7 +130,7 @@ const ProfileScreen = () => {
         <Divider />
         <View style={[styles.containerSet, { borderColor: colors.primary }]}>
           <MediumText style={styles.subHeading}>{'Не выходить из профиля'}</MediumText>
-          <Switch color={colors.primary} value={!isLogout} onValueChange={handleUpdate} />
+          <Switch value={!isLogout} onValueChange={handleUpdate} />
         </View>
         <Divider />
         {!!visibleList?.length && (

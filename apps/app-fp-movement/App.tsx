@@ -55,14 +55,14 @@ const Root = () => {
         component: MoveNavigator,
       },
       {
-        name: 'Otves',
-        title: 'Отвесы',
+        name: 'SellBill',
+        title: 'Отвес по заявке',
         icon: 'clipboard-list-outline',
         component: SellbillNavigator,
       },
       {
         name: 'FreeSellbill',
-        title: 'Заявки',
+        title: 'Отвес',
         icon: 'clipboard-list-outline',
         component: FreeSellbillNavigator,
       },
