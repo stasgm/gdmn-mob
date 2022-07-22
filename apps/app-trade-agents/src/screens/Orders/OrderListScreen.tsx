@@ -48,12 +48,6 @@ const OrderListScreen = () => {
 
   const dispatch = useDispatch();
 
-  // const orderList = useFilteredDocList<IOrderDocument>('order').sort(
-  //   (a, b) =>
-  //     new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-  //     new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
-  // );
-
   const orderList = (
     useSelector((state) => state.documents.list).filter((i) => i.documentType.name === 'order') as IOrderDocument[]
   ).sort(
@@ -61,14 +55,6 @@ const OrderListScreen = () => {
       new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
       new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
   );
-
-  // const list = useSelector((state) => state.documents.list) as IMovementDocument[];
-
-  // const orderList = list.sort(
-  //   (a, b) =>
-  //     new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-  //     new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
-  // );
 
   const { colors } = useTheme();
 
@@ -327,8 +313,6 @@ const OrderListScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  // const RC = useMemo(() => <RefreshControl refreshing={loading} title="загрузка данных..." />, [loading]);
-
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
@@ -353,7 +337,6 @@ const OrderListScreen = () => {
         keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        // refreshControl={RC}
         ListEmptyComponent={EmptyList}
         renderSectionFooter={renderSectionFooter}
       />

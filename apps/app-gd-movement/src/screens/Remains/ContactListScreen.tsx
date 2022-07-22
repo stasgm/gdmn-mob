@@ -135,7 +135,6 @@ const ContactListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
         scrollEventThrottle={400}
-        // onEndReached={() => ({})}
         ListEmptyComponent={!contacts || !remains ? EmptyList : null}
       />
     </AppScreen>

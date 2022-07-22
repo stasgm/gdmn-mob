@@ -11,13 +11,13 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
   ScanButton,
   CloseButton,
   DeleteButton,
   SendButton,
   AppActivityIndicator,
   MediumText,
+  LargeText,
 } from '@lib/mobile-ui';
 
 import { getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -42,11 +42,9 @@ export const DocViewScreen = () => {
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
-  // const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument;
-
   const doc = docSelectors.selectByDocId<IMovementDocument>(id);
 
-  const isBlocked = doc?.status !== 'DRAFT';
+  const isBlocked = doc?.status !== 'DRAFT' || screenState !== 'idle';
 
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
@@ -160,21 +158,20 @@ export const DocViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked &&
-      screenState !== 'deleting' && (
-        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
+      !isBlocked && (
+        <View style={styles.buttons}>
           {delList.length > 0 ? (
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
-              <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+              <SendButton onPress={handleSendDoc} />
               <ScanButton onPress={handleDoScan} />
               <MenuButton actionsMenu={actionsMenu} />
             </>
           )}
         </View>
       ),
-    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendDoc, isBlocked],
   );
 
   const renderLeft = useCallback(
@@ -221,28 +218,23 @@ export const DocViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <SubTitle style={styles.title}>
-            {screenState === 'deleting'
-              ? 'Удаление документа...'
-              : // : screenState === 'sending'
-                // ? 'Отправка документа...'
-                ''}
-          </SubTitle>
-          <AppActivityIndicator />
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
   }
+
   if (!doc) {
     return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}

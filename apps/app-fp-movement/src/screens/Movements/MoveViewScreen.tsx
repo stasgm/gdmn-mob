@@ -9,11 +9,10 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
-  // ScanButton,
   SendButton,
   AppActivityIndicator,
   MediumText,
+  LargeText,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -53,7 +52,7 @@ export const MoveViewScreen = () => {
 
   const lines = useMemo(() => doc.lines.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc.lines]);
 
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
+  const isBlocked = useMemo(() => doc?.status !== 'DRAFT' || screenState !== 'idle', [doc?.status, screenState]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -113,10 +112,6 @@ export const MoveViewScreen = () => {
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('MoveEdit', { id });
   }, [navigation, id]);
-
-  // const handleDoScan = useCallback(() => {
-  //   navigation.navigate('ScanBarcode', { docId: id });
-  // }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -199,13 +194,13 @@ export const MoveViewScreen = () => {
   const renderRight = useCallback(
     () =>
       !isBlocked && (
-        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
-          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        <View style={styles.buttons}>
+          <SendButton onPress={handleSendDoc} />
           {/* <ScanButton onPress={handleDoScan} /> */}
           <MenuButton actionsMenu={actionsMenu} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, handleSendDoc, isBlocked],
   );
 
   useLayoutEffect(() => {
@@ -307,14 +302,8 @@ export const MoveViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <SubTitle style={styles.title}>
-            {screenState === 'deleting'
-              ? 'Удаление документа...'
-              : // : screenState === 'sending'
-                // ? 'Отправка документа...'
-                ''}
-          </SubTitle>
-          <AppActivityIndicator />
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
@@ -322,14 +311,14 @@ export const MoveViewScreen = () => {
 
   if (!doc) {
     return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={`№ ${doc.number} от ${getDateString(doc.documentDate)}` || ''}

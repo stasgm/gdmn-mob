@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider /*, useTheme*/ } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
@@ -95,7 +95,6 @@ export const MoveEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, doc, defaultDepart]);
 
-  // const handleSave = useCallback(() => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!movementType) {
@@ -138,7 +137,6 @@ export const MoveEditScreen = () => {
         dispatch(documentActions.addDocument(newDoc));
 
         navigation.dispatch(StackActions.replace('MoveView', { id: newDoc.id }));
-        // setScreenState('idle');
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -168,7 +166,6 @@ export const MoveEditScreen = () => {
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         navigation.navigate('MoveView', { id });
-        // setScreenState('idle');
       }
     }
   }, [
@@ -187,14 +184,10 @@ export const MoveEditScreen = () => {
   ]);
 
   const renderRight = useCallback(
-    () => (
-      // <SaveButton onPress={handleSave} />,
-      <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
-    ),
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
     [screenState],
   );
 
-  console.log('state', screenState);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,

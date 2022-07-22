@@ -181,6 +181,9 @@ const globalStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  alignItemsCenter: {
+    alignItems: 'center',
+  },
   name: {
     fontSize: 17,
     fontWeight: 'bold',

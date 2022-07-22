@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -12,12 +12,12 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
   SendButton,
   MediumText,
   AppActivityIndicator,
   DeleteButton,
   CloseButton,
+  LargeText,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -45,12 +45,12 @@ const OrderViewScreen = () => {
 
   const dispatch = useDispatch();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting' | 'sent'>('idle');
   const [delList, setDelList] = useState<string[]>([]);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
-  const isBlocked = useMemo(() => order?.status !== 'DRAFT', [order?.status]);
+  const isBlocked = useMemo(() => order?.status !== 'DRAFT' || screenState !== 'idle', [order?.status, screenState]);
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
@@ -143,26 +143,28 @@ const OrderViewScreen = () => {
 
   const handleSendDoc = useSendDocs([order]);
 
-  const handleSendOrder = useCallback(() => {
-    setScreenState('sending');
-    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-      {
-        text: 'Да',
-        onPress: () => {
-          setTimeout(() => {
+  useEffect(() => {
+    if (screenState === 'sending') {
+      Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            handleSendDoc();
+            setScreenState('sent');
+          },
+        },
+        {
+          text: 'Отмена',
+          onPress: () => {
             setScreenState('idle');
-          }, 10000);
-          handleSendDoc();
+          },
         },
-      },
-      {
-        text: 'Отмена',
-        onPress: () => {
-          setScreenState('idle');
-        },
-      },
-    ]);
-  }, [handleSendDoc]);
+      ]);
+    } else if (screenState === 'sent' && order?.head?.route?.id) {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [handleSendDoc, navigation, order?.head?.route?.id, screenState]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -192,21 +194,20 @@ const OrderViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked &&
-      screenState !== 'deleting' && (
-        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
+      !isBlocked && (
+        <View style={styles.buttons}>
           {delList.length > 0 ? (
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
-              <SendButton onPress={handleSendOrder} disabled={screenState !== 'idle'} />
+              <SendButton onPress={() => setScreenState('sending')} />
               <AddButton onPress={handleAddOrderLine} />
               <MenuButton actionsMenu={actionsMenu} />
             </>
           )}
         </View>
       ),
-    [isBlocked, screenState, delList.length, handleDeleteDocLine, handleSendOrder, handleAddOrderLine, actionsMenu],
+    [isBlocked, delList.length, handleDeleteDocLine, handleAddOrderLine, actionsMenu],
   );
 
   const renderLeft = useCallback(
@@ -254,14 +255,8 @@ const OrderViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <SubTitle style={styles.title}>
-            {screenState === 'deleting'
-              ? 'Удаление документа...'
-              : // : screenState === 'sending'
-                // ? 'Отправка документа...'
-                ''}
-          </SubTitle>
-          <AppActivityIndicator />
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
@@ -269,8 +264,8 @@ const OrderViewScreen = () => {
 
   if (!order) {
     return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
       </View>
     );
   }
@@ -279,9 +274,10 @@ const OrderViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(order?.status || 'DRAFT')}
-        title={order.head.outlet?.name}
+        title={order.head?.outlet?.name}
         onPress={handleEditOrderHead}
         disabled={!['DRAFT', 'READY'].includes(order.status)}
+        isBlocked={isBlocked}
       >
         <View style={styles.directionColumn}>
           <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
@@ -310,7 +306,6 @@ const OrderViewScreen = () => {
         maxToRenderPerBatch={6} // Reduce number in each render batch
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
-        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
       {order.lines.length ? <OrderTotal order={order} /> : null}

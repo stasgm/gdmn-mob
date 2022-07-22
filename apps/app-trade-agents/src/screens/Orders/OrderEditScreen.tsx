@@ -121,72 +121,78 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, order, defaultDepart]);
 
-  const handleSave = useCallback(() => {
-    if (!orderType) {
-      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
-    }
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
-    if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
-
-    const docId = !id ? generateId() : id;
-
-    const newOrderDate = new Date().toISOString();
-
-    if (!id) {
-      const newOrder: IOrderDocument = {
-        id: docId,
-        documentType: orderType,
-        number: docNumber,
-        documentDate: newOrderDate,
-        status: 'DRAFT',
-        head: {
-          contact: docContact,
-          onDate: docOnDate,
-          outlet: docOutlet,
-          depart: docDepart,
-          comment: docComment && docComment.trim(),
-        },
-        lines: [],
-        creationDate: newOrderDate,
-        editionDate: newOrderDate,
-      };
-
-      dispatch(documentActions.addDocument(newOrder));
-
-      navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
-      // navigation.navigate('OrderView', { id: newOrder.id });
-    } else {
-      if (!order) {
-        return;
+  useEffect(() => {
+    if (screenState === 'saving') {
+      if (!orderType) {
+        setScreenState('idle');
+        return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
       }
 
-      const updatedOrderDate = new Date().toISOString();
+      if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
+        setScreenState('idle');
+        return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      }
 
-      const updatedOrder: IOrderDocument = {
-        ...order,
-        id,
-        number: docNumber,
-        status: docStatus || 'DRAFT',
-        documentDate: docDocumentDate,
-        documentType: orderType,
-        errorMessage: undefined,
-        head: {
-          ...order.head,
-          contact: docContact,
-          outlet: docOutlet,
-          onDate: docOnDate,
-          depart: docDepart,
-          comment: docComment && docComment.trim(),
-        },
-        lines: order.lines,
-        creationDate: order.creationDate || updatedOrderDate,
-        editionDate: updatedOrderDate,
-      };
+      const docId = !id ? generateId() : id;
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
-      navigation.navigate('OrderView', { id });
+      const newOrderDate = new Date().toISOString();
+
+      if (!id) {
+        const newOrder: IOrderDocument = {
+          id: docId,
+          documentType: orderType,
+          number: docNumber,
+          documentDate: newOrderDate,
+          status: 'DRAFT',
+          head: {
+            contact: docContact,
+            onDate: docOnDate,
+            outlet: docOutlet,
+            depart: docDepart,
+            comment: docComment && docComment.trim(),
+          },
+          lines: [],
+          creationDate: newOrderDate,
+          editionDate: newOrderDate,
+        };
+
+        dispatch(documentActions.addDocument(newOrder));
+
+        navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
+      } else {
+        if (!order) {
+          setScreenState('idle');
+          return;
+        }
+
+        const updatedOrderDate = new Date().toISOString();
+
+        const updatedOrder: IOrderDocument = {
+          ...order,
+          id,
+          number: docNumber,
+          status: docStatus || 'DRAFT',
+          documentDate: docDocumentDate,
+          documentType: orderType,
+          errorMessage: undefined,
+          head: {
+            ...order.head,
+            contact: docContact,
+            outlet: docOutlet,
+            onDate: docOnDate,
+            depart: docDepart,
+            comment: docComment && docComment.trim(),
+          },
+          lines: order.lines,
+          creationDate: order.creationDate || updatedOrderDate,
+          editionDate: updatedOrderDate,
+        };
+
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
+        navigation.navigate('OrderView', { id });
+      }
     }
   }, [
     orderType,
@@ -202,9 +208,13 @@ const OrderEditScreen = () => {
     navigation,
     order,
     docStatus,
+    screenState,
   ]);
 
-  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+  const renderRight = useCallback(
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
+    [screenState],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({

@@ -11,8 +11,6 @@ import { OrderStackParamList } from '../../navigation/Root/types';
 import { IOtvesDocument, IOtvesLine, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
-// import { getBarcode } from '../../utils/helpers';
-
 import { OtvesLine } from './components/OtvesLine';
 
 const round = (num: number) => {

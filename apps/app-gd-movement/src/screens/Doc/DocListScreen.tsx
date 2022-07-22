@@ -1,14 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import {
-  StyleSheet,
-  SectionList,
-  ListRenderItem,
-  SectionListData,
-  View,
-  // RefreshControl,
-  Text,
-  Alert,
-} from 'react-native';
+import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, Text, Alert } from 'react-native';
 import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 import { IconButton, Searchbar } from 'react-native-paper';
 
