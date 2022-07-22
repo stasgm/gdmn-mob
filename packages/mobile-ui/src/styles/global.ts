@@ -54,6 +54,9 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     padding: 5,
   },
+  directionColumn: {
+    flexDirection: 'column',
+  },
   containerCenter: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -147,6 +150,20 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 30,
   },
+  checkedIcon: {
+    alignItems: 'center',
+    backgroundColor: '#587a20',
+    borderRadius: 8,
+    height: 15,
+    justifyContent: 'center',
+    width: 15,
+    marginLeft: -10,
+    marginTop: 15,
+  },
+  iconsWithCheck: {
+    flexDirection: 'row',
+    width: '9%',
+  },
   roundButton: {
     alignItems: 'center',
     backgroundColor: colors.primary,
@@ -164,6 +181,9 @@ const globalStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
+  alignItemsCenter: {
+    alignItems: 'center',
+  },
   name: {
     fontSize: 17,
     fontWeight: 'bold',
@@ -179,8 +199,10 @@ const globalStyles = StyleSheet.create({
     // opacity: 0.7,
     fontSize: 15,
   },
-  lightText: {
+  normalText: {
     fontSize: 15,
+  },
+  lightText: {
     color: '#fff',
   },
   textTotal: {
@@ -218,7 +240,16 @@ const globalStyles = StyleSheet.create({
   textReference: {
     textDecorationLine: 'underline',
   },
-  textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
+  textInfo: { fontSize: 18, textAlign: 'left', marginHorizontal: 10 },
+  // textInfo: { fontSize: 18, color: colors.text, textAlign: 'left', marginHorizontal: 10 },
+  groupWidth: {
+    width: '72%',
+  },
+  deleteView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default globalStyles;

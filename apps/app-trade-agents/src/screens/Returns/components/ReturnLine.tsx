@@ -1,4 +1,4 @@
-import { styles } from '@lib/mobile-navigation/src/screens/References/styles';
+import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
 import { useTheme } from '@react-navigation/native';
 

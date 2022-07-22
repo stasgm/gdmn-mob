@@ -7,7 +7,6 @@ import { getDateString } from '@lib/mobile-app';
 import { IVisitDocument } from '../../../store/types';
 
 const VisitItem = ({ item }: { item: IVisitDocument }) => {
-  //const navigation = useNavigation<RouteLineProp>();
   const dateBegin = new Date(item.head.dateBegin);
   const dateEnd = item.head.dateEnd ? new Date(item.head.dateEnd) : undefined;
 

@@ -41,7 +41,6 @@ const Root = () => {
   const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
-  const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const invLoading = useInvSelector((state) => state.appInventory.loading);
 
@@ -84,15 +83,11 @@ const Root = () => {
 
   return (
     <ErrorBoundary FallbackComponent={AppFallback}>
-      {authLoading || loading || appLoading || invLoading || appDataLoading ? (
+      {authLoading || loading || invLoading || appDataLoading ? (
         <AppScreen>
           <ActivityIndicator size="large" color={colors.primary} />
           <Caption style={styles.title}>
-            {appDataLoading || invLoading
-              ? 'Загрузка данных...'
-              : appLoading
-              ? 'Синхронизация данных..'
-              : 'Пожалуйста, подождите..'}
+            {appDataLoading || invLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
           </Caption>
         </AppScreen>
       ) : (

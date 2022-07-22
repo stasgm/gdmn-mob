@@ -1,7 +1,7 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, Text, View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { Alert, View, FlatList, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { docSelectors, documentActions, useDocThunkDispatch } from '@lib/store';
 import {
@@ -12,6 +12,8 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
+  MediumText,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -37,11 +39,6 @@ const ReturnViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'ReturnView'>>();
   const { id } = useRoute<RouteProp<ReturnsStackParamList, 'ReturnView'>>().params;
-
-  const { colors } = useTheme();
-
-  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
-  const viewStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [del, setDel] = useState(false);
 
@@ -124,7 +121,7 @@ const ReturnViewScreen = () => {
       <View style={styles.container}>
         <View style={localStyles.del}>
           <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={viewStyle} />
+          <AppActivityIndicator />
         </View>
       </View>
     );
@@ -153,7 +150,7 @@ const ReturnViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(returnDoc.status)}
       >
         <View style={styles.directionRow}>
-          <Text style={textStyle}>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</Text>
+          <MediumText>{`№ ${returnDoc.number} от ${getDateString(returnDoc.documentDate)}`}</MediumText>
           {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
         </View>
       </InfoBlock>

@@ -5,15 +5,12 @@ import { Divider } from 'react-native-paper';
 
 import { BackButton, SubTitle, AppScreen } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
-import { INamedEntity } from '@lib/types';
+
+import { IReferenceData } from '@lib/types';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
 import { styles } from './styles';
-
-interface IRefEntity extends INamedEntity {
-  [fieldName: string]: string | undefined | IRefEntity;
-}
 
 interface IProperty {
   sortOrder: number;
@@ -41,7 +38,7 @@ const ReferenceDetailScreen = () => {
 
   const { name, id } = useRoute<RouteProp<ReferenceStackParamList, 'ReferenceDetals'>>().params;
 
-  const ref = refSelectors.selectByName<IRefEntity>(name);
+  const ref = refSelectors.selectByName<IReferenceData>(name);
 
   const list = ref?.data.find((e) => e.id === id);
 

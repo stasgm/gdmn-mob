@@ -1,9 +1,9 @@
 import { log } from '@lib/mobile-app';
+import { IDocument } from '@lib/types';
 
 import { IGood, IMGoodData, IMGoodRemain, IModelRem, IRemainsData, IRemGood } from '../store/app/types';
-import { IMovementDocument } from '../store/types';
 
-export const getNextDocNumber = (documents: IMovementDocument[]) => {
+export const getNextDocNumber = (documents: IDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))

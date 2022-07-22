@@ -15,9 +15,11 @@ interface Props {
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   menuStyle?: StyleProp<ViewStyle>;
+  viewMenuStyle?: StyleProp<ViewStyle>;
   isActive?: boolean;
   iconName?: IconSource;
   iconSize?: number;
+  menuIconSize?: number;
 }
 
 const Menu = ({
@@ -31,8 +33,10 @@ const Menu = ({
   disabled,
   style,
   menuStyle,
+  viewMenuStyle,
   isActive = false,
   iconSize,
+  menuIconSize,
   iconName,
 }: Props) => {
   const { colors } = useTheme();
@@ -73,10 +77,14 @@ const Menu = ({
             key={`${title}${option?.id}`}
             onPress={() => onChange(option)}
             disabled={disabled}
+            // style={{ width: 320 }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <IconButton icon={activeOptionId === option?.id ? 'check' : ''} size={20} />
-              <PaperMenu.Item title={option?.value} />
+            <View style={viewMenuStyle ? viewMenuStyle : { flexDirection: 'row', alignItems: 'center' }}>
+              {activeOptionId ? (
+                <IconButton icon={activeOptionId === option?.id ? 'check' : ''} size={menuIconSize || 20} />
+              ) : null}
+              {/* <PaperMenu.Item style={{ height: 100, width: 1000 }} title={option?.value} /> */}
+              <PaperMenu.Item title={option?.value}>{/* <Text>{option.value}</Text> */}</PaperMenu.Item>
             </View>
           </TouchableHighlight>
         ))}

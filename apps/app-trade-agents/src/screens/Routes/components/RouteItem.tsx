@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react';
-import { useNavigation, useTheme } from '@react-navigation/native';
-import { View, Text, TouchableHighlight } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { View, TouchableHighlight } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
-import { docSelectors, refSelectors } from '@lib/store';
+import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
+import { refSelectors } from '@lib/store';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
@@ -18,63 +18,46 @@ export interface IItem {
 }
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
+const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
 
 const RouteItem = ({ item, routeId }: IItem) => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
 
-  const { colors } = useTheme();
+  const address = refSelectors.selectByRefId<IOutlet>('outlet', item.outlet.id)?.address;
 
-  //TODO получить адрес item.outlet.id
-  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === item.outlet.id);
+  const visit = useFilteredDocList<IVisitDocument>('visit').find((doc) => doc.head?.routeLineId === item.id);
 
-  const address = outlet ? outlet.address : '';
+  const status = !visit ? 0 : visit.head.dateEnd ? 2 : 1;
 
-  const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
+  const dateEnd = useMemo(
+    () => status === 2 && visit?.head.dateEnd && getDateString(visit.head.dateEnd),
+    [status, visit?.head.dateEnd],
+  );
 
-  const visits = docSelectors.selectByDocType<IVisitDocument>('visit')?.filter((e) => e.head.routeLineId === item.id);
-
-  const lastVisit = visits
-    .filter((visit) => visit.head.dateEnd)
-    .sort((a, b) =>
-      a.head.dateEnd === b.head.dateEnd || !a.head.dateEnd || !b.head.dateEnd
-        ? 0
-        : a.head.dateEnd > b.head.dateEnd
-        ? 1
-        : -1,
-    );
-
-  const status = visits.length === 0 ? 0 : visits.find((visit) => visit.head.dateEnd) ? 2 : 1;
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
+  const handlePressRouteItem = useCallback(() => {
+    navigation.navigate('RouteDetails', { routeId, id: item.id });
+  }, [item.id, navigation, routeId]);
 
   return (
-    <TouchableHighlight
-      activeOpacity={0.7}
-      underlayColor="#DDDDDD"
-      onPress={() => {
-        navigation.navigate('RouteDetails', { routeId, id: item.id });
-      }}
-    >
+    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={handlePressRouteItem}>
       <View style={styles.item}>
         <View style={styles.icon}>
-          <Text style={styles.lightText}>{item.ordNumber}</Text>
+          <MediumText style={styles.lightText}>{item.ordNumber}</MediumText>
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.outlet.name}</Text>
+            <LargeText style={styles.textBold}>{item.outlet.name}</LargeText>
           </View>
-          <View style={styles.directionRow}>
-            <Text style={textStyle}>{address}</Text>
+          {address ? (
             <View style={styles.directionRow}>
-              <Text style={styles.field}>{item.comment}</Text>
+              <MediumText>{address}</MediumText>
             </View>
-          </View>
+          ) : null}
         </View>
+
         <View style={styles.bottomButtons}>
           {status ? <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" /> : null}
-          <Text style={textStyle}>
-            {status === 2 && lastVisit[0].head.dateEnd && getDateString(lastVisit[0].head.dateEnd)}
-          </Text>
+          {dateEnd ? <MediumText>{dateEnd}</MediumText> : null}
         </View>
       </View>
     </TouchableHighlight>

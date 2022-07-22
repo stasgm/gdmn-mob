@@ -16,8 +16,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorContaner: {
-    // justifyContent: 'center',
-    height: 20,
+    maxHeight: 40,
   },
   headerContaner: {
     flexDirection: 'row',

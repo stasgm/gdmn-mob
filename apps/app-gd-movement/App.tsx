@@ -42,6 +42,7 @@ import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageGdMovement } from './src/store/mock';
 
 import RemainsNavigator from './src/navigation/RemainsNavigator';
+import { ScanNavigator } from './src/navigation/ScanNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -51,6 +52,12 @@ const Root = () => {
         title: 'Документы',
         icon: 'file-document-outline',
         component: DocNavigator,
+      },
+      {
+        name: 'Scan',
+        title: 'Сканирование',
+        icon: 'file-document-outline',
+        component: ScanNavigator,
       },
       {
         name: 'Remains',
@@ -68,7 +75,6 @@ const Root = () => {
   const isInit = useSelector((state) => state.settings.isInit);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
-  const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const invLoading = useInvSelector((state) => state.appInventory.loading);
   const isDemo = useSelector((state) => state.auth.isDemo);
@@ -197,24 +203,15 @@ const Root = () => {
             {'Начать работу'}
           </PrimeButton>
         </AppScreen>
-      ) : authLoading || loading || appLoading || invLoading || appDataLoading ? (
+      ) : authLoading || loading || invLoading || appDataLoading ? (
         <AppScreen>
           <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
           <Caption style={styles.title}>
-            {appDataLoading || invLoading
-              ? 'Загрузка данных...'
-              : appLoading
-              ? 'Синхронизация данных..'
-              : 'Пожалуйста, подождите..'}
+            {appDataLoading || invLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
           </Caption>
         </AppScreen>
       ) : (
-        <MobileApp
-          items={navItems}
-          loadingErrors={[invLoadingError]}
-          onClearLoadingErrors={onClearLoadingErrors}
-          onGetMessages={isDemo ? getMessages : undefined}
-        />
+        <MobileApp items={navItems} loadingErrors={[invLoadingError]} onClearLoadingErrors={onClearLoadingErrors} />
       )}
     </ErrorBoundary>
   );

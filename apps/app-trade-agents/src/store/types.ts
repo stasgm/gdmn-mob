@@ -22,25 +22,25 @@ export interface IFormParam {
 }
 
 export interface IOrderFormParam extends IFormParam {
-  contact?: INamedEntity;
-  outlet?: INamedEntity;
-  depart?: INamedEntity;
+  contact?: IReferenceData;
+  outlet?: IReferenceData;
+  depart?: IReferenceData;
   number?: string;
   documentDate?: string;
   onDate?: string;
   status?: StatusType;
-  route?: INamedEntity;
+  route?: IReferenceData;
   comment?: string;
 }
 
 export interface IReturnFormParam extends IFormParam {
-  contact?: INamedEntity;
-  outlet?: INamedEntity;
+  contact?: IReferenceData;
+  outlet?: IReferenceData;
   number?: string;
   documentDate?: string;
-  depart?: INamedEntity;
+  depart?: IReferenceData;
   reason?: string;
-  route?: INamedEntity;
+  route?: IReferenceData;
   status?: StatusType;
 }
 
@@ -102,10 +102,10 @@ export interface IPackageGood extends IEntity {
 }
 
 export interface IOrderHead extends IHead {
-  contact: INamedEntity; //организация-плательщик
-  outlet: INamedEntity; // магазин –подразделение организации плательщика
-  route?: INamedEntity; // 	Маршрут
-  depart?: INamedEntity; // Необязательное поле склад (подразделение предприятия-производителя)
+  contact: IReferenceData; //организация-плательщик
+  outlet: IReferenceData; // магазин –подразделение организации плательщика
+  route?: IReferenceData; // 	Маршрут
+  depart?: IReferenceData; // Необязательное поле склад (подразделение предприятия-производителя)
   onDate: string; //  Дата отгрузки
   takenOrder?: TakeOrderType; //тип взятия заявки
   comment?: string;
@@ -114,17 +114,16 @@ export interface IOrderHead extends IHead {
 export interface IOrderLine extends IEntity {
   good: IGood;
   quantity: number;
-  packagekey?: INamedEntity; // Вид упаковки
+  package?: INamedEntity; // Вид упаковки
 }
 
 export interface IOrderTotalLine {
   group: INamedEntity;
-  quantity?: number;
-  price?: number;
+  quantity: number;
+  s: number;
 }
 
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
-// export type IOrderDocument = IDocument<IOrderHead, IOrderLine[]>;
 
 interface IRouteHead extends IHead {
   agent: INamedEntity;
@@ -146,9 +145,9 @@ export interface IRouteTotalLine {
 export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine>, 'head' | 'lines'>;
 
 interface IReturnHead extends IHead {
-  contact: INamedEntity;
-  outlet: INamedEntity;
-  route?: INamedEntity; // 	Маршрут
+  contact: IReferenceData;
+  outlet: IReferenceData;
+  route?: IReferenceData; // 	Маршрут
 }
 
 export interface IReturnLine extends IEntity {

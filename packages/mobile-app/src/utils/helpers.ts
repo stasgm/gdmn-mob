@@ -1,4 +1,4 @@
-import { INamedEntity } from '@lib/types';
+import { IEntity, INamedEntity } from '@lib/types';
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
 import { Linking, Platform } from 'react-native';
@@ -79,6 +79,11 @@ const formatValue = (format: NumberFormat | INumberFormat, value: number | strin
   }
 };
 
+const round = (value: number, x = 2) => {
+  const d = parseFloat('1'.padEnd(1 + x, '0'));
+  return Math.round((value + Number.EPSILON) * d) / d;
+};
+
 const generateId = () => customAlphabet('1234567890abcdef', 10)();
 
 const dialCall = (number: string) => {
@@ -91,6 +96,8 @@ const dialCall = (number: string) => {
   Linking.openURL(phoneNumber);
 };
 
+const keyExtractor = (item: IEntity) => String(item.id);
+
 export {
   truncate,
   log,
@@ -99,6 +106,8 @@ export {
   extraPredicate,
   isNamedEntity,
   formatValue,
+  round,
   generateId,
   dialCall,
+  keyExtractor,
 };

@@ -7,6 +7,7 @@ import { authActions, useSelector, useAuthThunkDispatch } from '@lib/store';
 import { IUserCredentials } from '@lib/types';
 import { IApiConfig } from '@lib/client-types';
 import api from '@lib/client-api';
+import Constants from 'expo-constants';
 
 import {
   SplashScreen,
@@ -22,12 +23,10 @@ import { AuthStackParamList } from './types';
 const AuthStack = createStackNavigator<AuthStackParamList>();
 
 const AuthNavigator: React.FC = () => {
-  const config = useSelector((state) => state.auth.config);
-  const isDemo = useSelector((state) => state.auth.isDemo);
-  const isInit = useSelector((state) => state.auth.isInit);
-  const user = useSelector((state) => state.auth.user);
-  const isConfigFirst = useSelector((state) => state.auth.isConfigFirst);
-  const connectionStatus = useSelector((state) => state.auth.connectionStatus);
+  const { config, isDemo, isInit, user, isConfigFirst, connectionStatus, isLogout } = useSelector(
+    (state) => state.auth,
+  );
+
   const authDispatch = useAuthThunkDispatch();
 
   /*
@@ -59,16 +58,26 @@ const AuthNavigator: React.FC = () => {
     [config.deviceId, authDispatch, disconnect],
   );
 
+  const logout = useCallback(async () => {
+    await authDispatch(authActions.logout());
+    api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
+  }, [authDispatch]);
+
   const checkDevice = useCallback(async () => {
     //Если в настройках записан deviceId, то получаем от сервера устройство,
     //иначе connectionStatus = 'not-activated', переходим на окно ввода кода
-    const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
-
-    //Получим устройство по uid
-    if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
-      await authDispatch(authActions.getDeviceByUid(config.deviceId));
+    if (isLogout && config?.deviceId && user) {
+      logout();
+    } else {
+      const objGetStatus = await authDispatch(authActions.getDeviceStatus(config?.deviceId));
+      //Получим устройство по uid
+      if (config?.deviceId && user && objGetStatus.type !== 'AUTH/GET_DEVICE_STATUS_FAILURE') {
+        await authDispatch(
+          authActions.getDeviceByUid(config.deviceId, user.erpUser!.id, Constants.manifest?.extra?.slug, logout),
+        );
+      }
     }
-  }, [authDispatch, config.deviceId, user]);
+  }, [authDispatch, config.deviceId, isLogout, logout, user]);
 
   const activateDevice = useCallback(
     async (code: string) => {
@@ -85,18 +94,20 @@ const AuthNavigator: React.FC = () => {
 
   const login = useCallback(
     async (credentials: IUserCredentials) => {
-      const res = await authDispatch(authActions.login(credentials));
+      const res = await authDispatch(authActions.login(credentials, Constants.manifest?.extra?.slug, logout));
       if (config?.deviceId && res.type === 'AUTH/LOGIN_SUCCESS') {
-        await authDispatch(authActions.getDeviceByUid(config.deviceId));
+        await authDispatch(
+          authActions.getDeviceByUid(
+            config.deviceId,
+            res.payload?.erpUser?.id,
+            Constants.manifest?.extra?.slug,
+            logout,
+          ),
+        );
       }
     },
-    [authDispatch, config.deviceId],
+    [authDispatch, config.deviceId, logout],
   );
-
-  const logout = useCallback(async () => {
-    await authDispatch(authActions.logout());
-    api.config.debug = api.config.debug ? { ...api.config.debug, isMock: false } : { isMock: false };
-  }, [authDispatch]);
 
   const [companyLoading, setCompanyLoading] = useState<boolean>(false);
 

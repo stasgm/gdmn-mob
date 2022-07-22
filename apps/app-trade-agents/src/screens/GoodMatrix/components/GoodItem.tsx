@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { GoodMatrixParamList } from '../../../navigation/Root/types';
 import { IGood } from '../../../store/types';
@@ -13,10 +13,7 @@ interface IProps {
 }
 
 const GoodItem = ({ item }: IProps) => {
-  const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<GoodMatrixParamList, 'GoodList'>>();
-
-  const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   return (
     <TouchableOpacity
@@ -29,8 +26,8 @@ const GoodItem = ({ item }: IProps) => {
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <Text style={[styles.name]}>{item?.name}</Text>
-          <Text style={textStyle}>{(item?.priceFsn || 0).toString()} р.</Text>
+          <LargeText style={styles.textBold}>{item?.name}</LargeText>
+          <MediumText>{(item?.priceFsn || 0).toString()} р.</MediumText>
         </View>
       </View>
     </TouchableOpacity>

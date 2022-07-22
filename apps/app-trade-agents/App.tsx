@@ -122,7 +122,6 @@ const Root = () => {
   }, [isInit]);
 
   const appDataLoading = appSelectors.selectLoading();
-  const appLoading = useSelector((state) => state.app.loading);
   const authLoading = useSelector((state) => state.auth.loadingData);
   const tradeLoading = useAppTradeSelector((state) => state.appTrade.loadingData);
   const isLogged = authSelectors.isLoggedWithCompany();
@@ -164,15 +163,11 @@ const Root = () => {
 
   const onClearLoadingErrors = () => dispatch(appTradeActions.setLoadingError(''));
 
-  return authLoading || loading || appLoading || tradeLoading || appDataLoading ? (
+  return authLoading || loading || tradeLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={defaultTheme.colors.primary} />
       <Caption style={styles.title}>
-        {appDataLoading || tradeLoading
-          ? 'Загрузка данных...'
-          : appLoading
-          ? 'Синхронизация данных..'
-          : 'Пожалуйста, подождите..'}
+        {appDataLoading || tradeLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
       </Caption>
     </AppScreen>
   ) : infoWindow === 1 ? (

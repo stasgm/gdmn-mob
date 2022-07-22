@@ -1,9 +1,9 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { Text } from 'react-native';
 
-import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
+import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { globalStyles } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
@@ -53,13 +53,13 @@ const ScanBarcodeScreen = () => {
 
   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IMovementDocument;
 
-  const goods = refSelectors.selectByName<IGood>('good').data;
+  const goods = refSelectors.selectByName<IGood>('good')?.data;
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
 
   const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
   const documentType = useMemo(
-    () => documentTypes.find((d) => d.id === document.documentType.id),
-    [document.documentType.id, documentTypes],
+    () => documentTypes?.find((d) => d.id === document?.documentType.id),
+    [document?.documentType.id, documentTypes],
   );
 
   const contactId = useMemo(
@@ -133,6 +133,11 @@ const ScanBarcodeScreen = () => {
       weightSettingsWeightCode.data,
     ],
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!document) {
     return <Text style={globalStyles.title}>Документ не найден</Text>;

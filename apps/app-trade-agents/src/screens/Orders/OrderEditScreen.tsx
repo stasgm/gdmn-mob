@@ -1,15 +1,23 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
-import { RouteProp, useNavigation, useRoute, StackActions, useTheme } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
-import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
+import { documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
+import {
+  AppInputScreen,
+  Input,
+  SelectableInput,
+  SaveButton,
+  SubTitle,
+  RadioGroup,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
-import { generateId, getDateString } from '@lib/mobile-app';
+import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
@@ -24,7 +32,8 @@ const OrderEditScreen = () => {
 
   const { colors } = useTheme();
 
-  const orders = docSelectors.selectByDocType<IOrderDocument>('order');
+  const orders = useFilteredDocList<IOrderDocument>('order');
+
   const order = orders?.find((e) => e.id === id);
 
   const orderType = refSelectors
@@ -63,8 +72,7 @@ const OrderEditScreen = () => {
     if (!docContact && !!docOutlet) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['contact']: outlet?.company,
+          contact: outlet?.company,
         }),
       );
     }
@@ -75,8 +83,7 @@ const OrderEditScreen = () => {
     if (!!docContact && !!docOutlet && docContact.id !== outlet?.company.id) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['outlet']: undefined,
+          outlet: undefined,
         }),
       );
     }
@@ -114,72 +121,78 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, order, defaultDepart]);
 
-  const handleSave = useCallback(() => {
-    if (!orderType) {
-      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
-    }
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
-    if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
-
-    const docId = !id ? generateId() : id;
-
-    const newOrderDate = new Date().toISOString();
-
-    if (!id) {
-      const newOrder: IOrderDocument = {
-        id: docId,
-        documentType: orderType,
-        number: docNumber,
-        documentDate: newOrderDate,
-        status: 'DRAFT',
-        head: {
-          contact: docContact,
-          onDate: docOnDate,
-          outlet: docOutlet,
-          depart: docDepart,
-          comment: docComment && docComment.trim(),
-        },
-        lines: [],
-        creationDate: newOrderDate,
-        editionDate: newOrderDate,
-      };
-
-      dispatch(documentActions.addDocument(newOrder));
-
-      navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
-      // navigation.navigate('OrderView', { id: newOrder.id });
-    } else {
-      if (!order) {
-        return;
+  useEffect(() => {
+    if (screenState === 'saving') {
+      if (!orderType) {
+        setScreenState('idle');
+        return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
       }
 
-      const updatedOrderDate = new Date().toISOString();
+      if (!(docNumber && docContact && docOutlet && docOnDate && docDocumentDate)) {
+        setScreenState('idle');
+        return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      }
 
-      const updatedOrder: IOrderDocument = {
-        ...order,
-        id,
-        number: docNumber,
-        status: docStatus || 'DRAFT',
-        documentDate: docDocumentDate,
-        documentType: orderType,
-        errorMessage: undefined,
-        head: {
-          ...order.head,
-          contact: docContact,
-          outlet: docOutlet,
-          onDate: docOnDate,
-          depart: docDepart,
-          comment: docComment && docComment.trim(),
-        },
-        lines: order.lines,
-        creationDate: order.creationDate || updatedOrderDate,
-        editionDate: updatedOrderDate,
-      };
+      const docId = !id ? generateId() : id;
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
-      navigation.navigate('OrderView', { id });
+      const newOrderDate = new Date().toISOString();
+
+      if (!id) {
+        const newOrder: IOrderDocument = {
+          id: docId,
+          documentType: orderType,
+          number: docNumber,
+          documentDate: newOrderDate,
+          status: 'DRAFT',
+          head: {
+            contact: docContact,
+            onDate: docOnDate,
+            outlet: docOutlet,
+            depart: docDepart,
+            comment: docComment && docComment.trim(),
+          },
+          lines: [],
+          creationDate: newOrderDate,
+          editionDate: newOrderDate,
+        };
+
+        dispatch(documentActions.addDocument(newOrder));
+
+        navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
+      } else {
+        if (!order) {
+          setScreenState('idle');
+          return;
+        }
+
+        const updatedOrderDate = new Date().toISOString();
+
+        const updatedOrder: IOrderDocument = {
+          ...order,
+          id,
+          number: docNumber,
+          status: docStatus || 'DRAFT',
+          documentDate: docDocumentDate,
+          documentType: orderType,
+          errorMessage: undefined,
+          head: {
+            ...order.head,
+            contact: docContact,
+            outlet: docOutlet,
+            onDate: docOnDate,
+            depart: docDepart,
+            comment: docComment && docComment.trim(),
+          },
+          lines: order.lines,
+          creationDate: order.creationDate || updatedOrderDate,
+          editionDate: updatedOrderDate,
+        };
+
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
+        navigation.navigate('OrderView', { id });
+      }
     }
   }, [
     orderType,
@@ -195,9 +208,13 @@ const OrderEditScreen = () => {
     navigation,
     order,
     docStatus,
+    screenState,
   ]);
 
-  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+  const renderRight = useCallback(
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
+    [screenState],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -277,6 +294,7 @@ const OrderEditScreen = () => {
       fieldName: 'outlet',
       clause: params,
       value: docOutlet && [docOutlet],
+      descrFieldName: 'address',
     });
   }, [docContact?.id, docOutlet, docRoute, isBlocked, navigation]);
 
@@ -309,6 +327,11 @@ const OrderEditScreen = () => {
     ],
     [colors.card, colors.primary],
   );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppInputScreen>

@@ -1,12 +1,21 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Alert, View, StyleSheet, Platform, FlatList, ActivityIndicator, Text, ListRenderItem } from 'react-native';
+import { Alert, View, StyleSheet, Platform, FlatList, Text, ListRenderItem } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { Divider, Snackbar } from 'react-native-paper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { appActions, docSelectors, refSelectors, useSelector } from '@lib/store';
-import { SelectableInput, SubTitle, PrimeButton, InfoBlock, ItemSeparator, AppScreen, Theme } from '@lib/mobile-ui';
+import {
+  SelectableInput,
+  SubTitle,
+  PrimeButton,
+  InfoBlock,
+  ItemSeparator,
+  AppScreen,
+  Theme,
+  AppActivityIndicator,
+} from '@lib/mobile-ui';
 
 import { IResponse, ISettingsOption } from '@lib/types';
 
@@ -259,7 +268,7 @@ function SellBillScreen() {
     <AppScreen style={localStyles.appScreen}>
       <View style={localStyles.title}>
         <SubTitle>Поиск накладных</SubTitle>
-        {loading ? <ActivityIndicator size="small" color={viewStyle} /> : <View style={localStyles.blank} />}
+        {loading ? <AppActivityIndicator /> : <View style={localStyles.blank} />}
       </View>
       <Divider />
       <SelectableInput

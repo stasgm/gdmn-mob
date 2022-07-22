@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { useDispatch, useDocThunkDispatch, useSelector, documentActions, appActions } from '@lib/store';
+import { useDispatch, useDocThunkDispatch, useSelector, documentActions, appActions, authActions } from '@lib/store';
 
 import { IAppSystem, IDocument, IMessage } from '@lib/types';
 import api from '@lib/client-api';
@@ -14,6 +14,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
   const { user, company, config } = useSelector((state) => state.auth);
 
   const docVersion = 1;
+  const authMiddleware = () => dispatch(authActions.logout());
 
   const send = () => {
     if (!user || !user.erpUser) {
@@ -44,7 +45,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
     const deviceId = config.deviceId!;
 
     const sendData = async () => {
-      const getErpUser = await api.user.getUser(consumer.id);
+      const getErpUser = await api.user.getUser(consumer.id, authMiddleware);
 
       let appSystem: IAppSystem | undefined;
       if (getErpUser.type === 'ERROR') {
@@ -80,6 +81,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
             sendingDocsMessage,
             getNextOrder(),
             deviceId,
+            authMiddleware,
           );
 
           if (sendMessageResponse.type === 'SEND_MESSAGE') {
@@ -106,7 +108,7 @@ const useSendDocs = (readyDocs: IDocument[]): (() => void) => {
       ]);
     } else {
       Alert.alert('Внимание!', 'Отправка прошла успешно!', [{ text: 'OK' }]);
-      dispatch(appActions.setSyncDate(new Date()));
+      // dispatch(appActions.setSyncDate(new Date()));
     }
 
     sendData();

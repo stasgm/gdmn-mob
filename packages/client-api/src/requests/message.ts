@@ -17,6 +17,7 @@ class Message extends BaseRequest {
     message: IMessage['body'],
     order: number,
     deviceId: string,
+    authFunc?: () => void,
   ) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
@@ -38,6 +39,10 @@ class Message extends BaseRequest {
       const res = await this.api.axios.post<IResponse<IMessageInfo>>('/messages', body);
       const resData = res.data;
 
+      if (authFunc && resData.status === 401) {
+        authFunc();
+      }
+
       if (resData.result) {
         return {
           type: 'SEND_MESSAGE',
@@ -58,7 +63,7 @@ class Message extends BaseRequest {
     }
   };
 
-  getMessages = async (params: IMessageParams) => {
+  getMessages = async (params: IMessageParams, authFunc?: () => void) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -73,6 +78,10 @@ class Message extends BaseRequest {
         `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
       );
       const resData = res.data;
+
+      if (authFunc && resData.status === 401) {
+        authFunc();
+      }
 
       if (resData.result) {
         return {
@@ -93,7 +102,7 @@ class Message extends BaseRequest {
     }
   };
 
-  removeMessage = async (messageId: string, params: IMessageParams) => {
+  removeMessage = async (messageId: string, params: IMessageParams, authFunc?: () => void) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -107,6 +116,10 @@ class Message extends BaseRequest {
         `/messages/${messageId}?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
       );
       const resData = res.data;
+
+      if (authFunc && resData.status === 401) {
+        authFunc();
+      }
 
       if (resData.result) {
         return {
@@ -125,7 +138,7 @@ class Message extends BaseRequest {
     }
   };
 
-  clear = async (params: IMessageParams) => {
+  clear = async (params: IMessageParams, authFunc?: () => void) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -139,6 +152,10 @@ class Message extends BaseRequest {
         `/messages?companyId=${params.companyId}&appSystemId=${params.appSystemId}`,
       );
       const resData = res.data;
+
+      if (authFunc && resData.status === 401) {
+        authFunc();
+      }
 
       if (resData.result) {
         return {

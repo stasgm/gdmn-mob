@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
@@ -34,11 +34,14 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     permission();
   }, []);
 
-  const handleBarCodeScanned = (data: string) => {
-    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
-    setScanned(true);
-    setBarcode(data);
-  };
+  const handleBarCodeScanned = useCallback(
+    (data: string) => {
+      vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
+      setScanned(true);
+      setBarcode(data);
+    },
+    [vibroMode],
+  );
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
@@ -55,6 +58,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   return (
     <View style={viewStyle}>
       <Camera
+        key={`${scanned}`}
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],
@@ -106,6 +110,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
                   style={[styles.buttons, styles.btnFind]}
                   onPress={() => {
                     onSave(barcode);
+                    setScanned(false);
                   }}
                 >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />

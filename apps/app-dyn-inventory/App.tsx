@@ -48,7 +48,6 @@ const Root = () => {
   const remains = refSelectors.selectByName<IRemains>('remains')?.data;
   const authLoading = useSelector((state) => state.auth.loadingData);
   const appDataLoading = appSelectors.selectLoading();
-  const appLoading = useSelector((state) => state.app.loading);
   const isLogged = authSelectors.isLoggedWithCompany();
   const invLoading = useInvSelector((state) => state.appDynInventory.loading);
 
@@ -114,15 +113,11 @@ const Root = () => {
 
   const onClearLoadingErrors = () => dispatch(appDynInvActions.setLoadingError(''));
 
-  return authLoading || loading || appLoading || invLoading || appDataLoading ? (
+  return authLoading || loading || invLoading || appDataLoading ? (
     <AppScreen>
       <ActivityIndicator size="large" color={colors.primary} />
       <Caption style={styles.title}>
-        {appDataLoading || invLoading
-          ? 'Загрузка данных...'
-          : appLoading
-          ? 'Синхронизация данных..'
-          : 'Пожалуйста, подождите..'}
+        {appDataLoading || invLoading ? 'Загрузка данных...' : 'Пожалуйста, подождите..'}
       </Caption>
     </AppScreen>
   ) : (

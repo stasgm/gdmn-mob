@@ -1,43 +1,50 @@
-import React, { useCallback, useLayoutEffect, useMemo } from 'react';
-import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
+import { View, FlatList, Alert } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
   ScanButton,
+  CloseButton,
+  DeleteButton,
+  SendButton,
+  AppActivityIndicator,
+  MediumText,
+  LargeText,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+
+import { sleep } from '@lib/client-api';
 
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
-import SwipeLineItem from '../../components/SwipeLineItem';
 import { DocItem } from '../../components/DocItem';
 import { navBackButton } from '../../components/navigateOptions';
 
 export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
+  const docDispatch = useDocThunkDispatch();
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
 
-  const { colors } = useTheme();
+  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
-  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
+  const [delList, setDelList] = useState<string[]>([]);
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
-  const doc = useSelector((state) => state.documents.list).find((e) => e.id === id) as IMovementDocument | undefined;
+  const doc = docSelectors.selectByDocId<IMovementDocument>(id);
 
-  const isBlocked = doc?.status !== 'DRAFT';
+  const isBlocked = doc?.status !== 'DRAFT' || screenState !== 'idle';
 
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
@@ -57,10 +64,75 @@ export const DocViewScreen = () => {
     if (!id) {
       return;
     }
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          setScreenState('deleting');
+          await sleep(1);
+          const res = await docDispatch(documentActions.removeDocument(id));
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            navigation.goBack();
+          }
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [docDispatch, id, navigation]);
 
-    dispatch(documentActions.removeDocument(id));
-    navigation.goBack();
-  }, [dispatch, id, navigation]);
+  const handelAddDeletelList = useCallback(
+    (lineId: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = delList.filter((i) => i !== checkedId);
+        setDelList(newList);
+      } else {
+        setDelList([...delList, lineId]);
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocLine = useCallback(() => {
+    Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+      {
+        text: 'Да',
+        onPress: () => {
+          for (const item of delList) {
+            dispatch(documentActions.removeDocumentLine({ docId: id, lineId: item }));
+          }
+          setDelList([]);
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [delList, dispatch, id]);
+
+  const handleUseSendDoc = useSendDocs([doc]);
+
+  const handleSendDoc = useCallback(() => {
+    setScreenState('sending');
+    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          setTimeout(() => {
+            setScreenState('idle');
+          }, 10000);
+          handleUseSendDoc();
+        },
+      },
+      {
+        text: 'Отмена',
+        onPress: () => {
+          setScreenState('idle');
+        },
+      },
+    ]);
+  }, [handleUseSendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -88,36 +160,81 @@ export const DocViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <ScanButton onPress={handleDoScan} />
-          <MenuButton actionsMenu={actionsMenu} />
+          {delList.length > 0 ? (
+            <DeleteButton onPress={handleDeleteDocLine} />
+          ) : (
+            <>
+              <SendButton onPress={handleSendDoc} />
+              <ScanButton onPress={handleDoScan} />
+              <MenuButton actionsMenu={actionsMenu} />
+            </>
+          )}
         </View>
       ),
-    [actionsMenu, handleDoScan, isBlocked],
+    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendDoc, isBlocked],
+  );
+
+  const renderLeft = useCallback(
+    () => !isBlocked && delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList.length, isBlocked],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: delList.length > 0 ? renderLeft : navBackButton,
       headerRight: renderRight,
+      title: delList.length > 0 ? `Выделено позиций: ${delList.length}` : 'Документ',
     });
-  }, [navigation, renderRight]);
+  }, [delList.length, navigation, renderLeft, renderRight]);
 
-  if (!doc) {
+  const handlePressDocLine = useCallback(
+    (item: IMovementLine) => !isBlocked && navigation.navigate('DocLine', { mode: 1, docId: id, item }),
+    [id, isBlocked, navigation],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: IMovementLine }) => {
+      const checkedId = delList.find((i) => i === item.id) || '';
+
+      return (
+        <DocItem
+          item={item}
+          checked={checkedId ? true : false}
+          onPress={() => handlePressDocLine(item)}
+          onLongPress={() => handelAddDeletelList(item.id, checkedId)}
+          isDelList={delList.length > 0 ? true : false}
+        />
+      );
+    },
+    [delList, handelAddDeletelList, handlePressDocLine],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
+  if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        <View style={styles.containerCenter}>
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
+        </View>
       </View>
     );
   }
 
-  const renderItem = ({ item }: { item: IMovementLine }) => (
-    <SwipeLineItem docId={doc.id} item={item} readonly={isBlocked} copy={false} routeName="DocLine">
-      <DocItem docId={doc.id} item={item} readonly={isBlocked} />
-    </SwipeLineItem>
-  );
+  if (!doc) {
+    return (
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
+  }
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.documentType.description || ''}
@@ -125,13 +242,13 @@ export const DocViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
       >
         <>
-          <Text style={[styles.rowCenter, textStyle]}>
+          <MediumText style={styles.rowCenter}>
             {(doc.documentType.remainsField === 'fromContact'
               ? doc.head.fromContact?.name
               : doc.head.toContact?.name) || ''}
-          </Text>
+          </MediumText>
           <View style={styles.rowCenter}>
-            <Text style={textStyle}>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</Text>
+            <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
 
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
@@ -139,9 +256,13 @@ export const DocViewScreen = () => {
       </InfoBlock>
       <FlatList
         data={doc.lines}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        scrollEventThrottle={400}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
+        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
       />
     </View>

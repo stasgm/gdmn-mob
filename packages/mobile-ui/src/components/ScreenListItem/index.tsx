@@ -1,15 +1,16 @@
 import React, { ReactNode } from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusType } from '@lib/types';
 
 import styles from '../../styles/global';
 
+import { LargeText, MediumText } from '../AppText';
+
 import { getStatusColor } from './constants';
 export interface IListItemProps {
   children?: ReactNode;
-  info?: ReactNode;
   title: string;
   documentDate: string;
   subtitle?: string;
@@ -18,13 +19,15 @@ export interface IListItemProps {
   lineCount?: number;
   errorMessage?: string;
   id: string;
-  onSelectItem?: () => void;
+  onSelectItem: () => void;
+  onCheckItem?: () => void;
+  isChecked?: boolean;
+  isDelList?: boolean;
   documentType?: string;
 }
 
 const ScreenListItem = ({
   children,
-  info,
   title,
   subtitle,
   status,
@@ -32,35 +35,48 @@ const ScreenListItem = ({
   isFromRoute,
   errorMessage,
   onSelectItem,
+  onCheckItem,
+  isChecked,
+  isDelList,
 }: IListItemProps) => {
   const { colors } = useTheme();
 
   return (
-    <TouchableOpacity onPress={onSelectItem}>
+    <TouchableOpacity
+      onPress={() => {
+        isDelList ? onCheckItem && onCheckItem() : onSelectItem && onSelectItem();
+      }}
+      onLongPress={onCheckItem}
+    >
       <View style={styles.item}>
-        <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
-          <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+        <View style={styles.iconsWithCheck}>
+          <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
+            <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+          </View>
+          {isChecked ? (
+            <View style={styles.checkedIcon}>
+              <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
+            </View>
+          ) : null}
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{title}</Text>
+            <LargeText style={styles.textBold}>{title}</LargeText>
           </View>
           <View style={styles.directionRow}>
-            <Text style={[styles.field, { color: colors.text }]}>{subtitle ? subtitle : children}</Text>
+            {subtitle ? <MediumText>{subtitle}</MediumText> : null}
+            {children ? <View style={{ width: '95%' }}>{children}</View> : null}
             <View style={styles.rowCenter}>
-              <Text style={[styles.field, { color: colors.text }]}>{lineCount}</Text>
+              <MediumText>{lineCount}</MediumText>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
               {isFromRoute && (
                 <MaterialCommunityIcons name="routes" size={15} color={colors.text} style={styles.field} />
               )}
             </View>
           </View>
-          {info && <View>{info}</View>}
-          <View>
-            {errorMessage && (
-              <Text style={[styles.field, { color: colors.error }]}>Отказано: {errorMessage || ''}</Text>
-            )}
-          </View>
+          {errorMessage ? (
+            <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>

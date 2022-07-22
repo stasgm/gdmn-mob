@@ -56,6 +56,7 @@ export const authMiddlewareFactory: PersistedMiddleware =
       case getType(actions.setConfig):
       case getType(actions.setCompany):
       case getType(actions.setIsConfigFirst):
+      case getType(actions.setIsLogOut):
       case getType(actions.setDemoModeAsync.success):
       case getType(actions.disconnectAsync.success):
       case getType(actions.logoutUserAsync.success):

@@ -95,16 +95,10 @@ const MobileApp = ({ store, loadingErrors, onClearLoadingErrors, ...props }: IAp
     </Snackbar>
   );
 
-  const Router = () => (
-    <>
-      {authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />}
-      <SnackbarComponent />
-    </>
-  );
-
   return (
     <NavigationContainer theme={defaultTheme}>
-      <Router />
+      {authSelectors.isLoggedWithCompany() ? <AppRoot {...props} /> : <AuthNavigator />}
+      <SnackbarComponent />
     </NavigationContainer>
   );
 };
