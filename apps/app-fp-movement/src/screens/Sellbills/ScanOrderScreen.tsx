@@ -1,9 +1,7 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
-// import { Alert, Text } from 'react-native';
 
 import { useNavigation, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
 
-// import { globalStyles } from '@lib/mobile-ui';
 import { useSelector, refSelectors, docSelectors, documentActions, useDispatch } from '@lib/store';
 
 import { IDocumentType, IReference } from '@lib/types';
@@ -32,8 +30,8 @@ import { ScanBarcode } from './components/ScanBarcode';
 import { ScanBarcodeReader } from './components/ScanBarcodeReader';
 
 const ScanOrderScreen = () => {
-  const docId = useRoute<RouteProp<SellbillStackParamList, 'ScanOrder'>>().params?.id;
-  console.log('id', docId);
+  const docTypeId = useRoute<RouteProp<SellbillStackParamList, 'ScanOrder'>>().params?.id;
+
   const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'ScanOrder'>>();
   const settings = useSelector((state) => state.settings?.data);
 
@@ -57,7 +55,7 @@ const ScanOrderScreen = () => {
 
   const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === docId);
+    ?.data.find((t) => t.name === docTypeId);
 
   const handleSaveScannedItem = useCallback(
     (item: ISellbillDocument) => {

@@ -8,7 +8,7 @@ import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/m
 
 import { SellbillStackParamList } from '../../navigation/Root/types';
 
-import { ISellbillDocument, ISellbillLine, ITempDocument } from '../../store/types';
+import { ISellbillLine, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 import { SellbillLine } from './components/SellbillLine';
@@ -25,14 +25,10 @@ export const SellbillLineScreen = () => {
   const [line, setLine] = useState<ISellbillLine>(item);
 
   const tempLines = docSelectors.selectByDocId<ITempDocument>(tempId)?.lines;
-  const otvesLines = docSelectors.selectByDocId<ISellbillDocument>(docId)?.lines;
 
   const handleSave = useCallback(() => {
-    // for (const tempLine of tempLines) {
     const tempLine = tempLines?.find((i) => line.good.id === i.good.id);
-    const otvesLine = otvesLines.find((i) => i.barcode === line.barcode);
 
-    console.log('otv', otvesLine);
     if (tempLine) {
       const newLine = { ...tempLine, weight: round(tempLine.weight - line.weight) };
       if (newLine.weight > 0) {
@@ -82,7 +78,7 @@ export const SellbillLineScreen = () => {
       ]);
     }
     // }
-  }, [dispatch, docId, line, mode, navigation, otvesLines, tempId, tempLines]);
+  }, [dispatch, docId, line, mode, navigation, tempId, tempLines]);
 
   const renderRight = useCallback(
     () => (

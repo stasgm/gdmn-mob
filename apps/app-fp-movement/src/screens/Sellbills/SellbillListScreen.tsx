@@ -1,10 +1,10 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, RefreshControl, SectionList, SectionListData, Text, View } from 'react-native';
+import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { docSelectors, refSelectors, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   FilterButtons,
@@ -16,18 +16,20 @@ import {
   IListItemProps,
   AppActivityIndicator,
   Menu,
+  DeleteButton,
+  CloseButton,
+  EmptyList,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
 
 import { ISellbillDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
 import { SellbillStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
@@ -41,34 +43,26 @@ export type SectionDataProps = SectionListData<IListItemProps, SellbillListSecti
 
 export const SellbillListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillList'>>();
-
-  const loading = useSelector((state) => state.documents.loading);
+  const dispatch = useDispatch();
 
   const { colors } = useTheme();
+  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
-  // const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
-
-  // const movements = useSelector((state) => state.documents.list) as ITempDocument[];
   const sellbills = useSelector((state) => state.documents.list) as ISellbillDocument[];
-  // const temps = docSelectors.selectByDocType<ISellbillDocument>('otves');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  // const otvesTypes = refSelectors
-  // .selectByName<IReference<IDocumentType>>('documentType')
-  // ?.data.filter((i) => i.);
-
   const list = sellbills
-    ?.filter((i) =>
-      i.documentType?.name === 'otves' || i.documentType.name === 'otvesCurr'
-        ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
-          ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-          : true
-        : false,
+    ?.filter(
+      (i) => i.documentType?.name === 'otves' || i.documentType.name === 'otvesCurr',
+      //     ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
+      //       ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+      //         i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+      //         i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+      //         getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+      //       : true
+      //     : false,
     )
     .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
@@ -119,6 +113,60 @@ export const SellbillListScreen = () => {
       }, []),
     [filteredList],
   );
+  const [delList, setDelList] = useState({});
+
+  const handleAddDeletelList = useCallback(
+    (lineId: string, lineStatus: string, checkedId: string) => {
+      if (checkedId) {
+        const newList = Object.entries(delList).reduce((sum, cur) => {
+          const curId = cur[0];
+          const curStatus = cur[1];
+          if (curId !== checkedId) {
+            return { ...sum, [curId]: curStatus };
+          } else {
+            return { ...sum };
+          }
+        }, {});
+        setDelList(newList);
+      } else {
+        setDelList({ ...delList, [lineId]: lineStatus });
+      }
+    },
+    [delList],
+  );
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
+
+    if (statusList) {
+      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    } else {
+      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocuments(docIds));
+            setDelList([]);
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
+  }, [delList, dispatch]);
 
   const handleAddDocument = useCallback(
     (item: IListItem) => {
@@ -128,9 +176,9 @@ export const SellbillListScreen = () => {
     [navigation],
   );
 
-  const typeList: IDocumentType[] = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
+  const typesRef: IDocumentType[] = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
 
-  const a: IListItem[] = typeList
+  const typeList: IListItem[] = typesRef
     .filter((i) => i.isShip && i.name !== 'shipFree')
     .map((i) => {
       return { id: i.name || '', value: i.description || '' };
@@ -147,44 +195,66 @@ export const SellbillListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-        <Menu
-          key={'MenuType'}
-          visible={visible}
-          onChange={handleAddDocument}
-          onDismiss={() => setVisible(false)}
-          onPress={() => setVisible(true)}
-          options={a}
-          iconName={'plus'}
-          iconSize={30}
-        />
+        {delList && Object.values(delList).length > 0 ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <IconButton
+              icon="card-search-outline"
+              style={filterVisible && { backgroundColor: colors.card }}
+              size={26}
+              onPress={() => setFilterVisible((prev) => !prev)}
+            />
+            <Menu
+              key={'MenuType'}
+              visible={visible}
+              onChange={handleAddDocument}
+              onDismiss={() => setVisible(false)}
+              onPress={() => setVisible(true)}
+              options={typeList}
+              iconName={'plus'}
+              iconSize={30}
+            />
+          </>
+        )}
       </View>
     ),
-    [a, colors.card, filterVisible, handleAddDocument, visible],
+    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs, typeList, visible],
+  );
+
+  const renderLeft = useCallback(
+    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
+    [delList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackDrawer,
+      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
+      title: delList && Object.values(delList).length > 0 ? `Выделено: ${Object.values(delList).length}` : 'Накладные',
     });
-  }, [navigation, renderRight]);
+  }, [delList, navigation, renderLeft, renderRight]);
+
+  const handlePressSellbill = useCallback((id: string) => navigation.navigate('SellbillView', { id }), [navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const doc = list.find((r) => r.id === item.id);
-    return doc ? (
-      <SwipeListItem renderItem={item} item={doc} routeName="SellbillView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('SellbillView', { id: item.id })} />
-      </SwipeListItem>
-    ) : null;
+    const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
+    return (
+      <ScreenListItem
+        key={item.id}
+        {...item}
+        onSelectItem={() => handlePressSellbill(item.id)}
+        onCheckItem={() => handleAddDeletelList(item.id, item.status || '', checkedId)}
+        isChecked={checkedId ? true : false}
+        isDelList={delList && Object.values(delList).length > 0 ? true : false}
+      />
+    );
   };
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    [],
+  );
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -212,13 +282,11 @@ export const SellbillListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
+        keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
-        renderSectionHeader={({ section }) => (
-          <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
-        )}
-        refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
+        renderSectionHeader={renderSectionHeader}
+        // refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
+        ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );
