@@ -62,9 +62,25 @@ export const MoveViewScreen = () => {
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        setError(true);
+        return;
+      }
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === barc.shcode);
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+
+      if (!good) {
+        setError(true);
+        return;
+      }
+
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        setError(true);
+        return;
+      }
 
       if (good) {
         const barcodeItem = {
@@ -88,7 +104,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [goods, id, navigation],
+    [doc?.lines, goods, id, navigation],
   );
 
   const handleShowDialog = () => {
