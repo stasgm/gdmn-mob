@@ -14,8 +14,8 @@ import { IconButton } from 'react-native-paper';
 
 import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
 
-import { ISellbillDocument } from '../../../../store/types';
-import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
+import { ISellbillDocument } from '../../../../types';
+import { ONE_SECOND_IN_MS } from '../../../../../utils/constants';
 
 import styles from './styles';
 

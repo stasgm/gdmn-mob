@@ -25,9 +25,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString, keyExtractor } from '@lib/mobile-app';
 
-import { IFreeSellbillDocument } from '../../store/types';
-import { FreeSellbillStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
+import { IFreeSellbillDocument } from '../../types';
+import { FreeSellbillStackParamList } from '../../../navigation/Root/types';
+import { navBackDrawer } from '../../../components/navigateOptions';
 
 export interface FreeSellbillListSectionProps {
   title: string;

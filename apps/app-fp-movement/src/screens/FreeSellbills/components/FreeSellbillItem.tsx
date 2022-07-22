@@ -6,7 +6,7 @@ import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IFreeSellbillLine } from '../../../store/types';
+import { IFreeSellbillLine } from '../../../types';
 
 interface IProps {
   item: IFreeSellbillLine;

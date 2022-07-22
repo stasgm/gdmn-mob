@@ -19,15 +19,15 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
-import { IMoveDocument, IMoveLine } from '../../store/types';
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { IMoveDocument, IMoveLine } from '../../types';
+import { MoveStackParamList } from '../../../navigation/Root/types';
+import { getStatusColor, ONE_SECOND_IN_MS } from '../../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
-import { getBarcode } from '../../utils/helpers';
-import { IGood } from '../../store/app/types';
+import { navBackButton } from '../../../components/navigateOptions';
+import { getBarcode } from '../../../utils/helpers';
+import { IGood } from '../../app/types';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
+import BarcodeDialog from '../../../components/BarcodeDialog';
 
 import { MoveItem } from './components/MoveItem';
 import MoveTotal from './components/MoveTotal';

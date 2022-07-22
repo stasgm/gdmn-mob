@@ -10,17 +10,17 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { IMoveDocument } from '../../store/types';
+import { MoveStackParamList } from '../../../navigation/Root/types';
+import { IMoveDocument } from '../../types';
 
-import { IGood } from '../../store/app/types';
-import { getBarcode } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
+import { IGood } from '../../app/types';
+import { getBarcode } from '../../../utils/helpers';
+import { navBackButton } from '../../../components/navigateOptions';
 
-import { ScanBarcode, ScanBarcodeReader } from '../../components';
+import { ScanBarcode, ScanBarcodeReader } from '../../../components';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
-import { IScanerObject } from '../../components/ScanBarcode/ScanBarcode';
+import BarcodeDialog from '../../../components/BarcodeDialog';
+import { IScanerObject } from '../../../components/ScanBarcode/ScanBarcode';
 
 import FreeSellbillTotal from './components/FreeSellbillTotal';
 

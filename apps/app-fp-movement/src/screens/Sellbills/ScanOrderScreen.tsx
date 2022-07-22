@@ -16,17 +16,17 @@ import { AppActivityIndicator } from '@lib/mobile-ui';
 
 import { Alert } from 'react-native';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, ISellbillDocument, ITempDocument } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
+import { SellbillStackParamList } from '../../../navigation/Root/types';
+import { IOrderDocument, ISellbillDocument, ITempDocument } from '../../types';
+import { navBackButton } from '../../../components/navigateOptions';
 
-import { tempType } from '../../utils/constants';
+import { tempType } from '../../../utils/constants';
 
-import { ICodeEntity, IOrder } from '../../store/app/types';
+import { ICodeEntity, IOrder } from '../../app/types';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
+import BarcodeDialog from '../../../components/BarcodeDialog';
 
-import { actions as orderActions } from '../../store/app/actions';
+import { actions as orderActions } from '../../app/actions';
 
 import { ScanBarcode } from './components/ScanBarcode';
 import { ScanBarcodeReader } from './components/ScanBarcodeReader';

@@ -22,11 +22,11 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
-import { FreeSellbillStackParamList } from '../../navigation/Root/types';
-import { IFreeSellbillFormParam, IFreeSellbillDocument } from '../../store/types';
-import { STATUS_LIST } from '../../utils/constants';
-import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
+import { FreeSellbillStackParamList } from '../../../navigation/Root/types';
+import { IFreeSellbillFormParam, IFreeSellbillDocument } from '../../types';
+import { STATUS_LIST } from '../../../utils/constants';
+import { getNextDocNumber } from '../../../utils/helpers';
+import { navBackButton } from '../../../components/navigateOptions';
 
 export const FreeSellbillEditScreen = () => {
   const id = useRoute<RouteProp<FreeSellbillStackParamList, 'FreeSellbillEdit'>>().params?.id;

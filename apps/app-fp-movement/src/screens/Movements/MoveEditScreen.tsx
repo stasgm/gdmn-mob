@@ -22,11 +22,11 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { IMoveFormParam, IMoveDocument } from '../../store/types';
-import { STATUS_LIST } from '../../utils/constants';
-import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
+import { MoveStackParamList } from '../../../navigation/Root/types';
+import { IMoveFormParam, IMoveDocument } from '../../types';
+import { STATUS_LIST } from '../../../utils/constants';
+import { getNextDocNumber } from '../../../utils/helpers';
+import { navBackButton } from '../../../components/navigateOptions';
 
 export const MoveEditScreen = () => {
   const id = useRoute<RouteProp<MoveStackParamList, 'MoveEdit'>>().params?.id;

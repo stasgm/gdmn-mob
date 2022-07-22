@@ -8,9 +8,9 @@ import { useTheme } from '@react-navigation/native';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../../store/types';
+import { IMoveLine } from '../../../types';
 
-import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 interface IProps {
   item: IMoveLine;

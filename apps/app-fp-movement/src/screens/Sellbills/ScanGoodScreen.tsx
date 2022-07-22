@@ -10,16 +10,16 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
-import { ISellbillLine, ISellbillDocument } from '../../store/types';
+import { SellbillStackParamList } from '../../../navigation/Root/types';
+import { ISellbillLine, ISellbillDocument } from '../../types';
 
-import { IGood } from '../../store/app/types';
-import { getBarcode } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
+import { IGood } from '../../app/types';
+import { getBarcode } from '../../../utils/helpers';
+import { navBackButton } from '../../../components/navigateOptions';
 
-import { ScanBarcode, ScanBarcodeReader } from '../../components';
+import { ScanBarcode, ScanBarcodeReader } from '../../../components';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
+import BarcodeDialog from '../../../components/BarcodeDialog';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.docId;

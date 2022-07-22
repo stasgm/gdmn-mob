@@ -28,18 +28,18 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { ITempLine, IOtvesDocument, IOtvesLine, ITempDocument } from '../../store/types';
+import { ITempLine, IOtvesDocument, IOtvesLine, ITempDocument } from '../../types';
 
-import { OrderStackParamList } from '../../navigation/Root/types';
+import { OrderStackParamList } from '../../../navigation/Root/types';
 
-import { getStatusColor } from '../../utils/constants';
+import { getStatusColor } from '../../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
+import { navBackButton } from '../../../components/navigateOptions';
 
-import { getBarcode } from '../../utils/helpers';
-import { IGood } from '../../store/app/types';
+import { getBarcode } from '../../../utils/helpers';
+import { IGood } from '../../app/types';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
+import BarcodeDialog from '../../../components/BarcodeDialog';
 
 import TempItem from './components/TempItem';
 

@@ -6,10 +6,10 @@ import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigat
 import { documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
 
-import { MoveStackParamList } from '../../navigation/Root/types';
+import { MoveStackParamList } from '../../../navigation/Root/types';
 
-import { IMoveLine } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
+import { IMoveLine } from '../../types';
+import { navBackButton } from '../../../components/navigateOptions';
 
 import { MoveLine } from './components/MoveLine';
 

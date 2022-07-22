@@ -26,9 +26,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString, keyExtractor } from '@lib/mobile-app';
 
-import { IMoveDocument } from '../../store/types';
-import { MoveStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
+import { IMoveDocument } from '../../types';
+import { MoveStackParamList } from '../../../navigation/Root/types';
+import { navBackDrawer } from '../../../components/navigateOptions';
 
 export interface MoveListSectionProps {
   title: string;

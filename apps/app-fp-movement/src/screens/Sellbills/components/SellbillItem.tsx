@@ -6,7 +6,7 @@ import { globalStyles as styles } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { ISellbillLine, ITempLine } from '../../../store/types';
+import { ISellbillLine, ITempLine } from '../../../types';
 
 interface IProps {
   docId: string;

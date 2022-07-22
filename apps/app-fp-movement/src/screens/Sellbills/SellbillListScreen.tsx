@@ -26,10 +26,10 @@ import { IDocumentType, IReference } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
 
-import { ISellbillDocument } from '../../store/types';
-import SwipeListItem from '../../components/SwipeListItem';
-import { SellbillStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
+import { ISellbillDocument } from '../../types';
+import SwipeListItem from '../../../components/SwipeListItem';
+import { SellbillStackParamList } from '../../../navigation/Root/types';
+import { navBackDrawer } from '../../../components/navigateOptions';
 
 // import { getBarcode } from '../../utils/helpers';
 

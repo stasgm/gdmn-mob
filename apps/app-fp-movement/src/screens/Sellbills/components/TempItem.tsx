@@ -4,7 +4,7 @@ import { useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { globalStyles as styles } from '@lib/mobile-ui';
 
-import { ITempLine } from '../../../store/types';
+import { ITempLine } from '../../../types';
 
 interface IProps {
   item: ITempLine;

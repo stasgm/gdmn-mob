@@ -20,15 +20,15 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
-import { IFreeSellbillDocument, IFreeSellbillLine } from '../../store/types';
-import { FreeSellbillStackParamList } from '../../navigation/Root/types';
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { IFreeSellbillDocument, IFreeSellbillLine } from '../../types';
+import { FreeSellbillStackParamList } from '../../../navigation/Root/types';
+import { getStatusColor, ONE_SECOND_IN_MS } from '../../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
-import { getBarcode } from '../../utils/helpers';
-import { IGood } from '../../store/app/types';
+import { navBackButton } from '../../../components/navigateOptions';
+import { getBarcode } from '../../../utils/helpers';
+import { IGood } from '../../app/types';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
+import BarcodeDialog from '../../../components/BarcodeDialog';
 
 import { FreeSellbillItem } from './components/FreeSellbillItem';
 import FreeSellbillTotal from './components/FreeSellbillTotal';

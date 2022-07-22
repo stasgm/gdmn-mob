@@ -8,8 +8,8 @@ import { useIsFocused, useTheme } from '@react-navigation/native';
 
 import { globalStyles } from '@lib/mobile-ui';
 
-import { ISellbillDocument } from '../../../../store/types';
-import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
+import { ISellbillDocument } from '../../../../types';
+import { ONE_SECOND_IN_MS } from '../../../../../utils/constants';
 
 import styles from './styles';
 

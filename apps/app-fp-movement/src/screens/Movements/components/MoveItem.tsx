@@ -6,7 +6,7 @@ import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../../store/types';
+import { IMoveLine } from '../../../types';
 
 interface IProps {
   item: IMoveLine;

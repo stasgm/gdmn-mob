@@ -11,11 +11,11 @@ import { IDepartment, IDocumentType, IReference } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
-import { ISellbillFormParam, ISellbillDocument } from '../../store/types';
+import { SellbillStackParamList } from '../../../navigation/Root/types';
+import { ISellbillFormParam, ISellbillDocument } from '../../types';
 
-import { navBackButton } from '../../components/navigateOptions';
-import { STATUS_LIST } from '../../utils/constants';
+import { navBackButton } from '../../../components/navigateOptions';
+import { STATUS_LIST } from '../../../utils/constants';
 
 const SellbillEditScreen = () => {
   const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillEdit'>>().params?.id;

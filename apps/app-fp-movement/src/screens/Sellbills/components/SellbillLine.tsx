@@ -8,9 +8,9 @@ import { useTheme } from '@react-navigation/native';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { ISellbillLine } from '../../../store/types';
+import { ISellbillLine } from '../../../types';
 
-import { ONE_SECOND_IN_MS } from '../../../utils/constants';
+import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 interface IProps {
   item: ISellbillLine;

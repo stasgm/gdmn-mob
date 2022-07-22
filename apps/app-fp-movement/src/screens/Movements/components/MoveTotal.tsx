@@ -7,7 +7,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { round } from '@lib/mobile-app';
 
-import { IMoveLine } from '../../../store/types';
+import { IMoveLine } from '../../../types';
 
 export interface IItem {
   lines: IMoveLine[];

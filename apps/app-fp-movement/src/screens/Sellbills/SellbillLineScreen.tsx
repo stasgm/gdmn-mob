@@ -6,10 +6,10 @@ import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigat
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
+import { SellbillStackParamList } from '../../../navigation/Root/types';
 
-import { ISellbillDocument, ISellbillLine, ITempDocument } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
+import { ISellbillDocument, ISellbillLine, ITempDocument } from '../../types';
+import { navBackButton } from '../../../components/navigateOptions';
 
 import { SellbillLine } from './components/SellbillLine';
 

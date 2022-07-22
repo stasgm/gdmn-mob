@@ -32,18 +32,18 @@ import { IDocument } from '@lib/types';
 
 import { IListItem } from '@lib/mobile-types';
 
-import { ISellbillDocument, ISellbillLine, ITempLine } from '../../store/types';
+import { ISellbillDocument, ISellbillLine, ITempLine } from '../../types';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
+import { SellbillStackParamList } from '../../../navigation/Root/types';
 
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
+import { getStatusColor, ONE_SECOND_IN_MS } from '../../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
+import { navBackButton } from '../../../components/navigateOptions';
 
-import { IGood } from '../../store/app/types';
-import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
+import { IGood } from '../../app/types';
+import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../index';
 
-import { getBarcode } from '../../utils/helpers';
+import { getBarcode } from '../../../utils/helpers';
 
 import SellbillTotal from './components/SellbillTotal';
 

@@ -7,7 +7,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { round } from '@lib/mobile-app';
 
-import { IFreeSellbillLine } from '../../../store/types';
+import { IFreeSellbillLine } from '../../../types';
 
 export interface IItem {
   lines: IFreeSellbillLine[];
