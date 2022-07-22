@@ -231,7 +231,10 @@ export const SellbillListScreen = () => {
     navigation.setOptions({
       headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: delList && Object.values(delList).length > 0 ? `Выделено: ${Object.values(delList).length}` : 'Накладные',
+      title:
+        delList && Object.values(delList).length > 0
+          ? `Выделено отвесов: ${Object.values(delList).length}`
+          : 'Отвесы по заявкам',
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
