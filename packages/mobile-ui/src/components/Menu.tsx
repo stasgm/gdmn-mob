@@ -65,6 +65,7 @@ const Menu = ({
                 onPress={onPress}
                 disabled={disabled}
                 color={isActive ? colors.background : disabled ? colors.disabled : colors.primary}
+                style={localStyles.icon}
               />
             )}
           </View>
@@ -77,14 +78,12 @@ const Menu = ({
             key={`${title}${option?.id}`}
             onPress={() => onChange(option)}
             disabled={disabled}
-            // style={{ width: 320 }}
           >
             <View style={viewMenuStyle ? viewMenuStyle : { flexDirection: 'row', alignItems: 'center' }}>
               {activeOptionId ? (
                 <IconButton icon={activeOptionId === option?.id ? 'check' : ''} size={menuIconSize || 20} />
               ) : null}
-              {/* <PaperMenu.Item style={{ height: 100, width: 1000 }} title={option?.value} /> */}
-              <PaperMenu.Item title={option?.value}>{/* <Text>{option.value}</Text> */}</PaperMenu.Item>
+              <PaperMenu.Item title={option?.value} />
             </View>
           </TouchableHighlight>
         ))}
@@ -102,6 +101,9 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     display: 'flex',
+  },
+  icon: {
+    margin: 0,
   },
 });
 

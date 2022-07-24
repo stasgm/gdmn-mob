@@ -44,7 +44,7 @@ const BarcodeDialog = ({
       </Dialog.Content>
       {error ? (
         <Dialog.Content>
-          <Text>Штрих-код не найден</Text>
+          <Text>Штрих-код не добавлен</Text>
         </Dialog.Content>
       ) : null}
 
@@ -53,7 +53,7 @@ const BarcodeDialog = ({
           Отмена
         </Button>
         <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onSearch}>
-          Найти
+          Добавить
         </Button>
       </Dialog.Actions>
     </Dialog>

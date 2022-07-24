@@ -1,8 +1,6 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
-
-import { IconButton, Searchbar } from 'react-native-paper';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import {
   globalStyles as styles,
@@ -38,11 +36,6 @@ export interface OrderListSectionProps {
 
 export type SectionDataProps = SectionListData<IListItemProps, OrderListSectionProps>[];
 
-// interface IFilteredList {
-//   searchQuery: string;
-//   orders: IOrderDocument[];
-// }
-
 const OrderListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderList'>>();
 
@@ -55,80 +48,6 @@ const OrderListScreen = () => {
       new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
       new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
   );
-
-  const { colors } = useTheme();
-
-  const searchStyle = colors.primary;
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterVisible, setFilterVisible] = useState(false);
-
-  // const [filteredList, setFilteredList] = useState<IFilteredList>({
-  //   searchQuery: '',
-  //   orders: orderList,
-  // });
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     if (!searchQuery && filteredList?.orders?.length && filteredList?.orders?.length !== orderList.length) {
-  //       setFilteredList({ searchQuery, orders: orderList });
-  //     }
-  //   }, [filteredList.orders.length, orderList, searchQuery]),
-  // );
-
-  // useEffect(
-  //   // React.useCallback(
-  //   () => {
-  //     if (!searchQuery && filteredList?.orders?.length && filteredList?.orders?.length !== orderList.length) {
-  //       setFilteredList({ searchQuery, orders: orderList });
-  //     }
-  //   },
-  //   [filteredList.orders.length, orderList, searchQuery],
-  //   // ),
-  // );
-
-  // console.log('123', orderList[0]);
-
-  // useEffect(
-  //   // React.useCallback(
-  //   () => {
-  //     if (searchQuery !== filteredList.searchQuery) {
-  //       if (!searchQuery) {
-  //         setFilteredList({
-  //           searchQuery,
-  //           orders: orderList,
-  //         });
-  //       } else {
-  //         const lower = searchQuery.toLowerCase();
-
-  //         const fn = (i: IOrderDocument) =>
-  //           i?.head?.contact?.name.toUpperCase().includes(lower) ||
-  //           i?.head?.outlet?.name.toUpperCase().includes(lower) ||
-  //           i.number.toUpperCase().includes(lower) ||
-  //           getDateString(i.documentDate).toUpperCase().includes(lower) ||
-  //           getDateString(i.head.onDate).toUpperCase().includes(lower);
-
-  //         let newList;
-
-  //         if (
-  //           filteredList.searchQuery &&
-  //           searchQuery.length > filteredList.searchQuery.length &&
-  //           searchQuery.startsWith(filteredList.searchQuery)
-  //         ) {
-  //           newList = filteredList.orders?.filter(fn);
-  //         } else {
-  //           newList = orderList?.filter(fn);
-  //         }
-
-  //         setFilteredList({
-  //           searchQuery,
-  //           orders: newList,
-  //         });
-  //       }
-  //     }
-  //   },
-  //   [filteredList, orderList, searchQuery],
-  // );
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -238,31 +157,17 @@ const OrderListScreen = () => {
     navigation.navigate('OrderEdit');
   }, [navigation]);
 
-  useEffect(() => {
-    if (!filterVisible && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [filterVisible, searchQuery]);
-
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
         {delList && Object.values(delList).length > 0 ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
-          <>
-            <IconButton
-              icon="card-search-outline"
-              style={filterVisible && { backgroundColor: colors.card }}
-              size={26}
-              onPress={() => setFilterVisible((prev) => !prev)}
-            />
-            <AddButton onPress={handleAddDocument} />
-          </>
+          <AddButton onPress={handleAddDocument} />
         )}
       </View>
     ),
-    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+    [delList, handleAddDocument, handleDeleteDocs],
   );
 
   const renderLeft = useCallback(
@@ -316,21 +221,6 @@ const OrderListScreen = () => {
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
-      {filterVisible && (
-        <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={searchStyle}
-            />
-          </View>
-          <ItemSeparator />
-        </>
-      )}
       <SectionList
         sections={sections}
         renderItem={renderItem}

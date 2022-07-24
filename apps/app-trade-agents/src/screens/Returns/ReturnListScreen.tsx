@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } fro
 import { ListRenderItem, RefreshControl, SectionList, SectionListData, View } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useTheme } from '@react-navigation/native';
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { useSelector } from '@lib/store';
 import {
@@ -16,6 +16,7 @@ import {
   IListItemProps,
   SubTitle,
   EmptyList,
+  SearchButton,
 } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
@@ -116,16 +117,11 @@ const ReturnListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
         <AddButton onPress={handleAddDocument} />
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument],
+    [filterVisible, handleAddDocument],
   );
 
   useLayoutEffect(() => {
@@ -140,7 +136,6 @@ const ReturnListScreen = () => {
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
     <ScreenListItem {...item} onSelectItem={() => handlePressReturn(item.id)} />
   );
-  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
   return (
     <AppScreen>
@@ -154,7 +149,7 @@ const ReturnListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={colorStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

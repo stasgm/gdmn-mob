@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme, useIsFocused } from '@react-navigation/native';
 
@@ -23,6 +23,8 @@ const SellbillEditScreen = () => {
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
+
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
   const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
 
@@ -72,38 +74,43 @@ const SellbillEditScreen = () => {
     }
   }, [dispatch, sellbill]);
 
-  const handleSave = useCallback(() => {
-    if (!sellbillType) {
-      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
-    }
-
-    if (!(/*docNumber  && docContact && docOutlet && docOnDate &&*/ docDocumentDate)) {
-      return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
-    }
-
-    if (id) {
-      if (!sellbill) {
-        return;
+  useEffect(() => {
+    if (screenState === 'saving') {
+      if (!sellbillType) {
+        return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
       }
 
-      const updatedSellbillDate = new Date().toISOString();
+      if (!(/*docNumber  && docContact && docOutlet && docOnDate &&*/ docDocumentDate)) {
+        return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+      }
 
-      const updatedSellbill: ISellbillDocument = {
-        ...sellbill,
-        id,
-        status: docStatus || 'DRAFT',
-        documentDate: docDocumentDate,
-        documentType: sellbillType,
-        creationDate: sellbill.creationDate || updatedSellbillDate,
-        editionDate: updatedSellbillDate,
-      };
+      if (id) {
+        if (!sellbill) {
+          return;
+        }
 
-      dispatch(documentActions.updateDocument({ docId: id, document: updatedSellbill }));
-      navigation.navigate('TempView', { id });
+        const updatedSellbillDate = new Date().toISOString();
+
+        const updatedSellbill: ISellbillDocument = {
+          ...sellbill,
+          id,
+          status: docStatus || 'DRAFT',
+          documentDate: docDocumentDate,
+          documentType: sellbillType,
+          creationDate: sellbill.creationDate || updatedSellbillDate,
+          editionDate: updatedSellbillDate,
+        };
+
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedSellbill }));
+        navigation.navigate('SellbillView', { id });
+      }
     }
-  }, [sellbillType, docDocumentDate, id, sellbill, docStatus, dispatch, navigation]);
+  }, [sellbillType, docDocumentDate, id, sellbill, docStatus, dispatch, navigation, screenState]);
 
-  const renderRight = useCallback(() => <SaveButton onPress={handleSave} />, [handleSave]);
+  const renderRight = useCallback(
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
+    [screenState],
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({

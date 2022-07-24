@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 
 import { RouteProp, useIsFocused, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, Alert, RefreshControl } from 'react-native';
-import { Divider, IconButton, Searchbar } from 'react-native-paper';
+import { Divider, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import {
@@ -14,6 +14,7 @@ import {
   AppScreen,
   EmptyList,
   AppActivityIndicator,
+  SearchButton,
 } from '@lib/mobile-ui';
 import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
@@ -44,8 +45,6 @@ const RouteViewScreen = () => {
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
-
-  const viewStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -159,16 +158,11 @@ const RouteViewScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
         <MenuButton actionsMenu={actionsMenu} />
       </View>
     ),
-    [actionsMenu, colors.card, filterVisible],
+    [actionsMenu, filterVisible],
   );
 
   useLayoutEffect(() => {
@@ -214,7 +208,7 @@ const RouteViewScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={viewStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

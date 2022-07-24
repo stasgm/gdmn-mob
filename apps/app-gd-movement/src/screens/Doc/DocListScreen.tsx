@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
 import { StyleSheet, SectionList, ListRenderItem, SectionListData, View, Text, Alert } from 'react-native';
 import { useFocusEffect, useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import {
   globalStyles as styles,
@@ -17,6 +17,7 @@ import {
   CloseButton,
   EmptyList,
   AppActivityIndicator,
+  SearchButton,
 } from '@lib/mobile-ui';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -52,10 +53,7 @@ export const DocListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocList'>>();
   const dispatch = useDispatch();
 
-  // const { loading } = useSelector((state) => state.documents);
   const { colors } = useTheme();
-
-  // const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -138,18 +136,13 @@ export const DocListScreen = () => {
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
           <>
-            <IconButton
-              icon="card-search-outline"
-              style={filterVisible && { backgroundColor: colors.card }}
-              size={26}
-              onPress={() => setFilterVisible((prev) => !prev)}
-            />
+            <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
             <AddButton onPress={handleAddDocument} />
           </>
         )}
       </View>
     ),
-    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+    [delList, filterVisible, handleAddDocument, handleDeleteDocs],
   );
 
   const renderLeft = useCallback(

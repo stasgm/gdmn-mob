@@ -8,7 +8,10 @@ const Stack = createStackNavigator<SellbillStackParamList>();
 
 export const SellbillNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="SellbillList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
+    <Stack.Navigator
+      initialRouteName="SellbillList"
+      screenOptions={{ headerShown: true, headerBackTitleVisible: false }}
+    >
       {Object.entries({ ...sellbillListScreens, ...sellbillScreens }).map(([name, { title, component }]) => (
         <Stack.Screen
           name={name as keyof SellbillStackParamList}

@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
-import { Divider, IconButton, Searchbar } from 'react-native-paper';
+import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -11,17 +11,21 @@ import {
   globalStyles as styles,
   EmptyList,
   AppActivityIndicator,
+  Menu,
+  SearchButton,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
-import { getDateString, keyExtractor } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { IListItem } from '@lib/mobile-types';
+
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IGoodGroup, IMGroupModel, IOrderDocument } from '../../store/types';
-import { getGroupModelByContact } from '../../utils/helpers';
-import { UNKNOWN_GROUP } from '../../utils/constants';
+import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
+import { UNKNOWN_GROUP, viewTypeList } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
@@ -32,35 +36,22 @@ interface IProp {
   item: IGoodGroup;
   expendGroup: string | undefined;
   setExpend: (group: IGoodGroup | undefined) => void;
-  onPressGroup: (groupId: string) => void;
-  searchQuery?: string;
+  onPressGood: (good: IGood) => void;
 }
 
-const Group = ({ docId, model, item, expendGroup, setExpend, searchQuery, onPressGroup }: IProp) => {
+const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IProp) => {
   const refListGood = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refListGood);
 
-  const nextLevelGroupsList = useMemo(() => {
-    return model[item.id]?.children?.map((gr) => gr.group) || [];
-  }, [item.id, model]);
-
-  const nextLevelGroups = useMemo(() => {
-    return nextLevelGroupsList?.filter((i) =>
-      i.name ? i.name.toUpperCase().includes(searchQuery?.toUpperCase() || '') : true,
-    );
-  }, [nextLevelGroupsList, searchQuery]);
-
-  const isExpand = useMemo(() => {
-    return expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup);
-  }, [expendGroup, item.id, nextLevelGroups]);
-
-  const icon = useMemo(
-    () => (nextLevelGroups?.length === 0 ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon,
-    [isExpand, nextLevelGroups?.length],
-  );
-
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
+
+  const nextLevelGroups = useMemo(() => model[item.id]?.children?.map((gr) => gr.group) || [], [item.id, model]);
+
+  const isExpand = useMemo(
+    () => expendGroup === item.id || !!nextLevelGroups?.find((group) => group.id === expendGroup),
+    [expendGroup, item.id, nextLevelGroups],
+  );
 
   const renderGroup = useCallback(
     ({ item: grItem }: { item: IGoodGroup }) => {
@@ -72,29 +63,49 @@ const Group = ({ docId, model, item, expendGroup, setExpend, searchQuery, onPres
           item={grItem}
           expendGroup={expendGroup}
           setExpend={setExpend}
-          onPressGroup={onPressGroup}
+          onPressGood={onPressGood}
         />
       );
     },
-    [docId, expendGroup, model, onPressGroup, setExpend],
+    [docId, expendGroup, model, onPressGood, setExpend],
+  );
+  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
+
+  const renderGood = useCallback(
+    ({ item: itemGood }: { item: IGood }) => {
+      const line = doc.lines?.find((i) => i.good.id === itemGood.id);
+      return <Good key={itemGood.id} item={itemGood} onPress={onPressGood} quantity={line?.quantity} />;
+    },
+    [doc.lines, onPressGood],
   );
 
-  const len = useMemo(
-    () => model[item.parent?.id || '']?.children?.find((gr) => gr.group.id === item.id)?.goods?.length,
+  const goodModel = useMemo(
+    () =>
+      model[item.parent?.id || '']?.children
+        ?.find((gr) => gr.group.id === item.id)
+        ?.goods?.sort((a, b) => (a.name < b.name ? -1 : 1)) || [],
+
     [item.id, item.parent?.id, model],
   );
 
-  const handlePressGroup = useCallback(
+  const len = goodModel.length;
+
+  const icon = useMemo(
     () =>
-      nextLevelGroups?.length && nextLevelGroups?.length > 0
-        ? setExpend(!isExpand ? item : undefined)
-        : onPressGroup(item.id),
-    [isExpand, item, nextLevelGroups?.length, onPressGroup, setExpend],
+      (nextLevelGroups?.length === 0 && !isExpand ? 'chevron-right' : isExpand ? 'chevron-up' : 'chevron-down') as Icon,
+    [isExpand, nextLevelGroups?.length],
   );
 
+  const handlePressGroup = useCallback(() => {
+    setExpend(!isExpand ? item : item.parent);
+  }, [isExpand, item, setExpend]);
+
+  const refList = React.useRef<FlatList<IGood>>(null);
+  useScrollToTop(refList);
+
   return (
-    <>
-      <TouchableOpacity style={styles.item} onPress={handlePressGroup}>
+    <View key={item.id}>
+      <TouchableOpacity style={localStyles.item} onPress={handlePressGroup}>
         <View style={styles.details}>
           <Text style={styles.name}>{item.name || item.name}</Text>
           {nextLevelGroups?.length === 0 && (
@@ -106,21 +117,64 @@ const Group = ({ docId, model, item, expendGroup, setExpend, searchQuery, onPres
         </View>
         <MaterialCommunityIcons name={icon} size={24} color="black" />
       </TouchableOpacity>
-      {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && (
+      {goodModel.length > 0 && isExpand && (
+        <FlatList
+          ref={refList}
+          data={goodModel}
+          renderItem={renderGood}
+          ItemSeparatorComponent={ItemSeparator}
+          keyExtractor={keyExtractor}
+          removeClippedSubviews={true} // Unmount compsonents when outside of window
+          initialNumToRender={20}
+          maxToRenderPerBatch={20} // Reduce number in each render batch
+          updateCellsBatchingPeriod={100} // Increase time between renders
+          windowSize={7} // Reduce the window size
+        />
+      )}
+      {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && nextLevelGroups && nextLevelGroups?.length > 0 && (
         <View style={localStyles.marginLeft}>
-          {nextLevelGroups && nextLevelGroups?.length > 0 && (
-            <FlatList
-              ref={refListGroups}
-              data={nextLevelGroups}
-              keyExtractor={keyExtractor}
-              renderItem={renderGroup}
-              ItemSeparatorComponent={ItemSeparator}
-              ListEmptyComponent={EmptyList}
-            />
-          )}
+          <FlatList
+            ref={refListGroups}
+            data={nextLevelGroups}
+            keyExtractor={keyExtractor}
+            renderItem={renderGroup}
+            ItemSeparatorComponent={ItemSeparator}
+            ListEmptyComponent={EmptyList}
+          />
         </View>
       )}
-    </>
+    </View>
+  );
+};
+
+interface IGoodProp {
+  item: IGood;
+  onPress: (item: IGood) => void;
+  quantity?: number;
+}
+
+const Good = ({ item, onPress, quantity }: IGoodProp) => {
+  const iconStyle = useMemo(() => [styles.icon, { backgroundColor: quantity ? '#06567D' : '#E91E63' }], [quantity]);
+
+  return (
+    <TouchableOpacity onPress={() => onPress(item)}>
+      <View style={styles.item}>
+        <View style={iconStyle}>
+          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+        </View>
+        <View style={styles.details}>
+          <View style={styles.directionRow}>
+            <Text style={styles.name}>{item.name || item.id}</Text>
+          </View>
+          {quantity ? (
+            <View style={styles.flexDirectionRow}>
+              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <Text style={styles.field}>{quantity} кг</Text>
+            </View>
+          ) : null}
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -131,9 +185,9 @@ const SelectGroupScreen = () => {
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewType, setViewType] = useState('groups');
   const [filterVisible, setFilterVisible] = useState(false);
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
@@ -157,11 +211,22 @@ const SelectGroupScreen = () => {
 
   const groups = useMemo(() => refGroup.data.concat(UNKNOWN_GROUP), [refGroup.data]);
 
-  const contactId = docSelectors.selectByDocId<IOrderDocument>(docId)?.head.contact.id;
+  const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
+  const contactId = doc.head.contact.id;
 
   const model = useMemo(
-    () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice),
-    [groups, goods, goodMatrix, contactId, isUseNetPrice],
+    () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice, searchQuery),
+    [groups, goods, goodMatrix, contactId, isUseNetPrice, searchQuery],
+  );
+
+  const goodModel = useMemo(
+    () =>
+      contactId && viewType === 'goods'
+        ? getGoodMatrixByContact(goods, goodMatrix[contactId], isUseNetPrice, undefined, searchQuery)?.sort((a, b) =>
+            a.name < b.name ? -1 : 1,
+          )
+        : [],
+    [contactId, viewType, goods, goodMatrix, isUseNetPrice, searchQuery],
   );
 
   const firstLevelGroups = useMemo(() => Object.values(model).map((item) => item.parent), [model]);
@@ -174,30 +239,36 @@ const SelectGroupScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const [isVisibleTypeMenu, setIsVisibleTypeMenu] = useState(false);
+
+  const handleCnangeViewType = (option: IListItem) => {
+    setViewType(option.id);
+    setIsVisibleTypeMenu(false);
+  };
+
   const renderRight = useCallback(
     () => (
-      <IconButton
-        icon="card-search-outline"
-        style={filterVisible && { backgroundColor: colors.card }}
-        size={26}
-        onPress={() => setFilterVisible((prev) => !prev)}
-      />
+      <View style={styles.buttons}>
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
+      </View>
     ),
-    [colors.card, filterVisible],
+    [filterVisible],
   );
+
+  useEffect(() => {
+    if (formParams?.groupId && formParams?.groupId !== expend?.id) {
+      const expandGroup = groups.find((group) => group.id === formParams.groupId);
+      setExpend(expandGroup?.parent || expandGroup);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: navBackButton,
       headerRight: renderRight,
     });
-
-    if (formParams?.groupId) {
-      const expandGroup = groups.find((group) => group.id === formParams.groupId);
-      setExpend(expandGroup);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation, formParams?.groupId, renderRight]);
+  }, [navigation, renderRight]);
 
   const handleSetExpand = useCallback(
     (group: IGoodGroup | undefined) => {
@@ -214,16 +285,39 @@ const SelectGroupScreen = () => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const pressGroup = useCallback(
-    (groupId: string) =>
-      navigation.navigate('SelectGoodItem', {
-        docId,
-        groupId,
-      }),
-    [docId, navigation],
-  );
+  const handlePressGood = useCallback(
+    (item: IGood) => {
+      const good = doc.lines?.find((i) => i.good.id === item.id);
 
-  const handleExpend = useCallback((group: IGoodGroup | undefined) => handleSetExpand(group), [handleSetExpand]);
+      if (good) {
+        Alert.alert(
+          'Товар уже добавлен в документ!',
+          "Нажмите 'Добавить', если хотите добавить новую позицию.\n\nНажмите 'Редактировать', если хотите редактировать существующую позицию.",
+          [
+            {
+              text: 'Отмена',
+            },
+            {
+              text: 'Редактировать',
+              onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }), //() => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
+            },
+            {
+              text: 'Добавить',
+              onPress: () =>
+                navigation.navigate('OrderLine', {
+                  mode: 0,
+                  docId,
+                  item: { id: generateId(), good: item, quantity: 0 },
+                }),
+            },
+          ],
+        );
+      } else {
+        navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
+      }
+    },
+    [doc.lines, docId, navigation],
+  );
 
   const renderGroup = useCallback(
     ({ item }: { item: IGoodGroup }) => (
@@ -232,13 +326,28 @@ const SelectGroupScreen = () => {
         docId={docId}
         model={model}
         item={item}
-        expendGroup={expend?.id}
-        setExpend={handleExpend}
-        searchQuery={searchQuery}
-        onPressGroup={pressGroup}
+        expendGroup={expend?.id || expend?.parent?.id}
+        setExpend={handleSetExpand}
+        onPressGood={handlePressGood}
       />
     ),
-    [docId, expend?.id, handleExpend, model, pressGroup, searchQuery],
+    [docId, expend?.id, expend?.parent?.id, handleSetExpand, handlePressGood, model],
+  );
+
+  const refListGood = React.useRef<FlatList<IGood>>(null);
+  useScrollToTop(refListGood);
+
+  const renderGood = useCallback(
+    ({ item: itemGood }: { item: IGood }) => (
+      <Good
+        key={itemGood.id}
+        item={itemGood}
+        onPress={handlePressGood}
+        quantity={doc.lines?.find((i) => i.good.id === itemGood.id)?.quantity}
+      />
+    ),
+
+    [doc.lines, handlePressGood],
   );
 
   const isFocused = useIsFocused();
@@ -248,7 +357,20 @@ const SelectGroupScreen = () => {
 
   return (
     <AppScreen>
-      <SubTitle style={styles.title}>{refGroup.description || refGroup.name}</SubTitle>
+      <View style={[styles.rowCenter, styles.containerCenter]}>
+        <SubTitle style={styles.title}>{viewTypeList.find((t) => t.id === viewType)?.value || ''}</SubTitle>
+        <Menu
+          key={'MenuType'}
+          visible={isVisibleTypeMenu}
+          onChange={handleCnangeViewType}
+          onDismiss={() => setIsVisibleTypeMenu(false)}
+          onPress={() => setIsVisibleTypeMenu(true)}
+          options={viewTypeList}
+          iconName={'menu-down'}
+          iconSize={26}
+          activeOptionId={viewType}
+        />
+      </View>
       <Divider />
       {filterVisible && (
         <>
@@ -259,20 +381,35 @@ const SelectGroupScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={searchStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />
         </>
       )}
-      <FlatList
-        ref={refListGroups}
-        data={firstLevelGroups}
-        keyExtractor={keyExtractor}
-        renderItem={renderGroup}
-        ItemSeparatorComponent={ItemSeparator}
-        ListEmptyComponent={EmptyList}
-      />
+      {viewType === 'goods' ? (
+        <FlatList
+          ref={refListGood}
+          data={goodModel}
+          renderItem={renderGood}
+          ItemSeparatorComponent={ItemSeparator}
+          keyExtractor={keyExtractor}
+          removeClippedSubviews={true} // Unmount compsonents when outside of window
+          initialNumToRender={20}
+          maxToRenderPerBatch={20} // Reduce number in each render batch
+          updateCellsBatchingPeriod={100} // Increase time between renders
+          windowSize={7} // Reduce the window size
+        />
+      ) : (
+        <FlatList
+          ref={refListGroups}
+          data={firstLevelGroups}
+          keyExtractor={keyExtractor}
+          renderItem={renderGroup}
+          ItemSeparatorComponent={ItemSeparator}
+          ListEmptyComponent={EmptyList}
+        />
+      )}
     </AppScreen>
   );
 };
@@ -282,5 +419,11 @@ export default SelectGroupScreen;
 const localStyles = StyleSheet.create({
   marginLeft: {
     marginLeft: 20,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 3,
+    minHeight: 50,
   },
 });
