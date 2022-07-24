@@ -58,6 +58,8 @@ export const SelectRefItemScreen = () => {
 
   const title = refObj?.description || refObj?.name;
 
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [filteredList, setFilteredList] = useState<IReferenceData[]>();
@@ -97,6 +99,7 @@ export const SelectRefItemScreen = () => {
           { id: item.id, name: item.name, shcode: item.shcode },
         ]);
       } else {
+        setScreenState('saving');
         dispatch(
           appActions.setFormParams({
             [fieldName]: { id: item.id, name: item.name, shcode: item.shcode },
@@ -111,9 +114,17 @@ export const SelectRefItemScreen = () => {
   const renderItem = useCallback(
     ({ item }: { item: IReferenceData }) => {
       const isChecked = !!checkedItem?.find((i) => i.id === item.id);
-      return <LineItem item={item} isChecked={isChecked} descrFieldName={descrFieldName} onCheck={handleSelectItem} />;
+      return (
+        <LineItem
+          item={item}
+          isChecked={isChecked}
+          descrFieldName={descrFieldName}
+          onCheck={handleSelectItem}
+          disabled={screenState === 'saving' ? true : false}
+        />
+      );
     },
-    [checkedItem, descrFieldName, handleSelectItem],
+    [checkedItem, descrFieldName, handleSelectItem, screenState],
   );
 
   const renderRight = useCallback(
@@ -180,18 +191,20 @@ const LineItem = React.memo(
     isChecked,
     onCheck,
     descrFieldName,
+    disabled,
   }: {
     item: IReferenceData;
     isChecked: boolean;
     onCheck: (id: IReferenceData) => void;
     descrFieldName?: string;
+    disabled?: boolean;
   }) => {
     const { colors } = useTheme();
     const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
     const textStyle = useMemo(() => [styles.name, { color: colors.text }], [colors.text]);
 
     return (
-      <TouchableOpacity onPress={() => onCheck(item)}>
+      <TouchableOpacity onPress={() => onCheck(item)} disabled={disabled}>
         <View style={viewStyle}>
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
           <View style={styles.details}>
