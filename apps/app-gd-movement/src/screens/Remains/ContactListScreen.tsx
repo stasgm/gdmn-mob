@@ -5,6 +5,7 @@ import {
   EmptyList,
   globalStyles as styles,
   ItemSeparator,
+  SearchButton,
   SubTitle,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
@@ -13,7 +14,7 @@ import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionList, SectionListData, View } from 'react-native';
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { navBackDrawer } from '../../components/navigateOptions';
 
@@ -35,7 +36,6 @@ const ContactListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const remains = refSelectors.selectByName<IRemains>('remains')?.data[0];
   const department = refSelectors.selectByName<IDepartment>('department')?.data || [];
@@ -81,15 +81,8 @@ const ContactListScreen = () => {
   }, [filterVisible, searchQuery]);
 
   const renderRight = useCallback(
-    () => (
-      <IconButton
-        icon="card-search-outline"
-        style={filterVisible && { backgroundColor: colors.card }}
-        size={26}
-        onPress={() => setFilterVisible((prev) => !prev)}
-      />
-    ),
-    [colors.card, filterVisible],
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    [filterVisible],
   );
 
   useLayoutEffect(() => {
@@ -122,7 +115,7 @@ const ContactListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={searchStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

@@ -37,7 +37,7 @@ export const moveListScreens = {
 export const sellbillScreens = {
   TempView: { title: 'Заявка', component: TempViewScreen },
   SellbillEdit: { title: 'Отвес по заявке', component: SellbillEditScreen },
-  SellbillView: { title: 'Отвес по заявке', component: SellbillViewScreen },
+  SellbillView: { title: 'Отвес', component: SellbillViewScreen },
   SellbillLine: { title: 'Позиция отвеса', component: SellbillLineScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },

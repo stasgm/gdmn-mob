@@ -1,9 +1,17 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppScreen, ItemSeparator, SubTitle, globalStyles, Menu, AppActivityIndicator } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SubTitle,
+  globalStyles,
+  Menu,
+  AppActivityIndicator,
+  SearchButton,
+} from '@lib/mobile-ui';
 
 import { refSelectors, useSelector } from '@lib/store';
 
@@ -126,13 +134,7 @@ const GoodListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={globalStyles.buttons}>
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-          color={colors.primary}
-        />
+        <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
         <Menu
           key={'MenuType'}
           visible={visibleMenu}
@@ -146,7 +148,7 @@ const GoodListScreen = () => {
         />
       </View>
     ),
-    [colors, filterVisible, handleApply, rem.id, remainsList, visibleMenu],
+    [filterVisible, handleApply, rem.id, remainsList, visibleMenu],
   );
 
   useLayoutEffect(() => {

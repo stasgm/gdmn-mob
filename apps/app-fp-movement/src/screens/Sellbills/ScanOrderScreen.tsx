@@ -66,7 +66,6 @@ const ScanOrderScreen = () => {
         ...item,
         lines: [],
       };
-      console.log('otvesDoc', sellbillDoc);
 
       const order = orders.find((i) => i.id === item.head.orderId)!;
 

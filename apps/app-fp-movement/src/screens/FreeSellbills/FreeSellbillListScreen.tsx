@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } fro
 import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
 import {
@@ -19,6 +19,7 @@ import {
   CloseButton,
   AppActivityIndicator,
   EmptyList,
+  SearchButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -39,9 +40,7 @@ export const FreeSellbillListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillList'>>();
   const dispatch = useDispatch();
 
-  // const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
   const { colors } = useTheme();
-  const searchStyle = colors.primary;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
@@ -185,18 +184,13 @@ export const FreeSellbillListScreen = () => {
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
           <>
-            <IconButton
-              icon="card-search-outline"
-              style={filterVisible && { backgroundColor: colors.card }}
-              size={26}
-              onPress={() => setFilterVisible((prev) => !prev)}
-            />
+            <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
             <AddButton onPress={handleAddDocument} />
           </>
         )}
       </View>
     ),
-    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs],
+    [delList, filterVisible, handleAddDocument, handleDeleteDocs],
   );
 
   const renderLeft = useCallback(
@@ -255,7 +249,7 @@ export const FreeSellbillListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={searchStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

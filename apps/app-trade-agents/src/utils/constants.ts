@@ -83,3 +83,8 @@ export const appSettings: Settings = {
     group: backGroup,
   },
 };
+
+export const viewTypeList: IListItem[] = [
+  { id: 'groups', value: 'Товарные группы' },
+  { id: 'goods', value: 'Справочник ТМЦ' },
+];

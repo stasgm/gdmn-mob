@@ -12,6 +12,7 @@ const SearchButton = ({ onPress, visible }: IProps) => {
   return (
     <IconButton
       icon="card-search-outline"
+      color={colors.primary}
       style={visible && { backgroundColor: colors.card }}
       size={26}
       onPress={onPress}
