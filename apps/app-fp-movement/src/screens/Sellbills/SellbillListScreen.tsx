@@ -2,7 +2,7 @@ import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } fro
 import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
@@ -19,6 +19,7 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
+  SearchButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -46,7 +47,6 @@ export const SellbillListScreen = () => {
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
 
   const sellbills = useSelector((state) => state.documents.list) as ISellbillDocument[];
 
@@ -180,9 +180,7 @@ export const SellbillListScreen = () => {
 
   const typeList: IListItem[] = typesRef
     .filter((i) => i.isShip && i.name !== 'shipFree')
-    .map((i) => {
-      return { id: i.name || '', value: i.description || '' };
-    });
+    .map((i) => ({ id: i.name, value: i.description || '' }));
 
   const [visible, setVisible] = useState(false);
 
@@ -199,12 +197,7 @@ export const SellbillListScreen = () => {
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
           <>
-            <IconButton
-              icon="card-search-outline"
-              style={filterVisible && { backgroundColor: colors.card }}
-              size={26}
-              onPress={() => setFilterVisible((prev) => !prev)}
-            />
+            <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
             <Menu
               key={'MenuType'}
               visible={visible}
@@ -219,7 +212,7 @@ export const SellbillListScreen = () => {
         )}
       </View>
     ),
-    [colors.card, delList, filterVisible, handleAddDocument, handleDeleteDocs, typeList, visible],
+    [delList, filterVisible, handleAddDocument, handleDeleteDocs, typeList, visible],
   );
 
   const renderLeft = useCallback(
@@ -276,7 +269,7 @@ export const SellbillListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={searchStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

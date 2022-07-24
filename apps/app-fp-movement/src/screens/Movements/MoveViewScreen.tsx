@@ -92,11 +92,8 @@ export const MoveViewScreen = () => {
           numReceived: barc.numReceived,
         };
         setError(false);
-        navigation.navigate('MoveLine', {
-          mode: 0,
-          docId: id,
-          item: barcodeItem,
-        });
+        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+
         setVisibleDialog(false);
         setBarcode('');
       } else {
@@ -104,7 +101,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [doc?.lines, goods, id, navigation],
+    [dispatch, doc?.lines, goods, id],
   );
 
   const handleShowDialog = () => {

@@ -1,25 +1,26 @@
-import React, { useState, useLayoutEffect, useMemo } from 'react';
+import React, { useState, useLayoutEffect, useMemo, useCallback } from 'react';
 import { ListRenderItem, SectionList, SectionListData, Text, View } from 'react-native';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { docSelectors, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
-  DrawerButton,
   FilterButtons,
   Status,
   AppScreen,
   SubTitle,
   ItemSeparator,
+  SearchButton,
 } from '@lib/mobile-ui';
 
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 
 import { getDateString, shortenString } from '@lib/mobile-app';
 
 import { IApplDocument } from '../../store/types';
 
 import ApplListItem, { ApplListRenderItemProps } from './components/ApplListItem';
+import { navBackDrawer } from './components/navigateOptions';
 
 export interface ApplListSectionProps {
   title: string;
@@ -109,19 +110,17 @@ const ApplListScreen = () => {
     [filteredList],
   );
 
+  const renderRight = useCallback(
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    [filterVisible],
+  );
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
-      headerRight: () => (
-        <IconButton
-          icon="card-search-outline"
-          style={filterVisible && { backgroundColor: colors.card }}
-          size={26}
-          onPress={() => setFilterVisible((prev) => !prev)}
-        />
-      ),
+      headerLeft: navBackDrawer,
+      headerRight: renderRight,
     });
-  }, [colors.card, filterVisible, navigation]);
+  }, [colors.card, filterVisible, navigation, renderRight]);
 
   return (
     <AppScreen>
@@ -135,6 +134,7 @@ const ApplListScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

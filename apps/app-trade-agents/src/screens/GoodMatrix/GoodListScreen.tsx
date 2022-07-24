@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FlatList, View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
-import { IconButton, Searchbar } from 'react-native-paper';
+import { Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppActivityIndicator, AppScreen, EmptyList, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppActivityIndicator, AppScreen, EmptyList, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
@@ -56,15 +56,8 @@ const GoodListScreen = () => {
   }, [filterVisible, searchQuery]);
 
   const renderRight = useCallback(
-    () => (
-      <IconButton
-        icon="card-search-outline"
-        style={filterVisible && { backgroundColor: colors.card }}
-        size={26}
-        onPress={() => setFilterVisible((prev) => !prev)}
-      />
-    ),
-    [colors.card, filterVisible],
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    [filterVisible],
   );
 
   useLayoutEffect(() => {

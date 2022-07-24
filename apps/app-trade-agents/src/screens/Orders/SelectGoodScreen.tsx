@@ -1,11 +1,19 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
-import { globalStyles, AppScreen, ItemSeparator, SubTitle, EmptyList, AppActivityIndicator } from '@lib/mobile-ui';
+import {
+  globalStyles,
+  AppScreen,
+  ItemSeparator,
+  SubTitle,
+  EmptyList,
+  AppActivityIndicator,
+  SearchButton,
+} from '@lib/mobile-ui';
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import React, { useState, useEffect, useMemo, useLayoutEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text, Alert } from 'react-native';
-import { Searchbar, IconButton, Divider } from 'react-native-paper';
+import { Searchbar, Divider } from 'react-native-paper';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -18,7 +26,7 @@ import { navBackButton } from '../../components/navigateOptions';
 
 interface IProp {
   item: IGood;
-  onPress: () => void;
+  onPress: (item: IGood) => void;
   quantity?: number;
 }
 
@@ -26,7 +34,7 @@ const Good = ({ item, onPress, quantity }: IProp) => {
   const iconStyle = useMemo(() => [styles.icon, { backgroundColor: quantity ? '#06567D' : '#E91E63' }], [quantity]);
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity onPress={() => onPress(item)}>
       <View style={styles.item}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -64,15 +72,8 @@ const SelectGoodScreen = () => {
   }, [filterVisible, searchQuery]);
 
   const renderRight = useCallback(
-    () => (
-      <IconButton
-        icon="card-search-outline"
-        style={filterVisible && { backgroundColor: colors.card }}
-        size={26}
-        onPress={() => setFilterVisible((prev) => !prev)}
-      />
-    ),
-    [colors.card, filterVisible],
+    () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />,
+    [filterVisible],
   );
 
   useLayoutEffect(() => {
@@ -147,8 +148,6 @@ const SelectGoodScreen = () => {
     );
   }, [model, searchQuery]);
 
-  const searchStyle = useMemo(() => colors.primary, [colors.primary]);
-
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -167,7 +166,7 @@ const SelectGoodScreen = () => {
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
-              selectionColor={searchStyle}
+              selectionColor={colors.primary}
             />
           </View>
           <ItemSeparator />

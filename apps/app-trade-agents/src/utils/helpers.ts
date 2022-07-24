@@ -38,14 +38,18 @@ const getGoodMatrixByContact = (
   goodMatrix: IMatrixData[],
   isMatrix: boolean,
   groupId?: string,
+  filterText?: string,
 ): IGood[] => {
   log('getGoodMatrixByContact', 'Начало построения модели матрицы товаров');
-
+  const filterTextUpper = filterText?.toUpperCase();
   const matrixGoods: IGood[] = [];
   if (isMatrix && goodMatrix) {
     for (const matrix of goodMatrix) {
       const good = goods?.find((g) => g.id === matrix.goodId);
-      if ((groupId && good?.goodgroup.id === groupId) || !groupId) {
+      if (
+        ((groupId && good?.goodgroup.id === groupId) || !groupId) &&
+        (!filterTextUpper || good?.name.toUpperCase().includes(filterTextUpper))
+      ) {
         const newGood: IGood = {
           ...good,
           priceFsn: matrix.priceFsn,
@@ -59,7 +63,10 @@ const getGoodMatrixByContact = (
     }
   } else {
     for (const good of goods) {
-      if ((groupId && good?.goodgroup.id === groupId) || !groupId) {
+      if (
+        ((groupId && good?.goodgroup.id === groupId) || !groupId) &&
+        (!filterTextUpper || good?.name.toUpperCase().includes(filterTextUpper))
+      ) {
         matrixGoods?.push(good);
       }
     }
@@ -68,8 +75,15 @@ const getGoodMatrixByContact = (
   return matrixGoods;
 };
 /**Формирует модель товаров в разрезе родительских групп*/
-const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix: IMatrixData[], isMatrix: boolean) => {
+const getGroupModelByContact = (
+  groups: IGoodGroup[],
+  goods: IGood[],
+  goodMatrix: IMatrixData[],
+  isMatrix: boolean,
+  filterText?: string,
+) => {
   log('getGroupModelByContact', 'Начало построения модели матрицы');
+  const filterTextUpper = filterText?.toUpperCase();
   // Если установлен признак Использовать матрицы, то берем товары только из матриц,
   // иначе - берем все товары
   // Далее группируем товары по группам
@@ -81,7 +95,7 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
       ? goodMatrix.reduce((p: IMGroupData<IMGroup>, { goodId, priceFsn, priceFso, priceFsnSklad, priceFsoSklad }) => {
           const good = goods?.find((g) => g.id === goodId);
           const group = groups?.find((gr) => gr.id === good?.goodgroup.id);
-          if (good && group) {
+          if (good && group && (!filterTextUpper || group.name.toUpperCase().includes(filterTextUpper))) {
             if (!p[group.id]) {
               p[group.id] = {
                 group: group.parent?.id ? group : ({ ...group, parent: UNKNOWN_GROUP } as IGoodGroup),
@@ -96,7 +110,7 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
       : goods.reduce((p: IMGroupData<IMGroup>, good: IGood) => {
           if (!p[good.goodgroup.id]) {
             const group = groups.find((gr) => gr.id === good.goodgroup.id);
-            if (group) {
+            if (group && (!filterTextUpper || group.name.toUpperCase().includes(filterTextUpper))) {
               p[good.goodgroup.id] = {
                 group: group.parent?.id ? group : ({ ...group, parent: UNKNOWN_GROUP } as IGoodGroup),
                 goods: [good],
@@ -105,6 +119,7 @@ const getGroupModelByContact = (groups: IGoodGroup[], goods: IGood[], goodMatrix
           } else {
             p[good.goodgroup.id].goods?.push(good);
           }
+
           return p;
         }, {});
 

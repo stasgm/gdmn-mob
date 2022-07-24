@@ -358,7 +358,7 @@ const SellbillViewScreen = () => {
   }
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(sellbill?.status || 'DRAFT')}
         title={sellbill.head.outlet?.name || ''}

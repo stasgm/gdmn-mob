@@ -5,7 +5,6 @@ import {
   OrderLineScreen,
   OrderListScreen,
   OrderViewScreen,
-  SelectGoodScreen,
   SelectGroupScreen,
 } from '../../screens/Orders';
 
@@ -30,8 +29,7 @@ const orderScreens = {
   OrderView: { title: 'Заявка', component: OrderViewScreen },
   OrderEdit: { title: 'Заявка', component: OrderEditScreen },
   OrderLine: { title: 'Позиция заявки', component: OrderLineScreen },
-  SelectGroupItem: { title: 'Добавление позиции заявки', component: SelectGroupScreen },
-  SelectGoodItem: { title: 'Добавление позиции заявки', component: SelectGoodScreen },
+  SelectGroupItem: { title: 'Выбор товара', component: SelectGroupScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
 
@@ -44,8 +42,8 @@ const returnScreens = {
   ReturnEdit: { title: 'Возврат', component: ReturnEditScreen },
   ReturnLine: { title: 'Позиция возврата', component: ReturnLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
-  SelectItemReturn: { title: 'Добавление позиции возврата', component: SelectItemScreen },
-  SellBill: { title: 'Добавление позиции возврата', component: SellBillScreen },
+  SelectItemReturn: { title: 'Выбор товара', component: SelectItemScreen },
+  SellBill: { title: 'Выбор товара', component: SellBillScreen },
 };
 
 const routerScreen = {
