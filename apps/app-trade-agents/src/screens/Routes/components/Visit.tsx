@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
 import {
@@ -11,6 +11,7 @@ import {
   IListItemProps,
   EmptyList,
   MediumText,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
@@ -52,60 +53,51 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
-  const handleCloseVisit = useCallback(() => {
+  const handleCloseVisit = useCallback(async () => {
     // TODO Вынести в async actions
     setProcess(true);
 
-    const updateDocs = async () => {
-      const coords = await getCurrentPosition();
+    const coords = await getCurrentPosition();
 
-      const date = new Date().toISOString();
+    const date = new Date().toISOString();
 
-      const updatedVisit: IVisitDocument = {
-        ...visit,
-        head: {
-          ...visit.head,
-          dateEnd: date,
-          endGeoPoint: coords,
-        },
-        creationDate: visit.creationDate || date,
-        editionDate: date,
-      };
-
-      const updatedOrders: IOrderDocument[] = [];
-      orderDocs.forEach((doc) => {
-        if (doc.status === 'DRAFT') {
-          updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
-        }
-      });
-
-      await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
+    const updatedVisit: IVisitDocument = {
+      ...visit,
+      head: {
+        ...visit.head,
+        dateEnd: date,
+        endGeoPoint: coords,
+      },
+      creationDate: visit.creationDate || date,
+      editionDate: date,
     };
 
-    updateDocs();
+    const updatedOrders: IOrderDocument[] = [];
+    orderDocs.forEach((doc) => {
+      if (doc.status === 'DRAFT') {
+        updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
+      }
+    });
+    await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
 
     setProcess(false);
   }, [docDispatch, visit, orderDocs]);
 
-  const handleReopenVisit = useCallback(() => {
+  const handleReopenVisit = useCallback(async () => {
     setProcess(true);
 
-    const updateVisit = async () => {
-      const date = new Date().toISOString();
+    const date = new Date().toISOString();
 
-      const updatedVisit: IVisitDocument = {
-        ...visit,
-        head: {
-          ...visit.head,
-          dateEnd: undefined,
-          endGeoPoint: undefined,
-        },
-        editionDate: date,
-      };
-      await docDispatch(documentActions.updateDocuments([updatedVisit]));
+    const updatedVisit: IVisitDocument = {
+      ...visit,
+      head: {
+        ...visit.head,
+        dateEnd: undefined,
+        endGeoPoint: undefined,
+      },
+      editionDate: date,
     };
-
-    updateVisit();
+    await docDispatch(documentActions.updateDocuments([updatedVisit]));
 
     setProcess(false);
   }, [docDispatch, visit]);
@@ -185,11 +177,14 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
 
   const handleReadyDocs = useSendDocs(readyDocs);
 
-  const handleSendDocs = useCallback(() => {
-    setSendLoading(true);
+  const handleSendDocs = async () => {
     handleReadyDocs();
-    setSendLoading(false);
-  }, [handleReadyDocs]);
+  };
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <>
@@ -246,10 +241,18 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
             Добавить документ
           </PrimeButton>
         ) : (
-          readyDocs.length > 0 && (
+          readyDocs.length > 0 &&
+          !sendLoading && (
             <PrimeButton
               icon={!loading ? 'file-send' : 'block-helper'}
-              onPress={handleSendDocs}
+              onPress={() => {
+                if (!sendLoading) {
+                  setSendLoading(true);
+                  handleSendDocs()
+                    .then(() => setSendLoading(false))
+                    .catch((err) => console.log(err));
+                }
+              }}
               disabled={sendLoading || loading}
               loadIcon={loading}
             >

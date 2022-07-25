@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen } from '@lib/mobile-ui';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { DocLine } from '../../components/DocLine';
@@ -18,15 +18,6 @@ export const DocLineScreen = () => {
   const [line, setLine] = useState<IMovementLine>(item);
 
   const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
-
-  // const handleSave = useCallback(() => {
-  //   dispatch(
-  //     mode === 0
-  //       ? documentActions.addDocumentLine({ docId, line })
-  //       : documentActions.updateDocumentLine({ docId, line }),
-  //   );
-  //   navigation.goBack();
-  // }, [navigation, line, docId, dispatch, mode]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -61,8 +52,8 @@ export const DocLineScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
       <DocLine item={line} onSetLine={setLine} />
-    </View>
+    </AppScreen>
   );
 };

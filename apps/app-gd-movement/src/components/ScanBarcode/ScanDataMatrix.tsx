@@ -5,9 +5,11 @@ import { Camera } from 'expo-camera';
 import { View, TouchableOpacity, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
-import { globalStyles } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText } from '@lib/mobile-ui';
 
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
+
+import { useCameraPermission } from '../../hooks/useCameraPermission';
 
 import styles from './styles';
 
@@ -19,20 +21,14 @@ interface IProps {
 const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   const { colors } = useTheme();
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
 
   const [barcode, setBarcode] = useState('');
 
-  useEffect(() => {
-    const permission = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    permission();
-  }, []);
+  const hasPermission = useCameraPermission();
 
   const handleBarCodeScanned = useCallback(
     (data: string) => {
@@ -48,17 +44,36 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   }, [vibroMode]);
 
   if (hasPermission === null) {
-    return <View />;
+    return (
+      <>
+        <IconButton icon="arrow-left" size={30} style={styles.transparent} onPress={onCancel} />
+        <View style={globalStyles.container}>
+          <View style={globalStyles.containerCenter}>
+            <LargeText>Запрос на использование камеры</LargeText>
+            <AppActivityIndicator style={{}} />
+          </View>
+        </View>
+      </>
+    );
   }
 
   if (hasPermission === false) {
-    return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
+    return (
+      <>
+        <IconButton icon="arrow-left" size={30} style={styles.transparent} onPress={onCancel} />
+        <View style={globalStyles.container}>
+          <View style={globalStyles.containerCenter}>
+            <LargeText>Нет доступа к камере</LargeText>
+          </View>
+        </View>
+      </>
+    );
   }
 
   return (
     <View style={viewStyle}>
       <Camera
-        key={`${scanned}`}
+        key={`${scanned}${barcode}`}
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],

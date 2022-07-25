@@ -14,7 +14,7 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { formatValue, generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString } from '@lib/mobile-app';
 
 import { INamedEntity } from '@lib/types';
 
@@ -36,9 +36,7 @@ const RouteDetailScreen = () => {
 
   const route = { id: routeId, name: '' } as INamedEntity;
 
-  const visit = useFilteredDocList<IVisitDocument>('visit').find(
-    (doc) => doc.head?.routeLineId === id,
-  ) as IVisitDocument;
+  const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
 
   const [process, setProcess] = useState(false);
 

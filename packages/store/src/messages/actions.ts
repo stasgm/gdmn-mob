@@ -16,7 +16,6 @@ const clearMessagesAsync = createAsyncAction(
   'MESSAGES/CLEAR_MESSAGES_FAILURE',
 )<string | undefined, undefined, string>();
 
-//const deleteAllMessages = createAction('MESSAGES/DELETE_ALL')();
 const clearError = createAction('MESSAGES/CLEAR_ERROR')();
 
 const fetchMessagesAsync = createAsyncAction('MESSAGES/FETCH', 'MESSAGES/FETCH_SUCCESS', 'MESSAGES/FETCH_FAILURE')<
@@ -24,12 +23,6 @@ const fetchMessagesAsync = createAsyncAction('MESSAGES/FETCH', 'MESSAGES/FETCH_S
   IMessage[],
   string
 >();
-
-// const sendMessagesAsync = createAsyncAction('MESSAGES/SEND', 'MESSAGES/SEND_SUCCESS', 'MESSAGES/SEND_FAILURE')<
-//   string | undefined,
-//   IMessage[],
-//   string
-// >();
 
 export const actions = {
   fetchMessagesAsync,
