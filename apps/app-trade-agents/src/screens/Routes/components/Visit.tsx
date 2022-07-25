@@ -1,7 +1,7 @@
 import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, Alert, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDocThunkDispatch, useSelector } from '@lib/store';
 import { IDocumentType, INamedEntity } from '@lib/types';
 import {
   InfoBlock,
@@ -13,7 +13,7 @@ import {
   MediumText,
   AppActivityIndicator,
 } from '@lib/mobile-ui';
-import { useSendDocs, getDateString, generateId, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
+import { useSendDocs, getDateString, generateId, keyExtractor } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -33,7 +33,6 @@ interface IVisitProps {
 
 const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteDetails'>>();
-  const loading = useSelector((state) => state.documents.loading);
 
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -47,9 +46,13 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
   // Подразделение по умолчанию
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data) as INamedEntity | undefined;
 
-  const orderDocs = useFilteredDocList<IOrderDocument>('order').filter(
-    (doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id,
-  );
+  const orderDocs = docSelectors
+    .selectByDocType<IOrderDocument>('order')
+    ?.filter((doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id);
+
+  // useFilteredDocList<IOrderDocument>('order').filter(
+  //   (doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id,
+  // );
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
@@ -244,17 +247,16 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
           readyDocs.length > 0 &&
           !sendLoading && (
             <PrimeButton
-              icon={!loading ? 'file-send' : 'block-helper'}
-              onPress={() => {
+              icon={!sendLoading ? 'file-send' : 'block-helper'}
+              onPress={async () => {
                 if (!sendLoading) {
                   setSendLoading(true);
-                  handleSendDocs()
-                    .then(() => setSendLoading(false))
-                    .catch((err) => console.log(err));
+                  await handleSendDocs();
+                  setSendLoading(false);
                 }
               }}
-              disabled={sendLoading || loading}
-              loadIcon={loading}
+              disabled={sendLoading}
+              loadIcon={sendLoading}
             >
               Отправить
             </PrimeButton>
