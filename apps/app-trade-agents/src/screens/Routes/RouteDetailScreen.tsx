@@ -122,8 +122,6 @@ const RouteDetailScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  console.log('visit 111', visit);
-
   return (
     <AppScreen style={styles.contentTop}>
       <InfoBlock colorLabel={'#06567D'} title={point.outlet.name}>

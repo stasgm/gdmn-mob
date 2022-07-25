@@ -49,7 +49,7 @@ const OrderViewScreen = () => {
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
-  const isBlocked = useMemo(() => order?.status !== 'DRAFT' || screenState !== 'idle', [order?.status, screenState]);
+  const isBlocked = useMemo(() => order?.status !== 'DRAFT', [order?.status]);
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
@@ -193,20 +193,24 @@ const OrderViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked && (
+      isBlocked ? (
+        order?.status === 'READY' && (
+          <SendButton onPress={() => setScreenState('sending')} disabled={screenState !== 'idle'} />
+        )
+      ) : (
         <View style={styles.buttons}>
           {delList.length > 0 ? (
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
-              <SendButton onPress={() => setScreenState('sending')} />
-              <AddButton onPress={handleAddOrderLine} />
-              <MenuButton actionsMenu={actionsMenu} />
+              <SendButton onPress={() => setScreenState('sending')} disabled={screenState !== 'idle'} />
+              <AddButton onPress={handleAddOrderLine} disabled={screenState !== 'idle'} />
+              <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
         </View>
       ),
-    [isBlocked, delList.length, handleDeleteDocLine, handleAddOrderLine, actionsMenu],
+    [isBlocked, order?.status, screenState, delList.length, handleDeleteDocLine, handleAddOrderLine, actionsMenu],
   );
 
   const renderLeft = useCallback(
