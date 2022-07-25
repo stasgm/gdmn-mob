@@ -58,7 +58,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
   return (
     <View style={viewStyle}>
       <Camera
-        key={`${scanned}`}
+        key={`${scanned}${barcode}`}
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],
