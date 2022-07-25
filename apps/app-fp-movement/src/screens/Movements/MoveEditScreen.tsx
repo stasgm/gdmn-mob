@@ -163,7 +163,7 @@ export const MoveEditScreen = () => {
           creationDate: doc.creationDate || updatedDate,
           editionDate: updatedDate,
         };
-
+        setScreenState('idle');
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         navigation.navigate('MoveView', { id });
       }
