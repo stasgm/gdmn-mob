@@ -52,60 +52,51 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
 
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
-  const handleCloseVisit = useCallback(() => {
+  const handleCloseVisit = useCallback(async () => {
     // TODO Вынести в async actions
     setProcess(true);
 
-    const updateDocs = async () => {
-      const coords = await getCurrentPosition();
+    const coords = await getCurrentPosition();
 
-      const date = new Date().toISOString();
+    const date = new Date().toISOString();
 
-      const updatedVisit: IVisitDocument = {
-        ...visit,
-        head: {
-          ...visit.head,
-          dateEnd: date,
-          endGeoPoint: coords,
-        },
-        creationDate: visit.creationDate || date,
-        editionDate: date,
-      };
-
-      const updatedOrders: IOrderDocument[] = [];
-      orderDocs.forEach((doc) => {
-        if (doc.status === 'DRAFT') {
-          updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
-        }
-      });
-
-      await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
+    const updatedVisit: IVisitDocument = {
+      ...visit,
+      head: {
+        ...visit.head,
+        dateEnd: date,
+        endGeoPoint: coords,
+      },
+      creationDate: visit.creationDate || date,
+      editionDate: date,
     };
 
-    updateDocs();
+    const updatedOrders: IOrderDocument[] = [];
+    orderDocs.forEach((doc) => {
+      if (doc.status === 'DRAFT') {
+        updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
+      }
+    });
+    await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
 
     setProcess(false);
   }, [docDispatch, visit, orderDocs]);
 
-  const handleReopenVisit = useCallback(() => {
+  const handleReopenVisit = useCallback(async () => {
     setProcess(true);
 
-    const updateVisit = async () => {
-      const date = new Date().toISOString();
+    const date = new Date().toISOString();
 
-      const updatedVisit: IVisitDocument = {
-        ...visit,
-        head: {
-          ...visit.head,
-          dateEnd: undefined,
-          endGeoPoint: undefined,
-        },
-        editionDate: date,
-      };
-      await docDispatch(documentActions.updateDocuments([updatedVisit]));
+    const updatedVisit: IVisitDocument = {
+      ...visit,
+      head: {
+        ...visit.head,
+        dateEnd: undefined,
+        endGeoPoint: undefined,
+      },
+      editionDate: date,
     };
-
-    updateVisit();
+    await docDispatch(documentActions.updateDocuments([updatedVisit]));
 
     setProcess(false);
   }, [docDispatch, visit]);

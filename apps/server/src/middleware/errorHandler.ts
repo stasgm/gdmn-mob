@@ -32,7 +32,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
         data: 'InnerErrorException',
       };
 
-      log.error('Неизвестная ошибка');
+      log.error('Неизвестная ошибка', JSON.stringify(error));
     }
   }
 };

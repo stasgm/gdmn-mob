@@ -295,13 +295,7 @@ export const FreeSellbillViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <SubTitle style={styles.title}>
-            {screenState === 'deleting'
-              ? 'Удаление документа...'
-              : // : screenState === 'sending'
-                // ? 'Отправка документа...'
-                ''}
-          </SubTitle>
+          <SubTitle style={styles.title}>Удаление документа...</SubTitle>
           <AppActivityIndicator />
         </View>
       </View>

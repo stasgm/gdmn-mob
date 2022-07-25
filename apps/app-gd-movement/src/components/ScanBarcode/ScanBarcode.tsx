@@ -6,10 +6,12 @@ import { Camera } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
-import { globalStyles } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText } from '@lib/mobile-ui';
 
 import { IMovementLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
+
+import { useCameraPermission } from '../../hooks/useCameraPermission';
 
 import styles from './styles';
 
@@ -20,7 +22,6 @@ interface IProps {
 }
 
 const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -32,13 +33,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
 
-  useEffect(() => {
-    const permission = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    permission();
-  }, []);
+  const hasPermission = useCameraPermission();
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
@@ -68,11 +63,24 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   }, [barcode, scanned, vibroMode, getScannedObject]);
 
   if (hasPermission === null) {
-    return <View />;
+    return (
+      <View style={globalStyles.container}>
+        <View style={globalStyles.containerCenter}>
+          <LargeText>Запрос на использование камеры</LargeText>
+          <AppActivityIndicator style={{}} />
+        </View>
+      </View>
+    );
   }
 
   if (hasPermission === false) {
-    return <Text style={globalStyles.title}>Нет доступа к камере</Text>;
+    return (
+      <View style={globalStyles.container}>
+        <View style={globalStyles.containerCenter}>
+          <LargeText>Нет доступа к камере</LargeText>
+        </View>
+      </View>
+    );
   }
 
   return (
