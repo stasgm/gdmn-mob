@@ -348,7 +348,6 @@ export const MoveViewScreen = () => {
           </View>
         </>
       </InfoBlock>
-
       <TextInput
         style={{ width: 1, height: 1 }}
         key={key}
@@ -364,8 +363,8 @@ export const MoveViewScreen = () => {
         renderItem={renderItem}
         // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
-        initialNumToRender={6}
-        maxToRenderPerBatch={6} // Reduce number in each render batch
+        initialNumToRender={10}
+        maxToRenderPerBatch={10} // Reduce number in each render batch
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />

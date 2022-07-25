@@ -63,6 +63,8 @@ const SelectRefItemScreen = () => {
 
   const title = refObj?.description || refObj?.name;
 
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const [filteredList, setFilteredList] = useState<IReferenceData[]>();
@@ -95,6 +97,7 @@ const SelectRefItemScreen = () => {
       if (isMulti) {
         setCheckedItem((prev) => [...(prev as IReferenceData[]), item]);
       } else {
+        setScreenState('saving');
         dispatch(
           appActions.setFormParams({
             [fieldName]: item,
@@ -116,10 +119,11 @@ const SelectRefItemScreen = () => {
           onCheck={handleSelectItem}
           refFieldName={refFieldName}
           descrFieldName={descrFieldName}
+          disabled={screenState === 'saving' ? true : false}
         />
       );
     },
-    [checkedItem, handleSelectItem, refFieldName, descrFieldName],
+    [checkedItem, handleSelectItem, refFieldName, descrFieldName, screenState],
   );
 
   const renderRight = useCallback(
@@ -187,12 +191,14 @@ const LineItem = React.memo(
     onCheck,
     refFieldName,
     descrFieldName,
+    disabled,
   }: {
     item: IReferenceData;
     isChecked: boolean;
     onCheck: (id: IReferenceData) => void;
     refFieldName: string;
     descrFieldName?: string;
+    disabled?: boolean;
   }) => {
     const { colors } = useTheme();
 
@@ -201,7 +207,7 @@ const LineItem = React.memo(
     const handleCheckItem = useCallback(() => onCheck(item), [item, onCheck]);
 
     return (
-      <TouchableOpacity onPress={handleCheckItem}>
+      <TouchableOpacity onPress={handleCheckItem} disabled={disabled}>
         <View style={viewStyle}>
           <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={checkboxStyle} />
           <View style={styles.details}>
