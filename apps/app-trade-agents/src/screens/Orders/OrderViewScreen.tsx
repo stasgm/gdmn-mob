@@ -293,7 +293,6 @@ const OrderViewScreen = () => {
           </MediumText>
           <View style={styles.rowCenter}>
             <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
-            {/* {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null} */}
           </View>
         </View>
       </InfoBlock>
