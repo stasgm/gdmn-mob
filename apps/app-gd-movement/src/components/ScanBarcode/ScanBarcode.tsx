@@ -23,13 +23,10 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const isFocused = useIsFocused();
   const ref = useRef<TextInput>(null);
 
-  console.log('isFocused', isFocused);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [scanned, setScanned] = useState(false);
-
-  console.log('scanned', scanned);
 
   const { colors } = useTheme();
 
@@ -38,7 +35,6 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
 
-  console.log('barcode', barcode);
   useEffect(() => {
     const permission = async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -95,7 +91,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   }
 
   return isFocused ? (
-    <View style={[styles.content]}>
+    <View style={styles.content}>
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
