@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { Alert, View, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
@@ -294,7 +293,6 @@ const OrderViewScreen = () => {
           </MediumText>
           <View style={styles.rowCenter}>
             <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </View>
       </InfoBlock>

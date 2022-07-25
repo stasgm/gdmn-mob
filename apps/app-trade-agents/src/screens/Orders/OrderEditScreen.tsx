@@ -157,9 +157,7 @@ const OrderEditScreen = () => {
           creationDate: newOrderDate,
           editionDate: newOrderDate,
         };
-
         dispatch(documentActions.addDocument(newOrder));
-
         navigation.dispatch(StackActions.replace('OrderView', { id: newOrder.id }));
       } else {
         if (!order) {
@@ -189,7 +187,7 @@ const OrderEditScreen = () => {
           creationDate: order.creationDate || updatedOrderDate,
           editionDate: updatedOrderDate,
         };
-
+        setScreenState('idle');
         dispatch(documentActions.updateDocument({ docId: id, document: updatedOrder }));
         navigation.navigate('OrderView', { id });
       }
