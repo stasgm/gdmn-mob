@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "com.gsbelarus.gdmovement",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
+      "permissions": ["CAMERA", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       "versionCode": 2
     },
     "web": {
