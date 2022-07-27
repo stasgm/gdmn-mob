@@ -19,8 +19,8 @@ export interface IListItemProps {
   lineCount?: number;
   errorMessage?: string;
   id: string;
-  onSelectItem: () => void;
-  onCheckItem?: () => void;
+  onPress: () => void;
+  onLongPress?: () => void;
   isChecked?: boolean;
   isDelList?: boolean;
   documentType?: string;
@@ -30,27 +30,21 @@ const ScreenListItem = ({
   children,
   title,
   subtitle,
-  status,
+  status = 'DRAFT',
   lineCount,
   isFromRoute,
   errorMessage,
-  onSelectItem,
-  onCheckItem,
+  onPress,
+  onLongPress,
   isChecked,
-  isDelList,
 }: IListItemProps) => {
   const { colors } = useTheme();
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        isDelList ? onCheckItem && onCheckItem() : onSelectItem && onSelectItem();
-      }}
-      onLongPress={onCheckItem}
-    >
+    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <View style={styles.item}>
         <View style={styles.iconsWithCheck}>
-          <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
+          <View style={[styles.icon, { backgroundColor: getStatusColor(status) }]}>
             <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
           </View>
           {isChecked ? (

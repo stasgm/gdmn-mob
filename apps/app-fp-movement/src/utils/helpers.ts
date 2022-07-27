@@ -1,7 +1,7 @@
-import { IMoveDocument, IFreeSellbillDocument, ITempDocument } from '../store/types';
+import { IMoveDocument, IFreeSellbillDocument, ISellbillDocument } from '../store/types';
 import { IBarcode } from '../store/app/types';
 
-export const getNextDocNumber = (documents: IMoveDocument[] | ITempDocument[] | IFreeSellbillDocument[]) => {
+export const getNextDocNumber = (documents: IMoveDocument[] | ISellbillDocument[] | IFreeSellbillDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))
@@ -14,8 +14,6 @@ export const getBarcode = (barcode: string) => {
   const day = barcode.slice(6, 8);
   const month = barcode.slice(8, 10);
   const year = '20' + barcode.slice(10, 12);
-  // const hours = barcode.slice(12, 14);
-  // const minutes = barcode.slice(14, 16);
   const shcode = barcode.slice(16, 20);
   const quantPack = barcode.slice(16, 20);
   const numReceived = barcode.slice(24, 30);
@@ -31,6 +29,5 @@ export const getBarcode = (barcode: string) => {
     quantPack: Number(quantPack),
   };
 
-  // console.log('w', barcodeObj);
   return barcodeObj;
 };

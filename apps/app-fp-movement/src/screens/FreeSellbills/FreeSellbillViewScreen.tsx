@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput } from 'react-native';
+import { View, FlatList, Alert, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
@@ -10,15 +10,17 @@ import {
   InfoBlock,
   ItemSeparator,
   SubTitle,
-  // ScanButton,
   SendButton,
   AppActivityIndicator,
   MediumText,
+  AppDialog,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
+
+import colors from '@lib/mobile-ui/src/styles/colors';
 
 import { IFreeSellbillDocument, IFreeSellbillLine } from '../../store/types';
 import { FreeSellbillStackParamList } from '../../navigation/Root/types';
@@ -27,8 +29,6 @@ import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
-
-import BarcodeDialog from '../../components/BarcodeDialog';
 
 import { FreeSellbillItem } from './components/FreeSellbillItem';
 import FreeSellbillTotal from './components/FreeSellbillTotal';
@@ -51,13 +51,13 @@ export const FreeSellbillViewScreen = () => {
 
   const doc = docSelectors.selectByDocId<IFreeSellbillDocument>(id);
 
-  const lines = useMemo(() => doc.lines.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc.lines]);
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
   const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
@@ -76,7 +76,7 @@ export const FreeSellbillViewScreen = () => {
           workDate: barc.workDate,
           numReceived: barc.numReceived,
         };
-        setError(false);
+        setErrorMessage('');
         navigation.navigate('FreeSellbillLine', {
           mode: 0,
           docId: id,
@@ -85,7 +85,7 @@ export const FreeSellbillViewScreen = () => {
         setVisibleDialog(false);
         setBarcode('');
       } else {
-        setError(true);
+        setErrorMessage('Товар не найден');
       }
     },
 
@@ -96,10 +96,6 @@ export const FreeSellbillViewScreen = () => {
     setVisibleDialog(true);
   };
 
-  const handleDismisDialog = () => {
-    setVisibleDialog(false);
-  };
-
   const handleSearchBarcode = () => {
     handleGetBarcode(barcode);
   };
@@ -107,16 +103,12 @@ export const FreeSellbillViewScreen = () => {
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
-    setError(false);
+    setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
     navigation.navigate('FreeSellbillEdit', { id });
   }, [navigation, id]);
-
-  // const handleDoScan = useCallback(() => {
-  //   navigation.navigate('ScanBarcode', { docId: id });
-  // }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -142,10 +134,10 @@ export const FreeSellbillViewScreen = () => {
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = doc.lines?.[doc.lines.length - 1]?.id;
-
-    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
-  }, [dispatch, doc.lines, id]);
+    if (lines.length) {
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[lines.length - 1].id }));
+    }
+  }, [dispatch, id, lines]);
 
   const handleUseSendDoc = useSendDocs([doc]);
 
@@ -241,7 +233,7 @@ export const FreeSellbillViewScreen = () => {
         return;
       }
 
-      const line = doc.lines.find((i) => i.barcode === barc.barcode);
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
@@ -256,7 +248,7 @@ export const FreeSellbillViewScreen = () => {
         barcode: barc.barcode,
         workDate: barc.workDate,
         numReceived: barc.numReceived,
-        sortOrder: doc.lines.length + 1,
+        sortOrder: doc?.lines?.length + 1,
       };
 
       dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
@@ -264,7 +256,7 @@ export const FreeSellbillViewScreen = () => {
       setScanned(false);
     },
 
-    [dispatch, id, doc.lines, goods],
+    [dispatch, id, doc?.lines, goods],
   );
 
   const [key, setKey] = useState(1);
@@ -293,9 +285,9 @@ export const FreeSellbillViewScreen = () => {
   if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
-        <View style={styles.containerCenter}>
-          <SubTitle style={styles.title}>Удаление документа...</SubTitle>
-          <AppActivityIndicator />
+        <View style={localStyles.deleting}>
+          <SubTitle style={styles.title}>Удаление</SubTitle>
+          <ActivityIndicator size="small" color={colors.primary} />
         </View>
       </View>
     );
@@ -310,7 +302,7 @@ export const FreeSellbillViewScreen = () => {
   }
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
         title={doc.head.depart.name || ''}
@@ -324,7 +316,7 @@ export const FreeSellbillViewScreen = () => {
       </InfoBlock>
 
       <TextInput
-        style={{ width: 1, height: 1 }}
+        style={styles.scanInput}
         key={key}
         autoFocus={true}
         selectionColor="transparent"
@@ -343,16 +335,24 @@ export const FreeSellbillViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {doc.lines.length ? <FreeSellbillTotal lines={doc.lines} /> : null}
-      <BarcodeDialog
-        visibleDialog={visibleDialog}
-        onDismissDialog={handleDismisDialog}
-        barcode={barcode}
-        onChangeBarcode={setBarcode}
-        onDismiss={handleDismissBarcode}
-        onSearch={handleSearchBarcode}
-        error={error}
+      {lines.length ? <FreeSellbillTotal lines={lines} /> : null}
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={setBarcode}
+        onCancel={handleDismissBarcode}
+        onOk={handleSearchBarcode}
+        okLabel={'Найти'}
+        errorMessage={errorMessage}
       />
     </View>
   );
 };
+
+const localStyles = StyleSheet.create({
+  deleting: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

@@ -41,7 +41,7 @@ const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, 
             )
           }
         />
-        {errorMessage ? <Text style={{ color: colors.notification }}>{errorMessage}</Text> : null}
+        {!!errorMessage && <Text style={{ color: colors.notification }}>{errorMessage}</Text>}
       </Dialog.Content>
       <Dialog.Actions style={{ borderColor: colors.primary }}>
         <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onCancel}>

@@ -16,9 +16,6 @@ interface IProps {
 
 const SellbillItem = ({ item }: IProps) => {
   const { colors } = useTheme();
-
-  // const good = refSelectors.selectByName<IGood>('good')?.data?.find((e) => e.id === item?.good.id);
-
   const textStyle = useMemo(() => [styles.field, { color: colors.text }], [colors.text]);
 
   return (

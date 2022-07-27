@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, SubTitle } from '@lib/mobile-ui';
+import { AppActivityIndicator, AppDialog, globalStyles, SubTitle } from '@lib/mobile-ui';
 import { useSelector, refSelectors, useDispatch, documentActions } from '@lib/store';
 
 import { generateId } from '@lib/mobile-app';
@@ -19,7 +19,6 @@ import { navBackButton } from '../../components/navigateOptions';
 
 import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
 import { IScanerObject } from '../../components/ScanBarcode/ScanBarcode';
 
 import FreeSellbillTotal from './components/FreeSellbillTotal';
@@ -35,7 +34,7 @@ const ScanBarcodeScreen = () => {
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -107,7 +106,7 @@ const ScanBarcodeScreen = () => {
           workDate: barc.workDate,
           numReceived: barc.numReceived,
         };
-        setError(false);
+        setErrorMessage('');
         navigation.navigate('MoveLine', {
           mode: 0,
           docId: docId,
@@ -116,7 +115,7 @@ const ScanBarcodeScreen = () => {
         setVisibleDialog(false);
         setBarcode('');
       } else {
-        setError(true);
+        setErrorMessage('Товар не найден');
       }
     },
 
@@ -127,10 +126,6 @@ const ScanBarcodeScreen = () => {
     setVisibleDialog(true);
   };
 
-  const handleDismisDialog = () => {
-    setVisibleDialog(false);
-  };
-
   const handleSearchBarcode = () => {
     handleGetBarcode(barcode);
   };
@@ -138,7 +133,7 @@ const ScanBarcodeScreen = () => {
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
-    setError(false);
+    setErrorMessage('');
   };
 
   const isFocused = useIsFocused();
@@ -158,7 +153,6 @@ const ScanBarcodeScreen = () => {
     <>
       {isScanerReader ? (
         <ScanBarcodeReader
-          // onSave={(item) => handleSaveScannedItem(item)}
           onSearchBarcode={handleShowDialog}
           getScannedObject={getScannedObject}
           scanObject={scanObject}
@@ -174,14 +168,14 @@ const ScanBarcodeScreen = () => {
         />
       )}
       {document.lines?.length ? <FreeSellbillTotal lines={document.lines} scan={true} /> : null}
-      <BarcodeDialog
-        visibleDialog={visibleDialog}
-        onDismissDialog={handleDismisDialog}
-        barcode={barcode}
-        onChangeBarcode={setBarcode}
-        onDismiss={handleDismissBarcode}
-        onSearch={handleSearchBarcode}
-        error={error}
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={setBarcode}
+        onCancel={handleDismissBarcode}
+        onOk={handleSearchBarcode}
+        okLabel={'Найти'}
+        errorMessage={errorMessage}
       />
     </>
   );

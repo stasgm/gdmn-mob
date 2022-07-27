@@ -13,7 +13,7 @@ import {
 } from '../../screens/Sellbills';
 
 import ScanOrderScreen from '../../screens/Sellbills/ScanOrderScreen';
-import ScanGoodScreen from '../../screens/Sellbills/ScanGoodScreen';
+// import ScanGoodScreen from '../../screens/Sellbills/ScanGoodScreen';
 
 import {
   FreeSellbillListScreen,
@@ -40,7 +40,7 @@ export const sellbillScreens = {
   SellbillView: { title: 'Отвес', component: SellbillViewScreen },
   SellbillLine: { title: 'Позиция отвеса', component: SellbillLineScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
-  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
+  // ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const sellbillListScreens = {

@@ -1,7 +1,8 @@
 import { IEntity, INamedEntity } from '@lib/types';
 import 'react-native-get-random-values';
 import { customAlphabet } from 'nanoid';
-import { Linking, Platform } from 'react-native';
+import { Alert, Linking, Platform } from 'react-native';
+import { IDelList } from '@lib/mobile-types';
 
 const truncate = (str: string, l: number | undefined = 40) => (str.length > l ? `${str.substring(0, l)}...` : str);
 
@@ -98,6 +99,41 @@ const dialCall = (number: string) => {
 
 const keyExtractor = (item: IEntity) => String(item.id);
 
+const getDelList = (delList: IDelList, lineId: string, lineStatus: string) => {
+  const newList = { ...delList };
+  if (newList[lineId]) {
+    delete newList[lineId];
+  } else {
+    newList[lineId] = lineStatus;
+  }
+
+  return newList;
+};
+
+const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void) => {
+  if (Object.values(delList).find((i) => i === 'READY' || i === 'SENT')) {
+    Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
+      {
+        text: 'Да',
+        onPress: deleteDocs,
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  } else {
+    Alert.alert('Вы уверены, что хотите удалить документы?', '', [
+      {
+        text: 'Да',
+        onPress: deleteDocs,
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }
+};
+
 export {
   truncate,
   log,
@@ -110,4 +146,6 @@ export {
   generateId,
   dialCall,
   keyExtractor,
+  getDelList,
+  deleteSelectedItems,
 };

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { View, FlatList, Alert, TextInput, ActivityIndicator } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
@@ -13,6 +13,8 @@ import {
   AppActivityIndicator,
   MediumText,
   LargeText,
+  AppDialog,
+  SubTitle,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -27,8 +29,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
-
 import { MoveItem } from './components/MoveItem';
 import MoveTotal from './components/MoveTotal';
 
@@ -39,6 +39,7 @@ export interface IScanerObject {
 }
 
 export const MoveViewScreen = () => {
+  const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -56,14 +57,14 @@ export const MoveViewScreen = () => {
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        setError(true);
+        setErrorMessage('Штрих-код неверного формата');
         return;
       }
       const barc = getBarcode(brc);
@@ -71,14 +72,14 @@ export const MoveViewScreen = () => {
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
-        setError(true);
+        setErrorMessage('Товар не найден');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        setError(true);
+        setErrorMessage('Товар уже добавлен');
         return;
       }
 
@@ -91,13 +92,13 @@ export const MoveViewScreen = () => {
           workDate: barc.workDate,
           numReceived: barc.numReceived,
         };
-        setError(false);
+        setErrorMessage('');
         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
 
         setVisibleDialog(false);
         setBarcode('');
       } else {
-        setError(true);
+        setErrorMessage('Товар не найден');
       }
     },
 
@@ -108,10 +109,6 @@ export const MoveViewScreen = () => {
     setVisibleDialog(true);
   };
 
-  const handleDismisDialog = () => {
-    setVisibleDialog(false);
-  };
-
   const handleSearchBarcode = () => {
     handleGetBarcode(barcode);
   };
@@ -119,7 +116,7 @@ export const MoveViewScreen = () => {
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
-    setError(false);
+    setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -316,9 +313,9 @@ export const MoveViewScreen = () => {
   if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
-        <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
-          <AppActivityIndicator style={{}} />
+        <View style={styles.deleteView}>
+          <SubTitle style={styles.title}>Удаление</SubTitle>
+          <ActivityIndicator size="small" color={colors.primary} />
         </View>
       </View>
     );
@@ -349,7 +346,7 @@ export const MoveViewScreen = () => {
         </>
       </InfoBlock>
       <TextInput
-        style={{ width: 1, height: 1 }}
+        style={styles.scanInput}
         key={key}
         autoFocus={true}
         selectionColor="transparent"
@@ -361,7 +358,6 @@ export const MoveViewScreen = () => {
         data={lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={10}
         maxToRenderPerBatch={10} // Reduce number in each render batch
@@ -369,14 +365,14 @@ export const MoveViewScreen = () => {
         windowSize={7} // Reduce the window size
       />
       {doc?.lines?.length ? <MoveTotal lines={doc?.lines} /> : null}
-      <BarcodeDialog
-        visibleDialog={visibleDialog}
-        onDismissDialog={handleDismisDialog}
-        barcode={barcode}
-        onChangeBarcode={setBarcode}
-        onDismiss={handleDismissBarcode}
-        onSearch={handleSearchBarcode}
-        error={error}
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={setBarcode}
+        onCancel={handleDismissBarcode}
+        onOk={handleSearchBarcode}
+        okLabel={'Найти'}
+        errorMessage={errorMessage}
       />
     </View>
   );

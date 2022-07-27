@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { Alert, ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
+import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -20,11 +20,11 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString, keyExtractor } from '@lib/mobile-app';
+import { getDelList, getDateString, keyExtractor, deleteSelectedItems } from '@lib/mobile-app';
 
 import { IDocumentType } from '@lib/types';
 
-import { IListItem } from '@lib/mobile-types';
+import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { ISellbillDocument } from '../../store/types';
 import { SellbillStackParamList } from '../../navigation/Root/types';
@@ -33,10 +33,6 @@ import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface SellbillListSectionProps {
   title: string;
-}
-
-export interface IDelList {
-  [id: string]: any;
 }
 
 export type SectionDataProps = SectionListData<IListItemProps, SellbillListSectionProps>[];
@@ -61,6 +57,8 @@ export const SellbillListScreen = () => {
   const filterDocTypes = useMemo(() => docDepartTypes.concat(documentTypes), [documentTypes]);
 
   const [filterDocType, setFilterDocType] = useState(filterDocTypes[0]);
+
+  const [visibleDocTypeMenu, setVisibleDocTypeMenu] = useState(false);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     const res =
@@ -116,140 +114,98 @@ export const SellbillListScreen = () => {
     [filteredList],
   );
 
-  const [visibleType, setVisibleType] = useState(false);
-  const [visibleStatus, setVisibleStatus] = useState(false);
-  const [visibleDate, setVisibleDate] = useState(false);
+  const [visibleFilterType, setVisibleFilterType] = useState(false);
+  const [visibleFilterStatus, setVisibleFilterStatus] = useState(false);
+  const [visibleSortDate, setVisibleSortDate] = useState(false);
 
-  const handleApplyType = useCallback((option) => {
-    setVisibleType(false);
+  const handleApplyFilterType = useCallback((option) => {
+    setVisibleFilterType(false);
     setFilterDocType(option);
   }, []);
 
-  const handleApplyStatus = useCallback((option) => {
-    setVisibleStatus(false);
+  const handleApplyFilterStatus = useCallback((option) => {
+    setVisibleFilterStatus(false);
     setFilterStatus(option.id);
   }, []);
 
-  const handleApplyDate = useCallback((option) => {
-    setVisibleDate(false);
+  const handleApplySortDate = useCallback((option) => {
+    setVisibleSortDate(false);
     setSortDateType(option);
   }, []);
 
-  const [delList, setDelList] = useState({});
-
-  const handleAddDeletelList = useCallback(
-    (lineId: string, lineStatus: string, checkedId: string) => {
-      if (checkedId) {
-        const newList = Object.entries(delList).reduce((prev: IDelList, [curId, curStatus]) => {
-          if (curId !== checkedId) {
-            prev[curId] = curStatus;
-          }
-          return prev;
-        }, {});
-        setDelList(newList);
-      } else {
-        setDelList({ ...delList, [lineId]: lineStatus });
-      }
-    },
-    [delList],
-  );
+  const [delList, setDelList] = useState<IDelList>({});
+  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
-    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
 
-    if (statusList) {
-      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.removeDocuments(docIds));
-            setDelList([]);
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
-    } else {
-      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.removeDocuments(docIds));
-            setDelList([]);
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
-    }
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocuments(docIds));
+      setDelList({});
+    };
+
+    deleteSelectedItems(delList, deleteDocs);
   }, [delList, dispatch]);
 
   const handleAddDocument = useCallback(
     (item: IListItem) => {
-      setVisible(false);
+      setVisibleDocTypeMenu(false);
       navigation.navigate('ScanOrder', { id: item.id });
     },
     [navigation],
   );
 
-  const [visible, setVisible] = useState(false);
-
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {delList && Object.values(delList).length > 0 ? (
+        {isDelList ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
-          <Menu
-            key={'MenuType'}
-            visible={visible}
-            onChange={handleAddDocument}
-            onDismiss={() => setVisible(false)}
-            onPress={() => setVisible(true)}
-            options={documentTypes}
-            iconName={'plus'}
-            iconSize={30}
-          />
+          <View style={localStyles.menuDocType}>
+            <Menu
+              key={'MenuType'}
+              visible={visibleDocTypeMenu}
+              onChange={handleAddDocument}
+              onDismiss={() => setVisibleDocTypeMenu(false)}
+              onPress={() => setVisibleDocTypeMenu(true)}
+              options={documentTypes}
+              iconName={'plus'}
+              iconSize={30}
+            />
+          </View>
         )}
       </View>
     ),
-    [delList, documentTypes, handleAddDocument, handleDeleteDocs, visible],
+    [documentTypes, handleAddDocument, handleDeleteDocs, isDelList, visibleDocTypeMenu],
   );
 
-  const renderLeft = useCallback(
-    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
-    [delList],
-  );
+  const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
+      headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
       title:
         delList && Object.values(delList).length > 0
           ? `Выделено отвесов: ${Object.values(delList).length}`
           : 'Отвесы по заявкам',
     });
-  }, [delList, navigation, renderLeft, renderRight]);
+  }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
-  const handlePressSellbill = (id: string) => navigation.navigate('SellbillView', { id });
-
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
-    const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
-    return (
-      <ScreenListItem
-        key={item.id}
-        {...item}
-        onSelectItem={() => handlePressSellbill(item.id)}
-        onCheckItem={() => handleAddDeletelList(item.id, item.status || '', checkedId)}
-        isChecked={checkedId ? true : false}
-        isDelList={delList && Object.values(delList).length > 0 ? true : false}
-      />
-    );
-  };
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
+    <ScreenListItem
+      key={item.id}
+      {...item}
+      onPress={() =>
+        isDelList
+          ? setDelList(getDelList(delList, item.id, item.status!))
+          : navigation.navigate('SellbillView', { id: item.id })
+      }
+      onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+      isChecked={!!delList[item.id]}
+      isDelList={isDelList}
+    />
+  );
 
   const renderSectionHeader = useCallback(
     ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
@@ -267,10 +223,10 @@ export const SellbillListScreen = () => {
         <Menu
           key={'MenuType'}
           title="Тип"
-          visible={visibleType}
-          onChange={handleApplyType}
-          onDismiss={() => setVisibleType(false)}
-          onPress={() => setVisibleType(true)}
+          visible={visibleFilterType}
+          onChange={handleApplyFilterType}
+          onDismiss={() => setVisibleFilterType(false)}
+          onPress={() => setVisibleFilterType(true)}
           options={filterDocTypes}
           activeOptionId={filterDocType?.id}
           style={[styles.btnTab, styles.firstBtnTab]}
@@ -281,10 +237,10 @@ export const SellbillListScreen = () => {
         <Menu
           key={'MenuStatus'}
           title="Статус"
-          visible={visibleStatus}
-          onChange={handleApplyStatus}
-          onDismiss={() => setVisibleStatus(false)}
-          onPress={() => setVisibleStatus(true)}
+          visible={visibleFilterStatus}
+          onChange={handleApplyFilterStatus}
+          onDismiss={() => setVisibleFilterStatus(false)}
+          onPress={() => setVisibleFilterStatus(true)}
           options={statusTypes}
           activeOptionId={filterStatus}
           style={[styles.btnTab]}
@@ -295,10 +251,10 @@ export const SellbillListScreen = () => {
         <Menu
           key={'MenuDataSort'}
           title="Дата"
-          visible={visibleDate}
-          onChange={handleApplyDate}
-          onDismiss={() => setVisibleDate(false)}
-          onPress={() => setVisibleDate(true)}
+          visible={visibleSortDate}
+          onChange={handleApplySortDate}
+          onDismiss={() => setVisibleSortDate(false)}
+          onPress={() => setVisibleSortDate(true)}
           options={dateTypes}
           activeOptionId={sortDateType.id}
           style={[styles.btnTab, styles.lastBtnTab]}
@@ -324,5 +280,8 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 6,
     width: '100%',
+  },
+  menuDocType: {
+    marginRight: 6,
   },
 });

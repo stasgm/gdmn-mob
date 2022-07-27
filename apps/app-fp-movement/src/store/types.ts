@@ -47,8 +47,8 @@ export interface IContact extends INamedEntity, IReferenceData {
 export interface IMoveHead extends IHead {
   fromDepart: ICodeEntity;
   toDepart: ICodeEntity; //Подразделение
+  subtype: INamedEntity; //Подтип документа
   comment?: string; // Комvентарий
-  subtype: INamedEntity;
 }
 
 export interface IMoveLine extends IEntity {

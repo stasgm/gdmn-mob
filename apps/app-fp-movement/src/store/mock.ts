@@ -59,6 +59,22 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             },
           ],
         },
+        documentSubtype: {
+          id: '187037521',
+          name: 'documentSubtype',
+          visible: true,
+          description: 'Типы перемещений',
+          data: [
+            {
+              id: 'internalMovement',
+              name: 'Внутренне перемещение',
+            },
+            {
+              id: 'movement',
+              name: 'Цех-перемещение',
+            },
+          ],
+        },
         good: {
           id: '187037523',
           name: 'good',

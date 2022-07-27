@@ -22,8 +22,6 @@ import { sleep } from '@lib/client-api';
 
 import { generateId, getDateString, round } from '@lib/mobile-app';
 
-import { IDocument } from '@lib/types';
-
 import { ISellbillDocument, ISellbillLine, ITempLine } from '../../store/types';
 
 import { SellbillStackParamList } from '../../navigation/Root/types';
@@ -53,7 +51,7 @@ const SellbillViewScreen = () => {
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
 
-  const [del, setDel] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
   const sellBillLines = useMemo(
@@ -64,33 +62,12 @@ const SellbillViewScreen = () => {
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === sellbill?.head?.orderId);
   const tempOrderLines = tempOrder?.lines as ITempLine[];
 
-  const colorStyle = useMemo(() => colors.primary, [colors.primary]);
-
   const isBlocked = sellbill?.status !== 'DRAFT';
 
   const sellbillLineSum = sellbill?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
   const tempLineSum = tempOrder?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
 
   const handleEditSellbillHead = useCallback(() => navigation.navigate('SellbillEdit', { id }), [navigation, id]);
-
-  const handleCopySellbill = useCallback(() => {
-    const newDocDate = new Date().toISOString();
-    const newId = generateId();
-
-    const newDoc: IDocument = {
-      ...sellbill,
-      id: newId,
-      number: 'б\\н',
-      status: 'DRAFT',
-      documentDate: newDocDate,
-      creationDate: newDocDate,
-      editionDate: newDocDate,
-    };
-
-    docDispatch(documentActions.addDocument(newDoc));
-
-    navigation.navigate('TempView', { id: newId });
-  }, [sellbill, docDispatch, navigation]);
 
   const handleDeleteSellbill = useCallback(async () => {
     if (!id) {
@@ -104,7 +81,7 @@ const SellbillViewScreen = () => {
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
             fpDispatch(fpMovementActions.removeTempOrder(sellbill?.head.orderId));
-            setDel(true);
+            setDeleting(true);
             await sleep(500);
             navigation.goBack();
           }
@@ -133,11 +110,7 @@ const SellbillViewScreen = () => {
         onPress: handleEditSellbillHead,
       },
       {
-        title: 'Копировать заявку',
-        onPress: handleCopySellbill,
-      },
-      {
-        title: 'Удалить заявку',
+        title: 'Удалить документ',
         type: 'destructive',
         onPress: handleDeleteSellbill,
       },
@@ -146,7 +119,7 @@ const SellbillViewScreen = () => {
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditSellbillHead, handleCopySellbill, handleDeleteSellbill]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditSellbillHead, handleDeleteSellbill]);
 
   const renderRight = useCallback(
     () => !isBlocked && <MenuButton actionsMenu={actionsMenu} />,
@@ -315,12 +288,12 @@ const SellbillViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (del) {
+  if (deleting) {
     return (
       <View style={styles.container}>
-        <View style={localStyles.del}>
+        <View style={localStyles.deleting}>
           <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colorStyle} />
+          <ActivityIndicator size="small" color={colors.primary} />
         </View>
       </View>
     );
@@ -393,7 +366,7 @@ const SellbillViewScreen = () => {
 export default SellbillViewScreen;
 
 const localStyles = StyleSheet.create({
-  del: {
+  deleting: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

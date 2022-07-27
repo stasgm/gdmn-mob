@@ -1,5 +1,5 @@
 // import React, { useCallback, useLayoutEffect, useState } from 'react';
-// import { Text } from 'react-native';
+// import { Text, View } from 'react-native';
 
 // import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
@@ -19,6 +19,8 @@
 
 // import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
+// import styles from './components/ScanBarcode/styles';
+
 // const ScanGoodScreen = () => {
 //   const docId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.docId;
 //   const tempId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.tempId;
@@ -30,6 +32,8 @@
 //   const [visibleDialog, setVisibleDialog] = useState(false);
 //   const [barcode, setBarcode] = useState('');
 //   const [errorMessage, setErrorMessage] = useState('');
+
+//   const [scannedObject, setScannedObject] = useState<ISellbillLine>();
 
 //   useLayoutEffect(() => {
 //     navigation.setOptions({
@@ -55,6 +59,7 @@
 
 //   const getScannedObject = useCallback(
 //     (brc: string): ISellbillLine | undefined => {
+//       setErrorMessage('');
 //       const barc = getBarcode(brc);
 
 //       const good = goods.find((item) => item.shcode === barc.shcode);
@@ -62,10 +67,11 @@
 //       //   если выбор из остатков, то undefined,
 //       //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
 //       if (!good) {
+//         setErrorMessage('Товар не найден');
 //         return;
 //       }
 
-//       return {
+//       setScannedObject({
 //         good: { id: good.id, name: good.name, shcode: good.shcode },
 //         id: generateId(),
 //         weight: barc.weight,
@@ -73,10 +79,13 @@
 //         workDate: barc.workDate,
 //         numReceived: barc.numReceived,
 //         quantPack: barc.quantPack,
-//       };
-//     },
+//       });
 
-//     [goods],
+//       if (visibleDialog) {
+//         setVisibleDialog(false);
+//       }
+//     },
+//     [goods, visibleDialog],
 //   );
 
 //   const handleGetBarcode = useCallback(
@@ -126,6 +135,18 @@
 //     setErrorMessage('');
 //   };
 
+//   const ScanItem = useCallback(
+//     () => (
+//       <View style={styles.itemInfo}>
+//         <Text style={styles.barcode}>{scannedObject?.barcode}</Text>
+//         <Text style={[styles.itemName]} numberOfLines={3}>
+//           {scannedObject?.good.name}
+//         </Text>
+//       </View>
+//     ),
+//     [scannedObject?.barcode, scannedObject?.good.name],
+//   );
+
 //   const isFocused = useIsFocused();
 //   if (!isFocused) {
 //     return <AppActivityIndicator />;
@@ -139,16 +160,24 @@
 //     <>
 //       {isScanerReader ? (
 //         <ScanBarcodeReader
-//           // onSave={(item) => handleSaveScannedItem(item)}
-//           onSearchBarcode={handleShowDialog}
+//           onSave={(item) => handleSaveScannedItem(item)}
+//           onShowSearchDialog={handleShowDialog}
 //           getScannedObject={getScannedObject}
-//         />
+//           scannedObject={scannedObject}
+//           errorMessage={!visibleDialog ? errorMessage : ''}
+//         >
+//           <ScanItem />
+//         </ScanBarcodeReader>
 //       ) : (
 //         <ScanBarcode
-//           // onSave={(item) => handleSaveScannedItem(item)}
-//           onSearchBarcode={handleShowDialog}
+//           onSave={(item) => handleSaveScannedItem(item)}
+//           onShowSearchDialog={handleShowDialog}
 //           getScannedObject={getScannedObject}
-//         />
+//           scannedObject={scannedObject}
+//           errorMessage={!visibleDialog ? errorMessage : ''}
+//         >
+//           <ScanItem />
+//         </ScanBarcode>
 //       )}
 //       <AppDialog
 //         visible={visibleDialog}

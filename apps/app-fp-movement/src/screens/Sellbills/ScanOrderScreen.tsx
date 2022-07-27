@@ -57,6 +57,8 @@ const ScanOrderScreen = () => {
 
   const tempOrders = useFpSelector((state) => state.fpMovement.list);
 
+  const [scannedObject, setScannedObject] = useState<IOrderDocument>();
+
   const handleSaveScannedItem = useCallback(
     (item: IOrderDocument) => {
       const shipment = shipments.find((i) => i.head.orderId === item.id);
@@ -159,8 +161,6 @@ const ScanOrderScreen = () => {
     setScannedObject(undefined);
     setErrorMessage('');
   };
-
-  const [scannedObject, setScannedObject] = useState<IOrderDocument>();
 
   const ScanItem = useCallback(
     () => (
