@@ -50,6 +50,12 @@ const ScanBarcode = ({
   }, [vibroMode]);
 
   useEffect(() => {
+    if (scanned) {
+      vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
+    }
+  }, [scanned, vibroMode]);
+
+  useEffect(() => {
     if (scannedObject || errorMessage) {
       setScanned(true);
     }

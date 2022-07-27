@@ -60,7 +60,7 @@ const SellbillEditScreen = () => {
         appActions.setFormParams({
           documentDate: sellbill.documentDate,
           status: sellbill.status,
-          depart: sellbill.head.depart,
+          depart: sellbill.head?.depart,
         }),
       );
     } else {

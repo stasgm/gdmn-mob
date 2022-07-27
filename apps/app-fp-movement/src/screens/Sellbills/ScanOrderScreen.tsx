@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 
-import { useNavigation, useIsFocused, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useIsFocused, useRoute, RouteProp, StackActions } from '@react-navigation/native';
 
 import { useSelector, refSelectors, docSelectors, documentActions, useDispatch } from '@lib/store';
 
@@ -62,9 +62,11 @@ const ScanOrderScreen = () => {
       const shipment = shipments.find((i) => i.head.orderId === item.id);
 
       if (shipment) {
-        navigation.navigate('SellbillView', {
-          id: shipment.id,
-        });
+        navigation.dispatch(
+          StackActions.replace('SellbillView', {
+            id: shipment.id,
+          }),
+        );
         return;
       }
 
@@ -100,9 +102,11 @@ const ScanOrderScreen = () => {
 
       dispatch(documentActions.addDocument(sellbillDoc));
 
-      navigation.navigate('SellbillView', {
-        id: sellbillDoc.id,
-      });
+      navigation.dispatch(
+        StackActions.replace('SellbillView', {
+          id: sellbillDoc.id,
+        }),
+      );
     },
     [shipments, tempOrders, dispatch, shipmentType, depart, navigation],
   );
@@ -123,9 +127,11 @@ const ScanOrderScreen = () => {
         const shipment = shipments.find((i) => i.head.orderId === order.id);
 
         if (shipment) {
-          navigation.navigate('SellbillView', {
-            id: shipment.id,
-          });
+          navigation.dispatch(
+            StackActions.replace('SellbillView', {
+              id: shipment.id,
+            }),
+          );
         } else {
           setScannedObject(order);
         }
@@ -159,7 +165,6 @@ const ScanOrderScreen = () => {
   const ScanItem = useCallback(
     () => (
       <View style={styles.itemInfo}>
-        {/* <Text style={[styles.text]}>{isShipment ? 'Перейти к отвесу' : 'Cоздать отвес'}</Text> */}
         <Text style={styles.barcode}>{scannedObject?.head.barcode}</Text>
         <Text style={[styles.itemName]} numberOfLines={3}>
           {scannedObject?.head.outlet.name}

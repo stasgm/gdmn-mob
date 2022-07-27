@@ -61,7 +61,7 @@ const SellbillViewScreen = () => {
     [sellbill?.lines],
   );
 
-  const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === sellbill.head.orderId);
+  const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === sellbill?.head?.orderId);
   const tempOrderLines = tempOrder?.lines as ITempLine[];
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
@@ -70,8 +70,6 @@ const SellbillViewScreen = () => {
 
   const sellbillLineSum = sellbill?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
   const tempLineSum = tempOrder?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
-
-  // const goods = refSelectors.selectByName<IGood>('good').data;
 
   const handleEditSellbillHead = useCallback(() => navigation.navigate('SellbillEdit', { id }), [navigation, id]);
 
@@ -105,7 +103,7 @@ const SellbillViewScreen = () => {
         onPress: async () => {
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            fpDispatch(fpMovementActions.removeTempOrder(sellbill.head.orderId));
+            fpDispatch(fpMovementActions.removeTempOrder(sellbill?.head.orderId));
             setDel(true);
             await sleep(500);
             navigation.goBack();
@@ -116,13 +114,13 @@ const SellbillViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, fpDispatch, id, navigation, sellbill.head.orderId]);
+  }, [docDispatch, fpDispatch, id, navigation, sellbill?.head.orderId]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    if (sellbill?.lines?.length) {
+    if (sellbill?.lines.length) {
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: sellbill.lines[sellbill.lines.length - 1].id }));
     }
-  }, [dispatch, id, sellbill.lines]);
+  }, [dispatch, id, sellbill?.lines]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -253,7 +251,7 @@ const SellbillViewScreen = () => {
       setScanned(false);
     },
 
-    [goods, sellbill.lines, tempOrderLines, tempOrder, dispatch, id, fpDispatch],
+    [goods, sellbill?.lines, tempOrderLines, tempOrder, dispatch, id, fpDispatch],
   );
 
   //Для отрисовки при каждом новом сканировании

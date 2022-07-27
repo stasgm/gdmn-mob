@@ -1,8 +1,6 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
 import { Alert, ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
-
-import { Searchbar } from 'react-native-paper';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
@@ -18,7 +16,6 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
-  SearchButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -38,77 +35,47 @@ export interface SellbillListSectionProps {
   title: string;
 }
 
+export interface IDelList {
+  [id: string]: any;
+}
+
 export type SectionDataProps = SectionListData<IListItemProps, SellbillListSectionProps>[];
 
 export const SellbillListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillList'>>();
   const dispatch = useDispatch();
 
-  const { colors } = useTheme();
-
   const docs = useSelector((state) => state.documents.list) as ISellbillDocument[];
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterVisible, setFilterVisible] = useState(false);
-
   const list = docs?.filter((i) => i.documentType?.name === 'shipment' || i.documentType.name === 'currShipment');
-  //     ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
-  //       ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  //         i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  //         i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  //         getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-  //       : true
-  //     : false,
 
-  // .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+  const [sortDateType, setSortDateType] = useState(dateTypes[0]);
 
-  const [dateType, setDateType] = useState(dateTypes[0]);
-
-  const [status, setStatus] = useState<Status>('all');
+  const [filterStatus, setFilterStatus] = useState<Status>('all');
 
   const documentTypes: IListItem[] = refSelectors
     .selectByName<IDocumentType>('documentType')
-    ?.data?.filter((i) => i.subtype === 'sellbill' && i.name !== 'freeShipment')
+    ?.data?.filter((i) => i.subtype === 'shipment' && i.name !== 'freeShipment')
     .map((i) => ({ id: i.name, value: i.description || '' }));
 
-  // const typesRef: IDocumentType[] = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
+  const filterDocTypes = useMemo(() => docDepartTypes.concat(documentTypes), [documentTypes]);
 
-  // const typeList: IListItem[] = typesRef
-  //   .filter((i) => i.subtype === 'sellbill' && i.name !== 'freeShipment')
-  //   .map((i) => ({ id: i.name, value: i.description || '' }));
-
-  const docTypes: IListItem[] = useMemo(
-    () =>
-      documentTypes
-        ? docDepartTypes.concat(
-            documentTypes?.map(
-              (i) =>
-                ({
-                  id: i.id,
-                  value: i.value || '',
-                } as IListItem),
-            ),
-          )
-        : docDepartTypes,
-    [documentTypes],
-  );
-
-  const [type, setType] = useState(docTypes[0]);
+  const [filterDocType, setFilterDocType] = useState(filterDocTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     const res =
-      status === 'all'
+      filterStatus === 'all'
         ? list
-        : status === 'active'
+        : filterStatus === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
-        : status !== 'archive' && status !== 'all'
-        ? list.filter((e) => e.status === status)
+        : filterStatus !== 'archive' && filterStatus !== 'all'
+        ? list.filter((e) => e.status === filterStatus)
         : [];
 
-    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === type?.id);
+    const newRes = filterDocType?.id === 'all' ? res : res?.filter((i) => i?.documentType.name === filterDocType?.id);
 
     newRes.sort((a, b) =>
-      dateType.id === 'new'
+      sortDateType.id === 'new'
         ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
         : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
     );
@@ -125,7 +92,7 @@ export const SellbillListScreen = () => {
           errorMessage: i.errorMessage,
         } as IListItemProps),
     );
-  }, [status, list, type?.id, dateType.id]);
+  }, [filterStatus, list, filterDocType?.id, sortDateType.id]);
 
   const sections = useMemo(
     () =>
@@ -155,17 +122,17 @@ export const SellbillListScreen = () => {
 
   const handleApplyType = useCallback((option) => {
     setVisibleType(false);
-    setType(option);
+    setFilterDocType(option);
   }, []);
 
   const handleApplyStatus = useCallback((option) => {
     setVisibleStatus(false);
-    setStatus(option.id);
+    setFilterStatus(option.id);
   }, []);
 
   const handleApplyDate = useCallback((option) => {
     setVisibleDate(false);
-    setDateType(option);
+    setSortDateType(option);
   }, []);
 
   const [delList, setDelList] = useState({});
@@ -173,14 +140,11 @@ export const SellbillListScreen = () => {
   const handleAddDeletelList = useCallback(
     (lineId: string, lineStatus: string, checkedId: string) => {
       if (checkedId) {
-        const newList = Object.entries(delList).reduce((sum, cur) => {
-          const curId = cur[0];
-          const curStatus = cur[1];
+        const newList = Object.entries(delList).reduce((prev: IDelList, [curId, curStatus]) => {
           if (curId !== checkedId) {
-            return { ...sum, [curId]: curStatus };
-          } else {
-            return { ...sum };
+            prev[curId] = curStatus;
           }
+          return prev;
         }, {});
         setDelList(newList);
       } else {
@@ -225,7 +189,6 @@ export const SellbillListScreen = () => {
 
   const handleAddDocument = useCallback(
     (item: IListItem) => {
-      console.log('handleAddDocument', item);
       setVisible(false);
       navigation.navigate('ScanOrder', { id: item.id });
     },
@@ -234,35 +197,26 @@ export const SellbillListScreen = () => {
 
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    if (!filterVisible && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [filterVisible, searchQuery]);
-
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
         {delList && Object.values(delList).length > 0 ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
-          <>
-            <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
-            <Menu
-              key={'MenuType'}
-              visible={visible}
-              onChange={handleAddDocument}
-              onDismiss={() => setVisible(false)}
-              onPress={() => setVisible(true)}
-              options={documentTypes}
-              iconName={'plus'}
-              iconSize={30}
-            />
-          </>
+          <Menu
+            key={'MenuType'}
+            visible={visible}
+            onChange={handleAddDocument}
+            onDismiss={() => setVisible(false)}
+            onPress={() => setVisible(true)}
+            options={documentTypes}
+            iconName={'plus'}
+            iconSize={30}
+          />
         )}
       </View>
     ),
-    [delList, documentTypes, filterVisible, handleAddDocument, handleDeleteDocs, visible],
+    [delList, documentTypes, handleAddDocument, handleDeleteDocs, visible],
   );
 
   const renderLeft = useCallback(
@@ -281,7 +235,7 @@ export const SellbillListScreen = () => {
     });
   }, [delList, navigation, renderLeft, renderRight]);
 
-  const handlePressSellbill = useCallback((id: string) => navigation.navigate('SellbillView', { id }), [navigation]);
+  const handlePressSellbill = (id: string) => navigation.navigate('SellbillView', { id });
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
@@ -317,11 +271,11 @@ export const SellbillListScreen = () => {
           onChange={handleApplyType}
           onDismiss={() => setVisibleType(false)}
           onPress={() => setVisibleType(true)}
-          options={docTypes}
-          activeOptionId={type.id}
+          options={filterDocTypes}
+          activeOptionId={filterDocType?.id}
           style={[styles.btnTab, styles.firstBtnTab]}
           menuStyle={localStyles.menu}
-          isActive={type.id !== 'all'}
+          isActive={filterDocType?.id !== 'all'}
           iconName={'chevron-down'}
         />
         <Menu
@@ -332,10 +286,10 @@ export const SellbillListScreen = () => {
           onDismiss={() => setVisibleStatus(false)}
           onPress={() => setVisibleStatus(true)}
           options={statusTypes}
-          activeOptionId={status}
+          activeOptionId={filterStatus}
           style={[styles.btnTab]}
           menuStyle={localStyles.menu}
-          isActive={status !== 'all'}
+          isActive={filterStatus !== 'all'}
           iconName={'chevron-down'}
         />
         <Menu
@@ -346,36 +300,19 @@ export const SellbillListScreen = () => {
           onDismiss={() => setVisibleDate(false)}
           onPress={() => setVisibleDate(true)}
           options={dateTypes}
-          activeOptionId={dateType.id}
+          activeOptionId={sortDateType.id}
           style={[styles.btnTab, styles.lastBtnTab]}
           menuStyle={localStyles.menu}
-          isActive={dateType.id !== 'new'}
+          isActive={sortDateType.id !== 'new'}
           iconName={'chevron-down'}
         />
       </View>
-
-      {filterVisible && (
-        <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
-          <ItemSeparator />
-        </>
-      )}
       <SectionList
         sections={sections}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        // refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={EmptyList}
       />
     </AppScreen>
