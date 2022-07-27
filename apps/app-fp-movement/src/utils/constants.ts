@@ -43,7 +43,7 @@ export const statusTypes: IListItem[] = [
   },
 ];
 
-export const dataTypes: IListItem[] = [
+export const dateTypes: IListItem[] = [
   {
     id: 'new',
     value: 'Сначала новые',
