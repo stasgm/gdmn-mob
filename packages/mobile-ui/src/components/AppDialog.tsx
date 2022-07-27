@@ -30,6 +30,16 @@ const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, 
           value={text}
           onChangeText={(text) => onChangeText(text)}
           autoFocus
+          right={
+            !!text && (
+              <TextInput.Icon
+                name="close"
+                size={20}
+                style={{ marginTop: 14 }}
+                onPress={() => onChangeText && onChangeText('')}
+              />
+            )
+          }
         />
         {errorMessage ? <Text style={{ color: colors.notification }}>{errorMessage}</Text> : null}
       </Dialog.Content>
