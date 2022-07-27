@@ -47,7 +47,7 @@ export const FreeSellbillListScreen = () => {
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
-      (i) => i.documentType?.name === 'shipFree',
+      (i) => i.documentType?.name === 'freeShipment',
     ) as IFreeSellbillDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 

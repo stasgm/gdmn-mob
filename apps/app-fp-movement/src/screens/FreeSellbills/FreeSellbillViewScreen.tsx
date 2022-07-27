@@ -237,7 +237,6 @@ export const FreeSellbillViewScreen = () => {
 
       if (!good) {
         Alert.alert('Внимание!', 'Товар не найден!', [{ text: 'OK' }]);
-        console.log('barc', barc);
         setScanned(false);
         return;
       }

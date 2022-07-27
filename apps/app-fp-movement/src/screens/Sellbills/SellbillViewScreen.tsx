@@ -257,8 +257,6 @@ const SellbillViewScreen = () => {
         sortOrder: sellbill.lines.length + 1,
       };
 
-      console.log('newLine', newLine);
-
       if (tempLine && order) {
         const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight) };
         if (newLine.weight > 0) {

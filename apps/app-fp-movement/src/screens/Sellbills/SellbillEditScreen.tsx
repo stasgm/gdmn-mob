@@ -35,7 +35,7 @@ const SellbillEditScreen = () => {
 
   const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'otves');
+    ?.data.find((t) => t.name === 'shipment');
 
   const formParams = useSelector((state) => state.app.formParams as ISellbillFormParam);
 

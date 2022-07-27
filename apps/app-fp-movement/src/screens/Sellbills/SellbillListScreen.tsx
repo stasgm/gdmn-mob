@@ -55,7 +55,7 @@ export const SellbillListScreen = () => {
 
   const list = sellbills
     ?.filter(
-      (i) => i.documentType?.name === 'otves' || i.documentType.name === 'otvesCurr',
+      (i) => i.documentType?.name === 'shipment' || i.documentType.name === 'currShipment',
       //     ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
       //       ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
       //         i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
@@ -179,7 +179,7 @@ export const SellbillListScreen = () => {
   const typesRef: IDocumentType[] = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
 
   const typeList: IListItem[] = typesRef
-    .filter((i) => i.isShip && i.name !== 'shipFree')
+    .filter((i) => i.isShip && i.name !== 'freeShipment')
     .map((i) => ({ id: i.name, value: i.description || '' }));
 
   const [visible, setVisible] = useState(false);

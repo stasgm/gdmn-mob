@@ -39,7 +39,7 @@ export const MoveEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
 
-  const movements = useFilteredDocList<IMoveDocument>('move');
+  const movements = useFilteredDocList<IMoveDocument>('movement');
 
   const doc = movements?.find((e) => e.id === id);
 
@@ -47,10 +47,11 @@ export const MoveEditScreen = () => {
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'move');
+    ?.data.find((t) => t.name === 'movement');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {
+    documentSubtype: docDocumentSubtype,
     fromDepart: docFromDepart,
     toDepart: docToDepart,
     documentDate: docDate,
@@ -79,6 +80,7 @@ export const MoveEditScreen = () => {
           comment: doc.head.comment,
           fromDepart: doc.head.fromDepart,
           toDepart: doc.head.toDepart,
+          documentSubtype: doc.head.subtype,
         }),
       );
     } else {
@@ -88,12 +90,13 @@ export const MoveEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart: defaultDepart,
+          fromDepart: docDocumentSubtype?.id === 'movement' ? defaultDepart : undefined,
+          toDepart: docDocumentSubtype?.id === 'internalMovement' ? defaultDepart : undefined,
         }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, doc, defaultDepart]);
+  }, [dispatch, doc, defaultDepart, docDocumentSubtype]);
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -102,13 +105,25 @@ export const MoveEditScreen = () => {
         setScreenState('idle');
         return;
       }
-      if (!docFromDepart) {
+
+      if (!docDocumentSubtype) {
+        Alert.alert('Ошибка!', 'Не указан тип документа.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
+      }
+
+      if (
+        !(
+          (docDocumentSubtype?.id === 'movement' && docFromDepart) ||
+          (docDocumentSubtype?.id === 'internalMovement' && docToDepart)
+        )
+      ) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
       }
 
-      if (!(docNumber && docToDepart && docDate)) {
+      if (!(docNumber && docDate && docFromDepart && docToDepart)) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -128,6 +143,7 @@ export const MoveEditScreen = () => {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
             toDepart: docToDepart,
+            subtype: docDocumentSubtype,
           },
           lines: [],
           creationDate: createdDate,
@@ -158,6 +174,7 @@ export const MoveEditScreen = () => {
             comment: docComment && docComment.trim(),
             fromDepart: docFromDepart,
             toDepart: docToDepart,
+            subtype: docDocumentSubtype,
           },
           lines: doc.lines,
           creationDate: doc.creationDate || updatedDate,
@@ -173,6 +190,7 @@ export const MoveEditScreen = () => {
     doc,
     docComment,
     docDate,
+    docDocumentSubtype,
     docFromDepart,
     docNumber,
     docStatus,
@@ -217,6 +235,18 @@ export const MoveEditScreen = () => {
     }
 
     setShowDate(true);
+  };
+
+  const handlePresentSubtype = () => {
+    if (isBlocked) {
+      return;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'documentSubtype',
+      fieldName: 'documentSubtype',
+      value: docDocumentSubtype && [docDocumentSubtype],
+    });
   };
 
   const handleFromDepart = () => {
@@ -291,9 +321,26 @@ export const MoveEditScreen = () => {
             onPress={handlePresentDate}
             disabled={docStatus !== 'DRAFT'}
           />
-          <SelectableInput label={'Откуда'} value={docFromDepart?.name} onPress={handleFromDepart} disabled={true} />
+          <SelectableInput
+            label={'Тип'}
+            value={docDocumentSubtype?.name}
+            onPress={handlePresentSubtype}
+            disabled={id ? true : isBlocked}
+          />
 
-          <SelectableInput label={'Куда'} value={docToDepart?.name} onPress={handleToDepart} disabled={isBlocked} />
+          <SelectableInput
+            label={'Откуда'}
+            value={docFromDepart?.name}
+            onPress={handleFromDepart}
+            disabled={docDocumentSubtype?.id === 'movement' ? true : isBlocked}
+          />
+
+          <SelectableInput
+            label={'Куда'}
+            value={docToDepart?.name}
+            onPress={handleToDepart}
+            disabled={docDocumentSubtype?.id === 'internalMovement' ? true : isBlocked}
+          />
           <Input
             label="Комментарий"
             value={docComment}

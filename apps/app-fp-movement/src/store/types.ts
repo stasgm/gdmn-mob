@@ -13,6 +13,7 @@ export interface IMoveFormParam extends IFormParam {
   fromDepart?: ICodeEntity;
   toDepart?: ICodeEntity;
   comment?: string;
+  documentSubtype?: INamedEntity;
 }
 
 export interface ISellbillFormParam extends IFormParam {
@@ -45,6 +46,7 @@ export interface IMoveHead extends IHead {
   fromDepart: ICodeEntity;
   toDepart: ICodeEntity; //Подразделение
   comment?: string; // Комvентарий
+  subtype: INamedEntity;
 }
 
 export interface IMoveLine extends IEntity {
