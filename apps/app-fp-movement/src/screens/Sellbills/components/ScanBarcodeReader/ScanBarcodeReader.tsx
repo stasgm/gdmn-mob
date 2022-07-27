@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, ReactNode } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
-import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
+import { useFocusEffect, useTheme } from '@react-navigation/native';
 
 import { IOrderDocument } from '../../../../store/types';
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
@@ -22,10 +22,20 @@ import styles from './styles';
 interface IProps {
   onSave: (item: IOrderDocument) => void;
   onShowSearchDialog: () => void;
-  getScannedObject: (brc: string) => IOrderDocument | undefined;
+  getScannedObject: (brc: string) => void;
+  scannedObject: IOrderDocument | undefined;
+  errorMessage?: string;
+  children?: ReactNode;
 }
 
-export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject }: IProps) => {
+const ScanBarcodeReader = ({
+  onSave,
+  onShowSearchDialog,
+  getScannedObject,
+  scannedObject,
+  errorMessage,
+  children,
+}: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const [vibroMode, setVibroMode] = useState(false);
@@ -35,14 +45,23 @@ export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<IOrderDocument>();
-
-  const isFocused = useIsFocused();
 
   const handleBarCodeScanned = (data: string) => {
+    const brc = data.replace(']C1', '');
     setScanned(true);
-    setBarcode(data);
+    setBarcode(brc);
+    getScannedObject(brc);
   };
+
+  useEffect(() => {
+    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
+  }, [vibroMode]);
+
+  useEffect(() => {
+    if (scannedObject || errorMessage) {
+      setScanned(true);
+    }
+  }, [errorMessage, scannedObject]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -56,25 +75,7 @@ export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject
     }, [scanned, ref]),
   );
 
-  useEffect(() => {
-    if (!scanned) {
-      return;
-    }
-
-    if (!barcode && scanned) {
-      setItemLine(undefined);
-      return;
-    }
-
-    vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
-
-    const scannedObj: IOrderDocument | undefined = getScannedObject(barcode);
-    if (scannedObj !== undefined) {
-      setItemLine(scannedObj);
-    }
-  }, [barcode, scanned, vibroMode, getScannedObject]);
-
-  return isFocused ? (
+  return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
       <View style={styles.camera}>
         <View style={styles.header}>
@@ -90,7 +91,10 @@ export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={onShowSearchDialog}
+            onPress={() => {
+              setScanned(false);
+              onShowSearchDialog();
+            }}
           />
         </View>
         {!scanned ? (
@@ -112,14 +116,13 @@ export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject
                 style={[styles.buttons, styles.btnReScan]}
                 onPress={() => {
                   setScanned(false);
-                  setItemLine(undefined);
                 }}
               >
                 <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {scanned && !itemLine && (
+            {errorMessage ? (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
@@ -129,26 +132,21 @@ export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject
                   </View>
                 </View>
               </View>
-            )}
-            {scanned && itemLine && (
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity
-                  style={[styles.buttons, itemLine.id === 'unknown' ? styles.btnUnknown : styles.btnFind]}
-                  onPress={() => {
-                    onSave(itemLine);
-                    setScanned(false);
-                    setItemLine(undefined);
-                  }}
-                >
-                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                  <View style={styles.goodInfo}>
-                    <Text style={styles.goodName} numberOfLines={3}>
-                      {itemLine?.head.outlet.name}
-                    </Text>
-                    <Text style={styles.barcode}>{itemLine?.head.barcode}</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
+            ) : (
+              scannedObject && (
+                <View style={styles.buttonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.buttons, styles.btnFind]}
+                    onPress={() => {
+                      onSave(scannedObject);
+                      setScanned(false);
+                    }}
+                  >
+                    <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                    {children}
+                  </TouchableOpacity>
+                </View>
+              )
             )}
           </View>
         )}
@@ -160,7 +158,7 @@ export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject
         )}
       </View>
     </KeyboardAvoidingView>
-  ) : null;
+  );
 };
 
 export default ScanBarcodeReader;

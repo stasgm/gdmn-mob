@@ -156,12 +156,18 @@ const ScanOrderScreen = () => {
 
   const [scannedObject, setScannedObject] = useState<IOrderDocument>();
 
-  // useEffect(() => {
-  //   if (visibleDialog) {
-  //     setBarcode('');
-  //     setScannedObject(undefined);
-  //   }
-  // }, [visibleDialog]);
+  const ScanItem = useCallback(
+    () => (
+      <View style={styles.itemInfo}>
+        {/* <Text style={[styles.text]}>{isShipment ? 'Перейти к отвесу' : 'Cоздать отвес'}</Text> */}
+        <Text style={styles.barcode}>{scannedObject?.head.barcode}</Text>
+        <Text style={[styles.itemName]} numberOfLines={3}>
+          {scannedObject?.head.outlet.name}
+        </Text>
+      </View>
+    ),
+    [scannedObject?.head.barcode, scannedObject?.head.outlet.name],
+  );
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -185,7 +191,11 @@ const ScanOrderScreen = () => {
           onSave={(item) => handleSaveScannedItem(item)}
           onShowSearchDialog={handleShowDialog}
           getScannedObject={getScannedObject}
-        />
+          scannedObject={scannedObject}
+          errorMessage={!visibleDialog ? errorMessage : ''}
+        >
+          <ScanItem />
+        </ScanBarcodeReader>
       ) : (
         <ScanBarcode
           onSave={(item) => handleSaveScannedItem(item)}
@@ -194,13 +204,7 @@ const ScanOrderScreen = () => {
           scannedObject={scannedObject}
           errorMessage={!visibleDialog ? errorMessage : ''}
         >
-          <View style={styles.itemInfo}>
-            {/* <Text style={[styles.text]}>{isShipment ? 'Перейти к отвесу' : 'Cоздать отвес'}</Text> */}
-            <Text style={styles.barcode}>{scannedObject?.head.barcode}</Text>
-            <Text style={[styles.itemName]} numberOfLines={3}>
-              {scannedObject?.head.outlet.name}
-            </Text>
-          </View>
+          <ScanItem />
         </ScanBarcode>
       )}
       <AppDialog

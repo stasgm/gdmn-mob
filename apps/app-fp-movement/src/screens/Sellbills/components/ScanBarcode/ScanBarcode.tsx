@@ -118,7 +118,6 @@ const ScanBarcode = ({
                 style={[styles.buttons, styles.btnReScan]}
                 onPress={() => {
                   setScanned(false);
-                  // setItemLine(undefined);
                 }}
               >
                 <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
@@ -143,7 +142,6 @@ const ScanBarcode = ({
                     onPress={() => {
                       onSave(scannedObject);
                       setScanned(false);
-                      // setItemLine(undefined);
                     }}
                   >
                     <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
