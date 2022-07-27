@@ -52,8 +52,6 @@ export const MoveListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const [date, setDate] = useState(dataTypes[0]);
-
   const list = useSelector((state) => state.documents.list)?.filter(
     (i) => i.documentType?.name === 'movement',
   ) as IMoveDocument[];
@@ -72,6 +70,8 @@ export const MoveListScreen = () => {
   //   .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [delList, setDelList] = useState({});
+
+  const [date, setDate] = useState(dataTypes[0]);
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -101,8 +101,8 @@ export const MoveListScreen = () => {
         ? list
         : status === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        : status !== 'archive' && status !== 'all'
+        ? list.filter((e) => e.status === status)
         : [];
 
     const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
@@ -136,6 +136,7 @@ export const MoveListScreen = () => {
     );
   }, [status, list, type?.id, date.id]);
 
+  console.log('stat', status);
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
