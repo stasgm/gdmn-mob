@@ -1,14 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import {
-  Alert,
-  Text,
-  View,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  TouchableHighlight,
-  TextInput,
-} from 'react-native';
+import { Alert, View, FlatList, ActivityIndicator, StyleSheet, TouchableHighlight, TextInput } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,6 +13,9 @@ import {
   ItemSeparator,
   SubTitle,
   AppActivityIndicator,
+  MediumText,
+  LargeText,
+  BackButton,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -30,15 +24,11 @@ import { generateId, getDateString, round } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
-import { IListItem } from '@lib/mobile-types';
-
 import { ISellbillDocument, ISellbillLine, ITempLine } from '../../store/types';
 
 import { SellbillStackParamList } from '../../navigation/Root/types';
 
-import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
-
-import { navBackButton } from '../../components/navigateOptions';
+import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { IGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
@@ -50,17 +40,6 @@ import SellbillTotal from './components/SellbillTotal';
 import SellbillItem from './components/SellbillItem';
 import TempItem from './components/TempItem';
 
-const lineTypes: IListItem[] = [
-  {
-    id: 'order',
-    value: 'заявлено',
-  },
-  {
-    id: 'sellbill',
-    value: 'отвешено',
-  },
-];
-
 const keyExtractor = (item: ISellbillLine | ITempLine) => item.id;
 
 const SellbillViewScreen = () => {
@@ -71,41 +50,30 @@ const SellbillViewScreen = () => {
   const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillView'>>().params?.id;
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
-  const textStyle = useMemo(() => [styles.textLow, { color: colors.text }], [colors.text]);
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
 
   const [del, setDel] = useState(false);
 
   const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
+  const sellBillLines = useMemo(
+    () => sellbill?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
+    [sellbill?.lines],
+  );
 
-  const order = useFpSelector((state) => state.fpMovement.list).find((i) => i.id === sellbill.head.orderId);
-  const lines = order?.lines as ITempLine[];
+  const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === sellbill.head.orderId);
+  const tempOrderLines = tempOrder?.lines as ITempLine[];
 
   const colorStyle = useMemo(() => colors.primary, [colors.primary]);
 
-  const [list, setList] = useState<(ISellbillLine | ITempLine)[]>([]);
   const isBlocked = sellbill?.status !== 'DRAFT';
 
-  // const handleAddOrderLine = useCallback(() => {
-  //   navigation.navigate('SelectGroupItem', {
-  //     docId: id,
-  //   });
-  // }, [navigation, id]);
+  const sellbillLineSum = sellbill?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
+  const tempLineSum = tempOrder?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
 
-  useEffect(() => {
-    if (lineType === 'sellbill') {
-      setList(sellbill.lines);
-    } else if (lineType === 'order') {
-      setList(lines);
-    }
-  }, [lineType, lines, list, sellbill.lines]);
+  // const goods = refSelectors.selectByName<IGood>('good').data;
 
-  const lineSum = list?.reduce((sum: number, line: ISellbillLine | ITempLine) => sum + (line.weight || 0), 0);
-
-  const handleEditSellbillHead = useCallback(() => {
-    navigation.navigate('SellbillEdit', { id });
-  }, [navigation, id]);
+  const handleEditSellbillHead = useCallback(() => navigation.navigate('SellbillEdit', { id }), [navigation, id]);
 
   const handleCopySellbill = useCallback(() => {
     const newDocDate = new Date().toISOString();
@@ -126,7 +94,7 @@ const SellbillViewScreen = () => {
     navigation.navigate('TempView', { id: newId });
   }, [sellbill, docDispatch, navigation]);
 
-  const handleDelete = useCallback(async () => {
+  const handleDeleteSellbill = useCallback(async () => {
     if (!id) {
       return;
     }
@@ -137,6 +105,7 @@ const SellbillViewScreen = () => {
         onPress: async () => {
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            fpDispatch(fpMovementActions.removeTempOrder(sellbill.head.orderId));
             setDel(true);
             await sleep(500);
             navigation.goBack();
@@ -147,20 +116,16 @@ const SellbillViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, fpDispatch, id, navigation, sellbill.head.orderId]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = sellbill.lines?.[sellbill.lines.length - 1]?.id;
-
-    dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
+    if (sellbill?.lines?.length) {
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: sellbill.lines[sellbill.lines.length - 1].id }));
+    }
   }, [dispatch, id, sellbill.lines]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
-      // {
-      //   title: 'Добавить товар',
-      //   onPress: handleAddOrderLine,
-      // },
       {
         title: 'Отменить последнее сканирование',
         onPress: hanldeCancelLastScan,
@@ -176,42 +141,31 @@ const SellbillViewScreen = () => {
       {
         title: 'Удалить заявку',
         type: 'destructive',
-        onPress: handleDelete,
+        onPress: handleDeleteSellbill,
       },
       {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditSellbillHead, handleCopySellbill, handleDelete]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditSellbillHead, handleCopySellbill, handleDeleteSellbill]);
 
   const renderRight = useCallback(
-    () =>
-      !isBlocked && (
-        <View style={styles.buttons}>
-          {/* <AddButton onPress={handleAddOrderLine} /> */}
-          <MenuButton actionsMenu={actionsMenu} />
-        </View>
-      ),
+    () => !isBlocked && <MenuButton actionsMenu={actionsMenu} />,
     [actionsMenu, isBlocked],
+  );
+
+  const renderLeft = useCallback(
+    () => <BackButton onPress={() => navigation.navigate('SellbillList')} />,
+    [navigation],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: renderLeft,
       headerRight: renderRight,
     });
-  }, [navigation, renderRight]);
-
-  const renderItem = useCallback(
-    ({ item }: { item: ISellbillLine | ITempLine }) =>
-      lineType === 'sellbill' ? (
-        <SellbillItem docId={sellbill?.id} item={item} readonly={isBlocked} />
-      ) : (
-        <TempItem item={item} readonly={isBlocked} />
-      ),
-    [isBlocked, lineType, sellbill?.id],
-  );
+  }, [navigation, renderLeft, renderRight]);
 
   const [scanned, setScanned] = useState(false);
 
@@ -222,7 +176,7 @@ const SellbillViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повоторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
@@ -244,7 +198,7 @@ const SellbillViewScreen = () => {
         return;
       }
 
-      const tempLine = lines?.find((i) => good.id === i.good.id);
+      const tempLine = tempOrderLines?.find((i) => good.id === i.good.id);
 
       const newLine: ISellbillLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
@@ -257,26 +211,25 @@ const SellbillViewScreen = () => {
         sortOrder: sellbill.lines.length + 1,
       };
 
-      console.log('newLine', newLine);
-
-      if (tempLine && order) {
-        const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight) };
-        if (newLine.weight > 0) {
+      if (tempLine && tempOrder) {
+        const newTempLine = { ...tempLine, weight: round(tempLine.weight - newLine.weight, 3) };
+        if (newTempLine.weight > 0) {
           fpDispatch(
-            fpMovementActions.updateOrderLine({
-              docId: order?.id,
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
               line: newTempLine,
             }),
           );
-          setScanned(false);
-        } else if (newLine.weight === 0) {
-          fpDispatch(fpMovementActions.removeOrderLine({ docId: order?.id, lineId: tempLine.id }));
+          // setScanned(false);
+        } else if (newTempLine.weight === 0) {
+          fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
+          // setScanned(false);
         } else {
           Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
             {
               text: 'Да',
               onPress: async () => {
-                fpDispatch(fpMovementActions.removeOrderLine({ docId: order?.id, lineId: tempLine.id }));
+                fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
               },
             },
             {
@@ -285,7 +238,7 @@ const SellbillViewScreen = () => {
           ]);
         }
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-        setScanned(false);
+        // setScanned(false);
       } else {
         Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
           {
@@ -298,17 +251,16 @@ const SellbillViewScreen = () => {
             text: 'Отмена',
           },
         ]);
-        setScanned(false);
+        // setScanned(false);
       }
-
-      // dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
 
       setScanned(false);
     },
 
-    [goods, sellbill.lines, lines, order, dispatch, id, fpDispatch],
+    [goods, sellbill.lines, tempOrderLines, tempOrder, dispatch, id, fpDispatch],
   );
 
+  //Для отрисовки при каждом новом сканировании
   const [key, setKey] = useState(1);
 
   const setScan = (brc: string) => {
@@ -326,12 +278,43 @@ const SellbillViewScreen = () => {
         }, ONE_SECOND_IN_MS);
     }
   }, [scanned, ref]);
-  // const renderOrderItem = useCallback(
-  //   ({ item }: { item: ITempLine }) => <TempItem item={item} readonly={isBlocked} />,
-  //   [isBlocked],
-  // );
 
-  // const lineSum = sellbill.lines?.reduce((sum, line) => ({ weight: sum.weight + (line.weight || 0) }), { weight: 0 });
+  const LineTypes = useCallback(
+    () => (
+      <View style={styles.containerCenter}>
+        {lineTypes.map((e, i) => {
+          return (
+            <TouchableHighlight
+              activeOpacity={0.7}
+              underlayColor="#DDDDDD"
+              key={e.id}
+              style={[
+                styles.btnTab,
+                i === 0 && styles.firstBtnTab,
+                i === lineTypes.length - 1 && styles.lastBtnTab,
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
+              ]}
+              onPress={() => setLineType(e.id)}
+            >
+              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+            </TouchableHighlight>
+          );
+        })}
+      </View>
+    ),
+    [colors.background, colors.primary, colors.text, lineType],
+  );
+
+  const renderSellbillItem = useCallback(
+    ({ item }: { item: ISellbillLine }) => <SellbillItem docId={sellbill?.id} item={item} readonly={isBlocked} />,
+    [isBlocked, sellbill?.id],
+  );
+
+  const renderTempItem = useCallback(
+    ({ item }: { item: ISellbillLine | ITempLine }) => <TempItem item={item} readonly={isBlocked} />,
+    [isBlocked],
+  );
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -366,37 +349,17 @@ const SellbillViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(sellbill.status)}
       >
         <View style={localStyles.infoBlock}>
-          <Text style={textStyle}>{`№ ${sellbill.number} на ${getDateString(sellbill.head?.onDate)}`}</Text>
-          <View style={styles.rowCenter}>
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
-          </View>
+          <MediumText>{`№ ${sellbill.number} на ${getDateString(sellbill.head?.onDate)}`}</MediumText>
+          {isBlocked ? (
+            <View style={styles.rowCenter}>
+              <MaterialCommunityIcons name="lock-outline" size={20} />
+            </View>
+          ) : null}
         </View>
       </InfoBlock>
-      <View style={[styles.containerCenter]}>
-        {lineTypes.map((e, i) => {
-          return (
-            <TouchableHighlight
-              activeOpacity={0.7}
-              underlayColor="#DDDDDD"
-              key={e.id}
-              style={[
-                styles.btnTab,
-                i === 0 && styles.firstBtnTab,
-                i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
-              ]}
-              onPress={() => setLineType(e.id)}
-            >
-              <Text style={[{ color: e.id === lineType ? colors.background : colors.text }, { fontSize: 17 }]}>
-                {e.value}
-              </Text>
-            </TouchableHighlight>
-          );
-        })}
-      </View>
+      <LineTypes />
       <TextInput
-        style={{ width: 1, height: 1 }}
+        style={styles.scanInput}
         key={key}
         autoFocus={true}
         selectionColor="transparent"
@@ -404,17 +367,31 @@ const SellbillViewScreen = () => {
         showSoftInputOnFocus={false}
         onChangeText={(text) => !scanned && setScan(text)}
       />
-      <FlatList
-        // data={sellbill.lines}
-        data={list}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        scrollEventThrottle={400}
-        ItemSeparatorComponent={ItemSeparator}
-      />
-
-      {/* <Divider style={{ backgroundColor: colors.primary }} /> */}
-      <SellbillTotal quantity={lineSum} weight={list.length} />
+      {lineType === 'shipment' ? (
+        <>
+          <FlatList
+            key={lineType}
+            data={sellBillLines}
+            keyExtractor={keyExtractor}
+            renderItem={renderSellbillItem}
+            scrollEventThrottle={400}
+            ItemSeparatorComponent={ItemSeparator}
+          />
+          <SellbillTotal quantity={sellbillLineSum} weight={sellbill?.lines?.length} />
+        </>
+      ) : (
+        <>
+          <FlatList
+            key={lineType}
+            data={tempOrderLines}
+            keyExtractor={keyExtractor}
+            renderItem={renderTempItem}
+            scrollEventThrottle={400}
+            ItemSeparatorComponent={ItemSeparator}
+          />
+          <SellbillTotal quantity={tempLineSum} weight={tempOrder?.lines?.length || 0} />
+        </>
+      )}
     </View>
   );
 };

@@ -49,7 +49,7 @@ const Root = () => {
   const navItems: INavItem[] = useMemo(
     () => [
       {
-        name: 'Move',
+        name: 'Movement',
         title: 'Перемещение',
         icon: 'file-document-outline',
         component: MoveNavigator,

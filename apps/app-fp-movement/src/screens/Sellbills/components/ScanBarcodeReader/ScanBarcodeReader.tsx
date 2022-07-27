@@ -14,18 +14,18 @@ import { IconButton } from 'react-native-paper';
 
 import { useFocusEffect, useIsFocused, useTheme } from '@react-navigation/native';
 
-import { ISellbillDocument } from '../../../../store/types';
+import { IOrderDocument } from '../../../../store/types';
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
 
 import styles from './styles';
 
 interface IProps {
-  onSave: (item: ISellbillDocument) => void;
-  onShowRemains: () => void;
-  getScannedObject: (brc: string) => ISellbillDocument | undefined;
+  onSave: (item: IOrderDocument) => void;
+  onShowSearchDialog: () => void;
+  getScannedObject: (brc: string) => IOrderDocument | undefined;
 }
 
-export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
+export const ScanBarcodeReader = ({ onSave, onShowSearchDialog, getScannedObject }: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const [vibroMode, setVibroMode] = useState(false);
@@ -35,7 +35,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const [itemLine, setItemLine] = useState<ISellbillDocument>();
+  const [itemLine, setItemLine] = useState<IOrderDocument>();
 
   const isFocused = useIsFocused();
 
@@ -68,7 +68,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
 
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
 
-    const scannedObj: ISellbillDocument | undefined = getScannedObject(barcode);
+    const scannedObj: IOrderDocument | undefined = getScannedObject(barcode);
     if (scannedObj !== undefined) {
       setItemLine(scannedObj);
     }
@@ -90,7 +90,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={onShowRemains}
+            onPress={onShowSearchDialog}
           />
         </View>
         {!scanned ? (
@@ -160,9 +160,7 @@ export const ScanBarcodeReader = ({ onSave, onShowRemains, getScannedObject }: I
         )}
       </View>
     </KeyboardAvoidingView>
-  ) : (
-    <></>
-  );
+  ) : null;
 };
 
 export default ScanBarcodeReader;

@@ -33,10 +33,7 @@ const SellbillTotal = ({ weight, quantity, scan = false }: IItem) => {
             <View style={localStyles.quantity}>
               <MediumText>{`${round(quantity, 3)}` || 0}</MediumText>
             </View>
-
-            {/* <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(, 2))}`}</MediumText> */}
           </View>
-
           <View style={styles.directionRow}>
             <View style={localStyles.groupWidth}>
               <MediumText>Количество позиций</MediumText>
@@ -44,13 +41,10 @@ const SellbillTotal = ({ weight, quantity, scan = false }: IItem) => {
             <View style={localStyles.quantity}>
               <MediumText>{weight || 0}</MediumText>
             </View>
-
-            {/* <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(, 2))}`}</MediumText> */}
           </View>
         </View>
       </View>
     </View>
-    // </View>
   );
 };
 

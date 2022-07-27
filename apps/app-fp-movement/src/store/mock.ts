@@ -30,24 +30,37 @@ export const messageFpMovement: IMessage<MessageType>[] = [
           description: 'Типы документов',
           data: [
             {
-              id: '187034695',
-              name: 'move',
-              description: 'Внутреннее перемещение',
-            },
-            {
               id: '187034696',
               name: 'order',
               description: 'Заявка',
             },
             {
-              id: '187891695',
-              name: 'temp',
-              description: 'Отвес',
+              id: '187034697',
+              name: 'movement',
+              description: 'Перемещение',
             },
             {
-              id: '188521695',
-              name: 'otves',
-              description: 'Внешний документ (отвес)',
+              id: '187034698',
+              name: 'internalMovement',
+              description: 'Внутреннее перемещение',
+            },
+            {
+              id: '187034699',
+              name: 'shipment',
+              description: 'Реализация ГП',
+              isShip: true,
+            },
+            {
+              id: '1878916910',
+              name: 'currShipment',
+              description: 'Реализация ГП (валюта)',
+              isShip: true,
+            },
+            {
+              id: '1870346911',
+              name: 'freeShipment',
+              description: 'Отвес',
+              isShip: true,
             },
           ],
         },
@@ -624,6 +637,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '357852117',
               name: 'Магазин-склад',
             },
+            barcode: '260720220032471108',
           },
           lines: [
             {

@@ -39,7 +39,7 @@ export const FreeSellbillEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IFreeSellbillFormParam);
 
-  const sellbills = useFilteredDocList<IFreeSellbillDocument>('shipFree');
+  const sellbills = useFilteredDocList<IFreeSellbillDocument>('freeShipment');
 
   const doc = sellbills?.find((e) => e.id === id);
 
@@ -47,7 +47,7 @@ export const FreeSellbillEditScreen = () => {
 
   const sellbillType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'shipFree');
+    ?.data.find((t) => t.name === 'freeShipment');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {

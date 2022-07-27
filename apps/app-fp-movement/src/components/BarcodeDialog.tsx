@@ -10,7 +10,7 @@ interface IProps {
   onChangeBarcode: (text: string) => void;
   onSearch: () => void;
   onDismiss: () => void;
-  error: boolean;
+  errorMessage: string;
 }
 
 const BarcodeDialog = ({
@@ -20,11 +20,10 @@ const BarcodeDialog = ({
   onChangeBarcode,
   onSearch,
   onDismiss,
-  error,
+  errorMessage,
 }: IProps) => {
   const { colors } = useTheme();
   return (
-    // <View>
     <Dialog visible={visibleDialog} onDismiss={onDismissDialog}>
       <Dialog.Title>Введите штрих-код</Dialog.Title>
       <Dialog.Content>
@@ -34,20 +33,17 @@ const BarcodeDialog = ({
               primary: colors.primary,
               text: colors.text,
               placeholder: colors.primary,
-              // background: colors.surface,
             },
           }}
           value={barcode}
           onChangeText={(text) => onChangeBarcode(text)}
         />
-        {/* <Input value={barcode} onChangeText={(text) => onChangeBarcode(text)} /> */}
       </Dialog.Content>
-      {error ? (
+      {errorMessage ? (
         <Dialog.Content>
-          <Text>Штрих-код не добавлен</Text>
+          <Text>{errorMessage}</Text>
         </Dialog.Content>
       ) : null}
-
       <Dialog.Actions style={{ borderColor: colors.primary }}>
         <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={onDismiss}>
           Отмена

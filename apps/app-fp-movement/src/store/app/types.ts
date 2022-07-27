@@ -5,7 +5,7 @@ export interface ICodeEntity extends INamedEntity {
 }
 
 export type FpMovementState = {
-  readonly list: IOrder[];
+  readonly list: ITempDocument[];
   readonly loading: boolean;
   readonly loadingData: boolean;
   readonly errorMessage: string;
@@ -35,6 +35,13 @@ export interface IBarcode {
   quantPack: number;
 }
 
-export interface IOrder<K extends IEntity = IEntity> extends IEntity {
-  lines?: K[];
+export interface ITempDocument extends IEntity {
+  orderId: string;
+  lines?: ITempLine[];
+}
+
+export interface ITempLine extends IEntity {
+  good: IGood; // товар
+  weight: number; //вес
+  packagekey?: INamedEntity; // Вид упаковки
 }

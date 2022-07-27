@@ -51,11 +51,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingBottom: 10,
   },
-  goodInfo: {
+  itemInfo: {
     flexShrink: 1,
     paddingRight: 10,
   },
-  goodName: {
+  itemName: {
     color: '#fff',
     fontSize: 18,
     textTransform: 'uppercase',

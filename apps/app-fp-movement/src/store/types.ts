@@ -6,6 +6,8 @@ import { IFormParam } from '@lib/store';
 
 import { ICodeEntity, IGood } from './app/types';
 
+export { ITempLine, ITempDocument } from './app/types';
+
 export interface IMoveFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
@@ -73,22 +75,22 @@ export interface IOrderLine extends IEntity {
 
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
 
-export interface ITempHead extends IHead {
-  contact: ICodeEntity; //организация-плательщик
-  outlet: ICodeEntity; // магазин –подразделение организации плательщика
-  depart: ICodeEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
-  onDate: string; // Дата отгрузки
-  barcode: string; // штрих-код заявки, по которой создан
-  orderId: string;
-}
+// export interface ITempHead extends IHead {
+//   contact: ICodeEntity; //организация-плательщик
+//   outlet: ICodeEntity; // магазин –подразделение организации плательщика
+//   depart: ICodeEntity; // подразделение сотрудника (кладовщик, работающий с терминалом)
+//   onDate: string; // Дата отгрузки
+//   barcode: string; // штрих-код заявки, по которой создан
+//   orderId: string;
+// }
 
-export interface ITempLine extends IEntity {
-  good: IGood; // товар
-  weight: number; //вес
-  packagekey?: INamedEntity; // Вид упаковки
-}
+// export interface ITempLine extends IEntity {
+//   good: IGood; // товар
+//   weight: number; //вес
+//   packagekey?: INamedEntity; // Вид упаковки
+// }
 
-export type ITempDocument = MandateProps<IDocument<ITempHead, ITempLine>, 'head' | 'lines'>;
+// export type ITempDocument = MandateProps<IDocument<ITempHead, ITempLine>, 'head' | 'lines'>;
 
 export interface ISellbillHead extends IHead {
   contact: ICodeEntity; //организация-плательщик

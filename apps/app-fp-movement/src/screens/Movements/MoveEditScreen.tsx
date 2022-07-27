@@ -39,7 +39,7 @@ export const MoveEditScreen = () => {
 
   const formParams = useSelector((state) => state.app.formParams as IMoveFormParam);
 
-  const movements = useFilteredDocList<IMoveDocument>('move');
+  const movements = useFilteredDocList<IMoveDocument>('movement');
 
   const doc = movements?.find((e) => e.id === id);
 
@@ -47,7 +47,7 @@ export const MoveEditScreen = () => {
 
   const movementType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
-    ?.data.find((t) => t.name === 'move');
+    ?.data.find((t) => t.name === 'movement');
 
   //Вытягиваем свойства formParams и переопределяем их названия для удобства
   const {

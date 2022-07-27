@@ -34,8 +34,6 @@ import { ISellbillDocument } from '../../store/types';
 import { SellbillStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
-// import { getBarcode } from '../../utils/helpers';
-
 export interface SellbillListSectionProps {
   title: string;
 }
@@ -48,35 +46,34 @@ export const SellbillListScreen = () => {
 
   const { colors } = useTheme();
 
-  const sellbills = useSelector((state) => state.documents.list) as ISellbillDocument[];
+  const docs = useSelector((state) => state.documents.list) as ISellbillDocument[];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const list = sellbills
-    ?.filter(
-      (i) => i.documentType?.name === 'otves' || i.documentType.name === 'otvesCurr',
-      //     ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
-      //       ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-      //         i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-      //         i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-      //         getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-      //       : true
-      //     : false,
-    )
-    .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+  const list = docs?.filter(
+    (i) => i.documentType?.name === 'shipment' || i.documentType.name === 'currShipment',
+    //     ? i?.head?.contact.name || i?.head?.outlet.name || i.number || i.documentDate
+    //       ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //         i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //         i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+    //         getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
+    //       : true
+    //     : false,
+  );
 
   const [status, setStatus] = useState<Status>('all');
 
   const filteredList: IListItemProps[] = useMemo(() => {
-    const res =
+    const res = (
       status === 'all'
         ? list
         : status === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
         : status === 'archive'
         ? list.filter((e) => e.status === 'PROCESSED')
-        : [];
+        : []
+    ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
     return res.map(
       (i) =>
@@ -170,8 +167,9 @@ export const SellbillListScreen = () => {
 
   const handleAddDocument = useCallback(
     (item: IListItem) => {
-      navigation.navigate('ScanOrder', { id: item.id });
+      console.log('handleAddDocument', item);
       setVisible(false);
+      navigation.navigate('ScanOrder', { id: item.id });
     },
     [navigation],
   );
@@ -179,7 +177,7 @@ export const SellbillListScreen = () => {
   const typesRef: IDocumentType[] = refSelectors.selectByName<IReference<IDocumentType>>('documentType')?.data;
 
   const typeList: IListItem[] = typesRef
-    .filter((i) => i.isShip && i.name !== 'shipFree')
+    .filter((i) => i.isShip && i.name !== 'freeShipment')
     .map((i) => ({ id: i.name, value: i.description || '' }));
 
   const [visible, setVisible] = useState(false);

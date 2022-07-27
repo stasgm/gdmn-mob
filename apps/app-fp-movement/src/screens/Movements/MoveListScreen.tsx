@@ -48,7 +48,7 @@ export const MoveListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
 
   const list = (
-    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'move') as IMoveDocument[]
+    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'movement') as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   // const list = movements

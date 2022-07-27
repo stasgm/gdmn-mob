@@ -110,3 +110,14 @@ export const tempType = {
   name: 'temp',
   description: 'Отвес',
 };
+
+export const lineTypes: IListItem[] = [
+  {
+    id: 'order',
+    value: 'заявлено',
+  },
+  {
+    id: 'shipment',
+    value: 'отвешено',
+  },
+];

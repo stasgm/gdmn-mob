@@ -61,7 +61,7 @@ const TempViewScreen = () => {
   const order = docSelectors.selectByDocId<ITempDocument>(id);
 
   const otvesId =
-    docSelectors.selectByDocType<IOtvesDocument>('otves').find((item) => item.head?.barcode === order?.head?.barcode)
+    docSelectors.selectByDocType<IOtvesDocument>('shipment').find((item) => item.head?.barcode === order?.head?.barcode)
       ?.id || '-1';
 
   const isBlocked = order?.status !== 'DRAFT';
