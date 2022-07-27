@@ -1,14 +1,13 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { Alert, ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import { Searchbar } from 'react-native-paper';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
-  FilterButtons,
   ItemSeparator,
   Status,
   AppScreen,
@@ -21,15 +20,21 @@ import {
   EmptyList,
   MediumText,
   SearchButton,
+  Menu,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { getDateString, keyExtractor } from '@lib/mobile-app';
 
+import { INamedEntity } from '@lib/types';
+
+import { IListItem } from '@lib/mobile-types';
+
 import { IMoveDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
+import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface MoveListSectionProps {
   title: string;
@@ -66,7 +71,29 @@ export const MoveListScreen = () => {
 
   const [delList, setDelList] = useState({});
 
+  const [date, setDate] = useState(dateTypes[0]);
+
   const [status, setStatus] = useState<Status>('all');
+
+  const documentSubtypes = refSelectors.selectByName<INamedEntity>('documentSubtype')?.data;
+
+  const docTypes: IListItem[] = useMemo(
+    () =>
+      documentSubtypes
+        ? docDepartTypes.concat(
+            documentSubtypes?.map(
+              (i) =>
+                ({
+                  id: i.id,
+                  value: i.name || '',
+                } as IListItem),
+            ),
+          )
+        : docDepartTypes,
+    [documentSubtypes],
+  );
+
+  const [type, setType] = useState(docTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     const res =
@@ -74,24 +101,42 @@ export const MoveListScreen = () => {
         ? list
         : status === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        : status !== 'archive' && status !== 'all'
+        ? list.filter((e) => e.status === status)
         : [];
 
-    return res.map(
+    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
+
+    newRes.sort((a, b) =>
+      date.id === 'new'
+        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    );
+
+    return newRes.map(
       (i) =>
         ({
           id: i.id,
-          title: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
+          title: i.head.subtype.name || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          // subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          children: (
+            <View>
+              <MediumText>Откуда: {i.head.fromDepart?.name || ''}</MediumText>
+              <MediumText>Куда: {i.head.toDepart?.name || ''}</MediumText>
+              <MediumText>
+                № {i.number} на {getDateString(i.documentDate)}
+              </MediumText>
+            </View>
+          ),
         } as IListItemProps),
     );
-  }, [status, list]);
+  }, [status, list, type?.id, date.id]);
 
+  console.log('stat', status);
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
@@ -113,6 +158,25 @@ export const MoveListScreen = () => {
       }, []),
     [filteredList],
   );
+
+  const [visibleType, setVisibleType] = useState(false);
+  const [visibleStatus, setVisibleStatus] = useState(false);
+  const [visibleDate, setVisibleDate] = useState(false);
+
+  const handleApplyType = useCallback((option) => {
+    setVisibleType(false);
+    setType(option);
+  }, []);
+
+  const handleApplyStatus = useCallback((option) => {
+    setVisibleStatus(false);
+    setStatus(option.id);
+  }, []);
+
+  const handleApplyDate = useCallback((option) => {
+    setVisibleDate(false);
+    setDate(option);
+  }, []);
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('MoveEdit');
@@ -223,12 +287,7 @@ export const MoveListScreen = () => {
           onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
           isChecked={checkedId ? true : false}
           isDelList={delList && Object.values(delList).length > 0 ? true : false}
-        >
-          <View>
-            <MediumText>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
-          </View>
-        </ScreenListItem>
+        />
       ) : null;
     },
     [delList, handelAddDeletelList, handlePressDoc, list],
@@ -246,7 +305,51 @@ export const MoveListScreen = () => {
 
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
+      {/* <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} /> */}
+      <View style={[styles.containerCenter, localStyles.container]}>
+        <Menu
+          key={'MenuType'}
+          title="Тип"
+          visible={visibleType}
+          onChange={handleApplyType}
+          onDismiss={() => setVisibleType(false)}
+          onPress={() => setVisibleType(true)}
+          options={docTypes}
+          activeOptionId={type.id}
+          style={[styles.btnTab, styles.firstBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={type.id !== 'all'}
+          iconName={'chevron-down'}
+        />
+        <Menu
+          key={'MenuStatus'}
+          title="Статус"
+          visible={visibleStatus}
+          onChange={handleApplyStatus}
+          onDismiss={() => setVisibleStatus(false)}
+          onPress={() => setVisibleStatus(true)}
+          options={statusTypes}
+          activeOptionId={status}
+          style={[styles.btnTab]}
+          menuStyle={localStyles.menu}
+          isActive={status !== 'all'}
+          iconName={'chevron-down'}
+        />
+        <Menu
+          key={'MenuDataSort'}
+          title="Дата"
+          visible={visibleDate}
+          onChange={handleApplyDate}
+          onDismiss={() => setVisibleDate(false)}
+          onPress={() => setVisibleDate(true)}
+          options={dateTypes}
+          activeOptionId={date.id}
+          style={[styles.btnTab, styles.lastBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={date.id !== 'new'}
+          iconName={'chevron-down'}
+        />
+      </View>
       {filterVisible && (
         <>
           <View style={styles.flexDirectionRow}>
@@ -274,3 +377,14 @@ export const MoveListScreen = () => {
     </AppScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  container: {
+    marginBottom: 5,
+  },
+  menu: {
+    justifyContent: 'center',
+    marginLeft: 6,
+    width: '100%',
+  },
+});

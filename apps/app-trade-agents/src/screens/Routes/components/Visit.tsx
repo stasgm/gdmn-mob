@@ -215,7 +215,7 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
                       outlined={true}
                       disabled={process}
                     >
-                      Возообновить визит
+                      Возобновить визит
                     </PrimeButton>
                   )
                 )}

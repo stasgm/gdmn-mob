@@ -220,10 +220,8 @@ const SellbillViewScreen = () => {
               line: newTempLine,
             }),
           );
-          // setScanned(false);
         } else if (newTempLine.weight === 0) {
           fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
-          // setScanned(false);
         } else {
           Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
             {
@@ -238,7 +236,6 @@ const SellbillViewScreen = () => {
           ]);
         }
         dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
-        // setScanned(false);
       } else {
         Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
           {
@@ -251,7 +248,6 @@ const SellbillViewScreen = () => {
             text: 'Отмена',
           },
         ]);
-        // setScanned(false);
       }
 
       setScanned(false);
