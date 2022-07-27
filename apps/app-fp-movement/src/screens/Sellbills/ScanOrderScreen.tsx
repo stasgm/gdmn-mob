@@ -21,6 +21,7 @@ import { navBackButton } from '../../components/navigateOptions';
 import { ICodeEntity } from '../../store/app/types';
 
 import { actions as fpActions } from '../../store/app/actions';
+import { useSelector as useFpSelector } from '../../store/index';
 
 import { ScanBarcode } from './components/ScanBarcode';
 import { ScanBarcodeReader } from './components/ScanBarcodeReader';
@@ -53,6 +54,8 @@ const ScanOrderScreen = () => {
   const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
 
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
+
+  const tempOrders = useFpSelector((state) => state.fpMovement.list);
 
   const handleSaveScannedItem = useCallback(
     (item: IOrderDocument) => {
