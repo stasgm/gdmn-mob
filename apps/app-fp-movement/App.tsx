@@ -51,19 +51,19 @@ const Root = () => {
       {
         name: 'Movement',
         title: 'Перемещение',
-        icon: 'file-document-outline',
+        icon: 'transfer',
         component: MoveNavigator,
       },
       {
         name: 'SellBill',
         title: 'Отвес по заявке',
-        icon: 'clipboard-list-outline',
+        icon: 'playlist-check',
         component: SellbillNavigator,
       },
       {
         name: 'FreeSellbill',
         title: 'Отвес',
-        icon: 'clipboard-list-outline',
+        icon: 'playlist-plus',
         component: FreeSellbillNavigator,
       },
     ],

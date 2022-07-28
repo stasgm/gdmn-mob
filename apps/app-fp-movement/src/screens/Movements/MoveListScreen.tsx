@@ -174,7 +174,7 @@ export const MoveListScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Премещение',
+      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Перемещение',
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
