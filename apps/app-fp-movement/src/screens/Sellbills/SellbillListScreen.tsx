@@ -16,6 +16,7 @@ import {
   DeleteButton,
   CloseButton,
   EmptyList,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -85,9 +86,17 @@ export const SellbillListScreen = () => {
           title: i.documentType.description || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          subtitle: `№ ${i.number} на ${getDateString(i.head?.onDate)}`,
+          // subtitle: `№ ${i.number} на ${getDateString(i.head?.onDate)}`,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          children: (
+            <View>
+              <MediumText>{i.head.outlet?.name || ''}</MediumText>
+              <MediumText>
+                № {i.number} на {getDateString(i.head?.onDate)}
+              </MediumText>
+            </View>
+          ),
         } as IListItemProps),
     );
   }, [filterStatus, list, filterDocType?.id, sortDateType.id]);

@@ -46,7 +46,8 @@ export const appFpMiddlewareFactory: PersistedMiddleware =
         case getType(actions.addTempOrder):
         case getType(actions.updateTempOrderLine):
         case getType(actions.removeTempOrderLine):
-        case getType(actions.removeTempOrder): {
+        case getType(actions.removeTempOrder):
+        case getType(actions.init): {
           const result = next(action);
 
           save('fpMovement', store.getState().fpMovement, store.getState().auth.user?.id).catch((err) => {

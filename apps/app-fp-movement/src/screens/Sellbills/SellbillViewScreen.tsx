@@ -57,12 +57,13 @@ const SellbillViewScreen = () => {
   );
 
   const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === sellbill?.head?.orderId);
-  const tempOrderLines = tempOrder?.lines as ITempLine[];
+  const tempOrderLines = tempOrder?.lines?.filter((i) => i.weight > 0) as ITempLine[];
 
+  console.log('temp', tempOrder?.lines);
   const isBlocked = sellbill?.status !== 'DRAFT';
 
   const sellbillLineSum = sellbill?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
-  const tempLineSum = tempOrder?.lines?.reduce((sum, line) => sum + line.weight, 0) || 0;
+  const tempLineSum = tempOrderLines?.reduce((sum, line) => sum + line.weight, 0) || 0;
 
   const handleEditSellbillHead = useCallback(() => navigation.navigate('SellbillEdit', { id }), [navigation, id]);
 
@@ -92,9 +93,19 @@ const SellbillViewScreen = () => {
 
   const hanldeCancelLastScan = useCallback(() => {
     if (sellbill?.lines.length) {
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: sellbill.lines[sellbill.lines.length - 1].id }));
+      const sellbillLine = sellbill.lines[0];
+      const tempLine = tempOrder?.lines?.find((i) => sellbillLine.good.id === i.good.id);
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: sellbillLine.id }));
+      if (tempLine) {
+        fpDispatch(
+          fpMovementActions.updateTempOrderLine({
+            docId: tempOrder?.id || '-1',
+            line: { ...tempLine, weight: round(tempLine.weight + sellbillLine.weight, 3) },
+          }),
+        );
+      }
     }
-  }, [dispatch, id, sellbill?.lines]);
+  }, [dispatch, fpDispatch, id, sellbill.lines, tempOrder?.id, tempOrder?.lines]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -166,7 +177,7 @@ const SellbillViewScreen = () => {
         return;
       }
 
-      const tempLine = tempOrderLines?.find((i) => good.id === i.good.id);
+      const tempLine = tempOrder?.lines?.find((i) => good.id === i.good.id);
 
       const newLine: ISellbillLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
@@ -188,14 +199,29 @@ const SellbillViewScreen = () => {
               line: newTempLine,
             }),
           );
+          dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
         } else if (newTempLine.weight === 0) {
-          fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
+          // fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
         } else {
           Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
             {
               text: 'Да',
               onPress: async () => {
-                fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
+                // fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
+                dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
               },
             },
             {
@@ -203,7 +229,6 @@ const SellbillViewScreen = () => {
             },
           ]);
         }
-        dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
       } else {
         Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
           {
@@ -221,7 +246,7 @@ const SellbillViewScreen = () => {
       setScanned(false);
     },
 
-    [goods, sellbill?.lines, tempOrderLines, tempOrder, dispatch, id, fpDispatch],
+    [goods, sellbill.lines, tempOrder, dispatch, id, fpDispatch],
   );
 
   //Для отрисовки при каждом новом сканировании
@@ -367,7 +392,7 @@ const SellbillViewScreen = () => {
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <SellbillTotal quantity={tempLineSum} weight={tempOrder?.lines?.length || 0} />
+          <SellbillTotal quantity={tempLineSum} weight={tempOrderLines?.length || 0} />
         </>
       )}
     </View>

@@ -49,20 +49,25 @@ const ScanOrderScreen = () => {
 
   const orders = docSelectors.selectByDocType<IOrderDocument>('order');
 
-  const shipments = docSelectors.selectByDocType<ISellbillDocument>('shipment');
+  // const shipments = docSelectors.selectByDocType<ISellbillDocument>('shipment');
+
+  const shipments = useSelector((state) =>
+    state.documents?.list.filter((i) => i.documentType?.name === 'shipment' || i.documentType?.name === 'currShipment'),
+  ) as ISellbillDocument[];
 
   const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
 
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as ICodeEntity;
 
   const tempOrders = useFpSelector((state) => state.fpMovement.list);
+  // console.log('tempOrders', tempOrders);
 
   const [scannedObject, setScannedObject] = useState<IOrderDocument>();
 
   const handleSaveScannedItem = useCallback(
     (item: IOrderDocument) => {
       const shipment = shipments.find((i) => i.head.orderId === item.id);
-
+      console.log('shipment', shipment);
       if (shipment) {
         navigation.dispatch(
           StackActions.replace('SellbillView', {

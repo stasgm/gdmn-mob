@@ -133,7 +133,7 @@ export const FreeSellbillViewScreen = () => {
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines.length) {
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[lines.length - 1].id }));
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
     }
   }, [dispatch, id, lines]);
 

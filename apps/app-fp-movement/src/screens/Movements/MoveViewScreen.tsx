@@ -145,7 +145,7 @@ export const MoveViewScreen = () => {
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = doc?.lines?.[doc?.lines?.length - 1]?.id;
+    const lastId = doc?.lines?.[0]?.id;
 
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
   }, [dispatch, doc?.lines, id]);
