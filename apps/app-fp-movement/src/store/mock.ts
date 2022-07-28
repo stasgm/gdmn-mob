@@ -156,10 +156,10 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '111852486',
               name: 'Ручка шариковая',
               alias: '76138',
-              barcode: '3329687853210',
+              barcode: '00600028072213101142005',
               valueName: 'шт',
               isFrac: 1,
-              shcode: '1544',
+              shcode: '1142',
               weightCode: '',
             },
             {

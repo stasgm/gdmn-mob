@@ -223,6 +223,19 @@ const reducer: Reducer<DocumentState, DocumentActionType> = (state = initialStat
         ),
       };
 
+    case getType(actions.removeDocumentLines):
+      return {
+        ...state,
+        list: state.list.map((doc) =>
+          doc.id === action.payload.docId
+            ? {
+                ...doc,
+                lines: doc.lines?.filter((doc) => action.payload.lineIds.indexOf(doc.id) === -1),
+              }
+            : doc,
+        ),
+      };
+
     default:
       return state;
   }

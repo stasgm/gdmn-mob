@@ -110,6 +110,9 @@ const getDelList = (delList: IDelList, lineId: string, lineStatus: string) => {
   return newList;
 };
 
+const getDelLineList = (delList: string[], lineId: string) =>
+  delList.includes(lineId) ? delList.filter((i) => i !== lineId) : [...delList, lineId];
+
 const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void) => {
   if (Object.values(delList).find((i) => i === 'READY' || i === 'SENT')) {
     Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
@@ -134,6 +137,17 @@ const deleteSelectedItems = (delList: IDelList, deleteDocs: () => void) => {
   }
 };
 
+const deleteSelectedLineItems = (deleteDocs: () => void) =>
+  Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
+    {
+      text: 'Да',
+      onPress: deleteDocs,
+    },
+    {
+      text: 'Отмена',
+    },
+  ]);
+
 export {
   truncate,
   log,
@@ -148,4 +162,6 @@ export {
   keyExtractor,
   getDelList,
   deleteSelectedItems,
+  getDelLineList,
+  deleteSelectedLineItems,
 };

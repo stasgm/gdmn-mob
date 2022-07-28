@@ -52,7 +52,7 @@ export const SellbillListScreen = () => {
   const documentTypes: IListItem[] = refSelectors
     .selectByName<IDocumentType>('documentType')
     ?.data?.filter((i) => i.subtype === 'shipment' && i.name !== 'freeShipment')
-    .map((i) => ({ id: i.name, value: i.description || '' }));
+    .map((i) => ({ id: i.name, value: i.description || i.name }));
 
   const filterDocTypes = useMemo(() => docDepartTypes.concat(documentTypes), [documentTypes]);
 
@@ -202,8 +202,7 @@ export const SellbillListScreen = () => {
           : navigation.navigate('SellbillView', { id: item.id })
       }
       onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
-      isChecked={!!delList[item.id]}
-      isDelList={isDelList}
+      checked={!!delList[item.id]}
     />
   );
 

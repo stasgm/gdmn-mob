@@ -10,20 +10,19 @@ import { LargeText, MediumText } from '../AppText';
 
 import { getStatusColor } from './constants';
 export interface IListItemProps {
-  children?: ReactNode;
   title: string;
   documentDate: string;
-  subtitle?: string;
-  status?: StatusType;
-  isFromRoute?: boolean;
-  lineCount?: number;
   errorMessage?: string;
   id: string;
   onPress: () => void;
   onLongPress?: () => void;
-  isChecked?: boolean;
-  isDelList?: boolean;
+  subtitle?: string;
+  isFromRoute?: boolean;
+  status?: StatusType;
+  checked?: boolean;
   documentType?: string;
+  lineCount?: number;
+  children?: ReactNode;
 }
 
 const ScreenListItem = ({
@@ -36,7 +35,7 @@ const ScreenListItem = ({
   errorMessage,
   onPress,
   onLongPress,
-  isChecked,
+  checked,
 }: IListItemProps) => {
   const { colors } = useTheme();
 
@@ -47,7 +46,7 @@ const ScreenListItem = ({
           <View style={[styles.icon, { backgroundColor: getStatusColor(status) }]}>
             <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
           </View>
-          {isChecked ? (
+          {checked ? (
             <View style={styles.checkedIcon}>
               <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
             </View>

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput, ActivityIndicator } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
@@ -14,7 +14,7 @@ import {
   MediumText,
   LargeText,
   AppDialog,
-  SubTitle,
+  ListItemLine,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -29,7 +29,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import { MoveItem } from './components/MoveItem';
 import MoveTotal from './components/MoveTotal';
 
 export interface IScanerObject {
@@ -39,7 +38,6 @@ export interface IScanerObject {
 }
 
 export const MoveViewScreen = () => {
-  const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
@@ -238,7 +236,18 @@ export const MoveViewScreen = () => {
   //   return sum;
   // }, []);
 
-  const renderItem = useCallback(({ item }: { item: IMoveLine }) => <MoveItem key={item.id} item={item} />, []);
+  const renderItem: ListRenderItem<IMoveLine> = ({ item }) => (
+    <ListItemLine key={item.id}>
+      <View style={styles.details}>
+        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+        <View style={styles.directionRow}>
+          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        </View>
+        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
+        <MediumText>Дата изготовления: {getDateString(item.workDate) || ''}</MediumText>
+      </View>
+    </ListItemLine>
+  );
 
   const [scanned, setScanned] = useState(false);
 
@@ -313,20 +322,20 @@ export const MoveViewScreen = () => {
   if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
-        <View style={styles.deleteView}>
-          <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colors.primary} />
+        <View style={styles.containerCenter}>
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  }
-
-  if (!doc) {
-    return (
-      <View style={[styles.container, styles.alignItemsCenter]}>
-        <LargeText>Документ не найден</LargeText>
-      </View>
-    );
+  } else {
+    if (!doc) {
+      return (
+        <View style={[styles.container, styles.alignItemsCenter]}>
+          <LargeText>Документ не найден</LargeText>
+        </View>
+      );
+    }
   }
 
   return (

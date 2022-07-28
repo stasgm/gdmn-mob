@@ -32,3 +32,4 @@ export { EmptyList } from './EmptyList';
 export { LargeText, MediumText } from './AppText';
 export { AppActivityIndicator } from './AppActivityIndicator';
 export { default as AppDialog } from './AppDialog';
+export { ListItemLine } from './ListItemLine';

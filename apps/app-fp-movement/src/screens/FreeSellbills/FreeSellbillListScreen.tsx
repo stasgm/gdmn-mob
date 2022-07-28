@@ -141,8 +141,7 @@ export const FreeSellbillListScreen = () => {
             : navigation.navigate('FreeSellbillView', { id: item.id })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
-        isChecked={!!delList[item.id]}
-        isDelList={isDelList}
+        checked={!!delList[item.id]}
       />
     ),
     [delList, isDelList, navigation],

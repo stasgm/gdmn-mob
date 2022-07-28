@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
@@ -9,18 +9,17 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
   SendButton,
   AppActivityIndicator,
   MediumText,
   AppDialog,
+  LargeText,
+  ListItemLine,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
-
-import colors from '@lib/mobile-ui/src/styles/colors';
 
 import { IFreeSellbillDocument, IFreeSellbillLine } from '../../store/types';
 import { FreeSellbillStackParamList } from '../../navigation/Root/types';
@@ -30,7 +29,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import { FreeSellbillItem } from './components/FreeSellbillItem';
 import FreeSellbillTotal from './components/FreeSellbillTotal';
 
 export interface IScanerObject {
@@ -207,9 +205,17 @@ export const FreeSellbillViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem = useCallback(
-    ({ item }: { item: IFreeSellbillLine }) => <FreeSellbillItem key={item.id} item={item} />,
-    [],
+  const renderItem: ListRenderItem<IFreeSellbillLine> = ({ item }) => (
+    <ListItemLine key={item.id}>
+      <View style={styles.details}>
+        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+        <View style={styles.directionRow}>
+          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        </View>
+        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
+        <MediumText>Дата изготовления: {getDateString(item.workDate) || ''}</MediumText>
+      </View>
+    </ListItemLine>
   );
 
   const [scanned, setScanned] = useState(false);
@@ -285,20 +291,20 @@ export const FreeSellbillViewScreen = () => {
   if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
-        <View style={localStyles.deleting}>
-          <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colors.primary} />
+        <View style={styles.containerCenter}>
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  }
-
-  if (!doc) {
-    return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
-      </View>
-    );
+  } else {
+    if (!doc) {
+      return (
+        <View style={[styles.container, styles.alignItemsCenter]}>
+          <LargeText>Документ не найден</LargeText>
+        </View>
+      );
+    }
   }
 
   return (
@@ -314,7 +320,6 @@ export const FreeSellbillViewScreen = () => {
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
-
       <TextInput
         style={styles.scanInput}
         key={key}
@@ -328,7 +333,6 @@ export const FreeSellbillViewScreen = () => {
         data={lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={6}
         maxToRenderPerBatch={6} // Reduce number in each render batch
@@ -348,11 +352,3 @@ export const FreeSellbillViewScreen = () => {
     </View>
   );
 };
-
-const localStyles = StyleSheet.create({
-  deleting: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

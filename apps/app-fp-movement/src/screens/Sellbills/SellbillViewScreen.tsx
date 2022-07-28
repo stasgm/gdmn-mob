@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View, FlatList, ActivityIndicator, StyleSheet, TouchableHighlight, TextInput } from 'react-native';
+import { Alert, View, FlatList, StyleSheet, TouchableHighlight, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,11 +11,11 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
   AppActivityIndicator,
   MediumText,
   LargeText,
   BackButton,
+  ListItemLine,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -34,9 +34,6 @@ import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDi
 import { getBarcode } from '../../utils/helpers';
 
 import SellbillTotal from './components/SellbillTotal';
-
-import SellbillItem from './components/SellbillItem';
-import TempItem from './components/TempItem';
 
 const keyExtractor = (item: ISellbillLine | ITempLine) => item.id;
 
@@ -273,14 +270,28 @@ const SellbillViewScreen = () => {
     [colors.background, colors.primary, colors.text, lineType],
   );
 
-  const renderSellbillItem = useCallback(
-    ({ item }: { item: ISellbillLine }) => <SellbillItem docId={sellbill?.id} item={item} readonly={isBlocked} />,
-    [isBlocked, sellbill?.id],
+  const renderSellbillItem: ListRenderItem<ISellbillLine> = ({ item }) => (
+    <ListItemLine key={item.id} readonly={isBlocked}>
+      <View style={styles.details}>
+        <MediumText style={styles.name}>{item.good.name}</MediumText>
+        <View style={styles.directionRow}>
+          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        </View>
+        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
+        <MediumText>Дата: {getDateString(item.workDate) || ''}</MediumText>
+      </View>
+    </ListItemLine>
   );
 
-  const renderTempItem = useCallback(
-    ({ item }: { item: ISellbillLine | ITempLine }) => <TempItem item={item} readonly={isBlocked} />,
-    [isBlocked],
+  const renderTempItem: ListRenderItem<ITempLine> = ({ item }) => (
+    <ListItemLine key={item.id} readonly={isBlocked}>
+      <View style={styles.details}>
+        <MediumText style={styles.name}>{item.good.name}</MediumText>
+        <View style={styles.directionRow}>
+          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        </View>
+      </View>
+    </ListItemLine>
   );
 
   const isFocused = useIsFocused();
@@ -291,17 +302,17 @@ const SellbillViewScreen = () => {
   if (deleting) {
     return (
       <View style={styles.container}>
-        <View style={localStyles.deleting}>
-          <SubTitle style={styles.title}>Удаление</SubTitle>
-          <ActivityIndicator size="small" color={colors.primary} />
+        <View style={styles.containerCenter}>
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
   } else {
     if (!sellbill) {
       return (
-        <View style={styles.container}>
-          <SubTitle style={styles.title}>Документ не найден</SubTitle>
+        <View style={[styles.container, styles.alignItemsCenter]}>
+          <LargeText>Документ не найден</LargeText>
         </View>
       );
     }
@@ -366,11 +377,6 @@ const SellbillViewScreen = () => {
 export default SellbillViewScreen;
 
 const localStyles = StyleSheet.create({
-  deleting: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   infoBlock: {
     flexDirection: 'column',
   },

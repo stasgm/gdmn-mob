@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
-import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 import {
@@ -20,9 +20,11 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
+
+import { IDelList } from '@lib/mobile-types';
 
 import { IOrderDocument } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
@@ -98,59 +100,18 @@ const OrderListScreen = () => {
     [filteredListByStatus],
   );
 
-  const [delList, setDelList] = useState({});
-
-  const handleAddDeletelList = useCallback(
-    (lineId: string, lineStatus: string, checkedId: string) => {
-      if (checkedId) {
-        const newList = Object.entries(delList).reduce((sum, cur) => {
-          const curId = cur[0];
-          const curStatus = cur[1];
-          if (curId !== checkedId) {
-            return { ...sum, [curId]: curStatus };
-          } else {
-            return { ...sum };
-          }
-        }, {});
-        setDelList(newList);
-      } else {
-        setDelList({ ...delList, [lineId]: lineStatus });
-      }
-    },
-    [delList],
-  );
+  const [delList, setDelList] = useState<IDelList>({});
+  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
-    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
 
-    if (statusList) {
-      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.removeDocuments(docIds));
-            setDelList([]);
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
-    } else {
-      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.removeDocuments(docIds));
-            setDelList([]);
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
-    }
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocuments(docIds));
+      setDelList({});
+    };
+
+    deleteSelectedItems(delList, deleteDocs);
   }, [delList, dispatch]);
 
   const handleAddDocument = useCallback(() => {
@@ -160,47 +121,34 @@ const OrderListScreen = () => {
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {delList && Object.values(delList).length > 0 ? (
-          <DeleteButton onPress={handleDeleteDocs} />
-        ) : (
-          <AddButton onPress={handleAddDocument} />
-        )}
+        {isDelList ? <DeleteButton onPress={handleDeleteDocs} /> : <AddButton onPress={handleAddDocument} />}
       </View>
     ),
-    [delList, handleAddDocument, handleDeleteDocs],
+    [handleAddDocument, handleDeleteDocs, isDelList],
   );
 
-  const renderLeft = useCallback(
-    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
-    [delList],
-  );
+  const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
+      headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title:
-        delList && Object.values(delList).length > 0 ? `Выделено заявок: ${Object.values(delList).length}` : 'Заявки',
+      title: isDelList ? `Выделено заявок: ${Object.values(delList).length}` : 'Заявки',
     });
-  }, [delList, navigation, renderLeft, renderRight]);
+  }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
-  const handlePressOrder = useCallback((id: string) => navigation.navigate('OrderView', { id }), [navigation]);
-
-  const renderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => {
-      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
-      return (
-        <ScreenListItem
-          key={item.id}
-          {...item}
-          onSelectItem={() => handlePressOrder(item.id)}
-          onCheckItem={() => handleAddDeletelList(item.id, item.status || '', checkedId)}
-          isChecked={checkedId ? true : false}
-          isDelList={delList && Object.values(delList).length > 0 ? true : false}
-        />
-      );
-    },
-    [delList, handleAddDeletelList, handlePressOrder],
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
+    <ScreenListItem
+      key={item.id}
+      {...item}
+      onPress={() =>
+        isDelList
+          ? setDelList(getDelList(delList, item.id, item.status!))
+          : navigation.navigate('OrderView', { id: item.id })
+      }
+      onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+      checked={!!delList[item.id]}
+    />
   );
 
   const renderSectionHeader = useCallback(

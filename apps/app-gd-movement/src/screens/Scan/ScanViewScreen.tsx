@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, FlatList, Modal, TextInput, Alert } from 'react-native';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { View, FlatList, Modal, TextInput, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,16 +11,24 @@ import {
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  SubTitle,
   ScanButton,
   DeleteButton,
   CloseButton,
   SendButton,
   AppActivityIndicator,
   MediumText,
+  LargeText,
+  ListItemLine,
 } from '@lib/mobile-ui';
 
-import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import {
+  deleteSelectedLineItems,
+  generateId,
+  getDateString,
+  getDelLineList,
+  keyExtractor,
+  useSendDocs,
+} from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
@@ -30,8 +38,6 @@ import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 import { ScanDataMatrix, ScanDataMatrixReader } from '../../components';
 
-import { ScanItem } from './components/ScanItem';
-
 export const ScanViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
@@ -40,8 +46,6 @@ export const ScanViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanView'>>();
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
-
-  const [delList, setDelList] = useState<string[]>([]);
 
   const [doScanned, setDoScanned] = useState(false);
 
@@ -97,34 +101,17 @@ export const ScanViewScreen = () => {
     ]);
   }, [docDispatch, id, navigation]);
 
-  const handelAddDeletelList = useCallback(
-    (lineId: string, checkedId: string) => {
-      if (checkedId) {
-        const newList = delList.filter((i) => i !== checkedId);
-        setDelList(newList);
-      } else {
-        setDelList([...delList, lineId]);
-      }
-    },
-    [delList],
-  );
+  const [delList, setDelList] = useState<string[]>([]);
+  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
-  const handleDeleteDocLine = useCallback(() => {
-    Alert.alert('Вы уверены, что хотите удалить позиции документа?', '', [
-      {
-        text: 'Да',
-        onPress: () => {
-          for (const item of delList) {
-            dispatch(documentActions.removeDocumentLine({ docId: id, lineId: item }));
-          }
-          setDelList([]);
-        },
-      },
-      {
-        text: 'Отмена',
-      },
-    ]);
-  }, [delList, dispatch, id]);
+  const handleDeleteDocs = useCallback(() => {
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocumentLines({ docId: id, lineIds: delList }));
+      setDelList([]);
+    };
+
+    deleteSelectedLineItems(deleteDocs);
+  }, [delList, dispatch, id, setDelList]);
 
   const handleSendDoc = useSendDocs([doc]);
 
@@ -172,8 +159,8 @@ export const ScanViewScreen = () => {
       !isBlocked &&
       screenState !== 'deleting' && (
         <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
-          {delList.length > 0 ? (
-            <DeleteButton onPress={handleDeleteDocLine} />
+          {isDelList ? (
+            <DeleteButton onPress={handleDeleteDocs} />
           ) : (
             <>
               <SendButton onPress={handleSendScanDoc} disabled={screenState !== 'idle'} />
@@ -183,36 +170,34 @@ export const ScanViewScreen = () => {
           )}
         </View>
       ),
-    [actionsMenu, delList.length, handleDeleteDocLine, handleDoScan, handleSendScanDoc, isBlocked, screenState],
+    [actionsMenu, handleDeleteDocs, handleDoScan, handleSendScanDoc, isBlocked, isDelList, screenState],
   );
 
   const renderLeft = useCallback(
-    () => !isBlocked && delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
-    [delList.length, isBlocked],
+    () => !isBlocked && isDelList && <CloseButton onPress={() => setDelList([])} />,
+    [isBlocked, isDelList, setDelList],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: delList.length > 0 ? renderLeft : navBackButton,
+      headerLeft: isDelList ? renderLeft : navBackButton,
       headerRight: renderRight,
-      title: delList.length > 0 ? `Выделено позиций: ${delList.length}` : 'Документ',
+      title: isDelList ? `Выделено позиций: ${delList.length}` : 'Документ',
     });
-  }, [delList.length, navigation, renderLeft, renderRight]);
+  }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
-  const renderItem = useCallback(
-    ({ item, index }: { item: IScanLine; index: number }) => {
-      const checkedId = delList.find((i) => i === item.id) || '';
-      return (
-        <ScanItem
-          readonly={isBlocked}
-          index={index}
-          checked={checkedId ? true : false}
-          onCheckItem={() => handelAddDeletelList(item.id, checkedId)}
-          isDelList={delList.length > 0 ? true : false}
-        />
-      );
-    },
-    [delList, handelAddDeletelList, isBlocked],
+  const renderItem: ListRenderItem<IScanLine> = ({ item, index }) => (
+    <ListItemLine
+      key={item.id}
+      {...item}
+      onPress={() => (isDelList ? setDelList(getDelLineList(delList, item.id)) : undefined)}
+      onLongPress={() => setDelList(getDelLineList(delList, item.id))}
+      checked={delList.includes(item.id)}
+    >
+      <View style={styles.details}>
+        <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
+      </View>
+    </ListItemLine>
   );
 
   const isFocused = useIsFocused();
@@ -224,14 +209,8 @@ export const ScanViewScreen = () => {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <SubTitle style={styles.title}>
-            {screenState === 'deleting'
-              ? 'Удаление документа...'
-              : // : screenState === 'sending'
-                // ? 'Отправка документа...'
-                ''}
-          </SubTitle>
-          <AppActivityIndicator />
+          <LargeText>Удаление документа...</LargeText>
+          <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
@@ -239,8 +218,8 @@ export const ScanViewScreen = () => {
 
   if (!doc) {
     return (
-      <View style={styles.container}>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
       </View>
     );
   }
@@ -275,7 +254,6 @@ export const ScanViewScreen = () => {
           maxToRenderPerBatch={6} // Reduce number in each render batch
           updateCellsBatchingPeriod={100} // Increase time between renders
           windowSize={7} // Reduce the window size
-          // scrollEventThrottle={400}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>

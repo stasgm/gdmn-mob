@@ -172,7 +172,7 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
   }, [orderDocs]);
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />,
+    ({ item }) => <ScreenListItem {...item} onPress={() => navigation.navigate('OrderView', { id: item.id })} />,
     [navigation],
   );
 

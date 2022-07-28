@@ -7,10 +7,10 @@ import { DocumentState } from './types';
 const init = createAction('DOCUMENTS/INIT')();
 const addDocument = createAction('DOCUMENTS/ADD_ONE')<IDocument>();
 const updateDocument = createAction('DOCUMENTS/UPDATE_ONE')<{ docId: string; document: IDocument }>();
-// const removeDocument = createAction('DOCUMENTS/REMOVE_ONE')<string>();
 const addDocumentLine = createAction('DOCUMENTS/ADD_LINE_ONE')<{ docId: string; line: IEntity }>();
 const updateDocumentLine = createAction('DOCUMENTS/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
 const removeDocumentLine = createAction('DOCUMENTS/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
+const removeDocumentLines = createAction('DOCUMENTS/REMOVE_LINE_MANY')<{ docId: string; lineIds: string[] }>();
 const clearError = createAction('DOCUMENTS/CLEAR_ERROR')();
 const loadData = createAction('DOCUMENTS/LOAD_DATA')<DocumentState>();
 const setLoading = createAction('DOCUMENTS/SET_LOADING')<boolean>();
@@ -62,7 +62,6 @@ export const actions = {
   addDocument,
   updateDocument,
   updateDocumentsAsync,
-  // removeDocument,
   removeDocumentAsync,
   removeDocumentsAsync,
   addDocumentLine,
@@ -72,6 +71,7 @@ export const actions = {
   setLoading,
   setLoadingData,
   setLoadingError,
+  removeDocumentLines,
 };
 
 export type DocumentActionType = ActionType<typeof actions>;
