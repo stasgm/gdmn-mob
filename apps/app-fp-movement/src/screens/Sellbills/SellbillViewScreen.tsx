@@ -16,6 +16,7 @@ import {
   LargeText,
   BackButton,
   ListItemLine,
+  AppDialog,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -64,6 +65,72 @@ const SellbillViewScreen = () => {
   const sellbillLineSum = sellBillLines?.reduce((sum, line) => sum + line.weight, 0) || 0;
   const tempLineSum = tempOrderLines?.reduce((sum, line) => sum + line.weight, 0) || 0;
 
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const goods = refSelectors.selectByName<IGood>('good').data;
+
+  const handleGetBarcode = useCallback(
+    (brc: string) => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        setErrorMessage('Штрих-код неверного формата');
+        return;
+      }
+      const barc = getBarcode(brc);
+
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+
+      if (!good) {
+        setErrorMessage('Товар не найден');
+        return;
+      }
+
+      const line = sellbill?.lines?.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        setErrorMessage('Товар уже добавлен');
+        return;
+      }
+
+      if (good) {
+        const barcodeItem = {
+          good: { id: good.id, name: good.name, shcode: good.shcode },
+          id: generateId(),
+          weight: barc.weight,
+          barcode: barc.barcode,
+          workDate: barc.workDate,
+          numReceived: barc.numReceived,
+          quantPack: barc.quantPack,
+          sortOrder: sellBillLines.length + 1,
+        };
+        setErrorMessage('');
+        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+
+        setVisibleDialog(false);
+        setBarcode('');
+      } else {
+        setErrorMessage('Товар не найден');
+      }
+    },
+
+    [dispatch, goods, id, sellBillLines.length, sellbill?.lines],
+  );
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+  };
+
+  const handleSearchBarcode = () => {
+    handleGetBarcode(barcode);
+  };
+
+  const handleDismissBarcode = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    setErrorMessage('');
+  };
+
   const handleEditSellbillHead = useCallback(() => navigation.navigate('SellbillEdit', { id }), [navigation, id]);
 
   const handleDeleteSellbill = useCallback(async () => {
@@ -110,6 +177,10 @@ const SellbillViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet([
       {
+        title: 'Ввести штрих-код',
+        onPress: handleShowDialog,
+      },
+      {
         title: 'Отменить последнее сканирование',
         onPress: hanldeCancelLastScan,
       },
@@ -149,8 +220,6 @@ const SellbillViewScreen = () => {
   const [scanned, setScanned] = useState(false);
 
   const ref = useRef<TextInput>(null);
-
-  const goods = refSelectors.selectByName<IGood>('good').data;
 
   const getScannedObject = useCallback(
     (brc: string) => {
@@ -395,6 +464,15 @@ const SellbillViewScreen = () => {
           <SellbillTotal quantity={tempLineSum} weight={tempOrderLines?.length || 0} />
         </>
       )}
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={setBarcode}
+        onCancel={handleDismissBarcode}
+        onOk={handleSearchBarcode}
+        okLabel={'Найти'}
+        errorMessage={errorMessage}
+      />
     </View>
   );
 };

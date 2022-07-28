@@ -61,9 +61,26 @@ export const FreeSellbillViewScreen = () => {
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        setErrorMessage('Штрих-код неверного формата');
+        return;
+      }
+
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === barc.shcode);
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+
+      if (!good) {
+        setErrorMessage('Товар не найден');
+        return;
+      }
+
+      const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
+
+      if (line) {
+        setErrorMessage('Товар уже добавлен');
+        return;
+      }
 
       if (good) {
         const barcodeItem = {
@@ -73,13 +90,11 @@ export const FreeSellbillViewScreen = () => {
           barcode: barc.barcode,
           workDate: barc.workDate,
           numReceived: barc.numReceived,
+          sortOrder: doc?.lines?.length + 1,
         };
         setErrorMessage('');
-        navigation.navigate('FreeSellbillLine', {
-          mode: 0,
-          docId: id,
-          item: barcodeItem,
-        });
+        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+
         setVisibleDialog(false);
         setBarcode('');
       } else {
@@ -87,7 +102,7 @@ export const FreeSellbillViewScreen = () => {
       }
     },
 
-    [goods, id, navigation],
+    [dispatch, doc?.lines, goods, id],
   );
 
   const handleShowDialog = () => {

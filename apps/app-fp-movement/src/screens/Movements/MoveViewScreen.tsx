@@ -89,6 +89,7 @@ export const MoveViewScreen = () => {
           barcode: barc.barcode,
           workDate: barc.workDate,
           numReceived: barc.numReceived,
+          sortOrder: doc?.lines?.length + 1,
         };
         setErrorMessage('');
         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
