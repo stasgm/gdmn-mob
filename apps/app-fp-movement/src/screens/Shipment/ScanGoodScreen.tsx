@@ -10,8 +10,8 @@
 
 // import { StackNavigationProp } from '@react-navigation/stack';
 
-// import { SellbillStackParamList } from '../../navigation/Root/types';
-// import { ISellbillLine, ISellbillDocument } from '../../store/types';
+// import { ShipmentStackParamList } from '../../navigation/Root/types';
+// import { IShipmentLine, IShipmentDocument } from '../../store/types';
 
 // import { IGood } from '../../store/app/types';
 // import { getBarcode } from '../../utils/helpers';
@@ -20,9 +20,9 @@
 // import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 // const ScanGoodScreen = () => {
-//   const docId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.docId;
-//   const tempId = useRoute<RouteProp<SellbillStackParamList, 'ScanGood'>>().params?.tempId;
-//   const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'ScanGood'>>();
+//   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
+//   const tempId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.tempId;
+//   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
 //   const settings = useSelector((state) => state.settings?.data);
 
 //   const isScanerReader = settings.scannerUse?.data;
@@ -38,8 +38,8 @@
 //   }, [navigation]);
 
 //   const handleSaveScannedItem = useCallback(
-//     (item: ISellbillLine) => {
-//       navigation.navigate('SellbillLine', {
+//     (item: IShipmentLine) => {
+//       navigation.navigate('ShipmentLine', {
 //         mode: 0,
 //         docId,
 //         item: item,
@@ -49,12 +49,12 @@
 //     [docId, navigation, tempId],
 //   );
 
-//   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as ISellbillDocument;
+//   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IShipmentDocument;
 
 //   const goods = refSelectors.selectByName<IGood>('good').data;
 
 //   const getScannedObject = useCallback(
-//     (brc: string): ISellbillLine | undefined => {
+//     (brc: string): IShipmentLine | undefined => {
 //       const barc = getBarcode(brc);
 
 //       const good = goods.find((item) => item.shcode === barc.shcode);
@@ -86,7 +86,7 @@
 //       const good = goods.find((item) => item.shcode === barc.shcode);
 
 //       if (good) {
-//         const barcodeItem: ISellbillLine = {
+//         const barcodeItem: IShipmentLine = {
 //           good: { id: good.id, name: good.name, shcode: good.shcode },
 //           id: generateId(),
 //           weight: barc.weight,
@@ -96,7 +96,7 @@
 //           quantPack: barc.quantPack,
 //         };
 //         setErrorMessage('');
-//         navigation.navigate('SellbillLine', {
+//         navigation.navigate('ShipmentLine', {
 //           mode: 0,
 //           docId: docId,
 //           item: barcodeItem,

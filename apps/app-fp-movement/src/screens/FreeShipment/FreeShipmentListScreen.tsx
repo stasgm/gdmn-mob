@@ -25,24 +25,24 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@l
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IFreeSellbillDocument } from '../../store/types';
-import { FreeSellbillStackParamList } from '../../navigation/Root/types';
+import { IFreeShipmentDocument } from '../../store/types';
+import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 
-export interface FreeSellbillListSectionProps {
+export interface FreeShipmentListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, FreeSellbillListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, FreeShipmentListSectionProps>[];
 
-export const FreeSellbillListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillList'>>();
+export const FreeShipmentListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentList'>>();
   const dispatch = useDispatch();
 
   const list = (
     useSelector((state) => state.documents.list)?.filter(
       (i) => i.documentType?.name === 'freeShipment',
-    ) as IFreeSellbillDocument[]
+    ) as IFreeShipmentDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
   const [delList, setDelList] = useState<IDelList>({});
@@ -113,7 +113,7 @@ export const FreeSellbillListScreen = () => {
         {isDelList ? (
           <DeleteButton onPress={handleDeleteDocs} />
         ) : (
-          <AddButton onPress={() => navigation.navigate('FreeSellbillEdit')} />
+          <AddButton onPress={() => navigation.navigate('FreeShipmentEdit')} />
         )}
       </View>
     ),
@@ -138,7 +138,7 @@ export const FreeSellbillListScreen = () => {
         onPress={() =>
           isDelList
             ? setDelList(getDelList(delList, item.id, item.status!))
-            : navigation.navigate('FreeSellbillView', { id: item.id })
+            : navigation.navigate('FreeShipmentView', { id: item.id })
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}

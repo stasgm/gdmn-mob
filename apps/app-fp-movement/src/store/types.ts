@@ -18,14 +18,14 @@ export interface IMoveFormParam extends IFormParam {
   documentSubtype?: INamedEntity;
 }
 
-export interface ISellbillFormParam extends IFormParam {
+export interface IShipmentFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
   comment?: string;
 }
 
-export interface IFreeSellbillFormParam extends IFormParam {
+export interface IFreeShipmentFormParam extends IFormParam {
   number?: string;
   documentDate?: string;
   status?: StatusType;
@@ -77,7 +77,7 @@ export interface IOrderLine extends IEntity {
 
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;
 
-export interface ISellbillHead extends IHead {
+export interface IShipmentHead extends IHead {
   contact: ICodeEntity; //организация-плательщик
   outlet: ICodeEntity; // магазин –подразделение организации плательщика
   depart: ICodeEntity; // подразделеніе сотрудника (кладовщик, работающий с терминалом)
@@ -87,7 +87,7 @@ export interface ISellbillHead extends IHead {
   orderId: string;
 }
 
-export interface ISellbillLine extends IEntity {
+export interface IShipmentLine extends IEntity {
   good: IGood; // товар
   weight: number; //вес
   workDate: string; // Дата производства
@@ -97,13 +97,13 @@ export interface ISellbillLine extends IEntity {
   sortOrder?: number; // порядок сортировки
 }
 
-export type ISellbillDocument = MandateProps<IDocument<ISellbillHead, ISellbillLine>, 'head' | 'lines'>;
+export type IShipmentDocument = MandateProps<IDocument<IShipmentHead, IShipmentLine>, 'head' | 'lines'>;
 
-export interface IFreeSellbillHead extends IHead {
+export interface IFreeShipmentHead extends IHead {
   depart: ICodeEntity;
   comment?: string; // Комvентарий
 }
-export interface IFreeSellbillLine extends IEntity {
+export interface IFreeShipmentLine extends IEntity {
   good: IGood;
   weight: number;
   workDate: string; // Дата производства
@@ -111,7 +111,7 @@ export interface IFreeSellbillLine extends IEntity {
   barcode?: string; // технологический код
   sortOrder?: number; // порядок сортировки
 }
-export type IFreeSellbillDocument = MandateProps<IDocument<IFreeSellbillHead, IFreeSellbillLine>, 'head' | 'lines'>;
+export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 

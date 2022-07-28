@@ -11,33 +11,33 @@ import { IDepartment, IDocumentType, IReference } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
-import { ISellbillFormParam, ISellbillDocument } from '../../store/types';
+import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { IShipmentFormParam, IShipmentDocument } from '../../store/types';
 
 import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
-const SellbillEditScreen = () => {
-  const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillEdit'>>();
+const ShipmentEditScreen = () => {
+  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
-  const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
+  const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
 
-  const number = sellbill?.number;
-  const contact = sellbill?.head.contact;
-  const outlet = sellbill?.head.outlet;
-  const onDate = sellbill?.head.onDate;
+  const number = shipment?.number;
+  const contact = shipment?.head.contact;
+  const outlet = shipment?.head.outlet;
+  const onDate = shipment?.head.onDate;
 
-  const sellbillType = refSelectors
+  const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'shipment');
 
-  const formParams = useSelector((state) => state.app.formParams as ISellbillFormParam);
+  const formParams = useSelector((state) => state.app.formParams as IShipmentFormParam);
 
   // Подразделение по умолчанию
   const depart = useSelector((state) => state.auth.user?.settings?.depart?.data) as IDepartment;
@@ -55,12 +55,12 @@ const SellbillEditScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-    if (sellbill) {
+    if (shipment) {
       dispatch(
         appActions.setFormParams({
-          documentDate: sellbill.documentDate,
-          status: sellbill.status,
-          depart: sellbill.head?.depart,
+          documentDate: shipment.documentDate,
+          status: shipment.status,
+          depart: shipment.head?.depart,
         }),
       );
     } else {
@@ -72,11 +72,11 @@ const SellbillEditScreen = () => {
         }),
       );
     }
-  }, [dispatch, sellbill]);
+  }, [dispatch, shipment]);
 
   useEffect(() => {
     if (screenState === 'saving') {
-      if (!sellbillType) {
+      if (!shipmentType) {
         return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
       }
 
@@ -85,27 +85,27 @@ const SellbillEditScreen = () => {
       }
 
       if (id) {
-        if (!sellbill) {
+        if (!shipment) {
           return;
         }
 
-        const updatedSellbillDate = new Date().toISOString();
+        const updatedShipmentDate = new Date().toISOString();
 
-        const updatedSellbill: ISellbillDocument = {
-          ...sellbill,
+        const updatedShipment: IShipmentDocument = {
+          ...shipment,
           id,
           status: docStatus || 'DRAFT',
           documentDate: docDocumentDate,
-          documentType: sellbillType,
-          creationDate: sellbill.creationDate || updatedSellbillDate,
-          editionDate: updatedSellbillDate,
+          documentType: shipmentType,
+          creationDate: shipment.creationDate || updatedShipmentDate,
+          editionDate: updatedShipmentDate,
         };
 
-        dispatch(documentActions.updateDocument({ docId: id, document: updatedSellbill }));
-        navigation.navigate('SellbillView', { id });
+        dispatch(documentActions.updateDocument({ docId: id, document: updatedShipment }));
+        navigation.navigate('ShipmentView', { id });
       }
     }
-  }, [sellbillType, docDocumentDate, id, sellbill, docStatus, dispatch, navigation, screenState]);
+  }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState]);
 
   const renderRight = useCallback(
     () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
@@ -167,7 +167,7 @@ const SellbillEditScreen = () => {
   );
 };
 
-export default SellbillEditScreen;
+export default ShipmentEditScreen;
 
 const localStyles = StyleSheet.create({
   switchContainer: {

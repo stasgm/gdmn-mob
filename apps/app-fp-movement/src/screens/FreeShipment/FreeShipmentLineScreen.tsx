@@ -11,9 +11,9 @@ import { MoveStackParamList } from '../../navigation/Root/types';
 import { IMoveLine } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
-import { FreeSellbillLine } from './components/FreeSellbillLine';
+import { FreeShipmentLine } from './components/FreeShipmentLine';
 
-export const FreeSellbillLineScreen = () => {
+export const FreeShipmentLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList | MoveStackParamList, 'MoveLine'>>();
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<MoveStackParamList, 'MoveLine'>>().params;
@@ -55,7 +55,7 @@ export const FreeSellbillLineScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <FreeSellbillLine item={line} onSetLine={setLine} />
+      <FreeShipmentLine item={line} onSetLine={setLine} />
     </View>
   );
 };

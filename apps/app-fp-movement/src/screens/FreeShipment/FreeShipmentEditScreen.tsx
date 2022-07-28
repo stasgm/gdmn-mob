@@ -22,30 +22,30 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IDocumentType, IReference } from '@lib/types';
 
-import { FreeSellbillStackParamList } from '../../navigation/Root/types';
-import { IFreeSellbillFormParam, IFreeSellbillDocument } from '../../store/types';
+import { FreeShipmentStackParamList } from '../../navigation/Root/types';
+import { IFreeShipmentFormParam, IFreeShipmentDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 import { navBackButton } from '../../components/navigateOptions';
 
-export const FreeSellbillEditScreen = () => {
-  const id = useRoute<RouteProp<FreeSellbillStackParamList, 'FreeSellbillEdit'>>().params?.id;
-  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillEdit'>>();
+export const FreeShipmentEditScreen = () => {
+  const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>();
   const dispatch = useDispatch();
 
   const { colors } = useTheme();
 
   const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
-  const formParams = useSelector((state) => state.app.formParams as IFreeSellbillFormParam);
+  const formParams = useSelector((state) => state.app.formParams as IFreeShipmentFormParam);
 
-  const sellbills = useFilteredDocList<IFreeSellbillDocument>('freeShipment');
+  const shipments = useFilteredDocList<IFreeShipmentDocument>('freeShipment');
 
-  const doc = sellbills?.find((e) => e.id === id);
+  const doc = shipments?.find((e) => e.id === id);
 
   const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
 
-  const sellbillType = refSelectors
+  const shipmentType = refSelectors
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'freeShipment');
 
@@ -80,7 +80,7 @@ export const FreeSellbillEditScreen = () => {
         }),
       );
     } else {
-      const newNumber = getNextDocNumber(sellbills);
+      const newNumber = getNextDocNumber(shipments);
       dispatch(
         appActions.setFormParams({
           number: newNumber,
@@ -96,7 +96,7 @@ export const FreeSellbillEditScreen = () => {
   // const handleSave = useCallback(() => {
   useEffect(() => {
     if (screenState === 'saving') {
-      if (!sellbillType) {
+      if (!shipmentType) {
         Alert.alert('Внимание!', 'Тип документа для заявок не найден.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -117,9 +117,9 @@ export const FreeSellbillEditScreen = () => {
       const createdDate = new Date().toISOString();
 
       if (!id) {
-        const newDoc: IFreeSellbillDocument = {
+        const newDoc: IFreeShipmentDocument = {
           id: docId,
-          documentType: sellbillType,
+          documentType: shipmentType,
           number: docNumber && docNumber.trim(),
           documentDate: docDate,
           status: 'DRAFT',
@@ -134,7 +134,7 @@ export const FreeSellbillEditScreen = () => {
 
         dispatch(documentActions.addDocument(newDoc));
 
-        navigation.dispatch(StackActions.replace('FreeSellbillView', { id: newDoc.id }));
+        navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
         // setScreenState('idle');
       } else {
         if (!doc) {
@@ -144,13 +144,13 @@ export const FreeSellbillEditScreen = () => {
 
         const updatedDate = new Date().toISOString();
 
-        const updatedDoc: IFreeSellbillDocument = {
+        const updatedDoc: IFreeShipmentDocument = {
           ...doc,
           id,
           number: docNumber && docNumber.trim(),
           status: docStatus || 'DRAFT',
           documentDate: docDate,
-          documentType: sellbillType,
+          documentType: shipmentType,
           errorMessage: undefined,
           head: {
             ...doc.head,
@@ -163,17 +163,14 @@ export const FreeSellbillEditScreen = () => {
         };
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
-        navigation.navigate('FreeSellbillView', { id });
+        navigation.navigate('FreeShipmentView', { id });
         // setScreenState('idle');
       }
     }
-  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, sellbillType]);
+  }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, shipmentType]);
 
   const renderRight = useCallback(
-    () => (
-      // <SaveButton onPress={handleSave} />,
-      <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
-    ),
+    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
     [screenState],
   );
 

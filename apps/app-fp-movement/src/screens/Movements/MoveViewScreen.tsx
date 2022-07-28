@@ -51,7 +51,7 @@ export const MoveViewScreen = () => {
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT' || screenState !== 'idle', [doc?.status, screenState]);
+  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -153,25 +153,24 @@ export const MoveViewScreen = () => {
   const handleUseSendDoc = useSendDocs([doc]);
 
   const handleSendDoc = useCallback(() => {
-    setScreenState('sending');
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
+          setScreenState('sending');
           setTimeout(() => {
-            setScreenState('idle');
+            if (screenState !== 'idle') {
+              setScreenState('idle');
+            }
           }, 10000);
           handleUseSendDoc();
         },
       },
       {
         text: 'Отмена',
-        onPress: () => {
-          setScreenState('idle');
-        },
       },
     ]);
-  }, [handleUseSendDoc]);
+  }, [handleUseSendDoc, screenState]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -203,12 +202,12 @@ export const MoveViewScreen = () => {
     () =>
       !isBlocked && (
         <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} />
+          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {/* <ScanButton onPress={handleDoScan} /> */}
-          <MenuButton actionsMenu={actionsMenu} />
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked],
+    [actionsMenu, handleSendDoc, isBlocked, screenState],
   );
 
   useLayoutEffect(() => {

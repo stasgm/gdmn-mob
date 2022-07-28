@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View, FlatList, StyleSheet, TouchableHighlight, TextInput, ListRenderItem } from 'react-native';
+import { Alert, View, FlatList, TouchableHighlight, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,15 +16,16 @@ import {
   LargeText,
   BackButton,
   ListItemLine,
+  SendButton,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
 
-import { generateId, getDateString, round } from '@lib/mobile-app';
+import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
 
-import { ISellbillDocument, ISellbillLine, ITempLine } from '../../store/types';
+import { IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
+import { ShipmentStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor, lineTypes, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -33,40 +34,40 @@ import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDi
 
 import { getBarcode } from '../../utils/helpers';
 
-import SellbillTotal from './components/SellbillTotal';
+import ShipmentTotal from './components/ShipmentTotal';
 
-const keyExtractor = (item: ISellbillLine | ITempLine) => item.id;
+const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 
-const SellbillViewScreen = () => {
+const ShipmentViewScreen = () => {
   const { colors } = useTheme();
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillView'>>();
-  const id = useRoute<RouteProp<SellbillStackParamList, 'SellbillView'>>().params?.id;
+  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentView'>>();
+  const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
 
-  const [deleting, setDeleting] = useState(false);
+  // const [deleting, setDeleting] = useState(false);
 
-  const sellbill = docSelectors.selectByDocId<ISellbillDocument>(id);
-  const sellBillLines = useMemo(
-    () => sellbill?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
-    [sellbill?.lines],
+  const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
+  const shipmentLines = useMemo(
+    () => shipment?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
+    [shipment?.lines],
   );
 
-  const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === sellbill?.head?.orderId);
+  const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
   const tempOrderLines = tempOrder?.lines?.filter((i) => i.weight > 0) as ITempLine[];
 
-  const isBlocked = sellbill?.status !== 'DRAFT';
+  const isBlocked = shipment?.status !== 'DRAFT';
 
-  const sellbillLineSum = sellBillLines?.reduce((sum, line) => sum + line.weight, 0) || 0;
+  const shipmentLineSum = shipmentLines?.reduce((sum, line) => sum + line.weight, 0) || 0;
   const tempLineSum = tempOrderLines?.reduce((sum, line) => sum + line.weight, 0) || 0;
 
-  const handleEditSellbillHead = useCallback(() => navigation.navigate('SellbillEdit', { id }), [navigation, id]);
+  const handleEditShipmentHead = useCallback(() => navigation.navigate('ShipmentEdit', { id }), [navigation, id]);
 
-  const handleDeleteSellbill = useCallback(async () => {
+  const handleDeleteShipment = useCallback(async () => {
     if (!id) {
       return;
     }
@@ -77,8 +78,8 @@ const SellbillViewScreen = () => {
         onPress: async () => {
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            fpDispatch(fpMovementActions.removeTempOrder(sellbill?.head.orderId));
-            setDeleting(true);
+            fpDispatch(fpMovementActions.removeTempOrder(shipment?.head.orderId));
+            setScreenState('deleting');
             await sleep(500);
             navigation.goBack();
           }
@@ -88,24 +89,24 @@ const SellbillViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, fpDispatch, id, navigation, sellbill?.head.orderId]);
+  }, [docDispatch, fpDispatch, id, navigation, shipment?.head.orderId]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    if (sellBillLines.length) {
-      const sellbillLine = sellBillLines[0];
-      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: sellbillLine.id }));
+    if (shipmentLines.length) {
+      const ShipmentLine = shipmentLines[0];
+      dispatch(documentActions.removeDocumentLine({ docId: id, lineId: ShipmentLine.id }));
 
-      const tempLine = tempOrderLines?.find((i) => sellbillLine.good.id === i.good.id);
+      const tempLine = tempOrderLines?.find((i) => ShipmentLine.good.id === i.good.id);
       if (tempLine && tempOrder) {
         fpDispatch(
           fpMovementActions.updateTempOrderLine({
             docId: tempOrder.id,
-            line: { ...tempLine, weight: round(tempLine.weight + sellbillLine.weight, 3) },
+            line: { ...tempLine, weight: round(tempLine.weight + ShipmentLine.weight, 3) },
           }),
         );
       }
     }
-  }, [dispatch, fpDispatch, id, sellBillLines, tempOrder, tempOrderLines]);
+  }, [dispatch, fpDispatch, id, shipmentLines, tempOrder, tempOrderLines]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -115,27 +116,57 @@ const SellbillViewScreen = () => {
       },
       {
         title: 'Редактировать данные',
-        onPress: handleEditSellbillHead,
+        onPress: handleEditShipmentHead,
       },
       {
         title: 'Удалить документ',
         type: 'destructive',
-        onPress: handleDeleteSellbill,
+        onPress: handleDeleteShipment,
       },
       {
         title: 'Отмена',
         type: 'cancel',
       },
     ]);
-  }, [showActionSheet, hanldeCancelLastScan, handleEditSellbillHead, handleDeleteSellbill]);
+  }, [showActionSheet, hanldeCancelLastScan, handleEditShipmentHead, handleDeleteShipment]);
+
+  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+
+  const handleUseSendDoc = useSendDocs([shipment]);
+
+  const handleSendDoc = useCallback(() => {
+    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          setScreenState('sending');
+          setTimeout(() => {
+            if (screenState !== 'idle') {
+              setScreenState('idle');
+            }
+          }, 10000);
+          handleUseSendDoc();
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [handleUseSendDoc, screenState]);
 
   const renderRight = useCallback(
-    () => !isBlocked && <MenuButton actionsMenu={actionsMenu} />,
-    [actionsMenu, isBlocked],
+    () =>
+      !isBlocked && (
+        <View style={styles.buttons}>
+          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+        </View>
+      ),
+    [actionsMenu, handleSendDoc, isBlocked, screenState],
   );
 
   const renderLeft = useCallback(
-    () => <BackButton onPress={() => navigation.navigate('SellbillList')} />,
+    () => <BackButton onPress={() => navigation.navigate('ShipmentList')} />,
     [navigation],
   );
 
@@ -169,7 +200,7 @@ const SellbillViewScreen = () => {
         return;
       }
 
-      const line = sellBillLines.find((i) => i.barcode === barc.barcode);
+      const line = shipmentLines.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
@@ -179,7 +210,7 @@ const SellbillViewScreen = () => {
 
       const tempLine = tempOrderLines?.find((i) => good.id === i.good.id);
 
-      const newLine: ISellbillLine = {
+      const newLine: IShipmentLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
@@ -187,7 +218,7 @@ const SellbillViewScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-        sortOrder: sellBillLines.length + 1,
+        sortOrder: shipmentLines.length + 1,
       };
 
       if (tempLine && tempOrder) {
@@ -201,7 +232,6 @@ const SellbillViewScreen = () => {
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
         } else if (newTempLine.weight === 0) {
-          // fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
           fpDispatch(
             fpMovementActions.updateTempOrderLine({
               docId: tempOrder?.id,
@@ -214,7 +244,6 @@ const SellbillViewScreen = () => {
             {
               text: 'Да',
               onPress: async () => {
-                // fpDispatch(fpMovementActions.removeTempOrderLine({ docId: tempOrder?.id, lineId: tempLine.id }));
                 dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
                 fpDispatch(
                   fpMovementActions.updateTempOrderLine({
@@ -246,7 +275,7 @@ const SellbillViewScreen = () => {
       setScanned(false);
     },
 
-    [goods, sellBillLines, tempOrderLines, tempOrder, fpDispatch, dispatch, id],
+    [goods, shipmentLines, tempOrderLines, tempOrder, fpDispatch, dispatch, id],
   );
 
   //Для отрисовки при каждом новом сканировании
@@ -295,7 +324,7 @@ const SellbillViewScreen = () => {
     [colors.background, colors.primary, colors.text, lineType],
   );
 
-  const renderSellbillItem: ListRenderItem<ISellbillLine> = ({ item }) => (
+  const renderShipmentItem: ListRenderItem<IShipmentLine> = ({ item }) => (
     <ListItemLine key={item.id} readonly={isBlocked}>
       <View style={styles.details}>
         <MediumText style={styles.name}>{item.good.name}</MediumText>
@@ -324,7 +353,7 @@ const SellbillViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (deleting) {
+  if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
@@ -334,7 +363,7 @@ const SellbillViewScreen = () => {
       </View>
     );
   } else {
-    if (!sellbill) {
+    if (!shipment) {
       return (
         <View style={[styles.container, styles.alignItemsCenter]}>
           <LargeText>Документ не найден</LargeText>
@@ -346,13 +375,13 @@ const SellbillViewScreen = () => {
   return (
     <View style={styles.container}>
       <InfoBlock
-        colorLabel={getStatusColor(sellbill?.status || 'DRAFT')}
-        title={sellbill.head.outlet?.name || ''}
-        onPress={handleEditSellbillHead}
-        disabled={!['DRAFT', 'READY'].includes(sellbill.status)}
+        colorLabel={getStatusColor(shipment?.status || 'DRAFT')}
+        title={shipment.head.outlet?.name || ''}
+        onPress={handleEditShipmentHead}
+        disabled={!['DRAFT', 'READY'].includes(shipment.status)}
       >
-        <View style={localStyles.infoBlock}>
-          <MediumText>{`№ ${sellbill.number} на ${getDateString(sellbill.head?.onDate)}`}</MediumText>
+        <View style={styles.infoBlock}>
+          <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
           {isBlocked ? (
             <View style={styles.rowCenter}>
               <MaterialCommunityIcons name="lock-outline" size={20} />
@@ -374,13 +403,13 @@ const SellbillViewScreen = () => {
         <>
           <FlatList
             key={lineType}
-            data={sellBillLines}
+            data={shipmentLines}
             keyExtractor={keyExtractor}
-            renderItem={renderSellbillItem}
+            renderItem={renderShipmentItem}
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <SellbillTotal quantity={sellbillLineSum} weight={sellBillLines.length} />
+          <ShipmentTotal quantity={shipmentLineSum} weight={shipmentLines.length} />
         </>
       ) : (
         <>
@@ -392,17 +421,11 @@ const SellbillViewScreen = () => {
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <SellbillTotal quantity={tempLineSum} weight={tempOrderLines?.length || 0} />
+          <ShipmentTotal quantity={tempLineSum} weight={tempOrderLines?.length || 0} />
         </>
       )}
     </View>
   );
 };
 
-export default SellbillViewScreen;
-
-const localStyles = StyleSheet.create({
-  infoBlock: {
-    flexDirection: 'column',
-  },
-});
+export default ShipmentViewScreen;

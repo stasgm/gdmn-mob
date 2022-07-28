@@ -1,7 +1,7 @@
-import { IMoveDocument, IFreeSellbillDocument, ISellbillDocument } from '../store/types';
+import { IMoveDocument, IFreeShipmentDocument, IShipmentDocument } from '../store/types';
 import { IBarcode } from '../store/app/types';
 
-export const getNextDocNumber = (documents: IMoveDocument[] | ISellbillDocument[] | IFreeSellbillDocument[]) => {
+export const getNextDocNumber = (documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))

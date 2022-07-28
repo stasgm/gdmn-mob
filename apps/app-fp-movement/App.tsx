@@ -42,8 +42,8 @@ import { store, useSelector as useFpSelector, fpMovementActions } from './src/st
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
 import { messageFpMovement } from './src/store/mock';
-import { FreeSellbillNavigator } from './src/navigation/FreeSellbillNavigator';
-import { SellbillNavigator } from './src/navigation/SellbillNavigator';
+import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
+import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
 
 const Root = () => {
   const navItems: INavItem[] = useMemo(
@@ -55,16 +55,16 @@ const Root = () => {
         component: MoveNavigator,
       },
       {
-        name: 'SellBill',
+        name: 'Shipment',
         title: 'Отвес по заявке',
         icon: 'playlist-check',
-        component: SellbillNavigator,
+        component: ShipmentNavigator,
       },
       {
-        name: 'FreeSellbill',
+        name: 'FreeShipment',
         title: 'Отвес',
         icon: 'playlist-plus',
-        component: FreeSellbillNavigator,
+        component: FreeShipmentNavigator,
       },
     ],
     [],
@@ -157,7 +157,7 @@ const Root = () => {
         <AppScreen>
           <Text style={styles.textInfo}>
             {
-              'Добро пожаловать в GDMN Отгрузка!\n\nНаше приложение облегчает процесс перемещения готовой продукции и позволяет выполнить следующие действия: \n\n1. Оформить внутреннее перемещение товаров\n\n2. Создать отвес-накладную по готовой заявке' // \n\n3. Планировать посещение торговых объектов, составлять маршрут и просматривать его на карте\n\n4. Оперативно контролировать задолженность за поставленную продукцию\n\n5. Просматривать юридический адрес, адрес разгрузки и иные реквизиты покупателя\n\n6. Гибко настраивать цены и скидки для конкретного покупателя или группы покупателей'
+              'Добро пожаловать в GDMN Отгрузка!\n\nНаше приложение облегчает процесс перемещения готовой продукции и позволяет выполнить следующие действия: \n\n1. Оформить внутреннее перемещение товаров\n\n2. Создать отвес-накладную по готовой заявке'
             }
           </Text>
           <TouchableOpacity

@@ -50,10 +50,6 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
     .selectByDocType<IOrderDocument>('order')
     ?.filter((doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id);
 
-  // useFilteredDocList<IOrderDocument>('order').filter(
-  //   (doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id,
-  // );
-
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
   const handleCloseVisit = useCallback(async () => {
@@ -178,10 +174,10 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
 
   const readyDocs = orderDocs.filter((doc) => doc.status === 'READY');
 
-  const handleReadyDocs = useSendDocs(readyDocs);
+  const sendDoc = useSendDocs(readyDocs);
 
   const handleSendDocs = async () => {
-    handleReadyDocs();
+    sendDoc();
   };
 
   const isFocused = useIsFocused();

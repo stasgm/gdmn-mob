@@ -7,14 +7,14 @@ import { useTheme } from '@react-navigation/native';
 
 import { round } from '@lib/mobile-app';
 
-import { IFreeSellbillLine } from '../../../store/types';
+import { IFreeShipmentLine } from '../../../store/types';
 
 export interface IItem {
-  lines: IFreeSellbillLine[];
+  lines: IFreeShipmentLine[];
   scan?: boolean;
 }
 
-const FreeSellbillTotal = ({ lines, scan = false }: IItem) => {
+const FreeShipmentTotal = ({ lines, scan = false }: IItem) => {
   const { colors } = useTheme();
 
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
@@ -57,7 +57,7 @@ const FreeSellbillTotal = ({ lines, scan = false }: IItem) => {
   );
 };
 
-export default FreeSellbillTotal;
+export default FreeShipmentTotal;
 
 const localStyles = StyleSheet.create({
   margins: {

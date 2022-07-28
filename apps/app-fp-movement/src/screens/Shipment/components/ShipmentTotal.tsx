@@ -13,7 +13,7 @@ export interface IItem {
   scan?: boolean;
 }
 
-const SellbillTotal = ({ weight, quantity, scan = false }: IItem) => {
+const ShipmentTotal = ({ weight, quantity, scan = false }: IItem) => {
   const { colors } = useTheme();
 
   return (
@@ -48,7 +48,7 @@ const SellbillTotal = ({ weight, quantity, scan = false }: IItem) => {
   );
 };
 
-export default SellbillTotal;
+export default ShipmentTotal;
 
 const localStyles = StyleSheet.create({
   margins: {

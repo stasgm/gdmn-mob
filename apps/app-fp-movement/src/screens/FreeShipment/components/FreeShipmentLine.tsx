@@ -8,16 +8,16 @@ import { useTheme } from '@react-navigation/native';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { ISellbillLine } from '../../../store/types';
+import { IFreeShipmentLine } from '../../../store/types';
 
 import { ONE_SECOND_IN_MS } from '../../../utils/constants';
 
 interface IProps {
-  item: ISellbillLine;
-  onSetLine: (value: ISellbillLine) => void;
+  item: IFreeShipmentLine;
+  onSetLine: (value: IFreeShipmentLine) => void;
 }
 
-export const SellbillLine = ({ item }: IProps) => {
+export const FreeShipmentLine = ({ item }: IProps) => {
   const { colors } = useTheme();
 
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
