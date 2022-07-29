@@ -82,7 +82,7 @@ const ShipmentEditScreen = () => {
         return;
       }
 
-      if (!(/*docNumber  && docContact && docOutlet && docOnDate &&*/ docDocumentDate)) {
+      if (!docDocumentDate) {
         Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
         setScreenState('idle');
         return;
@@ -101,7 +101,6 @@ const ShipmentEditScreen = () => {
           id,
           status: docStatus || 'DRAFT',
           documentDate: docDocumentDate,
-          // documentType: shipmentType,
           creationDate: shipment.creationDate || updatedShipmentDate,
           editionDate: updatedShipmentDate,
         };
@@ -109,11 +108,21 @@ const ShipmentEditScreen = () => {
         dispatch(documentActions.updateDocument({ docId: id, document: updatedShipment }));
         navigation.navigate('ShipmentView', { id });
       }
+      setScreenState('idle');
     }
   }, [shipmentType, docDocumentDate, id, shipment, docStatus, dispatch, navigation, screenState]);
 
   const renderRight = useCallback(
-    () => <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />,
+    () => (
+      <SaveButton
+        onPress={() => {
+          // if (screenState !== 'saving') {
+          setScreenState('saving');
+          // }
+        }}
+        disabled={screenState === 'saving'}
+      />
+    ),
     [screenState],
   );
 

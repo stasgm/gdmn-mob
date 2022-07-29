@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { Alert, View, StyleSheet, ScrollView, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider /*, useTheme*/ } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { RouteProp, useNavigation, useRoute, StackActions, useTheme, useIsFocused } from '@react-navigation/native';
@@ -93,7 +93,6 @@ export const FreeShipmentEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, doc, defaultDepart]);
 
-  // const handleSave = useCallback(() => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
@@ -135,7 +134,6 @@ export const FreeShipmentEditScreen = () => {
         dispatch(documentActions.addDocument(newDoc));
 
         navigation.dispatch(StackActions.replace('FreeShipmentView', { id: newDoc.id }));
-        // setScreenState('idle');
       } else {
         if (!doc) {
           setScreenState('idle');
@@ -164,8 +162,8 @@ export const FreeShipmentEditScreen = () => {
 
         dispatch(documentActions.updateDocument({ docId: id, document: updatedDoc }));
         navigation.navigate('FreeShipmentView', { id });
-        // setScreenState('idle');
       }
+      setScreenState('idle');
     }
   }, [dispatch, doc, docComment, docDate, docDepart, docNumber, docStatus, id, navigation, screenState, shipmentType]);
 
