@@ -93,28 +93,78 @@ const ShipmentViewScreen = () => {
         return;
       }
 
-      if (good) {
-        const barcodeItem = {
-          good: { id: good.id, name: good.name, shcode: good.shcode },
-          id: generateId(),
-          weight: barc.weight,
-          barcode: barc.barcode,
-          workDate: barc.workDate,
-          numReceived: barc.numReceived,
-          quantPack: barc.quantPack,
-          sortOrder: shipmentLines?.length + 1,
-        };
-        setErrorMessage('');
-        dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+      const tempLine = tempOrder?.lines?.find((i) => good.id === i.good.id);
 
-        setVisibleDialog(false);
-        setBarcode('');
-      } else {
-        setErrorMessage('Товар не найден');
+      const barcodeItem = {
+        good: { id: good.id, name: good.name, shcode: good.shcode },
+        id: generateId(),
+        weight: barc.weight,
+        barcode: barc.barcode,
+        workDate: barc.workDate,
+        numReceived: barc.numReceived,
+        quantPack: barc.quantPack,
+        sortOrder: shipmentLines?.length + 1,
+      };
+
+      if (tempLine && tempOrder) {
+        const newTempLine = { ...tempLine, weight: round(tempLine.weight - barcodeItem.weight, 3) };
+
+        setErrorMessage('');
+        if (newTempLine.weight > 0) {
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+        } else if (newTempLine.weight === 0) {
+          fpDispatch(
+            fpMovementActions.updateTempOrderLine({
+              docId: tempOrder?.id,
+              line: newTempLine,
+            }),
+          );
+          dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+        }
+        // else {
+        //   Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+        //     {
+        //       text: 'Да',
+        //       onPress: async () => {
+        //         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+        //         fpDispatch(
+        //           fpMovementActions.updateTempOrderLine({
+        //             docId: tempOrder?.id,
+        //             line: newTempLine,
+        //           }),
+        //         );
+        //       },
+        //     },
+        //     {
+        //       text: 'Отмена',
+        //     },
+        //   ]);
+        // }
       }
+      // else {
+      //   Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+      //     {
+      //       text: 'Да',
+      //       onPress: async () => {
+      //         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+      //       },
+      //     },
+      //     {
+      //       text: 'Отмена',
+      //     },
+      //   ]);
+      // }
+      setVisibleDialog(false);
+      setBarcode('');
     },
 
-    [dispatch, goods, id, shipment?.lines, shipmentLines?.length],
+    [dispatch, fpDispatch, goods, id, shipment?.lines, shipmentLines?.length, tempOrder],
   );
 
   const handleShowDialog = () => {
@@ -143,8 +193,8 @@ const ShipmentViewScreen = () => {
         text: 'Да',
         onPress: async () => {
           const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            fpDispatch(fpMovementActions.removeTempOrder(shipment?.head.orderId));
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS' && tempOrder) {
+            fpDispatch(fpMovementActions.removeTempOrder(tempOrder?.id));
             setScreenState('deleting');
             await sleep(500);
             navigation.goBack();
@@ -155,14 +205,14 @@ const ShipmentViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, fpDispatch, id, navigation, shipment?.head.orderId]);
+  }, [docDispatch, fpDispatch, id, navigation, tempOrder]);
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
       const ShipmentLine = shipmentLines?.[0];
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: ShipmentLine.id }));
 
-      const tempLine = tempOrderLines?.find((i) => ShipmentLine.good.id === i.good.id);
+      const tempLine = tempOrder?.lines?.find((i) => ShipmentLine.good.id === i.good.id);
       if (tempLine && tempOrder) {
         fpDispatch(
           fpMovementActions.updateTempOrderLine({
@@ -172,7 +222,7 @@ const ShipmentViewScreen = () => {
         );
       }
     }
-  }, [dispatch, fpDispatch, id, shipmentLines, tempOrder, tempOrderLines]);
+  }, [dispatch, fpDispatch, id, shipmentLines, tempOrder]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -278,7 +328,7 @@ const ShipmentViewScreen = () => {
         return;
       }
 
-      const tempLine = tempOrderLines?.find((i) => good.id === i.good.id);
+      const tempLine = tempOrder?.lines?.find((i) => good.id === i.good.id);
 
       const newLine: IShipmentLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
@@ -345,8 +395,10 @@ const ShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [goods, shipmentLines, tempOrderLines, tempOrder, fpDispatch, dispatch, id],
+    [goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
   );
+
+  console.log('123', tempOrderLines);
 
   //Для отрисовки при каждом новом сканировании
   const [key, setKey] = useState(1);

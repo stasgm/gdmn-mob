@@ -57,7 +57,7 @@
 //     (brc: string): IShipmentLine | undefined => {
 //       const barc = getBarcode(brc);
 
-//       const good = goods.find((item) => item.shcode === barc.shcode);
+//       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 //       // Находим товар из модели остатков по баркоду, если баркод не найден, то
 //       //   если выбор из остатков, то undefined,
 //       //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
@@ -83,7 +83,7 @@
 //     (brc: string) => {
 //       const barc = getBarcode(brc);
 
-//       const good = goods.find((item) => item.shcode === barc.shcode);
+//       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
 //       if (good) {
 //         const barcodeItem: IShipmentLine = {
