@@ -96,7 +96,7 @@ const ShipmentEditScreen = () => {
           id,
           status: docStatus || 'DRAFT',
           documentDate: docDocumentDate,
-          documentType: shipmentType,
+          // documentType: shipmentType,
           creationDate: shipment.creationDate || updatedShipmentDate,
           editionDate: updatedShipmentDate,
         };

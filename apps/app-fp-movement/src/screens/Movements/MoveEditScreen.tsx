@@ -90,8 +90,8 @@ export const MoveEditScreen = () => {
           number: newNumber,
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          fromDepart: docDocumentSubtype?.id === 'movement' ? defaultDepart : undefined,
-          toDepart: docDocumentSubtype?.id === 'internalMovement' ? defaultDepart : undefined,
+          fromDepart: docDocumentSubtype?.id === 'internalMovement' ? defaultDepart : undefined,
+          toDepart: docDocumentSubtype?.id === 'movement' ? defaultDepart : undefined,
         }),
       );
     }
@@ -114,8 +114,8 @@ export const MoveEditScreen = () => {
 
       if (
         !(
-          (docDocumentSubtype?.id === 'movement' && docFromDepart) ||
-          (docDocumentSubtype?.id === 'internalMovement' && docToDepart)
+          (docDocumentSubtype?.id === 'internalMovement' && docFromDepart) ||
+          (docDocumentSubtype?.id === 'movement' && docToDepart)
         )
       ) {
         Alert.alert('Ошибка!', 'Нет подразделения пользователя. Обратитесь к администратору.', [{ text: 'OK' }]);
@@ -258,6 +258,7 @@ export const MoveEditScreen = () => {
       refName: 'depart',
       fieldName: 'fromDepart',
       value: docFromDepart && [docFromDepart],
+      descrFieldName: 'shcode',
     });
   };
 
@@ -332,14 +333,14 @@ export const MoveEditScreen = () => {
             label={'Откуда'}
             value={docFromDepart?.name}
             onPress={handleFromDepart}
-            disabled={docDocumentSubtype?.id === 'movement' ? true : isBlocked}
+            disabled={docDocumentSubtype?.id === 'internalMovement' || !docDocumentSubtype ? true : isBlocked}
           />
 
           <SelectableInput
             label={'Куда'}
             value={docToDepart?.name}
             onPress={handleToDepart}
-            disabled={docDocumentSubtype?.id === 'internalMovement' ? true : isBlocked}
+            disabled={docDocumentSubtype?.id === 'movement' || !docDocumentSubtype ? true : isBlocked}
           />
           <Input
             label="Комментарий"

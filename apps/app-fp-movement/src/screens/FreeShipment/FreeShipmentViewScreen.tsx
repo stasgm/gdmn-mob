@@ -202,14 +202,16 @@ export const FreeShipmentViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked && (
+      isBlocked ? (
+        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+      ) : (
         <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {/* <ScanButton onPress={handleDoScan} /> */}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, doc?.status, handleSendDoc, isBlocked, screenState],
   );
 
   useLayoutEffect(() => {

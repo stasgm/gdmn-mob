@@ -227,13 +227,15 @@ const ShipmentViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked && (
+      isBlocked ? (
+        shipment?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+      ) : (
         <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, handleSendDoc, isBlocked, screenState, shipment?.status],
   );
 
   const renderLeft = useCallback(
