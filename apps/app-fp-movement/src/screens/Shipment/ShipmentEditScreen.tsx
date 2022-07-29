@@ -77,15 +77,20 @@ const ShipmentEditScreen = () => {
   useEffect(() => {
     if (screenState === 'saving') {
       if (!shipmentType) {
-        return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
+        Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
       }
 
       if (!(/*docNumber  && docContact && docOutlet && docOnDate &&*/ docDocumentDate)) {
-        return Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        Alert.alert('Ошибка!', 'Не все поля заполнены.', [{ text: 'OK' }]);
+        setScreenState('idle');
+        return;
       }
 
       if (id) {
         if (!shipment) {
+          setScreenState('idle');
           return;
         }
 
