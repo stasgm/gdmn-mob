@@ -6,8 +6,13 @@ import { Camera } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
+import { AppActivityIndicator, globalStyles, LargeText } from '@lib/mobile-ui';
+
 import { IOrderDocument } from '../../../../store/types';
+
 import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
+
+import { useCameraPermission } from '../../../../hooks/useCameraPermission';
 
 import styles from './styles';
 
@@ -37,6 +42,7 @@ const ScanBarcode = ({
   const cameraStyle = useMemo(() => [styles.camera, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
+  const hasPermission = useCameraPermission();
 
   const handleBarCodeScanned = (data: string) => {
     const brc = data.replace(']C1', '');
@@ -60,6 +66,27 @@ const ScanBarcode = ({
       setScanned(true);
     }
   }, [errorMessage, scannedObject]);
+
+  if (hasPermission === null) {
+    return (
+      <View style={globalStyles.container}>
+        <View style={globalStyles.containerCenter}>
+          <LargeText>Запрос на использование камеры</LargeText>
+          <AppActivityIndicator style={{}} />
+        </View>
+      </View>
+    );
+  }
+
+  if (hasPermission === false) {
+    return (
+      <View style={globalStyles.container}>
+        <View style={globalStyles.containerCenter}>
+          <LargeText>Нет доступа к камере</LargeText>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.content}>
