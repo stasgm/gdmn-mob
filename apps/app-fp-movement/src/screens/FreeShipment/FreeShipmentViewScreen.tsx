@@ -21,37 +21,37 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
-import { IFreeSellbillDocument, IFreeSellbillLine } from '../../store/types';
-import { FreeSellbillStackParamList } from '../../navigation/Root/types';
+import { IFreeShipmentDocument, IFreeShipmentLine } from '../../store/types';
+import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import FreeSellbillTotal from './components/FreeSellbillTotal';
+import FreeShipmentTotal from './components/FreeShipmentTotal';
 
 export interface IScanerObject {
-  item?: IFreeSellbillLine;
+  item?: IFreeShipmentLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }
 
-export const FreeSellbillViewScreen = () => {
+export const FreeShipmentViewScreen = () => {
   const showActionSheet = useActionSheet();
   const dispatch = useDispatch();
   const docDispatch = useDocThunkDispatch();
-  const navigation = useNavigation<StackNavigationProp<FreeSellbillStackParamList, 'FreeSellbillView'>>();
+  const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
-  const id = useRoute<RouteProp<FreeSellbillStackParamList, 'FreeSellbillView'>>().params?.id;
+  const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params?.id;
 
-  const doc = docSelectors.selectByDocId<IFreeSellbillDocument>(id);
+  const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
+  const isBlocked = doc?.status !== 'DRAFT';
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -120,7 +120,7 @@ export const FreeSellbillViewScreen = () => {
   };
 
   const handleEditDocHead = useCallback(() => {
-    navigation.navigate('FreeSellbillEdit', { id });
+    navigation.navigate('FreeShipmentEdit', { id });
   }, [navigation, id]);
 
   const handleDelete = useCallback(() => {
@@ -155,25 +155,24 @@ export const FreeSellbillViewScreen = () => {
   const handleUseSendDoc = useSendDocs([doc]);
 
   const handleSendDoc = useCallback(() => {
-    setScreenState('sending');
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
+          setScreenState('sending');
           setTimeout(() => {
-            setScreenState('idle');
+            if (screenState !== 'idle') {
+              setScreenState('idle');
+            }
           }, 10000);
           handleUseSendDoc();
         },
       },
       {
         text: 'Отмена',
-        onPress: () => {
-          setScreenState('idle');
-        },
       },
     ]);
-  }, [handleUseSendDoc]);
+  }, [handleUseSendDoc, screenState]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -204,10 +203,10 @@ export const FreeSellbillViewScreen = () => {
   const renderRight = useCallback(
     () =>
       !isBlocked && (
-        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
+        <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {/* <ScanButton onPress={handleDoScan} /> */}
-          <MenuButton actionsMenu={actionsMenu} />
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
     [actionsMenu, handleSendDoc, isBlocked, screenState],
@@ -220,7 +219,7 @@ export const FreeSellbillViewScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const renderItem: ListRenderItem<IFreeSellbillLine> = ({ item }) => (
+  const renderItem: ListRenderItem<IFreeShipmentLine> = ({ item }) => (
     <ListItemLine key={item.id}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
@@ -262,7 +261,7 @@ export const FreeSellbillViewScreen = () => {
         return;
       }
 
-      const newLine: IFreeSellbillLine = {
+      const newLine: IFreeShipmentLine = {
         good: { id: good.id, name: good.name, shcode: good.shcode },
         id: generateId(),
         weight: barc.weight,
@@ -331,7 +330,7 @@ export const FreeSellbillViewScreen = () => {
         disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
-        <View style={styles.directionColumn}>
+        <View style={styles.infoBlock}>
           <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
@@ -354,7 +353,7 @@ export const FreeSellbillViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {lines.length ? <FreeSellbillTotal lines={lines} /> : null}
+      {lines.length ? <FreeShipmentTotal lines={lines} /> : null}
       <AppDialog
         visible={visibleDialog}
         text={barcode}

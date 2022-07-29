@@ -27,22 +27,22 @@ import { IDocumentType } from '@lib/types';
 
 import { IDelList, IListItem } from '@lib/mobile-types';
 
-import { ISellbillDocument } from '../../store/types';
-import { SellbillStackParamList } from '../../navigation/Root/types';
+import { IShipmentDocument } from '../../store/types';
+import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
 import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
-export interface SellbillListSectionProps {
+export interface ShipmentListSectionProps {
   title: string;
 }
 
-export type SectionDataProps = SectionListData<IListItemProps, SellbillListSectionProps>[];
+export type SectionDataProps = SectionListData<IListItemProps, ShipmentListSectionProps>[];
 
-export const SellbillListScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'SellbillList'>>();
+export const ShipmentListScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ShipmentList'>>();
   const dispatch = useDispatch();
 
-  const docs = useSelector((state) => state.documents.list) as ISellbillDocument[];
+  const docs = useSelector((state) => state.documents.list) as IShipmentDocument[];
 
   const list = docs?.filter((i) => i.documentType?.name === 'shipment' || i.documentType.name === 'currShipment');
 
@@ -208,7 +208,7 @@ export const SellbillListScreen = () => {
       onPress={() =>
         isDelList
           ? setDelList(getDelList(delList, item.id, item.status!))
-          : navigation.navigate('SellbillView', { id: item.id })
+          : navigation.navigate('ShipmentView', { id: item.id })
       }
       onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
       checked={!!delList[item.id]}

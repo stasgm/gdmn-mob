@@ -18,13 +18,13 @@ import { MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
-import { IMoveLine, ISellbillLine } from '../../store/types';
+import { IMoveLine, IShipmentLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
 import styles from './styles';
 
 export interface IScanerObject {
-  item?: IMoveLine | ISellbillLine;
+  item?: IMoveLine | IShipmentLine;
   barcode: string;
   state: 'scan' | 'added' | 'notFound';
 }

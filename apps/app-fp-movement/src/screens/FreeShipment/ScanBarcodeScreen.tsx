@@ -21,7 +21,7 @@ import { ScanBarcode, ScanBarcodeReader } from '../../components';
 
 import { IScanerObject } from '../../components/ScanBarcode/ScanBarcode';
 
-import FreeSellbillTotal from './components/FreeSellbillTotal';
+import FreeShipmentTotal from './components/FreeShipmentTotal';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<MoveStackParamList, 'ScanBarcode'>>().params?.docId;
@@ -167,7 +167,7 @@ const ScanBarcodeScreen = () => {
           clearScan={handleClearScan}
         />
       )}
-      {document.lines?.length ? <FreeSellbillTotal lines={document.lines} scan={true} /> : null}
+      {document.lines?.length ? <FreeShipmentTotal lines={document.lines} scan={true} /> : null}
       <AppDialog
         visible={visibleDialog}
         text={barcode}

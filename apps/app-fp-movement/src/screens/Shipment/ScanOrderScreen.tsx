@@ -14,8 +14,8 @@ import { AppActivityIndicator, AppDialog, globalStyles, LargeText } from '@lib/m
 
 import { View, Text } from 'react-native';
 
-import { SellbillStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, ISellbillDocument, ITempDocument } from '../../store/types';
+import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { IOrderDocument, IShipmentDocument, ITempDocument } from '../../store/types';
 import { navBackButton } from '../../components/navigateOptions';
 
 import { ICodeEntity } from '../../store/app/types';
@@ -28,9 +28,9 @@ import { ScanBarcodeReader } from './components/ScanBarcodeReader';
 import styles from './components/ScanBarcode/styles';
 
 const ScanOrderScreen = () => {
-  const docTypeId = useRoute<RouteProp<SellbillStackParamList, 'ScanOrder'>>().params?.id;
+  const docTypeId = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params?.id;
 
-  const navigation = useNavigation<StackNavigationProp<SellbillStackParamList, 'ScanOrder'>>();
+  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanOrder'>>();
   const settings = useSelector((state) => state.settings?.data);
 
   const dispatch = useDispatch();
@@ -51,7 +51,7 @@ const ScanOrderScreen = () => {
 
   const shipments = useSelector((state) =>
     state.documents?.list.filter((i) => i.documentType?.name === 'shipment' || i.documentType?.name === 'currShipment'),
-  ) as ISellbillDocument[];
+  ) as IShipmentDocument[];
 
   const shipmentType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === docTypeId);
 
@@ -67,7 +67,7 @@ const ScanOrderScreen = () => {
 
       if (shipment) {
         navigation.dispatch(
-          StackActions.replace('SellbillView', {
+          StackActions.replace('ShipmentView', {
             id: shipment.id,
           }),
         );
@@ -85,7 +85,7 @@ const ScanOrderScreen = () => {
         dispatch(fpActions.addTempOrder(newTempOrder));
       }
 
-      const sellbillDoc: ISellbillDocument = {
+      const shipmentDoc: IShipmentDocument = {
         id: generateId(),
         documentType: shipmentType!,
         number: item.number,
@@ -104,11 +104,11 @@ const ScanOrderScreen = () => {
         editionDate: new Date().toISOString(),
       };
 
-      dispatch(documentActions.addDocument(sellbillDoc));
+      dispatch(documentActions.addDocument(shipmentDoc));
 
       navigation.dispatch(
-        StackActions.replace('SellbillView', {
-          id: sellbillDoc.id,
+        StackActions.replace('ShipmentView', {
+          id: shipmentDoc.id,
         }),
       );
     },
@@ -132,7 +132,7 @@ const ScanOrderScreen = () => {
 
         if (shipment) {
           navigation.dispatch(
-            StackActions.replace('SellbillView', {
+            StackActions.replace('ShipmentView', {
               id: shipment.id,
             }),
           );
