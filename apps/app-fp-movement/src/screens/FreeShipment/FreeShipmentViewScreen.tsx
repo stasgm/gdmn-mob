@@ -147,7 +147,7 @@ export const FreeShipmentViewScreen = () => {
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    if (lines.length) {
+    if (lines?.length) {
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lines[0].id }));
     }
   }, [dispatch, id, lines]);
@@ -353,7 +353,7 @@ export const FreeShipmentViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {lines.length ? <FreeShipmentTotal lines={lines} /> : null}
+      {lines?.length ? <FreeShipmentTotal lines={lines} /> : null}
       <AppDialog
         visible={visibleDialog}
         text={barcode}

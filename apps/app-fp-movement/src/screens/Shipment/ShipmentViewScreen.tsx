@@ -103,7 +103,7 @@ const ShipmentViewScreen = () => {
           workDate: barc.workDate,
           numReceived: barc.numReceived,
           quantPack: barc.quantPack,
-          sortOrder: shipmentLines.length + 1,
+          sortOrder: shipmentLines?.length + 1,
         };
         setErrorMessage('');
         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
@@ -115,7 +115,7 @@ const ShipmentViewScreen = () => {
       }
     },
 
-    [dispatch, goods, id, shipment?.lines, shipmentLines.length],
+    [dispatch, goods, id, shipment?.lines, shipmentLines?.length],
   );
 
   const handleShowDialog = () => {
@@ -159,8 +159,8 @@ const ShipmentViewScreen = () => {
   }, [docDispatch, fpDispatch, id, navigation, shipment?.head.orderId]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    if (shipmentLines.length) {
-      const ShipmentLine = shipmentLines[0];
+    if (shipmentLines?.length) {
+      const ShipmentLine = shipmentLines?.[0];
       dispatch(documentActions.removeDocumentLine({ docId: id, lineId: ShipmentLine.id }));
 
       const tempLine = tempOrderLines?.find((i) => ShipmentLine.good.id === i.good.id);
@@ -269,7 +269,7 @@ const ShipmentViewScreen = () => {
         return;
       }
 
-      const line = shipmentLines.find((i) => i.barcode === barc.barcode);
+      const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
         Alert.alert('Внимание!', 'Данный штрих-код уже добавлен!', [{ text: 'OK' }]);
@@ -287,7 +287,7 @@ const ShipmentViewScreen = () => {
         workDate: barc.workDate,
         numReceived: barc.numReceived,
         quantPack: barc.quantPack,
-        sortOrder: shipmentLines.length + 1,
+        sortOrder: shipmentLines?.length + 1,
       };
 
       if (tempLine && tempOrder) {
@@ -478,7 +478,7 @@ const ShipmentViewScreen = () => {
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <ShipmentTotal quantity={shipmentLineSum} weight={shipmentLines.length} />
+          <ShipmentTotal quantity={shipmentLineSum} weight={shipmentLines?.length} />
         </>
       ) : (
         <>
