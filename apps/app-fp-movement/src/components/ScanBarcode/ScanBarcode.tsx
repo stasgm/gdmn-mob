@@ -6,14 +6,14 @@ import { Camera } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
-import { globalStyles, MediumText } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
 import { IMoveLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
 
-// import MoveTotal from '../../screens/Movements/components/MoveTotal';
+import { useCameraPermission } from '../../hooks/useCameraPermission';
 
 import styles from './styles';
 
@@ -28,11 +28,9 @@ interface IProps {
   getScannedObject: (brc: string) => void;
   clearScan: () => void;
   scanObject: IScanerObject;
-  // lines?: IMoveLine[];
 }
 
 const ScanBarcode = ({ onSearchBarcode, getScannedObject, scanObject, clearScan }: IProps) => {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
 
@@ -42,24 +40,31 @@ const ScanBarcode = ({ onSearchBarcode, getScannedObject, scanObject, clearScan 
   //Для перерисовки компонента после добавления новой позиции
   const [key, setKey] = useState(1);
 
-  useEffect(() => {
-    const permission = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    permission();
-  }, []);
+  const hasPermission = useCameraPermission();
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
 
   if (hasPermission === null) {
-    return <View />;
+    return (
+      <View style={globalStyles.container}>
+        <View style={globalStyles.containerCenter}>
+          <LargeText>Запрос на использование камеры</LargeText>
+          <AppActivityIndicator style={{}} />
+        </View>
+      </View>
+    );
   }
 
   if (hasPermission === false) {
-    return <MediumText style={globalStyles.title}>Нет доступа к камере</MediumText>;
+    return (
+      <View style={globalStyles.container}>
+        <View style={globalStyles.containerCenter}>
+          <LargeText>Нет доступа к камере</LargeText>
+        </View>
+      </View>
+    );
   }
 
   const setScan = (brc: string) => {
@@ -73,12 +78,7 @@ const ScanBarcode = ({ onSearchBarcode, getScannedObject, scanObject, clearScan 
       <Camera
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
         barCodeScannerSettings={{
-          barCodeTypes: [
-            BarCodeScanner.Constants.BarCodeType.code128,
-            BarCodeScanner.Constants.BarCodeType.ean128,
-            // BarCodeScanner.Constants.BarCodeType.ean13,
-            // BarCodeScanner.Constants.BarCodeType.ean8,
-          ],
+          barCodeTypes: [BarCodeScanner.Constants.BarCodeType.code128, BarCodeScanner.Constants.BarCodeType.ean128],
         }}
         autoFocus="on"
         whiteBalance="auto"
@@ -110,7 +110,6 @@ const ScanBarcode = ({ onSearchBarcode, getScannedObject, scanObject, clearScan 
         </View>
         {scanObject.item && (
           <View style={[{ backgroundColor: '#0008', padding: 10 }]}>
-            {/* <MediumText style={styles.barcode}>Штрихкод: {scanObject.barcode}</MediumText> */}
             <MediumText style={styles.text}>{scanObject.item.good.name}</MediumText>
             <MediumText style={styles.textWhite}>№ партии: {scanObject.item.numReceived || ''}</MediumText>
             <MediumText style={styles.textWhite}>
@@ -161,7 +160,6 @@ const ScanBarcode = ({ onSearchBarcode, getScannedObject, scanObject, clearScan 
             <MediumText style={styles.text}>Наведите рамку на штрихкод</MediumText>
           </View>
         )}
-        {/* {lines?.length ? <MoveTotal lines={lines} scan={true} /> : null} */}
       </Camera>
     </View>
   );
