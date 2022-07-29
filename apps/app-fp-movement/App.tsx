@@ -37,11 +37,11 @@ import { TouchableOpacity, Linking } from 'react-native';
 
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
-import { store, useSelector as useFpSelector, fpMovementActions } from './src/store';
+import { store, useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from './src/store';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 
-import { messageFpMovement } from './src/store/mock';
+import { messageFpMovement, tempOrders } from './src/store/mock';
 import { FreeShipmentNavigator } from './src/navigation/FreeShipmentNavigator';
 import { ShipmentNavigator } from './src/navigation/ShipmentNavigator';
 
@@ -139,15 +139,17 @@ const Root = () => {
   const handleSetInfoWindow_2 = useCallback(() => setInfoWindow(2), []);
   const handleSetInfoWindow_3 = useCallback(() => setInfoWindow(3), []);
 
+  const fpDispatch = useFpDispatch();
   useEffect(() => {
     if (isDemo) {
       //Если включен демо режим, то запускаем получение данных из мока
       getMessages();
+      fpDispatch(fpMovementActions.addTempOrders(tempOrders));
       if (connectionStatus === 'connected') {
         handleSetInfoWindow_1();
       }
     }
-  }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1]);
+  }, [isDemo, getMessages, connectionStatus, handleSetInfoWindow_1, fpDispatch]);
 
   const onClearLoadingErrors = () => dispatch(fpMovementActions.setLoadingError(''));
 

@@ -39,6 +39,11 @@ const reducer: Reducer<FpMovementState, FpMovementActionType> = (state = initial
         list: [...(state.list || []), action.payload],
       };
 
+    case getType(actions.addTempOrders):
+      return {
+        ...state,
+        list: [...state.list, ...action.payload],
+      };
     case getType(actions.updateTempOrderLine):
       return {
         ...state,

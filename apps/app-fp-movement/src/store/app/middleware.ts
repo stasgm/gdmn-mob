@@ -42,8 +42,8 @@ export const appFpMiddlewareFactory: PersistedMiddleware =
 
     if (store.getState().auth.user?.id) {
       switch (action.type) {
-        case getType(actions.init):
         case getType(actions.addTempOrder):
+        case getType(actions.addTempOrders):
         case getType(actions.updateTempOrderLine):
         case getType(actions.removeTempOrderLine):
         case getType(actions.removeTempOrder):

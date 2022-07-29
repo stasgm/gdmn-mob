@@ -4,6 +4,7 @@ import { FpMovementState, ITempDocument, ITempLine } from './types';
 
 const init = createAction('APP_FP_MOVEMENT/INIT')();
 const addTempOrder = createAction('APP_FP_MOVEMENT/ADD_ONE')<ITempDocument>();
+const addTempOrders = createAction('APP_FP_MOVEMENT/ADD_MANY')<ITempDocument[]>();
 const updateTempOrderLine = createAction('APP_FP_MOVEMENT/UPDATE_LINE_ONE')<{ docId: string; line: ITempLine }>();
 const removeTempOrderLine = createAction('APP_FP_MOVEMENT/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
 const removeTempOrder = createAction('APP_FP_MOVEMENT/REMOVE_ONE')<string>();
@@ -20,6 +21,7 @@ export const actions = {
   setLoadingData,
   setLoadingError,
   addTempOrder,
+  addTempOrders,
   updateTempOrderLine,
   removeTempOrderLine,
   removeTempOrder,
