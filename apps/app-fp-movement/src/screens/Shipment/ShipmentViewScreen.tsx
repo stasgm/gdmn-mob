@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { Alert, View, FlatList, TouchableHighlight, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
@@ -450,14 +449,10 @@ const ShipmentViewScreen = () => {
         title={shipment.head.outlet?.name || ''}
         onPress={handleEditShipmentHead}
         disabled={!['DRAFT', 'READY'].includes(shipment.status)}
+        isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
-          {isBlocked ? (
-            <View style={styles.rowCenter}>
-              <MaterialCommunityIcons name="lock-outline" size={20} />
-            </View>
-          ) : null}
         </View>
       </InfoBlock>
       <LineTypes />
