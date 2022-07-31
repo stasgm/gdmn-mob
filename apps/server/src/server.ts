@@ -81,17 +81,13 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   passport.use(new LocalStrategy(strategy, validateAuthCreds));
 
   // Логи для Morgan
-  const logPath = path.join(process.cwd(), '/logs/');
+  const logPath = path.join(process.cwd(), `${config.LOG_PATH}/`);
   if (!fs.existsSync(logPath)) {
     fs.mkdirSync(logPath);
   }
-  const accessLogStream: fs.WriteStream = fs.createWriteStream(path.join(logPath, 'access.log'), { flags: 'a' });
+  const accessLogStream: fs.WriteStream = fs.createWriteStream(config.LOG_ACCESS_PATH, { flags: 'a' });
 
   app
-    // .use(async (ctx, next) => {
-    //   console.log('querystring: ', ctx.querystring);
-    //   return next();
-    // })
     .use(errorHandler)
     .use(helmet())
     .use(
@@ -118,7 +114,6 @@ export async function createServer(server: IServer): Promise<KoaApp> {
     .use(
       cors({
         credentials: true,
-        // origin: 'http://localhost:8080',
       }),
     )
     .use(router.routes())
