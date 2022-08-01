@@ -2,7 +2,6 @@ import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, FlatList, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
 import {
@@ -30,6 +29,7 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 import { navBackButton } from '../../components/navigateOptions';
 import { IGood } from '../../store/app/types';
+import DocTotal from '../../components/DocTotal';
 
 export const DocViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -42,6 +42,9 @@ export const DocViewScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
   const doc = docSelectors.selectByDocId<IMovementDocument>(id);
+
+  const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
+  const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
 
   const isBlocked = doc?.status !== 'DRAFT' || screenState !== 'idle';
 
@@ -227,25 +230,22 @@ export const DocViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc.documentType.description || ''}
+        title={doc?.documentType.description || ''}
         onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        disabled={!['DRAFT', 'READY'].includes(doc?.status)}
+        isBlocked={isBlocked}
       >
         <>
           <MediumText style={styles.rowCenter}>
-            {(doc.documentType.remainsField === 'fromContact'
-              ? doc.head.fromContact?.name
-              : doc.head.toContact?.name) || ''}
+            {(doc?.documentType.remainsField === 'fromContact'
+              ? doc?.head.fromContact?.name
+              : doc?.head.toContact?.name) || ''}
           </MediumText>
-          <View style={styles.rowCenter}>
-            <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-
-            {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
-          </View>
+          <MediumText>{`№ ${doc?.number} от ${getDateString(doc?.documentDate)}`}</MediumText>
         </>
       </InfoBlock>
       <FlatList
-        data={doc.lines}
+        data={doc?.lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         initialNumToRender={6}
@@ -254,6 +254,9 @@ export const DocViewScreen = () => {
         windowSize={7} // Reduce the window size
         ItemSeparatorComponent={ItemSeparator}
       />
+      {doc?.lines.length ? (
+        <DocTotal lineCount={doc?.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
+      ) : null}
     </View>
   );
 };

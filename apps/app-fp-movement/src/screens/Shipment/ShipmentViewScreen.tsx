@@ -126,40 +126,38 @@ const ShipmentViewScreen = () => {
             }),
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+        } else {
+          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+            {
+              text: 'Да',
+              onPress: async () => {
+                dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+                fpDispatch(
+                  fpMovementActions.updateTempOrderLine({
+                    docId: tempOrder?.id,
+                    line: newTempLine,
+                  }),
+                );
+              },
+            },
+            {
+              text: 'Отмена',
+            },
+          ]);
         }
-        // else {
-        //   Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
-        //     {
-        //       text: 'Да',
-        //       onPress: async () => {
-        //         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
-        //         fpDispatch(
-        //           fpMovementActions.updateTempOrderLine({
-        //             docId: tempOrder?.id,
-        //             line: newTempLine,
-        //           }),
-        //         );
-        //       },
-        //     },
-        //     {
-        //       text: 'Отмена',
-        //     },
-        //   ]);
-        // }
+      } else {
+        Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+          {
+            text: 'Да',
+            onPress: async () => {
+              dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
+            },
+          },
+          {
+            text: 'Отмена',
+          },
+        ]);
       }
-      // else {
-      //   Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
-      //     {
-      //       text: 'Да',
-      //       onPress: async () => {
-      //         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
-      //       },
-      //     },
-      //     {
-      //       text: 'Отмена',
-      //     },
-      //   ]);
-      // }
       setVisibleDialog(false);
       setBarcode('');
     },
