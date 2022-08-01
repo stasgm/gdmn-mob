@@ -540,7 +540,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
-              shcode: '1574',
+              shcode: '1504',
               name: 'Сахар',
             },
             {

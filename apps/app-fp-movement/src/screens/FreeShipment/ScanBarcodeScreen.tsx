@@ -55,7 +55,7 @@ const ScanBarcodeScreen = () => {
       }
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === barc.shcode);
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
         setScanObject({ item: undefined, state: 'notFound', barcode: brc });
@@ -95,7 +95,7 @@ const ScanBarcodeScreen = () => {
       }
       const barc = getBarcode(brc);
 
-      const good = goods.find((item) => item.shcode === barc.shcode);
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (good) {
         const barcodeItem = {

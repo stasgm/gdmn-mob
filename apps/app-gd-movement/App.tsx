@@ -56,7 +56,7 @@ const Root = () => {
       {
         name: 'Scan',
         title: 'Сканирование',
-        icon: 'file-document-outline',
+        icon: 'barcode-scan',
         component: ScanNavigator,
       },
       {
