@@ -1,6 +1,6 @@
 # gdmn-mob
 
-![Схема платформы](docs\gdmn-mobile\img\platform_scheme_small.png "Title")
+![Схема платформы](docs\gdmn-mobile\img\platform_scheme_small.png "Схема платформы")
 
 ## Установка
 
