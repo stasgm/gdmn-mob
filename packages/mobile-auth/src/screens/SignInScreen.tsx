@@ -31,9 +31,11 @@ const SignInScreen = (props: Props) => {
 
   const [credential, setCredentials] = useState<IUserCredentials>({ name: '', password: '' });
 
+  const [visiblePassword, setVisiblePassword] = useState(false);
+
   const handleLogIn = useCallback(() => {
     Keyboard.dismiss();
-    onSignIn(credential);
+    onSignIn({ ...credential, name: credential.name.trim(), password: credential.password.trim() });
   }, [onSignIn, credential]);
 
   return (
@@ -52,9 +54,12 @@ const SignInScreen = (props: Props) => {
         />
         <Input
           label="Пароль"
-          secureText
+          secureText={!visiblePassword}
           value={credential.password}
           onChangeText={(e) => setCredentials({ ...credential, password: e })}
+          isIcon={true && credential.password !== ''}
+          iconName={visiblePassword ? 'eye-outline' : 'eye-off-outline'}
+          onIconPress={() => (visiblePassword ? setVisiblePassword(false) : setVisiblePassword(true))}
         />
         <PrimeButton disabled={loading || !credential.name || !credential.password} icon="login" onPress={handleLogIn}>
           Войти
