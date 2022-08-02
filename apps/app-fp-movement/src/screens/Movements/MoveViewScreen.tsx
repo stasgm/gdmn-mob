@@ -307,14 +307,14 @@ export const MoveViewScreen = () => {
   };
 
   useEffect(() => {
-    if (!scanned && ref?.current) {
+    if (!visibleDialog && !scanned && ref?.current) {
       ref?.current &&
         setTimeout(() => {
           ref.current?.focus();
           ref.current?.clear();
         }, ONE_SECOND_IN_MS);
     }
-  }, [scanned, ref]);
+  }, [scanned, ref, visibleDialog]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
