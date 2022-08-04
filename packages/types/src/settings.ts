@@ -1,4 +1,4 @@
-import { IEntity, ISortEntity } from './common';
+import { IEntity, ISettingsGroup } from './common';
 
 export type SettingValue = string | number | boolean;
 
@@ -8,7 +8,7 @@ interface ISettingsOption<T = SettingValue> extends IEntity {
   visible?: boolean;
   sortOrder?: number;
   type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
-  group?: ISortEntity;
+  group?: ISettingsGroup;
 }
 
 type Settings<T = Record<string, SettingValue>> = {

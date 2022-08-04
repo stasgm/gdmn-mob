@@ -33,3 +33,4 @@ export { LargeText, MediumText } from './AppText';
 export { AppActivityIndicator } from './AppActivityIndicator';
 export { default as AppDialog } from './AppDialog';
 export { ListItemLine } from './ListItemLine';
+export { default as Switch } from './Switch';

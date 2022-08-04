@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { Alert, View, StyleSheet } from 'react-native';
-import { Avatar, Divider, Switch } from 'react-native-paper';
+import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
 import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
@@ -15,6 +15,7 @@ import {
   useActionSheet,
   globalStyles,
   LargeText,
+  Switch,
 } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 

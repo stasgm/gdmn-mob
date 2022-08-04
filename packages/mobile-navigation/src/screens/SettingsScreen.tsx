@@ -1,21 +1,17 @@
 import React, { useCallback, useLayoutEffect, useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Divider } from 'react-native-paper';
+import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
-import {
-  globalStyles as styles,
-  DrawerButton,
-  MenuButton,
-  useActionSheet,
-  SettingsGroup,
-  AppScreen,
-} from '@lib/mobile-ui';
+import { DrawerButton, MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const SettingsSceen = () => {
-  const navigation = useNavigation();
+import { SettingsStackParamList } from '../navigation/Root/types';
+
+const SettingsScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<SettingsStackParamList, 'Settings'>>();
   const dispatch = useDispatch();
   const showActionSheet = useActionSheet();
   const data = useSelector((state) => state.settings.data);
@@ -88,21 +84,31 @@ const SettingsSceen = () => {
     <AppScreen>
       <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} style={[{ padding: 5, flexDirection: 'column' }]}>
         <View>
-          <Text style={styles.title}>Параметры связи с сервером</Text>
-          <Divider />
-          <View style={styles.details}>
-            <Text style={styles.name}>Путь к серверу</Text>
-            <Text style={[styles.number, styles.field, { color: colors.text }]}>{serverPath}</Text>
-          </View>
-        </View>
-        <View>
           {parents.map((group, groupKey) => {
             const list = Object.entries(settsData)
               .filter(([_, item]) => item?.visible && item.group?.id === group.id)
               .sort(([, itema], [, itemb]) => (itema?.sortOrder || 0) - (itemb?.sortOrder || 0));
             return (
               <View key={groupKey}>
-                <SettingsGroup key={groupKey} group={group} list={list} onValueChange={handleUpdate} />
+                {group.id === '1' ? (
+                  <SettingsGroup key={groupKey} list={list} onValueChange={handleUpdate} />
+                ) : (
+                  <View key={groupKey} style={localStyles.group}>
+                    <Divider />
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate('SettingsDetails', { id: group.id });
+                      }}
+                    >
+                      <View style={localStyles.container}>
+                        <View style={localStyles.details}>
+                          <MediumText>{group.name}</MediumText>
+                        </View>
+                        <IconButton icon="chevron-right" color={colors.text} />
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             );
           })}
@@ -112,14 +118,21 @@ const SettingsSceen = () => {
   );
 };
 
-export default SettingsSceen;
+export default SettingsScreen;
 
 const localStyles = StyleSheet.create({
   details: {
+    marginVertical: 5,
+    paddingHorizontal: 12,
+    height: 32,
+    justifyContent: 'center',
+  },
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  text: {
-    fontSize: 12,
-    opacity: 0.5,
+  group: {
+    paddingTop: 6,
   },
 });
