@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -21,7 +21,9 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
-import { IMoveDocument, IMoveLine } from '../../store/types';
+import { ISettingsOption, SettingValue } from '@lib/types';
+
+import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -59,13 +61,31 @@ export const MoveViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
+  const { data: settings } = useSelector((state) => state.settings);
+
+  const goodBarcodeSettings = Object.entries(settings).reduce(
+    (prev: barcodeSettings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+      if (cur?.[1]?.group?.id !== '1' && typeof cur[1]?.data === 'number') {
+        prev[cur[0]] = cur[1]?.data;
+      }
+      return prev;
+    },
+    {},
+  );
+
   const handleGetBarcode = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование');
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -101,7 +121,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [dispatch, doc?.lines, goods, id],
+    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const handleShowDialog = () => {
@@ -258,11 +278,22 @@ export const MoveViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повоторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+        Alert.alert(
+          'Внимание!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках! Повторите сканирование!',
+          [{ text: 'OK' }],
+        );
+        setScanned(false);
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -295,7 +326,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [dispatch, id, doc?.lines, goods],
+    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const [key, setKey] = useState(1);

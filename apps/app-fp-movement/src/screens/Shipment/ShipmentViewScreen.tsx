@@ -3,7 +3,7 @@ import { Alert, View, FlatList, TouchableHighlight, TextInput, ListRenderItem } 
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -23,7 +23,9 @@ import { sleep } from '@lib/client-api';
 
 import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
 
-import { IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
+import { ISettingsOption, SettingValue } from '@lib/types';
+
+import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 
@@ -47,7 +49,7 @@ const ShipmentViewScreen = () => {
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
 
-  const [lineType, setLineType] = useState(lineTypes[1].id);
+  const [lineType, setLineType] = useState(lineTypes[0].id);
 
   // const [deleting, setDeleting] = useState(false);
 
@@ -71,13 +73,31 @@ const ShipmentViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
+  const { data: settings } = useSelector((state) => state.settings);
+
+  const goodBarcodeSettings = Object.entries(settings).reduce(
+    (prev: barcodeSettings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+      if (cur?.[1]?.group?.id !== '1' && typeof cur[1]?.data === 'number') {
+        prev[cur[0]] = cur[1]?.data;
+      }
+      return prev;
+    },
+    {},
+  );
+
   const handleGetBarcode = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование');
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -162,7 +182,17 @@ const ShipmentViewScreen = () => {
       setBarcode('');
     },
 
-    [dispatch, fpDispatch, goods, id, shipment?.lines, shipmentLines?.length, tempOrder],
+    [
+      dispatch,
+      fpDispatch,
+      goodBarcodeSettings,
+      goods,
+      id,
+      settings.countBarcodeLentgh?.data,
+      shipment?.lines,
+      shipmentLines?.length,
+      tempOrder,
+    ],
   );
 
   const handleShowDialog = () => {
@@ -308,7 +338,18 @@ const ShipmentViewScreen = () => {
         setScanned(false);
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+        Alert.alert(
+          'Внимание!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках! Повторите сканирование!',
+          [{ text: 'OK' }],
+        );
+        setScanned(false);
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -393,10 +434,8 @@ const ShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
+    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
   );
-
-  console.log('123', tempOrderLines);
 
   //Для отрисовки при каждом новом сканировании
   const [key, setKey] = useState(1);
