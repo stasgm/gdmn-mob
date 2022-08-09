@@ -229,23 +229,23 @@ export const DocViewScreen = () => {
   return (
     <View style={styles.container}>
       <InfoBlock
-        colorLabel={getStatusColor(doc?.status || 'DRAFT')}
-        title={doc?.documentType.description || ''}
+        colorLabel={getStatusColor(doc.status || 'DRAFT')}
+        title={doc.documentType.description || ''}
         onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc?.status)}
+        disabled={!['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
         <>
           <MediumText style={styles.rowCenter}>
-            {(doc?.documentType.remainsField === 'fromContact'
-              ? doc?.head.fromContact?.name
-              : doc?.head.toContact?.name) || ''}
+            {(doc.documentType.remainsField === 'fromContact'
+              ? doc.head.fromContact?.name
+              : doc.head.toContact?.name) || ''}
           </MediumText>
-          <MediumText>{`№ ${doc?.number} от ${getDateString(doc?.documentDate)}`}</MediumText>
+          <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </>
       </InfoBlock>
       <FlatList
-        data={doc?.lines}
+        data={doc.lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         initialNumToRender={6}
@@ -254,8 +254,8 @@ export const DocViewScreen = () => {
         windowSize={7} // Reduce the window size
         ItemSeparatorComponent={ItemSeparator}
       />
-      {doc?.lines.length ? (
-        <DocTotal lineCount={doc?.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
+      {doc.lines.length ? (
+        <DocTotal lineCount={doc.lines?.length || 0} sum={docLineSum} quantity={docLineQuantity} />
       ) : null}
     </View>
   );
