@@ -27,6 +27,7 @@ import {
   getDateString,
   getDelLineList,
   keyExtractor,
+  shortenString,
   useSendDocs,
 } from '@lib/mobile-app';
 
@@ -193,15 +194,12 @@ export const ScanViewScreen = () => {
       onPress={() => (isDelList ? setDelList(getDelLineList(delList, item.id)) : undefined)}
       onLongPress={() => setDelList(getDelLineList(delList, item.id))}
       checked={delList.includes(item.id)}
+      readonly={true}
     >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
 
-        {item.barcode?.length && item.barcode?.length > 25 ? (
-          <MediumText>{item.barcode?.slice(0, 25)}...</MediumText>
-        ) : (
-          <MediumText>{item.barcode}</MediumText>
-        )}
+        <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
     </ListItemLine>
   );

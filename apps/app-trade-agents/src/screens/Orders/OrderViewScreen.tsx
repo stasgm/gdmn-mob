@@ -47,7 +47,7 @@ const OrderViewScreen = () => {
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting' | 'sent'>('idle');
   const [delList, setDelList] = useState<string[]>([]);
 
-  const [groupp, setGroup] = useState(false);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
@@ -321,7 +321,11 @@ const OrderViewScreen = () => {
         />
 
         {order.lines.length ? (
-          <OrderTotal onPress={() => setGroup(!groupp)} isGroupVisible={groupp} order={order} />
+          <OrderTotal
+            onPress={() => setIsGroupVisible(!isGroupVisible)}
+            isGroupVisible={isGroupVisible}
+            order={order}
+          />
         ) : null}
       </View>
     </>
