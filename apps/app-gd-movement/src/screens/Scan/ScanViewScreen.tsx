@@ -196,6 +196,12 @@ export const ScanViewScreen = () => {
     >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
+
+        {item.barcode?.length && item.barcode?.length > 25 ? (
+          <MediumText>{item.barcode?.slice(0, 25)}...</MediumText>
+        ) : (
+          <MediumText>{item.barcode}</MediumText>
+        )}
       </View>
     </ListItemLine>
   );
@@ -238,7 +244,7 @@ export const ScanViewScreen = () => {
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc?.head?.department?.name || ''}
           onPress={handleEditDocHead}
-          disabled={!['DRAFT', 'READY'].includes(doc.status)}
+          disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
         >
           <View style={styles.rowCenter}>
             <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>

@@ -232,7 +232,7 @@ export const DocViewScreen = () => {
         colorLabel={getStatusColor(doc.status || 'DRAFT')}
         title={doc.documentType.description || ''}
         onPress={handleEditDocHead}
-        disabled={!['DRAFT', 'READY'].includes(doc.status)}
+        disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
         isBlocked={isBlocked}
       >
         <>
