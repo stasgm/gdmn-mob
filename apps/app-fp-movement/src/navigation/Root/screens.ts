@@ -4,23 +4,16 @@ import { MoveListScreen, MoveEditScreen, MoveViewScreen, MoveLineScreen } from '
 
 import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
 
-import {
-  SellbillListScreen,
-  TempViewScreen,
-  SellbillEditScreen,
-  SellbillViewScreen,
-  SellbillLineScreen,
-} from '../../screens/Sellbills';
+import { ShipmentListScreen, ShipmentEditScreen, ShipmentViewScreen } from '../../screens/Shipment';
 
-import ScanOrderScreen from '../../screens/Sellbills/ScanOrderScreen';
-import ScanGoodScreen from '../../screens/Sellbills/ScanGoodScreen';
+import ScanOrderScreen from '../../screens/Shipment/ScanOrderScreen';
 
 import {
-  FreeSellbillListScreen,
-  FreeSellbillEditScreen,
-  FreeSellbillViewScreen,
-  FreeSellbillLineScreen,
-} from '../../screens/FreeSellbills';
+  FreeShipmentListScreen,
+  FreeShipmentEditScreen,
+  FreeShipmentViewScreen,
+  FreeShipmentLineScreen,
+} from '../../screens/FreeShipment';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
@@ -34,27 +27,24 @@ export const moveListScreens = {
   MoveList: { title: 'Перемещение', component: MoveListScreen },
 };
 
-export const sellbillScreens = {
-  TempView: { title: 'Заявка', component: TempViewScreen },
-  SellbillEdit: { title: 'Отвес по заявке', component: SellbillEditScreen },
-  SellbillView: { title: 'Отвес', component: SellbillViewScreen },
-  SellbillLine: { title: 'Позиция отвеса', component: SellbillLineScreen },
+export const shipmentScreens = {
+  ShipmentEdit: { title: 'Отвес по заявке', component: ShipmentEditScreen },
+  ShipmentView: { title: 'Отвес', component: ShipmentViewScreen },
   ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
-  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
-export const sellbillListScreens = {
-  SellbillList: { title: 'Отвесы по заявке', component: SellbillListScreen },
+export const shipmentListScreens = {
+  ShipmentList: { title: 'Отвесы по заявке', component: ShipmentListScreen },
 };
 
-export const freeSellbillScreens = {
-  FreeSellbillEdit: { title: 'Отвес', component: FreeSellbillEditScreen },
-  FreeSellbillView: { title: 'Отвес', component: FreeSellbillViewScreen },
-  FreeSellbillLine: { title: 'Позиция отвеса', component: FreeSellbillLineScreen },
+export const freeShipmentScreens = {
+  FreeShipmentEdit: { title: 'Отвес', component: FreeShipmentEditScreen },
+  FreeShipmentView: { title: 'Отвес', component: FreeShipmentViewScreen },
+  FreeShipmentLine: { title: 'Позиция отвеса', component: FreeShipmentLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
 };
 
-export const freeSellbillListScreens = {
-  FreeSellbillList: { title: 'Отвесы', component: FreeSellbillListScreen },
+export const freeShipmentListScreens = {
+  FreeShipmentList: { title: 'Отвесы', component: FreeShipmentListScreen },
 };

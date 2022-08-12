@@ -1,12 +1,13 @@
-import { IEntity } from '@lib/types';
 import { ActionType, createAction } from 'typesafe-actions';
 
-import { FpMovementState, IOrder } from './types';
+import { FpMovementState, ITempDocument, ITempLine } from './types';
 
 const init = createAction('APP_FP_MOVEMENT/INIT')();
-const addOrder = createAction('APP_FP_MOVEMENT/ADD_ONE')<IOrder>();
-const updateOrderLine = createAction('APP_FP_MOVEMENT/UPDATE_LINE_ONE')<{ docId: string; line: IEntity }>();
-const removeOrderLine = createAction('APP_FP_MOVEMENT/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
+const addTempOrder = createAction('APP_FP_MOVEMENT/ADD_ONE')<ITempDocument>();
+const addTempOrders = createAction('APP_FP_MOVEMENT/ADD_MANY')<ITempDocument[]>();
+const updateTempOrderLine = createAction('APP_FP_MOVEMENT/UPDATE_LINE_ONE')<{ docId: string; line: ITempLine }>();
+const removeTempOrderLine = createAction('APP_FP_MOVEMENT/REMOVE_LINE_ONE')<{ docId: string; lineId: string }>();
+const removeTempOrder = createAction('APP_FP_MOVEMENT/REMOVE_ONE')<string>();
 
 const loadData = createAction('APP_FP_MOVEMENT/LOAD_DATA')<FpMovementState>();
 const setLoading = createAction('APP_FP_MOVEMENT/SET_LOADING')<boolean>();
@@ -19,9 +20,11 @@ export const actions = {
   loadData,
   setLoadingData,
   setLoadingError,
-  addOrder,
-  updateOrderLine,
-  removeOrderLine,
+  addTempOrder,
+  addTempOrders,
+  updateTempOrderLine,
+  removeTempOrderLine,
+  removeTempOrder,
 };
 
 export type FpMovementActionType = ActionType<typeof actions>;

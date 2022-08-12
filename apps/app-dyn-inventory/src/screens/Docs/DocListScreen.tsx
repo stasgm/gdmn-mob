@@ -111,7 +111,7 @@ export const DocListScreen = () => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="InventoryView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('DocView', { id: item.id })} />
+        <ScreenListItem {...item} onPress={() => navigation.navigate('DocView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

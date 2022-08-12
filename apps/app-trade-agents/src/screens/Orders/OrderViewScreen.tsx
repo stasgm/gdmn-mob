@@ -47,6 +47,8 @@ const OrderViewScreen = () => {
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting' | 'sent'>('idle');
   const [delList, setDelList] = useState<string[]>([]);
 
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
+
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
   const isBlocked = useMemo(() => order?.status !== 'DRAFT', [order?.status]);
@@ -274,44 +276,59 @@ const OrderViewScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <InfoBlock
-        colorLabel={getStatusColor(order?.status || 'DRAFT')}
-        title={order.head?.outlet?.name}
-        onPress={handleEditOrderHead}
-        disabled={!['DRAFT', 'READY'].includes(order.status)}
-        isBlocked={isBlocked}
-      >
-        <View style={styles.directionColumn}>
-          <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
-            order.head?.onDate,
-          )}`}</MediumText>
-          <MediumText>Адрес: {address}</MediumText>
-          <MediumText style={debtTextStyle}>
-            {(debt?.saldo && debt?.saldo < 0
-              ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
-              : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
-          </MediumText>
-          <MediumText>
-            {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
-          </MediumText>
-          <View style={styles.rowCenter}>
-            <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
+    <>
+      <View style={styles.container}>
+        <InfoBlock
+          colorLabel={getStatusColor(order?.status || 'DRAFT')}
+          title={order.head?.outlet?.name}
+          onPress={handleEditOrderHead}
+          disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
+          // disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
+          isBlocked={isBlocked}
+        >
+          <View style={styles.directionColumn}>
+            <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
+              order.head?.onDate,
+            )}`}</MediumText>
+            <MediumText>Адрес: {address}</MediumText>
+            <MediumText style={debtTextStyle}>
+              {(debt?.saldo && debt?.saldo < 0
+                ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
+                : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
+            </MediumText>
+            <MediumText>
+              {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
+            </MediumText>
+            <View style={styles.rowCenter}>
+              <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
+            </View>
+            {order.head.comment ? (
+              <View style={styles.rowCenter}>
+                <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
+              </View>
+            ) : null}
           </View>
-        </View>
-      </InfoBlock>
-      <FlatList
-        data={order.lines}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        initialNumToRender={6}
-        maxToRenderPerBatch={6} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
-        ItemSeparatorComponent={ItemSeparator}
-      />
-      {order.lines.length ? <OrderTotal order={order} /> : null}
-    </View>
+        </InfoBlock>
+        <FlatList
+          data={order.lines}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          initialNumToRender={6}
+          maxToRenderPerBatch={6} // Reduce number in each render batch
+          updateCellsBatchingPeriod={100} // Increase time between renders
+          windowSize={7} // Reduce the window size
+          ItemSeparatorComponent={ItemSeparator}
+        />
+
+        {order.lines.length ? (
+          <OrderTotal
+            onPress={() => setIsGroupVisible(!isGroupVisible)}
+            isGroupVisible={isGroupVisible}
+            order={order}
+          />
+        ) : null}
+      </View>
+    </>
   );
 };
 

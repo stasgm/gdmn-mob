@@ -1,5 +1,5 @@
-import React from 'react';
-import { ReturnKeyTypeOptions, View } from 'react-native';
+import React, { ReactNode } from 'react';
+import { ReturnKeyTypeOptions, Text, View } from 'react-native';
 import { TextInput, useTheme } from 'react-native-paper';
 
 import styles from './styles';
@@ -34,6 +34,9 @@ interface Props {
   disabled?: boolean;
   clearInput?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
+  isIcon?: boolean;
+  iconName?: string;
+  onIconPress?: () => void;
 }
 
 const Input = ({
@@ -51,6 +54,9 @@ const Input = ({
   onEndEditing,
   clearInput,
   autoCapitalize,
+  onIconPress,
+  isIcon,
+  iconName,
 }: Props) => {
   const { colors } = useTheme();
 
@@ -78,15 +84,19 @@ const Input = ({
           maxLength={maxLength}
           placeholderTextColor={colors.text}
           right={
-            !!value &&
-            !!clearInput &&
-            !disabled && (
-              <TextInput.Icon
-                name="close"
-                size={20}
-                style={{ marginTop: 14 }}
-                onPress={() => onChangeText && onChangeText('')}
-              />
+            isIcon ? (
+              <TextInput.Icon name={iconName} size={20} style={{ marginTop: 14 }} onPress={onIconPress} />
+            ) : (
+              !!value &&
+              !!clearInput &&
+              !disabled && (
+                <TextInput.Icon
+                  name="close"
+                  size={20}
+                  style={{ marginTop: 14 }}
+                  onPress={() => onChangeText && onChangeText('')}
+                />
+              )
             )
           }
           secureTextEntry={secureText}

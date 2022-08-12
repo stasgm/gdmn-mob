@@ -33,13 +33,18 @@ const reducer: Reducer<FpMovementState, FpMovementActionType> = (state = initial
         loadingError: action.payload,
       };
 
-    case getType(actions.addOrder):
+    case getType(actions.addTempOrder):
       return {
         ...state,
         list: [...(state.list || []), action.payload],
       };
 
-    case getType(actions.updateOrderLine):
+    case getType(actions.addTempOrders):
+      return {
+        ...state,
+        list: [...state.list, ...action.payload],
+      };
+    case getType(actions.updateTempOrderLine):
       return {
         ...state,
         list: state.list.map((doc) =>
@@ -52,7 +57,7 @@ const reducer: Reducer<FpMovementState, FpMovementActionType> = (state = initial
         ),
       };
 
-    case getType(actions.removeOrderLine):
+    case getType(actions.removeTempOrderLine):
       return {
         ...state,
         list: state.list.map((doc) =>
@@ -63,6 +68,12 @@ const reducer: Reducer<FpMovementState, FpMovementActionType> = (state = initial
               }
             : doc,
         ),
+      };
+
+    case getType(actions.removeTempOrder):
+      return {
+        ...state,
+        list: state.list.filter((i) => i.id !== action.payload),
       };
 
     default:

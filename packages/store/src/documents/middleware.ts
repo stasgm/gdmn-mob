@@ -46,6 +46,7 @@ export const documentMiddlewareFactory: PersistedMiddleware =
         case getType(actions.addDocumentLine):
         case getType(actions.updateDocumentLine):
         case getType(actions.removeDocumentLine):
+        case getType(actions.removeDocumentLines):
         case getType(actions.addDocumentsAsync.success):
         case getType(actions.clearDocumentsAsync.success):
         case getType(actions.setDocumentsAsync.success):

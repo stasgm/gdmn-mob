@@ -13,6 +13,10 @@ export interface ISortEntity extends INamedEntity {
   sortOrder: number;
 }
 
+export interface ISettingsGroup extends ISortEntity {
+  description?: string;
+}
+
 export interface IExternalSystemProps {
   externalId?: string;
 }

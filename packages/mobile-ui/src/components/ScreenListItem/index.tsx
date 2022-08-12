@@ -10,50 +10,43 @@ import { LargeText, MediumText } from '../AppText';
 
 import { getStatusColor } from './constants';
 export interface IListItemProps {
-  children?: ReactNode;
   title: string;
   documentDate: string;
-  subtitle?: string;
-  status?: StatusType;
-  isFromRoute?: boolean;
-  lineCount?: number;
   errorMessage?: string;
   id: string;
-  onSelectItem: () => void;
-  onCheckItem?: () => void;
-  isChecked?: boolean;
-  isDelList?: boolean;
+  onPress: () => void;
+  onLongPress?: () => void;
+  subtitle?: string;
+  isFromRoute?: boolean;
+  status?: StatusType;
+  checked?: boolean;
   documentType?: string;
+  lineCount?: number;
+  children?: ReactNode;
 }
 
 const ScreenListItem = ({
   children,
   title,
   subtitle,
-  status,
+  status = 'DRAFT',
   lineCount,
   isFromRoute,
   errorMessage,
-  onSelectItem,
-  onCheckItem,
-  isChecked,
-  isDelList,
+  onPress,
+  onLongPress,
+  checked,
 }: IListItemProps) => {
   const { colors } = useTheme();
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        isDelList ? onCheckItem && onCheckItem() : onSelectItem && onSelectItem();
-      }}
-      onLongPress={onCheckItem}
-    >
+    <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <View style={styles.item}>
         <View style={styles.iconsWithCheck}>
-          <View style={[styles.icon, { backgroundColor: getStatusColor(status || 'DRAFT') }]}>
+          <View style={[styles.icon, { backgroundColor: getStatusColor(status) }]}>
             <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
           </View>
-          {isChecked ? (
+          {checked ? (
             <View style={styles.checkedIcon}>
               <MaterialCommunityIcons name="check" size={11} color={'#FFF'} />
             </View>

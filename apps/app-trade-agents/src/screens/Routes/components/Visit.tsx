@@ -50,10 +50,6 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
     .selectByDocType<IOrderDocument>('order')
     ?.filter((doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id);
 
-  // useFilteredDocList<IOrderDocument>('order').filter(
-  //   (doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet.id,
-  // );
-
   const orderType = refSelectors.selectByName<IDocumentType>('documentType')?.data.find((t) => t.name === 'order');
 
   const handleCloseVisit = useCallback(async () => {
@@ -172,16 +168,16 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
   }, [orderDocs]);
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => <ScreenListItem {...item} onSelectItem={() => navigation.navigate('OrderView', { id: item.id })} />,
+    ({ item }) => <ScreenListItem {...item} onPress={() => navigation.navigate('OrderView', { id: item.id })} />,
     [navigation],
   );
 
   const readyDocs = orderDocs.filter((doc) => doc.status === 'READY');
 
-  const handleReadyDocs = useSendDocs(readyDocs);
+  const sendDoc = useSendDocs(readyDocs);
 
   const handleSendDocs = async () => {
-    handleReadyDocs();
+    sendDoc();
   };
 
   const isFocused = useIsFocused();
@@ -215,7 +211,7 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
                       outlined={true}
                       disabled={process}
                     >
-                      Возообновить визит
+                      Возобновить визит
                     </PrimeButton>
                   )
                 )}

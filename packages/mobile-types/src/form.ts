@@ -19,3 +19,7 @@ export interface IDocumentParams {
 export interface IFilterParams {
   fieldSearch: string[];
 }
+
+export interface IDelList {
+  [id: string]: string;
+}

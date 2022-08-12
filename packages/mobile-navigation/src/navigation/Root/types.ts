@@ -33,6 +33,7 @@ type ReferenceStackParamList = {
 
 type SettingsStackParamList = {
   Settings: undefined;
+  SettingsDetails: { id: string };
 };
 
 type TabsStackParams = {

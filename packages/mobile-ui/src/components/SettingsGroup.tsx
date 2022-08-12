@@ -1,5 +1,5 @@
 import React from 'react';
-import { INamedEntity, ISettingsOption } from '@lib/types';
+import { ISettingsOption } from '@lib/types';
 import { View, StyleSheet } from 'react-native';
 import { Divider, useTheme } from 'react-native-paper';
 
@@ -7,29 +7,31 @@ import SettingsItem from './SettingsItem';
 import { LargeText } from './AppText';
 
 type Props = {
-  group: INamedEntity;
+  groupDescription?: string;
   list: any[];
   onValueChange: (optionName: string, value: ISettingsOption) => void;
 };
 
-const SettingsGroup = ({ group, list, onValueChange }: Props) => {
-  const { colors } = useTheme();
+const SettingsGroup = ({ groupDescription, list, onValueChange }: Props) => {
   return (
-    <View style={localStyles.container}>
+    <View>
+      {groupDescription ? (
+        <View>
+          <LargeText style={localStyles.title}>{groupDescription}</LargeText>
+        </View>
+      ) : null}
       <View>
-        <LargeText style={localStyles.title}>{group.name}</LargeText>
-      </View>
-      <View style={[localStyles.border, { borderColor: colors.primary }]}>
         {list.map(([key, item]) => {
           return (
             <View key={key}>
+              <Divider />
+
               <SettingsItem
                 key={key}
                 label={item.description || key}
                 value={item.data}
                 onValueChange={(newValue) => onValueChange(key, { ...item, data: newValue })}
               />
-              <Divider />
             </View>
           );
         })}

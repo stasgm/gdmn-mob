@@ -1,7 +1,7 @@
-import { IMoveDocument, IFreeSellbillDocument, ITempDocument } from '../store/types';
+import { IMoveDocument, IFreeShipmentDocument, IShipmentDocument, barcodeSettings } from '../store/types';
 import { IBarcode } from '../store/app/types';
 
-export const getNextDocNumber = (documents: IMoveDocument[] | ITempDocument[] | IFreeSellbillDocument[]) => {
+export const getNextDocNumber = (documents: IMoveDocument[] | IShipmentDocument[] | IFreeShipmentDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))
@@ -9,16 +9,22 @@ export const getNextDocNumber = (documents: IMoveDocument[] | ITempDocument[] | 
   ).toString();
 };
 
-export const getBarcode = (barcode: string) => {
-  const weight = barcode.slice(0, 6);
-  const day = barcode.slice(6, 8);
-  const month = barcode.slice(8, 10);
-  const year = '20' + barcode.slice(10, 12);
-  // const hours = barcode.slice(12, 14);
-  // const minutes = barcode.slice(14, 16);
-  const shcode = barcode.slice(16, 20);
-  const quantPack = barcode.slice(16, 20);
-  const numReceived = barcode.slice(24, 30);
+export const getBarcode = (barcode: string, settings: barcodeSettings) => {
+  const weightLast = settings.countWeight;
+  const dayLast = weightLast + settings.countDay;
+  const monthLast = dayLast + settings.countMonth;
+  const yearLast = monthLast + settings.countYear;
+  const shcodeLast = yearLast + 4 + settings.countCode;
+  const quantPackLast = shcodeLast + settings.countQuantPack;
+  const numReceivedLast = quantPackLast + settings.countType + settings.countNumReceived;
+
+  const weight = barcode.slice(0, weightLast);
+  const day = barcode.slice(weightLast, dayLast);
+  const month = barcode.slice(dayLast, monthLast);
+  const year = '20' + barcode.slice(monthLast, yearLast);
+  const shcode = barcode.slice(yearLast + 4, shcodeLast);
+  const quantPack = barcode.slice(shcodeLast, quantPackLast);
+  const numReceived = barcode.slice(quantPackLast + 1, numReceivedLast);
 
   const date = new Date(Number(year), Number(month) - 1, Number(day)).toISOString();
 
@@ -31,6 +37,5 @@ export const getBarcode = (barcode: string) => {
     quantPack: Number(quantPack),
   };
 
-  // console.log('w', barcodeObj);
   return barcodeObj;
 };

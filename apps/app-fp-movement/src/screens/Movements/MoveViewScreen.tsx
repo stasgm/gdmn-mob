@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Alert, TextInput } from 'react-native';
+import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -13,13 +13,17 @@ import {
   AppActivityIndicator,
   MediumText,
   LargeText,
+  AppDialog,
+  ListItemLine,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
-import { IMoveDocument, IMoveLine } from '../../store/types';
+import { ISettingsOption, SettingValue } from '@lib/types';
+
+import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -27,9 +31,6 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import BarcodeDialog from '../../components/BarcodeDialog';
-
-import { MoveItem } from './components/MoveItem';
 import MoveTotal from './components/MoveTotal';
 
 export interface IScanerObject {
@@ -52,33 +53,51 @@ export const MoveViewScreen = () => {
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
 
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT' || screenState !== 'idle', [doc?.status, screenState]);
+  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const goods = refSelectors.selectByName<IGood>('good').data;
+
+  const { data: settings } = useSelector((state) => state.settings);
+
+  const goodBarcodeSettings = Object.entries(settings).reduce(
+    (prev: barcodeSettings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
+      if (cur?.[1]?.group?.id !== '1' && typeof cur[1]?.data === 'number') {
+        prev[cur[0]] = cur[1]?.data;
+      }
+      return prev;
+    },
+    {},
+  );
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        setError(true);
+        setErrorMessage('Штрих-код неверного формата');
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование');
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
       if (!good) {
-        setError(true);
+        setErrorMessage('Товар не найден');
         return;
       }
 
       const line = doc?.lines?.find((i) => i.barcode === barc.barcode);
 
       if (line) {
-        setError(true);
+        setErrorMessage('Товар уже добавлен');
         return;
       }
 
@@ -90,26 +109,23 @@ export const MoveViewScreen = () => {
           barcode: barc.barcode,
           workDate: barc.workDate,
           numReceived: barc.numReceived,
+          sortOrder: doc?.lines?.length + 1,
         };
-        setError(false);
+        setErrorMessage('');
         dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
 
         setVisibleDialog(false);
         setBarcode('');
       } else {
-        setError(true);
+        setErrorMessage('Товар не найден');
       }
     },
 
-    [dispatch, doc?.lines, goods, id],
+    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const handleShowDialog = () => {
     setVisibleDialog(true);
-  };
-
-  const handleDismisDialog = () => {
-    setVisibleDialog(false);
   };
 
   const handleSearchBarcode = () => {
@@ -119,7 +135,7 @@ export const MoveViewScreen = () => {
   const handleDismissBarcode = () => {
     setVisibleDialog(false);
     setBarcode('');
-    setError(false);
+    setErrorMessage('');
   };
 
   const handleEditDocHead = useCallback(() => {
@@ -150,7 +166,7 @@ export const MoveViewScreen = () => {
   }, [docDispatch, id, navigation]);
 
   const hanldeCancelLastScan = useCallback(() => {
-    const lastId = doc?.lines?.[doc?.lines?.length - 1]?.id;
+    const lastId = doc?.lines?.[0]?.id;
 
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
   }, [dispatch, doc?.lines, id]);
@@ -158,25 +174,24 @@ export const MoveViewScreen = () => {
   const handleUseSendDoc = useSendDocs([doc]);
 
   const handleSendDoc = useCallback(() => {
-    setScreenState('sending');
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
+          setScreenState('sending');
           setTimeout(() => {
-            setScreenState('idle');
+            if (screenState !== 'idle') {
+              setScreenState('idle');
+            }
           }, 10000);
           handleUseSendDoc();
         },
       },
       {
         text: 'Отмена',
-        onPress: () => {
-          setScreenState('idle');
-        },
       },
     ]);
-  }, [handleUseSendDoc]);
+  }, [handleUseSendDoc, screenState]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -206,14 +221,16 @@ export const MoveViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked && (
+      isBlocked ? (
+        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+      ) : (
         <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} />
+          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {/* <ScanButton onPress={handleDoScan} /> */}
-          <MenuButton actionsMenu={actionsMenu} />
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked],
+    [actionsMenu, doc?.status, handleSendDoc, isBlocked, screenState],
   );
 
   useLayoutEffect(() => {
@@ -241,7 +258,18 @@ export const MoveViewScreen = () => {
   //   return sum;
   // }, []);
 
-  const renderItem = useCallback(({ item }: { item: IMoveLine }) => <MoveItem key={item.id} item={item} />, []);
+  const renderItem: ListRenderItem<IMoveLine> = ({ item }) => (
+    <ListItemLine key={item.id}>
+      <View style={styles.details}>
+        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+        <View style={styles.directionRow}>
+          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        </View>
+        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
+        <MediumText>Дата изготовления: {getDateString(item.workDate) || ''}</MediumText>
+      </View>
+    </ListItemLine>
+  );
 
   const [scanned, setScanned] = useState(false);
 
@@ -250,11 +278,22 @@ export const MoveViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повоторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+        Alert.alert(
+          'Внимание!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках! Повторите сканирование!',
+          [{ text: 'OK' }],
+        );
+        setScanned(false);
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -287,7 +326,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [dispatch, id, doc?.lines, goods],
+    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const [key, setKey] = useState(1);
@@ -299,14 +338,14 @@ export const MoveViewScreen = () => {
   };
 
   useEffect(() => {
-    if (!scanned && ref?.current) {
+    if (!visibleDialog && !scanned && ref?.current) {
       ref?.current &&
         setTimeout(() => {
           ref.current?.focus();
           ref.current?.clear();
         }, ONE_SECOND_IN_MS);
     }
-  }, [scanned, ref]);
+  }, [scanned, ref, visibleDialog]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -322,14 +361,14 @@ export const MoveViewScreen = () => {
         </View>
       </View>
     );
-  }
-
-  if (!doc) {
-    return (
-      <View style={[styles.container, styles.alignItemsCenter]}>
-        <LargeText>Документ не найден</LargeText>
-      </View>
-    );
+  } else {
+    if (!doc) {
+      return (
+        <View style={[styles.container, styles.alignItemsCenter]}>
+          <LargeText>Документ не найден</LargeText>
+        </View>
+      );
+    }
   }
 
   return (
@@ -349,7 +388,7 @@ export const MoveViewScreen = () => {
         </>
       </InfoBlock>
       <TextInput
-        style={{ width: 1, height: 1 }}
+        style={styles.scanInput}
         key={key}
         autoFocus={true}
         selectionColor="transparent"
@@ -361,7 +400,6 @@ export const MoveViewScreen = () => {
         data={lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={10}
         maxToRenderPerBatch={10} // Reduce number in each render batch
@@ -369,14 +407,14 @@ export const MoveViewScreen = () => {
         windowSize={7} // Reduce the window size
       />
       {doc?.lines?.length ? <MoveTotal lines={doc?.lines} /> : null}
-      <BarcodeDialog
-        visibleDialog={visibleDialog}
-        onDismissDialog={handleDismisDialog}
-        barcode={barcode}
-        onChangeBarcode={setBarcode}
-        onDismiss={handleDismissBarcode}
-        onSearch={handleSearchBarcode}
-        error={error}
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={setBarcode}
+        onCancel={handleDismissBarcode}
+        onOk={handleSearchBarcode}
+        okLabel={'Найти'}
+        errorMessage={errorMessage}
       />
     </View>
   );

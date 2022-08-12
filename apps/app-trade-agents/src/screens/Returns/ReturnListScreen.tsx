@@ -134,7 +134,7 @@ const ReturnListScreen = () => {
   const handlePressReturn = useCallback((id: string) => navigation.navigate('ReturnView', { id }), [navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
-    <ScreenListItem {...item} onSelectItem={() => handlePressReturn(item.id)} />
+    <ScreenListItem {...item} onPress={() => handlePressReturn(item.id)} />
   );
 
   return (

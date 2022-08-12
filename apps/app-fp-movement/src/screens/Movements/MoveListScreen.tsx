@@ -1,14 +1,11 @@
-import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { Alert, ListRenderItem, SectionList, SectionListData, View } from 'react-native';
-import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
+import React, { useCallback, useState, useLayoutEffect, useMemo } from 'react';
+import { ListRenderItem, SectionList, SectionListData, View, StyleSheet } from 'react-native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
-import { Searchbar } from 'react-native-paper';
-
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   globalStyles as styles,
   AddButton,
-  FilterButtons,
   ItemSeparator,
   Status,
   AppScreen,
@@ -20,16 +17,21 @@ import {
   AppActivityIndicator,
   EmptyList,
   MediumText,
-  SearchButton,
+  Menu,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { getDateString, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+
+import { INamedEntity } from '@lib/types';
+
+import { IDelList } from '@lib/mobile-types';
 
 import { IMoveDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { navBackDrawer } from '../../components/navigateOptions';
+import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface MoveListSectionProps {
   title: string;
@@ -41,32 +43,24 @@ export const MoveListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveList'>>();
   const dispatch = useDispatch();
 
-  // const movements = useSelector((state) => state.documents.list) as IMoveDocument[];
-  const { colors } = useTheme();
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterVisible, setFilterVisible] = useState(false);
-
   const list = (
-    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'move') as IMoveDocument[]
+    useSelector((state) => state.documents.list)?.filter((i) => i.documentType?.name === 'movement') as IMoveDocument[]
   ).sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
 
-  // const list = movements
-  //   ?.filter((i) =>
-  //     i.documentType?.name === 'move'
-  //       ? i?.head?.fromDepart.name || i?.head?.toDepart.name || i.number || i.documentDate
-  //         ? i?.head?.fromDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  //           i?.head?.toDepart?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  //           i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-  //           getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase())
-  //         : true
-  //       : false,
-  //   )
-  //   .sort((a, b) => new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime());
+  const [delList, setDelList] = useState<IDelList>({});
+  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
-  const [delList, setDelList] = useState({});
+  const [date, setDate] = useState(dateTypes[0]);
 
   const [status, setStatus] = useState<Status>('all');
+
+  const documentSubtypes = refSelectors
+    .selectByName<INamedEntity>('documentSubtype')
+    ?.data?.map((i) => ({ id: i.id, value: i.name }));
+
+  const docTypes = useMemo(() => docDepartTypes.concat(documentSubtypes), [documentSubtypes]);
+
+  const [type, setType] = useState(docTypes[0]);
 
   const filteredList: IListItemProps[] = useMemo(() => {
     const res =
@@ -74,23 +68,40 @@ export const MoveListScreen = () => {
         ? list
         : status === 'active'
         ? list.filter((e) => e.status !== 'PROCESSED')
-        : status === 'archive'
-        ? list.filter((e) => e.status === 'PROCESSED')
+        : status !== 'archive' && status !== 'all'
+        ? list.filter((e) => e.status === status)
         : [];
 
-    return res.map(
+    const newRes = type?.id === 'all' ? res : res?.filter((i) => i?.head.subtype.id === type?.id);
+
+    newRes.sort((a, b) =>
+      date.id === 'new'
+        ? new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime()
+        : new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
+    );
+
+    return newRes.map(
       (i) =>
         ({
           id: i.id,
-          title: `№ ${i.number} на ${getDateString(i.documentDate)}` || '',
+          title: i.head.subtype.name || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          // subtitle: `№ ${i.number} от ${getDateString(i.documentDate)} на ${getDateString(i.head?.onDate)}`,
+
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
+          children: (
+            <View>
+              <MediumText>Откуда: {i.head.fromDepart?.name || ''}</MediumText>
+              <MediumText>Куда: {i.head.toDepart?.name || ''}</MediumText>
+              <MediumText>
+                № {i.number} на {getDateString(i.documentDate)}
+              </MediumText>
+            </View>
+          ),
         } as IListItemProps),
     );
-  }, [status, list]);
+  }, [status, list, type?.id, date.id]);
 
   const sections = useMemo(
     () =>
@@ -114,124 +125,74 @@ export const MoveListScreen = () => {
     [filteredList],
   );
 
+  const [visibleType, setVisibleType] = useState(false);
+  const [visibleStatus, setVisibleStatus] = useState(false);
+  const [visibleDate, setVisibleDate] = useState(false);
+
+  const handleApplyType = useCallback((option) => {
+    setVisibleType(false);
+    setType(option);
+  }, []);
+
+  const handleApplyStatus = useCallback((option) => {
+    setVisibleStatus(false);
+    setStatus(option.id);
+  }, []);
+
+  const handleApplyDate = useCallback((option) => {
+    setVisibleDate(false);
+    setDate(option);
+  }, []);
+
   const handleAddDocument = useCallback(() => {
     navigation.navigate('MoveEdit');
   }, [navigation]);
 
-  const handelAddDeletelList = useCallback(
-    (lineId: string, docStatus: string, checkedId: string) => {
-      if (checkedId) {
-        const newList = Object.entries(delList).reduce((sum, cur) => {
-          const curId = cur[0];
-          const curStatus = cur[1];
-          if (curId !== checkedId) {
-            return { ...sum, [curId]: curStatus };
-          } else {
-            return { ...sum };
-          }
-        }, {});
-        setDelList(newList);
-      } else {
-        setDelList({ ...delList, [lineId]: docStatus });
-      }
-    },
-    [delList],
-  );
-
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
-    const statusList = Object.values(delList).find((i) => i === 'READY' || i === 'SENT');
 
-    if (statusList) {
-      Alert.alert('Внимание!', 'Среди выделенных документов есть необработанные документы. Продолжить удаление?', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.removeDocuments(docIds));
-            setDelList([]);
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
-    } else {
-      Alert.alert('Вы уверены, что хотите удалить документы?', '', [
-        {
-          text: 'Да',
-          onPress: () => {
-            dispatch(documentActions.removeDocuments(docIds));
-            setDelList([]);
-          },
-        },
-        {
-          text: 'Отмена',
-        },
-      ]);
-    }
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocuments(docIds));
+      setDelList({});
+    };
+
+    deleteSelectedItems(delList, deleteDocs);
   }, [delList, dispatch]);
-
-  useEffect(() => {
-    if (!filterVisible && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [filterVisible, searchQuery]);
 
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        {delList && Object.values(delList).length > 0 ? (
-          <DeleteButton onPress={handleDeleteDocs} />
-        ) : (
-          <>
-            <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={filterVisible} />
-            <AddButton onPress={handleAddDocument} />
-          </>
-        )}
+        {isDelList ? <DeleteButton onPress={handleDeleteDocs} /> : <AddButton onPress={handleAddDocument} />}
       </View>
     ),
-    [delList, filterVisible, handleAddDocument, handleDeleteDocs],
+    [handleAddDocument, handleDeleteDocs, isDelList],
   );
 
-  const renderLeft = useCallback(
-    () => delList && Object.values(delList).length > 0 && <CloseButton onPress={() => setDelList([])} />,
-    [delList],
-  );
+  const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: delList && Object.values(delList).length > 0 ? renderLeft : navBackDrawer,
+      headerLeft: isDelList ? renderLeft : navBackDrawer,
       headerRight: renderRight,
-      title:
-        delList && Object.values(delList).length > 0
-          ? `Выделено документов: ${Object.values(delList).length}`
-          : 'Документы',
+      title: isDelList ? `Выделено документов: ${Object.values(delList).length}` : 'Перемещение',
     });
-  }, [delList, navigation, renderLeft, renderRight]);
-
-  const handlePressDoc = useCallback((id: string) => navigation.navigate('MoveView', { id }), [navigation]);
+  }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
   const renderItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => {
-      const doc = list.find((r) => r.id === item.id);
-      const checkedId = (delList && Object.keys(delList).find((i) => i === item.id)) || '';
-      return doc ? (
-        <ScreenListItem
-          key={item.id}
-          {...item}
-          onSelectItem={() => handlePressDoc(item.id)}
-          onCheckItem={() => handelAddDeletelList(item.id, item.status || '', checkedId)}
-          isChecked={checkedId ? true : false}
-          isDelList={delList && Object.values(delList).length > 0 ? true : false}
-        >
-          <View>
-            <MediumText>Откуда: {doc.head.fromDepart?.name || ''}</MediumText>
-            <MediumText>Куда: {doc.head.toDepart?.name || ''}</MediumText>
-          </View>
-        </ScreenListItem>
-      ) : null;
-    },
-    [delList, handelAddDeletelList, handlePressDoc, list],
+    ({ item }) => (
+      <ScreenListItem
+        key={item.id}
+        {...item}
+        onPress={() =>
+          isDelList
+            ? setDelList(getDelList(delList, item.id, item.status!))
+            : navigation.navigate('MoveView', { id: item.id })
+        }
+        onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+        checked={!!delList[item.id]}
+      />
+    ),
+    [delList, isDelList, navigation],
   );
 
   const renderSectionHeader = useCallback(
@@ -246,31 +207,69 @@ export const MoveListScreen = () => {
 
   return (
     <AppScreen>
-      <FilterButtons status={status} onPress={setStatus} style={styles.marginBottom5} />
-      {filterVisible && (
-        <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
-          <ItemSeparator />
-        </>
-      )}
+      <View style={[styles.containerCenter, localStyles.container]}>
+        <Menu
+          key={'MenuType'}
+          title="Тип"
+          visible={visibleType}
+          onChange={handleApplyType}
+          onDismiss={() => setVisibleType(false)}
+          onPress={() => setVisibleType(true)}
+          options={docTypes}
+          activeOptionId={type.id}
+          style={[styles.btnTab, styles.firstBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={type.id !== 'all'}
+          iconName={'chevron-down'}
+        />
+        <Menu
+          key={'MenuStatus'}
+          title="Статус"
+          visible={visibleStatus}
+          onChange={handleApplyStatus}
+          onDismiss={() => setVisibleStatus(false)}
+          onPress={() => setVisibleStatus(true)}
+          options={statusTypes}
+          activeOptionId={status}
+          style={[styles.btnTab]}
+          menuStyle={localStyles.menu}
+          isActive={status !== 'all'}
+          iconName={'chevron-down'}
+        />
+        <Menu
+          key={'MenuDataSort'}
+          title="Дата"
+          visible={visibleDate}
+          onChange={handleApplyDate}
+          onDismiss={() => setVisibleDate(false)}
+          onPress={() => setVisibleDate(true)}
+          options={dateTypes}
+          activeOptionId={date.id}
+          style={[styles.btnTab, styles.lastBtnTab]}
+          menuStyle={localStyles.menu}
+          isActive={date.id !== 'new'}
+          iconName={'chevron-down'}
+        />
+      </View>
       <SectionList
         sections={sections}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         ItemSeparatorComponent={ItemSeparator}
         renderSectionHeader={renderSectionHeader}
-        // refreshControl={<RefreshControl refreshing={loading} title="загрузка данных..." />}
         ListEmptyComponent={EmptyList}
       />
     </AppScreen>
   );
 };
+
+const localStyles = StyleSheet.create({
+  container: {
+    marginBottom: 5,
+  },
+  menu: {
+    justifyContent: 'center',
+    marginLeft: 6,
+    width: '100%',
+  },
+});

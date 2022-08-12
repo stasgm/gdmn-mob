@@ -250,6 +250,10 @@ const globalStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  scanInput: { width: 1, height: 1 },
+  infoBlock: {
+    flexDirection: 'column',
+  },
 });
 
 export default globalStyles;

@@ -111,7 +111,7 @@ export const MovementListScreen = () => {
     const doc = list.find((r) => r.id === item.id);
     return doc ? (
       <SwipeListItem renderItem={item} item={doc} routeName="MovementView">
-        <ScreenListItem {...item} onSelectItem={() => navigation.navigate('MovementView', { id: item.id })} />
+        <ScreenListItem {...item} onPress={() => navigation.navigate('MovementView', { id: item.id })} />
       </SwipeListItem>
     ) : null;
   };

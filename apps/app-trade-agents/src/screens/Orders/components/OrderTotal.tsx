@@ -1,21 +1,22 @@
 import React, { useMemo } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { globalStyles as styles, ItemSeparator, MediumText } from '@lib/mobile-ui';
+import { View, StyleSheet } from 'react-native';
 import { refSelectors } from '@lib/store';
-import { Divider } from 'react-native-paper';
+import { DataTable, IconButton } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
 import { formatValue, round } from '@lib/mobile-app';
 
-import { IGoodGroup, IOrderDocument, IOrderTotalLine } from '../../../store/types';
+import { IGoodGroup, IOrderDocument } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
 
 export interface IItem {
   order: IOrderDocument;
+  isGroupVisible: boolean;
+  onPress: () => void;
 }
 
-const OrderTotal = ({ order }: IItem) => {
+const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
@@ -26,48 +27,79 @@ const OrderTotal = ({ order }: IItem) => {
     [firstLevelGroups, groups, order.lines],
   );
 
-  const total = useMemo(() => totalList(totalListByOrder), [totalListByOrder]);
+  const headerStyle = [{ borderColor: colors.border, borderBottomColor: colors.border, borderTopColor: colors.border }];
+  const textColor = { color: colors.text };
+  const borderColor = { borderColor: colors.border };
+  const borderTopColor = { borderTopColor: colors.border };
+  const borderBottomColor = { borderBottomColor: colors.border };
+  const rowStyle = [
+    localStyles.total,
+    borderTopColor,
+    { borderTopWidth: isGroupVisible ? StyleSheet.hairlineWidth * 2 : 0 },
+  ];
+  const textStyle = [localStyles.cellText, textColor];
+  const textBoldStyle = [textStyle, textColor];
 
-  const renderTotalItem = ({ item }: { item: IOrderTotalLine }) => (
-    <View style={styles.itemNoMargin}>
-      <View style={styles.details}>
-        <View style={styles.directionRow}>
-          <View style={localStyles.groupWidth}>
-            <MediumText>{item.group.name}</MediumText>
-          </View>
-          <View style={localStyles.quantity}>
-            <MediumText>{`${round(item.quantity, 3)} кг. /`}</MediumText>
-            <MediumText>{`${formatValue({ type: 'currency', decimals: 2 }, round(item.s, 2))}`}</MediumText>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
+  const total = useMemo(() => totalList(totalListByOrder), [totalListByOrder]);
 
   return (
     <View>
-      {totalList.length ? (
-        <View style={[localStyles.margins, localStyles.total]}>
-          <MediumText style={styles.textTotal}>Итого:</MediumText>
-          <MediumText style={styles.textTotal}>вес {' / '} сумма:</MediumText>
-        </View>
-      ) : null}
-      <Divider style={{ backgroundColor: colors.primary }} />
-      <FlatList
-        data={totalListByOrder}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={renderTotalItem}
-        style={localStyles.groupMargin}
-        ItemSeparatorComponent={ItemSeparator}
+      <IconButton
+        icon={isGroupVisible ? 'chevron-down' : 'chevron-up'}
+        size={22}
+        onPress={onPress}
+        color={colors.text}
+        style={localStyles.icon}
       />
-      <Divider style={{ backgroundColor: colors.primary }} />
-      <View style={[localStyles.margins]}>
-        <View style={localStyles.content}>
-          <MediumText style={styles.textTotal}>
-            {round(total?.quantity, 3)} кг. / {formatValue({ type: 'currency', decimals: 2 }, round(total?.s, 2))}
-          </MediumText>
-        </View>
-      </View>
+      <DataTable style={borderColor}>
+        <DataTable.Header style={[localStyles.header, headerStyle, { backgroundColor: colors.border }]}>
+          {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
+            return (
+              <DataTable.Title key={i} textStyle={textBoldStyle} style={localStyles.title} numeric>
+                {i}
+              </DataTable.Title>
+            );
+          })}
+        </DataTable.Header>
+
+        {isGroupVisible
+          ? totalListByOrder.map((item) => {
+              return (
+                <View key={item.group.id}>
+                  <DataTable.Row style={[localStyles.row, borderBottomColor]}>
+                    <DataTable.Cell textStyle={textStyle}>{item.group.name}</DataTable.Cell>
+                  </DataTable.Row>
+                  <DataTable.Row style={[localStyles.row, borderBottomColor]}>
+                    <DataTable.Cell textStyle={textStyle} numeric>
+                      {round(item.quantity, 3)}
+                    </DataTable.Cell>
+                    <DataTable.Cell textStyle={textStyle} numeric>
+                      {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
+                    </DataTable.Cell>
+                    <DataTable.Cell textStyle={textBoldStyle} numeric>
+                      {formatValue({ type: 'number', decimals: 2 }, round(item.sumVat, 2))}
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                </View>
+              );
+            })
+          : null}
+
+        <DataTable.Row style={rowStyle}>
+          <DataTable.Cell textStyle={textStyle}>Итого</DataTable.Cell>
+        </DataTable.Row>
+        <DataTable.Row style={[borderColor, localStyles.total, localStyles.totalMargin]}>
+          <DataTable.Cell textStyle={textBoldStyle} numeric>
+            {round(total?.quantity, 3)}
+          </DataTable.Cell>
+          <DataTable.Cell textStyle={textBoldStyle} numeric>
+            {formatValue({ type: 'number', decimals: 2 }, round(total?.sum, 2))}
+          </DataTable.Cell>
+          <DataTable.Cell textStyle={textBoldStyle} numeric>
+            {formatValue({ type: 'number', decimals: 2 }, round(total?.sumVat, 2))}
+          </DataTable.Cell>
+        </DataTable.Row>
+      </DataTable>
     </View>
   );
 };
@@ -75,26 +107,35 @@ const OrderTotal = ({ order }: IItem) => {
 export default OrderTotal;
 
 const localStyles = StyleSheet.create({
-  margins: {
-    marginHorizontal: 8,
-    marginVertical: 5,
+  cellText: {
+    fontSize: 14,
   },
-  content: {
-    alignItems: 'flex-end',
+  header: {
+    display: 'flex',
+    flexDirection: 'row',
+    height: 33,
+    borderBottomWidth: StyleSheet.hairlineWidth * 2,
+    borderTopWidth: StyleSheet.hairlineWidth * 2,
   },
-  groupWidth: {
-    width: '62%',
+  row: {
+    minHeight: 22,
+    borderBottomWidth: 0,
   },
-  groupMargin: {
-    marginHorizontal: 5,
-  },
-  quantity: {
-    alignItems: 'flex-end',
-    width: '35%',
+  title: {
+    paddingVertical: 0,
+    alignItems: 'center',
   },
   total: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 5,
+    minHeight: 20,
+    borderBottomWidth: 0,
+  },
+  totalMargin: {
+    marginTop: -8,
+  },
+  icon: {
+    top: -6,
+    zIndex: 1,
+    position: 'absolute',
+    marginBottom: 10,
   },
 });
