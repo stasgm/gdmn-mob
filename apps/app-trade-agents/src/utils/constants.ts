@@ -75,7 +75,7 @@ export const appSettings: Settings = {
   },
   returnDocTime: {
     id: '8',
-    description: 'Время поиска накладных возврата, дн',
+    description: 'Поиск накладных, дн. ',
     data: 30,
     type: 'number',
     sortOrder: 7,
