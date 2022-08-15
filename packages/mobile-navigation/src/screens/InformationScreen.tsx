@@ -53,8 +53,11 @@ const InformationScreen = () => {
             <Avatar.Icon size={40} icon="file-document-edit-outline" style={{ backgroundColor: colors.primary }} />
           </View>
           <View style={localStyles.profileInfo}>
+            <LargeText style={styles.textBold}>Документация</LargeText>
             <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
-              <LargeText style={styles.textBold}>Документация</LargeText>
+              <MediumText selectable={true} style={{ textDecorationLine: 'underline' }}>
+                {Constants.manifest?.extra?.name}
+              </MediumText>
             </TouchableOpacity>
           </View>
         </View>

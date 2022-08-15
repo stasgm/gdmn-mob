@@ -369,6 +369,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1143',
               name: 'Степлер',
             },
             {
@@ -378,6 +379,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1144',
               name: 'Дырокол',
             },
             {
@@ -387,6 +389,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1145',
               name: 'Бейдж',
             },
             {
@@ -396,6 +399,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1146',
               name: 'Штамп',
             },
             {
@@ -405,6 +409,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1147',
               name: 'Блокнот А5',
             },
             {
@@ -413,6 +418,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               barcode: '2000100029470',
               valueName: 'шт',
               isFrac: 1,
+              shcode: '1148',
               weightCode: '',
               name: 'Календарь',
             },
@@ -422,6 +428,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               barcode: '2000100029471',
               valueName: 'шт',
               isFrac: 1,
+              shcode: '1149',
               weightCode: '',
               name: 'Подставка настольная',
             },
@@ -432,6 +439,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1150',
               name: 'Корректирующая ручка',
             },
             {
@@ -441,6 +449,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
+              shcode: '1151',
               name: 'Текстовыделитель',
             },
             {
@@ -450,6 +459,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1152',
               name: 'Изделие колбасное',
             },
             {
@@ -459,6 +469,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1153',
               name: 'Рулет Европейский',
             },
             {
@@ -468,6 +479,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1154',
               name: 'Смесь сухая',
             },
             {
@@ -477,6 +489,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1155',
               name: 'Колбаса Докторская',
             },
             {
@@ -486,6 +499,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1156',
               name: 'Дрожжи',
             },
             {
@@ -495,6 +509,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1157',
               name: 'Колбаса Сливочная',
             },
             {
@@ -504,6 +519,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1158',
               name: 'Колбаски Баварские',
             },
             {
@@ -513,6 +529,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1159',
               name: 'Колбаса для гриля',
             },
             {
@@ -522,6 +539,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'кг',
               isFrac: 1,
               weightCode: '',
+              shcode: '1160',
               name: 'Арахис фасованный',
             },
             {
@@ -530,6 +548,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               barcode: '2306763298512',
               valueName: 'кг',
               isFrac: 1,
+              shcode: '1161',
               weightCode: '',
               name: 'Масло подсолнечное',
             },
@@ -924,11 +943,11 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e89',
               good: {
-                id: '857817085',
-                name: 'Колбаса вареная докторская',
+                id: '955211845',
+                name: 'Колб. изд. "Колбаса Мортаделла"',
                 priceFsn: 4.82,
               },
-              weight: 2,
+              weight: 5,
               packagekey: {
                 id: '1617776619',
                 name: 'Мал. батон 5',
@@ -937,11 +956,11 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e88',
               good: {
-                id: '857817085',
-                name: 'Колбаса вареная докторская',
+                id: '955211846',
+                name: 'Колб. изд. "Колбаса Сливочная"',
                 priceFsn: 4.82,
               },
-              weight: 2,
+              weight: 8,
               packagekey: {
                 id: '1617776621',
                 name: 'Мал. батон 10',
@@ -985,7 +1004,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Ветчина вар.',
                 priceFsn: 4.37,
               },
-              weight: 2,
+              weight: 7,
               packagekey: {
                 id: '615762858',
                 name: 'Большой батон 5',
@@ -994,9 +1013,9 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e86',
               good: {
-                id: '1572500926',
-                name: 'Ветчина вар.',
-                priceFsn: 4.37,
+                id: '857817085',
+                name: 'Колбаса вареная докторская',
+                priceFsn: 10,
               },
               weight: 2,
               packagekey: {
@@ -1042,7 +1061,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Колбаски баварские',
                 priceFsn: 20.42,
               },
-              weight: 2,
+              weight: 10,
               packagekey: {
                 id: '1811739170',
                 name: '2 кг',
@@ -1055,7 +1074,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
                 name: 'Колбаски балканские',
                 priceFsn: 20.27,
               },
-              weight: 2,
+              weight: 15,
               packagekey: {
                 id: '1811739170',
                 name: '2 кг',
@@ -1083,7 +1102,6 @@ export const messageFpMovement: IMessage<MessageType>[] = [
             outlet: {
               id: '3121846445',
               name: 'Магазин "МаркетКомпани" № 1',
-              shcode: '',
             },
             onDate: '2022-07-28',
             orderId: '1369028476',

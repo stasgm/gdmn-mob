@@ -35,6 +35,8 @@ import { sleep } from '@lib/client-api';
 
 import { TouchableOpacity, Linking } from 'react-native';
 
+import Constants from 'expo-constants';
+
 import { MoveNavigator } from './src/navigation/MoveNavigator';
 
 import { store, useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from './src/store';
@@ -200,9 +202,13 @@ const Root = () => {
         </AppScreen>
       ) : infoWindow === 3 ? (
         <AppScreen>
+          <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
+          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+            <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
+          </TouchableOpacity>
           <Text style={styles.textInfo}>
             {
-              'Подробную информацию об использовании приложения вы найдете в справочной системе.\n\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Склад!\n\n'
+              '\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Отгрузка!\n\n'
             }
           </Text>
           <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
