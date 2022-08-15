@@ -167,7 +167,9 @@ export const DocListScreen = () => {
 
   const [status, setStatus] = useState<Status>('all');
 
-  const documentTypes = refSelectors.selectByName<IDocumentType>('documentType')?.data;
+  const documentTypes = refSelectors
+    .selectByName<IDocumentType>('documentType')
+    ?.data.filter((i) => i.subtype === 'inventory');
 
   const docTypes: IListItem[] = useMemo(
     () =>

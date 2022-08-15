@@ -291,9 +291,15 @@ export const DocEditScreen = () => {
       return;
     }
     setOldDocTypeId(docDocumentType?.id);
+
+    const params: Record<string, string> = {};
+
+    params.subtype = 'inventory';
+
     navigation.navigate('SelectRefItem', {
       refName: 'documentType',
       fieldName: 'documentType',
+      clause: params,
       value: docDocumentType && [docDocumentType],
       refFieldName: 'description',
     });
