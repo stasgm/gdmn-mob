@@ -29,7 +29,7 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import FreeShipmentTotal from './components/FreeShipmentTotal';
+import ViewTotal from '../../components/ViewTotal';
 
 export interface IScanerObject {
   item?: IFreeShipmentLine;
@@ -50,6 +50,8 @@ export const FreeShipmentViewScreen = () => {
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
 
   const isBlocked = doc?.status !== 'DRAFT';
 
@@ -382,7 +384,7 @@ export const FreeShipmentViewScreen = () => {
         updateCellsBatchingPeriod={100}
         windowSize={7}
       />
-      {lines?.length ? <FreeShipmentTotal lines={lines} /> : null}
+      {lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
       <AppDialog
         visible={visibleDialog}
         text={barcode}
