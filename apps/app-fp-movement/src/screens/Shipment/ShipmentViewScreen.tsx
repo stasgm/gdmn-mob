@@ -3,7 +3,7 @@ import { Alert, View, FlatList, TouchableHighlight, TextInput, ListRenderItem } 
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -17,6 +17,7 @@ import {
   ListItemLine,
   AppDialog,
   SendButton,
+  ScanButton,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -46,10 +47,10 @@ const ShipmentViewScreen = () => {
   const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
+  const settings = useSelector((state) => state.settings?.data);
+  const isScanerReader = settings.scannerUse?.data;
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
-
-  // const [deleting, setDeleting] = useState(false);
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
   const shipmentLines = useMemo(
@@ -130,7 +131,7 @@ const ShipmentViewScreen = () => {
           Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
             {
               text: 'Да',
-              onPress: async () => {
+              onPress: () => {
                 dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
                 fpDispatch(
                   fpMovementActions.updateTempOrderLine({
@@ -279,10 +280,11 @@ const ShipmentViewScreen = () => {
       ) : (
         <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+          {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked, screenState, shipment?.status],
+    [actionsMenu, handleSendDoc, id, isBlocked, isScanerReader, navigation, screenState, shipment?.status],
   );
 
   const renderLeft = useCallback(
@@ -361,7 +363,7 @@ const ShipmentViewScreen = () => {
           Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
             {
               text: 'Да',
-              onPress: async () => {
+              onPress: () => {
                 dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
                 fpDispatch(
                   fpMovementActions.updateTempOrderLine({
@@ -380,7 +382,7 @@ const ShipmentViewScreen = () => {
         Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
           {
             text: 'Да',
-            onPress: async () => {
+            onPress: () => {
               dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
             },
           },
@@ -392,11 +394,8 @@ const ShipmentViewScreen = () => {
 
       setScanned(false);
     },
-
     [goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
   );
-
-  console.log('123', tempOrderLines);
 
   //Для отрисовки при каждом новом сканировании
   const [key, setKey] = useState(1);

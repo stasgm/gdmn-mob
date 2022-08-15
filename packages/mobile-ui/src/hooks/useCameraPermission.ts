@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Camera } from 'expo-camera';
 
-export function useCameraPermission(): boolean | null {
+function useCameraPermission(): boolean | null {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -13,3 +13,5 @@ export function useCameraPermission(): boolean | null {
 
   return hasPermission;
 }
+
+export default useCameraPermission;

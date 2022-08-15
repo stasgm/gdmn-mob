@@ -23,8 +23,6 @@ export const docScreens = {
   SelectGoodItem: { title: 'Выбор товара', component: SelectGoodScreen },
   SelectRemainsItem: { title: 'Выбор из остатков', component: SelectRemainsScreen },
   ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
-  //
-  // ScanBarcodeReader: ScanBarcodeReaderScreen,
 };
 
 export const docListScreens = {

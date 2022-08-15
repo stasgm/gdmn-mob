@@ -14,54 +14,36 @@ import { IconButton } from 'react-native-paper';
 
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 
-import { IOrderDocument } from '../../../../store/types';
-import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
+import { IScannedObject } from '@lib/client-types';
+
+import AppDialog from '../AppDialog';
 
 import styles from './styles';
 
+const ONE_SECOND_IN_MS = 1000;
+
 interface IProps {
-  onSave: (item: IOrderDocument) => void;
-  onShowSearchDialog: () => void;
-  getScannedObject: (brc: string) => void;
-  scannedObject: IOrderDocument | undefined;
-  errorMessage?: string;
+  scaner: IScannedObject;
+  onSave: () => void;
+  onGetScannedObject: (brc: string) => void;
+  onClearScannedObject: () => void;
   children?: ReactNode;
 }
 
-const ScanBarcodeReader = ({
-  onSave,
-  onShowSearchDialog,
-  getScannedObject,
-  scannedObject,
-  errorMessage,
-  children,
-}: IProps) => {
+const ScanBarcodeReader = ({ scaner, onSave, onGetScannedObject, onClearScannedObject, children }: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const [vibroMode, setVibroMode] = useState(false);
-  const [scanned, setScanned] = useState(false);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const scanned = scaner.state !== 'init' && !visibleDialog;
 
   const { colors } = useTheme();
   const viewStyle = useMemo(() => [styles.content, { backgroundColor: colors.card }], [colors.card]);
 
-  const [barcode, setBarcode] = useState('');
-
-  const handleBarCodeScanned = (data: string) => {
-    const brc = data.replace(']C1', '');
-    setScanned(true);
-    setBarcode(brc);
-    getScannedObject(brc);
-  };
-
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
-
-  useEffect(() => {
-    if (scannedObject || errorMessage) {
-      setScanned(true);
-    }
-  }, [errorMessage, scannedObject]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -74,6 +56,43 @@ const ScanBarcodeReader = ({
       }
     }, [scanned, ref]),
   );
+
+  useEffect(() => {
+    if (scaner.state === 'found' && visibleDialog) {
+      setVisibleDialog(false);
+    }
+  }, [scaner, visibleDialog]);
+
+  const handleBarCodeScanned = (data: string) => {
+    const brc = data.replace(']C1', '');
+    setBarcode(brc);
+    onGetScannedObject(brc);
+  };
+
+  const handleHideDialog = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    onClearScannedObject();
+  };
+
+  const handlePressOkDialog = () => onGetScannedObject(barcode);
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+    setBarcode('');
+    onClearScannedObject();
+  };
+
+  const handleSave = () => {
+    onSave && onSave();
+  };
+
+  const handleChangeText = (text: string) => {
+    setBarcode(text);
+    if (!text) {
+      onClearScannedObject();
+    }
+  };
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={viewStyle}>
@@ -91,10 +110,7 @@ const ScanBarcodeReader = ({
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={() => {
-              setScanned(false);
-              onShowSearchDialog();
-            }}
+            onPress={handleShowDialog}
           />
         </View>
         {!scanned ? (
@@ -112,41 +128,28 @@ const ScanBarcodeReader = ({
         ) : (
           <View style={styles.scannerContainer}>
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                style={[styles.buttons, styles.btnReScan]}
-                onPress={() => {
-                  setScanned(false);
-                }}
-              >
+              <TouchableOpacity style={[styles.buttons, styles.btnReScan]} onPress={onClearScannedObject}>
                 <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {errorMessage ? (
+            {scaner.message ? (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.text}>{barcode}</Text>
-                    <Text style={styles.text}>{'Заявка не найдена'}</Text>
+                    <Text style={styles.text}>{scaner.message}</Text>
                   </View>
                 </View>
               </View>
             ) : (
-              scannedObject && (
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    style={[styles.buttons, styles.btnFind]}
-                    onPress={() => {
-                      onSave(scannedObject);
-                      setScanned(false);
-                    }}
-                  >
-                    <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                    {children}
-                  </TouchableOpacity>
-                </View>
-              )
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handleSave}>
+                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                  {children}
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         )}
@@ -157,6 +160,15 @@ const ScanBarcodeReader = ({
           </View>
         )}
       </View>
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={handleChangeText}
+        onCancel={handleHideDialog}
+        onOk={handlePressOkDialog}
+        okLabel={'Найти'}
+        errorMessage={scaner.message}
+      />
     </KeyboardAvoidingView>
   );
 };

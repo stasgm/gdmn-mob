@@ -159,7 +159,7 @@ export const ShipmentListScreen = () => {
   const handleAddDocument = useCallback(
     (item: IListItem) => {
       setVisibleDocTypeMenu(false);
-      navigation.navigate('ScanOrder', { id: item.id });
+      navigation.navigate('ScanOrder', { docTypeId: item.id });
     },
     [navigation],
   );

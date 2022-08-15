@@ -12,3 +12,10 @@ export interface IApiConfig {
     mockDeviceId?: string;
   };
 }
+
+export interface IScannedObject {
+  state: IScannedObjectState;
+  message?: string;
+}
+
+export type IScannedObjectState = 'init' | 'found' | 'error';

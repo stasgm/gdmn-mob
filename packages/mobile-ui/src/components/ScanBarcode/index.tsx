@@ -1,41 +1,40 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, LargeText } from '@lib/mobile-ui';
+import { IScannedObject } from '@lib/client-types';
 
-import { IOrderDocument } from '../../../../store/types';
+import useCameraPermission from '../../hooks/useCameraPermission';
 
-import { ONE_SECOND_IN_MS } from '../../../../utils/constants';
+import globalStyles from '../../styles/global';
 
-import { useCameraPermission } from '../../../../hooks/useCameraPermission';
+import { LargeText } from '../AppText';
+
+import { AppActivityIndicator } from '../AppActivityIndicator';
+
+import AppDialog from '../AppDialog';
 
 import styles from './styles';
 
+const ONE_SECOND_IN_MS = 1000;
+
 interface IProps {
-  onSave: (item: IOrderDocument) => void;
-  onShowSearchDialog: () => void;
-  getScannedObject: (brc: string) => void;
-  scannedObject: IOrderDocument | undefined;
-  errorMessage?: string;
+  scaner: IScannedObject;
+  onSave?: () => void;
+  onGetScannedObject: (brc: string) => void;
+  onClearScannedObject: () => void;
+  barCodeTypes: string[];
   children?: ReactNode;
 }
 
-const ScanBarcode = ({
-  onSave,
-  onShowSearchDialog,
-  getScannedObject,
-  scannedObject,
-  errorMessage,
-  children,
-}: IProps) => {
+const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject, barCodeTypes, children }: IProps) => {
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
-  const [scanned, setScanned] = useState(false);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const scanned = scaner.state !== 'init' && !visibleDialog;
 
   const { colors } = useTheme();
 
@@ -43,13 +42,6 @@ const ScanBarcode = ({
 
   const [barcode, setBarcode] = useState('');
   const hasPermission = useCameraPermission();
-
-  const handleBarCodeScanned = (data: string) => {
-    const brc = data.replace(']C1', '');
-    setScanned(true);
-    setBarcode(brc);
-    getScannedObject(brc);
-  };
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
@@ -62,10 +54,41 @@ const ScanBarcode = ({
   }, [scanned, vibroMode]);
 
   useEffect(() => {
-    if (scannedObject || errorMessage) {
-      setScanned(true);
+    if (scaner.state === 'found' && visibleDialog) {
+      setVisibleDialog(false);
     }
-  }, [errorMessage, scannedObject]);
+  }, [scaner, visibleDialog]);
+
+  const handleBarCodeScanned = (data: string) => {
+    const brc = data.replace(']C1', '');
+    setBarcode(brc);
+    onGetScannedObject(brc);
+  };
+
+  const handleHideDialog = () => {
+    setVisibleDialog(false);
+    setBarcode('');
+    onClearScannedObject();
+  };
+
+  const handlePressOkDialog = () => onGetScannedObject(barcode);
+
+  const handleShowDialog = () => {
+    setVisibleDialog(true);
+    setBarcode('');
+    onClearScannedObject();
+  };
+
+  const handleSave = () => {
+    onSave && onSave();
+  };
+
+  const handleChangeText = (text: string) => {
+    setBarcode(text);
+    if (!text) {
+      onClearScannedObject();
+    }
+  };
 
   if (hasPermission === null) {
     return (
@@ -91,15 +114,9 @@ const ScanBarcode = ({
   return (
     <View style={styles.content}>
       <Camera
-        key={`${scanned}${barcode}`}
+        key={`${scaner.state}`}
         flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
-        barCodeScannerSettings={{
-          barCodeTypes: [
-            BarCodeScanner.Constants.BarCodeType.code128,
-            BarCodeScanner.Constants.BarCodeType.ean13,
-            BarCodeScanner.Constants.BarCodeType.ean8,
-          ],
-        }}
+        barCodeScannerSettings={barCodeTypes ? { barCodeTypes } : undefined}
         autoFocus="on"
         whiteBalance="auto"
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
@@ -125,10 +142,7 @@ const ScanBarcode = ({
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={() => {
-              setScanned(false);
-              onShowSearchDialog();
-            }}
+            onPress={handleShowDialog}
           />
         </View>
         {!scanned ? (
@@ -147,42 +161,29 @@ const ScanBarcode = ({
         ) : (
           <View style={styles.scannerContainer}>
             <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                style={[styles.buttons, styles.btnReScan]}
-                onPress={() => {
-                  setScanned(false);
-                }}
-              >
+              <TouchableOpacity style={[styles.buttons, styles.btnReScan]} onPress={onClearScannedObject}>
                 <IconButton icon="barcode-scan" color={'#FFF'} size={30} />
                 <Text style={styles.text}>Пересканировать</Text>
               </TouchableOpacity>
             </View>
-            {errorMessage ? (
+            {scaner.message ? (
               <View style={styles.infoContainer}>
                 <View style={[styles.buttons, styles.btnNotFind]}>
                   <IconButton icon={'information-outline'} color={'#FFF'} size={30} />
                   <View>
                     <Text style={styles.text}>{barcode}</Text>
-                    <Text style={styles.text}>{errorMessage}</Text>
+                    <Text style={styles.text}>{scaner.message}</Text>
                   </View>
                 </View>
               </View>
-            ) : (
-              scannedObject && (
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    style={[styles.buttons, styles.btnFind]}
-                    onPress={() => {
-                      onSave(scannedObject);
-                      setScanned(false);
-                    }}
-                  >
-                    <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
-                    {children}
-                  </TouchableOpacity>
-                </View>
-              )
-            )}
+            ) : children ? (
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handleSave}>
+                  <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
+                  {children}
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </View>
         )}
         {!scanned && (
@@ -192,6 +193,15 @@ const ScanBarcode = ({
           </View>
         )}
       </Camera>
+      <AppDialog
+        visible={visibleDialog}
+        text={barcode}
+        onChangeText={handleChangeText}
+        onCancel={handleHideDialog}
+        onOk={handlePressOkDialog}
+        okLabel={'Найти'}
+        errorMessage={scaner.message}
+      />
     </View>
   );
 };

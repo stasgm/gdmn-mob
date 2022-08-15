@@ -1,166 +1,197 @@
-// import React, { useCallback, useLayoutEffect, useState } from 'react';
-// import { Text } from 'react-native';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { Text, Alert, View, StyleSheet } from 'react-native';
 
-// import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
+import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-// import { AppActivityIndicator, AppDialog, globalStyles } from '@lib/mobile-ui';
-// import { useSelector, refSelectors } from '@lib/store';
+import { AppActivityIndicator, globalStyles, MediumText, ScanBarcode } from '@lib/mobile-ui';
+import { refSelectors, docSelectors, useDispatch, documentActions } from '@lib/store';
 
-// import { generateId } from '@lib/mobile-app';
+import { generateId, getDateString, round } from '@lib/mobile-app';
 
-// import { StackNavigationProp } from '@react-navigation/stack';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-// import { ShipmentStackParamList } from '../../navigation/Root/types';
-// import { IShipmentLine, IShipmentDocument } from '../../store/types';
+import { IScannedObject } from '@lib/client-types';
 
-// import { IGood } from '../../store/app/types';
-// import { getBarcode } from '../../utils/helpers';
-// import { navBackButton } from '../../components/navigateOptions';
+import { ShipmentStackParamList } from '../../navigation/Root/types';
+import { IShipmentLine, IShipmentDocument } from '../../store/types';
 
-// import { ScanBarcode, ScanBarcodeReader } from '../../components';
+import { IGood } from '../../store/app/types';
+import { getBarcode } from '../../utils/helpers';
+import { navBackButton } from '../../components/navigateOptions';
+import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
-// const ScanGoodScreen = () => {
-//   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
-//   const tempId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.tempId;
-//   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
-//   const settings = useSelector((state) => state.settings?.data);
+import { barCodeTypes } from '../../utils/constants';
 
-//   const isScanerReader = settings.scannerUse?.data;
+const ScanGoodScreen = () => {
+  const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
+  const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanGood'>>();
 
-//   const [visibleDialog, setVisibleDialog] = useState(false);
-//   const [barcode, setBarcode] = useState('');
-//   const [errorMessage, setErrorMessage] = useState('');
+  const fpDispatch = useFpDispatch();
+  const dispatch = useDispatch();
 
-//   useLayoutEffect(() => {
-//     navigation.setOptions({
-//       headerLeft: navBackButton,
-//     });
-//   }, [navigation]);
+  const goods = refSelectors.selectByName<IGood>('good').data;
+  const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
+  const [scannedObject, setScannedObject] = useState<IShipmentLine>();
 
-//   const handleSaveScannedItem = useCallback(
-//     (item: IShipmentLine) => {
-//       navigation.navigate('ShipmentLine', {
-//         mode: 0,
-//         docId,
-//         item: item,
-//         tempId,
-//       });
-//     },
-//     [docId, navigation, tempId],
-//   );
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: navBackButton,
+    });
+  }, [navigation]);
 
-//   const document = useSelector((state) => state.documents.list).find((item) => item.id === docId) as IShipmentDocument;
+  const shipment = docSelectors.selectByDocId<IShipmentDocument>(docId);
+  const shipmentLines = useMemo(
+    () => shipment?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
+    [shipment?.lines],
+  );
 
-//   const goods = refSelectors.selectByName<IGood>('good').data;
+  const tempOrder = useFpSelector((state) => state.fpMovement.list).find((i) => i.orderId === shipment?.head?.orderId);
 
-//   const getScannedObject = useCallback(
-//     (brc: string): IShipmentLine | undefined => {
-//       const barc = getBarcode(brc);
+  const handleGetScannedObject = useCallback(
+    (brc: string) => {
+      if (!brc.match(/^-{0,1}\d+$/)) {
+        setScaner({ state: 'error', message: 'Штрих-код неверного формата' });
+        return;
+      }
 
-//       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
-//       // Находим товар из модели остатков по баркоду, если баркод не найден, то
-//       //   если выбор из остатков, то undefined,
-//       //   иначе подставляем unknownGood cо сканированным шк и добавляем в позицию документа
-//       if (!good) {
-//         return;
-//       }
+      const barc = getBarcode(brc);
 
-//       return {
-//         good: { id: good.id, name: good.name, shcode: good.shcode },
-//         id: generateId(),
-//         weight: barc.weight,
-//         barcode: barc.barcode,
-//         workDate: barc.workDate,
-//         numReceived: barc.numReceived,
-//         quantPack: barc.quantPack,
-//       };
-//     },
+      const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
-//     [goods],
-//   );
+      if (!good) {
+        setScaner({ state: 'error', message: 'Товар не найден' });
+        return;
+      }
 
-//   const handleGetBarcode = useCallback(
-//     (brc: string) => {
-//       const barc = getBarcode(brc);
+      const line = shipmentLines?.find((i) => i.barcode === barc.barcode);
 
-//       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
+      if (line) {
+        setScaner({ state: 'error', message: 'Штрих-код уже добавлен' });
+        return;
+      }
 
-//       if (good) {
-//         const barcodeItem: IShipmentLine = {
-//           good: { id: good.id, name: good.name, shcode: good.shcode },
-//           id: generateId(),
-//           weight: barc.weight,
-//           barcode: barc.barcode,
-//           workDate: barc.workDate,
-//           numReceived: barc.numReceived,
-//           quantPack: barc.quantPack,
-//         };
-//         setErrorMessage('');
-//         navigation.navigate('ShipmentLine', {
-//           mode: 0,
-//           docId: docId,
-//           item: barcodeItem,
-//           tempId: tempId,
-//         });
-//         setVisibleDialog(false);
-//         setBarcode('');
-//       } else {
-//         setErrorMessage('Товар не найден');
-//       }
-//     },
+      setScannedObject({
+        good: { id: good.id, name: good.name, shcode: good.shcode },
+        id: generateId(),
+        weight: barc.weight,
+        barcode: barc.barcode,
+        workDate: barc.workDate,
+        numReceived: barc.numReceived,
+        quantPack: barc.quantPack,
+        sortOrder: shipmentLines?.length + 1,
+      });
 
-//     [goods, navigation, docId, tempId],
-//   );
+      setScaner({ state: 'found' });
+    },
 
-//   const handleShowDialog = () => {
-//     setVisibleDialog(true);
-//   };
+    [goods, shipmentLines],
+  );
 
-//   const handleSearchBarcode = () => {
-//     handleGetBarcode(barcode);
-//   };
+  const handleSaveScannedItem = useCallback(() => {
+    if (!scannedObject) {
+      return;
+    }
 
-//   const handleDismissBarcode = () => {
-//     setVisibleDialog(false);
-//     setBarcode('');
-//     setErrorMessage('');
-//   };
+    const tempLine = tempOrder?.lines?.find((i) => scannedObject.good.id === i.good.id);
 
-//   const isFocused = useIsFocused();
-//   if (!isFocused) {
-//     return <AppActivityIndicator />;
-//   }
+    if (tempLine && tempOrder) {
+      const newTempLine = { ...tempLine, weight: round(tempLine.weight - scannedObject.weight, 3) };
+      if (newTempLine.weight > 0) {
+        fpDispatch(
+          fpMovementActions.updateTempOrderLine({
+            docId: tempOrder?.id,
+            line: newTempLine,
+          }),
+        );
+        dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+        setScaner({ state: 'init' });
+      } else if (newTempLine.weight === 0) {
+        fpDispatch(
+          fpMovementActions.updateTempOrderLine({
+            docId: tempOrder?.id,
+            line: newTempLine,
+          }),
+        );
+        dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+        setScaner({ state: 'init' });
+      } else {
+        Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+          {
+            text: 'Да',
+            onPress: () => {
+              dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+              fpDispatch(
+                fpMovementActions.updateTempOrderLine({
+                  docId: tempOrder?.id,
+                  line: newTempLine,
+                }),
+              );
+              setScaner({ state: 'init' });
+            },
+          },
+          {
+            text: 'Отмена',
+          },
+        ]);
+      }
+    } else {
+      Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+            setScaner({ state: 'init' });
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+    }
+  }, [scannedObject, tempOrder, fpDispatch, dispatch, docId]);
 
-//   if (!document) {
-//     return <Text style={globalStyles.title}>Документ не найден</Text>;
-//   }
+  const handleClearScaner = () => setScaner({ state: 'init' });
 
-//   return (
-//     <>
-//       {isScanerReader ? (
-//         <ScanBarcodeReader
-//           // onSave={(item) => handleSaveScannedItem(item)}
-//           onSearchBarcode={handleShowDialog}
-//           getScannedObject={getScannedObject}
-//         />
-//       ) : (
-//         <ScanBarcode
-//           // onSave={(item) => handleSaveScannedItem(item)}
-//           onSearchBarcode={handleShowDialog}
-//           getScannedObject={getScannedObject}
-//         />
-//       )}
-//       <AppDialog
-//         visible={visibleDialog}
-//         text={barcode}
-//         onChangeText={setBarcode}
-//         onCancel={handleDismissBarcode}
-//         onOk={handleSearchBarcode}
-//         okLabel={'Найти'}
-//         errorMessage={errorMessage}
-//       />
-//     </>
-//   );
-// };
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
-// export default ScanGoodScreen;
+  if (!shipment) {
+    return <Text style={globalStyles.title}>Документ не найден</Text>;
+  }
+
+  return (
+    <ScanBarcode
+      onSave={handleSaveScannedItem}
+      onGetScannedObject={handleGetScannedObject}
+      onClearScannedObject={handleClearScaner}
+      scaner={scaner}
+      barCodeTypes={barCodeTypes}
+    >
+      {scannedObject ? (
+        <View style={localStyles.itemInfo}>
+          <MediumText style={localStyles.text}>{scannedObject.good.name}</MediumText>
+          <MediumText style={globalStyles.lightText}>№ партии: {scannedObject.numReceived || ''}</MediumText>
+          <MediumText style={globalStyles.lightText}>
+            Дата производства: {getDateString(scannedObject.workDate)}
+          </MediumText>
+          <MediumText style={globalStyles.lightText}>Вес: {scannedObject.weight} кг.</MediumText>
+        </View>
+      ) : undefined}
+    </ScanBarcode>
+  );
+};
+
+export default ScanGoodScreen;
+
+const localStyles = StyleSheet.create({
+  itemInfo: {
+    flexShrink: 1,
+    paddingRight: 10,
+  },
+  text: {
+    color: '#fff',
+    textTransform: 'uppercase',
+  },
+});

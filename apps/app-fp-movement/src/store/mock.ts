@@ -975,7 +975,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '357852117',
               name: 'Магазин-склад',
             },
-            barcode: '100620220042467496',
+            barcode: '260720220032471108',
           },
           lines: [
             {

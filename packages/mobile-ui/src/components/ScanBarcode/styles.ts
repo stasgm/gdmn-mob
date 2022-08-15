@@ -1,11 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  barcode: {
-    color: '#fff',
-    fontSize: 16,
-    opacity: 0.5,
-  },
   border: {
     height: 50,
     width: 50,
@@ -50,15 +45,6 @@ const styles = StyleSheet.create({
     height: 100,
     justifyContent: 'center',
     paddingBottom: 10,
-  },
-  itemInfo: {
-    flexShrink: 1,
-    paddingRight: 10,
-  },
-  itemName: {
-    color: '#fff',
-    fontSize: 18,
-    textTransform: 'uppercase',
   },
   header: {
     alignItems: 'center',

@@ -81,10 +81,11 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   passport.use(new LocalStrategy(strategy, validateAuthCreds));
 
   // Логи для Morgan
-  const logPath = path.join(process.cwd(), `${config.LOG_PATH}/`);
+  const logPath = path.join(process.cwd(), config.LOG_PATH);
   if (!fs.existsSync(logPath)) {
     fs.mkdirSync(logPath);
   }
+
   const accessLogStream: fs.WriteStream = fs.createWriteStream(config.LOG_ACCESS_PATH, { flags: 'a' });
 
   app

@@ -24,7 +24,6 @@ export type MoveParamList = RefParamList & {
   MoveEdit: { id: string; docType?: string } | undefined; //itemId: string;
   MoveLine: { mode: number; docId: string; item: IMoveLine; docType?: string };
   ScanBarcode: { docId: string; docType?: string };
-  // // ScanBarcodeReader: { docId: string; docType?: string };
   MoveLineEdit: {
     docId: string;
     prodId: string;
@@ -44,8 +43,8 @@ export type ShipmentParamList = RefParamList & {
   TempView: { id: string };
   ShipmentEdit: { id: string };
   ShipmentView: { id: string };
-  ScanOrder: { id: string };
-  ScanGood: { docId: string; tempId: string; docType?: string };
+  ScanOrder: { docTypeId: string };
+  ScanGood: { docId: string };
 };
 
 export type ShipmentStackParamList = { ShipmentList: undefined } & ShipmentParamList;

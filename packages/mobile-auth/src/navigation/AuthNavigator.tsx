@@ -119,9 +119,8 @@ const AuthNavigator: React.FC = () => {
     const res = await authDispatch(authActions.getCompany(user.company.id));
     if (res.type === 'AUTH/GET_COMPANY_SUCCESS') {
       authDispatch(authActions.setCompany(res.payload));
-    } else if (res.type === 'AUTH/GET_COMPANY_FAILURE') {
-      setCompanyLoading(false);
     }
+    setCompanyLoading(false);
   }, [authDispatch, user?.company]);
 
   const SplashWithParams = useCallback(

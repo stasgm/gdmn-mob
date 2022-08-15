@@ -6,14 +6,12 @@ import { Camera } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, LargeText, MediumText } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText, MediumText, useCameraPermission } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
 import { IMoveLine } from '../../store/types';
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
-
-import { useCameraPermission } from '../../hooks/useCameraPermission';
 
 import styles from './styles';
 

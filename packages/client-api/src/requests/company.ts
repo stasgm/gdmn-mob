@@ -121,7 +121,6 @@ class Company extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка удаления компании',
-        //err?.response?.data?.error || 'ошибка удаления компании',
       } as error.INetworkError;
     }
   };
@@ -163,7 +162,6 @@ class Company extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о компании',
-        //err?.response?.data?.error || 'ошибка получения данных о компании',
       } as error.INetworkError;
     }
   };
@@ -186,7 +184,7 @@ class Company extends BaseRequest {
 
     try {
       const res = await this.api.axios.get<IResponse<ICompany[]>>(`/companies${paramText}`);
-      ///${this.api.config.version}
+
       const resData = res.data;
 
       if (resData.result) {
@@ -204,7 +202,6 @@ class Company extends BaseRequest {
       return {
         type: 'ERROR',
         message: err instanceof TypeError ? err.message : 'ошибка получения данных о компаниях',
-        //err?.response?.data?.error || 'ошибка получения данных о компаниях',
       } as error.INetworkError;
     }
   };

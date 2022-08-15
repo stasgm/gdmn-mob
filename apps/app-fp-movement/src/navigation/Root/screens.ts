@@ -4,9 +4,13 @@ import { MoveListScreen, MoveEditScreen, MoveViewScreen, MoveLineScreen } from '
 
 import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
 
-import { ShipmentListScreen, ShipmentEditScreen, ShipmentViewScreen } from '../../screens/Shipment';
-
-import ScanOrderScreen from '../../screens/Shipment/ScanOrderScreen';
+import {
+  ShipmentListScreen,
+  ShipmentEditScreen,
+  ShipmentViewScreen,
+  ScanOrderScreen,
+  ScanGoodScreen,
+} from '../../screens/Shipment';
 
 import {
   FreeShipmentListScreen,
@@ -30,7 +34,8 @@ export const moveListScreens = {
 export const shipmentScreens = {
   ShipmentEdit: { title: 'Отвес по заявке', component: ShipmentEditScreen },
   ShipmentView: { title: 'Отвес', component: ShipmentViewScreen },
-  ScanOrder: { title: 'Сканер', component: ScanOrderScreen },
+  ScanOrder: { title: 'Сканер заявки', component: ScanOrderScreen },
+  ScanGood: { title: 'Сканер товара', component: ScanGoodScreen },
 };
 
 export const shipmentListScreens = {

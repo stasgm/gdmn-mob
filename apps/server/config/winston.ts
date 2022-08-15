@@ -1,13 +1,13 @@
 import winston = require('winston');
 
-import environnement from './dev';
+import config from '../config';
 
 const myMessage = winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`);
 
 const logger = winston.createLogger({
   exceptionHandlers: [
     new winston.transports.File({
-      filename: `${environnement.LOG_ERROR_PATH}`,
+      filename: `${config.LOG_ERROR_PATH}`,
     }),
   ],
   format: winston.format.combine(
@@ -23,11 +23,11 @@ const logger = winston.createLogger({
     // - Write all logs error (and below) to `error.log`.
     //
     new winston.transports.File({
-      filename: `${environnement.LOG_ERROR_PATH}`,
+      filename: `${config.LOG_ERROR_PATH}`,
       level: 'error',
     }),
     new winston.transports.File({
-      filename: `${environnement.LOG_COMBINED_PATH}`,
+      filename: `${config.LOG_COMBINED_PATH}`,
     }),
   ],
 });
