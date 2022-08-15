@@ -31,6 +31,8 @@ import { IDocument, IReferences, ISettingsOption } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
+import Constants from 'expo-constants';
+
 import { appTradeActions, store, useSelector as useAppTradeSelector } from './src/store';
 
 import {
@@ -215,9 +217,13 @@ const Root = () => {
     </AppScreen>
   ) : infoWindow === 3 ? (
     <AppScreen>
+      <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
+      <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+        <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
+      </TouchableOpacity>
       <Text style={styles.textInfo}>
         {
-          'Подробную информацию об использовании приложения вы найдете в справочной системе.\n\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Агент!\n\n'
+          '\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Агент!\n\n'
         }
       </Text>
       <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>

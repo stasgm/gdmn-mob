@@ -33,6 +33,8 @@ import { sleep } from '@lib/client-api';
 
 import { TouchableOpacity, Linking } from 'react-native';
 
+import Constants from 'expo-constants';
+
 import { DocNavigator } from './src/navigation/DocNavigator';
 
 import { store, useSelector as useInvSelector, appInventoryActions } from './src/store';
@@ -191,9 +193,13 @@ const Root = () => {
         </AppScreen>
       ) : infoWindow === 3 ? (
         <AppScreen>
+          <Text style={styles.textInfo}>{'Подробную информацию об использовании приложения вы найдете в '}</Text>
+          <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
+            <Text style={[styles.textInfo, styles.textDecorationLine]}>{'документации.'}</Text>
+          </TouchableOpacity>
           <Text style={styles.textInfo}>
             {
-              'Подробную информацию об использовании приложения вы найдете в справочной системе.\n\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Склад!\n\n'
+              '\nВыявленные ошибки и пожелания оставляйте в системе регистрации.\n\nСпасибо за использование GDMN Склад!\n\n'
             }
           </Text>
           <TouchableOpacity style={styles.buttonPrev} onPress={handleSetInfoWindow_2}>
