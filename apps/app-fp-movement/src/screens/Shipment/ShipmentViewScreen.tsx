@@ -35,8 +35,7 @@ import { IGood } from '../../store/app/types';
 import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
 
 import { getBarcode } from '../../utils/helpers';
-
-import ShipmentTotal from './components/ShipmentTotal';
+import ViewTotal from '../../components/ViewTotal';
 
 const keyExtractor = (item: IShipmentLine | ITempLine) => item.id;
 
@@ -564,7 +563,7 @@ const ShipmentViewScreen = () => {
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <ShipmentTotal quantity={shipmentLineSum} weight={shipmentLines?.length} />
+          <ViewTotal quantity={shipmentLineSum} weight={shipmentLines?.length} />
         </>
       ) : (
         <>
@@ -576,7 +575,7 @@ const ShipmentViewScreen = () => {
             scrollEventThrottle={400}
             ItemSeparatorComponent={ItemSeparator}
           />
-          <ShipmentTotal quantity={tempLineSum} weight={tempOrderLines?.length || 0} />
+          <ViewTotal quantity={tempLineSum} weight={tempOrderLines?.length || 0} />
         </>
       )}
       <AppDialog

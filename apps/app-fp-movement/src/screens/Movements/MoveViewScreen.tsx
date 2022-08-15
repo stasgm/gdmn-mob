@@ -31,7 +31,7 @@ import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
-import MoveTotal from './components/MoveTotal';
+import ViewTotal from '../../components/ViewTotal';
 
 export interface IScanerObject {
   item?: IMoveLine;
@@ -52,6 +52,8 @@ export const MoveViewScreen = () => {
   const doc = docSelectors.selectByDocId<IMoveDocument>(id);
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
 
   const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
 
@@ -406,7 +408,7 @@ export const MoveViewScreen = () => {
         updateCellsBatchingPeriod={100} // Increase time between renders
         windowSize={7} // Reduce the window size
       />
-      {doc?.lines?.length ? <MoveTotal lines={doc?.lines} /> : null}
+      {doc?.lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
       <AppDialog
         visible={visibleDialog}
         text={barcode}
