@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform } from 'rea
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-import { AppScreen, DrawerButton, globalStyles as styles } from '@lib/mobile-ui';
+import { AppScreen, DrawerButton, globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
@@ -41,10 +41,10 @@ const InformationScreen = () => {
             <Avatar.Icon size={40} icon="cog-outline" style={{ backgroundColor: colors.primary }} />
           </View>
           <View style={localStyles.profileInfo}>
-            <Text style={localStyles.profileInfoTextUser}>Версия</Text>
-            <Text style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
+            <LargeText style={styles.textBold}>Версия</LargeText>
+            <MediumText>
               {Constants.manifest?.extra?.appVesion}-{Constants.manifest?.extra?.buildVersion || 0}
-            </Text>
+            </MediumText>
           </View>
         </View>
         <Divider />
@@ -54,7 +54,7 @@ const InformationScreen = () => {
           </View>
           <View style={localStyles.profileInfo}>
             <TouchableOpacity onPress={() => Linking.openURL(Constants.manifest?.extra?.documentationUrl)}>
-              <Text style={localStyles.profileInfoTextUser}>Документация</Text>
+              <LargeText style={styles.textBold}>Документация</LargeText>
             </TouchableOpacity>
           </View>
         </View>
@@ -65,12 +65,10 @@ const InformationScreen = () => {
             <Avatar.Icon size={40} icon="office-building" style={{ backgroundColor: colors.primary }} />
           </View>
           <View style={localStyles.profileInfo}>
-            <Text selectable={true} style={localStyles.profileInfoTextUser}>
+            <LargeText style={styles.textBold} selectable={true}>
               {GDMN_COMPANY_NAME}
-            </Text>
-            <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
-              {GDMN_TRADEMARK}
-            </Text>
+            </LargeText>
+            <MediumText selectable={true}>{GDMN_TRADEMARK}</MediumText>
           </View>
         </View>
         <Divider />
@@ -79,11 +77,9 @@ const InformationScreen = () => {
             <Avatar.Icon size={40} icon="phone" style={{ backgroundColor: colors.primary }} />
           </View>
           <View style={localStyles.profileInfo}>
-            <Text style={localStyles.profileInfoTextUser}>Телефон</Text>
+            <LargeText style={styles.textBold}>Телефон</LargeText>
             <TouchableOpacity onPress={() => dialCall(GDMN_PHONE)}>
-              <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
-                {GDMN_PHONE}
-              </Text>
+              <MediumText selectable={true}>{GDMN_PHONE}</MediumText>
             </TouchableOpacity>
           </View>
         </View>
@@ -93,11 +89,9 @@ const InformationScreen = () => {
             <Avatar.Icon size={40} icon="email-outline" style={{ backgroundColor: colors.primary }} />
           </View>
           <View style={localStyles.profileInfo}>
-            <Text style={localStyles.profileInfoTextUser}>Email</Text>
+            <LargeText style={styles.textBold}>Email</LargeText>
             <TouchableOpacity onPress={() => Linking.openURL(`mailto:${GDMN_EMAIL}`)}>
-              <Text selectable={true} style={[localStyles.profileInfoTextCompany, { color: colors.text }]}>
-                {GDMN_EMAIL}
-              </Text>
+              <MediumText selectable={true}>{GDMN_EMAIL}</MediumText>
             </TouchableOpacity>
           </View>
         </View>
@@ -107,14 +101,11 @@ const InformationScreen = () => {
             <Avatar.Icon size={40} icon="web" style={{ backgroundColor: colors.primary }} />
           </View>
           <View style={localStyles.profileInfo}>
-            <Text style={localStyles.profileInfoTextUser}>Сайт</Text>
+            <LargeText style={styles.textBold}>Сайт</LargeText>
             <TouchableOpacity onPress={() => Linking.openURL(GDMN_SITE_ADDRESS)}>
-              <Text
-                selectable={true}
-                style={[localStyles.profileInfoTextCompany, { color: colors.text, textDecorationLine: 'underline' }]}
-              >
+              <MediumText selectable={true} style={{ textDecorationLine: 'underline' }}>
                 {GDMN_SITE_ADDRESS}
-              </Text>
+              </MediumText>
             </TouchableOpacity>
           </View>
         </View>
@@ -155,22 +146,10 @@ const localStyles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 4,
   },
-  profileInfoTextCompany: {
-    fontSize: 15,
-    fontWeight: '300',
-  },
-  profileInfoTextUser: {
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
   title: {
     alignItems: 'center',
     fontSize: 18,
     textAlign: 'center',
     margin: 10,
-  },
-  text: {
-    fontSize: 17,
-    // color: colors.text,
   },
 });

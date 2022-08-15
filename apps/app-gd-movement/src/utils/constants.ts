@@ -87,6 +87,8 @@ export const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
+const goodGroup = { id: '2', name: 'Весовой товар', sortOrder: 2 };
+
 export const appSettings: Settings = {
   scannerUse: {
     id: '4',
@@ -104,25 +106,25 @@ export const appSettings: Settings = {
     data: '22',
     type: 'string',
     visible: true,
-    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
+    group: goodGroup,
   },
   countCode: {
     id: '6',
     sortOrder: 6,
-    description: 'Количество символов для кода товара',
+    description: 'Кол-во символов кода товара',
     data: 5,
     type: 'number',
     visible: true,
-    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
+    group: goodGroup,
   },
   countWeight: {
     id: '7',
     sortOrder: 7,
-    description: 'Количество символов для веса (в гр.)',
+    description: 'Кол-во символов веса (в гр.)',
     data: 5,
     type: 'number',
     visible: true,
-    group: { id: '2', name: 'Настройки весового товара', sortOrder: 2 },
+    group: goodGroup,
   },
 };
 

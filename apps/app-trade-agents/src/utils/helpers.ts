@@ -159,15 +159,16 @@ const totalListByGroup = (
         ),
       );
 
-      const { quantity, s } = linesByParentGroup?.reduce(
+      const { quantity, sum, sumVat } = linesByParentGroup?.reduce(
         (prev: any, line) => {
-          const sum = round((round(line.quantity, 3) / (line.good.invWeight || 1)) * line.good.priceFsn);
+          const s1 = round((round(line.quantity, 3) / (line.good.invWeight || 1)) * line.good.priceFsn);
           return {
             quantity: prev.quantity + round(line.quantity, 3),
-            s: prev.s + sum + round((sum * Number(line.good.vat || 0)) / 100),
+            sum: prev.sum + s1,
+            sumVat: prev.sumVat + s1 + round((s1 * Number(line.good.vat || 0)) / 100, 3),
           };
         },
-        { quantity: 0, s: 0 },
+        { quantity: 0, sum: 0, sumVat: 0 },
       );
 
       return {
@@ -176,15 +177,24 @@ const totalListByGroup = (
           name: firstGr.name,
         },
         quantity,
-        s,
+        sum,
+        sumVat,
       };
     })
     .filter((i) => i.quantity > 0);
 
 const totalList = (list: IOrderTotalLine[]) =>
-  list?.reduce((prev, item) => ({ quantity: prev.quantity + (item.quantity || 0), s: prev.s + (item.s || 0) }), {
-    quantity: 0,
-    s: 0,
-  });
+  list?.reduce(
+    (prev, item) => ({
+      quantity: prev.quantity + (item.quantity || 0),
+      sum: prev.sum + (item.sum || 0),
+      sumVat: prev.sumVat + (item.sumVat || 0),
+    }),
+    {
+      quantity: 0,
+      sum: 0,
+      sumVat: 0,
+    },
+  );
 
 export { getTimeProcess, twoDigits, getGoodMatrixByContact, getGroupModelByContact, totalListByGroup, totalList };

@@ -72,7 +72,7 @@ export interface IScanHead extends IHead {
 }
 
 export interface IScanLine extends IEntity {
-  barcode?: string;
+  barcode: string;
 }
 
 export type IScanDocument = MandateProps<IDocument<IScanHead, IScanLine>, 'head' | 'lines'>;

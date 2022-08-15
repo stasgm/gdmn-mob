@@ -27,6 +27,7 @@ import {
   getDateString,
   getDelLineList,
   keyExtractor,
+  shortenString,
   useSendDocs,
 } from '@lib/mobile-app';
 
@@ -193,9 +194,12 @@ export const ScanViewScreen = () => {
       onPress={() => (isDelList ? setDelList(getDelLineList(delList, item.id)) : undefined)}
       onLongPress={() => setDelList(getDelLineList(delList, item.id))}
       checked={delList.includes(item.id)}
+      readonly={true}
     >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
+
+        <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
     </ListItemLine>
   );
@@ -238,7 +242,7 @@ export const ScanViewScreen = () => {
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc?.head?.department?.name || ''}
           onPress={handleEditDocHead}
-          disabled={!['DRAFT', 'READY'].includes(doc.status)}
+          disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
         >
           <View style={styles.rowCenter}>
             <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>

@@ -120,7 +120,8 @@ export interface IOrderLine extends IEntity {
 export interface IOrderTotalLine {
   group: INamedEntity;
   quantity: number;
-  s: number;
+  sum: number;
+  sumVat: number;
 }
 
 export type IOrderDocument = MandateProps<IDocument<IOrderHead, IOrderLine>, 'head' | 'lines'>;

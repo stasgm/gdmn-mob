@@ -24,7 +24,7 @@ import { sleep } from '@lib/client-api';
 
 import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
 
-import { IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
+import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 
@@ -48,7 +48,7 @@ const ShipmentViewScreen = () => {
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
   const settings = useSelector((state) => state.settings?.data);
-  const isScanerReader = settings.scannerUse?.data;
+  const isScanerReader = useSelector((state) => state.settings?.data).scannerUse?.data;
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
 
@@ -72,13 +72,28 @@ const ShipmentViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
+
+  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+
   const handleGetBarcode = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (brc.length < minBarcodeLength) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -128,7 +143,7 @@ const ShipmentViewScreen = () => {
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
         } else {
-          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
             {
               text: 'Да',
               onPress: () => {
@@ -147,7 +162,7 @@ const ShipmentViewScreen = () => {
           ]);
         }
       } else {
-        Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+        Alert.alert('Данный товар отсутствует в позициях заявки!', 'Добавить позицию?', [
           {
             text: 'Да',
             onPress: async () => {
@@ -163,7 +178,17 @@ const ShipmentViewScreen = () => {
       setBarcode('');
     },
 
-    [dispatch, fpDispatch, goods, id, shipment?.lines, shipmentLines?.length, tempOrder],
+    [
+      dispatch,
+      fpDispatch,
+      goodBarcodeSettings,
+      goods,
+      id,
+      minBarcodeLength,
+      shipment?.lines,
+      shipmentLines?.length,
+      tempOrder,
+    ],
   );
 
   const handleShowDialog = () => {
@@ -306,11 +331,22 @@ const ShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (brc.length < minBarcodeLength) {
+        Alert.alert(
+          'Внимание!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+          [{ text: 'OK' }],
+        );
+        setScanned(false);
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -360,7 +396,7 @@ const ShipmentViewScreen = () => {
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
         } else {
-          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
             {
               text: 'Да',
               onPress: () => {
@@ -379,7 +415,7 @@ const ShipmentViewScreen = () => {
           ]);
         }
       } else {
-        Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+        Alert.alert('Данный товар отсутствует в позициях заявки.', 'Добавить позицию?', [
           {
             text: 'Да',
             onPress: () => {
@@ -394,7 +430,8 @@ const ShipmentViewScreen = () => {
 
       setScanned(false);
     },
-    [goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
+
+    [minBarcodeLength, goodBarcodeSettings, goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
   );
 
   //Для отрисовки при каждом новом сканировании
@@ -407,14 +444,14 @@ const ShipmentViewScreen = () => {
   };
 
   useEffect(() => {
-    if (!scanned && ref?.current) {
+    if (!visibleDialog && !scanned && ref?.current) {
       ref?.current &&
         setTimeout(() => {
           ref.current?.focus();
           ref.current?.clear();
         }, ONE_SECOND_IN_MS);
     }
-  }, [scanned, ref]);
+  }, [scanned, ref, visibleDialog]);
 
   const LineTypes = useCallback(
     () => (

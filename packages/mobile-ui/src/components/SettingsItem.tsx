@@ -1,9 +1,10 @@
 import React from 'react';
 import { SettingValue } from '@lib/types';
-import { View, StyleSheet, Switch } from 'react-native';
-import { Subheading, useTheme } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
 
 import Input from './Input';
+import { MediumText } from './AppText';
+import Switch from './Switch';
 
 type Props = {
   label: string;
@@ -16,9 +17,7 @@ const SettingsItem = ({ label, value, onValueChange }: Props) => {
     <View>
       {typeof value === 'boolean' ? (
         <View style={localStyles.container}>
-          <Subheading numberOfLines={5} style={localStyles.subHeading}>
-            {label}
-          </Subheading>
+          <MediumText>{label}</MediumText>
           <Switch value={value} onValueChange={() => onValueChange(!value)} />
         </View>
       ) : (
@@ -53,6 +52,7 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 12,
     fontSize: 20,
+    justifyContent: 'space-between',
   },
   settingsContainer: {
     flexDirection: 'column',

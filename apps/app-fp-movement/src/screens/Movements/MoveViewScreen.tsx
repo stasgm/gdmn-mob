@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { View, FlatList, Alert, TextInput, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
+import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch, useSelector } from '@lib/store';
 import {
   MenuButton,
   useActionSheet,
@@ -21,7 +21,7 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
-import { IMoveDocument, IMoveLine } from '../../store/types';
+import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
@@ -59,13 +59,30 @@ export const MoveViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
+  const settings = useSelector((state) => state.settings?.data);
+
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
+
+  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+
   const handleGetBarcode = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
         setErrorMessage('Штрих-код неверного формата');
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (brc.length < minBarcodeLength) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -101,7 +118,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [dispatch, doc?.lines, goods, id],
+    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const handleShowDialog = () => {
@@ -206,7 +223,6 @@ export const MoveViewScreen = () => {
       ) : (
         <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          {/* <ScanButton onPress={handleDoScan} /> */}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -258,11 +274,22 @@ export const MoveViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повоторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
-      const barc = getBarcode(brc);
+
+      if (brc.length < minBarcodeLength) {
+        Alert.alert(
+          'Внимание!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
+          [{ text: 'OK' }],
+        );
+        setScanned(false);
+        return;
+      }
+
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -295,7 +322,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [dispatch, id, doc?.lines, goods],
+    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const [key, setKey] = useState(1);
@@ -307,14 +334,14 @@ export const MoveViewScreen = () => {
   };
 
   useEffect(() => {
-    if (!scanned && ref?.current) {
+    if (!visibleDialog && !scanned && ref?.current) {
       ref?.current &&
         setTimeout(() => {
           ref.current?.focus();
           ref.current?.clear();
         }, ONE_SECOND_IN_MS);
     }
-  }, [scanned, ref]);
+  }, [scanned, ref, visibleDialog]);
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -371,9 +398,9 @@ export const MoveViewScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={10}
-        maxToRenderPerBatch={10} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={100}
+        windowSize={7}
       />
       {doc?.lines?.length ? <MoveTotal lines={doc?.lines} /> : null}
       <AppDialog

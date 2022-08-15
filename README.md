@@ -1,5 +1,7 @@
 # gdmn-mob
 
+![Схема платформы](docs\gdmn-mobile\img\platform_scheme_small.png "Схема платформы")
+
 ## Установка
 
 1. Установить [Node.js](https://nodejs.org/en/download/). Проверено с версией Node 16.13.1 LTS

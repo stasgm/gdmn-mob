@@ -113,6 +113,10 @@ export interface IFreeShipmentLine extends IEntity {
 }
 export type IFreeShipmentDocument = MandateProps<IDocument<IFreeShipmentHead, IFreeShipmentLine>, 'head' | 'lines'>;
 
+export type barcodeSettings = {
+  [name: string]: number;
+};
+
 export type TakeOrderType = 'ON_PLACE' | 'BY_PHONE' | 'BY_EMAIL';
 
 export type AppThunk<ReturnType = void, S = void, A extends AnyAction = AnyAction> = ThunkAction<
