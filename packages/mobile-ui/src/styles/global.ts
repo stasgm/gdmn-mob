@@ -254,6 +254,9 @@ const globalStyles = StyleSheet.create({
   infoBlock: {
     flexDirection: 'column',
   },
+  textDecorationLine: {
+    textDecorationLine: 'underline',
+  },
 });
 
 export default globalStyles;
