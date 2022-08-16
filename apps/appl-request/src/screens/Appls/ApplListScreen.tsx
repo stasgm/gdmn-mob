@@ -124,7 +124,6 @@ const ApplListScreen = () => {
 
   const renderSectionHeader = useCallback(
     ({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
-    // <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
     [],
   );
 

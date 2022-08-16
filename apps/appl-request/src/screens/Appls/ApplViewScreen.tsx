@@ -1,18 +1,20 @@
 import React, { useCallback, useEffect, useLayoutEffect } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Divider, useTheme, Dialog, Button, TextInput } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import {
   AppActivityIndicator,
+  AppDialog,
   AppScreen,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
   LargeText,
+  MediumText,
   PrimeButton,
 } from '@lib/mobile-ui';
 
@@ -103,7 +105,7 @@ const ApplViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => navBackButton,
+      headerLeft: navBackButton,
     });
   }, [navigation]);
 
@@ -119,16 +121,16 @@ const ApplViewScreen = () => {
     );
   }
 
-  const renderItem = ({ item }: { item: IApplLine }) => <ApplItem docId={appl.id} item={item} />;
+  const renderItem = ({ item }: { item: IApplLine }) => <ApplItem item={item} />;
 
   return (
     <AppScreen>
       <InfoBlock colorLabel={colors.primary} title={appl.head.headCompany.name}>
         <>
-          <Text style={[styles.textBold, styles.textDescription]}>{appl.head.dept.name}</Text>
-          <Text>{`№ ${appl.number} от ${getDateString(appl.documentDate)}`} </Text>
-          <Text>{`${appl.head.purpose.name}`} </Text>
-          <Text style={[styles.field, styles.number]}>{`${appl.head.justification}`} </Text>
+          <LargeText style={[styles.textBold, styles.textDescription]}>{appl.head.dept.name}</LargeText>
+          <MediumText>{`№ ${appl.number} от ${getDateString(appl.documentDate)}`} </MediumText>
+          <MediumText>{`${appl.head.purpose.name}`} </MediumText>
+          <MediumText style={[styles.field, styles.number]}>{`${appl.head.justification}`} </MediumText>
           {appl.head.applStatus.name ? (
             <Text style={[styles.textBold, styles.field]}>{appl.head.applStatus.name}</Text>
           ) : null}
@@ -136,19 +138,24 @@ const ApplViewScreen = () => {
             <Text style={[styles.field, styles.number]}>{`${appl.head.cancelReason}`} </Text>
           ) : null}
           <ItemSeparator />
-          <Text style={[styles.name]}>{appl.head.sysApplicant?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>Системный заявитель</Text>
+
+          <LargeText style={styles.textBold}>{appl.head.sysApplicant?.name || ' - '} </LargeText>
+          <MediumText>Системный заявитель</MediumText>
+
           <Divider />
-          <Text style={[styles.name]}>{appl.head.applicant?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>Заявитель</Text>
+
+          <LargeText style={styles.textBold}>{appl.head.applicant?.name || ' - '} </LargeText>
+          <MediumText>Заявитель</MediumText>
+
           <Divider />
-          <Text style={[styles.name]}>{appl.head.specPreAgree?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>Специалист предварительно согласовавший заявку</Text>
+
+          <LargeText style={styles.textBold}>{appl.head.specPreAgree?.name || ' - '} </LargeText>
+          <MediumText>Специалист, предварительно согласовавший заявку</MediumText>
+
           <Divider />
-          <Text style={[styles.name]}>{appl.head.specAgreeEngin?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>
-            Специалист согласовавший со стороны инженерной службы заявку
-          </Text>
+
+          <LargeText style={styles.textBold}>{appl.head.specAgreeEngin?.name || ' - '} </LargeText>
+          <MediumText>Специалист, согласовавший со стороны инженерной службы заявку</MediumText>
         </>
       </InfoBlock>
       <FlatList
@@ -172,16 +179,15 @@ const ApplViewScreen = () => {
           </PrimeButton>
         </View>
       ) : null}
-      <Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
-        <Dialog.Title>Укажите причину отказа</Dialog.Title>
-        <Dialog.Content>
-          <TextInput value={refuseReason} onChangeText={setRefuseReason} />
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={() => setVisibleDialog(false)}>Отмена</Button>
-          <Button onPress={handleRefuse}>Сохранить</Button>
-        </Dialog.Actions>
-      </Dialog>
+      <AppDialog
+        title="Укажите причину отказа"
+        visible={visibleDialog}
+        text={refuseReason}
+        onChangeText={setRefuseReason}
+        onCancel={() => setVisibleDialog(false)}
+        onOk={handleRefuse}
+        okLabel={'Сохранить'}
+      />
     </AppScreen>
   );
 };

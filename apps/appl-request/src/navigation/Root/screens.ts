@@ -1,8 +1,8 @@
 import { ApplListScreen, ApplViewScreen } from '../../screens/Appls';
 
 const applScreens = {
-  ApplList: ApplListScreen,
-  ApplView: ApplViewScreen,
+  ApplList: { title: 'Заявки', component: ApplListScreen },
+  ApplView: { title: 'Заявка', component: ApplViewScreen },
 };
 
 export { applScreens };

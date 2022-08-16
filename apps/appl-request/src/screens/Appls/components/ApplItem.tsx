@@ -1,31 +1,26 @@
 import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { globalStyles as styles } from '@lib/mobile-ui';
+import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
 import { IApplLine } from '../../../store/types';
 
 interface IProps {
-  docId: string;
   item: IApplLine;
 }
 
 const ApplItem = ({ item }: IProps) => {
   return (
-    <TouchableOpacity>
-      <View style={[styles.item]}>
-        <View style={[styles.icon]}>
-          <MaterialCommunityIcons name="information-outline" size={20} color={'#FFF'} />
-        </View>
-        <View style={styles.details}>
-          <Text style={styles.name}>{item.goodName}</Text>
-          <Text
-            style={[styles.field, styles.number, styles.rightAlignmentSelf]}
-          >{`${item.quantity} ${item.value.name}`}</Text>
-        </View>
+    <View style={[styles.item]}>
+      <View style={[styles.icon]}>
+        <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
       </View>
-    </TouchableOpacity>
+      <View style={styles.details}>
+        <LargeText style={styles.textBold}>{item.goodName}</LargeText>
+        <MediumText style={[styles.number]}>{`${item.quantity} ${item.value.name}`}</MediumText>
+      </View>
+    </View>
   );
 };
 
