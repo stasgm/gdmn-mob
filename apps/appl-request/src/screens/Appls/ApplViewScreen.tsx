@@ -1,28 +1,29 @@
 import React, { useCallback, useEffect, useLayoutEffect } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider, useTheme, Dialog, Button, TextInput } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import {
+  AppActivityIndicator,
   AppScreen,
-  BackButton,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
+  LargeText,
   PrimeButton,
-  SubTitle,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IApplDocument, IApplLine } from '../../store/types';
 
 import { ApplsStackParamList } from '../../navigation/Root/types';
 
 import ApplItem from './components/ApplItem';
+import { navBackButton } from './components/navigateOptions';
 
 const ApplViewScreen = () => {
   const { colors } = useTheme();
@@ -102,15 +103,19 @@ const ApplViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: () => navBackButton,
     });
   }, [navigation]);
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
   if (!appl) {
     return (
-      <AppScreen>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
-      </AppScreen>
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
     );
   }
 
@@ -148,10 +153,14 @@ const ApplViewScreen = () => {
       </InfoBlock>
       <FlatList
         data={appl.lines}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        scrollEventThrottle={400}
+        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
       />
       {!isBlocked ? (
         <View style={styles.flexDirectionRow}>
