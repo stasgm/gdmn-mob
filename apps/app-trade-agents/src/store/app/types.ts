@@ -11,6 +11,7 @@ export type AppTradeState = {
 
 // Товары
 export interface IGood extends INamedEntity {
+  [fieldName: string]: unknown;
   alias: string;
   barcode: string;
   vat: string; //НДС
