@@ -1,8 +1,8 @@
 import React, { useState, useLayoutEffect, useMemo, useCallback } from 'react';
-import { ListRenderItem, SectionList, SectionListData, Text, View } from 'react-native';
-import { useNavigation, useTheme } from '@react-navigation/native';
+import { ListRenderItem, SectionList, SectionListData, View } from 'react-native';
+import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
-import { docSelectors, useSelector } from '@lib/store';
+import { docSelectors } from '@lib/store';
 import {
   globalStyles as styles,
   FilterButtons,
@@ -11,11 +11,13 @@ import {
   SubTitle,
   ItemSeparator,
   SearchButton,
+  EmptyList,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 
 import { Searchbar } from 'react-native-paper';
 
-import { getDateString, shortenString } from '@lib/mobile-app';
+import { getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
 
 import { IApplDocument } from '../../store/types';
 
@@ -37,8 +39,6 @@ const ApplListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
-
-  const loading = useSelector((state) => state.documents.loading);
 
   const list = docSelectors
     .selectByDocType<IApplDocument>('request')
@@ -122,6 +122,16 @@ const ApplListScreen = () => {
     });
   }, [colors.card, filterVisible, navigation, renderRight]);
 
+  const renderSectionHeader = useCallback(
+    ({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>,
+    [],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
+
   return (
     <AppScreen>
       <FilterButtons status={status} onPress={setStatus} />
@@ -143,10 +153,9 @@ const ApplListScreen = () => {
       <SectionList
         sections={sections}
         renderItem={renderItem}
-        keyExtractor={({ id }) => id}
-        renderSectionHeader={({ section }) => <SubTitle style={[styles.header]}>{section.title}</SubTitle>}
-        ListEmptyComponent={!loading ? <Text style={styles.emptyList}>Список пуст</Text> : null}
-        // Performance settings
+        keyExtractor={keyExtractor}
+        renderSectionHeader={renderSectionHeader}
+        ListEmptyComponent={EmptyList}
         removeClippedSubviews={true} // Unmount components when outside of window
         initialNumToRender={6}
         maxToRenderPerBatch={6} // Reduce number in each render batch
