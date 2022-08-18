@@ -576,6 +576,7 @@ const ShipmentViewScreen = () => {
         </>
       )}
       <AppDialog
+        title="Введите штрих-код"
         visible={visibleDialog}
         text={barcode}
         onChangeText={setBarcode}

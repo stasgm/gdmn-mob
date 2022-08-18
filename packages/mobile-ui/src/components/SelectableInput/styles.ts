@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
+    lineHeight: 40,
     height: 40,
     flex: 1,
     marginHorizontal: 10,

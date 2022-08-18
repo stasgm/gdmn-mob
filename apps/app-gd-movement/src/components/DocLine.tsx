@@ -130,6 +130,7 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
                 style={[styles.number, styles.field]}
                 editable={true}
                 keyboardType="numeric"
+                autoCapitalize="words"
                 onChangeText={handleQuantityChange}
                 returnKeyType="done"
                 ref={currRef}

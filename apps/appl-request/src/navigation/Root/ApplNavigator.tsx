@@ -9,8 +9,8 @@ const Stack = createStackNavigator<ApplsStackParamList>();
 const ApplsNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="ApplList" screenOptions={{ headerShown: true, title: 'Заявки' }}>
-      {Object.entries({ ...applScreens }).map(([name, component]) => (
-        <Stack.Screen name={name as keyof ApplsStackParamList} component={component} key={name} />
+      {Object.entries({ ...applScreens }).map(([name, { title, component }]) => (
+        <Stack.Screen name={name as keyof ApplsStackParamList} component={component} key={name} options={{ title }} />
       ))}
     </Stack.Navigator>
   );

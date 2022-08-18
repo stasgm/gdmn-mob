@@ -8,7 +8,7 @@ import { refSelectors } from '@lib/store';
 
 import { IRefMetadata } from '@lib/types';
 
-import { keyExtractor } from '@lib/mobile-app';
+// import { keyExtractor } from '@lib/mobile-app';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
@@ -19,6 +19,7 @@ interface IProperty {
   title: string;
   visible: boolean;
   value?: string;
+  id?: string;
 }
 
 const LineItem = React.memo(({ item }: { item: IProperty }) => {
@@ -79,7 +80,7 @@ const GoodLineScreen = () => {
       <View style={[styles.content]}>
         <FlatList
           data={refData}
-          keyExtractor={keyExtractor}
+          keyExtractor={(_, i) => String(i)}
           renderItem={renderItem}
           ItemSeparatorComponent={ItemSeparator}
         />

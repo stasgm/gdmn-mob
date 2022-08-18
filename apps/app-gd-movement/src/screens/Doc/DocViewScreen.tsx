@@ -143,7 +143,9 @@ export const DocViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked && (
+      isBlocked ? (
+        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+      ) : (
         <View style={styles.buttons}>
           {isDelList ? (
             <DeleteButton onPress={handleDeleteDocs} />
@@ -156,7 +158,7 @@ export const DocViewScreen = () => {
           )}
         </View>
       ),
-    [actionsMenu, handleDeleteDocs, handleDoScan, handleSendDoc, isBlocked, isDelList],
+    [actionsMenu, doc?.status, handleDeleteDocs, handleDoScan, handleSendDoc, isBlocked, isDelList, screenState],
   );
 
   const renderLeft = useCallback(

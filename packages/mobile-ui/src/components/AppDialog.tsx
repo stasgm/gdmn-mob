@@ -11,13 +11,14 @@ interface IProps {
   onCancel: () => void;
   okLabel?: string;
   errorMessage?: string;
+  title: string;
 }
 
-const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, okLabel = 'Ок' }: IProps) => {
+const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, okLabel = 'Ок', title }: IProps) => {
   const { colors } = useTheme();
   return (
     <Dialog visible={visible} onDismiss={onCancel}>
-      <Dialog.Title>Введите штрих-код</Dialog.Title>
+      <Dialog.Title>{title}</Dialog.Title>
       <Dialog.Content>
         <TextInput
           theme={{

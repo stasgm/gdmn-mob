@@ -157,21 +157,32 @@ export const ScanViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      !isBlocked &&
-      screenState !== 'deleting' && (
-        <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
-          {isDelList ? (
-            <DeleteButton onPress={handleDeleteDocs} />
-          ) : (
-            <>
-              <SendButton onPress={handleSendScanDoc} disabled={screenState !== 'idle'} />
-              <ScanButton onPress={handleDoScan} />
-              <MenuButton actionsMenu={actionsMenu} />
-            </>
-          )}
-        </View>
-      ),
-    [actionsMenu, handleDeleteDocs, handleDoScan, handleSendScanDoc, isBlocked, isDelList, screenState],
+      isBlocked
+        ? doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        : screenState !== 'deleting' && (
+            <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
+              {isDelList ? (
+                <DeleteButton onPress={handleDeleteDocs} />
+              ) : (
+                <>
+                  <SendButton onPress={handleSendScanDoc} disabled={screenState !== 'idle'} />
+                  <ScanButton onPress={handleDoScan} />
+                  <MenuButton actionsMenu={actionsMenu} />
+                </>
+              )}
+            </View>
+          ),
+    [
+      actionsMenu,
+      doc?.status,
+      handleDeleteDocs,
+      handleDoScan,
+      handleSendDoc,
+      handleSendScanDoc,
+      isBlocked,
+      isDelList,
+      screenState,
+    ],
   );
 
   const renderLeft = useCallback(

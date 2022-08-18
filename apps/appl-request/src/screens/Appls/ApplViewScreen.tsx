@@ -1,22 +1,25 @@
 import React, { useCallback, useEffect, useLayoutEffect } from 'react';
 import { Text, View, FlatList } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Divider, useTheme, Dialog, Button, TextInput } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 import {
+  AppActivityIndicator,
+  AppDialog,
   AppScreen,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
-  navBackButton,
+  LargeText,
+  MediumText,
   PrimeButton,
-  SubTitle,
+  navBackButton,
 } from '@lib/mobile-ui';
 
-import { getDateString } from '@lib/mobile-app';
+import { getDateString, keyExtractor } from '@lib/mobile-app';
 
 import { IApplDocument, IApplLine } from '../../store/types';
 
@@ -106,24 +109,28 @@ const ApplViewScreen = () => {
     });
   }, [navigation]);
 
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
   if (!appl) {
     return (
-      <AppScreen>
-        <SubTitle style={styles.title}>Документ не найден</SubTitle>
-      </AppScreen>
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
     );
   }
 
-  const renderItem = ({ item }: { item: IApplLine }) => <ApplItem docId={appl.id} item={item} />;
+  const renderItem = ({ item }: { item: IApplLine }) => <ApplItem item={item} />;
 
   return (
     <AppScreen>
       <InfoBlock colorLabel={colors.primary} title={appl.head.headCompany.name}>
         <>
-          <Text style={[styles.textBold, styles.textDescription]}>{appl.head.dept.name}</Text>
-          <Text>{`№ ${appl.number} от ${getDateString(appl.documentDate)}`} </Text>
-          <Text>{`${appl.head.purpose.name}`} </Text>
-          <Text style={[styles.field, styles.number]}>{`${appl.head.justification}`} </Text>
+          <LargeText style={[styles.textBold, styles.textDescription]}>{appl.head.dept.name}</LargeText>
+          <MediumText>{`№ ${appl.number} от ${getDateString(appl.documentDate)}`} </MediumText>
+          <MediumText>{`${appl.head.purpose.name}`} </MediumText>
+          <MediumText style={[styles.field, styles.number]}>{`${appl.head.justification}`} </MediumText>
           {appl.head.applStatus.name ? (
             <Text style={[styles.textBold, styles.field]}>{appl.head.applStatus.name}</Text>
           ) : null}
@@ -131,27 +138,36 @@ const ApplViewScreen = () => {
             <Text style={[styles.field, styles.number]}>{`${appl.head.cancelReason}`} </Text>
           ) : null}
           <ItemSeparator />
-          <Text style={[styles.name]}>{appl.head.sysApplicant?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>Системный заявитель</Text>
+
+          <LargeText style={styles.textBold}>{appl.head.sysApplicant?.name || ' - '} </LargeText>
+          <MediumText>Системный заявитель</MediumText>
+
           <Divider />
-          <Text style={[styles.name]}>{appl.head.applicant?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>Заявитель</Text>
+
+          <LargeText style={styles.textBold}>{appl.head.applicant?.name || ' - '} </LargeText>
+          <MediumText>Заявитель</MediumText>
+
           <Divider />
-          <Text style={[styles.name]}>{appl.head.specPreAgree?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>Специалист предварительно согласовавший заявку</Text>
+
+          <LargeText style={styles.textBold}>{appl.head.specPreAgree?.name || ' - '} </LargeText>
+          <MediumText>Специалист, предварительно согласовавший заявку</MediumText>
+
           <Divider />
-          <Text style={[styles.name]}>{appl.head.specAgreeEngin?.name || ' - '} </Text>
-          <Text style={[styles.field, styles.number]}>
-            Специалист согласовавший со стороны инженерной службы заявку
-          </Text>
+
+          <LargeText style={styles.textBold}>{appl.head.specAgreeEngin?.name || ' - '} </LargeText>
+          <MediumText>Специалист, согласовавший со стороны инженерной службы заявку</MediumText>
         </>
       </InfoBlock>
       <FlatList
         data={appl.lines}
-        keyExtractor={(_, i) => String(i)}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        scrollEventThrottle={400}
+        // scrollEventThrottle={400}
         ItemSeparatorComponent={ItemSeparator}
+        initialNumToRender={6}
+        maxToRenderPerBatch={6} // Reduce number in each render batch
+        updateCellsBatchingPeriod={100} // Increase time between renders
+        windowSize={7} // Reduce the window size
       />
       {!isBlocked ? (
         <View style={styles.flexDirectionRow}>
@@ -163,16 +179,15 @@ const ApplViewScreen = () => {
           </PrimeButton>
         </View>
       ) : null}
-      <Dialog visible={visibleDialog} onDismiss={() => setVisibleDialog(false)}>
-        <Dialog.Title>Укажите причину отказа</Dialog.Title>
-        <Dialog.Content>
-          <TextInput value={refuseReason} onChangeText={setRefuseReason} />
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={() => setVisibleDialog(false)}>Отмена</Button>
-          <Button onPress={handleRefuse}>Сохранить</Button>
-        </Dialog.Actions>
-      </Dialog>
+      <AppDialog
+        title="Укажите причину отказа"
+        visible={visibleDialog}
+        text={refuseReason}
+        onChangeText={setRefuseReason}
+        onCancel={() => setVisibleDialog(false)}
+        onOk={handleRefuse}
+        okLabel={'Сохранить'}
+      />
     </AppScreen>
   );
 };
