@@ -17,6 +17,7 @@ import {
   DeleteButton,
   CloseButton,
   LargeText,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -30,8 +31,6 @@ import { IDebt, IOrderDocument, IOrderLine, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';

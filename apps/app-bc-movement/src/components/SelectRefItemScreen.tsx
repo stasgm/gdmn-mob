@@ -103,6 +103,7 @@ export const SelectRefItemScreen = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => <BackButton />,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <View style={styles.buttons}>
           <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />

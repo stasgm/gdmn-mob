@@ -12,6 +12,7 @@ import {
   SubTitle,
   globalStyles as styles,
   LargeText,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { extraPredicate, keyExtractor } from '@lib/mobile-app';
@@ -20,8 +21,6 @@ import { useDispatch } from '../store';
 
 import { RefParamList } from '../navigation/Root/types';
 import { IOutlet } from '../store/types';
-
-import { navBackButton } from './navigateOptions';
 
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();

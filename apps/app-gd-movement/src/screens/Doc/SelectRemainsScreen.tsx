@@ -13,6 +13,7 @@ import {
   EmptyList,
   MediumText,
   LargeText,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { refSelectors, useSelector } from '@lib/store';
 
@@ -28,7 +29,6 @@ import { getRemGoodListByContact } from '../../utils/helpers';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IMovementDocument } from '../../store/types';
 import { IGood, IRemains, IRemGood } from '../../store/app/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 interface IFilteredList {
   searchQuery: string;

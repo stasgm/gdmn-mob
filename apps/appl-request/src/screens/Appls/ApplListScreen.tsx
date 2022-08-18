@@ -11,6 +11,7 @@ import {
   SubTitle,
   ItemSeparator,
   SearchButton,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { Searchbar } from 'react-native-paper';
@@ -20,7 +21,6 @@ import { getDateString, shortenString } from '@lib/mobile-app';
 import { IApplDocument } from '../../store/types';
 
 import ApplListItem, { ApplListRenderItemProps } from './components/ApplListItem';
-import { navBackDrawer } from './components/navigateOptions';
 
 export interface ApplListSectionProps {
   title: string;

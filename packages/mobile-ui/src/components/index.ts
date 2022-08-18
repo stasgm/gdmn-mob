@@ -36,3 +36,4 @@ export { ListItemLine } from './ListItemLine';
 export { default as ScanBarcode } from './ScanBarcode';
 export { default as ScanBarcodeReader } from './ScanBarcodeReader';
 export { default as Switch } from './Switch';
+export { navBackButton, navBackDrawer } from './NavigationButtons';

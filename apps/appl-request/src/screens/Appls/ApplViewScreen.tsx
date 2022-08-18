@@ -8,10 +8,10 @@ import { docSelectors, documentActions, refSelectors, useDispatch, useSelector }
 import { INamedEntity } from '@lib/types';
 import {
   AppScreen,
-  BackButton,
   globalStyles as styles,
   InfoBlock,
   ItemSeparator,
+  navBackButton,
   PrimeButton,
   SubTitle,
 } from '@lib/mobile-ui';
@@ -102,7 +102,7 @@ const ApplViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
   }, [navigation]);
 

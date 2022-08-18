@@ -4,15 +4,21 @@ import { useNavigation } from '@react-navigation/core';
 import { useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { ItemSeparator, globalStyles as styles, AppScreen, EmptyList, MediumText, LargeText } from '@lib/mobile-ui';
+import {
+  ItemSeparator,
+  globalStyles as styles,
+  AppScreen,
+  EmptyList,
+  MediumText,
+  LargeText,
+  navBackDrawer,
+} from '@lib/mobile-ui';
 
 import { keyExtractor } from '@lib/mobile-app';
 
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
-
-import { navBackDrawer } from '../../components/navigateOptions';
 
 import localStyles from './styles';
 

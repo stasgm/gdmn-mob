@@ -10,7 +10,14 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { AppActivityIndicator, globalStyles, LargeText, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import {
+  AppActivityIndicator,
+  globalStyles,
+  LargeText,
+  navBackButton,
+  ScanBarcode,
+  ScanBarcodeReader,
+} from '@lib/mobile-ui';
 
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -18,7 +25,6 @@ import { IScannedObject } from '@lib/client-types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IShipmentDocument, ITempDocument } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 import { ICodeEntity } from '../../store/app/types';
 

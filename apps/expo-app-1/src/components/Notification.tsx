@@ -26,7 +26,6 @@ const Notification = () => {
   const [messageType, setMessageType] = useState<keyof typeof colors>('danger');
   const [message, setMessage] = useState<string | null>(null);
 
-  // eslint-disable-next-line no-undef
   const timeOutRef = useRef<NodeJS.Timer | null>(null);
   const [timeOutDuration, setTimeOutDuration] = useState(5000);
   const animatedOpacity = useSharedValue(0);

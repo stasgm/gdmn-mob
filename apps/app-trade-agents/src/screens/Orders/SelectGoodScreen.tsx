@@ -8,6 +8,7 @@ import {
   EmptyList,
   AppActivityIndicator,
   SearchButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { docSelectors, refSelectors, useSelector } from '@lib/store';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
@@ -22,7 +23,6 @@ import { generateId, keyExtractor } from '@lib/mobile-app';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IOrderDocument } from '../../store/types';
 import { getGoodMatrixByContact } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 
 interface IProp {
   item: IGood;

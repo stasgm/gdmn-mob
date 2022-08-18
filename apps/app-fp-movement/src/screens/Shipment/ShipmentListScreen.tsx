@@ -17,6 +17,7 @@ import {
   CloseButton,
   EmptyList,
   MediumText,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -29,7 +30,6 @@ import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { IShipmentDocument } from '../../store/types';
 import { ShipmentStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface ShipmentListSectionProps {

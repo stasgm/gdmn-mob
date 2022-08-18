@@ -18,6 +18,7 @@ import {
   EmptyList,
   MediumText,
   Menu,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -30,7 +31,6 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IMoveDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface MoveListSectionProps {

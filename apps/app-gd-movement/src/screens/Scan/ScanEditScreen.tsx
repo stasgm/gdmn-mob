@@ -15,6 +15,7 @@ import {
   AppScreen,
   RadioGroup,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors, docSelectors } from '@lib/store';
 
@@ -26,7 +27,6 @@ import { ScanStackParamList } from '../../navigation/Root/types';
 import { IScanFormParam, IScanDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 
 export const ScanEditScreen = () => {
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanEdit'>>().params?.id;

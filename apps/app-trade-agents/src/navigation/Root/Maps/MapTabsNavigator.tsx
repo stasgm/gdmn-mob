@@ -7,9 +7,10 @@ import { useNavigation } from '@react-navigation/native';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
+import { navBackDrawer } from '@lib/mobile-ui';
+
 import MapScreen from '../../../screens/Maps/MapsScreen';
 import ListScreen from '../../../screens/Maps/ListScreen';
-import { navBackDrawer } from '../../../components/navigateOptions';
 
 type MapTabsStackParams = {
   Maps: undefined;

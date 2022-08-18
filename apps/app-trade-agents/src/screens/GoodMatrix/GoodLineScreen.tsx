@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppActivityIndicator, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppActivityIndicator, ItemSeparator, navBackButton, SubTitle } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
@@ -12,7 +12,6 @@ import { keyExtractor } from '@lib/mobile-app';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 interface IProperty {
   sortOrder: number;

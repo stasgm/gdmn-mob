@@ -5,7 +5,15 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Searchbar, Divider } from 'react-native-paper';
 
-import { AppScreen, ItemSeparator, SearchButton, SubTitle, globalStyles as styles, MediumText } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SearchButton,
+  SubTitle,
+  globalStyles as styles,
+  MediumText,
+  navBackButton,
+} from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
@@ -13,7 +21,6 @@ import { generateId, keyExtractor } from '@lib/mobile-app';
 
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IReturnLine } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 const SelectItemScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ReturnsStackParamList, 'SelectItemReturn'>>();

@@ -15,6 +15,7 @@ import {
   AppScreen,
   RadioGroup,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
@@ -26,7 +27,6 @@ import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { IFreeShipmentFormParam, IFreeShipmentDocument } from '../../store/types';
 import { STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 
 export const FreeShipmentEditScreen = () => {
   const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentEdit'>>().params?.id;

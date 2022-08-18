@@ -15,6 +15,8 @@ import {
   LargeText,
   AppDialog,
   ListItemLine,
+  ScanButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -25,7 +27,6 @@ import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
@@ -44,23 +45,20 @@ export const MoveViewScreen = () => {
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
-
-  const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
-
-  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
-
-  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
-
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
-
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const goods = refSelectors.selectByName<IGood>('good').data;
+  const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
+  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
+  const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
+
+  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
+
+  const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
 
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
@@ -225,10 +223,11 @@ export const MoveViewScreen = () => {
       ) : (
         <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+          {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, doc?.status, handleSendDoc, id, isBlocked, isScanerReader, navigation, screenState],
   );
 
   useLayoutEffect(() => {

@@ -3,7 +3,15 @@ import { FlatList, View, StyleSheet } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppActivityIndicator, AppScreen, EmptyList, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
+import {
+  AppActivityIndicator,
+  AppScreen,
+  EmptyList,
+  ItemSeparator,
+  navBackButton,
+  SearchButton,
+  SubTitle,
+} from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 
@@ -13,8 +21,6 @@ import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGood, IGoodMatrix } from '../../store/types';
 
 import { getGoodMatrixByContact } from '../../utils/helpers';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import GoodItem from './components/GoodItem';
 

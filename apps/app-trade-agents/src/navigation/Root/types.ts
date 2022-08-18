@@ -37,11 +37,12 @@ export type ReturnParamList = RefParamList & {
 
 export type ReturnsStackParamList = { ReturnList: undefined } & ReturnParamList;
 
-export type RoutesStackParamList = OrderParamList & {
-  RouteList: undefined;
-  RouteView: { id: string };
-  RouteDetails: { routeId: string; id: string };
-};
+export type RoutesStackParamList = ReturnParamList &
+  OrderParamList & {
+    RouteList: undefined;
+    RouteView: { id: string };
+    RouteDetails: { routeId: string; id: string };
+  };
 
 export type MapStackParamList = {
   MapGeoView: undefined;

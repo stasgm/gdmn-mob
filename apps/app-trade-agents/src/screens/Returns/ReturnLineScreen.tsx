@@ -4,13 +4,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, navBackButton } from '@lib/mobile-ui';
 
 import { ReturnsStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
 import { IReturnLine } from '../../store/types';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import ReturnLine from './components/ReturnLine';
 

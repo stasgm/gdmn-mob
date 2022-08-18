@@ -4,12 +4,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, AppActivityIndicator, AppScreen, navBackButton } from '@lib/mobile-ui';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { DocLine } from '../../components/DocLine';
 import { IMovementLine } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 export const DocLineScreen = () => {
   const navigation = useNavigation<StackNavigationProp<DocStackParamList | DocStackParamList, 'DocLine'>>();

@@ -15,6 +15,7 @@ import {
   EmptyList,
   AppActivityIndicator,
   SearchButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
@@ -27,8 +28,6 @@ import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../.
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';

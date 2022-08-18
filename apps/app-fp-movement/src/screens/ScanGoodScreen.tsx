@@ -3,8 +3,8 @@ import { Text, Alert, View, StyleSheet } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles, MediumText, ScanBarcode } from '@lib/mobile-ui';
-import { refSelectors, docSelectors, useDispatch, documentActions } from '@lib/store';
+import { AppActivityIndicator, globalStyles, MediumText, navBackButton, ScanBarcode } from '@lib/mobile-ui';
+import { refSelectors, docSelectors, useDispatch, documentActions, useSelector } from '@lib/store';
 
 import { generateId, getDateString, round } from '@lib/mobile-app';
 
@@ -12,15 +12,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IScannedObject } from '@lib/client-types';
 
-import { ShipmentStackParamList } from '../../navigation/Root/types';
-import { IShipmentLine, IShipmentDocument } from '../../store/types';
+import { ShipmentStackParamList } from '../navigation/Root/types';
+import { IShipmentLine, IShipmentDocument, barcodeSettings } from '../store/types';
 
-import { IGood } from '../../store/app/types';
-import { getBarcode } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
-import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../../store/index';
+import { IGood } from '../store/app/types';
+import { getBarcode } from '../utils/helpers';
+import { useSelector as useFpSelector, fpMovementActions, useDispatch as useFpDispatch } from '../store/index';
 
-import { barCodeTypes } from '../../utils/constants';
+import { barCodeTypes } from '../utils/constants';
 
 const ScanGoodScreen = () => {
   const docId = useRoute<RouteProp<ShipmentStackParamList, 'ScanGood'>>().params?.docId;
@@ -30,8 +29,17 @@ const ScanGoodScreen = () => {
   const dispatch = useDispatch();
 
   const goods = refSelectors.selectByName<IGood>('good').data;
+  const settings = useSelector((state) => state.settings?.data);
+
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
   const [scannedObject, setScannedObject] = useState<IShipmentLine>();
+
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -54,7 +62,7 @@ const ScanGoodScreen = () => {
         return;
       }
 
-      const barc = getBarcode(brc);
+      const barc = getBarcode(brc, goodBarcodeSettings);
 
       const good = goods.find((item) => `0000${item.shcode}`.slice(-4) === barc.shcode);
 
@@ -84,7 +92,7 @@ const ScanGoodScreen = () => {
       setScaner({ state: 'found' });
     },
 
-    [goods, shipmentLines],
+    [goodBarcodeSettings, goods, shipmentLines],
   );
 
   const handleSaveScannedItem = useCallback(() => {

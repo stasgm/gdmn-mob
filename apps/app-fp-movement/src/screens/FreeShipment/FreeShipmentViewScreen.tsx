@@ -15,6 +15,8 @@ import {
   AppDialog,
   LargeText,
   ListItemLine,
+  ScanButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -25,7 +27,6 @@ import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine } from '../..
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
@@ -43,26 +44,15 @@ export const FreeShipmentViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
-
   const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params?.id;
-
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
+  const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
-
   const isBlocked = doc?.status !== 'DRAFT';
-
-  const [visibleDialog, setVisibleDialog] = useState(false);
-  const [barcode, setBarcode] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
   const goods = refSelectors.selectByName<IGood>('good').data;
-
   const settings = useSelector((state) => state.settings?.data);
-
   const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
     if (item && item.group?.id !== '1' && typeof item.data === 'number') {
       prev[idx] = item.data;
@@ -71,6 +61,11 @@ export const FreeShipmentViewScreen = () => {
   }, {});
 
   const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+
+  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [barcode, setBarcode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -225,11 +220,11 @@ export const FreeShipmentViewScreen = () => {
       ) : (
         <View style={styles.buttons}>
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          {/* <ScanButton onPress={handleDoScan} /> */}
+          {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSendDoc, isBlocked, screenState],
+    [actionsMenu, doc?.status, handleSendDoc, id, isBlocked, isScanerReader, navigation, screenState],
   );
 
   useLayoutEffect(() => {

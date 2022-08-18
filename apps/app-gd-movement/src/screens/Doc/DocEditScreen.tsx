@@ -16,6 +16,7 @@ import {
   AppScreen,
   RadioGroup,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
@@ -27,7 +28,6 @@ import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocFormParam, IMovementDocument } from '../../store/types';
 import { contactTypes, STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 
 export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;

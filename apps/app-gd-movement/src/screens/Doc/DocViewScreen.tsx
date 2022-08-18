@@ -18,6 +18,7 @@ import {
   MediumText,
   LargeText,
   ListItemLine,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -27,7 +28,6 @@ import { sleep } from '@lib/client-api';
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
-import { navBackButton } from '../../components/navigateOptions';
 import { IGood } from '../../store/app/types';
 import DocTotal from '../../components/DocTotal';
 

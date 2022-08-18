@@ -2,15 +2,21 @@ import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList } from 'react-native';
 import { useIsFocused, useNavigation, useScrollToTop } from '@react-navigation/native';
 
-import { ItemSeparator, FilterButtons, Status, AppScreen, EmptyList, AppActivityIndicator } from '@lib/mobile-ui';
+import {
+  ItemSeparator,
+  FilterButtons,
+  Status,
+  AppScreen,
+  EmptyList,
+  AppActivityIndicator,
+  navBackDrawer,
+} from '@lib/mobile-ui';
 
 import { keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { IRouteDocument } from '../../store/types';
-
-import { navBackDrawer } from '../../components/navigateOptions';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 

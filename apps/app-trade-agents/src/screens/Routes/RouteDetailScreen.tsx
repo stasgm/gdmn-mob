@@ -10,6 +10,7 @@ import {
   AppScreen,
   MediumText,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -22,8 +23,6 @@ import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import Visit from './components/Visit';
 

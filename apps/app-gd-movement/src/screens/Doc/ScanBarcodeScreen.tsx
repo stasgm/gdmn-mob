@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute, useIsFocused } from '@react-navigation/native';
 
-import { AppActivityIndicator, globalStyles } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, navBackButton } from '@lib/mobile-ui';
 import { useSelector, refSelectors } from '@lib/store';
 
 import { IDocumentType, INamedEntity, ISettingsOption } from '@lib/types';
@@ -18,7 +18,6 @@ import { ScanBarcode, ScanBarcodeReader } from '../../components';
 import { IGood, IMGoodData, IMGoodRemain, IRemains } from '../../store/app/types';
 import { getRemGoodByContact } from '../../utils/helpers';
 import { unknownGood } from '../../utils/constants';
-import { navBackButton } from '../../components/navigateOptions';
 
 const ScanBarcodeScreen = () => {
   const docId = useRoute<RouteProp<DocStackParamList, 'ScanBarcode'>>().params?.docId;

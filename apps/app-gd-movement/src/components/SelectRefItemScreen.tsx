@@ -4,14 +4,20 @@ import { Searchbar, Divider, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { IReferenceData } from '@lib/types';
 import { appActions, refSelectors } from '@lib/store';
-import { AppScreen, ItemSeparator, SaveButton, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SaveButton,
+  SearchButton,
+  SubTitle,
+  globalStyles as styles,
+  navBackButton,
+} from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-app';
 
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
-
-import { navBackButton } from './navigateOptions';
 
 const keyExtractor = (item: IReferenceData) => item.id;
 

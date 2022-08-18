@@ -56,8 +56,10 @@ const TodoList = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerLeft: () => <DrawerButton />,
       // headerLeft: () => <MaterialIcons name="menu" size={30} style={styles.menuButton} onPress={openDrawer} />,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         // <MaterialIcons
         <AddButton
@@ -77,6 +79,7 @@ const TodoList = () => {
         data={list}
         keyExtractor={(_, index) => index.toString()}
         refreshControl={<RefreshControl onRefresh={fetchData} refreshing={status === 'loading'} title="Loading..." />}
+        // eslint-disable-next-line react/no-unstable-nested-components
         ItemSeparatorComponent={() => <View style={{ borderBottomWidth: StyleSheet.hairlineWidth }} />}
         renderItem={({ item }) => (
           <View style={localStyles.todoItem}>

@@ -19,6 +19,7 @@ import {
   AppActivityIndicator,
   SearchButton,
   MediumText,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
@@ -31,7 +32,6 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IScanDocument } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
   orders: IListItemProps[];

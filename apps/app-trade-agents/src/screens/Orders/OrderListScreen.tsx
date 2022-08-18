@@ -16,6 +16,7 @@ import {
   AppActivityIndicator,
   CloseButton,
   DeleteButton,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -28,7 +29,6 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IOrderDocument } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 
 import OrderListTotal from './components/OrderListTotal';
 

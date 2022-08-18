@@ -12,7 +12,15 @@ import {
   useDispatch,
   useSelector,
 } from '@lib/store';
-import { AppInputScreen, Input, SelectableInput, SaveButton, SubTitle, RadioGroup } from '@lib/mobile-ui';
+import {
+  AppInputScreen,
+  Input,
+  SelectableInput,
+  SaveButton,
+  SubTitle,
+  RadioGroup,
+  navBackButton,
+} from '@lib/mobile-ui';
 import { IDocumentType } from '@lib/types';
 
 import { generateId, useFilteredDocList } from '@lib/mobile-app';
@@ -20,7 +28,6 @@ import { generateId, useFilteredDocList } from '@lib/mobile-app';
 import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { IOutlet, IReturnDocument, IReturnFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
 const ReturnEditScreen = () => {

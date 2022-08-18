@@ -5,6 +5,7 @@ import {
   EmptyList,
   globalStyles as styles,
   ItemSeparator,
+  navBackDrawer,
   SearchButton,
   SubTitle,
 } from '@lib/mobile-ui';
@@ -15,8 +16,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionList, SectionListData, View, Alert } from 'react-native';
 import { Searchbar } from 'react-native-paper';
-
-import { navBackDrawer } from '../../components/navigateOptions';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';

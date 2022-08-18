@@ -18,6 +18,7 @@ import {
   EmptyList,
   AppActivityIndicator,
   SearchButton,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -33,7 +34,6 @@ import { IDocumentType } from '@lib/types';
 import { IMovementDocument } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
-import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
   orders: IListItemProps[];

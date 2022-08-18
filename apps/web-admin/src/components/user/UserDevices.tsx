@@ -35,7 +35,6 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
   );
 
   const fetchActivationCodes = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars-experimental
     (deviceId?: string) => {
       dispatch(codeActions.fetchActivationCodes()); //TODO Добавить фильтрацию
     },

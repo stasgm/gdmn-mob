@@ -15,6 +15,7 @@ import {
   AppScreen,
   Theme,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { IResponse, ISettingsOption } from '@lib/types';
@@ -26,8 +27,6 @@ import { IGood, IReturnDocument, ISellBill, IToken, ISellBillFormParam } from '.
 import config from '../../config';
 
 import { useDispatch, useSelector as useAppSelector, appTradeActions } from '../../store';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import { mockSellBills } from '../../store/mock';
 

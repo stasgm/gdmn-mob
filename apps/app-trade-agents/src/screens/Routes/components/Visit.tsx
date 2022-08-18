@@ -12,6 +12,7 @@ import {
   EmptyList,
   MediumText,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId, keyExtractor } from '@lib/mobile-app';
 
@@ -21,7 +22,6 @@ import { useDispatch } from '../../../store';
 import { IOrderDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getTimeProcess, twoDigits } from '../../../utils/helpers';
-import { navBackButton } from '../../../components/navigateOptions';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 interface IVisitProps {

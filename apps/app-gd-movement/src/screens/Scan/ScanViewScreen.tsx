@@ -19,6 +19,7 @@ import {
   MediumText,
   LargeText,
   ListItemLine,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import {
@@ -36,7 +37,6 @@ import { sleep } from '@lib/client-api';
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
-import { navBackButton } from '../../components/navigateOptions';
 import { ScanDataMatrix, ScanDataMatrixReader } from '../../components';
 
 export const ScanViewScreen = () => {

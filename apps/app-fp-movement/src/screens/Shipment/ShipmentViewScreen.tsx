@@ -47,7 +47,7 @@ const ShipmentViewScreen = () => {
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
   const settings = useSelector((state) => state.settings?.data);
-  const isScanerReader = useSelector((state) => state.settings?.data).scannerUse?.data;
+  const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const [lineType, setLineType] = useState(lineTypes[1].id);
 
@@ -287,7 +287,7 @@ const ShipmentViewScreen = () => {
             if (screenState !== 'idle') {
               setScreenState('idle');
             }
-          }, 10000);
+          }, ONE_SECOND_IN_MS);
           handleUseSendDoc();
         },
       },

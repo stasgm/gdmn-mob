@@ -87,6 +87,7 @@ const TodoEdit = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       title: `${index ? 'Edit' : 'Add'} todo item`,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerLeft: () => (
         <MaterialIcons name="arrow-back-ios" size={30} style={styles.menuButton} onPress={navigation.goBack} />
       ),

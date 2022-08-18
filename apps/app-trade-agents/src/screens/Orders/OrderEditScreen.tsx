@@ -14,6 +14,7 @@ import {
   SubTitle,
   RadioGroup,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { IDocumentType, IReference } from '@lib/types';
 
@@ -22,7 +23,6 @@ import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IOutlet, IOrderFormParam } from '../../store/types';
 import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
 const OrderEditScreen = () => {

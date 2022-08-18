@@ -13,6 +13,7 @@ import {
   AppActivityIndicator,
   Menu,
   SearchButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -26,7 +27,6 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IGoodGroup, IMGroupModel, IOrderDocument } from '../../store/types';
 import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
 import { UNKNOWN_GROUP, viewTypeList } from '../../utils/constants';
-import { navBackButton } from '../../components/navigateOptions';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 

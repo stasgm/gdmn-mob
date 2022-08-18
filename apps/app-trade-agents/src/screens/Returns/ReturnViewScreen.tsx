@@ -14,6 +14,7 @@ import {
   SubTitle,
   MediumText,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -29,8 +30,6 @@ import { ReturnsStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
 
 import SwipeLineItem from '../../components/SwipeLineItem';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import ReturnItem from './components/ReturnItem';
 

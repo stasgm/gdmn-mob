@@ -12,6 +12,7 @@ import {
   SubTitle,
   globalStyles as styles,
   LargeText,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-app';
@@ -21,9 +22,7 @@ import { IReferenceData } from '@lib/types';
 import { useDispatch } from '../store';
 import { RefParamList } from '../navigation/Root/types';
 
-import { navBackButton } from './navigateOptions';
-
-export const SelectRefItemScreen = () => {
+const SelectRefItemScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { colors } = useTheme();
@@ -222,3 +221,5 @@ const LineItem = React.memo(
     );
   },
 );
+
+export default SelectRefItemScreen;

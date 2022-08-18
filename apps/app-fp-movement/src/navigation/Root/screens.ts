@@ -1,8 +1,4 @@
-import { SelectRefItemScreen } from '../../components/SelectRefItemScreen';
-
-import { MoveListScreen, MoveEditScreen, MoveViewScreen, MoveLineScreen } from '../../screens/Movements';
-
-import ScanBarcodeScreen from '../../screens/Movements/ScanBarcodeScreen';
+import { MoveListScreen, MoveEditScreen, MoveViewScreen } from '../../screens/Movements';
 
 import {
   ShipmentListScreen,
@@ -12,19 +8,14 @@ import {
   ScanGoodScreen,
 } from '../../screens/Shipment';
 
-import {
-  FreeShipmentListScreen,
-  FreeShipmentEditScreen,
-  FreeShipmentViewScreen,
-  FreeShipmentLineScreen,
-} from '../../screens/FreeShipment';
+import { FreeShipmentListScreen, FreeShipmentEditScreen, FreeShipmentViewScreen } from '../../screens/FreeShipment';
+import { SelectRefItemScreen } from '../../components';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
   MoveView: { title: 'Перемещение', component: MoveViewScreen },
-  MoveLine: { title: 'Позиция перемещения', component: MoveLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
-  ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const moveListScreens = {
@@ -35,7 +26,7 @@ export const shipmentScreens = {
   ShipmentEdit: { title: 'Отвес по заявке', component: ShipmentEditScreen },
   ShipmentView: { title: 'Отвес', component: ShipmentViewScreen },
   ScanOrder: { title: 'Сканер заявки', component: ScanOrderScreen },
-  ScanGood: { title: 'Сканер товара', component: ScanGoodScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const shipmentListScreens = {
@@ -45,9 +36,8 @@ export const shipmentListScreens = {
 export const freeShipmentScreens = {
   FreeShipmentEdit: { title: 'Отвес', component: FreeShipmentEditScreen },
   FreeShipmentView: { title: 'Отвес', component: FreeShipmentViewScreen },
-  FreeShipmentLine: { title: 'Позиция отвеса', component: FreeShipmentLineScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
-  ScanBarcode: { title: 'Сканер', component: ScanBarcodeScreen },
+  ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
 
 export const freeShipmentListScreens = {
