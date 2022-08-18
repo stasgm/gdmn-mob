@@ -90,7 +90,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                 style={textStyle}
                 editable={true}
                 keyboardType="numeric"
-                autoCapitalize="none"
+                autoCapitalize="words"
                 onChangeText={handelQuantityChange}
                 returnKeyType="done"
                 ref={qtyRef}

@@ -389,6 +389,7 @@ export const FreeShipmentViewScreen = () => {
       />
       {lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
       <AppDialog
+        title="Введите штрих-код"
         visible={visibleDialog}
         text={barcode}
         onChangeText={setBarcode}

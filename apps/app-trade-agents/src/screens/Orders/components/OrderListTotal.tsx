@@ -68,7 +68,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
       {totalListByOrders.length ? (
         <>
           <View style={[localStyles.margins, styles.rowCenter]}>
-            <LargeText style={styles.textTotal}>Итого вес, кг.:</LargeText>
+            <LargeText style={styles.textTotal}>Итого вес, кг:</LargeText>
           </View>
           <Divider style={{ backgroundColor: colors.primary }} />
           <FlatList
@@ -81,7 +81,7 @@ const OrderListTotal = ({ sectionOrders }: IItem) => {
         </>
       ) : null}
       <View style={[styles.directionRow, localStyles.margins]}>
-        <LargeText style={styles.textTotal}>Общий вес, кг.: </LargeText>
+        <LargeText style={styles.textTotal}>Общий вес, кг: </LargeText>
         <MediumText style={styles.textTotal}>{round(total?.quantity, 3)}</MediumText>
       </View>
       <Divider style={{ backgroundColor: colors.primary }} />
