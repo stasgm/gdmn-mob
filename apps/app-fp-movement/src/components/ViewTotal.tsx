@@ -28,7 +28,7 @@ const ViewTotal = ({ weight, quantity, scan = false }: IItem) => {
         <View style={styles.details}>
           <View style={styles.directionRow}>
             <View style={localStyles.groupWidth}>
-              <MediumText>Общий вес (кг)</MediumText>
+              <MediumText>Общий вес, кг</MediumText>
             </View>
             <View style={localStyles.quantity}>
               <MediumText>{`${round(quantity, 3)}` || 0}</MediumText>

@@ -5,4 +5,5 @@ export default {
   placeholder: '#2a628f',
   light: '#3e92cc',
   black: '#000000',
+  backgroundLight: '#e4e4e4',
 };

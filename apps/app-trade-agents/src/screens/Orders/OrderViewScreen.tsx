@@ -10,7 +10,6 @@ import {
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
-  ItemSeparator,
   SendButton,
   MediumText,
   AppActivityIndicator,
@@ -20,7 +19,7 @@ import {
   navBackButton,
 } from '@lib/mobile-ui';
 
-import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
@@ -232,12 +231,20 @@ const OrderViewScreen = () => {
     [id, isBlocked, navigation],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: IOrderLine }) => {
-      const checkedId = delList.find((i) => i === item.id) || '';
+  const handleSwipeOrder = () =>
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...order, status: order.status === 'DRAFT' ? 'READY' : 'DRAFT' },
+      }),
+    );
 
+  const renderItem = useCallback(
+    ({ item, index }: { item: IOrderLine; index: number }) => {
+      const checkedId = delList.find((i) => i === item.id) || '';
       return (
         <OrderItem
+          sortId={index}
           key={item.id}
           item={item}
           onPress={() => handlePressOrderLine(item)}
@@ -283,6 +290,9 @@ const OrderViewScreen = () => {
           onPress={handleEditOrderHead}
           disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
           isBlocked={isBlocked}
+          onSwipeOpen={handleSwipeOrder}
+          onSwipeClose={handleSwipeOrder}
+          isSwipeable={!(delList.length > 0 || !['DRAFT', 'READY'].includes(order.status))}
         >
           <View style={styles.directionColumn}>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
@@ -315,7 +325,6 @@ const OrderViewScreen = () => {
           maxToRenderPerBatch={6}
           updateCellsBatchingPeriod={100}
           windowSize={7}
-          ItemSeparatorComponent={ItemSeparator}
         />
 
         {order.lines.length ? (
