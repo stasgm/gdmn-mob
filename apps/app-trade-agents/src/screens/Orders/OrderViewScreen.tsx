@@ -10,7 +10,6 @@ import {
   useActionSheet,
   globalStyles as styles,
   InfoBlock,
-  ItemSeparator,
   SendButton,
   MediumText,
   AppActivityIndicator,
@@ -19,7 +18,7 @@ import {
   LargeText,
 } from '@lib/mobile-ui';
 
-import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
 import { IDocument } from '@lib/types';
 
@@ -233,12 +232,20 @@ const OrderViewScreen = () => {
     [id, isBlocked, navigation],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: IOrderLine }) => {
-      const checkedId = delList.find((i) => i === item.id) || '';
+  const handleSwipeOrder = () =>
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...order, status: order.status === 'DRAFT' ? 'READY' : 'DRAFT' },
+      }),
+    );
 
+  const renderItem = useCallback(
+    ({ item, index }: { item: IOrderLine; index: number }) => {
+      const checkedId = delList.find((i) => i === item.id) || '';
       return (
         <OrderItem
+          sortId={index}
           key={item.id}
           item={item}
           onPress={() => handlePressOrderLine(item)}
@@ -283,8 +290,10 @@ const OrderViewScreen = () => {
           title={order.head?.outlet?.name}
           onPress={handleEditOrderHead}
           disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
-          // disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
           isBlocked={isBlocked}
+          onSwipeOpen={handleSwipeOrder}
+          onSwipeClose={handleSwipeOrder}
+          isSwipeable={!(delList.length > 0 || !['DRAFT', 'READY'].includes(order.status))}
         >
           <View style={styles.directionColumn}>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
@@ -314,10 +323,9 @@ const OrderViewScreen = () => {
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           initialNumToRender={6}
-          maxToRenderPerBatch={6} // Reduce number in each render batch
-          updateCellsBatchingPeriod={100} // Increase time between renders
-          windowSize={7} // Reduce the window size
-          ItemSeparatorComponent={ItemSeparator}
+          maxToRenderPerBatch={6}
+          updateCellsBatchingPeriod={100}
+          windowSize={7}
         />
 
         {order.lines.length ? (

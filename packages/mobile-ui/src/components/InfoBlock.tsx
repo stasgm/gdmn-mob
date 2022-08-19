@@ -1,7 +1,10 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
-import { View, StyleSheet, Text, TouchableHighlight } from 'react-native';
+import React, { useRef } from 'react';
+import { View, StyleSheet, Text, TouchableHighlight, Animated } from 'react-native';
 import { Divider } from 'react-native-paper';
+
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { RectButton } from 'react-native-gesture-handler';
 
 import styles from '../styles/global';
 
@@ -12,10 +15,25 @@ interface IProps {
   onPress?: () => void;
   disabled?: boolean;
   isBlocked?: boolean;
+  onSwipeOpen?: () => void;
+  onSwipeClose?: () => void;
+  isSwipeable?: boolean;
 }
 
-const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress, isBlocked = false }: IProps) => {
-  return (
+const InfoBlock = ({
+  colorLabel,
+  title,
+  children,
+  disabled = false,
+  onPress,
+  onSwipeOpen,
+  onSwipeClose,
+  isBlocked = false,
+  isSwipeable,
+}: IProps) => {
+  const ref = useRef(null);
+
+  const infoBlock = (
     <View style={[styles.flexDirectionRow, localStyles.box]}>
       <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
       <TouchableHighlight
@@ -38,6 +56,18 @@ const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress, isB
         </>
       </TouchableHighlight>
     </View>
+  );
+
+  return (
+    <>
+      {isSwipeable ? (
+        <Swipeable friction={2} ref={ref} onSwipeableWillOpen={onSwipeOpen} onSwipeableWillClose={onSwipeClose}>
+          {infoBlock}
+        </Swipeable>
+      ) : (
+        infoBlock
+      )}
+    </>
   );
 };
 
