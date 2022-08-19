@@ -20,7 +20,6 @@ interface IProperty {
   title: string;
   visible: boolean;
   value?: string;
-  id?: string;
 }
 
 const LineItem = React.memo(({ item }: { item: IProperty }) => {
