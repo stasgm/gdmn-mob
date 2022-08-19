@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { RouteProp, useIsFocused, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, Alert, RefreshControl } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
@@ -13,7 +13,6 @@ import {
   MenuButton,
   AppScreen,
   EmptyList,
-  AppActivityIndicator,
   SearchButton,
   navBackButton,
 } from '@lib/mobile-ui';
@@ -181,10 +180,10 @@ const RouteViewScreen = () => {
     [route?.id],
   );
 
-  const isFocused = useIsFocused();
-  if (!isFocused) {
-    return <AppActivityIndicator />;
-  }
+  // const isFocused = useIsFocused();
+  // if (!isFocused) {
+  //   return <AppActivityIndicator />;
+  // }
 
   if (!route) {
     return (
@@ -222,11 +221,11 @@ const RouteViewScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         refreshControl={RC}
         ListEmptyComponent={EmptyList}
-        // removeClippedSubviews={true} // Unmount compsonents when outside of window
+        // removeClippedSubviews={true}
         initialNumToRender={9}
-        maxToRenderPerBatch={9} // Reduce number in each render batch
-        updateCellsBatchingPeriod={50} // Increase time between renders
-        windowSize={9} // Reduce the window size
+        maxToRenderPerBatch={9}
+        updateCellsBatchingPeriod={50}
+        windowSize={9}
       />
       <RouteTotal routeId={id} />
     </AppScreen>

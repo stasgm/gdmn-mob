@@ -15,7 +15,8 @@
     "lint": "eslint \"./src/**/*.ts*\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "build:apk": "expo build:android -t apk"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
