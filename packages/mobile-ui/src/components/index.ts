@@ -10,6 +10,7 @@ export {
   SearchButton,
   ScanButton,
   SendButton,
+  SaveDocument,
 } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';

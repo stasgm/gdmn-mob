@@ -17,6 +17,8 @@ import {
   CloseButton,
   LargeText,
   navBackButton,
+  ItemSeparator,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
@@ -142,6 +144,15 @@ const OrderViewScreen = () => {
 
   const handleSendDoc = useSendDocs([order]);
 
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...order, status: 'READY' },
+      }),
+    );
+  }, [dispatch, id, order]);
+
   useEffect(() => {
     if (screenState === 'sending') {
       Alert.alert('Вы уверены, что хотите отправить документ?', '', [
@@ -194,8 +205,10 @@ const OrderViewScreen = () => {
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        order?.status === 'READY' && (
+        order?.status === 'READY' ? (
           <SendButton onPress={() => setScreenState('sending')} disabled={screenState !== 'idle'} />
+        ) : (
+          order?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
@@ -203,6 +216,9 @@ const OrderViewScreen = () => {
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
+              {order?.status === 'DRAFT' && (
+                <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+              )}
               <SendButton onPress={() => setScreenState('sending')} disabled={screenState !== 'idle'} />
               <AddButton onPress={handleAddOrderLine} disabled={screenState !== 'idle'} />
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
@@ -210,7 +226,16 @@ const OrderViewScreen = () => {
           )}
         </View>
       ),
-    [isBlocked, order?.status, screenState, delList.length, handleDeleteDocLine, handleAddOrderLine, actionsMenu],
+    [
+      isBlocked,
+      order?.status,
+      screenState,
+      handleSaveDocument,
+      delList.length,
+      handleDeleteDocLine,
+      handleAddOrderLine,
+      actionsMenu,
+    ],
   );
 
   const renderLeft = useCallback(
@@ -231,20 +256,11 @@ const OrderViewScreen = () => {
     [id, isBlocked, navigation],
   );
 
-  const handleSwipeOrder = () =>
-    dispatch(
-      documentActions.updateDocument({
-        docId: id,
-        document: { ...order, status: order.status === 'DRAFT' ? 'READY' : 'DRAFT' },
-      }),
-    );
-
   const renderItem = useCallback(
-    ({ item, index }: { item: IOrderLine; index: number }) => {
+    ({ item }: { item: IOrderLine }) => {
       const checkedId = delList.find((i) => i === item.id) || '';
       return (
         <OrderItem
-          sortId={index}
           key={item.id}
           item={item}
           onPress={() => handlePressOrderLine(item)}
@@ -290,9 +306,6 @@ const OrderViewScreen = () => {
           onPress={handleEditOrderHead}
           disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
           isBlocked={isBlocked}
-          onSwipeOpen={handleSwipeOrder}
-          onSwipeClose={handleSwipeOrder}
-          isSwipeable={!(delList.length > 0 || !['DRAFT', 'READY'].includes(order.status))}
         >
           <View style={styles.directionColumn}>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
@@ -325,8 +338,8 @@ const OrderViewScreen = () => {
           maxToRenderPerBatch={6}
           updateCellsBatchingPeriod={100}
           windowSize={7}
+          ItemSeparatorComponent={ItemSeparator}
         />
-
         {order.lines.length ? (
           <OrderTotal
             onPress={() => setIsGroupVisible(!isGroupVisible)}

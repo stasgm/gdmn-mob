@@ -1,10 +1,9 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React, { useRef } from 'react';
-import { View, StyleSheet, Text, TouchableHighlight, Animated } from 'react-native';
+import { View, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { Divider } from 'react-native-paper';
 
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { RectButton } from 'react-native-gesture-handler';
 
 import styles from '../styles/global';
 

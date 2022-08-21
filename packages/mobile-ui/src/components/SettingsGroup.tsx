@@ -25,7 +25,6 @@ const SettingsGroup = ({ groupDescription, list, onValueChange }: Props) => {
           return (
             <View key={key}>
               <Divider />
-
               <SettingsItem
                 key={key}
                 label={item.description || key}

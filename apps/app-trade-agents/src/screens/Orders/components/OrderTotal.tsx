@@ -7,7 +7,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { formatValue, round } from '@lib/mobile-app';
 
-import { globalColors } from '@lib/mobile-ui';
+import { globalColors, globalStyles } from '@lib/mobile-ui';
 
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -57,8 +57,8 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
     { borderTopWidth: isGroupVisible ? StyleSheet.hairlineWidth * 2 : 0 },
   ];
   const textStyle = [localStyles.cellText, textColor];
-  const textBoldStyle = [textStyle, textColor];
-  const labelStyle = { backgroundColor: globalColors.backgroundLight, borderBottomColor: globalColors.backgroundLight };
+  const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
+  const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
   const totalStyle = {
     backgroundColor: isGroupVisible && totalListByOrder.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
   };
@@ -68,20 +68,9 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={localStyles.marginBottom}>
-        <DataTable
-          style={[
-            // borderColor,
-            borderColors,
-            localStyles.table,
-          ]}
-        >
+        <DataTable style={[borderColors, localStyles.table]}>
           <View style={[localStyles.label, labelStyle]}>
-            <IconButton
-              icon={isGroupVisible ? 'chevron-down' : 'chevron-up'}
-              size={22}
-              onPress={onPress}
-              color={colors.text}
-            />
+            <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} color={colors.text} />
           </View>
           <DataTable.Header style={[localStyles.header, headerStyle]}>
             {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
@@ -107,7 +96,7 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
                       <DataTable.Cell textStyle={textStyle} numeric>
                         {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
                       </DataTable.Cell>
-                      <DataTable.Cell textStyle={textBoldStyle} numeric>
+                      <DataTable.Cell textStyle={textStyle} numeric>
                         {formatValue({ type: 'number', decimals: 2 }, round(item.sumVat, 2))}
                       </DataTable.Cell>
                     </DataTable.Row>
@@ -115,10 +104,9 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
                 );
               })
             : null}
-
           <View style={totalStyle}>
-            <DataTable.Row style={[rowStyle]}>
-              <DataTable.Cell textStyle={textStyle}>Итого</DataTable.Cell>
+            <DataTable.Row style={rowStyle}>
+              <DataTable.Cell textStyle={[textStyle, textBoldStyle]}>Итого</DataTable.Cell>
             </DataTable.Row>
             <DataTable.Row style={[borderColor, localStyles.total, localStyles.paddingBottom]}>
               <DataTable.Cell textStyle={textBoldStyle} numeric>
@@ -142,14 +130,15 @@ export default OrderTotal;
 
 const localStyles = StyleSheet.create({
   cellText: {
-    fontSize: 14,
+    fontSize: 15,
   },
   header: {
     display: 'flex',
     flexDirection: 'row',
-    height: 33,
+    height: 30,
     borderBottomWidth: StyleSheet.hairlineWidth * 2,
     borderTopWidth: StyleSheet.hairlineWidth * 2,
+    fontWeight: 'bold',
   },
   row: {
     minHeight: 30,
