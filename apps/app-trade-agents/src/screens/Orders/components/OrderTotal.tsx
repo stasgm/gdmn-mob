@@ -16,11 +16,11 @@ import { totalList, totalListByGroup } from '../../../utils/helpers';
 
 export interface IItem {
   order: IOrderDocument;
-  isGroupVisible: boolean;
   onPress: () => void;
+  isGroupVisible?: boolean;
 }
 
-const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
+const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;
@@ -31,19 +31,15 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
     [firstLevelGroups, groups, order.lines],
   );
 
-  const borderColor = { borderColor: 'transparent' };
-  const borderTopColor = { borderTopColor: 'transparent' };
-  const borderBottomColor = { borderBottomColor: 'transparent' };
-
   const borderColors = {
     borderLeftColor: colors.border,
     borderRightColor: colors.border,
     borderTopColor: colors.border,
   };
   const headerStyle = [
-    borderColor,
-    borderBottomColor,
-    borderTopColor,
+    localStyles.borderColor,
+    localStyles.borderBottomColor,
+    localStyles.borderTopColor,
     {
       backgroundColor: globalColors.backgroundLight,
       borderTopColor: globalColors.backgroundLight,
@@ -52,9 +48,8 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
   ];
   const textColor = { color: colors.text };
   const rowStyle = [
-    localStyles.total,
-    borderTopColor,
-    { borderTopWidth: isGroupVisible ? StyleSheet.hairlineWidth * 2 : 0 },
+    { minHeight: 22, borderBottomWidth: 0, borderTopWidth: isGroupVisible ? StyleSheet.hairlineWidth * 2 : 0 },
+    localStyles.borderTopColor,
   ];
   const textStyle = [localStyles.cellText, textColor];
   const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
@@ -67,61 +62,59 @@ const OrderTotal = ({ order, isGroupVisible, onPress }: IItem) => {
 
   return (
     <TouchableOpacity onPress={onPress}>
-      <View style={localStyles.marginBottom}>
-        <DataTable style={[borderColors, localStyles.table]}>
-          <View style={[localStyles.label, labelStyle]}>
-            <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} color={colors.text} />
-          </View>
-          <DataTable.Header style={[localStyles.header, headerStyle]}>
-            {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
+      <DataTable style={[borderColors, localStyles.table]}>
+        <View style={[localStyles.label, labelStyle]}>
+          <IconButton icon={isGroupVisible ? 'chevron-down' : 'chevron-up'} size={18} color={colors.text} />
+        </View>
+        <DataTable.Header style={[localStyles.header, headerStyle]}>
+          {['Вес, кг', 'Сумма', 'Сумма с НДC'].map((i) => {
+            return (
+              <DataTable.Title key={i} textStyle={textBoldStyle} style={localStyles.title} numeric>
+                {i}
+              </DataTable.Title>
+            );
+          })}
+        </DataTable.Header>
+        {isGroupVisible
+          ? totalListByOrder.map((item, index) => {
+              const groupStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
               return (
-                <DataTable.Title key={i} textStyle={textBoldStyle} style={localStyles.title} numeric>
-                  {i}
-                </DataTable.Title>
+                <View key={item.group.id} style={groupStyle}>
+                  <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>
+                    <DataTable.Cell textStyle={textStyle}>{item.group.name}</DataTable.Cell>
+                  </DataTable.Row>
+                  <DataTable.Row style={[localStyles.row, localStyles.borderBottomColor]}>
+                    <DataTable.Cell textStyle={textStyle} numeric>
+                      {round(item.quantity, 3)}
+                    </DataTable.Cell>
+                    <DataTable.Cell textStyle={textStyle} numeric>
+                      {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
+                    </DataTable.Cell>
+                    <DataTable.Cell textStyle={textStyle} numeric>
+                      {formatValue({ type: 'number', decimals: 2 }, round(item.sumVat, 2))}
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                </View>
               );
-            })}
-          </DataTable.Header>
-          {isGroupVisible
-            ? totalListByOrder.map((item, index) => {
-                const groupStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
-                return (
-                  <View key={item.group.id} style={groupStyle}>
-                    <DataTable.Row style={[localStyles.row, borderBottomColor]}>
-                      <DataTable.Cell textStyle={textStyle}>{item.group.name}</DataTable.Cell>
-                    </DataTable.Row>
-                    <DataTable.Row style={[localStyles.row, borderBottomColor]}>
-                      <DataTable.Cell textStyle={textStyle} numeric>
-                        {round(item.quantity, 3)}
-                      </DataTable.Cell>
-                      <DataTable.Cell textStyle={textStyle} numeric>
-                        {formatValue({ type: 'number', decimals: 2 }, round(item.sum, 2))}
-                      </DataTable.Cell>
-                      <DataTable.Cell textStyle={textStyle} numeric>
-                        {formatValue({ type: 'number', decimals: 2 }, round(item.sumVat, 2))}
-                      </DataTable.Cell>
-                    </DataTable.Row>
-                  </View>
-                );
-              })
-            : null}
-          <View style={totalStyle}>
-            <DataTable.Row style={rowStyle}>
-              <DataTable.Cell textStyle={[textStyle, textBoldStyle]}>Итого</DataTable.Cell>
-            </DataTable.Row>
-            <DataTable.Row style={[borderColor, localStyles.total, localStyles.paddingBottom]}>
-              <DataTable.Cell textStyle={textBoldStyle} numeric>
-                {round(total?.quantity, 3)}
-              </DataTable.Cell>
-              <DataTable.Cell textStyle={textBoldStyle} numeric>
-                {formatValue({ type: 'number', decimals: 2 }, round(total?.sum, 2))}
-              </DataTable.Cell>
-              <DataTable.Cell textStyle={textBoldStyle} numeric>
-                {formatValue({ type: 'number', decimals: 2 }, round(total?.sumVat, 2))}
-              </DataTable.Cell>
-            </DataTable.Row>
-          </View>
-        </DataTable>
-      </View>
+            })
+          : null}
+        <View style={totalStyle}>
+          <DataTable.Row style={rowStyle}>
+            <DataTable.Cell textStyle={[textStyle, textBoldStyle]}>Итого</DataTable.Cell>
+          </DataTable.Row>
+          <DataTable.Row style={[localStyles.borderColor, localStyles.total, localStyles.paddingBottom]}>
+            <DataTable.Cell textStyle={textBoldStyle} numeric>
+              {round(total?.quantity, 3)}
+            </DataTable.Cell>
+            <DataTable.Cell textStyle={textBoldStyle} numeric>
+              {formatValue({ type: 'number', decimals: 2 }, round(total?.sum, 2))}
+            </DataTable.Cell>
+            <DataTable.Cell textStyle={textBoldStyle} numeric>
+              {formatValue({ type: 'number', decimals: 2 }, round(total?.sumVat, 2))}
+            </DataTable.Cell>
+          </DataTable.Row>
+        </View>
+      </DataTable>
     </TouchableOpacity>
   );
 };
@@ -150,7 +143,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
   },
   total: {
-    minHeight: 25,
+    minHeight: 30,
     borderBottomWidth: 0,
   },
   label: {
@@ -162,16 +155,17 @@ const localStyles = StyleSheet.create({
     borderBottomWidth: 0,
     marginBottom: -1,
   },
-  marginBottom: { marginBottom: -4 },
   paddingBottom: {
     paddingBottom: 8,
   },
   table: {
     borderLeftWidth: StyleSheet.hairlineWidth * 2,
     borderRightWidth: StyleSheet.hairlineWidth * 2,
-
     borderTopWidth: 0,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
+  borderColor: { borderColor: 'transparent' },
+  borderTopColor: { borderTopColor: 'transparent' },
+  borderBottomColor: { borderBottomColor: 'transparent' },
 });

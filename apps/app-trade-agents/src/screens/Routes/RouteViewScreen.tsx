@@ -46,6 +46,7 @@ const RouteViewScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
+  const [isGroupVisible, setIsGroupVisible] = useState(false);
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
@@ -194,41 +195,48 @@ const RouteViewScreen = () => {
   }
 
   return (
-    <AppScreen>
-      <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
-      <Divider />
-      {filterVisible && (
-        <>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
-          <ItemSeparator />
-        </>
+    <>
+      <AppScreen>
+        <SubTitle style={styles.title}>{getDateString(route.documentDate)}</SubTitle>
+        <Divider />
+        {filterVisible && (
+          <>
+            <View style={styles.flexDirectionRow}>
+              <Searchbar
+                placeholder="Поиск"
+                onChangeText={setSearchQuery}
+                value={searchQuery}
+                style={[styles.flexGrow, styles.searchBar]}
+                autoFocus
+                selectionColor={colors.primary}
+              />
+            </View>
+            <ItemSeparator />
+          </>
+        )}
+        <FlatList
+          ref={ref}
+          data={filteredList.routeLineList}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          scrollEventThrottle={400}
+          ItemSeparatorComponent={ItemSeparator}
+          refreshControl={RC}
+          ListEmptyComponent={EmptyList}
+          initialNumToRender={9}
+          maxToRenderPerBatch={9}
+          updateCellsBatchingPeriod={50}
+          windowSize={9}
+        />
+      </AppScreen>
+      {!!routeLineList.length && (
+        <RouteTotal
+          onPress={() => setIsGroupVisible(!isGroupVisible)}
+          isGroupVisible={isGroupVisible}
+          routeId={route.id}
+        />
       )}
-      <FlatList
-        ref={ref}
-        data={filteredList.routeLineList}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
-        scrollEventThrottle={400}
-        ItemSeparatorComponent={ItemSeparator}
-        refreshControl={RC}
-        ListEmptyComponent={EmptyList}
-        // removeClippedSubviews={true}
-        initialNumToRender={9}
-        maxToRenderPerBatch={9}
-        updateCellsBatchingPeriod={50}
-        windowSize={9}
-      />
-      <RouteTotal routeId={id} />
-    </AppScreen>
+    </>
   );
 };
 

@@ -34,9 +34,10 @@ const RouteItem = ({ item, routeId }: IItem) => {
     [status, visit?.head.dateEnd],
   );
 
-  const handlePressRouteItem = useCallback(() => {
-    navigation.navigate('RouteDetails', { routeId, id: item.id });
-  }, [item.id, navigation, routeId]);
+  const handlePressRouteItem = useCallback(
+    () => navigation.navigate('RouteDetails', { routeId, id: item.id }),
+    [item.id, navigation, routeId],
+  );
 
   return (
     <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={handlePressRouteItem}>

@@ -340,14 +340,10 @@ const OrderViewScreen = () => {
           windowSize={7}
           ItemSeparatorComponent={ItemSeparator}
         />
-        {order.lines.length ? (
-          <OrderTotal
-            onPress={() => setIsGroupVisible(!isGroupVisible)}
-            isGroupVisible={isGroupVisible}
-            order={order}
-          />
-        ) : null}
       </View>
+      {!!order.lines.length && (
+        <OrderTotal onPress={() => setIsGroupVisible(!isGroupVisible)} isGroupVisible={isGroupVisible} order={order} />
+      )}
     </>
   );
 };
