@@ -80,7 +80,7 @@
 
 По нажатию на иконку меню, расположенную в правом верхнем углу, можно вернуться к начальным настройкам, выбрав пункт **Установить настройки по умолчанию**.
 
-<img src="img/8.Settings/8.Settings.jpg" alt="drawing" height="400"/> <img src="img/8.Settings/8.SettingsBack.jpg" alt="drawing" height="400"/><img src="img/8.Settings/8.SettingsMenu.jpg" alt="drawing" height="400"/>
+<img src="img/8.Settings/8.Settings.jpg" alt="drawing" height="400"/>  <img src="img/8.Settings/8.SettingsBack.jpg" alt="drawing" height="400"/>  <img src="img/8.Settings/8.SettingsMenu.jpg" alt="drawing" height="400"/> 
 
 ## 3. Загрузка данных
 
