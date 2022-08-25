@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useRoute, useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
 import { View, FlatList, Alert, RefreshControl } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
 
 import {
   globalStyles as styles,

@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, Text } from 'react-native';
 
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/native';
 import { documentsMock } from '@lib/mock';
 import {
   MenuButton,

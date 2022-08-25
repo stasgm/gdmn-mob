@@ -15,7 +15,8 @@
       "sourceExts": ["svg"]
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "enabled": false
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {

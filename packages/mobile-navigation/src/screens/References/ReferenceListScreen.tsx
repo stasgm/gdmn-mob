@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { FlatList, RefreshControl, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';

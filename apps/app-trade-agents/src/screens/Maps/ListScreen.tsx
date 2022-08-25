@@ -1,7 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 import { FlatList, TouchableHighlight, View } from 'react-native';
-import { useNavigation } from '@react-navigation/core';
-import { useScrollToTop } from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {

@@ -1,11 +1,10 @@
 import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { AppScreen, DrawerButton, globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
 
-import { useTheme } from '@react-navigation/native';
 import Constants from 'expo-constants';
 
 import { GDMN_COMPANY_NAME, GDMN_EMAIL, GDMN_PHONE, GDMN_SITE_ADDRESS, GDMN_TRADEMARK } from '../constants';
