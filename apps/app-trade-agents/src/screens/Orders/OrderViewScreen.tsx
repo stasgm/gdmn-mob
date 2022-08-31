@@ -151,7 +151,8 @@ const OrderViewScreen = () => {
         document: { ...order, status: 'READY' },
       }),
     );
-  }, [dispatch, id, order]);
+    navigation.goBack();
+  }, [dispatch, id, navigation, order]);
 
   useEffect(() => {
     if (screenState === 'sending') {
