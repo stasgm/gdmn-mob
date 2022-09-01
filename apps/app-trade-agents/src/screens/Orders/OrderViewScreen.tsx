@@ -49,7 +49,7 @@ const OrderViewScreen = () => {
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting' | 'sent'>('idle');
   const [delList, setDelList] = useState<string[]>([]);
 
-  const [isGroupVisible, setIsGroupVisible] = useState(false);
+  const [isGroupVisible, setIsGroupVisible] = useState(true);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 

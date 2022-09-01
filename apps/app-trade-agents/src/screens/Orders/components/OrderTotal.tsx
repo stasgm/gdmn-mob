@@ -20,7 +20,7 @@ export interface IItem {
   isGroupVisible?: boolean;
 }
 
-const OrderTotal = ({ order, isGroupVisible = false, onPress }: IItem) => {
+const OrderTotal = ({ order, isGroupVisible = true, onPress }: IItem) => {
   const { colors } = useTheme();
 
   const groups = refSelectors.selectByName<IGoodGroup>('goodGroup')?.data;

@@ -46,7 +46,7 @@ const RouteViewScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [isGroupVisible, setIsGroupVisible] = useState(false);
+  const [isGroupVisible, setIsGroupVisible] = useState(true);
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
