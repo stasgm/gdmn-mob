@@ -332,4 +332,6 @@
 
 Нажимаем на иконку штрихкода <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"/> в верхнем правом углу и переходим на экран сканирования товара.
 
-Для удобства работы можно использовать **Вспышку Вибрацию**  <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="30"/>  <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="30"/>
+Для удобства работы во время сканирования можно использовать или отключить **Вспышку** <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="30"/>  или **Вибрацию**  <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="30"/>.
+
+Отредактировать введенные данные можно, нажав на шапку документа или используя пункт меню * **⁝** * **Редактировать данные**.
