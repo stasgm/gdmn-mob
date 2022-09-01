@@ -35,13 +35,7 @@ import Constants from 'expo-constants';
 
 import { appTradeActions, store, useSelector as useAppTradeSelector } from './src/store';
 
-import {
-  RoutesNavigator,
-  OrdersNavigator,
-  ReturnsNavigator,
-  MapNavigator,
-  GoodMatrixNavigator,
-} from './src/navigation';
+import { RoutesNavigator, OrdersNavigator, DebetsNavigator, MapNavigator, GoodMatrixNavigator } from './src/navigation';
 
 import { appSettings, ONE_SECOND_IN_MS } from './src/utils/constants';
 import { messageAgent } from './src/store/mock';
@@ -62,10 +56,10 @@ const Root = () => {
         component: OrdersNavigator,
       },
       {
-        name: 'ReturnsNav',
-        title: 'Возвраты',
-        icon: 'file-restore',
-        component: ReturnsNavigator,
+        name: 'DebetsNav',
+        title: 'Задолженности',
+        icon: 'currency-usd',
+        component: DebetsNavigator,
       },
       {
         name: 'MapNav',

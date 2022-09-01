@@ -68,8 +68,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   return (
     <>
       <ScrollView>
-        <View style={[styles.content]}>
-          <View style={[styles.item]}>
+        <View style={styles.content}>
+          <View style={styles.item}>
             <View style={styles.details}>
               <Text style={styles.name}>Наименование</Text>
               <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>

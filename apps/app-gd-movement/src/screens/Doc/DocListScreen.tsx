@@ -300,18 +300,19 @@ export const DocListScreen = () => {
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
-      >
-        <View>
-          <Text style={textStyle}>
-            {(doc.documentType.remainsField === 'fromContact'
-              ? doc.head.fromContact?.name
-              : doc.head.toContact?.name) || ''}
-          </Text>
-          <Text style={textStyle}>
-            № {doc.number} на {getDateString(doc.documentDate)}
-          </Text>
-        </View>
-      </ScreenListItem>
+        addInfo={
+          <View>
+            <Text style={textStyle}>
+              {(doc.documentType.remainsField === 'fromContact'
+                ? doc.head.fromContact?.name
+                : doc.head.toContact?.name) || ''}
+            </Text>
+            <Text style={textStyle}>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </Text>
+          </View>
+        }
+      />
     ) : null;
   };
 

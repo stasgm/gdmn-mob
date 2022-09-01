@@ -950,6 +950,7 @@ export const messageAgent: IMessage<MessageType>[] = [
               ondate: new Date().toISOString(),
               saldo: 2345600,
               saldoDebt: 1745,
+              dayLeft: 22,
             },
             {
               id: '1788296478',
@@ -959,11 +960,12 @@ export const messageAgent: IMessage<MessageType>[] = [
               saldoDebt: 0,
             },
             {
-              id: '1788296478',
+              id: '1908473665',
               name: 'ООО "ПродуктМаг"',
               ondate: new Date().toISOString(),
               saldo: 689571,
               saldoDebt: 12456,
+              dayLeft: 11,
             },
           ],
         },

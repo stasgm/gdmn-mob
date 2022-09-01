@@ -226,14 +226,15 @@ export const ScanListScreen = () => {
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
-      >
-        <View>
-          <MediumText>{doc.head.department?.name || ''}</MediumText>
-          <MediumText>
-            № {doc.number} на {getDateString(doc.documentDate)}
-          </MediumText>
-        </View>
-      </ScreenListItem>
+        addInfo={
+          <View>
+            <MediumText>{doc.head.department?.name || ''}</MediumText>
+            <MediumText>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </MediumText>
+          </View>
+        }
+      />
     ) : null;
   };
 

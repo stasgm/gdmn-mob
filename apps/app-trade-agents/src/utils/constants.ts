@@ -88,3 +88,10 @@ export const viewTypeList: IListItem[] = [
   { id: 'groups', value: 'Товарные группы' },
   { id: 'goods', value: 'Справочник ТМЦ' },
 ];
+
+export const debetTypes: IListItem[] = [
+  { id: 'all', value: 'Все' },
+  { id: 'credit', value: 'С задолженностью' },
+  { id: 'minus', value: 'С просрочкой' },
+  { id: 'debet', value: 'С предоплатой' },
+];

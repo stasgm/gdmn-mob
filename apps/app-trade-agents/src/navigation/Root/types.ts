@@ -1,6 +1,6 @@
 import { IReferenceData } from '@lib/types';
 
-import { IGood, IOrderLine, IReturnLine, ISellBillLine } from '../../store/types';
+import { IGood, IOrderLine } from '../../store/types';
 
 export type IRefSelectParams = {
   refName: string;
@@ -26,32 +26,24 @@ export type OrderParamList = RefParamList & {
 
 export type OrdersStackParamList = { OrderList: undefined } & OrderParamList;
 
-export type ReturnParamList = RefParamList & {
-  ReturnView: { id: string };
-  ReturnEdit: { id: string } | undefined;
-  ReturnLine: { mode: number; docId: string; item: IReturnLine };
-  SelectItemReturn: { docId: string; name: string };
-  SellBill: { id: string } | undefined;
-  SellBillLine: { mode: number; docId?: string; item: ISellBillLine };
+export type RoutesStackParamList = OrderParamList & {
+  RouteList: undefined;
+  RouteView: { id: string };
+  RouteDetails: { routeId: string; id: string };
 };
-
-export type ReturnsStackParamList = { ReturnList: undefined } & ReturnParamList;
-
-export type RoutesStackParamList = ReturnParamList &
-  OrderParamList & {
-    RouteList: undefined;
-    RouteView: { id: string };
-    RouteDetails: { routeId: string; id: string };
-  };
 
 export type MapStackParamList = {
   MapGeoView: undefined;
   ListGeoView: undefined;
 };
 
-export type GoodMatrixParamList = RefParamList & {
+export type GoodMatrixParamList = {
   GoodList: { id: string };
   GoodLine: { item: IGood };
 };
 
 export type GoodMatrixStackParamList = { ContactList: undefined } & GoodMatrixParamList;
+
+export type DebetStackParamList = {
+  DebetList: undefined;
+};
