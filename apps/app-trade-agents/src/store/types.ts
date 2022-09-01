@@ -33,17 +33,6 @@ export interface IOrderFormParam extends IFormParam {
   comment?: string;
 }
 
-export interface IReturnFormParam extends IFormParam {
-  contact?: IReferenceData;
-  outlet?: IReferenceData;
-  number?: string;
-  documentDate?: string;
-  depart?: IReferenceData;
-  reason?: string;
-  route?: IReferenceData;
-  status?: StatusType;
-}
-
 export interface ISellBillFormParam extends IFormParam {
   dateBegin?: string;
   dateEnd?: string;
@@ -144,22 +133,6 @@ export interface IRouteTotalLine {
 }
 
 export type IRouteDocument = MandateProps<IDocument<IRouteHead, IRouteLine>, 'head' | 'lines'>;
-
-interface IReturnHead extends IHead {
-  contact: IReferenceData;
-  outlet: IReferenceData;
-  route?: IReferenceData; // 	Маршрут
-}
-
-export interface IReturnLine extends IEntity {
-  good: INamedEntity;
-  quantity: number;
-  sellBillId?: string;
-  quantityFromSellBill?: number;
-  priceFromSellBill?: number;
-}
-
-export type IReturnDocument = MandateProps<IDocument<IReturnHead, IReturnLine>, 'head' | 'lines'>;
 
 export interface ISellBill extends IEntity {
   number: string;

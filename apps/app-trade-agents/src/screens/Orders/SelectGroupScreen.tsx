@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
@@ -13,6 +13,7 @@ import {
   Menu,
   SearchButton,
   navBackButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -349,10 +350,10 @@ const SelectGroupScreen = () => {
     [doc.lines, handlePressGood],
   );
 
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>

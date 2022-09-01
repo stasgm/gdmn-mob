@@ -5,7 +5,6 @@ import {
   IGoodGroup,
   IMatrixData,
   IOrderDocument,
-  IReturnDocument,
   IMGroup,
   IMGroupData,
   IMGroupModel,
@@ -25,7 +24,7 @@ const twoDigits = (value: number) => {
   return value >= 10 ? value : `0${value}`;
 };
 
-export const getNextDocNumber = (documents: IOrderDocument[] | IReturnDocument[]) => {
+export const getNextDocNumber = (documents: IOrderDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))

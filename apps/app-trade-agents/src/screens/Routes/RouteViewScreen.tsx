@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { RouteProp, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { View, FlatList, Alert, RefreshControl } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
@@ -15,6 +15,7 @@ import {
   EmptyList,
   SearchButton,
   navBackButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
 
@@ -181,10 +182,10 @@ const RouteViewScreen = () => {
     [route?.id],
   );
 
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!route) {
     return (
