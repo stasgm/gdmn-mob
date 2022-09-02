@@ -154,11 +154,14 @@ interface IGoodProp {
 }
 
 const Good = ({ item, onPress, quantity }: IGoodProp) => {
-  const iconStyle = useMemo(() => [styles.icon, { backgroundColor: quantity ? '#06567D' : '#E91E63' }], [quantity]);
+  const iconStyle = useMemo(
+    () => [styles.icon, { backgroundColor: quantity || quantity === 0 ? '#06567D' : '#E91E63' }],
+    [quantity],
+  );
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={styles.item}>
+      <View style={[styles.item, localStyles.goodItem]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
@@ -424,6 +427,9 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 3,
-    minHeight: 50,
+    height: 74,
+  },
+  goodItem: {
+    height: 60,
   },
 });
