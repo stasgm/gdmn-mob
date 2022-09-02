@@ -33,6 +33,10 @@ export interface IOrderFormParam extends IFormParam {
   comment?: string;
 }
 
+export interface IRouteFormParam extends IFormParam {
+  routeItemId?: number;
+}
+
 export interface ISellBillFormParam extends IFormParam {
   dateBegin?: string;
   dateEnd?: string;

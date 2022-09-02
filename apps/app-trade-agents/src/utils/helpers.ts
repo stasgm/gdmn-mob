@@ -196,4 +196,23 @@ const totalList = (list: IOrderTotalLine[]) =>
     },
   );
 
-export { getTimeProcess, twoDigits, getGoodMatrixByContact, getGroupModelByContact, totalListByGroup, totalList };
+const getItemLayout = (index: number, height: number) => ({
+  length: height,
+  offset: height * index,
+  index,
+});
+
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 50,
+};
+
+export {
+  getTimeProcess,
+  twoDigits,
+  getGoodMatrixByContact,
+  getGroupModelByContact,
+  totalListByGroup,
+  totalList,
+  getItemLayout,
+  viewabilityConfig,
+};

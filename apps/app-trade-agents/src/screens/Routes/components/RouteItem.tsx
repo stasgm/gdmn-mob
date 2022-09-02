@@ -1,7 +1,5 @@
-import React, { useCallback, useMemo } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { View, TouchableHighlight } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useMemo } from 'react';
+import { View, TouchableHighlight, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
@@ -10,19 +8,16 @@ import { refSelectors } from '@lib/store';
 import { getDateString, useFilteredDocList } from '@lib/mobile-app';
 
 import { IOutlet, IRouteLine, IVisitDocument } from '../../../store/types';
-import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 export interface IItem {
-  routeId: string;
   item: IRouteLine;
+  onPressItem: () => void;
 }
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline', 'check-circle-outline'];
 
-const RouteItem = ({ item, routeId }: IItem) => {
-  const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteView'>>();
-
+const RouteItem = ({ item, onPressItem }: IItem) => {
   const address = refSelectors.selectByRefId<IOutlet>('outlet', item.outlet.id)?.address;
 
   const visit = useFilteredDocList<IVisitDocument>('visit').find((doc) => doc.head?.routeLineId === item.id);
@@ -34,14 +29,9 @@ const RouteItem = ({ item, routeId }: IItem) => {
     [status, visit?.head.dateEnd],
   );
 
-  const handlePressRouteItem = useCallback(
-    () => navigation.navigate('RouteDetails', { routeId, id: item.id }),
-    [item.id, navigation, routeId],
-  );
-
   return (
-    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={handlePressRouteItem}>
-      <View style={styles.item}>
+    <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPressItem}>
+      <View style={[styles.item, localStyles.item]}>
         <View style={styles.icon}>
           <MediumText style={styles.lightText}>{item.ordNumber}</MediumText>
         </View>
@@ -55,7 +45,6 @@ const RouteItem = ({ item, routeId }: IItem) => {
             </View>
           ) : null}
         </View>
-
         <View style={styles.bottomButtons}>
           {status ? <MaterialCommunityIcons name={iconsStatus[status]} size={24} color="#888" /> : null}
           {dateEnd ? <MediumText>{dateEnd}</MediumText> : null}
@@ -66,3 +55,9 @@ const RouteItem = ({ item, routeId }: IItem) => {
 };
 
 export default RouteItem;
+
+const localStyles = StyleSheet.create({
+  item: {
+    height: 60,
+  },
+});
