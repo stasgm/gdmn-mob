@@ -379,6 +379,6 @@
 <img src="img/9.Profile/9.Profile.jpg" alt="drawing" height="400"/> <img src="img/9.Profile/9.ProfileDemo.jpg" alt="drawing" height="400"/> <img src="img/9.Profile/9.ClearData.jpg" alt="drawing" height="400"/>
 
 
-## 7. Сканирование
+## 9. Сканирование
 
 Уточнение: если вы производите сканирование штрихкодов исключительно с помощью камеры устройства, то в настройках приложения необходимо отключить признак **Использовать сканер**.
