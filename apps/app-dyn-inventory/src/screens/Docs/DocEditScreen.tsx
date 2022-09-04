@@ -8,13 +8,13 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { IDocumentType, IReference } from '@lib/types';
 import { docSelectors, useDispatch, documentActions, appActions, refSelectors, useSelector } from '@lib/store';
 import {
-  BackButton,
   AppInputScreen,
   SelectableInput,
   Input,
   SaveButton,
   globalStyles as styles,
   SubTitle,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString } from '@lib/mobile-app';
@@ -152,7 +152,8 @@ export const DocEditScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => <SaveButton onPress={handleSave} />,
     });
   }, [dispatch, handleSave, navigation]);

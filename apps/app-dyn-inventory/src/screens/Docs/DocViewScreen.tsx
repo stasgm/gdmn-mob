@@ -6,7 +6,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors, documentActions, useDispatch } from '@lib/store';
 import {
-  BackButton,
   MenuButton,
   useActionSheet,
   globalStyles as styles,
@@ -14,6 +13,7 @@ import {
   ItemSeparator,
   SubTitle,
   ScanButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
@@ -82,7 +82,8 @@ export const DocViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>

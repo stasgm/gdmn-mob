@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { RouteProp, useRoute, useScrollToTop, useTheme, useNavigation } from '@react-navigation/native';
+import { RouteProp, useRoute, useTheme, useNavigation, useIsFocused } from '@react-navigation/native';
 import { View, FlatList, Alert, RefreshControl } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 
@@ -94,7 +94,7 @@ const RouteViewScreen = () => {
     }
   }, [filteredList, searchQuery, routeLineList]);
 
-  const ref = useRef<FlatList<IRouteLine>>(null);
+  // const ref = useRef<FlatList<IRouteLine>>(null);
 
   const orders = useFilteredDocList<IOrderDocument>('order');
   const visits = useFilteredDocList<IVisitDocument>('visit');
@@ -107,8 +107,8 @@ const RouteViewScreen = () => {
   //Первый элемент записывается в параметры формы при прокрутке списка точек маршрута
   //При возвращении с окна визита, переходит на этот эелемент (initialScrollIndex)
   const onViewableItemsChanged = useCallback(
-    ({ viewableItems }) => {
-      if (viewableItems.length) {
+    ({ viewableItems }: any) => {
+      if (viewableItems?.length) {
         dispatch(
           appActions.setFormParams({
             routeItemId: viewableItems[0].index,
@@ -120,6 +120,8 @@ const RouteViewScreen = () => {
   );
 
   const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+
+  const getItemLayoutRoute = (_: any, index: number) => getItemLayout(index, ROUTE_ITEM_HEIGHT);
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
@@ -243,7 +245,7 @@ const RouteViewScreen = () => {
           </>
         )}
         <FlatList
-          ref={ref}
+          // ref={ref}
           data={filteredList.routeLineList}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
@@ -253,7 +255,7 @@ const RouteViewScreen = () => {
           updateCellsBatchingPeriod={50}
           viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
           initialScrollIndex={routeItemId}
-          getItemLayout={(_: any, index: number) => getItemLayout(index, ROUTE_ITEM_HEIGHT)}
+          getItemLayout={getItemLayoutRoute}
         />
       </AppScreen>
       {!!routeLineList.length && (

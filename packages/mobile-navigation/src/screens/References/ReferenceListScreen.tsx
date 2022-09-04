@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useSelector } from '@lib/store';
-import { DrawerButton, AppScreen } from '@lib/mobile-ui';
+import { AppScreen, navBackDrawer } from '@lib/mobile-ui';
 
 import { ReferenceStackParamList } from '../../navigation/Root/types';
 
@@ -29,7 +29,7 @@ const ReferenceListScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
     });
   }, [navigation]);
 

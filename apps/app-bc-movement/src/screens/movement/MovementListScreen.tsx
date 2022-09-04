@@ -7,12 +7,12 @@ import {
   AppScreen,
   ItemSeparator,
   Status,
-  DrawerButton,
   SubTitle,
   AddButton,
   FilterButtons,
   ScreenListItem,
   IListItemProps,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { docSelectors, useSelector } from '@lib/store';
@@ -98,7 +98,8 @@ export const MovementListScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <View style={styles.buttons}>
           <AddButton onPress={handleAddDocument} />

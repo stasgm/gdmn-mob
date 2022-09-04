@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Linking, TouchableOpacity, Platform } from 'rea
 import { Avatar, Divider } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 
-import { AppScreen, DrawerButton, globalStyles as styles, LargeText, MediumText } from '@lib/mobile-ui';
+import { AppScreen, globalStyles as styles, LargeText, MediumText, navBackDrawer } from '@lib/mobile-ui';
 
 import Constants from 'expo-constants';
 
@@ -26,7 +26,7 @@ const InformationScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
     });
   }, [navigation]);
 

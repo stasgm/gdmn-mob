@@ -3,7 +3,7 @@ import { Text, View, FlatList } from 'react-native';
 import { RouteProp, useNavigation, useRoute, useTheme } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 
-import { BackButton, SubTitle, AppScreen } from '@lib/mobile-ui';
+import { SubTitle, AppScreen, navBackButton } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import { IReferenceData } from '@lib/types';
@@ -74,7 +74,7 @@ const ReferenceDetailScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
   }, [navigation]);
 

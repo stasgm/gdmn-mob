@@ -1,9 +1,9 @@
-import React, { useLayoutEffect, useMemo } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { settingsActions, useDispatch, useSelector } from '@lib/store';
-import { globalStyles as styles, AppScreen, BackButton, SettingsGroup } from '@lib/mobile-ui';
+import { AppScreen, SettingsGroup, navBackButton } from '@lib/mobile-ui';
 import { ISettingsOption } from '@lib/types';
 
 import { SettingsStackParamList } from '../navigation/Root/types';
@@ -29,7 +29,7 @@ const SettingsDetailsScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
       title: groupName,
     });
   }, [navigation]);

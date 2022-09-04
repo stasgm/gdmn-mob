@@ -6,7 +6,6 @@ import { useNavigation, useTheme } from '@react-navigation/native';
 import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
 
 import {
-  DrawerButton,
   MenuButton,
   PrimeButton,
   DescriptionItem,
@@ -16,6 +15,7 @@ import {
   globalStyles,
   LargeText,
   Switch,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
@@ -81,7 +81,7 @@ const ProfileScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);

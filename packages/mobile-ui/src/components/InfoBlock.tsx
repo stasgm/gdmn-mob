@@ -1,9 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useRef } from 'react';
+import React from 'react';
 import { View, StyleSheet, Text, TouchableHighlight } from 'react-native';
 import { Divider } from 'react-native-paper';
-
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import styles from '../styles/global';
 
@@ -30,9 +28,7 @@ const InfoBlock = ({
   isBlocked = false,
   isSwipeable,
 }: IProps) => {
-  const ref = useRef(null);
-
-  const infoBlock = (
+  return (
     <View style={[styles.flexDirectionRow, localStyles.box]}>
       <View style={[localStyles.label, { backgroundColor: colorLabel }]} />
       <TouchableHighlight
@@ -55,18 +51,6 @@ const InfoBlock = ({
         </>
       </TouchableHighlight>
     </View>
-  );
-
-  return (
-    <>
-      {isSwipeable ? (
-        <Swipeable friction={2} ref={ref} onSwipeableWillOpen={onSwipeOpen} onSwipeableWillClose={onSwipeClose}>
-          {infoBlock}
-        </Swipeable>
-      ) : (
-        infoBlock
-      )}
-    </>
   );
 };
 

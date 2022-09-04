@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, FlatList, SafeAreaView, Refre
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
 
-import { AddButton, DrawerButton } from '@lib/mobile-ui';
+import { AddButton, navBackDrawer } from '@lib/mobile-ui';
 
 import { TodoScreenNavigationProp } from '../navigation/TodoStack';
 import { deleteTodo, fetchTodos, selectStatus, setTodoStatus } from '../store';
@@ -56,8 +56,7 @@ const TodoList = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
       // headerLeft: () => <MaterialIcons name="menu" size={30} style={styles.menuButton} onPress={openDrawer} />,
       // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (

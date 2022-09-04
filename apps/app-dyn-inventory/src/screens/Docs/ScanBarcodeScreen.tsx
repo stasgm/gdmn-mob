@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 import { useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 
-import { globalStyles, BackButton } from '@lib/mobile-ui';
+import { globalStyles, navBackButton } from '@lib/mobile-ui';
 import { useSelector, docSelectors } from '@lib/store';
 
 import { INamedEntity, ISettingsOption } from '@lib/types';
@@ -31,7 +31,7 @@ const ScanBarcodeScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
     });
   }, [navigation]);
 
