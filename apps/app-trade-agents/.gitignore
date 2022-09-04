@@ -16,3 +16,5 @@ web-build/
 #config
 src/config/prod.ts
 src/config/dev.ts
+
+.env

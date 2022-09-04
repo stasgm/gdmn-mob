@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start",
-    "start:dev": "cross-env MOCK=false DEVICE_ID=123 yarn start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
@@ -14,8 +13,8 @@
     "prettier:fix": "prettier --write \"src/**/*.ts*\"",
     "lint": "eslint \"./src/**/*.ts*\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "build:apk": "expo build:android -t apk"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -46,18 +45,16 @@
     "@react-navigation/stack": "^6.2.3",
     "@types/react-test-renderer": "^18.0.0",
     "axios": "^0.27.2",
-    "babel-plugin-inline-dotenv": "^1.6.0",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "expo-asset": "~8.6.1",
     "expo-barcode-scanner": "~11.4.0",
     "expo-camera": "~12.3.0",
-    "expo-constants": "~13.2.3",
+    "expo-constants": "~13.2.4",
     "expo-font": "~10.2.0",
     "expo-status-bar": "~1.4.0",
-    "expo-updates": "~0.14.4",
+    "expo-updates": "~0.14.5",
     "react": "18.0.0",
     "react-dom": "18.0.0",
-    "react-native": "0.69.4",
+    "react-native": "0.69.5",
     "react-native-error-boundary": "^1.1.15",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-paper": "4.12.4",
@@ -85,7 +82,6 @@
     "@types/react-native": "~0.69.1",
     "@types/react-redux": "^7.1.16",
     "babel-preset-expo": "~9.2.0",
-    "cross-env": "^7.0.3",
     "metro-react-native-babel-preset": "^0.70.2",
     "reactotron-react-native": "^5.0.1",
     "reactotron-redux": "^3.1.3",

@@ -65,7 +65,6 @@
     "@types/react-input-mask": "^3.0.1",
     "@types/react-text-mask": "^5.4.10",
     "@types/styled-components": "^5.1.26",
-    "@types/yup": "^0.32.0",
     "babel-loader": "^8.2.2",
     "clsx": "^1.2.1",
     "cross-env": "^7.0.3",
