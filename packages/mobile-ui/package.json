@@ -24,10 +24,11 @@
     "@expo/webpack-config": "^0.16.20",
     "@gorhom/bottom-sheet": "^4.3.0",
     "@types/node": "^17.0.25",
-    "@types/react-native": "~0.67.7",
+    "@types/react-native": "0.69.5",
+    "expo-camera": "^12.3.0",
     "eslint": "^7.29.0",
     "react": "^18.0.0",
-    "react-native": "~0.64.3",
+    "react-native": "0.69.5",
     "react-native-datepicker": "^1.7.2",
     "react-native-paper": "^4.12.4",
     "react-native-web": "~0.17.7",
@@ -39,6 +40,7 @@
     "@config/eslint-config-react": "*",
     "@config/eslint-config-react-native": "*",
     "@config/prettier-config": "*",
+    "@lib/client-types": "*",
     "lint-staged": "^12.4.0"
   }
 }
