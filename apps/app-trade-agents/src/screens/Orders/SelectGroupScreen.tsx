@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
 import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
-import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import {
@@ -13,6 +13,7 @@ import {
   Menu,
   SearchButton,
   navBackButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -153,11 +154,14 @@ interface IGoodProp {
 }
 
 const Good = ({ item, onPress, quantity }: IGoodProp) => {
-  const iconStyle = useMemo(() => [styles.icon, { backgroundColor: quantity ? '#06567D' : '#E91E63' }], [quantity]);
+  const iconStyle = useMemo(
+    () => [styles.icon, { backgroundColor: quantity || quantity === 0 ? '#06567D' : '#E91E63' }],
+    [quantity],
+  );
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={styles.item}>
+      <View style={[styles.item, localStyles.goodItem]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
@@ -349,10 +353,10 @@ const SelectGroupScreen = () => {
     [doc.lines, handlePressGood],
   );
 
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   return (
     <AppScreen>
@@ -423,6 +427,9 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 3,
-    minHeight: 50,
+    height: 74,
+  },
+  goodItem: {
+    height: 60,
   },
 });

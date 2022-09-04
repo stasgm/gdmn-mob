@@ -77,6 +77,7 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
         updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
       }
     });
+
     await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
 
     setProcess(false);

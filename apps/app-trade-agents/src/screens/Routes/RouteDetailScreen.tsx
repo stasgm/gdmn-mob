@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { View } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch } from '@lib/store';
 import {
   SubTitle,
@@ -18,6 +18,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { formatValue, generateId, getDateString } from '@lib/mobile-app';
 
 import { INamedEntity } from '@lib/types';
+
+import { useTheme } from 'react-native-paper';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import { IContact, IDebt, IOutlet, IRouteDocument, IVisitDocument, visitDocumentType } from '../../store/types';
@@ -56,7 +58,7 @@ const RouteDetailScreen = () => {
   const saldo = debt?.saldo ?? 0;
   const saldoDebt = debt?.saldoDebt ?? 0;
 
-  const debtTextStyle = [{ color: saldoDebt > 0 ? colors.notification : colors.text }];
+  const debtTextStyle = [{ color: saldoDebt > 0 ? colors.error : colors.text }];
 
   const handleNewVisit = useCallback(async () => {
     setProcess(true);
@@ -143,13 +145,15 @@ const RouteDetailScreen = () => {
               <MediumText>{`Условия оплаты: ${contact.paycond}`}</MediumText>
               <MediumText>
                 {saldo < 0
-                  ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(saldo) ?? 0)}`
-                  : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldo)}`}
+                  ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(saldo) ?? 0)}`
+                  : `Задолженность: ${formatValue({ type: 'currency', decimals: 2 }, saldo)}`}
               </MediumText>
-              <MediumText style={debtTextStyle}>
-                {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, saldoDebt ?? 0)}`}
-              </MediumText>
-              <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
+              {!!debt?.saldoDebt && (
+                <MediumText style={debtTextStyle}>
+                  {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, saldoDebt ?? 0)}, ${debt.dayLeft} дн.`}
+                </MediumText>
+              )}
+              {/* <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText> */}
             </>
           )}
         </>

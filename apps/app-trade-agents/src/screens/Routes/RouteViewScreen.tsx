@@ -14,18 +14,23 @@ import {
   EmptyList,
   SearchButton,
   navBackButton,
+  AppActivityIndicator,
 } from '@lib/mobile-ui';
-import { documentActions, docSelectors, useDocThunkDispatch } from '@lib/store';
+import { documentActions, docSelectors, useDocThunkDispatch, appActions, useSelector } from '@lib/store';
 
 import { getDateString, keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
-import { IOrderDocument, IRouteDocument, IRouteLine, IVisitDocument } from '../../store/types';
+import { IOrderDocument, IRouteDocument, IRouteFormParam, IRouteLine, IVisitDocument } from '../../store/types';
 import actions from '../../store/geo';
 
 import { useDispatch, useSelector as useAppSelector } from '../../store';
+
+import { getItemLayout, viewabilityConfig } from '../../utils/helpers';
+
+import { ROUTE_ITEM_HEIGHT } from '../../utils/constants';
 
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';
@@ -45,7 +50,7 @@ const RouteViewScreen = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
-  const [isGroupVisible, setIsGroupVisible] = useState(false);
+  const [isGroupVisible, setIsGroupVisible] = useState(true);
 
   const id = useRoute<RouteProp<RoutesStackParamList, 'RouteView'>>().params.id;
 
@@ -90,12 +95,31 @@ const RouteViewScreen = () => {
   }, [filteredList, searchQuery, routeLineList]);
 
   const ref = useRef<FlatList<IRouteLine>>(null);
-  useScrollToTop(ref);
 
   const orders = useFilteredDocList<IOrderDocument>('order');
   const visits = useFilteredDocList<IVisitDocument>('visit');
 
   const geoList = useAppSelector((state) => state.geo?.list)?.filter((g) => g.routeId === id);
+
+  //Первый элемент из списка точек маршрута
+  const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
+
+  //Первый элемент записывается в параметры формы при прокрутке списка точек маршрута
+  //При возвращении с окна визита, переходит на этот эелемент (initialScrollIndex)
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }) => {
+      if (viewableItems.length) {
+        dispatch(
+          appActions.setFormParams({
+            routeItemId: viewableItems[0].index,
+          }),
+        );
+      }
+    },
+    [dispatch],
+  );
+
+  const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
@@ -175,15 +199,20 @@ const RouteViewScreen = () => {
     [filteredList.routeLineList],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: IRouteLine }) => <RouteItem item={item} routeId={route?.id} />,
-    [route?.id],
+  const handlePressRouteItem = useCallback(
+    (item: IRouteLine) => navigation.navigate('RouteDetails', { routeId: route?.id, id: item.id }),
+    [navigation, route?.id],
   );
 
-  // const isFocused = useIsFocused();
-  // if (!isFocused) {
-  //   return <AppActivityIndicator />;
-  // }
+  const renderItem = useCallback(
+    ({ item }: { item: IRouteLine }) => <RouteItem item={item} onPressItem={() => handlePressRouteItem(item)} />,
+    [handlePressRouteItem],
+  );
+
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <AppActivityIndicator />;
+  }
 
   if (!route) {
     return (
@@ -218,14 +247,13 @@ const RouteViewScreen = () => {
           data={filteredList.routeLineList}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          scrollEventThrottle={400}
           ItemSeparatorComponent={ItemSeparator}
           refreshControl={RC}
           ListEmptyComponent={EmptyList}
-          initialNumToRender={9}
-          maxToRenderPerBatch={9}
           updateCellsBatchingPeriod={50}
-          windowSize={9}
+          viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+          initialScrollIndex={routeItemId}
+          getItemLayout={(_: any, index: number) => getItemLayout(index, ROUTE_ITEM_HEIGHT)}
         />
       </AppScreen>
       {!!routeLineList.length && (

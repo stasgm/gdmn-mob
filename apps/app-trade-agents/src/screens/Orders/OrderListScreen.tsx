@@ -17,17 +17,18 @@ import {
   CloseButton,
   DeleteButton,
   navBackDrawer,
+  MediumText,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
+import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
 
-import { documentActions, useDispatch, useSelector } from '@lib/store';
+import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { IDelList } from '@lib/mobile-types';
 
-import { IOrderDocument } from '../../store/types';
+import { IDebt, IOrderDocument } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import OrderListTotal from './components/OrderListTotal';
@@ -50,6 +51,8 @@ const OrderListScreen = () => {
       new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
       new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
   );
+
+  const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
   const [status, setStatus] = useState<Status>('all');
 
@@ -137,19 +140,29 @@ const OrderListScreen = () => {
     });
   }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
-  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => (
-    <ScreenListItem
-      key={item.id}
-      {...item}
-      onPress={() =>
-        isDelList
-          ? setDelList(getDelList(delList, item.id, item.status!))
-          : navigation.navigate('OrderView', { id: item.id })
-      }
-      onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
-      checked={!!delList[item.id]}
-    />
-  );
+  const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
+    const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
+
+    return (
+      <ScreenListItem
+        key={item.id}
+        {...item}
+        onPress={() =>
+          isDelList
+            ? setDelList(getDelList(delList, item.id, item.status!))
+            : navigation.navigate('OrderView', { id: item.id })
+        }
+        onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+        checked={!!delList[item.id]}
+      >
+        {!!debt?.saldoDebt && (
+          <MediumText>
+            {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, debt?.saldoDebt ?? 0)}, ${debt.dayLeft} дн.`}
+          </MediumText>
+        )}
+      </ScreenListItem>
+    );
+  };
 
   const renderSectionHeader = useCallback(
     ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,

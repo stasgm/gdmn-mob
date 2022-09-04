@@ -38,7 +38,7 @@ const ContactListScreen = () => {
 
   const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
 
-  const matrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data[0];
+  const matrix = goodMatrix[0];
 
   const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 

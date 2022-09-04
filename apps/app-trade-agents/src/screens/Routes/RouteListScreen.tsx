@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList } from 'react-native';
-import { useIsFocused, useNavigation, useScrollToTop } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused, useNavigation, useScrollToTop } from '@react-navigation/native';
 
 import {
   ItemSeparator,
@@ -16,7 +16,9 @@ import { keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { IRouteDocument } from '../../store/types';
+import { appActions, useDispatch, useSelector } from '@lib/store';
+
+import { IRouteDocument, IRouteFormParam } from '../../store/types';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 
@@ -25,6 +27,7 @@ import RouteListItem from './components/RouteListItem';
 const RouteListScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RoutesStackParamList, 'RouteList'>>();
   const [status, setStatus] = useState<Status>('active');
+  const dispatch = useDispatch();
 
   const list = useFilteredDocList<IRouteDocument>('route').sort((a, b) =>
     status === 'active'
@@ -34,6 +37,21 @@ const RouteListScreen = () => {
 
   const ref = useRef<FlatList<IRouteDocument>>(null);
   useScrollToTop(ref);
+
+  const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
+
+  //Очищаем первый элемент списка точек маршрута
+  useFocusEffect(
+    React.useCallback(() => {
+      if (routeItemId && routeItemId > 0) {
+        dispatch(
+          appActions.setFormParams({
+            routeItemId: 0,
+          }),
+        );
+      }
+    }, [dispatch, routeItemId]),
+  );
 
   const filteredList = useMemo(() => {
     if (status === 'all') {

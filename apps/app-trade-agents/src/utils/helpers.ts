@@ -5,7 +5,6 @@ import {
   IGoodGroup,
   IMatrixData,
   IOrderDocument,
-  IReturnDocument,
   IMGroup,
   IMGroupData,
   IMGroupModel,
@@ -25,7 +24,7 @@ const twoDigits = (value: number) => {
   return value >= 10 ? value : `0${value}`;
 };
 
-export const getNextDocNumber = (documents: IOrderDocument[] | IReturnDocument[]) => {
+export const getNextDocNumber = (documents: IOrderDocument[]) => {
   return (
     documents
       ?.map((item) => parseInt(item.number, 10))
@@ -197,4 +196,23 @@ const totalList = (list: IOrderTotalLine[]) =>
     },
   );
 
-export { getTimeProcess, twoDigits, getGoodMatrixByContact, getGroupModelByContact, totalListByGroup, totalList };
+const getItemLayout = (index: number, height: number) => ({
+  length: height,
+  offset: height * index,
+  index,
+});
+
+const viewabilityConfig = {
+  itemVisiblePercentThreshold: 50,
+};
+
+export {
+  getTimeProcess,
+  twoDigits,
+  getGoodMatrixByContact,
+  getGroupModelByContact,
+  totalListByGroup,
+  totalList,
+  getItemLayout,
+  viewabilityConfig,
+};

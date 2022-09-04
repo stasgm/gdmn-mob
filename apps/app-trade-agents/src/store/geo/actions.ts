@@ -11,11 +11,6 @@ const deleteOne = createAction('GEOLOCATION/DELETE_ONE')<string>();
 const deleteCurrent = createAction('GEOLOCATION/DELETE_CURRENT')();
 const deleteAll = createAction('GEOLOCATION/DELETE_ALL')();
 const removeMany = createAction('GEOLOCATION/REMOVE_MANY')<ILocation[] /*, 'id'*/>();
-// const removeMany = createAsyncAction(
-//   'GEOLOCATION/REMOVE_MANY',
-//   'GEOLOCATION/REMOVE_MANY_SUCCESS',
-//   'GEOLOCATION/REMOVE_MANY_FAILURE',
-// )<string | undefined, string[], string>();
 
 export const geoActions = {
   init,
