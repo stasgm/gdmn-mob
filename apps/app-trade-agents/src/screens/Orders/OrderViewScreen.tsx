@@ -173,7 +173,7 @@ const OrderViewScreen = () => {
           },
         },
       ]);
-    } else if (screenState === 'sent' && order?.head?.route?.id) {
+    } else if (screenState === 'sent') {
       setScreenState('idle');
       navigation.goBack();
     }

@@ -1,4 +1,5 @@
 import { keyExtractor } from '@lib/mobile-app';
+import { IListItem } from '@lib/mobile-types';
 import {
   AppActivityIndicator,
   AppScreen,
@@ -43,7 +44,7 @@ const DebetListScreen = () => {
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
-  const handleApplyType = useCallback((option) => {
+  const handleApplyType = useCallback((option: IListItem) => {
     setVisibleType(false);
     setDebetType(option);
   }, []);

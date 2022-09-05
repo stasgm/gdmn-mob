@@ -219,7 +219,10 @@ export const FreeShipmentEditScreen = () => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
 
-  const handleChangeNumber = useCallback((text) => dispatch(appActions.setFormParams({ number: text })), [dispatch]);
+  const handleChangeNumber = useCallback(
+    (text: string) => dispatch(appActions.setFormParams({ number: text })),
+    [dispatch],
+  );
 
   const viewStyle = useMemo(
     () => [

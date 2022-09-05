@@ -147,9 +147,8 @@ export const FreeShipmentListScreen = () => {
     [delList, isDelList, navigation],
   );
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const isFocused = useIsFocused();

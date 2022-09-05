@@ -127,20 +127,20 @@ export const ShipmentListScreen = () => {
   const [visibleFilterStatus, setVisibleFilterStatus] = useState(false);
   const [visibleSortDate, setVisibleSortDate] = useState(false);
 
-  const handleApplyFilterType = useCallback((option) => {
+  const handleApplyFilterType = (option: IListItem) => {
     setVisibleFilterType(false);
     setFilterDocType(option);
-  }, []);
+  };
 
-  const handleApplyFilterStatus = useCallback((option) => {
+  const handleApplyFilterStatus = (option) => {
     setVisibleFilterStatus(false);
     setFilterStatus(option.id);
-  }, []);
+  };
 
-  const handleApplySortDate = useCallback((option) => {
+  const handleApplySortDate = (option: IListItem) => {
     setVisibleSortDate(false);
     setSortDateType(option);
-  }, []);
+  };
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -215,9 +215,8 @@ export const ShipmentListScreen = () => {
     />
   );
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const isFocused = useIsFocused();

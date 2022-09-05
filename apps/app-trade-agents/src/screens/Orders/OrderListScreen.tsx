@@ -164,9 +164,8 @@ const OrderListScreen = () => {
     );
   };
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const renderSectionFooter = useCallback(

@@ -313,7 +313,7 @@ const OrderEditScreen = () => {
   }, [dispatch, docStatus]);
 
   const handleChangeNumber = useCallback(
-    (text) => dispatch(appActions.setFormParams({ number: text.trim() })),
+    (text: string) => dispatch(appActions.setFormParams({ number: text.trim() })),
     [dispatch],
   );
 

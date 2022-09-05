@@ -17,15 +17,12 @@ type Props = {
 };
 
 const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) => {
-  const onPress = useCallback(
-    (option) => {
-      if (option.id === activeButtonId) {
-        return;
-      }
-      onChange(option);
-    },
-    [onChange, activeButtonId],
-  );
+  const onPress = (option: IListItem) => {
+    if (option.id === activeButtonId) {
+      return;
+    }
+    onChange(option);
+  };
 
   return (
     <View
