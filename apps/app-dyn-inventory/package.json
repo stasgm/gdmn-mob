@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "expo start",
+    "start": "npx expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
