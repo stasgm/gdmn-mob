@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import { FlatList, TouchableHighlight, View } from 'react-native';
 import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -59,7 +59,7 @@ const ListScreen = () => {
   const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo.currentPoint);
 
-  const setCurrentPoint = useCallback((point: ILocation) => dispatch(geoActions.setCurrentPoint(point)), [dispatch]);
+  const setCurrentPoint = (point: ILocation) => dispatch(geoActions.setCurrentPoint(point));
 
   const ref = useRef<FlatList<ILocation>>(null);
   useScrollToTop(ref);

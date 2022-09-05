@@ -164,12 +164,12 @@ const OrderListScreen = () => {
     );
   };
 
-  const renderSectionHeader = ({ section }) => (
+  const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const renderSectionFooter = useCallback(
-    (item) => (status === 'all' && sections ? <OrderListTotal sectionOrders={item.section} /> : null),
+    (item: any) => (status === 'all' && sections ? <OrderListTotal sectionOrders={item.section} /> : null),
     [sections, status],
   );
 

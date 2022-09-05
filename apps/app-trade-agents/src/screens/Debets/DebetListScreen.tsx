@@ -44,10 +44,10 @@ const DebetListScreen = () => {
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
-  const handleApplyType = useCallback((option: IListItem) => {
+  const handleApplyType = (option: IListItem) => {
     setVisibleType(false);
     setDebetType(option);
-  }, []);
+  };
 
   //Фильтруем по названию клиента и по типу дебеторки
   const filteredList = useMemo(
