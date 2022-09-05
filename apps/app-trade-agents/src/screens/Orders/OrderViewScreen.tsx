@@ -316,13 +316,15 @@ const OrderViewScreen = () => {
             )}`}</MediumText>
             <MediumText>Адрес: {address}</MediumText>
             <MediumText style={debtTextStyle}>
-              {(debt?.saldo && debt?.saldo < 0
+              {(!!debt?.saldo && debt.saldo < 0
                 ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`
-                : `Задолженность: ${formatValue({ type: 'currency', decimals: 2 }, debt.saldo ?? 0)}`) || 0}
+                : `Задолженность: ${formatValue({ type: 'currency', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
             </MediumText>
             {!!debt?.saldoDebt && (
               <MediumText>
-                {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, debt?.saldoDebt)}, ${debt.dayLeft} дн.`}
+                {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, debt.saldoDebt)}, ${
+                  debt.dayLeft || 0
+                } дн.`}
               </MediumText>
             )}
             {order.head.comment ? (

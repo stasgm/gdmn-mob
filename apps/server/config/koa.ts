@@ -1,7 +1,7 @@
 import session from 'koa-session';
 
-// 7 days for session cookie lifetime
-const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 7;
+// 3 days for session cookie lifetime
+const SESSION_COOKIE_LIFETIME = 1000 * 60 * 60 * 24 * 3;
 
 const config: Partial<session.opts> = {
   key: 'koa:sess' /** (string) cookie key (default is koa:sess) */,
@@ -11,6 +11,7 @@ const config: Partial<session.opts> = {
   signed: true /** (boolean) signed or not (default true) */,
   sameSite: 'lax' /** (string) lets require that a cookie shouldn't
     be sent with cross-origin requests (default undefined) */,
+  rolling: true,
 };
 
 export default config;

@@ -58,6 +58,6 @@ export default RouteItem;
 
 const localStyles = StyleSheet.create({
   item: {
-    height: 60,
+    height: 76,
   },
 });

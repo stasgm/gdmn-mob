@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
-import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,6 +14,8 @@ import {
   SearchButton,
   navBackButton,
   AppActivityIndicator,
+  LargeText,
+  MediumText,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -107,11 +109,11 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
     <View key={item.id}>
       <TouchableOpacity style={localStyles.item} onPress={handlePressGroup}>
         <View style={styles.details}>
-          <Text style={styles.name}>{item.name || item.name}</Text>
+          <LargeText style={styles.textBold}>{item.name || item.name}</LargeText>
           {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <Text style={styles.field}>{len}</Text>
+              <MediumText>{len}</MediumText>
             </View>
           )}
         </View>
@@ -125,10 +127,6 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
-          initialNumToRender={20}
-          maxToRenderPerBatch={20} // Reduce number in each render batch
-          updateCellsBatchingPeriod={100} // Increase time between renders
-          windowSize={7} // Reduce the window size
         />
       )}
       {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && nextLevelGroups && nextLevelGroups?.length > 0 && (
@@ -161,18 +159,18 @@ const Good = ({ item, onPress, quantity }: IGoodProp) => {
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={[styles.item, localStyles.goodItem]}>
+      <View style={localStyles.item}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <Text style={styles.name}>{item.name || item.id}</Text>
+            <LargeText>{item.name || item.id}</LargeText>
           </View>
           {quantity ? (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <Text style={styles.field}>{quantity} кг</Text>
+              <MediumText style={styles.field}>{quantity} кг</MediumText>
             </View>
           ) : null}
         </View>
@@ -398,10 +396,6 @@ const SelectGroupScreen = () => {
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
-          initialNumToRender={20}
-          maxToRenderPerBatch={20} // Reduce number in each render batch
-          updateCellsBatchingPeriod={100} // Increase time between renders
-          windowSize={7} // Reduce the window size
         />
       ) : (
         <FlatList
@@ -421,15 +415,12 @@ export default SelectGroupScreen;
 
 const localStyles = StyleSheet.create({
   marginLeft: {
-    marginLeft: 20,
+    marginLeft: 14,
   },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 3,
-    height: 74,
-  },
-  goodItem: {
-    height: 60,
+    padding: 2,
+    height: 86,
   },
 });
