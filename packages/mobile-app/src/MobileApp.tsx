@@ -39,7 +39,6 @@ const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
   const { config, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log('useEffect');
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
   }, []);
