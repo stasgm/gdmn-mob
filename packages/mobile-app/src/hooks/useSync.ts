@@ -144,11 +144,16 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             //  справочники: очищаем старые и записываем в хранилище новые данные
             //  документы: добавляем новые, а старые заменеям только если был статус 'DRAFT'
             if (getMessagesResponse.type === 'GET_MESSAGES') {
-              await Promise.all(
-                getMessagesResponse.messageList
-                  .sort((a, b) => a.head.order - b.head.order)
-                  ?.map((message) => processMessage(message, errList, okList, params)),
-              );
+              const sortedMessages = getMessagesResponse.messageList.sort((a, b) => a.head.order - b.head.order);
+              for (const message of sortedMessages) {
+                // eslint-disable-next-line no-await-in-loop
+                await processMessage(message, errList, okList, params);
+              }
+              // await Promise.all(
+              //   getMessagesResponse.messageList
+              //     .sort((a, b) => a.head.order - b.head.order)
+              //     ?.map((message) => processMessage(message, errList, okList, params)),
+              // );
             } else {
               errList.push(`Сообщения не получены: ${getMessagesResponse.message}`);
             }
