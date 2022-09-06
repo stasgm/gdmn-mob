@@ -90,7 +90,7 @@ export const MoveListScreen = () => {
 
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-          children: (
+          addInfo: (
             <View>
               <MediumText>Откуда: {i.head.fromDepart?.name || ''}</MediumText>
               <MediumText>Куда: {i.head.toDepart?.name || ''}</MediumText>
@@ -134,7 +134,7 @@ export const MoveListScreen = () => {
     setType(option);
   };
 
-  const handleApplyStatus = (option) => {
+  const handleApplyStatus = (option: any) => {
     setVisibleStatus(false);
     setStatus(option.id);
   };
@@ -195,7 +195,7 @@ export const MoveListScreen = () => {
     [delList, isDelList, navigation],
   );
 
-  const renderSectionHeader = ({ section }) => (
+  const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 

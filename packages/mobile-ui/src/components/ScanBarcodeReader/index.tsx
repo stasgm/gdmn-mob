@@ -161,6 +161,7 @@ const ScanBarcodeReader = ({ scaner, onSave, onGetScannedObject, onClearScannedO
         )}
       </View>
       <AppDialog
+        title="Введите штрих-код"
         visible={visibleDialog}
         text={barcode}
         onChangeText={handleChangeText}
