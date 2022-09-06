@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
-import { Camera } from 'expo-camera';
+import { AutoFocus, Camera, FlashMode } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -115,10 +115,9 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
     <View style={styles.content}>
       <Camera
         key={`${scaner.state}`}
-        flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
+        flashMode={flashMode ? FlashMode.torch : FlashMode.off}
         barCodeScannerSettings={barCodeTypes ? { barCodeTypes } : undefined}
-        autoFocus="on"
-        whiteBalance="auto"
+        autoFocus={AutoFocus.on}
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={cameraStyle}
       >
@@ -194,6 +193,7 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
         )}
       </Camera>
       <AppDialog
+        title="Введите штрих-код"
         visible={visibleDialog}
         text={barcode}
         onChangeText={handleChangeText}
