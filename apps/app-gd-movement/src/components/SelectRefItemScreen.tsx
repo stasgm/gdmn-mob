@@ -74,7 +74,8 @@ export const SelectRefItemScreen = () => {
           return checkedItem?.find((v) => v.id === a.id) ? -1 : 1;
         }),
     );
-  }, [checkedItem, isMulti, list, refFieldName, searchQuery, value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMulti, list, refFieldName, searchQuery, value]);
 
   useEffect(() => {
     if (!filterVisible && searchQuery) {
@@ -90,16 +91,21 @@ export const SelectRefItemScreen = () => {
       if (isMulti) {
         setCheckedItem((prev) => [...(prev as IReferenceData[]), item]);
       } else {
-        setScreenState('saving');
-        dispatch(
-          appActions.setFormParams({
-            [fieldName]: item,
-          }),
-        );
-        navigation.goBack();
+        const isItemChecked = checkedItem.find((i) => i.id === item.id);
+        if (isItemChecked) {
+          setCheckedItem([]);
+        } else {
+          setScreenState('saving');
+          dispatch(
+            appActions.setFormParams({
+              [fieldName]: item,
+            }),
+          );
+          navigation.goBack();
+        }
       }
     },
-    [isMulti, dispatch, fieldName, navigation],
+    [isMulti, checkedItem, dispatch, fieldName, navigation],
   );
 
   const renderItem = useCallback(

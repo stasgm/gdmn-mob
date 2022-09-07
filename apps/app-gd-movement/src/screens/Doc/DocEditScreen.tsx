@@ -24,6 +24,8 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocumentType } from '@lib/types';
 
+import { IListItem } from '@lib/mobile-types';
+
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocFormParam, IMovementDocument } from '../../store/types';
 import { contactTypes, STATUS_LIST } from '../../utils/constants';
@@ -305,7 +307,7 @@ export const DocEditScreen = () => {
   const [visibleTo, setVisibleTo] = useState(false);
 
   const handleFromContactType = useCallback(
-    (option) => {
+    (option: IListItem) => {
       if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
         Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.fromDescription} при наличии позиций.`, [
           { text: 'OK' },
@@ -321,7 +323,7 @@ export const DocEditScreen = () => {
   );
 
   const handleToContactType = useCallback(
-    (option) => {
+    (option: IListItem) => {
       if (doc?.lines.length && documentType?.remainsField === 'toContact') {
         Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.toDescription} при наличии позиций.`, [
           { text: 'OK' },
@@ -360,7 +362,10 @@ export const DocEditScreen = () => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
 
-  const handleChangeNumber = useCallback((text) => dispatch(appActions.setFormParams({ number: text })), [dispatch]);
+  const handleChangeNumber = useCallback(
+    (text: string) => dispatch(appActions.setFormParams({ number: text })),
+    [dispatch],
+  );
 
   const viewStyle = useMemo(
     () => [
