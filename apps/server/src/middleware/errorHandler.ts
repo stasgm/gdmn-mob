@@ -7,10 +7,11 @@ import { ApplicationException } from '../exceptions';
 import { getDb } from '../services/dao/db';
 
 export const errorHandler = async (ctx: Context, next: Next) => {
-  const { pendingWrites: waitPendingWrites } = getDb();
+  const { pendingWrites } = getDb();
 
   try {
-    await Promise.all([next(), waitPendingWrites()]);
+    await pendingWrites();
+    await next();
   } catch (error) {
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {

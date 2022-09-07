@@ -66,7 +66,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   });
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
-  passport.deserializeUser(async (id: string, done) => {
+  passport.deserializeUser((id: string, done) => {
     try {
       log.info('deserializeUser', id);
       const user = userService.findOne(id);
