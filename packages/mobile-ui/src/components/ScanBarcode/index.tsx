@@ -41,7 +41,7 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
   const cameraStyle = useMemo(() => [styles.camera, { backgroundColor: colors.card }], [colors.card]);
 
   const [barcode, setBarcode] = useState('');
-  const hasPermission = useCameraPermission();
+  const permission = useCameraPermission();
 
   useEffect(() => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
@@ -90,7 +90,7 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
     }
   };
 
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <View style={globalStyles.container}>
         <View style={globalStyles.containerCenter}>
@@ -101,7 +101,7 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <View style={globalStyles.container}>
         <View style={globalStyles.containerCenter}>

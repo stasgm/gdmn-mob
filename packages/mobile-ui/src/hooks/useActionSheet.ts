@@ -1,4 +1,5 @@
 import { useActionSheet as useExpoActionSheet } from '@expo/react-native-action-sheet';
+import { useCallback } from 'react';
 
 type ActionSheetItem = {
   type?: 'normal' | 'destructive' | 'cancel';
@@ -17,19 +18,22 @@ interface ActionSheetOptions {
 const useActionSheet = () => {
   const { showActionSheetWithOptions } = useExpoActionSheet();
 
-  return (items: ActionSheetItem[], options: Partial<ActionSheetOptions> = {}) => {
-    showActionSheetWithOptions(
-      {
-        ...options,
-        options: items.map((i) => i.title).concat(options.defaultCancel ? ['Cancel'] : []),
-        cancelButtonIndex: options.defaultCancel ? items.length : items.findIndex((i) => i.type === 'cancel'),
-        destructiveButtonIndex: items.findIndex((i) => i.type === 'destructive'),
-      },
-      (i) => {
-        items[i as number]?.onPress?.();
-      },
-    );
-  };
+  return useCallback(
+    (items: ActionSheetItem[], options: Partial<ActionSheetOptions> = {}) => {
+      showActionSheetWithOptions(
+        {
+          ...options,
+          options: items.map((i) => i.title).concat(options.defaultCancel ? ['Cancel'] : []),
+          cancelButtonIndex: options.defaultCancel ? items.length : items.findIndex((i) => i.type === 'cancel'),
+          destructiveButtonIndex: items.findIndex((i) => i.type === 'destructive'),
+        },
+        (i) => {
+          items[i as number]?.onPress?.();
+        },
+      );
+    },
+    [showActionSheetWithOptions],
+  );
 };
 
 export default useActionSheet;

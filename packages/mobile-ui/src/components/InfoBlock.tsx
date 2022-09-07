@@ -17,17 +17,7 @@ interface IProps {
   isSwipeable?: boolean;
 }
 
-const InfoBlock = ({
-  colorLabel,
-  title,
-  children,
-  disabled = false,
-  onPress,
-  onSwipeOpen,
-  onSwipeClose,
-  isBlocked = false,
-  isSwipeable,
-}: IProps) => {
+const InfoBlock = ({ colorLabel, title, children, disabled = false, onPress, isBlocked = false }: IProps) => {
   return (
     <View style={[styles.flexDirectionRow, localStyles.box]}>
       <View style={[localStyles.label, { backgroundColor: colorLabel }]} />

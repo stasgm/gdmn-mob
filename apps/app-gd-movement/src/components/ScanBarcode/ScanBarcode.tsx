@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, TouchableOpacity, Vibration, Text } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Camera } from 'expo-camera';
+import { AutoFocus, Camera, FlashMode } from 'expo-camera';
 
 import { useTheme } from '@react-navigation/native';
 
@@ -31,7 +31,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
   const [barcode, setBarcode] = useState('');
   const [itemLine, setItemLine] = useState<IMovementLine | undefined>(undefined);
 
-  const hasPermission = useCameraPermission();
+  const permission = useCameraPermission();
 
   const handleBarCodeScanned = (data: string) => {
     setScanned(true);
@@ -60,7 +60,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
     }
   }, [barcode, scanned, vibroMode, getScannedObject]);
 
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <View style={globalStyles.container}>
         <View style={globalStyles.containerCenter}>
@@ -71,7 +71,7 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <View style={globalStyles.container}>
         <View style={globalStyles.containerCenter}>
@@ -85,12 +85,11 @@ const ScanBarcode = ({ onSave, onShowRemains, getScannedObject }: IProps) => {
     <View style={styles.content}>
       <Camera
         key={`${scanned}${barcode}`}
-        flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
+        flashMode={flashMode ? FlashMode.torch : FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13, BarCodeScanner.Constants.BarCodeType.ean8],
         }}
-        autoFocus="on"
-        whiteBalance="auto"
+        autoFocus={AutoFocus.on}
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={cameraStyle}
       >
