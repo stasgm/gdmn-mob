@@ -12,7 +12,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
   try {
     await pendingWrites();
     await next();
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {
         result: false,
@@ -26,14 +26,16 @@ export const errorHandler = async (ctx: Context, next: Next) => {
 
       log.error(error.toString());
     } else {
+      const errorMsg = (error instanceof Error && error.message) ? error.message : 'Неизвестная ошибка';
+
       ctx.status = 500;
       ctx.body = {
         result: false,
-        error: 'Неизвестная ошибка',
+        error: errorMsg,
         data: 'InnerErrorException',
       };
 
-      log.error('Неизвестная ошибка', JSON.stringify(error));
+      log.error(errorMsg, JSON.stringify(error));
     }
   }
 };
