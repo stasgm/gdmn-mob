@@ -7,11 +7,12 @@ import { ApplicationException } from '../exceptions';
 import { getDb } from '../services/dao/db';
 
 export const errorHandler = async (ctx: Context, next: Next) => {
-  const { pendingWrites: waitPendingWrites } = getDb();
+  const { pendingWrites } = getDb();
 
   try {
-    await Promise.all([next(), waitPendingWrites()]);
-  } catch (error) {
+    await pendingWrites();
+    await next();
+  } catch (error: any) {
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {
         result: false,
@@ -25,14 +26,16 @@ export const errorHandler = async (ctx: Context, next: Next) => {
 
       log.error(error.toString());
     } else {
+      const errorMsg = error instanceof Error && error.message ? error.message : `Неизвестная ошибка: ${error}`;
+
       ctx.status = 500;
       ctx.body = {
         result: false,
-        error: `Неизвестная ошибка: ${error}`,
+        error: errorMsg,
         data: 'InnerErrorException',
       };
 
-      log.error('Неизвестная ошибка: ', error);
+      log.error(errorMsg, JSON.stringify(error));
     }
   }
 };
