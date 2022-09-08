@@ -1,7 +1,8 @@
 import fs from 'fs';
 
+import { IItemDatabase } from '../..';
+
 import { createServer, KoaApp } from '../../server';
-import { IItemDatabase } from '../../utils/databaseMenu';
 
 let app: KoaApp | null = null;
 

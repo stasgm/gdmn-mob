@@ -382,7 +382,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           authActions.setUserSettings(msg.body.payload as IUserSettings),
         );
 
-        //Если удачно сохранились документы, удаляем сообщение в json
+        //Если удачно сохранились настройки, удаляем сообщение в json
         if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_SUCCESS') {
           const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
           if (removeMess.type === 'ERROR') {

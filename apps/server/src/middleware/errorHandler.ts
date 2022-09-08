@@ -15,7 +15,7 @@ export const errorHandler = async (ctx: Context, next: Next) => {
     if (error instanceof ApplicationException) {
       const result: IResponse<string> = {
         result: false,
-        error: error.message || 'Неизвестная ошибка',
+        error: error.message || 'Неизвестная внутренняя ошибка',
         data: error.name || 'InnerErrorException',
         status: error.status || 500,
       };
@@ -28,11 +28,11 @@ export const errorHandler = async (ctx: Context, next: Next) => {
       ctx.status = 500;
       ctx.body = {
         result: false,
-        error: 'Неизвестная ошибка',
+        error: `Неизвестная ошибка: ${error}`,
         data: 'InnerErrorException',
       };
 
-      log.error('Неизвестная ошибка', JSON.stringify(error));
+      log.error('Неизвестная ошибка: ', error);
     }
   }
 };

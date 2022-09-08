@@ -2,9 +2,11 @@ import config from '../config';
 
 import { createServer, KoaApp, startServer } from './server';
 
-import { IItemDatabase } from './utils/databaseMenu';
-
-//import { readFile } from './utils/workWithFile';
+export interface IItemDatabase {
+  name: string;
+  path: string;
+  port: number;
+}
 
 const defaultDatabase: IItemDatabase = {
   name: 'DB',
