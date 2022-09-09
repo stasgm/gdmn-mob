@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, MediumText, PrimeButton, ScanBarcode } from '@lib/mobile-ui';
-// import { useSelector } from '@lib/store';
+import { ItemSeparator, PrimeButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
+import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
 
@@ -16,8 +16,6 @@ import { IScannedObject } from '@lib/client-types';
 import { IMovementLine } from '../store/types';
 
 import { ONE_SECOND_IN_MS } from '../utils/constants';
-
-// import { ScanDataMatrix, ScanDataMatrixReader } from '.';
 
 interface IProps {
   item: IMovementLine;
@@ -32,15 +30,29 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
+
   const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
 
   const currRef = useRef<TextInput>(null);
 
-  // const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
+  const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
   }, []);
+
+  const handleGetScannedObject = useCallback((brc: string) => {
+    setScaner({ state: 'found' });
+    if (!brc) {
+      return;
+    }
+    setGoodEID(brc);
+
+    setScaner({ state: 'init' });
+    setDoScanned(false);
+  }, []);
+
+  const handleClearScaner = () => setScaner({ state: 'init' });
 
   const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -53,11 +65,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
-
-  const handleEIDScanned = (data: string) => {
-    setDoScanned(false);
-    setGoodEID(data);
-  };
 
   const handleDoScan = () => {
     setDoScanned(true);
@@ -74,32 +81,21 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
 
   return (
     <>
-      {/* <Modal animationType="slide" visible={doScanned}>
-        {isScanerReader ? (
-          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
-        ) : (
-          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
-        )}
-      </Modal> */}
       <Modal animationType="slide" visible={doScanned}>
-        <ScanBarcode
-          onGetScannedObject={(data) => {
-            handleEIDScanned(data);
-            setScaner({ state: 'found' });
-          }}
-          onClearScannedObject={() => {
-            setDoScanned(false);
-            () => setScaner({ state: 'init' });
-          }}
-          scaner={scaner}
-          barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
-        >
-          {/* {scannedObject ? ( */}
-          <View style={localStyles.itemInfo}>
-            <MediumText style={localStyles.text}>{goodEID}</MediumText>
-          </View>
-          {/* ) : undefined} */}
-        </ScanBarcode>
+        {isScanerReader ? (
+          <ScanBarcodeReader
+            onGetScannedObject={handleGetScannedObject}
+            onClearScannedObject={handleClearScaner}
+            scaner={scaner}
+          />
+        ) : (
+          <ScanBarcode
+            onGetScannedObject={handleGetScannedObject}
+            onClearScannedObject={handleClearScaner}
+            scaner={scaner}
+            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
+          />
+        )}
       </Modal>
       <ScrollView>
         <View style={[styles.content]}>
@@ -189,13 +185,5 @@ const localStyles = StyleSheet.create({
     flex: 1,
     margin: 5,
     justifyContent: 'center',
-  },
-  itemInfo: {
-    flexShrink: 1,
-    paddingRight: 10,
-  },
-  text: {
-    color: '#fff',
-    textTransform: 'uppercase',
   },
 });

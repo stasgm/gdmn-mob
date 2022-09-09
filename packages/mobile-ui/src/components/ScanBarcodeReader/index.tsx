@@ -24,7 +24,7 @@ const ONE_SECOND_IN_MS = 1000;
 
 interface IProps {
   scaner: IScannedObject;
-  onSave: () => void;
+  onSave?: () => void;
   onGetScannedObject: (brc: string) => void;
   onClearScannedObject: () => void;
   children?: ReactNode;
