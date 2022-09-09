@@ -30,7 +30,11 @@ const newMessage = async (ctx: ParameterizedContext): Promise<void> => {
   });
 
   const resultData = { uid: messageId, date: new Date() };
-  created(ctx as Context, resultData, 'newMessage: message is successfully created');
+  created(
+    ctx as Context,
+    resultData,
+    `newMessage: message '${messageId}' deviceId=${deviceId} is successfully created`,
+  );
 };
 
 const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
@@ -47,7 +51,7 @@ const getMessages = async (ctx: ParameterizedContext): Promise<void> => {
     deviceId: deviceId,
   });
 
-  ok(ctx as Context, messageList, 'getMessages: message is successfully received');
+  ok(ctx as Context, messageList, `getMessages: message deviceId=${deviceId} is successfully received`);
 };
 
 const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
@@ -56,7 +60,7 @@ const removeMessage = async (ctx: ParameterizedContext): Promise<void> => {
 
   await messageService.deleteOne({ messageId, companyId: companyId as string, appSystemName: appSystemName as string });
 
-  ok(ctx as Context, undefined, 'removeMessage: message is successfully removed');
+  ok(ctx as Context, undefined, `removeMessage: message '${messageId}' is successfully removed`);
 };
 
 const clear = async (ctx: ParameterizedContext): Promise<void> => {

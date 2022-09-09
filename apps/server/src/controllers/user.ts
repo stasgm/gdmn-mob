@@ -59,10 +59,10 @@ const getUser = async (ctx: ParameterizedContext) => {
   const user = userService.findOne(userId);
 
   if (!user) {
-    throw new DataNotFoundException('Пользователь не найден');
+    throw new DataNotFoundException(`Пользователь ${userId} не найден`);
   }
 
-  ok(ctx as Context, user, `getUser: device '${user.name}' is successfully received'`);
+  ok(ctx as Context, user, `getUser: user '${user.name}' (${user.id}) is successfully received'`);
 };
 
 const getUsers = async (ctx: ParameterizedContext) => {
