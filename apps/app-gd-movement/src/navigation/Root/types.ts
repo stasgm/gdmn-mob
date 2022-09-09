@@ -68,6 +68,7 @@ export type RemainsStackParamList = { ContactList: undefined } & RemainsParamLis
 export type ScanParamList = RefParamList & {
   ScanView: { id: string; docType?: string };
   ScanEdit: { id: string; docType?: string } | undefined; //itemId: string;
+  ScanGood: { docId: string };
 };
 
 export type ScanStackParamList = { ScanList: undefined } & ScanParamList;

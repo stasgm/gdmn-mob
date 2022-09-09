@@ -18,6 +18,7 @@ import {
   AppDialog,
   SendButton,
   ScanButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
@@ -275,6 +276,16 @@ const ShipmentViewScreen = () => {
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...shipment, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, shipment]);
+
   const handleUseSendDoc = useSendDocs([shipment]);
 
   const handleSendDoc = useCallback(() => {
@@ -303,12 +314,25 @@ const ShipmentViewScreen = () => {
         shipment?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
       ) : (
         <View style={styles.buttons}>
+          {shipment?.status === 'DRAFT' && (
+            <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          )}
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, id, isBlocked, isScanerReader, navigation, screenState, shipment?.status],
+    [
+      actionsMenu,
+      handleSaveDocument,
+      handleSendDoc,
+      id,
+      isBlocked,
+      isScanerReader,
+      navigation,
+      screenState,
+      shipment?.status,
+    ],
   );
 
   const renderLeft = useCallback(
@@ -493,7 +517,7 @@ const ShipmentViewScreen = () => {
   );
 
   const renderTempItem: ListRenderItem<ITempLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={isBlocked}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <MediumText style={styles.name}>{item.good.name}</MediumText>
         <View style={styles.directionRow}>
