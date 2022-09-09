@@ -271,17 +271,17 @@ export const DocListScreen = () => {
     return setVisibleDate(false);
   };
 
-  const handleApplyType = useCallback((option) => {
+  const handleApplyType = useCallback((option: IListItem) => {
     setVisibleType(false);
     setType(option);
   }, []);
 
-  const handleApplyStatus = useCallback((option) => {
+  const handleApplyStatus = useCallback((option: any) => {
     setVisibleStatus(false);
     setStatus(option.id);
   }, []);
 
-  const handleApplyDate = useCallback((option) => {
+  const handleApplyDate = useCallback((option: IListItem) => {
     setVisibleDate(false);
     setDate(option);
   }, []);
@@ -317,7 +317,7 @@ export const DocListScreen = () => {
   };
 
   const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
     [],
   );
 

@@ -147,7 +147,7 @@ export const FreeShipmentListScreen = () => {
     [delList, isDelList, navigation],
   );
 
-  const renderSectionHeader = ({ section }) => (
+  const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 

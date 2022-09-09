@@ -86,10 +86,9 @@ export const ShipmentListScreen = () => {
           title: i.documentType.description || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          // subtitle: `№ ${i.number} на ${getDateString(i.head?.onDate)}`,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-          children: (
+          addInfo: (
             <View>
               <MediumText>{i.head.outlet?.name || ''}</MediumText>
               <MediumText>
@@ -132,7 +131,7 @@ export const ShipmentListScreen = () => {
     setFilterDocType(option);
   };
 
-  const handleApplyFilterStatus = (option) => {
+  const handleApplyFilterStatus = (option: any) => {
     setVisibleFilterStatus(false);
     setFilterStatus(option.id);
   };
@@ -215,7 +214,7 @@ export const ShipmentListScreen = () => {
     />
   );
 
-  const renderSectionHeader = ({ section }) => (
+  const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 

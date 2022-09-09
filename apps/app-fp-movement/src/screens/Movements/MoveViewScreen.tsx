@@ -17,6 +17,7 @@ import {
   ListItemLine,
   ScanButton,
   navBackButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
@@ -168,6 +169,16 @@ export const MoveViewScreen = () => {
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
   }, [dispatch, doc?.lines, id]);
 
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...doc, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, doc]);
+
   const handleUseSendDoc = useSendDocs([doc]);
 
   const handleSendDoc = useCallback(() => {
@@ -222,12 +233,23 @@ export const MoveViewScreen = () => {
         doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
       ) : (
         <View style={styles.buttons}>
+          {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
           <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
           {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSendDoc, id, isBlocked, isScanerReader, navigation, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      handleSendDoc,
+      id,
+      isBlocked,
+      isScanerReader,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -256,7 +278,7 @@ export const MoveViewScreen = () => {
   // }, []);
 
   const renderItem: ListRenderItem<IMoveLine> = ({ item }) => (
-    <ListItemLine key={item.id}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.directionRow}>

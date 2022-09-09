@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { View, FlatList, Modal, TextInput, Alert, ListRenderItem } from 'react-native';
+import { View, FlatList, TextInput, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import {
   LargeText,
   ListItemLine,
   navBackButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import {
@@ -37,7 +38,6 @@ import { sleep } from '@lib/client-api';
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
-import { ScanDataMatrix, ScanDataMatrixReader } from '../../components';
 
 export const ScanViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -48,10 +48,7 @@ export const ScanViewScreen = () => {
 
   const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
 
-  const [doScanned, setDoScanned] = useState(false);
-
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
-
   const doc = docSelectors.selectByDocId<IScanDocument>(id);
 
   const isBlocked = doc?.status !== 'DRAFT';
@@ -61,18 +58,6 @@ export const ScanViewScreen = () => {
 
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
-  }, []);
-
-  const handleEIDScanned = useCallback(
-    (data: string) => {
-      const line: IScanLine = { id: generateId(), barcode: data };
-      dispatch(documentActions.addDocumentLine({ docId: id, line }));
-    },
-    [dispatch, id],
-  );
-
-  const handleDoScan = useCallback(() => {
-    setDoScanned(true);
   }, []);
 
   const handleEditDocHead = useCallback(() => {
@@ -113,6 +98,16 @@ export const ScanViewScreen = () => {
 
     deleteSelectedLineItems(deleteDocs);
   }, [delList, dispatch, id, setDelList]);
+
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...doc, status: 'READY' },
+      }),
+    );
+    // navigation.goBack();
+  }, [dispatch, id, doc]);
 
   const handleSendDoc = useSendDocs([doc]);
 
@@ -165,8 +160,12 @@ export const ScanViewScreen = () => {
                 <DeleteButton onPress={handleDeleteDocs} />
               ) : (
                 <>
+                  {doc?.status === 'DRAFT' && (
+                    <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+                  )}
                   <SendButton onPress={handleSendScanDoc} disabled={screenState !== 'idle'} />
-                  <ScanButton onPress={handleDoScan} />
+                  {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
+
                   <MenuButton actionsMenu={actionsMenu} />
                 </>
               )}
@@ -176,11 +175,14 @@ export const ScanViewScreen = () => {
       actionsMenu,
       doc?.status,
       handleDeleteDocs,
-      handleDoScan,
+      handleSaveDocument,
       handleSendDoc,
       handleSendScanDoc,
+      id,
       isBlocked,
       isDelList,
+      isScanerReader,
+      navigation,
       screenState,
     ],
   );
@@ -215,6 +217,39 @@ export const ScanViewScreen = () => {
     </ListItemLine>
   );
 
+  const [scanned, setScanned] = useState(false);
+
+  const ref = useRef<TextInput>(null);
+
+  const [key, setKey] = useState(1);
+
+  const getScannedObject = useCallback(
+    (brc: string) => {
+      const line: IScanLine = { id: generateId(), barcode: brc };
+      dispatch(documentActions.addDocumentLine({ docId: id, line }));
+
+      setScanned(false);
+    },
+
+    [dispatch, id],
+  );
+
+  const setScan = (brc: string) => {
+    setKey(key + 1);
+    setScanned(true);
+    getScannedObject(brc);
+  };
+
+  useEffect(() => {
+    if (!scanned && ref?.current) {
+      ref?.current &&
+        setTimeout(() => {
+          ref.current?.focus();
+          ref.current?.clear();
+        }, ONE_SECOND_IN_MS);
+    }
+  }, [scanned, ref]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -241,13 +276,6 @@ export const ScanViewScreen = () => {
 
   return (
     <>
-      <Modal animationType="slide" visible={doScanned}>
-        {isScanerReader ? (
-          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
-        ) : (
-          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
-        )}
-      </Modal>
       <View style={styles.container}>
         <InfoBlock
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
@@ -261,6 +289,15 @@ export const ScanViewScreen = () => {
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </InfoBlock>
+        <TextInput
+          style={styles.scanInput}
+          key={key}
+          autoFocus={true}
+          selectionColor="transparent"
+          ref={ref}
+          showSoftInputOnFocus={false}
+          onChangeText={(text) => !scanned && setScan(text)}
+        />
         <FlatList
           data={doc.lines}
           keyExtractor={keyExtractor}

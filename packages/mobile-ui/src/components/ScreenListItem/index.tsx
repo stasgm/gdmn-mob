@@ -60,7 +60,7 @@ const ScreenListItem = ({
           </View>
           <View style={styles.directionRow}>
             {subtitle ? <MediumText>{subtitle}</MediumText> : null}
-            {addInfo ? <View style={{ width: '95%' }}>{addInfo}</View> : null}
+            {addInfo ? <View style={{ width: '90%' }}>{addInfo}</View> : null}
             <View style={styles.rowCenter}>
               <MediumText>{lineCount}</MediumText>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />

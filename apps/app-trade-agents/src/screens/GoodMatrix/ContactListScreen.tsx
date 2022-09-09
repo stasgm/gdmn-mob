@@ -101,7 +101,7 @@ const ContactListScreen = () => {
 
   const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
 
-  const renderSectionHeader = ({ section }) => (
+  const renderSectionHeader = ({ section }: any) => (
     <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 

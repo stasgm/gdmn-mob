@@ -78,7 +78,7 @@ const GoodListScreen = () => {
   });
 
   const handleApply = useCallback(
-    (option) => {
+    (option: IListItem) => {
       setVisibleMenu(false);
       setFilteredList({
         searchQuery,

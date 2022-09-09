@@ -239,7 +239,7 @@ export const ScanListScreen = () => {
   };
 
   const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
     [],
   );
 
