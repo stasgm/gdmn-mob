@@ -42,14 +42,18 @@ export const getCurrentUser = async (ctx: ParameterizedContext, next: Next): Pro
 };
 
 export const logout = async (ctx: Context, next: Next): Promise<void> => {
-  const user = ctx.state.user as IUser;
+  if (ctx.state.user) {
+    const user = ctx.state.user as IUser;
 
-  authService.logout(user.id);
+    authService.logout(user.id);
 
-  ctx.logout();
-  ctx.session = null;
+    ctx.logout();
+    ctx.session = null;
 
-  ok(ctx as Context, undefined, `logout: user '${user.name}' (${user.id}) successfully logged out`);
+    ok(ctx as Context, undefined, `logout: user '${user.name}' (${user.id}) successfully logged out`);
+  } else {
+    ok(ctx as Context, undefined, 'logout: the session was over');
+  }
 };
 
 export const verifyCode = async (ctx: ParameterizedContext, next: Next): Promise<void> => {

@@ -35,7 +35,7 @@ const authenticate = async (ctx: Context, next: Next) => {
   }
 
   if (!user) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException('Неверное имя пользователя');
   }
 
   if (user.role === 'User') {

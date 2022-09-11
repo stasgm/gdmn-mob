@@ -8,8 +8,6 @@ import { refSelectors } from '@lib/store';
 
 import { IRefMetadata } from '@lib/types';
 
-// import { keyExtractor } from '@lib/mobile-app';
-
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IGoodMatrix, IMatrixData } from '../../store/types';
 

@@ -36,7 +36,7 @@ const ContactListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
-  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data || [];
 
   const matrix = goodMatrix[0];
 
@@ -62,7 +62,7 @@ const ContactListScreen = () => {
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const sectionTitle = syncDate ? getDateString(syncDate) : '';
+        const sectionTitle = syncDate ? getDateString(syncDate) : getDateString(new Date());
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>

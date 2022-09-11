@@ -22,6 +22,8 @@ import { View, Text, AppState } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 
+import { AuthLogOut } from '@lib/types';
+
 import { useSync } from './hooks';
 import { truncate } from './utils/helpers';
 
@@ -47,16 +49,13 @@ const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
 
   const authDispatch = useAuthThunkDispatch();
 
-  const logout = () => {
-    authDispatch(authActions.logout());
-  };
+  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-        console.log('Middleware');
         //Проверка сессии при фокусе приложения, можно getUser заменить на другую с Middleware
-        api.user.getUser(user!.id, logout);
+        await api.user.getUser(user!.id, authMiddleware);
       }
       appState.current = nextAppState;
     });

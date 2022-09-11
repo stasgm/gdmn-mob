@@ -1,4 +1,4 @@
-import { IUserCredentials, IUserSettings } from '@lib/types';
+import { AuthLogOut, IUserCredentials, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
@@ -22,7 +22,7 @@ const getDeviceByUid = (
   uid: string,
   erpUserId?: string,
   appSystemName?: string,
-  logout?: () => void,
+  logout?: AuthLogOut,
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
@@ -111,7 +111,7 @@ const signup = (
 const login = (
   credentials: IUserCredentials,
   appSystemName?: string,
-  logout?: () => void,
+  logout?: AuthLogOut,
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
