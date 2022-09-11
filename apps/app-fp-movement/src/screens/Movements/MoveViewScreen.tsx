@@ -24,6 +24,8 @@ import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobil
 
 import { sleep } from '@lib/client-api';
 
+import { ScreenState } from '@lib/types';
+
 import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -45,7 +47,7 @@ export const MoveViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -57,7 +59,7 @@ export const MoveViewScreen = () => {
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
 
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
+  const isBlocked = doc?.status !== 'DRAFT';
 
   const goods = refSelectors.selectByName<IGood>('good').data;
   const settings = useSelector((state) => state.settings?.data);
@@ -153,7 +155,9 @@ export const MoveViewScreen = () => {
           await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            navigation.goBack();
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -161,7 +165,7 @@ export const MoveViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
@@ -179,27 +183,23 @@ export const MoveViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation, doc]);
 
-  const handleUseSendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs([doc]);
 
-  const handleSendDoc = useCallback(() => {
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
           setScreenState('sending');
-          setTimeout(() => {
-            if (screenState !== 'idle') {
-              setScreenState('idle');
-            }
-          }, 10000);
-          handleUseSendDoc();
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [handleUseSendDoc, screenState]);
+  }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -230,12 +230,21 @@ export const MoveViewScreen = () => {
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        doc?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+        )
       ) : (
         <View style={styles.buttons}>
           {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
-          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          {!isScanerReader && (
+            <ScanButton
+              onPress={() => navigation.navigate('ScanGood', { docId: id })}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
@@ -243,7 +252,7 @@ export const MoveViewScreen = () => {
       actionsMenu,
       doc?.status,
       handleSaveDocument,
-      handleSendDoc,
+      handleSendDocument,
       id,
       isBlocked,
       isScanerReader,
@@ -366,28 +375,35 @@ export const MoveViewScreen = () => {
     }
   }, [scanned, ref, visibleDialog]);
 
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  } else {
-    if (!doc) {
-      return (
-        <View style={[styles.container, styles.alignItemsCenter]}>
-          <LargeText>Документ не найден</LargeText>
-        </View>
-      );
-    }
+  }
+
+  if (!doc) {
+    return (
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return (

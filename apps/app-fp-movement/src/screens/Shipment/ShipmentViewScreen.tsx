@@ -25,6 +25,8 @@ import { sleep } from '@lib/client-api';
 
 import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
 
+import { ScreenState } from '@lib/types';
+
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
@@ -212,16 +214,20 @@ const ShipmentViewScreen = () => {
       return;
     }
 
-    Alert.alert('Вы уверены, что хотите удалить заявку?', '', [
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
+          setScreenState('deleting');
+          await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS' && tempOrder) {
-            fpDispatch(fpMovementActions.removeTempOrder(tempOrder?.id));
-            setScreenState('deleting');
-            await sleep(500);
-            navigation.goBack();
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            if (tempOrder) {
+              fpDispatch(fpMovementActions.removeTempOrder(tempOrder?.id));
+            }
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -229,7 +235,7 @@ const ShipmentViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, fpDispatch, id, navigation, tempOrder]);
+  }, [docDispatch, fpDispatch, id, tempOrder]);
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
@@ -274,7 +280,7 @@ const ShipmentViewScreen = () => {
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditShipmentHead, handleDeleteShipment]);
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const handleSaveDocument = useCallback(() => {
     dispatch(
@@ -286,46 +292,53 @@ const ShipmentViewScreen = () => {
     navigation.goBack();
   }, [dispatch, id, navigation, shipment]);
 
-  const handleUseSendDoc = useSendDocs([shipment]);
+  const sendDoc = useSendDocs([shipment]);
 
-  const handleSendDoc = useCallback(() => {
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
           setScreenState('sending');
-          setTimeout(() => {
-            if (screenState !== 'idle') {
-              setScreenState('idle');
-            }
-          }, ONE_SECOND_IN_MS);
-          handleUseSendDoc();
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [handleUseSendDoc, screenState]);
+  }, [sendDoc]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        shipment?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        shipment?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          shipment?.status === 'DRAFT' && (
+            <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          )
+        )
       ) : (
         <View style={styles.buttons}>
           {shipment?.status === 'DRAFT' && (
             <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
           )}
-          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          {!isScanerReader && (
+            <ScanButton
+              onPress={() => navigation.navigate('ScanGood', { docId: id })}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
     [
       actionsMenu,
       handleSaveDocument,
-      handleSendDoc,
+      handleSendDocument,
       id,
       isBlocked,
       isScanerReader,
@@ -476,6 +489,13 @@ const ShipmentViewScreen = () => {
     }
   }, [scanned, ref, visibleDialog]);
 
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
+
   const LineTypes = useCallback(
     () => (
       <View style={styles.containerCenter}>
@@ -532,23 +552,23 @@ const ShipmentViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  } else {
-    if (!shipment) {
-      return (
-        <View style={[styles.container, styles.alignItemsCenter]}>
-          <LargeText>Документ не найден</LargeText>
-        </View>
-      );
-    }
+  }
+
+  if (!shipment) {
+    return (
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return (

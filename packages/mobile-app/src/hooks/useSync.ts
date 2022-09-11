@@ -11,7 +11,16 @@ import {
   authActions,
 } from '@lib/store';
 
-import { BodyType, IAppSystem, IDocument, IMessage, IReferences, ISettingsOption, IUserSettings } from '@lib/types';
+import {
+  AuthLogOut,
+  BodyType,
+  IAppSystem,
+  IDocument,
+  IMessage,
+  IReferences,
+  ISettingsOption,
+  IUserSettings,
+} from '@lib/types';
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
 
@@ -35,7 +44,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const docVersion = 1;
   const setVersion = 1;
 
-  const authMiddleware = () => authDispatch(authActions.logout());
+  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
 
   const sync = () => {
     if (!user || !user.erpUser) {
@@ -78,7 +87,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
 
         let appSystem: IAppSystem | undefined;
         if (getErpUser.type === 'ERROR') {
-          errList.push(`Пользователь ERP не определен: ${getErpUser.message}`);
+          errList.push(getErpUser.message);
         }
 
         if (getErpUser.type === 'GET_USER') {

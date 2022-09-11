@@ -177,10 +177,6 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
 
   const sendDoc = useSendDocs(readyDocs);
 
-  const handleSendDocs = async () => {
-    sendDoc();
-  };
-
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -241,21 +237,18 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
             Добавить документ
           </PrimeButton>
         ) : (
-          readyDocs.length > 0 &&
-          !sendLoading && (
+          readyDocs.length > 0 && (
             <PrimeButton
               icon={!sendLoading ? 'file-send' : 'block-helper'}
               onPress={async () => {
-                if (!sendLoading) {
-                  setSendLoading(true);
-                  await handleSendDocs();
-                  setSendLoading(false);
-                }
+                setSendLoading(true);
+                await sendDoc();
+                setSendLoading(false);
               }}
               disabled={sendLoading}
               loadIcon={sendLoading}
             >
-              Отправить
+              {sendLoading ? 'Отправка документов...' : 'Отправить'}
             </PrimeButton>
           )
         )}

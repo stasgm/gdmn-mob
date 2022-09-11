@@ -54,7 +54,7 @@ const ContactListScreen = () => {
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const sectionTitle = syncDate ? getDateString(syncDate) : '';
+        const sectionTitle = syncDate ? getDateString(syncDate) : getDateString(new Date());
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>

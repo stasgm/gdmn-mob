@@ -3,7 +3,6 @@ import { IconButton } from 'react-native-paper';
 
 interface IProps {
   onPress: () => void;
-
   disabled?: boolean;
 }
 

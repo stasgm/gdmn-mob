@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, FlatList, TextInput, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -35,6 +35,8 @@ import {
 
 import { sleep } from '@lib/client-api';
 
+import { ScreenState } from '@lib/types';
+
 import { IScanDocument, IScanLine } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
@@ -46,7 +48,7 @@ export const ScanViewScreen = () => {
 
   const navigation = useNavigation<StackNavigationProp<ScanStackParamList, 'ScanView'>>();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const id = useRoute<RouteProp<ScanStackParamList, 'ScanView'>>().params?.id;
   const doc = docSelectors.selectByDocId<IScanDocument>(id);
@@ -77,7 +79,9 @@ export const ScanViewScreen = () => {
           await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            navigation.goBack();
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -85,10 +89,10 @@ export const ScanViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id]);
 
   const [delList, setDelList] = useState<string[]>([]);
-  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
+  const isDelList = !!Object.keys(delList).length;
 
   const handleDeleteDocs = useCallback(() => {
     const deleteDocs = () => {
@@ -106,31 +110,26 @@ export const ScanViewScreen = () => {
         document: { ...doc, status: 'READY' },
       }),
     );
-    // navigation.goBack();
-  }, [dispatch, id, doc]);
+    navigation.goBack();
+  }, [dispatch, id, doc, navigation]);
 
-  const handleSendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs([doc]);
 
-  const handleSendScanDoc = useCallback(() => {
-    setScreenState('sending');
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
-        onPress: () => {
-          setTimeout(() => {
-            setScreenState('idle');
-          }, 10000);
-          handleSendDoc();
+        onPress: async () => {
+          setScreenState('sending');
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
-        onPress: () => {
-          setScreenState('idle');
-        },
       },
     ]);
-  }, [handleSendDoc]);
+  }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -152,32 +151,39 @@ export const ScanViewScreen = () => {
 
   const renderRight = useCallback(
     () =>
-      isBlocked
-        ? doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-        : screenState !== 'deleting' && (
-            <View style={styles.buttons} pointerEvents={screenState !== 'idle' ? 'none' : 'auto'}>
-              {isDelList ? (
-                <DeleteButton onPress={handleDeleteDocs} />
-              ) : (
-                <>
-                  {doc?.status === 'DRAFT' && (
-                    <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
-                  )}
-                  <SendButton onPress={handleSendScanDoc} disabled={screenState !== 'idle'} />
-                  {!isScanerReader && <ScanButton onPress={() => navigation.navigate('ScanGood', { docId: id })} />}
-
-                  <MenuButton actionsMenu={actionsMenu} />
-                </>
+      isBlocked ? (
+        doc?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+        )
+      ) : (
+        <View style={styles.buttons}>
+          {isDelList ? (
+            <DeleteButton onPress={handleDeleteDocs} />
+          ) : (
+            <>
+              {doc?.status === 'DRAFT' && (
+                <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
               )}
-            </View>
-          ),
+              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+              {!isScanerReader && (
+                <ScanButton
+                  onPress={() => navigation.navigate('ScanGood', { docId: id })}
+                  disabled={screenState !== 'idle'}
+                />
+              )}
+              <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+            </>
+          )}
+        </View>
+      ),
     [
       actionsMenu,
       doc?.status,
       handleDeleteDocs,
       handleSaveDocument,
-      handleSendDoc,
-      handleSendScanDoc,
+      handleSendDocument,
       id,
       isBlocked,
       isDelList,
@@ -211,7 +217,6 @@ export const ScanViewScreen = () => {
     >
       <View style={styles.details}>
         <LargeText style={styles.textBold}>Сканирование {(index + 1)?.toString()}</LargeText>
-
         <MediumText>{shortenString(item.barcode, 30)}</MediumText>
       </View>
     </ListItemLine>
@@ -250,16 +255,23 @@ export const ScanViewScreen = () => {
     }
   }, [scanned, ref]);
 
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -281,11 +293,10 @@ export const ScanViewScreen = () => {
           colorLabel={getStatusColor(doc?.status || 'DRAFT')}
           title={doc?.head?.department?.name || ''}
           onPress={handleEditDocHead}
-          disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(doc.status)}
+          disabled={isDelList || !['DRAFT', 'READY'].includes(doc.status)}
         >
           <View style={styles.rowCenter}>
             <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
-
             {isBlocked ? <MaterialCommunityIcons name="lock-outline" size={20} /> : null}
           </View>
         </InfoBlock>

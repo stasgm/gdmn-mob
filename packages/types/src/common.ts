@@ -36,3 +36,5 @@ export type StatusType =
   | 'PROCESSED_DEADLOCK';
 
 export type BodyType = 'CMD' | 'REFS' | 'DOCS' | 'SETTINGS';
+
+export type ScreenState = 'idle' | 'sending' | 'sent' | 'deleting' | 'deleted';
