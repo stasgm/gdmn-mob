@@ -97,6 +97,13 @@ const SelectRefItemScreen = () => {
           ...(prev as IReferenceData[]),
           { id: item.id, name: item.name, shcode: item.shcode },
         ]);
+      } else if (checkedItem.find((i) => i.id === item.id)) {
+        setCheckedItem([]);
+        dispatch(
+          appActions.setFormParams({
+            [fieldName]: undefined,
+          }),
+        );
       } else {
         setScreenState('saving');
         dispatch(
@@ -107,7 +114,7 @@ const SelectRefItemScreen = () => {
         navigation.goBack();
       }
     },
-    [isMulti, dispatch, fieldName, navigation],
+    [isMulti, checkedItem, dispatch, fieldName, navigation],
   );
 
   const renderItem = useCallback(

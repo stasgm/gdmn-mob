@@ -82,14 +82,13 @@ export const SelectRefItemScreen = () => {
       } else {
         dispatch(
           appActions.setFormParams({
-            ...formParams,
             [fieldName]: { id: item.id, name: item.name },
           }),
         );
         navigation.goBack();
       }
     },
-    [isMulti, dispatch, formParams, fieldName, navigation],
+    [isMulti, dispatch, fieldName, navigation],
   );
 
   const renderItem = useCallback(

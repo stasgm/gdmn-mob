@@ -58,8 +58,7 @@ export const DocEditScreen = () => {
     if (!docDepartment) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['department']: department?.name,
+          department: department?.name,
         }),
       );
     }

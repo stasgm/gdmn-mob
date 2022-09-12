@@ -97,19 +97,21 @@ const SelectRefItemScreen = () => {
     (item: IReferenceData) => {
       if (isMulti) {
         setCheckedItem((prev) => [...(prev as IReferenceData[]), item]);
+      } else if (checkedItem.find((i) => i.id === item.id)) {
+        setCheckedItem([]);
+        dispatch(
+          appActions.setFormParams({
+            [fieldName]: undefined,
+          }),
+        );
       } else {
-        const isItemChecked = checkedItem.find((i) => i.id === item.id);
-        if (isItemChecked) {
-          setCheckedItem([]);
-        } else {
-          setScreenState('saving');
-          dispatch(
-            appActions.setFormParams({
-              [fieldName]: item,
-            }),
-          );
-          navigation.goBack();
-        }
+        setScreenState('saving');
+        dispatch(
+          appActions.setFormParams({
+            [fieldName]: item,
+          }),
+        );
+        navigation.goBack();
       }
     },
     [isMulti, checkedItem, dispatch, fieldName, navigation],

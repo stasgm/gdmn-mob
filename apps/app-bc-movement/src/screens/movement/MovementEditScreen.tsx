@@ -59,8 +59,7 @@ export const MovementEditScreen = () => {
     if (!docFromPlace) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['department']: fromPlace?.name,
+          department: fromPlace?.name,
         }),
       );
     }
@@ -71,8 +70,7 @@ export const MovementEditScreen = () => {
     if (!docToPlace) {
       dispatch(
         appActions.setFormParams({
-          ...formParams,
-          ['department']: toPlace?.name,
+          department: toPlace?.name,
         }),
       );
     }
