@@ -244,6 +244,7 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
                 setSendLoading(true);
                 await sendDoc();
                 setSendLoading(false);
+                navigation.navigate('RouteView', { id: route.id });
               }}
               disabled={sendLoading}
               loadIcon={sendLoading}
