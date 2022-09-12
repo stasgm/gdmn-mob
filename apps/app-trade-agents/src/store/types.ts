@@ -37,6 +37,10 @@ export interface IRouteFormParam extends IFormParam {
   routeItemId?: number;
 }
 
+export interface IGroupFormParam extends IFormParam {
+  goodItemId?: number;
+}
+
 export interface ISellBillFormParam extends IFormParam {
   dateBegin?: string;
   dateEnd?: string;

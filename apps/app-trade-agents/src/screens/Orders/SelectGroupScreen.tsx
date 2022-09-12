@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
@@ -26,9 +26,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { IListItem } from '@lib/mobile-types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
-import { IGood, IGoodMatrix, IGoodGroup, IMGroupModel, IOrderDocument } from '../../store/types';
-import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
-import { UNKNOWN_GROUP, viewTypeList } from '../../utils/constants';
+import { IGood, IGoodMatrix, IGoodGroup, IMGroupModel, IOrderDocument, IGroupFormParam } from '../../store/types';
+import { getGoodMatrixByContact, getGroupModelByContact, getItemLayout, viewabilityConfig } from '../../utils/helpers';
+import { ROUTE_ITEM_HEIGHT, UNKNOWN_GROUP, viewTypeList } from '../../utils/constants';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -42,11 +42,11 @@ interface IProp {
 }
 
 const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IProp) => {
-  const refListGood = React.useRef<FlatList<IGood>>(null);
-  useScrollToTop(refListGood);
+  // const refListGood = React.useRef<FlatList<IGood>>(null);
+  // useScrollToTop(refListGood);
 
-  const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
-  useScrollToTop(refListGroups);
+  // const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
+  // useScrollToTop(refListGroups);
 
   const nextLevelGroups = useMemo(() => model[item.id]?.children?.map((gr) => gr.group) || [], [item.id, model]);
 
@@ -105,9 +105,34 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
   const refList = React.useRef<FlatList<IGood>>(null);
   useScrollToTop(refList);
 
+  //Первый элемент из списка точек маршрута
+  const goodItemId = useSelector((state) => state.app.formParams as IGroupFormParam)?.goodItemId || 0;
+  const dispatch = useDispatch();
+  console.log('goodItemId', goodItemId);
+
+  //Первый элемент записывается в параметры формы при прокрутке списка точек маршрута
+  //При возвращении с окна визита, переходит на этот эелемент (initialScrollIndex)
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: any) => {
+      if (viewableItems?.length) {
+        console.log('viewableItems', viewableItems[0].index);
+        dispatch(
+          appActions.setFormParams({
+            goodItemId: viewableItems[0].index,
+          }),
+        );
+      }
+    },
+    [dispatch],
+  );
+
+  const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+
+  const getItemLayoutRoute = (_: any, index: number) => getItemLayout(index, 72);
+
   return (
     <View key={item.id}>
-      <TouchableOpacity style={localStyles.item} onPress={handlePressGroup}>
+      <TouchableOpacity style={[localStyles.item]} onPress={handlePressGroup}>
         <View style={styles.details}>
           <LargeText style={styles.textBold}>{item.name || item.name}</LargeText>
           {nextLevelGroups?.length === 0 && (
@@ -121,18 +146,23 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
       </TouchableOpacity>
       {goodModel.length > 0 && isExpand && (
         <FlatList
-          ref={refList}
+          // style={{ backgroundColor: 'green' }}
+          // ref={refList}
           data={goodModel}
           renderItem={renderGood}
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
+          initialScrollIndex={goodItemId}
+          getItemLayout={getItemLayoutRoute}
+          viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         />
       )}
       {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && nextLevelGroups && nextLevelGroups?.length > 0 && (
         <View style={localStyles.marginLeft}>
           <FlatList
-            ref={refListGroups}
+            // style={{ backgroundColor: '#06567D' }}
+            // ref={refListGroups}
             data={nextLevelGroups}
             keyExtractor={keyExtractor}
             renderItem={renderGroup}
@@ -159,7 +189,7 @@ const Good = ({ item, onPress, quantity }: IGoodProp) => {
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={localStyles.item}>
+      <View style={[localStyles.item, { height: 72 }]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
@@ -421,6 +451,6 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 2,
-    height: 86,
+    height: 72,
   },
 });
