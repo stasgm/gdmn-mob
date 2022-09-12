@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "Debug server",
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "args": ["src/index.ts"],
       "runtimeArgs": ["-r", "ts-node/register"],
