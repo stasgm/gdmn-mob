@@ -16,6 +16,7 @@ import {
   LargeText,
   MediumText,
   PrimeButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { getDateString, keyExtractor } from '@lib/mobile-app';
@@ -25,7 +26,6 @@ import { IApplDocument, IApplLine } from '../../store/types';
 import { ApplsStackParamList } from '../../navigation/Root/types';
 
 import ApplItem from './components/ApplItem';
-import { navBackButton } from './components/navigateOptions';
 
 const ApplViewScreen = () => {
   const { colors } = useTheme();

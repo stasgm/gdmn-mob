@@ -19,6 +19,7 @@ import {
   AppActivityIndicator,
   SearchButton,
   MediumText,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { documentActions, useDispatch, useSelector } from '@lib/store';
@@ -31,7 +32,6 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IScanDocument } from '../../store/types';
 import { ScanStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -226,19 +226,20 @@ export const ScanListScreen = () => {
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
-      >
-        <View>
-          <MediumText>{doc.head.department?.name || ''}</MediumText>
-          <MediumText>
-            № {doc.number} на {getDateString(doc.documentDate)}
-          </MediumText>
-        </View>
-      </ScreenListItem>
+        addInfo={
+          <View>
+            <MediumText>{doc.head.department?.name || ''}</MediumText>
+            <MediumText>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </MediumText>
+          </View>
+        }
+      />
     ) : null;
   };
 
   const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
     [],
   );
 

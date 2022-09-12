@@ -5,7 +5,7 @@ import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@r
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
-import { AppScreen, BackButton, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, navBackButton, SearchButton, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
@@ -70,7 +70,8 @@ export const SelectGoodScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />,
     });
   }, [navigation, filterVisible, colors.card]);

@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -16,11 +15,11 @@ export const MovementNavigator = (props: any) => {
 
   return (
     <Stack.Navigator initialRouteName="MovementList" screenOptions={{ headerShown: true, title: titleDoc }}>
-      {Object.entries({ ...movementListScreens, ...movementScreens }).map(([name, component]) => (
+      {Object.entries({ ...movementListScreens, ...movementScreens }).map(([nameScreen, component]) => (
         <Stack.Screen
-          name={name as keyof MovementStackParamList}
+          name={nameScreen as keyof MovementStackParamList}
           component={component}
-          key={name}
+          key={nameScreen}
           initialParams={{ docType: nameDocument }}
         />
       ))}

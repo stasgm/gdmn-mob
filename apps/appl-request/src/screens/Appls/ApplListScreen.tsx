@@ -13,6 +13,7 @@ import {
   SearchButton,
   EmptyList,
   AppActivityIndicator,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { Searchbar } from 'react-native-paper';
@@ -22,7 +23,6 @@ import { getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
 import { IApplDocument } from '../../store/types';
 
 import ApplListItem, { ApplListRenderItemProps } from './components/ApplListItem';
-import { navBackDrawer } from './components/navigateOptions';
 
 export interface ApplListSectionProps {
   title: string;
@@ -156,11 +156,11 @@ const ApplListScreen = () => {
         keyExtractor={keyExtractor}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={EmptyList}
-        removeClippedSubviews={true} // Unmount components when outside of window
+        removeClippedSubviews={true}
         initialNumToRender={6}
-        maxToRenderPerBatch={6} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
+        maxToRenderPerBatch={6}
+        updateCellsBatchingPeriod={100}
+        windowSize={7}
       />
     </AppScreen>
   );

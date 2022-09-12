@@ -3,7 +3,14 @@ import { View, FlatList, TouchableOpacity, Text } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 
-import { AppScreen, ScanButton, ItemSeparator, BackButton, globalStyles as styles, SearchButton } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ScanButton,
+  ItemSeparator,
+  globalStyles as styles,
+  SearchButton,
+  navBackButton,
+} from '@lib/mobile-ui';
 import { docSelectors, useSelector } from '@lib/store';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -115,7 +122,8 @@ export const SelectRemainsScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <View style={styles.buttons}>
           <SearchButton onPress={() => setFilterVisible((prev) => !prev)} visible={true} />

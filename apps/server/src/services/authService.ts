@@ -35,7 +35,7 @@ const authenticate = async (ctx: Context, next: Next) => {
   }
 
   if (!user) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException('Неверное имя пользователя');
   }
 
   if (user.role === 'User') {
@@ -100,19 +100,19 @@ const validateAuthCreds: VerifyFunction = async (name: string, password: string,
   const user = userService.findByName(name);
 
   if (!user) {
-    return done(new Error('Неверные данные'));
+    return done(new Error(`Не найден пользователь: ${name}`));
   }
 
   const hashedPassword = userService.getUserPassword(user.id);
 
   if (!hashedPassword) {
-    throw new UnauthorizedException('Неверные данные');
+    throw new UnauthorizedException(`Не найден хэш пароля для пользователя: ${name}`);
   }
 
   if (await compare(password, hashedPassword)) {
     done(null, user);
   } else {
-    done(new UnauthorizedException('Неверные данные'));
+    done(new UnauthorizedException('Неверный пароль'));
   }
 };
 

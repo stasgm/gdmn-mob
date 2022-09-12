@@ -1,12 +1,11 @@
 import React, { useCallback, useLayoutEffect } from 'react';
 import { Alert, View, StyleSheet } from 'react-native';
 import { Avatar, Divider } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation, useTheme } from '@react-navigation/native';
 
 import { authActions, useSelector, useDispatch, documentActions, referenceActions, appActions } from '@lib/store';
 
 import {
-  DrawerButton,
   MenuButton,
   PrimeButton,
   DescriptionItem,
@@ -16,10 +15,9 @@ import {
   globalStyles,
   LargeText,
   Switch,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 import api from '@lib/client-api';
-
-import { useTheme } from '@react-navigation/native';
 
 const ProfileScreen = () => {
   const { colors } = useTheme();
@@ -83,7 +81,7 @@ const ProfileScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);

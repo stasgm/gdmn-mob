@@ -48,7 +48,7 @@ const getDevice = async (ctx: ParameterizedContext): Promise<void> => {
     throw new DataNotFoundException('Устройство не найдено');
   }
 
-  ok(ctx as Context, device, `getDevice: device '${device.name}' is successfully received`);
+  ok(ctx as Context, device, `getDevice: device '${device.name}' ('${device.uid}') is successfully received`);
 };
 
 const getDevices = async (ctx: ParameterizedContext): Promise<void> => {

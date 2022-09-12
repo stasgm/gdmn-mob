@@ -4,7 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, useDispatch } from '@lib/store';
-import { SaveButton, BackButton, globalStyles as styles } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, navBackButton } from '@lib/mobile-ui';
 
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocLine } from '../../store/types';
@@ -27,7 +27,8 @@ export const DocLineScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <View style={styles.buttons}>
           <SaveButton onPress={handleSave} />

@@ -8,9 +8,9 @@ export const deviceMiddleware = async (ctx: Context, next: Next) => {
   // Проверяем идентификатор только у пользователей с правами User
   const user = ctx.state.user as IUser;
 
-  if (!user) {
-    throw new UnauthorizedException('Неверные данные');
-  }
+  // if (!user) {
+  //   throw new UnauthorizedException('Не пройдена аутентификация');
+  // }
 
   if (user?.role === 'User') {
     const deviceId = ctx.query.deviceId;

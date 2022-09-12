@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, View, FlatList } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { docSelectors, documentActions, refSelectors, useDispatch, useDocThunkDispatch } from '@lib/store';
@@ -16,21 +16,24 @@ import {
   DeleteButton,
   CloseButton,
   LargeText,
+  navBackButton,
+  ItemSeparator,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
-import { IDocument } from '@lib/types';
+import { IDocument, ScreenState } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
+
+import { useTheme } from 'react-native-paper';
 
 import { IDebt, IOrderDocument, IOrderLine, IOutlet } from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
@@ -43,20 +46,21 @@ const OrderViewScreen = () => {
 
   const dispatch = useDispatch();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting' | 'sent'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [delList, setDelList] = useState<string[]>([]);
+  const isDelList = !!Object.keys(delList).length;
 
-  const [isGroupVisible, setIsGroupVisible] = useState(false);
+  const [isGroupVisible, setIsGroupVisible] = useState(true);
 
   const order = docSelectors.selectByDocId<IOrderDocument>(id);
 
-  const isBlocked = useMemo(() => order?.status !== 'DRAFT', [order?.status]);
+  const isBlocked = order?.status !== 'DRAFT';
 
   const debt = refSelectors.selectByRefId<IDebt>('debt', order?.head?.contact.id);
 
   const { colors } = useTheme();
 
-  const debtTextStyle = { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.notification : colors.text };
+  const debtTextStyle = { color: debt?.saldoDebt && debt?.saldoDebt > 0 ? colors.error : colors.text };
 
   const address = refSelectors.selectByRefId<IOutlet>('outlet', order?.head?.outlet.id)?.address;
 
@@ -102,7 +106,9 @@ const OrderViewScreen = () => {
           await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            navigation.goBack();
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -110,7 +116,7 @@ const OrderViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id]);
 
   const handleAddDeletelList = useCallback(
     (lineId: string, checkedId: string) => {
@@ -141,30 +147,40 @@ const OrderViewScreen = () => {
     ]);
   }, [delList, dispatch, id]);
 
-  const handleSendDoc = useSendDocs([order]);
+  const sendDoc = useSendDocs([order]);
+
+  const handleSendDocument = useCallback(() => {
+    Alert.alert('Вы уверены, что хотите отправить документ?', '', [
+      {
+        text: 'Да',
+        onPress: async () => {
+          setScreenState('sending');
+          await sendDoc();
+          setScreenState('sent');
+        },
+      },
+      {
+        text: 'Отмена',
+      },
+    ]);
+  }, [sendDoc]);
+
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...order, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, order]);
 
   useEffect(() => {
-    if (screenState === 'sending') {
-      Alert.alert('Вы уверены, что хотите отправить документ?', '', [
-        {
-          text: 'Да',
-          onPress: () => {
-            handleSendDoc();
-            setScreenState('sent');
-          },
-        },
-        {
-          text: 'Отмена',
-          onPress: () => {
-            setScreenState('idle');
-          },
-        },
-      ]);
-    } else if (screenState === 'sent' && order?.head?.route?.id) {
+    if (screenState === 'sent' || screenState === 'deleted') {
       setScreenState('idle');
       navigation.goBack();
     }
-  }, [handleSendDoc, navigation, order?.head?.route?.id, screenState]);
+  }, [navigation, screenState]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -195,67 +211,73 @@ const OrderViewScreen = () => {
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        order?.status === 'READY' && (
-          <SendButton onPress={() => setScreenState('sending')} disabled={screenState !== 'idle'} />
+        order?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          order?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
-          {delList.length > 0 ? (
+          {isDelList ? (
             <DeleteButton onPress={handleDeleteDocLine} />
           ) : (
             <>
-              <SendButton onPress={() => setScreenState('sending')} disabled={screenState !== 'idle'} />
+              {order?.status === 'DRAFT' && (
+                <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+              )}
+              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
               <AddButton onPress={handleAddOrderLine} disabled={screenState !== 'idle'} />
               <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
         </View>
       ),
-    [isBlocked, order?.status, screenState, delList.length, handleDeleteDocLine, handleAddOrderLine, actionsMenu],
+    [
+      isBlocked,
+      order?.status,
+      handleSendDocument,
+      screenState,
+      handleSaveDocument,
+      isDelList,
+      handleDeleteDocLine,
+      handleAddOrderLine,
+      actionsMenu,
+    ],
   );
 
   const renderLeft = useCallback(
-    () => !isBlocked && delList.length > 0 && <CloseButton onPress={() => setDelList([])} />,
-    [delList.length, isBlocked],
+    () => !isBlocked && isDelList && <CloseButton onPress={() => setDelList([])} />,
+    [isDelList, isBlocked],
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: delList.length > 0 ? renderLeft : navBackButton,
+      headerLeft: isDelList ? renderLeft : navBackButton,
       headerRight: renderRight,
-      title: delList.length > 0 ? `Выделено позиций: ${delList.length}` : 'Заявка',
+      title: isDelList ? `Выделено позиций: ${delList.length}` : 'Заявка',
     });
-  }, [delList.length, navigation, renderLeft, renderRight]);
+  }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
   const handlePressOrderLine = useCallback(
     (item: IOrderLine) => !isBlocked && navigation.navigate('OrderLine', { mode: 1, docId: id, item }),
     [id, isBlocked, navigation],
   );
 
-  const handleSwipeOrder = () =>
-    dispatch(
-      documentActions.updateDocument({
-        docId: id,
-        document: { ...order, status: order.status === 'DRAFT' ? 'READY' : 'DRAFT' },
-      }),
-    );
-
   const renderItem = useCallback(
-    ({ item, index }: { item: IOrderLine; index: number }) => {
+    ({ item }: { item: IOrderLine }) => {
       const checkedId = delList.find((i) => i === item.id) || '';
       return (
         <OrderItem
-          sortId={index}
           key={item.id}
           item={item}
           onPress={() => handlePressOrderLine(item)}
           isChecked={checkedId ? true : false}
           onLongPress={() => handleAddDeletelList(item.id, checkedId)}
-          isDelList={delList.length > 0 ? true : false}
+          isDelList={isDelList}
         />
       );
     },
-    [delList, handleAddDeletelList, handlePressOrderLine],
+    [delList, handleAddDeletelList, handlePressOrderLine, isDelList],
   );
 
   const isFocused = useIsFocused();
@@ -263,11 +285,11 @@ const OrderViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -289,11 +311,8 @@ const OrderViewScreen = () => {
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}
           onPress={handleEditOrderHead}
-          disabled={delList.length > 0 || !['DRAFT', 'READY'].includes(order.status)}
+          disabled={isDelList || !['DRAFT', 'READY'].includes(order.status)}
           isBlocked={isBlocked}
-          onSwipeOpen={handleSwipeOrder}
-          onSwipeClose={handleSwipeOrder}
-          isSwipeable={!(delList.length > 0 || !['DRAFT', 'READY'].includes(order.status))}
         >
           <View style={styles.directionColumn}>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
@@ -301,16 +320,17 @@ const OrderViewScreen = () => {
             )}`}</MediumText>
             <MediumText>Адрес: {address}</MediumText>
             <MediumText style={debtTextStyle}>
-              {(debt?.saldo && debt?.saldo < 0
-                ? `Предоплата: ${formatValue({ type: 'number', decimals: 2 }, Math.abs(debt?.saldo) ?? 0)}`
-                : `Задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
+              {(!!debt?.saldo && debt.saldo < 0
+                ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`
+                : `Задолженность: ${formatValue({ type: 'currency', decimals: 2 }, debt?.saldo ?? 0)}`) || 0}
             </MediumText>
-            <MediumText>
-              {`Просроченная задолженность: ${formatValue({ type: 'number', decimals: 2 }, debt?.saldoDebt ?? 0)}` || 0}
-            </MediumText>
-            <View style={styles.rowCenter}>
-              <MediumText>Количество дней: {debt?.dayLeft || 0}</MediumText>
-            </View>
+            {!!debt?.saldoDebt && (
+              <MediumText>
+                {`Просрочено: ${formatValue({ type: 'currency', decimals: 2 }, debt.saldoDebt)}, ${
+                  debt.dayLeft || 0
+                } дн.`}
+              </MediumText>
+            )}
             {order.head.comment ? (
               <View style={styles.rowCenter}>
                 <MediumText>Комментарий: {order.head.comment || ''}</MediumText>
@@ -326,16 +346,12 @@ const OrderViewScreen = () => {
           maxToRenderPerBatch={6}
           updateCellsBatchingPeriod={100}
           windowSize={7}
+          ItemSeparatorComponent={ItemSeparator}
         />
-
-        {order.lines.length ? (
-          <OrderTotal
-            onPress={() => setIsGroupVisible(!isGroupVisible)}
-            isGroupVisible={isGroupVisible}
-            order={order}
-          />
-        ) : null}
       </View>
+      {!!order.lines.length && (
+        <OrderTotal onPress={() => setIsGroupVisible(!isGroupVisible)} isGroupVisible={isGroupVisible} order={order} />
+      )}
     </>
   );
 };

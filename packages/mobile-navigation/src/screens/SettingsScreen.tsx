@@ -4,7 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { Divider, IconButton } from 'react-native-paper';
 import { useNavigation, useTheme } from '@react-navigation/native';
 import { baseSettingGroup, settingsActions, useDispatch, useSelector } from '@lib/store';
-import { DrawerButton, MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText } from '@lib/mobile-ui';
+import { MenuButton, useActionSheet, SettingsGroup, AppScreen, MediumText, navBackDrawer } from '@lib/mobile-ui';
 import { INamedEntity, ISettingsOption, Settings, SettingValue } from '@lib/types';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -73,7 +73,7 @@ const SettingsScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation, actionsMenu]);

@@ -6,12 +6,12 @@ import { INamedEntity } from '@lib/types';
 import { appActions, refSelectors, useSelector } from '@lib/store';
 import {
   AppScreen,
-  BackButton,
   ItemSeparator,
   SaveButton,
   SearchButton,
   SubTitle,
   globalStyles as styles,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-app';
@@ -102,7 +102,8 @@ export const SelectRefItemScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <View style={styles.buttons}>
           <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />

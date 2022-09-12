@@ -5,6 +5,7 @@ import {
   EmptyList,
   globalStyles as styles,
   ItemSeparator,
+  navBackDrawer,
   SearchButton,
   SubTitle,
 } from '@lib/mobile-ui';
@@ -15,8 +16,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SectionList, SectionListData, View, Alert } from 'react-native';
 import { Searchbar } from 'react-native-paper';
-
-import { navBackDrawer } from '../../components/navigateOptions';
 
 import { GoodMatrixStackParamList } from '../../navigation/Root/types';
 import { IContact, IGoodMatrix } from '../../store/types';
@@ -37,9 +36,9 @@ const ContactListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
   const { colors } = useTheme();
 
-  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data;
+  const goodMatrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data || [];
 
-  const matrix = refSelectors.selectByName<IGoodMatrix>('goodMatrix')?.data[0];
+  const matrix = goodMatrix[0];
 
   const contacts = refSelectors.selectByName<IContact>('contact')?.data?.filter((i) => matrix?.[i.id]);
 
@@ -63,7 +62,7 @@ const ContactListScreen = () => {
   const sections = useMemo(
     () =>
       filteredList.reduce<SectionDataProps>((prev, item) => {
-        const sectionTitle = syncDate ? getDateString(syncDate) : '';
+        const sectionTitle = syncDate ? getDateString(syncDate) : getDateString(new Date());
         const sectionExists = prev.some(({ title }) => title === sectionTitle);
         if (sectionExists) {
           return prev.map((section) =>
@@ -102,9 +101,8 @@ const ContactListScreen = () => {
 
   const renderItem = ({ item }: { item: IContact }) => <ContactItem item={item} />;
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const isFocused = useIsFocused();

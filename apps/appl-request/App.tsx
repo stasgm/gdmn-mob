@@ -72,7 +72,6 @@ const Root = () => {
   }, [isDemo, getMessages, connectionStatus]);
 
   useEffect(() => {
-    // console.log('useEffect loadGlobalDataFromDisc');
     // dispatch(authActions.init());
     dispatch(appActions.loadGlobalDataFromDisc());
     // eslint-disable-next-line react-hooks/exhaustive-deps

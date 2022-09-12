@@ -12,6 +12,8 @@ import { useNavigation } from '@react-navigation/native';
 
 import { documentsMock } from '@lib/mock';
 
+import { navBackDrawer } from '@lib/mobile-ui';
+
 import DocumentListScreen from '../../screens/Documents/DocumentListScreen';
 
 import { TabsStackParams } from './types';
@@ -52,7 +54,7 @@ const TabsNavigator = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [actionsMenu, navigation]);

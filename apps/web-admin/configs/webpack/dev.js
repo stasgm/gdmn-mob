@@ -19,9 +19,8 @@ module.exports = merge(commonConfig, {
   devServer: {
     host: server.name,
     port: 8080,
-    hot: true, // enable HMR on the server
     open: true,
-    contentBase: './',
+    static: './',
     historyApiFallback: true,
   },
   resolve: {

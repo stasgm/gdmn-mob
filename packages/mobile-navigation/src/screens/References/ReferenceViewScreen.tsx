@@ -2,7 +2,7 @@ import React, { useState, useMemo, useLayoutEffect, useEffect } from 'react';
 import { View, FlatList } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 import { useScrollToTop, RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { SubTitle, ItemSeparator, BackButton, SearchButton, AppScreen } from '@lib/mobile-ui';
+import { SubTitle, ItemSeparator, SearchButton, AppScreen, navBackButton } from '@lib/mobile-ui';
 
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
@@ -38,7 +38,7 @@ const ReferenceViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
       headerRight: () => <SearchButton visible={filterVisible} onPress={() => setFilterVisible((prev) => !prev)} />,
     });
   }, [navigation, filterVisible]);

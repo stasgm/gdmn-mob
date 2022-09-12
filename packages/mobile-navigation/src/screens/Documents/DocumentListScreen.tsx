@@ -3,15 +3,15 @@ import { FlatList, RefreshControl, Text } from 'react-native';
 
 import { IDocument } from '@lib/types';
 import { useDispatch, useSelector, documentActions } from '@lib/store';
-import { useNavigation } from '@react-navigation/core';
+import { useNavigation } from '@react-navigation/native';
 import { documentsMock } from '@lib/mock';
 import {
   MenuButton,
-  DrawerButton,
   AppScreen,
   useActionSheet,
   globalStyles as styles,
   ItemSeparator,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 /*
 import { useRoute, RouteProp } from '@react-navigation/native';
@@ -56,7 +56,7 @@ const DocumentListScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <DrawerButton />,
+      headerLeft: navBackDrawer,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
     });
   }, [navigation]);

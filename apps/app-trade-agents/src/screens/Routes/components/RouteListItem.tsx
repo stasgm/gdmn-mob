@@ -10,7 +10,7 @@ import { IRouteDocument } from '../../../store/types';
 import { getStatusColor } from '../../../utils/constants';
 
 const RouteListItem = ({ item, onPress }: { item: IRouteDocument; onPress: () => void }) => {
-  const todayStr = new Date(item.documentDate).getDate() === new Date().getDate() ? ' (сегодня)' : '';
+  const todayStr = getDateString(item.documentDate) === getDateString(new Date()) ? ' (сегодня)' : '';
 
   return (
     <TouchableHighlight activeOpacity={0.7} underlayColor="#DDDDDD" onPress={onPress}>

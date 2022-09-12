@@ -49,6 +49,7 @@ export const ScanBarcodeReader = ({ onSave, getScannedObject }: IProps) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () => (
         <IconButton
           icon={vibroMode ? 'vibrate' : 'vibrate-off'}

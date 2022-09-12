@@ -1,13 +1,8 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { IListItem } from '@lib/mobile-types';
 import { TouchableHighlight } from '@gorhom/bottom-sheet';
-
-// type IListItem = {
-//   id: string;
-//   value: string;
-// };
 
 type Props = {
   options: IListItem[];
@@ -17,15 +12,12 @@ type Props = {
 };
 
 const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) => {
-  const onPress = useCallback(
-    (option) => {
-      if (option.id === activeButtonId) {
-        return;
-      }
-      onChange(option);
-    },
-    [onChange, activeButtonId],
-  );
+  const onPress = (option: IListItem) => {
+    if (option.id === activeButtonId) {
+      return;
+    }
+    onChange(option);
+  };
 
   return (
     <View
@@ -39,9 +31,7 @@ const RadioGroup = ({ options, onChange, activeButtonId, directionRow }: Props) 
           <TouchableHighlight
             activeOpacity={0.4}
             key={option.id}
-            style={[
-              localStyles.item /* , { borderColor: activeButtonId === option.id ? colors.primary : 'transparent' } */,
-            ]}
+            style={[localStyles.item]}
             underlayColor="#DDDDDD"
             onPress={() => onPress(option)}
           >

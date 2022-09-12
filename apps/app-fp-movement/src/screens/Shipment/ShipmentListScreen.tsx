@@ -17,6 +17,7 @@ import {
   CloseButton,
   EmptyList,
   MediumText,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -29,7 +30,6 @@ import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { IShipmentDocument } from '../../store/types';
 import { ShipmentStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface ShipmentListSectionProps {
@@ -86,10 +86,9 @@ export const ShipmentListScreen = () => {
           title: i.documentType.description || '',
           documentDate: getDateString(i.documentDate),
           status: i.status,
-          // subtitle: `№ ${i.number} на ${getDateString(i.head?.onDate)}`,
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-          children: (
+          addInfo: (
             <View>
               <MediumText>{i.head.outlet?.name || ''}</MediumText>
               <MediumText>
@@ -127,20 +126,20 @@ export const ShipmentListScreen = () => {
   const [visibleFilterStatus, setVisibleFilterStatus] = useState(false);
   const [visibleSortDate, setVisibleSortDate] = useState(false);
 
-  const handleApplyFilterType = useCallback((option) => {
+  const handleApplyFilterType = (option: IListItem) => {
     setVisibleFilterType(false);
     setFilterDocType(option);
-  }, []);
+  };
 
-  const handleApplyFilterStatus = useCallback((option) => {
+  const handleApplyFilterStatus = (option: any) => {
     setVisibleFilterStatus(false);
     setFilterStatus(option.id);
-  }, []);
+  };
 
-  const handleApplySortDate = useCallback((option) => {
+  const handleApplySortDate = (option: IListItem) => {
     setVisibleSortDate(false);
     setSortDateType(option);
-  }, []);
+  };
 
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
@@ -159,7 +158,7 @@ export const ShipmentListScreen = () => {
   const handleAddDocument = useCallback(
     (item: IListItem) => {
       setVisibleDocTypeMenu(false);
-      navigation.navigate('ScanOrder', { id: item.id });
+      navigation.navigate('ScanOrder', { docTypeId: item.id });
     },
     [navigation],
   );
@@ -215,9 +214,8 @@ export const ShipmentListScreen = () => {
     />
   );
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const isFocused = useIsFocused();

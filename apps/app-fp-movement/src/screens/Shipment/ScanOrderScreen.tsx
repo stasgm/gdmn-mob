@@ -10,25 +10,31 @@ import { generateId } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { AppActivityIndicator, AppDialog, globalStyles, LargeText } from '@lib/mobile-ui';
+import {
+  AppActivityIndicator,
+  globalStyles,
+  LargeText,
+  navBackButton,
+  ScanBarcode,
+  ScanBarcodeReader,
+} from '@lib/mobile-ui';
 
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+
+import { IScannedObject } from '@lib/client-types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IOrderDocument, IShipmentDocument, ITempDocument } from '../../store/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 import { ICodeEntity } from '../../store/app/types';
 
 import { actions as fpActions } from '../../store/app/actions';
 import { useSelector as useFpSelector } from '../../store/index';
 
-import { ScanBarcode } from './components/ScanBarcode';
-import { ScanBarcodeReader } from './components/ScanBarcodeReader';
-import styles from './components/ScanBarcode/styles';
+import { barCodeTypes } from '../../utils/constants';
 
 const ScanOrderScreen = () => {
-  const docTypeId = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params?.id;
+  const docTypeId = useRoute<RouteProp<ShipmentStackParamList, 'ScanOrder'>>().params?.docTypeId;
 
   const navigation = useNavigation<StackNavigationProp<ShipmentStackParamList, 'ScanOrder'>>();
   const settings = useSelector((state) => state.settings?.data);
@@ -36,10 +42,6 @@ const ScanOrderScreen = () => {
   const dispatch = useDispatch();
 
   const isScanerReader = settings.scannerUse?.data;
-
-  const [visibleDialog, setVisibleDialog] = useState(false);
-  const [barcode, setBarcode] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -61,68 +63,67 @@ const ScanOrderScreen = () => {
 
   const [scannedObject, setScannedObject] = useState<IOrderDocument>();
 
-  const handleSaveScannedItem = useCallback(
-    (item: IOrderDocument) => {
-      const shipment = shipments.find((i) => i.head.orderId === item.id);
+  const handleSaveScannedItem = useCallback(() => {
+    if (!scannedObject) {
+      return;
+    }
 
-      if (shipment) {
-        navigation.dispatch(
-          StackActions.replace('ShipmentView', {
-            id: shipment.id,
-          }),
-        );
-        return;
-      }
+    const shipment = shipments.find((i) => i.head.orderId === scannedObject.id);
 
-      const tempOrder = tempOrders.find((i) => i.orderId === item.head.orderId);
-      if (!tempOrder) {
-        const newTempOrder: ITempDocument = {
-          id: generateId(),
-          orderId: item.id,
-          lines: item.lines,
-        };
-
-        dispatch(fpActions.addTempOrder(newTempOrder));
-      }
-
-      const shipmentDoc: IShipmentDocument = {
-        id: generateId(),
-        documentType: shipmentType!,
-        number: item.number,
-        documentDate: new Date().toISOString(),
-        status: 'DRAFT',
-        head: {
-          barcode: item.head.barcode,
-          contact: item.head.contact,
-          depart: depart,
-          outlet: item.head.outlet,
-          onDate: item.head.onDate,
-          orderId: item.id,
-        },
-        lines: [],
-        creationDate: new Date().toISOString(),
-        editionDate: new Date().toISOString(),
-      };
-
-      dispatch(documentActions.addDocument(shipmentDoc));
-
+    if (shipment) {
       navigation.dispatch(
         StackActions.replace('ShipmentView', {
-          id: shipmentDoc.id,
+          id: shipment.id,
         }),
       );
-    },
-    [shipments, tempOrders, dispatch, shipmentType, depart, navigation],
-  );
+      return;
+    }
 
-  const getScannedObject = useCallback(
+    const tempOrder = tempOrders.find((i) => i.orderId === scannedObject.head.orderId);
+    if (!tempOrder) {
+      const newTempOrder: ITempDocument = {
+        id: generateId(),
+        orderId: scannedObject.id,
+        lines: scannedObject.lines,
+      };
+
+      dispatch(fpActions.addTempOrder(newTempOrder));
+    }
+
+    const shipmentDoc: IShipmentDocument = {
+      id: generateId(),
+      documentType: shipmentType!,
+      number: scannedObject.number,
+      documentDate: new Date().toISOString(),
+      status: 'DRAFT',
+      head: {
+        barcode: scannedObject.head.barcode,
+        contact: scannedObject.head.contact,
+        depart: depart,
+        outlet: scannedObject.head.outlet,
+        onDate: scannedObject.head.onDate,
+        orderId: scannedObject.id,
+      },
+      lines: [],
+      creationDate: new Date().toISOString(),
+      editionDate: new Date().toISOString(),
+    };
+
+    dispatch(documentActions.addDocument(shipmentDoc));
+
+    navigation.dispatch(
+      StackActions.replace('ShipmentView', {
+        id: shipmentDoc.id,
+      }),
+    );
+  }, [scannedObject, shipments, tempOrders, shipmentType, depart, dispatch, navigation]);
+
+  const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
+
+  const handleGetScannedObject = useCallback(
     (brc: string) => {
-      setErrorMessage('');
       if (!brc.match(/^-{0,1}\d+$/)) {
-        if (!visibleDialog) {
-          setScannedObject(undefined);
-        }
-        setErrorMessage('Штрих-код неверного формата');
+        setScaner({ state: 'error', message: 'Штрих-код неверного формата' });
         return;
       }
 
@@ -138,42 +139,28 @@ const ScanOrderScreen = () => {
           );
         } else {
           setScannedObject(order);
+          setScaner({ state: 'found' });
         }
       } else {
-        setErrorMessage('Заявка не найдена');
-        return;
-      }
-
-      if (visibleDialog) {
-        setVisibleDialog(false);
+        setScaner({ state: 'error', message: 'Заявка не найдена' });
       }
     },
-    [navigation, orders, shipments, visibleDialog],
+    [navigation, orders, shipments],
   );
 
-  const handleShowDialog = () => {
-    setVisibleDialog(true);
-    setBarcode('');
-    setScannedObject(undefined);
-  };
-
-  const handleHideDialog = () => {
-    setVisibleDialog(false);
-    setBarcode('');
-    setScannedObject(undefined);
-    setErrorMessage('');
-  };
+  const handleClearScaner = () => setScaner({ state: 'init' });
 
   const ScanItem = useCallback(
-    () => (
-      <View style={styles.itemInfo}>
-        <Text style={styles.barcode}>{scannedObject?.head.barcode}</Text>
-        <Text style={[styles.itemName]} numberOfLines={3}>
-          {scannedObject?.head.outlet.name}
-        </Text>
-      </View>
-    ),
-    [scannedObject?.head.barcode, scannedObject?.head.outlet.name],
+    () =>
+      scannedObject ? (
+        <View style={localStyles.itemInfo}>
+          <Text style={localStyles.barcode}>{scannedObject.head.barcode}</Text>
+          <Text style={localStyles.itemName} numberOfLines={3}>
+            {scannedObject.head.outlet.name}
+          </Text>
+        </View>
+      ) : null,
+    [scannedObject],
   );
 
   const isFocused = useIsFocused();
@@ -195,36 +182,43 @@ const ScanOrderScreen = () => {
     <>
       {isScanerReader ? (
         <ScanBarcodeReader
-          onSave={(item) => handleSaveScannedItem(item)}
-          onShowSearchDialog={handleShowDialog}
-          getScannedObject={getScannedObject}
-          scannedObject={scannedObject}
-          errorMessage={!visibleDialog ? errorMessage : ''}
+          onSave={handleSaveScannedItem}
+          onGetScannedObject={handleGetScannedObject}
+          onClearScannedObject={handleClearScaner}
+          scaner={scaner}
         >
           <ScanItem />
         </ScanBarcodeReader>
       ) : (
         <ScanBarcode
-          onSave={(item) => handleSaveScannedItem(item)}
-          onShowSearchDialog={handleShowDialog}
-          getScannedObject={getScannedObject}
-          scannedObject={scannedObject}
-          errorMessage={!visibleDialog ? errorMessage : ''}
+          onSave={handleSaveScannedItem}
+          onGetScannedObject={handleGetScannedObject}
+          onClearScannedObject={handleClearScaner}
+          scaner={scaner}
+          barCodeTypes={barCodeTypes}
         >
           <ScanItem />
         </ScanBarcode>
       )}
-      <AppDialog
-        visible={visibleDialog}
-        text={barcode}
-        onChangeText={setBarcode}
-        onCancel={handleHideDialog}
-        onOk={() => getScannedObject(barcode)}
-        okLabel={'Найти'}
-        errorMessage={errorMessage}
-      />
     </>
   );
 };
 
 export default ScanOrderScreen;
+
+const localStyles = StyleSheet.create({
+  itemInfo: {
+    flexShrink: 1,
+    paddingRight: 10,
+  },
+  itemName: {
+    color: '#fff',
+    fontSize: 18,
+    textTransform: 'uppercase',
+  },
+  barcode: {
+    color: '#fff',
+    fontSize: 16,
+    opacity: 0.5,
+  },
+});

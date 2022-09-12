@@ -10,6 +10,7 @@ export {
   SearchButton,
   ScanButton,
   SendButton,
+  SaveDocument,
 } from './AppBar';
 export { BottomSheet } from './BottomSheet';
 export { ItemSeparator } from './ItemSeparator';
@@ -33,4 +34,7 @@ export { LargeText, MediumText } from './AppText';
 export { AppActivityIndicator } from './AppActivityIndicator';
 export { default as AppDialog } from './AppDialog';
 export { ListItemLine } from './ListItemLine';
+export { default as ScanBarcode } from './ScanBarcode';
+export { default as ScanBarcodeReader } from './ScanBarcodeReader';
 export { default as Switch } from './Switch';
+export { navBackButton, navBackDrawer } from './NavigationButtons';

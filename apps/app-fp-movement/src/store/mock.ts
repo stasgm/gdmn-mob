@@ -369,7 +369,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
-              shcode: '1143',
+              shcode: '2256',
               name: 'Степлер',
             },
             {
@@ -379,7 +379,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
-              shcode: '1144',
+              shcode: '1765',
               name: 'Дырокол',
             },
             {
@@ -389,7 +389,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
-              shcode: '1145',
+              shcode: '1764',
               name: 'Бейдж',
             },
             {
@@ -399,7 +399,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               valueName: 'шт',
               isFrac: 1,
               weightCode: '',
-              shcode: '1146',
+              shcode: '1747',
               name: 'Штамп',
             },
             {
@@ -994,7 +994,7 @@ export const messageFpMovement: IMessage<MessageType>[] = [
               id: '357852117',
               name: 'Магазин-склад',
             },
-            barcode: '100620220042467496',
+            barcode: '260720220032471108',
           },
           lines: [
             {

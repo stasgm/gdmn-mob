@@ -2,18 +2,20 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ScrollView, TextInput, View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator, PrimeButton } from '@lib/mobile-ui';
+import { ItemSeparator, PrimeButton, ScanBarcode, ScanBarcodeReader } from '@lib/mobile-ui';
 import { useSelector } from '@lib/store';
 
 import { IconButton } from 'react-native-paper';
 
 import { useTheme } from '@react-navigation/native';
 
+import { BarCodeScanner } from 'expo-barcode-scanner';
+
+import { IScannedObject } from '@lib/client-types';
+
 import { IMovementLine } from '../store/types';
 
 import { ONE_SECOND_IN_MS } from '../utils/constants';
-
-import { ScanDataMatrix, ScanDataMatrixReader } from '.';
 
 interface IProps {
   item: IMovementLine;
@@ -29,6 +31,8 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   const [goodEID, setGoodEID] = useState<string | undefined>(item?.EID?.toString());
   const [doScanned, setDoScanned] = useState(false);
 
+  const [scaner, setScaner] = useState<IScannedObject>({ state: 'init' });
+
   const currRef = useRef<TextInput>(null);
 
   const isScanerReader = useSelector((state) => state.settings?.data?.scannerUse?.data);
@@ -36,6 +40,19 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
   useEffect(() => {
     currRef?.current && setTimeout(() => currRef.current?.focus(), ONE_SECOND_IN_MS);
   }, []);
+
+  const handleGetScannedObject = useCallback((brc: string) => {
+    setScaner({ state: 'found' });
+    if (!brc) {
+      return;
+    }
+    setGoodEID(brc);
+
+    setScaner({ state: 'init' });
+    setDoScanned(false);
+  }, []);
+
+  const handleClearScaner = () => setScaner({ state: 'init' });
 
   const handleQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -48,11 +65,6 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
       return validNumber.test(value) ? value : prev;
     });
   }, []);
-
-  const handleEIDScanned = (data: string) => {
-    setDoScanned(false);
-    setGoodEID(data);
-  };
 
   const handleDoScan = () => {
     setDoScanned(true);
@@ -71,9 +83,18 @@ export const DocLine = ({ item, onSetLine }: IProps) => {
     <>
       <Modal animationType="slide" visible={doScanned}>
         {isScanerReader ? (
-          <ScanDataMatrixReader onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+          <ScanBarcodeReader
+            onGetScannedObject={handleGetScannedObject}
+            onClearScannedObject={handleClearScaner}
+            scaner={scaner}
+          />
         ) : (
-          <ScanDataMatrix onSave={(data) => handleEIDScanned(data)} onCancel={() => setDoScanned(false)} />
+          <ScanBarcode
+            onGetScannedObject={handleGetScannedObject}
+            onClearScannedObject={handleClearScaner}
+            scaner={scaner}
+            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.datamatrix]}
+          />
         )}
       </Modal>
       <ScrollView>

@@ -1,18 +1,23 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import { FlatList, TouchableHighlight, View } from 'react-native';
-import { useNavigation } from '@react-navigation/core';
-import { useScrollToTop } from '@react-navigation/native';
+import { useNavigation, useScrollToTop } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { ItemSeparator, globalStyles as styles, AppScreen, EmptyList, MediumText, LargeText } from '@lib/mobile-ui';
+import {
+  ItemSeparator,
+  globalStyles as styles,
+  AppScreen,
+  EmptyList,
+  MediumText,
+  LargeText,
+  navBackDrawer,
+} from '@lib/mobile-ui';
 
 import { keyExtractor } from '@lib/mobile-app';
 
 import { useDispatch, useSelector } from '../../store';
 import { ILocation } from '../../store/geo/types';
 import { geoActions } from '../../store/geo/actions';
-
-import { navBackDrawer } from '../../components/navigateOptions';
 
 import localStyles from './styles';
 
@@ -54,7 +59,7 @@ const ListScreen = () => {
   const list = useSelector((state) => state.geo)?.list?.sort((a, b) => a.number - b.number);
   const currentPoint = useSelector((state) => state.geo.currentPoint);
 
-  const setCurrentPoint = useCallback((point: ILocation) => dispatch(geoActions.setCurrentPoint(point)), [dispatch]);
+  const setCurrentPoint = (point: ILocation) => dispatch(geoActions.setCurrentPoint(point));
 
   const ref = useRef<FlatList<ILocation>>(null);
   useScrollToTop(ref);

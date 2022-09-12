@@ -18,6 +18,7 @@ import {
   EmptyList,
   AppActivityIndicator,
   SearchButton,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
@@ -33,7 +34,6 @@ import { IDocumentType } from '@lib/types';
 import { IMovementDocument } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { statusTypes, dataTypes, docContactTypes } from '../../utils/constants';
-import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface DocListProps {
   orders: IListItemProps[];
@@ -271,17 +271,17 @@ export const DocListScreen = () => {
     return setVisibleDate(false);
   };
 
-  const handleApplyType = useCallback((option) => {
+  const handleApplyType = useCallback((option: IListItem) => {
     setVisibleType(false);
     setType(option);
   }, []);
 
-  const handleApplyStatus = useCallback((option) => {
+  const handleApplyStatus = useCallback((option: any) => {
     setVisibleStatus(false);
     setStatus(option.id);
   }, []);
 
-  const handleApplyDate = useCallback((option) => {
+  const handleApplyDate = useCallback((option: IListItem) => {
     setVisibleDate(false);
     setDate(option);
   }, []);
@@ -300,23 +300,24 @@ export const DocListScreen = () => {
         }
         onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
         checked={!!delList[item.id]}
-      >
-        <View>
-          <Text style={textStyle}>
-            {(doc.documentType.remainsField === 'fromContact'
-              ? doc.head.fromContact?.name
-              : doc.head.toContact?.name) || ''}
-          </Text>
-          <Text style={textStyle}>
-            № {doc.number} на {getDateString(doc.documentDate)}
-          </Text>
-        </View>
-      </ScreenListItem>
+        addInfo={
+          <View>
+            <Text style={textStyle}>
+              {(doc.documentType.remainsField === 'fromContact'
+                ? doc.head.fromContact?.name
+                : doc.head.toContact?.name) || ''}
+            </Text>
+            <Text style={textStyle}>
+              № {doc.number} на {getDateString(doc.documentDate)}
+            </Text>
+          </View>
+        }
+      />
     ) : null;
   };
 
   const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
+    ({ section }: any) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
     [],
   );
 

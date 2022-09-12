@@ -12,6 +12,7 @@ import {
   SubTitle,
   globalStyles as styles,
   LargeText,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { extraPredicate, keyExtractor } from '@lib/mobile-app';
@@ -20,8 +21,6 @@ import { useDispatch } from '../store';
 
 import { RefParamList } from '../navigation/Root/types';
 import { IOutlet } from '../store/types';
-
-import { navBackButton } from './navigateOptions';
 
 const SelectRefItemScreen = () => {
   const navigation = useNavigation();
@@ -208,15 +207,13 @@ const LineItem = React.memo(
     disabled?: boolean;
   }) => {
     const { colors } = useTheme();
-
-    const checkboxStyle = useMemo(() => colors.primary, [colors.primary]);
-    const viewStyle = useMemo(() => [styles.item, { backgroundColor: colors.background }], [colors.background]);
-    const handleCheckItem = useCallback(() => onCheck(item), [item, onCheck]);
+    const viewStyle = [styles.item, { backgroundColor: colors.background }];
+    const handleCheckItem = () => onCheck(item);
 
     return (
       <TouchableOpacity onPress={handleCheckItem} disabled={disabled}>
         <View style={viewStyle}>
-          <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={checkboxStyle} />
+          <Checkbox status={isChecked ? 'checked' : 'unchecked'} color={colors.primary} />
           <View style={styles.details}>
             <View style={styles.rowCenter}>
               <LargeText style={styles.textBold}>{item[refFieldName] || item.id}</LargeText>

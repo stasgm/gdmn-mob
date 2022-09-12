@@ -66,7 +66,7 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   });
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   //passport достаёт пользовательские данные из сессии
-  passport.deserializeUser(async (id: string, done) => {
+  passport.deserializeUser((id: string, done) => {
     try {
       log.info('deserializeUser', id);
       const user = userService.findOne(id);
@@ -81,10 +81,11 @@ export async function createServer(server: IServer): Promise<KoaApp> {
   passport.use(new LocalStrategy(strategy, validateAuthCreds));
 
   // Логи для Morgan
-  const logPath = path.join(process.cwd(), `${config.LOG_PATH}/`);
+  const logPath = path.join(process.cwd(), config.LOG_PATH);
   if (!fs.existsSync(logPath)) {
     fs.mkdirSync(logPath);
   }
+
   const accessLogStream: fs.WriteStream = fs.createWriteStream(config.LOG_ACCESS_PATH, { flags: 'a' });
 
   app

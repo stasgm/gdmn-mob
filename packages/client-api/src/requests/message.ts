@@ -1,4 +1,4 @@
-import { IMessage, IMessageInfo, IMessageParams, INamedEntity, IResponse, NewMessage } from '@lib/types';
+import { AuthLogOut, IMessage, IMessageInfo, IMessageParams, INamedEntity, IResponse, NewMessage } from '@lib/types';
 
 import { error, message as types } from '../types';
 import { generateId, sleep } from '../utils';
@@ -17,7 +17,7 @@ class Message extends BaseRequest {
     message: IMessage['body'],
     order: number,
     deviceId: string,
-    authFunc?: () => void,
+    authFunc?: AuthLogOut,
   ) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
@@ -40,7 +40,7 @@ class Message extends BaseRequest {
       const resData = res.data;
 
       if (authFunc && resData.status === 401) {
-        authFunc();
+        await authFunc();
       }
 
       if (resData.result) {
@@ -63,7 +63,7 @@ class Message extends BaseRequest {
     }
   };
 
-  getMessages = async (params: IMessageParams, authFunc?: () => void) => {
+  getMessages = async (params: IMessageParams, authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -80,7 +80,7 @@ class Message extends BaseRequest {
       const resData = res.data;
 
       if (authFunc && resData.status === 401) {
-        authFunc();
+        await authFunc();
       }
 
       if (resData.result) {
@@ -102,7 +102,7 @@ class Message extends BaseRequest {
     }
   };
 
-  removeMessage = async (messageId: string, params: IMessageParams, authFunc?: () => void) => {
+  removeMessage = async (messageId: string, params: IMessageParams, authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -118,7 +118,7 @@ class Message extends BaseRequest {
       const resData = res.data;
 
       if (authFunc && resData.status === 401) {
-        authFunc();
+        await authFunc();
       }
 
       if (resData.result) {
@@ -138,7 +138,7 @@ class Message extends BaseRequest {
     }
   };
 
-  clear = async (params: IMessageParams, authFunc?: () => void) => {
+  clear = async (params: IMessageParams, authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -154,7 +154,7 @@ class Message extends BaseRequest {
       const resData = res.data;
 
       if (authFunc && resData.status === 401) {
-        authFunc();
+        await authFunc();
       }
 
       if (resData.result) {

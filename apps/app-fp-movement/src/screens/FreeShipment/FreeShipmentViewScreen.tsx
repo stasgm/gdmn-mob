@@ -15,19 +15,21 @@ import {
   AppDialog,
   LargeText,
   ListItemLine,
+  ScanButton,
+  navBackButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
-import { ISettingsOption, SettingValue } from '@lib/types';
+import { ScreenState } from '@lib/types';
 
 import { barcodeSettings, IFreeShipmentDocument, IFreeShipmentLine } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
@@ -45,35 +47,28 @@ export const FreeShipmentViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<FreeShipmentStackParamList, 'FreeShipmentView'>>();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
-
   const id = useRoute<RouteProp<FreeShipmentStackParamList, 'FreeShipmentView'>>().params?.id;
-
   const doc = docSelectors.selectByDocId<IFreeShipmentDocument>(id);
+  const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
   const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-
   const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
-
   const isBlocked = doc?.status !== 'DRAFT';
+  const goods = refSelectors.selectByName<IGood>('good').data;
+  const settings = useSelector((state) => state.settings?.data);
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
 
+  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
+
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
-  const goods = refSelectors.selectByName<IGood>('good').data;
-
-  const { data: settings } = useSelector((state) => state.settings);
-
-  const goodBarcodeSettings = Object.entries(settings).reduce(
-    (prev: barcodeSettings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-      if (cur?.[1]?.group?.id !== '1' && typeof cur[1]?.data === 'number') {
-        prev[cur[0]] = cur[1]?.data;
-      }
-      return prev;
-    },
-    {},
-  );
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -82,8 +77,8 @@ export const FreeShipmentViewScreen = () => {
         return;
       }
 
-      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
-        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование');
+      if (brc.length < minBarcodeLength) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
         return;
       }
 
@@ -123,7 +118,7 @@ export const FreeShipmentViewScreen = () => {
       }
     },
 
-    [dispatch, doc?.lines, goodBarcodeSettings, goods, id, settings.countBarcodeLentgh?.data],
+    [dispatch, doc?.lines, goodBarcodeSettings, goods, id, minBarcodeLength],
   );
 
   const handleShowDialog = () => {
@@ -157,7 +152,9 @@ export const FreeShipmentViewScreen = () => {
           await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            navigation.goBack();
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -165,7 +162,7 @@ export const FreeShipmentViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
     if (lines?.length) {
@@ -173,27 +170,23 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [dispatch, id, lines]);
 
-  const handleUseSendDoc = useSendDocs([doc]);
+  const sendDoc = useSendDocs([doc]);
 
-  const handleSendDoc = useCallback(() => {
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
           setScreenState('sending');
-          setTimeout(() => {
-            if (screenState !== 'idle') {
-              setScreenState('idle');
-            }
-          }, 10000);
-          handleUseSendDoc();
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [handleUseSendDoc, screenState]);
+  }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -221,18 +214,48 @@ export const FreeShipmentViewScreen = () => {
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditDocHead, handleDelete]);
 
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...doc, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, doc]);
+
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        doc?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+        )
       ) : (
         <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          {/* <ScanButton onPress={handleDoScan} /> */}
+          {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          {!isScanerReader && (
+            <ScanButton
+              onPress={() => navigation.navigate('ScanGood', { docId: id })}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSendDoc, isBlocked, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      handleSendDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -262,15 +285,15 @@ export const FreeShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
 
-      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+      if (brc.length < minBarcodeLength) {
         Alert.alert(
           'Внимание!',
-          'Длина штрих-кода меньше минимальной длины, указанной в настройках! Повторите сканирование!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
           [{ text: 'OK' }],
         );
         setScanned(false);
@@ -310,7 +333,7 @@ export const FreeShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const [key, setKey] = useState(1);
@@ -331,28 +354,35 @@ export const FreeShipmentViewScreen = () => {
     }
   }, [scanned, ref, visibleDialog]);
 
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  } else {
-    if (!doc) {
-      return (
-        <View style={[styles.container, styles.alignItemsCenter]}>
-          <LargeText>Документ не найден</LargeText>
-        </View>
-      );
-    }
+  }
+
+  if (!doc) {
+    return (
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return (
@@ -382,10 +412,10 @@ export const FreeShipmentViewScreen = () => {
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        initialNumToRender={6}
-        maxToRenderPerBatch={6} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={100}
+        windowSize={7}
       />
       {lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
       <AppDialog

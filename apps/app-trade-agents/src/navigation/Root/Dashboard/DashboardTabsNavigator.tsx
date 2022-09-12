@@ -4,11 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 
-import { MenuButton, useActionSheet } from '@lib/mobile-ui';
+import { MenuButton, navBackDrawer, useActionSheet } from '@lib/mobile-ui';
 
 import Home from '../../../screens/Dashboard/HomeScreen';
 import TaskListScreen from '../../../screens/Dashboard/TaskListScreen';
-import { navBackDrawer } from '../../../components/navigateOptions';
 
 export type TabsStackParams = {
   Main: undefined;

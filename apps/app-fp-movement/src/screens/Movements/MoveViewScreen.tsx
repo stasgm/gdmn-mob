@@ -15,19 +15,21 @@ import {
   LargeText,
   AppDialog,
   ListItemLine,
+  ScanButton,
+  navBackButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
-import { ISettingsOption, SettingValue } from '@lib/types';
+import { ScreenState } from '@lib/types';
 
 import { barcodeSettings, IMoveDocument, IMoveLine } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
 import { getStatusColor, ONE_SECOND_IN_MS } from '../../utils/constants';
 
-import { navBackButton } from '../../components/navigateOptions';
 import { getBarcode } from '../../utils/helpers';
 import { IGood } from '../../store/app/types';
 
@@ -45,35 +47,31 @@ export const MoveViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<MoveStackParamList, 'MoveView'>>();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
-
-  const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
-
-  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
-
-  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
-
-  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
-
-  const isBlocked = useMemo(() => doc?.status !== 'DRAFT', [doc?.status]);
-
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [barcode, setBarcode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  const id = useRoute<RouteProp<MoveStackParamList, 'MoveView'>>().params?.id;
+  const doc = docSelectors.selectByDocId<IMoveDocument>(id);
+  const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
+
+  const lines = useMemo(() => doc?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)), [doc?.lines]);
+  const lineSum = lines?.reduce((sum, line) => sum + (line.weight || 0), 0);
+
+  const isBlocked = doc?.status !== 'DRAFT';
+
   const goods = refSelectors.selectByName<IGood>('good').data;
+  const settings = useSelector((state) => state.settings?.data);
 
-  const { data: settings } = useSelector((state) => state.settings);
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
 
-  const goodBarcodeSettings = Object.entries(settings).reduce(
-    (prev: barcodeSettings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-      if (cur?.[1]?.group?.id !== '1' && typeof cur[1]?.data === 'number') {
-        prev[cur[0]] = cur[1]?.data;
-      }
-      return prev;
-    },
-    {},
-  );
+  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -82,8 +80,8 @@ export const MoveViewScreen = () => {
         return;
       }
 
-      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
-        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование');
+      if (brc.length < minBarcodeLength) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
         return;
       }
 
@@ -123,7 +121,7 @@ export const MoveViewScreen = () => {
       }
     },
 
-    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const handleShowDialog = () => {
@@ -157,7 +155,9 @@ export const MoveViewScreen = () => {
           await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            navigation.goBack();
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -165,7 +165,7 @@ export const MoveViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id]);
 
   const hanldeCancelLastScan = useCallback(() => {
     const lastId = doc?.lines?.[0]?.id;
@@ -173,27 +173,33 @@ export const MoveViewScreen = () => {
     dispatch(documentActions.removeDocumentLine({ docId: id, lineId: lastId }));
   }, [dispatch, doc?.lines, id]);
 
-  const handleUseSendDoc = useSendDocs([doc]);
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...doc, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, doc]);
 
-  const handleSendDoc = useCallback(() => {
+  const sendDoc = useSendDocs([doc]);
+
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
           setScreenState('sending');
-          setTimeout(() => {
-            if (screenState !== 'idle') {
-              setScreenState('idle');
-            }
-          }, 10000);
-          handleUseSendDoc();
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [handleUseSendDoc, screenState]);
+  }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -224,15 +230,35 @@ export const MoveViewScreen = () => {
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        doc?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+        )
       ) : (
         <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
-          {/* <ScanButton onPress={handleDoScan} /> */}
+          {doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />}
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          {!isScanerReader && (
+            <ScanButton
+              onPress={() => navigation.navigate('ScanGood', { docId: id })}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, doc?.status, handleSendDoc, isBlocked, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleSaveDocument,
+      handleSendDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      navigation,
+      screenState,
+    ],
   );
 
   useLayoutEffect(() => {
@@ -261,7 +287,7 @@ export const MoveViewScreen = () => {
   // }, []);
 
   const renderItem: ListRenderItem<IMoveLine> = ({ item }) => (
-    <ListItemLine key={item.id}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.directionRow}>
@@ -280,15 +306,15 @@ export const MoveViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
 
-      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+      if (brc.length < minBarcodeLength) {
         Alert.alert(
           'Внимание!',
-          'Длина штрих-кода меньше минимальной длины, указанной в настройках! Повторите сканирование!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
           [{ text: 'OK' }],
         );
         setScanned(false);
@@ -328,7 +354,7 @@ export const MoveViewScreen = () => {
       setScanned(false);
     },
 
-    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
+    [minBarcodeLength, goodBarcodeSettings, goods, doc?.lines, dispatch, id],
   );
 
   const [key, setKey] = useState(1);
@@ -349,28 +375,35 @@ export const MoveViewScreen = () => {
     }
   }, [scanned, ref, visibleDialog]);
 
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
+
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  } else {
-    if (!doc) {
-      return (
-        <View style={[styles.container, styles.alignItemsCenter]}>
-          <LargeText>Документ не найден</LargeText>
-        </View>
-      );
-    }
+  }
+
+  if (!doc) {
+    return (
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return (
@@ -404,9 +437,9 @@ export const MoveViewScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         initialNumToRender={10}
-        maxToRenderPerBatch={10} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={100}
+        windowSize={7}
       />
       {doc?.lines?.length ? <ViewTotal quantity={lineSum} weight={lines?.length || 0} /> : null}
       <AppDialog

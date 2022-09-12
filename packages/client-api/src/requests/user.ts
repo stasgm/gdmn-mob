@@ -1,4 +1,4 @@
-import { IResponse, IUser, NewUser } from '@lib/types';
+import { AuthLogOut, IResponse, IUser, NewUser } from '@lib/types';
 import { user as mockUser, users as mockUsers } from '@lib/mock';
 
 import { error, user as types } from '../types';
@@ -123,7 +123,7 @@ class User extends BaseRequest {
     }
   };
 
-  getUser = async (userId: string, authFunc?: () => void) => {
+  getUser = async (userId: string, authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
       const user = mockUsers.find((item) => item.id === userId);
@@ -146,7 +146,7 @@ class User extends BaseRequest {
       const resData = res.data;
 
       if (authFunc && resData.status === 401) {
-        authFunc();
+        await authFunc();
       }
 
       if (resData.result) {
@@ -168,7 +168,7 @@ class User extends BaseRequest {
     }
   };
 
-  getUsers = async (params?: Record<string, string | number>, authFunc?: () => void) => {
+  getUsers = async (params?: Record<string, string | number>, authFunc?: AuthLogOut) => {
     if (this.api.config.debug?.isMock) {
       await sleep(this.api.config.debug?.mockDelay || 0);
 
@@ -196,7 +196,7 @@ class User extends BaseRequest {
       const resData = res.data;
 
       if (authFunc && resData.status === 401) {
-        authFunc();
+        await authFunc();
       }
 
       if (resData.result) {

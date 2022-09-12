@@ -2,11 +2,10 @@ import React, { useLayoutEffect, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { styles } from '@lib/mobile-navigation';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useTheme } from '@react-navigation/native';
-import { AppActivityIndicator, ItemSeparator, SubTitle } from '@lib/mobile-ui';
+import { AppActivityIndicator, ItemSeparator, navBackButton, SubTitle } from '@lib/mobile-ui';
 
 import { RemainsStackParamList } from '../../navigation/Root/types';
 import { IRemGood } from '../../store/app/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 const LineItem = React.memo(({ item }: { item: IRemGood }) => {
   const { colors } = useTheme();

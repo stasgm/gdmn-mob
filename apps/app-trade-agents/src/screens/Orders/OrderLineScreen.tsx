@@ -4,13 +4,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
-import { SaveButton, globalStyles as styles, AppActivityIndicator } from '@lib/mobile-ui';
+import { SaveButton, globalStyles as styles, AppActivityIndicator, navBackButton } from '@lib/mobile-ui';
 
 import { OrdersStackParamList, RoutesStackParamList } from '../../navigation/Root/types';
 
 import { IOrderLine, IPackageGood } from '../../store/types';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import OrderLine from './components/OrderLine';
 

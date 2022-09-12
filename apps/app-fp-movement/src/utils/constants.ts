@@ -1,6 +1,7 @@
 import { IListItem } from '@lib/mobile-types';
-import { baseSettingGroup } from '@lib/store/src/settings/reducer';
+import { baseSettingGroup } from '@lib/store';
 import { Settings, StatusType } from '@lib/types';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { IGood } from '../store/app/types';
 
@@ -100,7 +101,7 @@ export const appSettings: Settings = {
     visible: true,
     group: baseSettingGroup,
   },
-  countBarcodeLentgh: {
+  minBarcodeLength: {
     id: '6',
     sortOrder: 6,
     description: 'Мин. длина штрих-кода',
@@ -258,4 +259,10 @@ export const lineTypes: IListItem[] = [
     id: 'shipment',
     value: 'отвешено',
   },
+];
+
+export const barCodeTypes = [
+  BarCodeScanner.Constants.BarCodeType.code128,
+  BarCodeScanner.Constants.BarCodeType.ean13,
+  BarCodeScanner.Constants.BarCodeType.ean8,
 ];

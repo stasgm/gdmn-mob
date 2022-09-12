@@ -8,7 +8,7 @@ import { useSelector } from '@lib/store';
 import { useRoute } from '@react-navigation/core';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 
-import { BackButton, MenuButton, useActionSheet, ItemSeparator } from '@lib/mobile-ui';
+import { MenuButton, useActionSheet, ItemSeparator, navBackButton } from '@lib/mobile-ui';
 
 import { DocumentsTabsStackParamsList } from '../../navigation/Root/types';
 
@@ -63,7 +63,7 @@ const DocumentViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
       headerRight: () => <MenuButton actionsMenu={actionsMenu} />,
       title: Title,
     });

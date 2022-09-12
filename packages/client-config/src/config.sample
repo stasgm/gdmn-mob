@@ -2,7 +2,7 @@ export default {
   server: {
     protocol: 'http://',
     name: 'localhost',
-    port: 3649,
+    port: 3651,
   },
   timeout: 10000,
   apiPath: 'api',

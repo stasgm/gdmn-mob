@@ -16,6 +16,7 @@ import {
   AppScreen,
   RadioGroup,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { useDispatch, documentActions, appActions, useSelector, refSelectors } from '@lib/store';
 
@@ -23,11 +24,12 @@ import { generateId, getDateString } from '@lib/mobile-app';
 
 import { IDocumentType } from '@lib/types';
 
+import { IListItem } from '@lib/mobile-types';
+
 import { DocStackParamList } from '../../navigation/Root/types';
 import { IDocFormParam, IMovementDocument } from '../../store/types';
 import { contactTypes, STATUS_LIST } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
-import { navBackButton } from '../../components/navigateOptions';
 
 export const DocEditScreen = () => {
   const id = useRoute<RouteProp<DocStackParamList, 'DocEdit'>>().params?.id;
@@ -292,14 +294,10 @@ export const DocEditScreen = () => {
     }
     setOldDocTypeId(docDocumentType?.id);
 
-    const params: Record<string, string> = {};
-
-    params.subtype = 'inventory';
-
     navigation.navigate('SelectRefItem', {
       refName: 'documentType',
       fieldName: 'documentType',
-      clause: params,
+      clause: { subtype: 'inventory' },
       value: docDocumentType && [docDocumentType],
       refFieldName: 'description',
     });
@@ -309,7 +307,7 @@ export const DocEditScreen = () => {
   const [visibleTo, setVisibleTo] = useState(false);
 
   const handleFromContactType = useCallback(
-    (option) => {
+    (option: IListItem) => {
       if (doc?.lines.length && documentType?.remainsField === 'fromContact') {
         Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.fromDescription} при наличии позиций.`, [
           { text: 'OK' },
@@ -325,7 +323,7 @@ export const DocEditScreen = () => {
   );
 
   const handleToContactType = useCallback(
-    (option) => {
+    (option: IListItem) => {
       if (doc?.lines.length && documentType?.remainsField === 'toContact') {
         Alert.alert('Внимание!', `Нельзя изменить тип поля ${documentType.toDescription} при наличии позиций.`, [
           { text: 'OK' },
@@ -364,7 +362,10 @@ export const DocEditScreen = () => {
     dispatch(appActions.setFormParams({ status: docStatus === 'DRAFT' ? 'READY' : 'DRAFT' }));
   }, [dispatch, docStatus]);
 
-  const handleChangeNumber = useCallback((text) => dispatch(appActions.setFormParams({ number: text })), [dispatch]);
+  const handleChangeNumber = useCallback(
+    (text: string) => dispatch(appActions.setFormParams({ number: text })),
+    [dispatch],
+  );
 
   const viewStyle = useMemo(
     () => [

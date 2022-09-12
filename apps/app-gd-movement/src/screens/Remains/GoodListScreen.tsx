@@ -11,6 +11,7 @@ import {
   Menu,
   AppActivityIndicator,
   SearchButton,
+  navBackButton,
 } from '@lib/mobile-ui';
 
 import { refSelectors, useSelector } from '@lib/store';
@@ -23,8 +24,6 @@ import { RemainsStackParamList } from '../../navigation/Root/types';
 
 import { IEmployee, IGood, IRemains, IRemGood } from '../../store/app/types';
 import { getRemGoodListByContact } from '../../utils/helpers';
-
-import { navBackButton } from '../../components/navigateOptions';
 
 import GoodItem from './components/GoodItem';
 
@@ -79,7 +78,7 @@ const GoodListScreen = () => {
   });
 
   const handleApply = useCallback(
-    (option) => {
+    (option: IListItem) => {
       setVisibleMenu(false);
       setFilteredList({
         searchQuery,

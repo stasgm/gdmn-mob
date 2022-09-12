@@ -27,7 +27,7 @@ const ConfigScreen = (props: Props) => {
   const [serverName, setServerName] = useState(`${config?.protocol}${config?.server}` || '');
   const [serverPort, setServerPort] = useState(config?.port?.toString() || '');
   const [timeout] = useState(config?.timeout?.toString() || '');
-  const [deviceId, setDeviceId] = useState(config?.deviceId || '');
+  // const [deviceId, setDeviceId] = useState(config?.deviceId || '');
   const [err, setErr] = useState(false);
 
   const handleSaveConfig = () => {
@@ -44,7 +44,7 @@ const ConfigScreen = (props: Props) => {
       port: parseInt(serverPort, 10),
       timeout: parseInt(timeout, 10),
       server,
-      deviceId,
+      // deviceId,
     };
 
     onSetConfig(newConfig);
@@ -77,7 +77,7 @@ const ConfigScreen = (props: Props) => {
           </HelperText>
         )}
         <Input label="Порт" value={serverPort} onChangeText={setServerPort} clearInput={true} />
-        <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} />
+        {/* <Input label="ID устройства" value={deviceId} onChangeText={setDeviceId} clearInput={true} /> */}
         <View style={localStyles.buttonsView}>
           <PrimeButton
             icon="check"

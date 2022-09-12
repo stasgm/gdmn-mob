@@ -33,12 +33,7 @@ const AppDialog = ({ visible, text, onChangeText, onOk, onCancel, errorMessage, 
           autoFocus
           right={
             !!text && (
-              <TextInput.Icon
-                name="close"
-                size={20}
-                style={{ marginTop: 14 }}
-                onPress={() => onChangeText && onChangeText('')}
-              />
+              <TextInput.Icon name="close" size={20} style={{ marginTop: 14 }} onPress={() => onChangeText('')} />
             )
           }
         />

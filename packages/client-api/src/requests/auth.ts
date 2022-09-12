@@ -1,6 +1,8 @@
 import { DeviceState, IResponse, IUser, IUserCredentials } from '@lib/types';
 import { user as mockUser } from '@lib/mock';
 
+import { AxiosError } from 'axios';
+
 import { error, auth as types } from '../types';
 import { sleep } from '../utils';
 import { BaseApi } from '../types/BaseApi';
@@ -209,8 +211,12 @@ class Auth extends BaseRequest {
     } catch (err) {
       return {
         type: 'ERROR',
-        message: err instanceof TypeError ? err.message : 'ошибка получения статуса устройства',
-        //err?.response?.data?.error || 'ошибка получения статуса устройства',
+        message:
+          err instanceof TypeError
+            ? err.message
+            : err instanceof AxiosError && err.code === 'ECONNABORTED'
+            ? 'нет соединения с сервером'
+            : 'ошибка получения статуса устройства',
       } as error.INetworkError;
     }
   };

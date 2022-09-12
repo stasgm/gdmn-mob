@@ -6,7 +6,15 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Divider } from 'react-native-paper';
 
 import { docSelectors, documentActions, refSelectors, useSelector, appActions, useDispatch } from '@lib/store';
-import { AppInputScreen, Input, SaveButton, SubTitle, RadioGroup, AppActivityIndicator } from '@lib/mobile-ui';
+import {
+  AppInputScreen,
+  Input,
+  SaveButton,
+  SubTitle,
+  RadioGroup,
+  AppActivityIndicator,
+  navBackButton,
+} from '@lib/mobile-ui';
 import { IDepartment, IDocumentType, IReference } from '@lib/types';
 
 import { getDateString } from '@lib/mobile-app';
@@ -14,7 +22,6 @@ import { getDateString } from '@lib/mobile-app';
 import { ShipmentStackParamList } from '../../navigation/Root/types';
 import { IShipmentFormParam, IShipmentDocument } from '../../store/types';
 
-import { navBackButton } from '../../components/navigateOptions';
 import { STATUS_LIST } from '../../utils/constants';
 
 const ShipmentEditScreen = () => {

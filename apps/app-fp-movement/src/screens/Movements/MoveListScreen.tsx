@@ -18,6 +18,7 @@ import {
   EmptyList,
   MediumText,
   Menu,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -26,11 +27,10 @@ import { deleteSelectedItems, getDateString, getDelList, keyExtractor } from '@l
 
 import { INamedEntity } from '@lib/types';
 
-import { IDelList } from '@lib/mobile-types';
+import { IDelList, IListItem } from '@lib/mobile-types';
 
 import { IMoveDocument } from '../../store/types';
 import { MoveStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 import { dateTypes, docDepartTypes, statusTypes } from '../../utils/constants';
 
 export interface MoveListSectionProps {
@@ -90,7 +90,7 @@ export const MoveListScreen = () => {
 
           lineCount: i.lines.length,
           errorMessage: i.errorMessage,
-          children: (
+          addInfo: (
             <View>
               <MediumText>Откуда: {i.head.fromDepart?.name || ''}</MediumText>
               <MediumText>Куда: {i.head.toDepart?.name || ''}</MediumText>
@@ -129,20 +129,20 @@ export const MoveListScreen = () => {
   const [visibleStatus, setVisibleStatus] = useState(false);
   const [visibleDate, setVisibleDate] = useState(false);
 
-  const handleApplyType = useCallback((option) => {
+  const handleApplyType = (option: IListItem) => {
     setVisibleType(false);
     setType(option);
-  }, []);
+  };
 
-  const handleApplyStatus = useCallback((option) => {
+  const handleApplyStatus = (option: any) => {
     setVisibleStatus(false);
     setStatus(option.id);
-  }, []);
+  };
 
-  const handleApplyDate = useCallback((option) => {
+  const handleApplyDate = (option: IListItem) => {
     setVisibleDate(false);
     setDate(option);
-  }, []);
+  };
 
   const handleAddDocument = useCallback(() => {
     navigation.navigate('MoveEdit');
@@ -195,9 +195,8 @@ export const MoveListScreen = () => {
     [delList, isDelList, navigation],
   );
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const isFocused = useIsFocused();

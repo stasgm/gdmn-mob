@@ -1,4 +1,4 @@
-import { IUserCredentials, IUserSettings } from '@lib/types';
+import { AuthLogOut, IUserCredentials, IUserSettings } from '@lib/types';
 import api from '@lib/client-api';
 
 import { ActionType } from 'typesafe-actions';
@@ -22,7 +22,7 @@ const getDeviceByUid = (
   uid: string,
   erpUserId?: string,
   appSystemName?: string,
-  logout?: () => void,
+  logout?: AuthLogOut,
 ): AppThunk<
   Promise<ActionType<typeof actions.getDeviceByUidAsync>>,
   AuthState,
@@ -37,9 +37,18 @@ const getDeviceByUid = (
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
       if (erpUserId && appSystemName && logout) {
         const getErpUser = await api.user.getUser(erpUserId, logout);
-        if (getErpUser.type === 'ERROR' || appSystemName !== getErpUser.user.appSystem?.name) {
+        if (getErpUser.type === 'ERROR') {
           return dispatch(
-            actions.getDeviceByUidAsync.failure('Подсистема пользователя не совпадает с подсистемой приложения'),
+            actions.getDeviceByUidAsync.failure(
+              'Ошибка получения устройства по UId: невозможно получить данные о пользователе',
+            ),
+          );
+        }
+        if (appSystemName !== getErpUser.user.appSystem?.name) {
+          return dispatch(
+            actions.getDeviceByUidAsync.failure(
+              'Ошибка получения устройства по UId: подсистема пользователя не совпадает с подсистемой приложения',
+            ),
           );
         }
       }
@@ -102,7 +111,7 @@ const signup = (
 const login = (
   credentials: IUserCredentials,
   appSystemName?: string,
-  logout?: () => void,
+  logout?: AuthLogOut,
 ): AppThunk<
   Promise<ActionType<typeof actions.loginUserAsync>>,
   AuthState,
@@ -117,9 +126,16 @@ const login = (
       //Проверка на совпадение подсистемы приложения с подсистемой пользователя
       if (response.user.erpUser?.id && appSystemName && logout) {
         const getErpUser = await api.user.getUser(response.user.erpUser?.id, logout);
-        if (getErpUser.type === 'ERROR' || appSystemName !== getErpUser.user.appSystem?.name) {
+        if (getErpUser.type === 'ERROR') {
           return dispatch(
-            actions.loginUserAsync.failure('Подсистема пользователя не совпадает с подсистемой приложения'),
+            actions.loginUserAsync.failure('Ошибка входа пользователя: невозможно получить данные о пользователе'),
+          );
+        }
+        if (appSystemName !== getErpUser.user.appSystem?.name) {
+          return dispatch(
+            actions.loginUserAsync.failure(
+              'Ошибка входа пользователя: подсистема пользователя не совпадает с подсистемой приложения',
+            ),
           );
         }
       }

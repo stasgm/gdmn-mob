@@ -23,6 +23,7 @@ export interface IListItemProps {
   documentType?: string;
   lineCount?: number;
   children?: ReactNode;
+  addInfo?: ReactNode;
 }
 
 const ScreenListItem = ({
@@ -36,6 +37,7 @@ const ScreenListItem = ({
   onPress,
   onLongPress,
   checked,
+  addInfo,
 }: IListItemProps) => {
   const { colors } = useTheme();
 
@@ -58,7 +60,7 @@ const ScreenListItem = ({
           </View>
           <View style={styles.directionRow}>
             {subtitle ? <MediumText>{subtitle}</MediumText> : null}
-            {children ? <View style={{ width: '95%' }}>{children}</View> : null}
+            {addInfo ? <View style={{ width: '90%' }}>{addInfo}</View> : null}
             <View style={styles.rowCenter}>
               <MediumText>{lineCount}</MediumText>
               <MaterialCommunityIcons name="shopping-outline" size={15} color={colors.text} style={styles.field} />
@@ -67,6 +69,7 @@ const ScreenListItem = ({
               )}
             </View>
           </View>
+          {children}
           {errorMessage ? (
             <MediumText style={{ color: colors.error }}>Отказано: {errorMessage || ''}</MediumText>
           ) : null}

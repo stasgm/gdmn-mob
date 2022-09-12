@@ -59,6 +59,7 @@ const DrawerNavigator = () => {
           fontSize: 15,
         },
       }}
+      // eslint-disable-next-line react/no-unstable-nested-components
       drawerContent={(props) => <DrawerContent {...props} />}
     >
       {navList.map((item) => (
@@ -68,6 +69,7 @@ const DrawerNavigator = () => {
           component={item.component}
           options={{
             title: item.title,
+            // eslint-disable-next-line react/no-unstable-nested-components
             drawerIcon: (pr) => <Icon name={item.icon} {...pr} />,
           }}
         />

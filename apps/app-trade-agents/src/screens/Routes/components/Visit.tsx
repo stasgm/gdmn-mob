@@ -12,6 +12,7 @@ import {
   EmptyList,
   MediumText,
   AppActivityIndicator,
+  navBackButton,
 } from '@lib/mobile-ui';
 import { useSendDocs, getDateString, generateId, keyExtractor } from '@lib/mobile-app';
 
@@ -21,7 +22,6 @@ import { useDispatch } from '../../../store';
 import { IOrderDocument, IVisitDocument } from '../../../store/types';
 import { getCurrentPosition } from '../../../utils/expoFunctions';
 import { getTimeProcess, twoDigits } from '../../../utils/helpers';
-import { navBackButton } from '../../../components/navigateOptions';
 import { RoutesStackParamList } from '../../../navigation/Root/types';
 
 interface IVisitProps {
@@ -77,6 +77,7 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
         updatedOrders.push({ ...doc, status: 'READY', creationDate: doc.creationDate || date, editionDate: date });
       }
     });
+
     await docDispatch(documentActions.updateDocuments([updatedVisit, ...updatedOrders]));
 
     setProcess(false);
@@ -176,10 +177,6 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
 
   const sendDoc = useSendDocs(readyDocs);
 
-  const handleSendDocs = async () => {
-    sendDoc();
-  };
-
   const isFocused = useIsFocused();
   if (!isFocused) {
     return <AppActivityIndicator />;
@@ -240,21 +237,18 @@ const Visit = ({ visit, outlet, contact, route }: IVisitProps) => {
             Добавить документ
           </PrimeButton>
         ) : (
-          readyDocs.length > 0 &&
-          !sendLoading && (
+          readyDocs.length > 0 && (
             <PrimeButton
               icon={!sendLoading ? 'file-send' : 'block-helper'}
               onPress={async () => {
-                if (!sendLoading) {
-                  setSendLoading(true);
-                  await handleSendDocs();
-                  setSendLoading(false);
-                }
+                setSendLoading(true);
+                await sendDoc();
+                setSendLoading(false);
               }}
               disabled={sendLoading}
               loadIcon={sendLoading}
             >
-              Отправить
+              {sendLoading ? 'Отправка документов...' : 'Отправить'}
             </PrimeButton>
           )
         )}

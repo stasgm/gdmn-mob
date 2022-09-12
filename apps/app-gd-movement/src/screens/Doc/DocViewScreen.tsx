@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { View, FlatList, Alert, ListRenderItem } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -18,16 +18,19 @@ import {
   MediumText,
   LargeText,
   ListItemLine,
+  navBackButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { deleteSelectedLineItems, getDateString, getDelLineList, keyExtractor, useSendDocs } from '@lib/mobile-app';
 
 import { sleep } from '@lib/client-api';
 
+import { ScreenState } from '@lib/types';
+
 import { IMovementDocument, IMovementLine } from '../../store/types';
 import { DocStackParamList } from '../../navigation/Root/types';
 import { getStatusColor } from '../../utils/constants';
-import { navBackButton } from '../../components/navigateOptions';
 import { IGood } from '../../store/app/types';
 import DocTotal from '../../components/DocTotal';
 
@@ -37,7 +40,7 @@ export const DocViewScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<StackNavigationProp<DocStackParamList, 'DocView'>>();
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const id = useRoute<RouteProp<DocStackParamList, 'DocView'>>().params?.id;
 
@@ -46,7 +49,7 @@ export const DocViewScreen = () => {
   const docLineQuantity = doc?.lines?.reduce((sum, line) => sum + line.quantity, 0) || 0;
   const docLineSum = doc?.lines?.reduce((sum, line) => sum + line.quantity * (line?.price || 0), 0) || 0;
 
-  const isBlocked = doc?.status !== 'DRAFT' || screenState !== 'idle';
+  const isBlocked = doc?.status !== 'DRAFT';
 
   const handleAddDocLine = useCallback(() => {
     navigation.navigate('SelectRemainsItem', {
@@ -74,7 +77,9 @@ export const DocViewScreen = () => {
           await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
           if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
-            navigation.goBack();
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -82,10 +87,10 @@ export const DocViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, id, navigation]);
+  }, [docDispatch, id]);
 
   const [delList, setDelList] = useState<string[]>([]);
-  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
+  const isDelList = !!Object.keys(delList).length;
 
   const handleDeleteDocs = useCallback(() => {
     const deleteDocs = () => {
@@ -96,28 +101,30 @@ export const DocViewScreen = () => {
     deleteSelectedLineItems(deleteDocs);
   }, [delList, dispatch, id, setDelList]);
 
-  const handleUseSendDoc = useSendDocs([doc]);
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
 
-  const handleSendDoc = useCallback(() => {
-    setScreenState('sending');
+  const sendDoc = useSendDocs([doc]);
+
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
-          setTimeout(() => {
-            setScreenState('idle');
-          }, 10000);
-          handleUseSendDoc();
+          setScreenState('sending');
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
-        onPress: () => {
-          setScreenState('idle');
-        },
       },
     ]);
-  }, [handleUseSendDoc]);
+  }, [sendDoc]);
 
   const actionsMenu = useCallback(() => {
     showActionSheet([
@@ -141,24 +148,51 @@ export const DocViewScreen = () => {
     ]);
   }, [showActionSheet, handleAddDocLine, handleDelete, handleEditDocHead]);
 
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...doc, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, doc]);
+
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        doc?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        doc?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          doc?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+        )
       ) : (
         <View style={styles.buttons}>
           {isDelList ? (
             <DeleteButton onPress={handleDeleteDocs} />
           ) : (
             <>
-              <SendButton onPress={handleSendDoc} />
-              <ScanButton onPress={handleDoScan} />
-              <MenuButton actionsMenu={actionsMenu} />
+              {doc?.status === 'DRAFT' && (
+                <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+              )}
+              <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+              <ScanButton onPress={handleDoScan} disabled={screenState !== 'idle'} />
+              <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
             </>
           )}
         </View>
       ),
-    [actionsMenu, doc?.status, handleDeleteDocs, handleDoScan, handleSendDoc, isBlocked, isDelList, screenState],
+    [
+      actionsMenu,
+      doc?.status,
+      handleDeleteDocs,
+      handleDoScan,
+      handleSaveDocument,
+      handleSendDocument,
+      isBlocked,
+      isDelList,
+      screenState,
+    ],
   );
 
   const renderLeft = useCallback(
@@ -209,11 +243,11 @@ export const DocViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
@@ -250,10 +284,10 @@ export const DocViewScreen = () => {
         data={doc.lines}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        initialNumToRender={6}
-        maxToRenderPerBatch={6} // Reduce number in each render batch
-        updateCellsBatchingPeriod={100} // Increase time between renders
-        windowSize={7} // Reduce the window size
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={100}
+        windowSize={7}
         ItemSeparatorComponent={ItemSeparator}
       />
       {doc.lines.length ? (

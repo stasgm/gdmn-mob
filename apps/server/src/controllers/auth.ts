@@ -27,7 +27,7 @@ export const logIn = async (ctx: ParameterizedContext, next: Next): Promise<void
   await authService.authenticate(ctx as Context, next);
   const user = ctx.state.user as IUser;
 
-  ok(ctx as Context, user, `logIn: user '${user.id}' is successfully logged in`);
+  ok(ctx as Context, user, `logIn: user '${user.name}' (${user.id}) is successfully logged in`);
 };
 
 /**
@@ -38,18 +38,22 @@ export const getCurrentUser = async (ctx: ParameterizedContext, next: Next): Pro
 
   delete user.password;
 
-  ok(ctx as Context, user, `getCurrentUser: user '${user.name}' authenticated`);
+  ok(ctx as Context, user, `getCurrentUser: user '${user.name}' (${user.id}) authenticated`);
 };
 
 export const logout = async (ctx: Context, next: Next): Promise<void> => {
-  const user = ctx.state.user as IUser;
+  if (ctx.state.user) {
+    const user = ctx.state.user as IUser;
 
-  authService.logout(user.id);
+    authService.logout(user.id);
 
-  ctx.logout();
-  ctx.session = null;
+    ctx.logout();
+    ctx.session = null;
 
-  ok(ctx as Context, undefined, `logout: user '${user.name}' successfully logged out`);
+    ok(ctx as Context, undefined, `logout: user '${user.name}' (${user.id}) successfully logged out`);
+  } else {
+    ok(ctx as Context, undefined, 'logout: the session was over');
+  }
 };
 
 export const verifyCode = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
@@ -57,7 +61,7 @@ export const verifyCode = async (ctx: ParameterizedContext, next: Next): Promise
 
   const uid = authService.verifyCode(code);
 
-  ok(ctx as Context, uid, 'verifyCode: ok');
+  ok(ctx as Context, uid, `verifyCode device '${uid}': ok`);
 };
 
 export const getDeviceStatus = async (ctx: ParameterizedContext, next: Next): Promise<void> => {
@@ -65,5 +69,5 @@ export const getDeviceStatus = async (ctx: ParameterizedContext, next: Next): Pr
 
   const deviceStatus = authService.getDeviceStatus(uid);
 
-  ok(ctx as Context, deviceStatus, 'getDeviceStatus: ok');
+  ok(ctx as Context, deviceStatus, `getDeviceStatus device '${uid}': ok`);
 };

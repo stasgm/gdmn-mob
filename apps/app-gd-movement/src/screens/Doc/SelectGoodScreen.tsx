@@ -5,7 +5,7 @@ import { RouteProp, useNavigation, useRoute, useScrollToTop, useTheme } from '@r
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
-import { AppScreen, ItemSeparator, SearchButton, SubTitle } from '@lib/mobile-ui';
+import { AppScreen, ItemSeparator, navBackButton, SearchButton, SubTitle } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 import { INamedEntity } from '@lib/types';
 
@@ -15,7 +15,6 @@ import { generateId } from '@lib/mobile-app';
 
 import { InventoryStackParamList } from '../../navigation/Root/types';
 import { IGood } from '../../store/app/types';
-import { navBackButton } from '../../components/navigateOptions';
 
 const Good = ({ item }: { item: INamedEntity }) => {
   const navigation = useNavigation<StackNavigationProp<InventoryStackParamList, 'SelectGoodItem'>>();

@@ -5,7 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { docSelectors } from '@lib/store';
-import { BackButton, globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton } from '@lib/mobile-ui';
+import { globalStyles as styles, InfoBlock, ItemSeparator, SubTitle, ScanButton, navBackButton } from '@lib/mobile-ui';
 
 import { getDateString } from '@lib/mobile-app';
 
@@ -34,7 +34,8 @@ export const MovementViewScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <BackButton />,
+      headerLeft: navBackButton,
+      // eslint-disable-next-line react/no-unstable-nested-components
       headerRight: () =>
         !isBlocked && (
           <View style={styles.buttons}>

@@ -17,6 +17,7 @@ import {
   CloseButton,
   AppActivityIndicator,
   EmptyList,
+  navBackDrawer,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -27,7 +28,6 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IFreeShipmentDocument } from '../../store/types';
 import { FreeShipmentStackParamList } from '../../navigation/Root/types';
-import { navBackDrawer } from '../../components/navigateOptions';
 
 export interface FreeShipmentListSectionProps {
   title: string;
@@ -147,9 +147,8 @@ export const FreeShipmentListScreen = () => {
     [delList, isDelList, navigation],
   );
 
-  const renderSectionHeader = useCallback(
-    ({ section }) => <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>,
-    [],
+  const renderSectionHeader = ({ section }: any) => (
+    <SubTitle style={[styles.header, styles.sectionTitle]}>{section.title}</SubTitle>
   );
 
   const isFocused = useIsFocused();

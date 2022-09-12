@@ -4,3 +4,5 @@ export interface IResponse<T = undefined> {
   error?: string;
   data?: T;
 }
+
+export type AuthLogOut = () => Promise<any>;

@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTheme } from '@react-navigation/native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Camera } from 'expo-camera';
+import { AutoFocus, Camera, FlashMode } from 'expo-camera';
 import { View, TouchableOpacity, Text, Vibration } from 'react-native';
 import { IconButton } from 'react-native-paper';
 
-import { AppActivityIndicator, globalStyles, LargeText } from '@lib/mobile-ui';
+import { AppActivityIndicator, globalStyles, LargeText, useCameraPermission } from '@lib/mobile-ui';
 
 import { ONE_SECOND_IN_MS } from '../../utils/constants';
-
-import { useCameraPermission } from '../../hooks/useCameraPermission';
 
 import styles from './styles';
 
@@ -28,7 +26,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
 
   const [barcode, setBarcode] = useState('');
 
-  const hasPermission = useCameraPermission();
+  const permission = useCameraPermission();
 
   const handleBarCodeScanned = useCallback(
     (data: string) => {
@@ -43,7 +41,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     vibroMode && Vibration.vibrate(ONE_SECOND_IN_MS);
   }, [vibroMode]);
 
-  if (hasPermission === null) {
+  if (!permission) {
     return (
       <>
         <IconButton icon="arrow-left" size={30} style={styles.transparent} onPress={onCancel} />
@@ -57,7 +55,7 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     );
   }
 
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <>
         <IconButton icon="arrow-left" size={30} style={styles.transparent} onPress={onCancel} />
@@ -74,12 +72,11 @@ const ScanDataMatrix = ({ onSave, onCancel }: IProps) => {
     <View style={viewStyle}>
       <Camera
         key={`${scanned}${barcode}`}
-        flashMode={flashMode ? Camera.Constants.FlashMode.torch : Camera.Constants.FlashMode.off}
+        flashMode={flashMode ? FlashMode.torch : FlashMode.off}
         barCodeScannerSettings={{
           barCodeTypes: [BarCodeScanner.Constants.BarCodeType.datamatrix],
         }}
-        autoFocus="on"
-        whiteBalance="auto"
+        autoFocus={AutoFocus.on}
         onBarCodeScanned={({ data }: { data: string }) => !scanned && handleBarCodeScanned(data)}
         style={styles.camera}
       >

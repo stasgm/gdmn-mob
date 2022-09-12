@@ -17,13 +17,15 @@ import {
   ListItemLine,
   AppDialog,
   SendButton,
+  ScanButton,
+  SaveDocument,
 } from '@lib/mobile-ui';
 
 import { sleep } from '@lib/client-api';
 
 import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
 
-import { ISettingsOption, SettingValue } from '@lib/types';
+import { ScreenState } from '@lib/types';
 
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
@@ -47,10 +49,10 @@ const ShipmentViewScreen = () => {
   const id = useRoute<RouteProp<ShipmentStackParamList, 'ShipmentView'>>().params?.id;
   const dispatch = useDispatch();
   const fpDispatch = useFpDispatch();
+  const settings = useSelector((state) => state.settings?.data);
+  const isScanerReader = useSelector((state) => state.settings?.data)?.scannerUse?.data;
 
-  const [lineType, setLineType] = useState(lineTypes[0].id);
-
-  // const [deleting, setDeleting] = useState(false);
+  const [lineType, setLineType] = useState(lineTypes[1].id);
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(id);
   const shipmentLines = useMemo(
@@ -72,17 +74,14 @@ const ShipmentViewScreen = () => {
 
   const goods = refSelectors.selectByName<IGood>('good').data;
 
-  const { data: settings } = useSelector((state) => state.settings);
+  const goodBarcodeSettings = Object.entries(settings).reduce((prev: barcodeSettings, [idx, item]) => {
+    if (item && item.group?.id !== '1' && typeof item.data === 'number') {
+      prev[idx] = item.data;
+    }
+    return prev;
+  }, {});
 
-  const goodBarcodeSettings = Object.entries(settings).reduce(
-    (prev: barcodeSettings, cur: [string, ISettingsOption<SettingValue> | undefined]) => {
-      if (cur?.[1]?.group?.id !== '1' && typeof cur[1]?.data === 'number') {
-        prev[cur[0]] = cur[1]?.data;
-      }
-      return prev;
-    },
-    {},
-  );
+  const minBarcodeLength = settings.minBarcodeLength?.data || 0;
 
   const handleGetBarcode = useCallback(
     (brc: string) => {
@@ -91,8 +90,8 @@ const ShipmentViewScreen = () => {
         return;
       }
 
-      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
-        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование');
+      if (brc.length < minBarcodeLength) {
+        setErrorMessage('Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!');
         return;
       }
 
@@ -146,10 +145,10 @@ const ShipmentViewScreen = () => {
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
         } else {
-          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
             {
               text: 'Да',
-              onPress: async () => {
+              onPress: () => {
                 dispatch(documentActions.addDocumentLine({ docId: id, line: barcodeItem }));
                 fpDispatch(
                   fpMovementActions.updateTempOrderLine({
@@ -165,7 +164,7 @@ const ShipmentViewScreen = () => {
           ]);
         }
       } else {
-        Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+        Alert.alert('Данный товар отсутствует в позициях заявки!', 'Добавить позицию?', [
           {
             text: 'Да',
             onPress: async () => {
@@ -187,7 +186,7 @@ const ShipmentViewScreen = () => {
       goodBarcodeSettings,
       goods,
       id,
-      settings.countBarcodeLentgh?.data,
+      minBarcodeLength,
       shipment?.lines,
       shipmentLines?.length,
       tempOrder,
@@ -215,16 +214,20 @@ const ShipmentViewScreen = () => {
       return;
     }
 
-    Alert.alert('Вы уверены, что хотите удалить заявку?', '', [
+    Alert.alert('Вы уверены, что хотите удалить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
+          setScreenState('deleting');
+          await sleep(1);
           const res = await docDispatch(documentActions.removeDocument(id));
-          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS' && tempOrder) {
-            fpDispatch(fpMovementActions.removeTempOrder(tempOrder?.id));
-            setScreenState('deleting');
-            await sleep(500);
-            navigation.goBack();
+          if (res.type === 'DOCUMENTS/REMOVE_ONE_SUCCESS') {
+            if (tempOrder) {
+              fpDispatch(fpMovementActions.removeTempOrder(tempOrder?.id));
+            }
+            setScreenState('deleted');
+          } else {
+            setScreenState('idle');
           }
         },
       },
@@ -232,7 +235,7 @@ const ShipmentViewScreen = () => {
         text: 'Отмена',
       },
     ]);
-  }, [docDispatch, fpDispatch, id, navigation, tempOrder]);
+  }, [docDispatch, fpDispatch, id, tempOrder]);
 
   const hanldeCancelLastScan = useCallback(() => {
     if (shipmentLines?.length) {
@@ -277,41 +280,72 @@ const ShipmentViewScreen = () => {
     ]);
   }, [showActionSheet, hanldeCancelLastScan, handleEditShipmentHead, handleDeleteShipment]);
 
-  const [screenState, setScreenState] = useState<'idle' | 'sending' | 'deleting'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
-  const handleUseSendDoc = useSendDocs([shipment]);
+  const handleSaveDocument = useCallback(() => {
+    dispatch(
+      documentActions.updateDocument({
+        docId: id,
+        document: { ...shipment, status: 'READY' },
+      }),
+    );
+    navigation.goBack();
+  }, [dispatch, id, navigation, shipment]);
 
-  const handleSendDoc = useCallback(() => {
+  const sendDoc = useSendDocs([shipment]);
+
+  const handleSendDocument = useCallback(() => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
         onPress: async () => {
           setScreenState('sending');
-          setTimeout(() => {
-            if (screenState !== 'idle') {
-              setScreenState('idle');
-            }
-          }, 10000);
-          handleUseSendDoc();
+          await sendDoc();
+          setScreenState('sent');
         },
       },
       {
         text: 'Отмена',
       },
     ]);
-  }, [handleUseSendDoc, screenState]);
+  }, [sendDoc]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        shipment?.status === 'READY' && <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+        shipment?.status === 'READY' ? (
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+        ) : (
+          shipment?.status === 'DRAFT' && (
+            <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          )
+        )
       ) : (
         <View style={styles.buttons}>
-          <SendButton onPress={handleSendDoc} disabled={screenState !== 'idle'} />
+          {shipment?.status === 'DRAFT' && (
+            <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          )}
+          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          {!isScanerReader && (
+            <ScanButton
+              onPress={() => navigation.navigate('ScanGood', { docId: id })}
+              disabled={screenState !== 'idle'}
+            />
+          )}
           <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         </View>
       ),
-    [actionsMenu, handleSendDoc, isBlocked, screenState, shipment?.status],
+    [
+      actionsMenu,
+      handleSaveDocument,
+      handleSendDocument,
+      id,
+      isBlocked,
+      isScanerReader,
+      navigation,
+      screenState,
+      shipment?.status,
+    ],
   );
 
   const renderLeft = useCallback(
@@ -333,15 +367,15 @@ const ShipmentViewScreen = () => {
   const getScannedObject = useCallback(
     (brc: string) => {
       if (!brc.match(/^-{0,1}\d+$/)) {
-        Alert.alert('Внимание!', 'Штрих-код не определен! Повторите сканирование!', [{ text: 'OK' }]);
+        Alert.alert('Внимание!', 'Штрих-код не определен. Повторите сканирование!', [{ text: 'OK' }]);
         setScanned(false);
         return;
       }
 
-      if (settings.countBarcodeLentgh?.data && brc.length < settings.countBarcodeLentgh?.data) {
+      if (brc.length < minBarcodeLength) {
         Alert.alert(
           'Внимание!',
-          'Длина штрих-кода меньше минимальной длины, указанной в настройках! Повторите сканирование!',
+          'Длина штрих-кода меньше минимальной длины, указанной в настройках. Повторите сканирование!',
           [{ text: 'OK' }],
         );
         setScanned(false);
@@ -398,10 +432,10 @@ const ShipmentViewScreen = () => {
           );
           dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
         } else {
-          Alert.alert('Данное количество превышает количество в заявке', 'Добавить позицию?', [
+          Alert.alert('Данное количество превышает количество в заявке.', 'Добавить позицию?', [
             {
               text: 'Да',
-              onPress: async () => {
+              onPress: () => {
                 dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
                 fpDispatch(
                   fpMovementActions.updateTempOrderLine({
@@ -417,10 +451,10 @@ const ShipmentViewScreen = () => {
           ]);
         }
       } else {
-        Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
+        Alert.alert('Данный товар отсутствует в позициях заявки.', 'Добавить позицию?', [
           {
             text: 'Да',
-            onPress: async () => {
+            onPress: () => {
               dispatch(documentActions.addDocumentLine({ docId: id, line: newLine }));
             },
           },
@@ -433,7 +467,7 @@ const ShipmentViewScreen = () => {
       setScanned(false);
     },
 
-    [settings.countBarcodeLentgh?.data, goodBarcodeSettings, goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
+    [minBarcodeLength, goodBarcodeSettings, goods, shipmentLines, tempOrder, fpDispatch, dispatch, id],
   );
 
   //Для отрисовки при каждом новом сканировании
@@ -454,6 +488,13 @@ const ShipmentViewScreen = () => {
         }, ONE_SECOND_IN_MS);
     }
   }, [scanned, ref, visibleDialog]);
+
+  useEffect(() => {
+    if (screenState === 'sent' || screenState === 'deleted') {
+      setScreenState('idle');
+      navigation.goBack();
+    }
+  }, [navigation, screenState]);
 
   const LineTypes = useCallback(
     () => (
@@ -496,7 +537,7 @@ const ShipmentViewScreen = () => {
   );
 
   const renderTempItem: ListRenderItem<ITempLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={isBlocked}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <MediumText style={styles.name}>{item.good.name}</MediumText>
         <View style={styles.directionRow}>
@@ -511,23 +552,23 @@ const ShipmentViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting') {
+  if (screenState === 'deleting' || screenState === 'sending') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>Удаление документа...</LargeText>
+          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
     );
-  } else {
-    if (!shipment) {
-      return (
-        <View style={[styles.container, styles.alignItemsCenter]}>
-          <LargeText>Документ не найден</LargeText>
-        </View>
-      );
-    }
+  }
+
+  if (!shipment) {
+    return (
+      <View style={[styles.container, styles.alignItemsCenter]}>
+        <LargeText>Документ не найден</LargeText>
+      </View>
+    );
   }
 
   return (

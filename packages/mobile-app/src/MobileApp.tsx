@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Store } from 'redux';
 
 import {
@@ -7,6 +7,7 @@ import {
   documentActions,
   referenceActions,
   settingsActions,
+  useAuthThunkDispatch,
   useDispatch,
   useSelector,
 } from '@lib/store';
@@ -17,9 +18,11 @@ import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
 import { Snackbar } from 'react-native-paper';
-import { View, Text } from 'react-native';
+import { View, Text, AppState } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
+
+import { AuthLogOut } from '@lib/types';
 
 import { useSync } from './hooks';
 import { truncate } from './utils/helpers';
@@ -35,11 +38,31 @@ export interface IApp {
 
 const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
   const handleSyncData = useSync(onSync, onGetMessages);
-  const config = useSelector((state) => state.auth.config);
+  const { config, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи
     api.config = { ...api.config, ...config };
+  }, []);
+
+  const appState = useRef(AppState.currentState);
+
+  const authDispatch = useAuthThunkDispatch();
+
+  const authMiddleware: AuthLogOut = () => authDispatch(authActions.logout());
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        //Проверка сессии при фокусе приложения, можно getUser заменить на другую с Middleware
+        await api.user.getUser(user!.id, authMiddleware);
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   return <DrawerNavigator items={items} onSyncClick={handleSyncData} />;
