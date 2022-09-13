@@ -153,9 +153,9 @@ const OrderViewScreen = () => {
     Alert.alert('Вы уверены, что хотите отправить документ?', '', [
       {
         text: 'Да',
-        onPress: async () => {
+        onPress: () => {
           setScreenState('sending');
-          await sendDoc();
+          sendDoc();
           setScreenState('sent');
         },
       },
@@ -285,11 +285,11 @@ const OrderViewScreen = () => {
     return <AppActivityIndicator />;
   }
 
-  if (screenState === 'deleting' || screenState === 'sending') {
+  if (screenState === 'deleting') {
     return (
       <View style={styles.container}>
         <View style={styles.containerCenter}>
-          <LargeText>{screenState === 'deleting' ? 'Удаление документа...' : 'Отправка документа...'}</LargeText>
+          <LargeText>Удаление документа...</LargeText>
           <AppActivityIndicator style={{}} />
         </View>
       </View>
