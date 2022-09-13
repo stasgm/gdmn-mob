@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback, useRef } from 'react';
 import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Divider, Searchbar } from 'react-native-paper';
+import { Button, Dialog, Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -17,7 +17,7 @@ import {
   LargeText,
   MediumText,
 } from '@lib/mobile-ui';
-import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { generateId, getDateString, keyExtractor } from '@lib/mobile-app';
 
@@ -316,39 +316,49 @@ const SelectGroupScreen = () => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
+  const [visiblDialog, setVisibleDialog] = useState(false);
+  const [dublicateGood, setDublicateGood] = useState<IGood | undefined>(undefined);
+
   const handlePressGood = useCallback(
     (item: IGood) => {
       const good = doc.lines?.find((i) => i.good.id === item.id);
 
       if (good) {
-        Alert.alert(
-          'Товар уже добавлен в документ!',
-          "Нажмите 'Добавить', если хотите добавить новую позицию.\n\nНажмите 'Редактировать', если хотите редактировать существующую позицию.",
-          [
-            {
-              text: 'Отмена',
-            },
-            {
-              text: 'Редактировать',
-              onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }), //() => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
-            },
-            {
-              text: 'Добавить',
-              onPress: () =>
-                navigation.navigate('OrderLine', {
-                  mode: 0,
-                  docId,
-                  item: { id: generateId(), good: item, quantity: 0 },
-                }),
-            },
-          ],
-        );
+        setVisibleDialog(true);
+        setDublicateGood(item);
       } else {
         navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
       }
     },
     [doc.lines, docId, navigation],
   );
+
+  const handleAddGood = useCallback(() => {
+    if (dublicateGood) {
+      setVisibleDialog(false);
+      navigation.navigate('OrderLine', {
+        mode: 0,
+        docId,
+        item: { id: generateId(), good: dublicateGood, quantity: 0 },
+      });
+    }
+  }, [docId, dublicateGood, navigation]);
+
+  const handleEditGood = useCallback(() => {
+    const good = doc.lines?.find((i) => i.good.id === dublicateGood?.id);
+    if (good) {
+      setVisibleDialog(false);
+      navigation.navigate('OrderLine', { mode: 1, docId, item: good });
+    }
+  }, [doc.lines, docId, dublicateGood, navigation]);
+
+  const handleDeleteGood = useCallback(() => {
+    const good = doc.lines?.find((i) => i.good.id === dublicateGood?.id);
+    if (good) {
+      setVisibleDialog(false);
+      dispatch(documentActions.removeDocumentLine({ docId, lineId: good.id }));
+    }
+  }, [dispatch, doc.lines, docId, dublicateGood]);
 
   const renderGroup = useCallback(
     ({ item }: { item: IGoodGroup }) => (
@@ -402,6 +412,7 @@ const SelectGroupScreen = () => {
           activeOptionId={viewType}
         />
       </View>
+
       <Divider />
       {filterVisible && (
         <>
@@ -437,6 +448,31 @@ const SelectGroupScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
+      <Dialog visible={visiblDialog} onDismiss={() => setVisibleDialog(false)}>
+        <Dialog.Title style={localStyles.titleSize}>{'Товар уже добавлен в документ!'}</Dialog.Title>
+        <Dialog.Content>
+          <LargeText style={localStyles.text}>
+            Нажмите 'Редактировать', если хотите редактировать существующую позицию.
+          </LargeText>
+          <LargeText style={localStyles.text}>Нажмите 'Добавить', если хотите добавить новую позицию</LargeText>
+          <LargeText style={localStyles.text}>Нажмите 'Удалить', если хотите удалить существующую позицию.</LargeText>
+        </Dialog.Content>
+        <Dialog.Actions style={localStyles.action}>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleEditGood}>
+            Редактировать
+          </Button>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleAddGood}>
+            Добавить
+          </Button>
+
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
+            Удалить
+          </Button>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={() => setVisibleDialog(false)}>
+            Отмена
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
     </AppScreen>
   );
 };
@@ -453,4 +489,9 @@ const localStyles = StyleSheet.create({
     padding: 2,
     height: 72,
   },
+  titleSize: {
+    fontSize: 18,
+  },
+  text: { fontSize: 15, paddingTop: 5 },
+  action: { flexDirection: 'column', alignItems: 'flex-end' },
 });
