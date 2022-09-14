@@ -173,7 +173,7 @@ const Good = ({ index, item, onPress, quantity }: IGoodProp) => {
         </View>
         <View style={styles.details}>
           <View style={styles.directionRow}>
-            <MediumText>{item.name || item.id}</MediumText>
+            <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
           </View>
           {quantity ? (
             <View style={styles.flexDirectionRow}>
@@ -470,7 +470,7 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     padding: 3,
-    // minHeight: 50,
+    minHeight: 50,
   },
   titleSize: {
     fontSize: 18,
