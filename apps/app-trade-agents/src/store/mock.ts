@@ -822,30 +822,6 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
             {
-              id: '205515511',
-              good: {
-                id: '955211846',
-                name: 'Колб. изд. "Колбаса Ням"',
-                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
-              },
-              package: {
-                id: '273098057',
-                name: '5',
-              },
-            },
-            {
-              id: '205515512',
-              good: {
-                id: '955211846',
-                name: 'Колб. изд. "Колбаса Ням"',
-                goodgroup: { id: '955211845', name: '03. Продукты, колбасы' },
-              },
-              package: {
-                id: '273098058',
-                name: '10',
-              },
-            },
-            {
               id: '205515514',
               good: {
                 id: '955211847',
@@ -884,8 +860,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             {
               id: '1918111195',
               good: {
-                id: '1572500926',
-                name: 'Ветчина вар.',
+                id: '1572500927',
+                name: 'Ветчина вар. Любительская',
                 goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
@@ -908,8 +884,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             {
               id: '1918111197',
               good: {
-                id: '1572500926',
-                name: 'Ветчина вар.',
+                id: '1572500927',
+                name: 'Ветчина вар. Любительская',
                 goodgroup: { id: '690457773', name: '02. Ветчины' },
               },
               package: {
@@ -979,8 +955,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             {
               id: '502428161',
               good: {
-                id: '857817085',
-                name: 'Колбаса вареная докторская',
+                id: '857817086',
+                name: 'Колбаса вареная молочная',
               },
               package: {
                 id: '1617776619',
@@ -1156,7 +1132,21 @@ export const messageAgent: IMessage<MessageType>[] = [
               ],
               '1788296478': [
                 {
-                  goodId: '955211846',
+                  goodId: '1572500926',
+                  priceFsn: 18.56,
+                  priceFso: 18.12,
+                  priceFsnSklad: 18.56,
+                  priceFsoSklad: 18.56,
+                },
+                {
+                  goodId: '1572500927',
+                  priceFsn: 18.56,
+                  priceFso: 18.12,
+                  priceFsnSklad: 18.56,
+                  priceFsoSklad: 18.56,
+                },
+                {
+                  goodId: '1955211846',
                   priceFsn: 18.56,
                   priceFso: 18.12,
                   priceFsnSklad: 18.56,
@@ -1206,14 +1196,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                   priceFsoSklad: 18.32,
                 },
                 {
-                  goodId: '955211846',
-                  priceFsn: 18.32,
-                  priceFso: 18.02,
-                  priceFsnSklad: 18.32,
-                  priceFsoSklad: 18.32,
-                },
-                {
-                  goodId: '955211846',
+                  goodId: '9552118461',
                   priceFsn: 18.32,
                   priceFso: 18.02,
                   priceFsnSklad: 18.32,
@@ -1235,6 +1218,20 @@ export const messageAgent: IMessage<MessageType>[] = [
                 },
                 {
                   goodId: '955211843',
+                  priceFsn: 18.32,
+                  priceFso: 18.02,
+                  priceFsnSklad: 18.32,
+                  priceFsoSklad: 18.32,
+                },
+                {
+                  goodId: '857817085',
+                  priceFsn: 18.32,
+                  priceFso: 18.02,
+                  priceFsnSklad: 18.32,
+                  priceFsoSklad: 18.32,
+                },
+                {
+                  goodId: '857817086',
                   priceFsn: 18.32,
                   priceFso: 18.02,
                   priceFsnSklad: 18.32,
@@ -1506,8 +1503,8 @@ export const messageAgent: IMessage<MessageType>[] = [
             {
               id: 'ab0d8341-1d64-4dc8-bd42-f030af280e86',
               good: {
-                id: '1572500926',
-                name: 'Ветчина вар.',
+                id: '1572500927',
+                name: 'Ветчина вар. Любительская',
                 goodgroup: { id: '690457773', name: '02. Ветчины' },
                 priceFsn: 4.37,
               },

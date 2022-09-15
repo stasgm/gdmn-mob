@@ -68,7 +68,8 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = true }: IItem) => {
   const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
   const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
   const totalStyle = {
-    backgroundColor: isGroupVisible && totalListByRoute.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
+    backgroundColor:
+      isGroupVisible && totalListByRoute?.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
   };
 
   return (
@@ -89,7 +90,7 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = true }: IItem) => {
           })}
         </DataTable.Header>
         {isGroupVisible
-          ? totalListByRoute.map((item, index) => {
+          ? totalListByRoute?.map((item, index) => {
               const groupStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
               return (
                 <View key={item.group.id} style={groupStyle}>

@@ -63,62 +63,60 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
 
   return (
-    <>
-      <ScrollView>
-        <View style={styles.content}>
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
-            </View>
+    <ScrollView>
+      <View style={styles.content}>
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Наименование</Text>
+            <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество, кг</Text>
-              <TextInput
-                style={textStyle}
-                editable={true}
-                keyboardType="numeric"
-                autoCapitalize="words"
-                onChangeText={handelQuantityChange}
-                returnKeyType="done"
-                ref={qtyRef}
-                value={goodQty}
-              />
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              {packages.length > 0 ? (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === pack?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              ) : (
-                <Text style={textStyle}>Для данного товара нет упаковки</Text>
-              )}
-            </View>
-          </View>
-          <ItemSeparator />
         </View>
-      </ScrollView>
-    </>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Цена</Text>
+            <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
+          </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Количество, кг</Text>
+            <TextInput
+              style={textStyle}
+              editable={true}
+              keyboardType="numeric"
+              autoCapitalize="words"
+              onChangeText={handelQuantityChange}
+              returnKeyType="done"
+              ref={qtyRef}
+              value={goodQty}
+            />
+          </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Упаковка</Text>
+            {packages.length > 0 ? (
+              <View style={localStyles.packages}>
+                {packages.map((elem) => (
+                  <Checkbox
+                    key={elem.package.id}
+                    title={elem.package.name}
+                    selected={elem.package.id === pack?.id}
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <Text style={textStyle}>Для данного товара нет упаковки</Text>
+            )}
+          </View>
+        </View>
+        <ItemSeparator />
+      </View>
+    </ScrollView>
   );
 };
 

@@ -77,7 +77,18 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
   const renderGood = useCallback(
     ({ item: itemGood, index }: { item: IGood; index: number }) => {
       const line = doc.lines?.find((i) => i.good.id === itemGood.id);
-      return <Good key={itemGood.id} index={index} item={itemGood} onPress={onPressGood} quantity={line?.quantity} />;
+      return (
+        <Good
+          key={itemGood.id}
+          index={index}
+          item={itemGood}
+          onPress={onPressGood}
+          quantity={line?.quantity}
+          priceFsn={line?.good?.priceFsn}
+          scale={line?.good?.scale}
+          packageName={line?.package?.name}
+        />
+      );
     },
     [doc.lines, onPressGood],
   );
@@ -125,7 +136,7 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
           ref={refList}
           data={goodModel}
           renderItem={renderGood}
-          // ItemSeparatorComponent={ItemSeparator}
+          ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
           initialNumToRender={20}
@@ -155,30 +166,42 @@ interface IGoodProp {
   item: IGood;
   onPress: (item: IGood) => void;
   quantity?: number;
+  packageName?: string;
+  scale?: number;
+  priceFsn?: number;
 }
 
-const Good = ({ index, item, onPress, quantity }: IGoodProp) => {
+const Good = ({ index, item, onPress, quantity, packageName, scale, priceFsn }: IGoodProp) => {
   const iconStyle = useMemo(
-    () => [styles.icon, { backgroundColor: quantity || quantity === 0 ? '#06567D' : '#E91E63', paddingLeft: 3 }],
+    () => [styles.icon, { backgroundColor: quantity || quantity === 0 ? '#06567D' : '#E91E63' }],
     [quantity],
   );
 
-  const goodStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
+  const goodStyle = {
+    backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent',
+  };
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
+      {/* {(quantity || quantity === 0) && <ItemSeparator />} */}
       <View style={[localStyles.item, goodStyle]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <View style={styles.directionRow}>
-            <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
-          </View>
-          {quantity ? (
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText style={styles.field}>{quantity} кг</MediumText>
+          <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
+          {quantity || quantity === 0 ? (
+            <View style={styles.details}>
+              <View style={styles.flexDirectionRow}>
+                <MaterialCommunityIcons name="shopping-outline" size={18} />
+                <MediumText style={styles.field}>
+                  {quantity} {(scale || 1) === 1 ? '' : 'уп. / ' + (scale || 1).toString()}
+                  {'кг  /  '}
+                  {(priceFsn || 0).toString()} р.{' '}
+                </MediumText>
+                <MaterialCommunityIcons name="package-variant-closed" size={18} />
+                <MediumText style={styles.field}>{packageName ? packageName : 'без упаковки'}</MediumText>
+              </View>
             </View>
           ) : null}
         </View>
@@ -357,16 +380,21 @@ const SelectGroupScreen = () => {
   useScrollToTop(refListGood);
 
   const renderGood = useCallback(
-    ({ item: itemGood, index }: { item: IGood; index: number }) => (
-      <Good
-        key={itemGood.id}
-        index={index}
-        item={itemGood}
-        onPress={handlePressGood}
-        quantity={doc.lines?.find((i) => i.good.id === itemGood.id)?.quantity}
-      />
-    ),
-
+    ({ item: itemGood, index }: { item: IGood; index: number }) => {
+      const line = doc.lines?.find((i) => i.good.id === itemGood.id);
+      return (
+        <Good
+          key={itemGood.id}
+          index={index}
+          item={itemGood}
+          onPress={handlePressGood}
+          quantity={line?.quantity}
+          priceFsn={line?.good?.priceFsn}
+          scale={line?.good?.scale}
+          packageName={line?.package?.name}
+        />
+      );
+    },
     [doc.lines, handlePressGood],
   );
 
@@ -447,7 +475,6 @@ const SelectGroupScreen = () => {
           <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleAddGood}>
             Добавить
           </Button>
-
           <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
             Удалить
           </Button>
