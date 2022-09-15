@@ -75,12 +75,11 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
   const doc = docSelectors.selectByDocId<IOrderDocument>(docId);
 
   const renderGood = useCallback(
-    ({ item: itemGood, index }: { item: IGood; index: number }) => {
+    ({ item: itemGood }: { item: IGood }) => {
       const line = doc.lines?.find((i) => i.good.id === itemGood.id);
       return (
         <Good
           key={itemGood.id}
-          index={index}
           item={itemGood}
           onPress={onPressGood}
           quantity={line?.quantity}
@@ -162,7 +161,6 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
 };
 
 interface IGoodProp {
-  index: number;
   item: IGood;
   onPress: (item: IGood) => void;
   quantity?: number;
@@ -171,37 +169,33 @@ interface IGoodProp {
   priceFsn?: number;
 }
 
-const Good = ({ index, item, onPress, quantity, packageName, scale, priceFsn }: IGoodProp) => {
-  const iconStyle = useMemo(
-    () => [styles.icon, { backgroundColor: quantity || quantity === 0 ? '#06567D' : '#E91E63' }],
-    [quantity],
-  );
+const Good = ({ item, onPress, quantity, packageName, scale, priceFsn }: IGoodProp) => {
+  const isAdded = quantity || quantity === 0;
+  const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
 
   const goodStyle = {
-    backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent',
+    backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
   };
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      {/* {(quantity || quantity === 0) && <ItemSeparator />} */}
       <View style={[localStyles.item, goodStyle]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
-          {quantity || quantity === 0 ? (
-            <View style={styles.details}>
+          {isAdded ? (
+            <View style={styles.directionColumn}>
               <View style={styles.flexDirectionRow}>
                 <MaterialCommunityIcons name="shopping-outline" size={18} />
-                <MediumText style={styles.field}>
+                <MediumText>
                   {quantity} {(scale || 1) === 1 ? '' : 'уп. / ' + (scale || 1).toString()}
                   {'кг  /  '}
                   {(priceFsn || 0).toString()} р.{' '}
                 </MediumText>
-                <MaterialCommunityIcons name="package-variant-closed" size={18} />
-                <MediumText style={styles.field}>{packageName ? packageName : 'без упаковки'}</MediumText>
               </View>
+              <MediumText>Упаковка: {packageName ? packageName : 'без упаковки'}</MediumText>
             </View>
           ) : null}
         </View>
@@ -323,7 +317,6 @@ const SelectGroupScreen = () => {
   const handlePressGood = useCallback(
     (item: IGood) => {
       const good = doc.lines?.find((i) => i.good.id === item.id);
-
       if (good) {
         setVisibleDialog(true);
         setDublicateGood(item);
@@ -380,12 +373,11 @@ const SelectGroupScreen = () => {
   useScrollToTop(refListGood);
 
   const renderGood = useCallback(
-    ({ item: itemGood, index }: { item: IGood; index: number }) => {
+    ({ item: itemGood }: { item: IGood }) => {
       const line = doc.lines?.find((i) => i.good.id === itemGood.id);
       return (
         <Good
           key={itemGood.id}
-          index={index}
           item={itemGood}
           onPress={handlePressGood}
           quantity={line?.quantity}
@@ -441,7 +433,7 @@ const SelectGroupScreen = () => {
           ref={refListGood}
           data={goodModel}
           renderItem={renderGood}
-          // ItemSeparatorComponent={ItemSeparator}
+          ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
           initialNumToRender={20}

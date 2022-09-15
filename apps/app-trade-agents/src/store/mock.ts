@@ -858,18 +858,6 @@ export const messageAgent: IMessage<MessageType>[] = [
               },
             },
             {
-              id: '1918111195',
-              good: {
-                id: '1572500927',
-                name: 'Ветчина вар. Любительская',
-                goodgroup: { id: '690457773', name: '02. Ветчины' },
-              },
-              package: {
-                id: '1617776621',
-                name: 'Мал. батон 10',
-              },
-            },
-            {
               id: '1918111196',
               good: {
                 id: '1572500926',
@@ -929,18 +917,7 @@ export const messageAgent: IMessage<MessageType>[] = [
                 name: 'Большой батон 5',
               },
             },
-            {
-              id: '1918111198',
-              good: {
-                id: '1572500927',
-                name: 'Ветчина вар. Любительская',
-                goodgroup: { id: '690457773', name: '02. Ветчины' },
-              },
-              package: {
-                id: '615762859',
-                name: 'Большой батон 10',
-              },
-            },
+
             {
               id: '502428160',
               good: {
@@ -950,17 +927,6 @@ export const messageAgent: IMessage<MessageType>[] = [
               package: {
                 id: '1617776621',
                 name: 'Мал. батон 10',
-              },
-            },
-            {
-              id: '502428161',
-              good: {
-                id: '857817086',
-                name: 'Колбаса вареная молочная',
-              },
-              package: {
-                id: '1617776619',
-                name: 'Мал. батон 5',
               },
             },
             {

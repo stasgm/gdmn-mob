@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { IListItem } from '@lib/mobile-types';
-import { TouchableHighlight } from '@gorhom/bottom-sheet';
 
 type Props = {
   options: IListItem[];

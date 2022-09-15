@@ -1,4 +1,3 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
@@ -6,7 +5,6 @@ import { INamedEntity } from '@lib/types';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View, Text } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useTheme } from '@react-navigation/native';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
@@ -18,8 +16,6 @@ interface IProps {
   onSetLine: (value: IOrderLine) => void;
 }
 
-type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
-
 const OrderLine = ({ item, onSetLine }: IProps) => {
   const { colors } = useTheme();
 
@@ -27,11 +23,15 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  const defaultPack = useMemo(() => packages.find((i) => i.isDefault)?.package, [packages]);
+  //Если упаковка только одна, то ставим ее по умолчанию, иначе
+  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
+  const defaultPack = useMemo(
+    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
+    [packages],
+  );
 
   const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
-  const [isVisiblePackages, setIsVisiblePackages] = useState<boolean>(false);
 
   const qtyRef = useRef<TextInput>(null);
 
@@ -62,8 +62,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
-  const textPackStyle = useMemo(() => [localStyles.text, { color: colors.text }], [colors.text]);
+  const textStyle = [styles.number, styles.field, { color: colors.text }];
+  const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
 
   return (
     <ScrollView>
@@ -98,46 +98,25 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           </View>
         </View>
         <ItemSeparator />
-        {packages.length > 0 ? (
-          <>
-            <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
-              <View style={styles.details}>
-                <Text style={styles.name}>Упаковка</Text>
-                <Text style={textStyle}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+        <View style={localStyles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Упаковка</Text>
+            {packages.length > 0 ? (
+              <View style={localStyles.packages}>
+                {packages.map((elem) => (
+                  <Checkbox
+                    key={elem.package.id}
+                    title={elem.package.name}
+                    selected={elem.package.id === pack?.id}
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                  />
+                ))}
               </View>
-              <MaterialCommunityIcons
-                name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
-                size={24}
-                color="black"
-              />
-            </TouchableOpacity>
-            <View>
-              {isVisiblePackages && (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === pack?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              )}
-            </View>
-          </>
-        ) : (
-          <>
-            <View style={localStyles.item}>
-              <View style={localStyles.details}>
-                <Text style={styles.name}>Упаковка</Text>
-                <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-              </View>
-              <MaterialCommunityIcons name={'chevron-down' as Icon} size={24} color="black" />
-            </View>
-            <Text style={textPackStyle}>Для данного товара нет упаковки</Text>
-          </>
-        )}
+            ) : (
+              <Text style={textPackStyle}>Без упаковки</Text>
+            )}
+          </View>
+        </View>
         <ItemSeparator />
       </View>
     </ScrollView>
@@ -158,11 +137,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 3,
     marginTop: 3,
-  },
-  details: {
-    flex: 1,
-    marginHorizontal: 5,
-    marginTop: 5,
   },
 });
 
