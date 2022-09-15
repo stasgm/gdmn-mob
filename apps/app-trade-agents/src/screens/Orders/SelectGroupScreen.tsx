@@ -347,10 +347,10 @@ const SelectGroupScreen = () => {
   }, [doc.lines, docId, dublicateGood, navigation]);
 
   const handleDeleteGood = useCallback(() => {
-    const good = doc.lines?.find((i) => i.good.id === dublicateGood?.id);
-    if (good) {
+    const lines: string[] = doc.lines?.filter((i) => i.good.id === dublicateGood?.id)?.map((i) => i.id);
+    if (lines.length) {
       setVisibleDialog(false);
-      dispatch(documentActions.removeDocumentLine({ docId, lineId: good.id }));
+      dispatch(documentActions.removeDocumentLines({ docId, lineIds: lines }));
     }
   }, [dispatch, doc.lines, docId, dublicateGood]);
 
