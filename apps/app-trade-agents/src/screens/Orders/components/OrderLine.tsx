@@ -66,83 +66,81 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const textPackStyle = useMemo(() => [localStyles.text, { color: colors.text }], [colors.text]);
 
   return (
-    <>
-      <ScrollView>
-        <View style={styles.content}>
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
-            </View>
+    <ScrollView>
+      <View style={styles.content}>
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Наименование</Text>
+            <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество, кг</Text>
-              <TextInput
-                style={textStyle}
-                editable={true}
-                keyboardType="numeric"
-                autoCapitalize="words"
-                onChangeText={handelQuantityChange}
-                returnKeyType="done"
-                ref={qtyRef}
-                value={goodQty}
-              />
-            </View>
-          </View>
-          <ItemSeparator />
-          {packages.length > 0 ? (
-            <>
-              <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
-                <View style={styles.details}>
-                  <Text style={styles.name}>Упаковка</Text>
-                  <Text style={textStyle}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-                </View>
-                <MaterialCommunityIcons
-                  name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
-                  size={24}
-                  color="black"
-                />
-              </TouchableOpacity>
-              <View>
-                {isVisiblePackages && (
-                  <View style={localStyles.packages}>
-                    {packages.map((elem) => (
-                      <Checkbox
-                        key={elem.package.id}
-                        title={elem.package.name}
-                        selected={elem.package.id === pack?.id}
-                        onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                      />
-                    ))}
-                  </View>
-                )}
-              </View>
-            </>
-          ) : (
-            <>
-              <View style={localStyles.item}>
-                <View style={localStyles.details}>
-                  <Text style={styles.name}>Упаковка</Text>
-                  <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
-                </View>
-                <MaterialCommunityIcons name={'chevron-down' as Icon} size={24} color="black" />
-              </View>
-              <Text style={textPackStyle}>Для данного товара нет упаковки</Text>
-            </>
-          )}
-          <ItemSeparator />
         </View>
-      </ScrollView>
-    </>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Цена</Text>
+            <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
+          </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Количество, кг</Text>
+            <TextInput
+              style={textStyle}
+              editable={true}
+              keyboardType="numeric"
+              autoCapitalize="words"
+              onChangeText={handelQuantityChange}
+              returnKeyType="done"
+              ref={qtyRef}
+              value={goodQty}
+            />
+          </View>
+        </View>
+        <ItemSeparator />
+        {packages.length > 0 ? (
+          <>
+            <TouchableOpacity style={styles.item} onPress={() => setIsVisiblePackages(!isVisiblePackages)}>
+              <View style={styles.details}>
+                <Text style={styles.name}>Упаковка</Text>
+                <Text style={textStyle}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+              </View>
+              <MaterialCommunityIcons
+                name={(isVisiblePackages ? 'chevron-up' : 'chevron-down') as Icon}
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+            <View>
+              {isVisiblePackages && (
+                <View style={localStyles.packages}>
+                  {packages.map((elem) => (
+                    <Checkbox
+                      key={elem.package.id}
+                      title={elem.package.name}
+                      selected={elem.package.id === pack?.id}
+                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={localStyles.item}>
+              <View style={localStyles.details}>
+                <Text style={styles.name}>Упаковка</Text>
+                <Text style={[styles.number, styles.field]}>{pack ? pack.name || 'упаковка не найдена' : ''}</Text>
+              </View>
+              <MaterialCommunityIcons name={'chevron-down' as Icon} size={24} color="black" />
+            </View>
+            <Text style={textPackStyle}>Для данного товара нет упаковки</Text>
+          </>
+        )}
+        <ItemSeparator />
+      </View>
+    </ScrollView>
   );
 };
 
