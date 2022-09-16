@@ -411,7 +411,6 @@ const SelectGroupScreen = () => {
           activeOptionId={viewType}
         />
       </View>
-
       <Divider />
       {filterVisible && (
         <>
