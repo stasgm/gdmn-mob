@@ -28,9 +28,18 @@ interface IProps {
   onClearScannedObject: () => void;
   barCodeTypes: string[];
   children?: ReactNode;
+  onSearch?: () => void;
 }
 
-const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject, barCodeTypes, children }: IProps) => {
+const ScanBarcode = ({
+  scaner,
+  onSave,
+  onGetScannedObject,
+  onClearScannedObject,
+  barCodeTypes,
+  children,
+  onSearch,
+}: IProps) => {
   const [flashMode, setFlashMode] = useState(false);
   const [vibroMode, setVibroMode] = useState(false);
   const [visibleDialog, setVisibleDialog] = useState(false);
@@ -142,7 +151,7 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={handleShowDialog}
+            onPress={onSearch ? onSearch : handleShowDialog}
           />
         </View>
         {!scanned ? (
@@ -178,7 +187,10 @@ const ScanBarcode = ({ scaner, onSave, onGetScannedObject, onClearScannedObject,
               </View>
             ) : children ? (
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handleSave}>
+                <TouchableOpacity
+                  style={[styles.buttons, scaner.state === 'error' ? styles.btnNotFind : styles.btnFind]}
+                  onPress={handleSave}
+                >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   {children}
                 </TouchableOpacity>
