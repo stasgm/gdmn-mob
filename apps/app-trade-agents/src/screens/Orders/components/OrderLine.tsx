@@ -23,6 +23,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
+  //Если упаковка только одна, то ставим ее по умолчанию, иначе
+  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
   const defaultPack = useMemo(
     () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
     [packages],
@@ -60,65 +62,64 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const textStyle = useMemo(() => [styles.number, styles.field, { color: colors.text }], [colors.text]);
+  const textStyle = [styles.number, styles.field, { color: colors.text }];
+  const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
 
   return (
-    <>
-      <ScrollView>
-        <View style={styles.content}>
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Наименование</Text>
-              <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
-            </View>
+    <ScrollView>
+      <View style={styles.content}>
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Наименование</Text>
+            <Text style={textStyle}>{item ? item.good.name || 'товар не найден' : ''}</Text>
           </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Цена</Text>
-              <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Количество, кг</Text>
-              <TextInput
-                style={textStyle}
-                editable={true}
-                keyboardType="numeric"
-                autoCapitalize="words"
-                onChangeText={handelQuantityChange}
-                returnKeyType="done"
-                ref={qtyRef}
-                value={goodQty}
-              />
-            </View>
-          </View>
-          <ItemSeparator />
-          <View style={styles.item}>
-            <View style={styles.details}>
-              <Text style={styles.name}>Упаковка</Text>
-              {packages.length > 0 ? (
-                <View style={localStyles.packages}>
-                  {packages.map((elem) => (
-                    <Checkbox
-                      key={elem.package.id}
-                      title={elem.package.name}
-                      selected={elem.package.id === pack?.id}
-                      onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
-                    />
-                  ))}
-                </View>
-              ) : (
-                <Text style={textStyle}>Для данного товара нет упаковки</Text>
-              )}
-            </View>
-          </View>
-          <ItemSeparator />
         </View>
-      </ScrollView>
-    </>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Цена</Text>
+            <Text style={textStyle}>{item.good.priceFsn.toString()}</Text>
+          </View>
+        </View>
+        <ItemSeparator />
+        <View style={styles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Количество, кг</Text>
+            <TextInput
+              style={textStyle}
+              editable={true}
+              keyboardType="numeric"
+              autoCapitalize="words"
+              onChangeText={handelQuantityChange}
+              returnKeyType="done"
+              ref={qtyRef}
+              value={goodQty}
+            />
+          </View>
+        </View>
+        <ItemSeparator />
+        <View style={localStyles.item}>
+          <View style={styles.details}>
+            <Text style={styles.name}>Упаковка</Text>
+            {packages.length > 0 ? (
+              <View style={localStyles.packages}>
+                {packages.map((elem) => (
+                  <Checkbox
+                    key={elem.package.id}
+                    title={elem.package.name}
+                    selected={elem.package.id === pack?.id}
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <Text style={textPackStyle}>Без упаковки</Text>
+            )}
+          </View>
+        </View>
+        <ItemSeparator />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -126,6 +127,16 @@ const localStyles = StyleSheet.create({
   packages: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  text: {
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  item: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginHorizontal: 3,
+    marginTop: 3,
   },
 });
 

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { refSelectors } from '@lib/store';
 import { DataTable, IconButton } from 'react-native-paper';
 
@@ -8,8 +8,6 @@ import { useTheme } from '@react-navigation/native';
 import { formatValue, round } from '@lib/mobile-app';
 
 import { globalColors, globalStyles } from '@lib/mobile-ui';
-
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IGoodGroup, IOrderDocument } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';

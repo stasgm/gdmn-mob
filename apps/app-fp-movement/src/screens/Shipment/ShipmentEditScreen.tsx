@@ -75,7 +75,6 @@ const ShipmentEditScreen = () => {
         appActions.setFormParams({
           documentDate: new Date().toISOString(),
           status: 'DRAFT',
-          // depart: defaultDepart,
         }),
       );
     }

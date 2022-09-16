@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Text, StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
@@ -25,15 +24,13 @@ const Checkbox = ({ title, selected, onSelect }: { title: string; selected: bool
     [colors.background, colors.text, selected],
   );
 
-  const borderStyle = useMemo(() => colors.border, [colors.border]);
+  const borderColor = useMemo(() => (selected ? 'white' : colors.border), [colors.border, selected]);
+
+  const iconName = useMemo(() => (selected ? 'check-circle-outline' : 'circle-outline') as Icon, [selected]);
 
   return (
     <TouchableOpacity style={checkboxStyle} onPress={onSelect}>
-      <MaterialCommunityIcons
-        name={(selected ? 'check-circle-outline' : 'circle-outline') as Icon}
-        size={20}
-        color={selected ? 'white' : borderStyle}
-      />
+      <MaterialCommunityIcons name={iconName} size={20} color={borderColor} />
       <Text style={textStyle}>{title}</Text>
     </TouchableOpacity>
   );

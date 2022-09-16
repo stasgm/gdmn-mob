@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { refSelectors } from '@lib/store';
 import { DataTable, IconButton } from 'react-native-paper';
 
@@ -8,8 +8,6 @@ import { useTheme } from '@react-navigation/native';
 import { formatValue, round, useFilteredDocList } from '@lib/mobile-app';
 
 import { globalColors, globalStyles } from '@lib/mobile-ui';
-
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { IGoodGroup, IOrderDocument, IOrderLine } from '../../../store/types';
 import { totalList, totalListByGroup } from '../../../utils/helpers';
@@ -68,7 +66,8 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = true }: IItem) => {
   const textBoldStyle = [textStyle, textColor, globalStyles.textBold];
   const labelStyle = { backgroundColor: colors.border, borderBottomColor: globalColors.backgroundLight };
   const totalStyle = {
-    backgroundColor: isGroupVisible && totalListByRoute.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
+    backgroundColor:
+      isGroupVisible && totalListByRoute?.length % 2 === 1 ? globalColors.backgroundLight : 'transparent',
   };
 
   return (
@@ -89,7 +88,7 @@ const RouteTotal = ({ routeId, onPress, isGroupVisible = true }: IItem) => {
           })}
         </DataTable.Header>
         {isGroupVisible
-          ? totalListByRoute.map((item, index) => {
+          ? totalListByRoute?.map((item, index) => {
               const groupStyle = { backgroundColor: index % 2 === 1 ? globalColors.backgroundLight : 'transparent' };
               return (
                 <View key={item.group.id} style={groupStyle}>

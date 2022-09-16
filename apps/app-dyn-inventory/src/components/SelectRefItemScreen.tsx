@@ -4,7 +4,15 @@ import { Searchbar, Divider, useTheme, Checkbox } from 'react-native-paper';
 import { RouteProp, useNavigation, useRoute, useScrollToTop } from '@react-navigation/native';
 import { INamedEntity } from '@lib/types';
 import { appActions, refSelectors, useSelector } from '@lib/store';
-import { AppScreen, ItemSeparator, SaveButton, SearchButton, SubTitle, globalStyles as styles } from '@lib/mobile-ui';
+import {
+  AppScreen,
+  ItemSeparator,
+  SaveButton,
+  SearchButton,
+  SubTitle,
+  globalStyles as styles,
+  navBackButton,
+} from '@lib/mobile-ui';
 
 import { extraPredicate } from '@lib/mobile-app';
 
@@ -74,14 +82,13 @@ export const SelectRefItemScreen = () => {
       } else {
         dispatch(
           appActions.setFormParams({
-            ...formParams,
             [fieldName]: { id: item.id, name: item.name },
           }),
         );
         navigation.goBack();
       }
     },
-    [isMulti, dispatch, formParams, fieldName, navigation],
+    [isMulti, dispatch, fieldName, navigation],
   );
 
   const renderItem = useCallback(

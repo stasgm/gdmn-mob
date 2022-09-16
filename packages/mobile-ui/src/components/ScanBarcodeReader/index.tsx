@@ -28,9 +28,17 @@ interface IProps {
   onGetScannedObject: (brc: string) => void;
   onClearScannedObject: () => void;
   children?: ReactNode;
+  onSearch?: () => void;
 }
 
-const ScanBarcodeReader = ({ scaner, onSave, onGetScannedObject, onClearScannedObject, children }: IProps) => {
+const ScanBarcodeReader = ({
+  scaner,
+  onSave,
+  onGetScannedObject,
+  onClearScannedObject,
+  children,
+  onSearch,
+}: IProps) => {
   const ref = useRef<TextInput>(null);
 
   const [vibroMode, setVibroMode] = useState(false);
@@ -110,7 +118,7 @@ const ScanBarcodeReader = ({ scaner, onSave, onGetScannedObject, onClearScannedO
             size={30}
             color={'#FFF'}
             style={styles.transparent}
-            onPress={handleShowDialog}
+            onPress={onSearch ? onSearch : handleShowDialog}
           />
         </View>
         {!scanned ? (
@@ -145,7 +153,10 @@ const ScanBarcodeReader = ({ scaner, onSave, onGetScannedObject, onClearScannedO
               </View>
             ) : (
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={[styles.buttons, styles.btnFind]} onPress={handleSave}>
+                <TouchableOpacity
+                  style={[styles.buttons, scaner.state === 'error' ? styles.btnNotFind : styles.btnFind]}
+                  onPress={handleSave}
+                >
                   <IconButton icon={'checkbox-marked-circle-outline'} color={'#FFF'} size={30} />
                   {children}
                 </TouchableOpacity>

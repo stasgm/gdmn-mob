@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, useMemo, useEffect, useCallback } from 'react';
-import { View, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { Divider, Searchbar } from 'react-native-paper';
+import { View, FlatList, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import { Button, Dialog, Divider, Searchbar } from 'react-native-paper';
 import { RouteProp, useIsFocused, useNavigation, useRoute, useScrollToTop, useTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -14,10 +14,11 @@ import {
   SearchButton,
   navBackButton,
   AppActivityIndicator,
-  LargeText,
   MediumText,
+  LargeText,
+  globalColors,
 } from '@lib/mobile-ui';
-import { appActions, docSelectors, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { generateId, getDateString, keyExtractor } from '@lib/mobile-app';
 
@@ -76,7 +77,17 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
   const renderGood = useCallback(
     ({ item: itemGood }: { item: IGood }) => {
       const line = doc.lines?.find((i) => i.good.id === itemGood.id);
-      return <Good key={itemGood.id} item={itemGood} onPress={onPressGood} quantity={line?.quantity} />;
+      return (
+        <Good
+          key={itemGood.id}
+          item={itemGood}
+          onPress={onPressGood}
+          quantity={line?.quantity}
+          priceFsn={line?.good?.priceFsn}
+          scale={line?.good?.scale}
+          packageName={line?.package?.name}
+        />
+      );
     },
     [doc.lines, onPressGood],
   );
@@ -109,11 +120,11 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
     <View key={item.id}>
       <TouchableOpacity style={localStyles.item} onPress={handlePressGroup}>
         <View style={styles.details}>
-          <LargeText style={styles.textBold}>{item.name || item.name}</LargeText>
+          <Text style={styles.name}>{item.name || item.name}</Text>
           {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
               <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText>{len}</MediumText>
+              <Text style={styles.field}>{len}</Text>
             </View>
           )}
         </View>
@@ -127,6 +138,10 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
+          initialNumToRender={20}
+          maxToRenderPerBatch={20} // Reduce number in each render batch
+          updateCellsBatchingPeriod={100} // Increase time between renders
+          windowSize={7} // Reduce the window size
         />
       )}
       {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && nextLevelGroups && nextLevelGroups?.length > 0 && (
@@ -149,28 +164,38 @@ interface IGoodProp {
   item: IGood;
   onPress: (item: IGood) => void;
   quantity?: number;
+  packageName?: string;
+  scale?: number;
+  priceFsn?: number;
 }
 
-const Good = ({ item, onPress, quantity }: IGoodProp) => {
-  const iconStyle = useMemo(
-    () => [styles.icon, { backgroundColor: quantity || quantity === 0 ? '#06567D' : '#E91E63' }],
-    [quantity],
-  );
+const Good = ({ item, onPress, quantity, packageName, scale, priceFsn }: IGoodProp) => {
+  const isAdded = quantity || quantity === 0;
+  const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
+
+  const goodStyle = {
+    backgroundColor: isAdded ? globalColors.backgroundLight : 'transparent',
+  };
 
   return (
     <TouchableOpacity onPress={() => onPress(item)}>
-      <View style={localStyles.item}>
+      <View style={[localStyles.item, goodStyle]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
-          <View style={styles.directionRow}>
-            <LargeText>{item.name || item.id}</LargeText>
-          </View>
-          {quantity ? (
-            <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
-              <MediumText style={styles.field}>{quantity} кг</MediumText>
+          <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
+          {isAdded ? (
+            <View style={styles.directionColumn}>
+              <View style={styles.flexDirectionRow}>
+                <MaterialCommunityIcons name="shopping-outline" size={18} />
+                <MediumText>
+                  {quantity} {(scale || 1) === 1 ? '' : 'уп. / ' + (scale || 1).toString()}
+                  {'кг  /  '}
+                  {(priceFsn || 0).toString()} р.{' '}
+                </MediumText>
+              </View>
+              <MediumText>Упаковка: {packageName ? packageName : 'без упаковки'}</MediumText>
             </View>
           ) : null}
         </View>
@@ -286,39 +311,48 @@ const SelectGroupScreen = () => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
+  const [visiblDialog, setVisibleDialog] = useState(false);
+  const [dublicateGood, setDublicateGood] = useState<IGood | undefined>(undefined);
+
   const handlePressGood = useCallback(
     (item: IGood) => {
       const good = doc.lines?.find((i) => i.good.id === item.id);
-
       if (good) {
-        Alert.alert(
-          'Товар уже добавлен в документ!',
-          "Нажмите 'Добавить', если хотите добавить новую позицию.\n\nНажмите 'Редактировать', если хотите редактировать существующую позицию.",
-          [
-            {
-              text: 'Отмена',
-            },
-            {
-              text: 'Редактировать',
-              onPress: () => navigation.navigate('OrderLine', { mode: 1, docId, item: good }), //() => navigation.navigate('OrderLine', { mode: 1, docId, item: good }),
-            },
-            {
-              text: 'Добавить',
-              onPress: () =>
-                navigation.navigate('OrderLine', {
-                  mode: 0,
-                  docId,
-                  item: { id: generateId(), good: item, quantity: 0 },
-                }),
-            },
-          ],
-        );
+        setVisibleDialog(true);
+        setDublicateGood(item);
       } else {
         navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
       }
     },
     [doc.lines, docId, navigation],
   );
+
+  const handleAddGood = useCallback(() => {
+    if (dublicateGood) {
+      setVisibleDialog(false);
+      navigation.navigate('OrderLine', {
+        mode: 0,
+        docId,
+        item: { id: generateId(), good: dublicateGood, quantity: 0 },
+      });
+    }
+  }, [docId, dublicateGood, navigation]);
+
+  const handleEditGood = useCallback(() => {
+    const good = doc.lines?.find((i) => i.good.id === dublicateGood?.id);
+    if (good) {
+      setVisibleDialog(false);
+      navigation.navigate('OrderLine', { mode: 1, docId, item: good });
+    }
+  }, [doc.lines, docId, dublicateGood, navigation]);
+
+  const handleDeleteGood = useCallback(() => {
+    const lines: string[] = doc.lines?.filter((i) => i.good.id === dublicateGood?.id)?.map((i) => i.id);
+    if (lines.length) {
+      setVisibleDialog(false);
+      dispatch(documentActions.removeDocumentLines({ docId, lineIds: lines }));
+    }
+  }, [dispatch, doc.lines, docId, dublicateGood]);
 
   const renderGroup = useCallback(
     ({ item }: { item: IGoodGroup }) => (
@@ -339,15 +373,20 @@ const SelectGroupScreen = () => {
   useScrollToTop(refListGood);
 
   const renderGood = useCallback(
-    ({ item: itemGood }: { item: IGood }) => (
-      <Good
-        key={itemGood.id}
-        item={itemGood}
-        onPress={handlePressGood}
-        quantity={doc.lines?.find((i) => i.good.id === itemGood.id)?.quantity}
-      />
-    ),
-
+    ({ item: itemGood }: { item: IGood }) => {
+      const line = doc.lines?.find((i) => i.good.id === itemGood.id);
+      return (
+        <Good
+          key={itemGood.id}
+          item={itemGood}
+          onPress={handlePressGood}
+          quantity={line?.quantity}
+          priceFsn={line?.good?.priceFsn}
+          scale={line?.good?.scale}
+          packageName={line?.package?.name}
+        />
+      );
+    },
     [doc.lines, handlePressGood],
   );
 
@@ -372,6 +411,7 @@ const SelectGroupScreen = () => {
           activeOptionId={viewType}
         />
       </View>
+
       <Divider />
       {filterVisible && (
         <>
@@ -396,6 +436,10 @@ const SelectGroupScreen = () => {
           ItemSeparatorComponent={ItemSeparator}
           keyExtractor={keyExtractor}
           removeClippedSubviews={true} // Unmount compsonents when outside of window
+          initialNumToRender={20}
+          maxToRenderPerBatch={20} // Reduce number in each render batch
+          updateCellsBatchingPeriod={100} // Increase time between renders
+          windowSize={7} // Reduce the window size
         />
       ) : (
         <FlatList
@@ -407,6 +451,30 @@ const SelectGroupScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
+      <Dialog visible={visiblDialog} onDismiss={() => setVisibleDialog(false)}>
+        <Dialog.Title style={localStyles.titleSize}>{'Товар уже добавлен в документ!'}</Dialog.Title>
+        <Dialog.Content>
+          <LargeText style={localStyles.text}>
+            Нажмите 'Редактировать', если хотите редактировать существующую позицию.
+          </LargeText>
+          <LargeText style={localStyles.text}>Нажмите 'Добавить', если хотите добавить новую позицию</LargeText>
+          <LargeText style={localStyles.text}>Нажмите 'Удалить', если хотите удалить существующую позицию.</LargeText>
+        </Dialog.Content>
+        <Dialog.Actions style={localStyles.action}>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleEditGood}>
+            Редактировать
+          </Button>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleAddGood}>
+            Добавить
+          </Button>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
+            Удалить
+          </Button>
+          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={() => setVisibleDialog(false)}>
+            Отмена
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
     </AppScreen>
   );
 };
@@ -415,12 +483,17 @@ export default SelectGroupScreen;
 
 const localStyles = StyleSheet.create({
   marginLeft: {
-    marginLeft: 14,
+    marginLeft: 20,
   },
   item: {
     alignItems: 'center',
     flexDirection: 'row',
-    padding: 2,
-    height: 86,
+    padding: 3,
+    minHeight: 50,
   },
+  titleSize: {
+    fontSize: 18,
+  },
+  text: { fontSize: 15, paddingTop: 5 },
+  action: { flexDirection: 'column', alignItems: 'flex-end' },
 });
