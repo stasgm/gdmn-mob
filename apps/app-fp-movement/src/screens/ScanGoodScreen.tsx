@@ -48,6 +48,7 @@ const ScanGoodScreen = () => {
   }, [navigation]);
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(docId);
+  console.log('shipment', shipment.documentType);
   const shipmentLines = useMemo(
     () => shipment?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
     [shipment?.lines],
@@ -142,7 +143,7 @@ const ScanGoodScreen = () => {
           },
         ]);
       }
-    } else {
+    } else if (shipment.documentType.name === 'shipment' || shipment.documentType.name === 'currShipment') {
       Alert.alert('Данный товар отсутствует в позициях заявки', 'Добавить позицию?', [
         {
           text: 'Да',
@@ -155,8 +156,11 @@ const ScanGoodScreen = () => {
           text: 'Отмена',
         },
       ]);
+    } else {
+      dispatch(documentActions.addDocumentLine({ docId, line: scannedObject }));
+      setScaner({ state: 'init' });
     }
-  }, [scannedObject, tempOrder, fpDispatch, dispatch, docId]);
+  }, [scannedObject, tempOrder, shipment.documentType.name, fpDispatch, dispatch, docId]);
 
   const handleClearScaner = () => setScaner({ state: 'init' });
 

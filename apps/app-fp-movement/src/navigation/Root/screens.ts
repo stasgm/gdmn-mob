@@ -13,7 +13,7 @@ import { SelectRefItemScreen } from '../../components';
 
 export const moveScreens = {
   MoveEdit: { title: 'Перемещение', component: MoveEditScreen },
-  MoveView: { title: 'Перемещение', component: MoveViewScreen },
+  MoveView: { title: '', component: MoveViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
@@ -24,7 +24,7 @@ export const moveListScreens = {
 
 export const shipmentScreens = {
   ShipmentEdit: { title: 'Отвес по заявке', component: ShipmentEditScreen },
-  ShipmentView: { title: 'Отвес', component: ShipmentViewScreen },
+  ShipmentView: { title: '', component: ShipmentViewScreen },
   ScanOrder: { title: 'Сканер заявки', component: ScanOrderScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
@@ -35,7 +35,7 @@ export const shipmentListScreens = {
 
 export const freeShipmentScreens = {
   FreeShipmentEdit: { title: 'Отвес', component: FreeShipmentEditScreen },
-  FreeShipmentView: { title: 'Отвес', component: FreeShipmentViewScreen },
+  FreeShipmentView: { title: '', component: FreeShipmentViewScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
   ScanGood: { title: 'Сканер', component: ScanGoodScreen },
 };
