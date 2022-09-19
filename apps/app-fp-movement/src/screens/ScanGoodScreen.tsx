@@ -48,7 +48,6 @@ const ScanGoodScreen = () => {
   }, [navigation]);
 
   const shipment = docSelectors.selectByDocId<IShipmentDocument>(docId);
-  console.log('shipment', shipment.documentType);
   const shipmentLines = useMemo(
     () => shipment?.lines?.sort((a, b) => (b.sortOrder || 0) - (a.sortOrder || 0)),
     [shipment?.lines],

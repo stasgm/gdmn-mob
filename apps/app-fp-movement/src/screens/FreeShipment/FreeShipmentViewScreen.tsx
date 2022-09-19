@@ -268,7 +268,7 @@ export const FreeShipmentViewScreen = () => {
   }, [navigation, renderRight]);
 
   const renderItem: ListRenderItem<IFreeShipmentLine> = ({ item }) => (
-    <ListItemLine key={item.id}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
@@ -401,8 +401,8 @@ export const FreeShipmentViewScreen = () => {
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
-          <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
           <MediumText>{doc.head.depart.name || ''}</MediumText>
+          <MediumText>{`№ ${doc.number} от ${getDateString(doc.documentDate)}`}</MediumText>
         </View>
       </InfoBlock>
       <TextInput

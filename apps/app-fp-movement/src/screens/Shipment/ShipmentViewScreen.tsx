@@ -526,7 +526,7 @@ const ShipmentViewScreen = () => {
   );
 
   const renderShipmentItem: ListRenderItem<IShipmentLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={isBlocked}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
         <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.flexDirectionRow}>
@@ -581,7 +581,6 @@ const ShipmentViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(shipment?.status || 'DRAFT')}
-        // title={shipment.head.outlet?.name || ''}
         title={shipment.documentType.description || ''}
         onPress={handleEditShipmentHead}
         disabled={!['DRAFT', 'READY'].includes(shipment.status)}
