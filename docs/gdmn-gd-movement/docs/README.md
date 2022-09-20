@@ -370,8 +370,8 @@
 
 | Иконка | Описание                                                                                                                                                                    |
 | :---------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | --???отправка документа на сервер --???автоматический перевод документа с признака **Черновик** на признак **Готов к отправке** с отправкой документа на обработку                                                                                                                                   |
-| <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>        | редакция (???редактирование) документа                                                                |
+| <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>            | отправка документа                                                                                                                                    |
+| <img src="img/1.Connection/1.IconEdit.jpg" alt="drawing" height="22"/>        | редактирование документа                                                                |
 | <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>           | поиск|
 | <img src="img/10.Scanner/10.IconScanner.jpg" alt="drawing" height="22"/>           | сканирование штрихкода|
 | <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>           | синхронизация|
@@ -379,6 +379,6 @@
 | <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>           | удаление документа|
 | <img src="img/1.Connection/1.IconFlash.jpg" alt="drawing" height="22"/>           | вспышка выключена|
 | <img src="img/1.Connection/1.IconVibr.jpg" alt="drawing" height="22"/>           | вибрация выключена|
-| **✓**           | ???готово|
+| **✓**            | сохранить|
 | **+**           | добавление нового документа|
 | **⁝**           | меню документа|
