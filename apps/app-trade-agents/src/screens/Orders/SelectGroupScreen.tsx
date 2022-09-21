@@ -342,10 +342,39 @@ const SelectGroupScreen = () => {
 
   const handleDeleteGood = useCallback(() => {
     if (selectedLine) {
-      dispatch(documentActions.removeDocumentLine({ docId, lineId: selectedLine.id }));
+      Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocumentLine({ docId, lineId: selectedLine.id }));
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
       setSelectedLine(undefined);
+    } else if (selectedGood) {
+      const lineIds: string[] = doc.lines?.filter((i) => i.good.id === selectedGood?.id)?.map((i) => i.id);
+      Alert.alert('Вы уверены, что хотите удалить все позиции?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocumentLines({ docId, lineIds }));
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+      setSelectedGood(undefined);
     }
-  }, [dispatch, docId, selectedLine]);
+  }, [dispatch, doc.lines, docId, selectedGood, selectedLine]);
+
+  const hadndleDismissDialog = () => {
+    setSelectedLine(undefined);
+    setSelectedGood(undefined);
+  };
 
   const renderGroup = useCallback(
     ({ item }: { item: IGoodGroup }) => (
@@ -433,13 +462,7 @@ const SelectGroupScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
-      <Dialog
-        visible={!!selectedLine || !!selectedGood}
-        onDismiss={() => {
-          setSelectedLine(undefined);
-          setSelectedGood(undefined);
-        }}
-      >
+      <Dialog visible={!!selectedLine || !!selectedGood} onDismiss={hadndleDismissDialog}>
         <Dialog.Title style={localStyles.titleSize}>{selectedLine?.good.name || selectedGood?.name || ''}</Dialog.Title>
         {selectedLine ? (
           <>
@@ -458,17 +481,10 @@ const SelectGroupScreen = () => {
               <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleEditLine}>
                 Редактировать
               </Button>
-
               <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
                 Удалить
               </Button>
-
-              <Button
-                color={colors.primary}
-                onPress={() => {
-                  setSelectedLine(undefined);
-                }}
-              >
+              <Button color={colors.primary} onPress={() => setSelectedLine(undefined)}>
                 Отмена
               </Button>
             </Dialog.Actions>
@@ -484,12 +500,10 @@ const SelectGroupScreen = () => {
               <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleAddGood}>
                 Добавить
               </Button>
-              <Button
-                color={colors.primary}
-                onPress={() => {
-                  setSelectedGood(undefined);
-                }}
-              >
+              <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
+                Удалить
+              </Button>
+              <Button color={colors.primary} onPress={() => setSelectedGood(undefined)}>
                 Отмена
               </Button>
             </Dialog.Actions>
