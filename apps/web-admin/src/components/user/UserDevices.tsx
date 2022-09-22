@@ -53,6 +53,7 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     },
     [dispatch],
   );
+
   useEffect(() => {
     /* Загружаем данные при загрузке компонента */
     fetchActivationCodes();
@@ -80,19 +81,12 @@ const UserDevices = ({ userId, userBindingDevices, onAddDevice }: IProps) => {
     dispatch(actionsBinding.deviceBindingActions.setPageParam({ filterText: pageParamLocal?.filterText }));
 
     fetchDeviceBindings(pageParamLocal?.filterText as string);
-
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchDeviceBindings(inputValue);
   };
 
   const handleKeyPress = (key: string) => {
     if (key !== 'Enter') return;
 
     handleSearchClick();
-    // const inputValue = valueRef?.current?.value;
-
-    // fetchDeviceBindings(inputValue);
   };
 
   const handleCreateCode = (deviceId: string) => {

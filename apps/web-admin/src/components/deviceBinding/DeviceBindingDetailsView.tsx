@@ -12,7 +12,7 @@ interface IProps {
   uid?: string;
 }
 
-const DeviceBindingDetailsView = ({ deviceBinding, uid }: IProps) => {
+const DeviceBindingDetailsView = ({ deviceBinding, uid = '' }: IProps) => {
   return (
     <Card>
       <CardHeader title="Общая информация" />

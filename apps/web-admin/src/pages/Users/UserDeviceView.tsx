@@ -16,6 +16,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
+import { IDevice } from '@lib/types';
+
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
 import deviceActions from '../../store/device';
@@ -42,6 +44,8 @@ const UserDeviceView = () => {
 
   const deviceBinding = deviceBindingSelectors.bindingById(bindingid);
 
+  const device = deviceSelectors.deviceById(deviceBinding?.device.id || '-1');
+
   const [open, setOpen] = useState(false);
 
   const handleCancel = () => {
@@ -50,7 +54,6 @@ const UserDeviceView = () => {
 
   const handleEdit = () => {
     navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/${bindingid}/edit`);
-    // <NavLink to={${adminPath}/app/users/${binding.user.id}/binding/${binding.id}}></NavLink>
   };
 
   const handleDelete = async () => {
@@ -63,30 +66,12 @@ const UserDeviceView = () => {
 
   const refreshData = useCallback(() => {
     dispatch(bindingActions.fetchDeviceBindings());
+    dispatch(deviceActions.fetchDevices());
   }, [dispatch]);
-
-  const deviceUid = deviceSelectors.deviceById(deviceBinding && deviceBinding?.device.id)?.uid;
-
-  const fetchDevice = useCallback(() => {
-    if (deviceBinding) {
-      dispatch(deviceActions.fetchDeviceById(deviceBinding?.device.id));
-    }
-  }, [deviceBinding, dispatch]);
 
   useEffect(() => {
     refreshData();
   }, [refreshData]);
-
-  useEffect(() => {
-    fetchDevice();
-  }, [fetchDevice]);
-
-  // const fetchUsers = useCallback(
-  //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
-  //     dispatch(userActions.fetchUsers('', filterText, fromRecord, toRecord));
-  //   },
-  //   [dispatch],
-  // );
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -95,27 +80,9 @@ const UserDeviceView = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [fetchUsers]);
-
   const handleClearError = () => {
     dispatch(bindingActions.deviceBindingActions.clearError());
   };
-
-  if (!deviceBinding) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          p: 3,
-        }}
-      >
-        Устройство не найдено
-      </Box>
-    );
-  }
 
   const buttons: IToolBarButton[] = [
     {
@@ -144,6 +111,20 @@ const UserDeviceView = () => {
       icon: <DeleteIcon />,
     },
   ];
+
+  if (!deviceBinding) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          p: 3,
+        }}
+      >
+        Устройство не найдено
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -195,7 +176,7 @@ const UserDeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={deviceUid} />
+          <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={device?.uid} />
         </Box>
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />
