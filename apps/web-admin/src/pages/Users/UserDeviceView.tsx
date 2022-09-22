@@ -18,10 +18,12 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import { useSelector, useDispatch } from '../../store';
 import bindingActions from '../../store/deviceBinding';
+import deviceActions from '../../store/device';
 import { IToolBarButton } from '../../types';
 import ToolBarAction from '../../components/ToolBarActions';
 
 import deviceBindingSelectors from '../../store/deviceBinding/selectors';
+import deviceSelectors from '../../store/device/selectors';
 import SnackBar from '../../components/SnackBar';
 
 import { adminPath } from '../../utils/constants';
@@ -48,7 +50,7 @@ const UserDeviceView = () => {
 
   const handleEdit = () => {
     navigate(`${adminPath}/app/users/${deviceBinding?.user.id}/binding/${bindingid}/edit`);
-    // <NavLink to={`${adminPath}/app/users/${binding.user.id}/binding/${binding.id}`}></NavLink>
+    // <NavLink to={${adminPath}/app/users/${binding.user.id}/binding/${binding.id}}></NavLink>
   };
 
   const handleDelete = async () => {
@@ -60,15 +62,24 @@ const UserDeviceView = () => {
   };
 
   const refreshData = useCallback(() => {
-    //dispatch(deviceActions.fetchDeviceById(deviceId));
     dispatch(bindingActions.fetchDeviceBindings());
-    //dispatch(userActions.fetchUsers());
-    //dispatch(codeActions.fetchActivationCodes(deviceId));
-  }, [dispatch /*, deviceId*/]);
+  }, [dispatch]);
+
+  const deviceUid = deviceSelectors.deviceById(deviceBinding && deviceBinding?.device.id)?.uid;
+
+  const fetchDevice = useCallback(() => {
+    if (deviceBinding) {
+      dispatch(deviceActions.fetchDeviceById(deviceBinding?.device.id));
+    }
+  }, [deviceBinding, dispatch]);
 
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  useEffect(() => {
+    fetchDevice();
+  }, [fetchDevice]);
 
   // const fetchUsers = useCallback(
   //   (filterText?: string, fromRecord?: number, toRecord?: number) => {
@@ -184,7 +195,7 @@ const UserDeviceView = () => {
             minHeight: '100%',
           }}
         >
-          <DeviceBindingDetailsView deviceBinding={deviceBinding} />
+          <DeviceBindingDetailsView deviceBinding={deviceBinding} uid={deviceUid} />
         </Box>
       </Box>
       <SnackBar errorMessage={errorMessage} onClearError={handleClearError} />

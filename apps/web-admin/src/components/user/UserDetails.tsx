@@ -239,7 +239,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                   <TextField
                     error={formik.touched.externalId && Boolean(formik.errors.externalId)}
                     fullWidth
-                    required
+                    required={userERP || user.role !== 'User' ? false : true}
                     label="ID"
                     name="externalId"
                     variant="outlined"
