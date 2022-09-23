@@ -256,6 +256,7 @@ const RouteViewScreen = () => {
           viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
           initialScrollIndex={routeItemId}
           getItemLayout={getItemLayoutRoute}
+          keyboardShouldPersistTaps={'handled'}
         />
       </AppScreen>
       {!!routeLineList.length && (

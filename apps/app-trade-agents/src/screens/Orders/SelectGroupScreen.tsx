@@ -30,6 +30,7 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 import { IGood, IGoodMatrix, IGoodGroup, IMGroupModel, IOrderDocument, IOrderLine } from '../../store/types';
 import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
 import { UNKNOWN_GROUP, viewTypeList } from '../../utils/constants';
+import IconTest from '../../components/IconTest';
 
 type Icon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -113,12 +114,12 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
           <Text style={styles.name}>{item.name || item.name}</Text>
           {nextLevelGroups?.length === 0 && (
             <View style={styles.flexDirectionRow}>
-              <MaterialCommunityIcons name="shopping-outline" size={18} />
+              <IconTest name="shopping-outline" size={18} />
               <Text style={styles.field}>{len}</Text>
             </View>
           )}
         </View>
-        <MaterialCommunityIcons name={icon} size={24} color="black" />
+        <IconTest name={icon} size={24} color="black" />
       </TouchableOpacity>
       {goodModel.length > 0 && isExpand && (
         <FlatList
@@ -132,6 +133,7 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
           maxToRenderPerBatch={20} // Reduce number in each render batch
           updateCellsBatchingPeriod={100} // Increase time between renders
           windowSize={7} // Reduce the window size
+          keyboardShouldPersistTaps={'handled'}
         />
       )}
       {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && nextLevelGroups && nextLevelGroups?.length > 0 && (
@@ -143,6 +145,7 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
             renderItem={renderGroup}
             ItemSeparatorComponent={ItemSeparator}
             ListEmptyComponent={EmptyList}
+            keyboardShouldPersistTaps={'handled'}
           />
         </View>
       )}
@@ -168,7 +171,7 @@ const Good = ({ item, onPress, lines }: IGoodProp) => {
     <TouchableOpacity onPress={() => (!isAdded ? onPress(item) : onPress(item, true))}>
       <View style={[localStyles.item, goodStyle]}>
         <View style={iconStyle}>
-          <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
+          <IconTest name="file-document" size={20} color={'#FFF'} />
         </View>
         <View style={styles.details}>
           <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
@@ -451,6 +454,7 @@ const SelectGroupScreen = () => {
           maxToRenderPerBatch={20} // Reduce number in each render batch
           updateCellsBatchingPeriod={100} // Increase time between renders
           windowSize={7} // Reduce the window size
+          keyboardShouldPersistTaps={'handled'}
         />
       ) : (
         <FlatList
@@ -460,6 +464,7 @@ const SelectGroupScreen = () => {
           renderItem={renderGroup}
           ItemSeparatorComponent={ItemSeparator}
           ListEmptyComponent={EmptyList}
+          keyboardShouldPersistTaps={'handled'}
         />
       )}
       <Dialog visible={!!selectedLine || !!selectedGood} onDismiss={hadndleDismissDialog}>

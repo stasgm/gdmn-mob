@@ -128,6 +128,7 @@ const DebetListScreen = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
         ListEmptyComponent={!debets ? EmptyList : null}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );
