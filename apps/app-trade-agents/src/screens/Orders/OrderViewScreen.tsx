@@ -23,7 +23,7 @@ import {
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
-import { IDocument, ScreenState } from '@lib/types';
+import { ScreenState } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -78,11 +78,12 @@ const OrderViewScreen = () => {
     const newDocDate = new Date().toISOString();
     const newId = generateId();
 
-    const newDoc: IDocument = {
+    const newDoc: IOrderDocument = {
       ...order,
       id: newId,
       number: 'б\\н',
       status: 'DRAFT',
+      head: { ...order?.head, route: undefined },
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
@@ -183,38 +184,59 @@ const OrderViewScreen = () => {
   }, [navigation, screenState]);
 
   const actionsMenu = useCallback(() => {
-    showActionSheet([
-      {
-        title: 'Добавить товар',
-        onPress: handleAddOrderLine,
-      },
-      {
-        title: 'Редактировать данные',
-        onPress: handleEditOrderHead,
-      },
-      {
-        title: 'Копировать заявку',
-        onPress: handleCopyOrder,
-      },
-      {
-        title: 'Удалить заявку',
-        type: 'destructive',
-        onPress: handleDelete,
-      },
-      {
-        title: 'Отмена',
-        type: 'cancel',
-      },
-    ]);
-  }, [showActionSheet, handleAddOrderLine, handleEditOrderHead, handleCopyOrder, handleDelete]);
+    showActionSheet(
+      isBlocked
+        ? [
+            {
+              title: 'Копировать заявку',
+              onPress: handleCopyOrder,
+            },
+            {
+              title: 'Удалить заявку',
+              type: 'destructive',
+              onPress: handleDelete,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+            },
+          ]
+        : [
+            {
+              title: 'Добавить товар',
+              onPress: handleAddOrderLine,
+            },
+            {
+              title: 'Редактировать данные',
+              onPress: handleEditOrderHead,
+            },
+            {
+              title: 'Копировать заявку',
+              onPress: handleCopyOrder,
+            },
+            {
+              title: 'Удалить заявку',
+              type: 'destructive',
+              onPress: handleDelete,
+            },
+            {
+              title: 'Отмена',
+              type: 'cancel',
+            },
+          ],
+    );
+  }, [showActionSheet, isBlocked, handleCopyOrder, handleDelete, handleAddOrderLine, handleEditOrderHead]);
 
   const renderRight = useCallback(
     () =>
       isBlocked ? (
         order?.status === 'READY' ? (
-          <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+          <View style={styles.buttons}>
+            <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
+            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+          </View>
         ) : (
-          order?.status === 'DRAFT' && <SaveDocument onPress={handleSaveDocument} disabled={screenState !== 'idle'} />
+          order?.status !== 'SENT' && <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
         )
       ) : (
         <View style={styles.buttons}>
