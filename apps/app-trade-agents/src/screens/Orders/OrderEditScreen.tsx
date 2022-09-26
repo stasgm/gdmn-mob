@@ -335,7 +335,7 @@ const OrderEditScreen = () => {
     <AppInputScreen>
       <SubTitle>{statusName}</SubTitle>
       <Divider />
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps={'handled'}>
         <View style={viewStyle}>
           <RadioGroup
             options={STATUS_LIST}

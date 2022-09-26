@@ -128,7 +128,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     password: passwordHash,
     role: oldUser.role,
     creatorId,
-    externalId: userData.externalId || oldUser.externalId,
+    externalId: userData.externalId === undefined ? oldUser.externalId : userData.externalId,
     firstName: userData.firstName === undefined ? oldUser.firstName : userData.firstName,
     lastName: userData.lastName === undefined ? oldUser.lastName : userData.lastName,
     middleName: userData.middleName === undefined ? oldUser.middleName : userData.middleName,

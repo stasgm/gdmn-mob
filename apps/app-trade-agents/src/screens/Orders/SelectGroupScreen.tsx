@@ -152,13 +152,12 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
 
 interface IGoodProp {
   item: IGood;
-  onPress: (item: IGood, line?: IOrderLine) => void;
+  onPress: (item: IGood, isLines?: boolean, line?: IOrderLine) => void;
   lines?: IOrderLine[];
 }
 
 const Good = ({ item, onPress, lines }: IGoodProp) => {
   const isAdded = !!lines?.length;
-  const isOneAdded = lines && lines.length === 1;
   const iconStyle = [styles.icon, { backgroundColor: isAdded ? '#06567D' : '#E91E63' }];
 
   const goodStyle = {
@@ -166,7 +165,7 @@ const Good = ({ item, onPress, lines }: IGoodProp) => {
   };
 
   return (
-    <TouchableOpacity onPress={() => (isOneAdded ? onPress(item, lines[0]) : !isAdded && onPress(item))}>
+    <TouchableOpacity onPress={() => (!isAdded ? onPress(item) : onPress(item, true))}>
       <View style={[localStyles.item, goodStyle]}>
         <View style={iconStyle}>
           <MaterialCommunityIcons name="file-document" size={20} color={'#FFF'} />
@@ -175,7 +174,7 @@ const Good = ({ item, onPress, lines }: IGoodProp) => {
           <MediumText style={styles.textBold}>{item.name || item.id}</MediumText>
           {isAdded
             ? lines.map((line, xid) => (
-                <TouchableOpacity key={line.id} onPress={() => onPress(line.good, line)} disabled={isOneAdded}>
+                <TouchableOpacity key={line.id} onPress={() => onPress(line.good, false, line)}>
                   <View style={[styles.directionColumn, localStyles.line]}>
                     <View style={styles.flexDirectionRow}>
                       {/* <MaterialCommunityIcons name="drag-vertical-variant" size={18} /> */}
@@ -300,12 +299,15 @@ const SelectGroupScreen = () => {
   const refListGroups = React.useRef<FlatList<IGoodGroup>>(null);
   useScrollToTop(refListGroups);
 
-  const [selectedItem, setSelectedItem] = useState<IOrderLine | undefined>(undefined);
+  const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
+  const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
 
   const handlePressGood = useCallback(
-    (item: IGood, line?: IOrderLine) => {
+    (item: IGood, isLines?: boolean, line?: IOrderLine) => {
       if (line) {
-        setSelectedItem(line);
+        setSelectedLine(line);
+      } else if (isLines) {
+        setSelectedGood(item);
       } else {
         navigation.navigate('OrderLine', { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
       }
@@ -314,29 +316,65 @@ const SelectGroupScreen = () => {
   );
 
   const handleAddGood = useCallback(() => {
-    if (selectedItem) {
+    if (selectedLine) {
       navigation.navigate('OrderLine', {
         mode: 0,
         docId,
-        item: { id: generateId(), good: selectedItem.good, quantity: 0 },
+        item: { id: generateId(), good: selectedLine.good, quantity: 0 },
       });
-      setSelectedItem(undefined);
+      setSelectedLine(undefined);
+    } else if (selectedGood) {
+      navigation.navigate('OrderLine', {
+        mode: 0,
+        docId,
+        item: { id: generateId(), good: selectedGood, quantity: 0 },
+      });
+      setSelectedGood(undefined);
     }
-  }, [docId, selectedItem, navigation]);
+  }, [selectedLine, selectedGood, navigation, docId]);
 
   const handleEditLine = useCallback(() => {
-    if (selectedItem) {
-      navigation.navigate('OrderLine', { mode: 1, docId, item: selectedItem });
-      setSelectedItem(undefined);
+    if (selectedLine) {
+      navigation.navigate('OrderLine', { mode: 1, docId, item: selectedLine });
+      setSelectedLine(undefined);
     }
-  }, [docId, navigation, selectedItem]);
+  }, [docId, navigation, selectedLine]);
 
   const handleDeleteGood = useCallback(() => {
-    if (selectedItem) {
-      dispatch(documentActions.removeDocumentLine({ docId, lineId: selectedItem.id }));
-      setSelectedItem(undefined);
+    if (selectedLine) {
+      Alert.alert('Вы уверены, что хотите удалить позицию?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocumentLine({ docId, lineId: selectedLine.id }));
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+      setSelectedLine(undefined);
+    } else if (selectedGood) {
+      const lineIds: string[] = doc.lines?.filter((i) => i.good.id === selectedGood?.id)?.map((i) => i.id);
+      Alert.alert('Вы уверены, что хотите удалить все позиции?', '', [
+        {
+          text: 'Да',
+          onPress: () => {
+            dispatch(documentActions.removeDocumentLines({ docId, lineIds }));
+          },
+        },
+        {
+          text: 'Отмена',
+        },
+      ]);
+      setSelectedGood(undefined);
     }
-  }, [dispatch, docId, selectedItem]);
+  }, [dispatch, doc.lines, docId, selectedGood, selectedLine]);
+
+  const hadndleDismissDialog = () => {
+    setSelectedLine(undefined);
+    setSelectedGood(undefined);
+  };
 
   const renderGroup = useCallback(
     ({ item }: { item: IGoodGroup }) => (
@@ -424,32 +462,53 @@ const SelectGroupScreen = () => {
           ListEmptyComponent={EmptyList}
         />
       )}
-      <Dialog visible={!!selectedItem} onDismiss={() => setSelectedItem(undefined)}>
-        <Dialog.Title style={localStyles.titleSize}>{selectedItem?.good.name}</Dialog.Title>
-        <Dialog.Content>
-          <LargeText>Количество: {selectedItem?.quantity} кг</LargeText>
-          <LargeText>Упаковка: {selectedItem?.package ? selectedItem.package.name : 'без упаковки'}</LargeText>
-          <ItemSeparator />
-          <LargeText style={localStyles.text}>
-            Нажмите 'Редактировать', если хотите редактировать существующую позицию.
-          </LargeText>
-          <LargeText style={localStyles.text}>Нажмите 'Добавить', если хотите добавить новую позицию.</LargeText>
-          <LargeText style={localStyles.text}>Нажмите 'Удалить', если хотите удалить существующую позицию.</LargeText>
-        </Dialog.Content>
-        <Dialog.Actions style={localStyles.action}>
-          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleEditLine}>
-            Редактировать
-          </Button>
-          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleAddGood}>
-            Добавить
-          </Button>
-          <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
-            Удалить
-          </Button>
-          <Button color={colors.primary} onPress={() => setSelectedItem(undefined)}>
-            Отмена
-          </Button>
-        </Dialog.Actions>
+      <Dialog visible={!!selectedLine || !!selectedGood} onDismiss={hadndleDismissDialog}>
+        <Dialog.Title style={localStyles.titleSize}>{selectedLine?.good.name || selectedGood?.name || ''}</Dialog.Title>
+        {selectedLine ? (
+          <>
+            <Dialog.Content>
+              <LargeText>Количество: {selectedLine?.quantity} кг</LargeText>
+              <LargeText>Упаковка: {selectedLine?.package ? selectedLine.package.name : 'без упаковки'}</LargeText>
+              <ItemSeparator />
+              <LargeText style={localStyles.text}>
+                Нажмите 'Редактировать', если хотите редактировать существующую позицию.
+              </LargeText>
+              <LargeText style={localStyles.text}>
+                Нажмите 'Удалить', если хотите удалить существующую позицию.
+              </LargeText>
+            </Dialog.Content>
+            <Dialog.Actions style={localStyles.action}>
+              <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleEditLine}>
+                Редактировать
+              </Button>
+              <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
+                Удалить
+              </Button>
+              <Button color={colors.primary} onPress={() => setSelectedLine(undefined)}>
+                Отмена
+              </Button>
+            </Dialog.Actions>
+          </>
+        ) : null}
+        {selectedGood ? (
+          <>
+            <Dialog.Content>
+              <LargeText style={localStyles.text}>Нажмите 'Добавить', если хотите добавить новую позицию.</LargeText>
+              <LargeText style={localStyles.text}>Нажмите 'Удалить', если хотите удалить все позиции.</LargeText>
+            </Dialog.Content>
+            <Dialog.Actions style={localStyles.action}>
+              <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleAddGood}>
+                Добавить
+              </Button>
+              <Button labelStyle={{ color: colors.primary }} color={colors.primary} onPress={handleDeleteGood}>
+                Удалить
+              </Button>
+              <Button color={colors.primary} onPress={() => setSelectedGood(undefined)}>
+                Отмена
+              </Button>
+            </Dialog.Actions>
+          </>
+        ) : null}
       </Dialog>
     </AppScreen>
   );

@@ -27,6 +27,8 @@ import { generateId, getDateString, round, useSendDocs } from '@lib/mobile-app';
 
 import { ScreenState } from '@lib/types';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import { barcodeSettings, IShipmentDocument, IShipmentLine, ITempLine } from '../../store/types';
 
 import { ShipmentStackParamList } from '../../navigation/Root/types';
@@ -524,14 +526,18 @@ const ShipmentViewScreen = () => {
   );
 
   const renderShipmentItem: ListRenderItem<IShipmentLine> = ({ item }) => (
-    <ListItemLine key={item.id} readonly={isBlocked}>
+    <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
-        <MediumText style={styles.name}>{item.good.name}</MediumText>
-        <View style={styles.directionRow}>
-          <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
+        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
+        <View style={styles.flexDirectionRow}>
+          <MaterialCommunityIcons name="shopping-outline" size={18} />
+          <MediumText> {(item.weight || 0).toString()} кг</MediumText>
         </View>
-        <MediumText>Номер партии: {item.numReceived || ''}</MediumText>
-        <MediumText>Дата: {getDateString(item.workDate) || ''}</MediumText>
+        <View style={styles.flexDirectionRow}>
+          <MediumText>
+            Партия № {item.numReceived || ''} от {getDateString(item.workDate) || ''}
+          </MediumText>
+        </View>
       </View>
     </ListItemLine>
   );
@@ -539,7 +545,7 @@ const ShipmentViewScreen = () => {
   const renderTempItem: ListRenderItem<ITempLine> = ({ item }) => (
     <ListItemLine key={item.id} readonly={true}>
       <View style={styles.details}>
-        <MediumText style={styles.name}>{item.good.name}</MediumText>
+        <LargeText style={styles.textBold}>{item.good.name}</LargeText>
         <View style={styles.directionRow}>
           <MediumText>Вес: {(item.weight || 0).toString()} кг</MediumText>
         </View>
@@ -575,12 +581,13 @@ const ShipmentViewScreen = () => {
     <View style={styles.container}>
       <InfoBlock
         colorLabel={getStatusColor(shipment?.status || 'DRAFT')}
-        title={shipment.head.outlet?.name || ''}
+        title={shipment.documentType.description || ''}
         onPress={handleEditShipmentHead}
         disabled={!['DRAFT', 'READY'].includes(shipment.status)}
         isBlocked={isBlocked}
       >
         <View style={styles.infoBlock}>
+          <MediumText>{shipment.head.outlet?.name || ''}</MediumText>
           <MediumText>{`№ ${shipment.number} на ${getDateString(shipment.head?.onDate)}`}</MediumText>
         </View>
       </InfoBlock>

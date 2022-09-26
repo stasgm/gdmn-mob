@@ -24,6 +24,7 @@ export interface IUser extends INamedEntity, IExternalSystemProps {
   creator?: INamedEntity;
   company?: INamedEntity;
   settings?: IUserSettings;
+  externalId?: string;
 }
 
 export type n = Omit<IUser, 'id' | 'name'>;

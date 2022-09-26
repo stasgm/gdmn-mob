@@ -204,7 +204,7 @@ export const DocViewScreen = () => {
     navigation.setOptions({
       headerLeft: isDelList ? renderLeft : navBackButton,
       headerRight: renderRight,
-      title: isDelList ? `Выделено позиций: ${delList.length}` : 'Документ',
+      title: isDelList ? `Выделено позиций: ${delList.length}` : '',
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
