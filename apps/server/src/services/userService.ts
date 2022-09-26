@@ -1,4 +1,4 @@
-import { IDBUser, IUser, NewUser } from '@lib/types';
+import { IDBUser, IUser, NewUser, IUserWithDevice } from '@lib/types';
 
 import { DataNotFoundException, ConflictException, InvalidParameterException, ForbiddenException } from '../exceptions';
 
@@ -6,6 +6,7 @@ import { hashPassword } from '../utils/crypt';
 import { extraPredicate, getListPart } from '../utils/helpers';
 
 import { getDb } from './dao/db';
+import { device } from './data/devices';
 
 import { users as mockUsers } from './data/user';
 
@@ -255,6 +256,20 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
       delete newParams['companyId'];
     }
 
+    let appSystemFound = true;
+
+    if ('appSystemId' in newParams) {
+      appSystemFound = item.appSystemId === newParams.appSystemId;
+      delete newParams['appSystemId'];
+    }
+
+    let erpUserFound = true;
+
+    if ('erpUserId' in newParams) {
+      erpUserFound = item.erpUserId === newParams.erpUserId;
+      delete newParams['erpUserId'];
+    }
+
     /** filtering data */
     let filteredUsers = true;
     if ('filterText' in newParams) {
@@ -279,10 +294,32 @@ const findMany = (params: Record<string, string | number>): IUser[] => {
       delete newParams['filterText'];
     }
 
-    return companyFound && filteredUsers && extraPredicate(item, newParams as Record<string, string>);
+    return (
+      companyFound &&
+      filteredUsers &&
+      erpUserFound &&
+      appSystemFound &&
+      extraPredicate(item, newParams as Record<string, string>)
+    );
   });
 
   return getListPart(userList, params).map((i) => makeUser(i));
+};
+
+/**
+ *  Возвращает множество пользователей c uid device по указанным параметрам
+ * @param params - параметры
+ * @returns
+ */
+export const findManyWithDevice = (params: Record<string, string | number>): IUserWithDevice[] => {
+  const userList = findMany(params);
+  const { devices, deviceBindings } = getDb();
+  return userList.map((item) => {
+    const fullUser: IUserWithDevice = item;
+    const deviceId = deviceBindings.data.find((i) => i.userId === item.id)?.deviceId;
+    if (deviceId) fullUser.deviceUid = devices.data.find((i) => i.id === deviceId)?.uid;
+    return fullUser;
+  });
 };
 
 export const makeUser = (user: IDBUser): IUser => {

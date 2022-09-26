@@ -66,12 +66,20 @@ const getUser = async (ctx: ParameterizedContext) => {
 };
 
 const getUsers = async (ctx: ParameterizedContext) => {
-  const { companyId, name, filterText, fromRecord, toRecord, version } = ctx.query;
+  const { companyId, name, filterText, fromRecord, toRecord, version, appSystemId, erpUserId } = ctx.query;
 
   const params: Record<string, string> = {};
 
   if (typeof companyId === 'string') {
     params.companyId = companyId;
+  }
+
+  if (typeof appSystemId === 'string') {
+    params.appSystemId = appSystemId;
+  }
+
+  if (typeof erpUserId === 'string') {
+    params.erpUserId = erpUserId;
   }
 
   if (typeof name === 'string') {
@@ -110,4 +118,57 @@ const getUsers = async (ctx: ParameterizedContext) => {
   ok(ctx as Context, users, 'getUsers: users are successfully received');
 };
 
-export { addUser, updateUser, removeUser, getUser, getUsers };
+const getUsersWithDevice = async (ctx: ParameterizedContext) => {
+  const { companyId, name, filterText, fromRecord, toRecord, version, appSystemId, erpUserId } = ctx.query;
+
+  const params: Record<string, string> = {};
+
+  if (typeof companyId === 'string') {
+    params.companyId = companyId;
+  }
+
+  if (typeof appSystemId === 'string') {
+    params.appSystemId = appSystemId;
+  }
+
+  if (typeof erpUserId === 'string') {
+    params.erpUserId = erpUserId;
+  }
+
+  if (typeof name === 'string') {
+    params.name = name;
+  }
+
+  if (typeof filterText === 'string') {
+    params.filterText = filterText;
+  }
+
+  if (typeof fromRecord === 'string') {
+    params.fromRecord = fromRecord;
+  }
+
+  if (typeof toRecord === 'string') {
+    params.toRecord = toRecord;
+  }
+
+  let users;
+  switch (version) {
+    case '1.0.0':
+      users = userService.findManyWithDevice(params);
+      /** example for versioning */
+      //users = verUsers.v1.myFunction(params);
+      break;
+    case '2.0.0':
+      users = userService.findManyWithDevice(params);
+      /** example for versioning */
+      //users = verUsers.v2.myFunction(params);
+      break;
+    default:
+      users = userService.findManyWithDevice(params);
+      break;
+  }
+
+  ok(ctx as Context, users, 'getUsers: users are successfully received');
+};
+
+export { addUser, updateUser, removeUser, getUser, getUsers, getUsersWithDevice };

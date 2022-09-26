@@ -33,6 +33,8 @@ export type NewUser = Omit<IUser, 'id'> & { password: string; verifyPassword?: s
 
 export type IUserCredentials = Pick<IUser, 'name' | 'email'> & { password: string; verifyPassword?: string };
 
+export type IUserWithDevice = IUser & { deviceUid?: string };
+
 export interface ICompany extends INamedEntity, IExternalSystemProps {
   city?: string;
   admin: INamedEntity;
