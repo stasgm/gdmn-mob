@@ -132,6 +132,7 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
           maxToRenderPerBatch={20} // Reduce number in each render batch
           updateCellsBatchingPeriod={100} // Increase time between renders
           windowSize={7} // Reduce the window size
+          keyboardShouldPersistTaps={'handled'}
         />
       )}
       {isExpand && nextLevelGroups && nextLevelGroups?.length > 0 && nextLevelGroups && nextLevelGroups?.length > 0 && (
@@ -143,6 +144,7 @@ const Group = ({ docId, model, item, expendGroup, setExpend, onPressGood }: IPro
             renderItem={renderGroup}
             ItemSeparatorComponent={ItemSeparator}
             ListEmptyComponent={EmptyList}
+            keyboardShouldPersistTaps={'handled'}
           />
         </View>
       )}
@@ -451,6 +453,7 @@ const SelectGroupScreen = () => {
           maxToRenderPerBatch={20} // Reduce number in each render batch
           updateCellsBatchingPeriod={100} // Increase time between renders
           windowSize={7} // Reduce the window size
+          keyboardShouldPersistTaps={'handled'}
         />
       ) : (
         <FlatList
@@ -460,6 +463,7 @@ const SelectGroupScreen = () => {
           renderItem={renderGroup}
           ItemSeparatorComponent={ItemSeparator}
           ListEmptyComponent={EmptyList}
+          keyboardShouldPersistTaps={'handled'}
         />
       )}
       <Dialog visible={!!selectedLine || !!selectedGood} onDismiss={hadndleDismissDialog}>
