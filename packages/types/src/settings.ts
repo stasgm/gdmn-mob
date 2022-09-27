@@ -9,6 +9,7 @@ interface ISettingsOption<T = SettingValue> extends IEntity {
   sortOrder?: number;
   type: 'string' | 'date' | 'number' | 'boolean' | 'option' | 'ref';
   group?: ISettingsGroup;
+  readonly?: boolean;
 }
 
 type Settings<T = Record<string, SettingValue>> = {

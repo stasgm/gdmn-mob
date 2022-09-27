@@ -45,6 +45,16 @@ const baseSettings: Settings<IBaseSettings> = {
     visible: true,
     group: baseSettingGroup,
   },
+  synchPeriod: {
+    id: 'synchPeriod',
+    description: 'Период синхронизации',
+    data: 10,
+    type: 'number',
+    sortOrder: 5,
+    visible: true,
+    group: baseSettingGroup,
+    readonly: true,
+  },
 };
 
 export const initialState: Readonly<SettingsState> = {
@@ -74,15 +84,6 @@ const reducer: Reducer<SettingsState, SettingsActionType> = (state = initialStat
       return {
         ...state,
         loadingError: action.payload,
-      };
-
-    case getType(actions.addOption):
-      return {
-        ...state,
-        data: {
-          ...state.data,
-          [action.payload.optionName]: action.payload.value,
-        },
       };
 
     case getType(actions.updateOption):

@@ -42,7 +42,6 @@ export const settingMiddlewareFactory: PersistedMiddleware =
     if (store.getState().auth.user?.id) {
       switch (action.type) {
         case getType(actions.init):
-        case getType(actions.addOption):
         case getType(actions.updateOption):
         case getType(actions.addSettings):
         case getType(actions.deleteOption):

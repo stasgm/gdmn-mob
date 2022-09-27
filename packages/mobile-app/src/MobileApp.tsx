@@ -18,7 +18,7 @@ import { globalStyles, Theme as defaultTheme } from '@lib/mobile-ui';
 import api from '@lib/client-api';
 
 import { Snackbar } from 'react-native-paper';
-import { View, Text, AppState } from 'react-native';
+import { View, Text, Alert, AppState } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 
@@ -37,8 +37,30 @@ export interface IApp {
 }
 
 const AppRoot = ({ items, onSync, onGetMessages }: Omit<IApp, 'store'>) => {
-  const handleSyncData = useSync(onSync, onGetMessages);
+  const sync = useSync(onSync, onGetMessages);
+
+  const syncDate = useSelector((state) => state.app.syncDate) as Date;
+  const synchPeriod = (useSelector((state) => state.settings?.data.synchPeriod)?.data as number) || 0;
   const { config, user } = useSelector((state) => state.auth);
+
+  const handleSyncData = () => {
+    if (!syncDate) {
+      sync();
+      return;
+    }
+    const nextTime = new Date(syncDate);
+    nextTime.setMinutes(nextTime.getMinutes() + synchPeriod);
+    const mins = Math.round((nextTime.getTime() - new Date().getTime()) / 60000);
+    if (mins > 0) {
+      Alert.alert(
+        'Внимание!',
+        `В настоящее время сервер обрабатывает ваш запрос. Повторная синхронизация возможна через ${mins} мин.`,
+        [{ text: 'OK' }],
+      );
+    } else {
+      sync();
+    }
+  };
 
   useEffect(() => {
     //При запуске приложения записываем настройки в апи

@@ -87,7 +87,7 @@ const Root = () => {
 
   //Загружаем в стор дополнительные настройки приложения
   const isInit = useSelector((state) => state.settings.isInit);
-  const isGetReferences = useSelector((state) => state.settings?.data.getReferences);
+  const { isGetReferences, synchPeriod } = useSelector((state) => state.settings?.data);
   const isDemo = useSelector((state) => state.auth.isDemo);
 
   const refDispatch = useRefThunkDispatch();
@@ -127,7 +127,16 @@ const Root = () => {
   useEffect(() => {
     if (isLogged) {
       dispatch(appActions.loadSuperDataFromDisc());
+      //Временно устанавливаем время синхронизации на сервере 10 мин
+      //В будущем, брать из приходящих настроек от ERP
+      dispatch(
+        settingsActions.updateOption({
+          optionName: 'synchPeriod',
+          value: { ...synchPeriod, data: 10 } as ISettingsOption,
+        }),
+      );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isLogged]);
 
   const [loading, setLoading] = useState(true);

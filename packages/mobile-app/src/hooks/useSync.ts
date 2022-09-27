@@ -4,11 +4,13 @@ import {
   useDocThunkDispatch,
   useRefThunkDispatch,
   useAuthThunkDispatch,
+  useSettingThunkDispatch,
   useSelector,
   documentActions,
   referenceActions,
   appActions,
   authActions,
+  settingsActions,
 } from '@lib/store';
 
 import {
@@ -20,6 +22,7 @@ import {
   IReferences,
   ISettingsOption,
   IUserSettings,
+  Settings,
 } from '@lib/types';
 import api from '@lib/client-api';
 import { Alert } from 'react-native';
@@ -30,6 +33,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
   const docDispatch = useDocThunkDispatch();
   const refDispatch = useRefThunkDispatch();
   const authDispatch = useAuthThunkDispatch();
+  const settDispatch = useSettingThunkDispatch();
   const dispatch = useDispatch();
 
   const { user, company, config } = useSelector((state) => state.auth);
@@ -178,11 +182,20 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           };
 
           //Формируем запрос на получение настроек для юзера
-          const messageGetDepart: IMessage['body'] = {
+          const messageGetUserSettings: IMessage['body'] = {
             type: 'CMD',
             version: docVersion,
             payload: {
               name: 'GET_USER_SETTINGS',
+            },
+          };
+
+          //Формируем запрос на получение настроек подсистемы
+          const messageGetAppSettings: IMessage['body'] = {
+            type: 'CMD',
+            version: docVersion,
+            payload: {
+              name: 'GET_APP_SYSTEM_SETTINGS',
             },
           };
 
@@ -252,19 +265,34 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
             }
           }
 
-          //7. Отправляем запрос на получение склада для юзера
-          const sendMesDepartResponse = await api.message.sendMessages(
+          //7. Отправляем запрос на получение настроек пользователя
+          const sendMesUserSettResponse = await api.message.sendMessages(
             appSystem,
             messageCompany,
             consumer,
-            messageGetDepart,
+            messageGetUserSettings,
             getNextOrder(),
             deviceId,
             authMiddleware,
           );
 
-          if (sendMesDepartResponse.type === 'ERROR') {
-            errList.push(`Запрос на получение склада не отправлен: ${sendMesDepartResponse.message}`);
+          if (sendMesUserSettResponse.type === 'ERROR') {
+            errList.push(`Запрос на получение настроек пользователя не отправлен: ${sendMesUserSettResponse.message}`);
+          }
+
+          //8. Отправляем запрос на получение настроек подсистемы
+          const sendMesAppSettResponse = await api.message.sendMessages(
+            appSystem,
+            messageCompany,
+            consumer,
+            messageGetAppSettings,
+            getNextOrder(),
+            deviceId,
+            authMiddleware,
+          );
+
+          if (sendMesAppSettResponse.type === 'ERROR') {
+            errList.push(`Запрос на получение настроек подсистемы не отправлен: ${sendMesAppSettResponse.message}`);
           }
         } else if (onSync) {
           // Если передан внешний обработчик то вызываем
@@ -382,7 +410,7 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
         //TODO: обработка
         if ((msg.body.version || 1) !== setVersion) {
           errList.push(
-            `Структура загружаемых данных для  настроек пользователя с версией '${msg.body.version}' не поддерживается приложением`,
+            `Структура загружаемых данных для настроек пользователя с версией '${msg.body.version}' не поддерживается приложением`,
           );
           break;
         }
@@ -400,6 +428,34 @@ const useSync = (onSync?: () => Promise<any>, onGetMessages?: () => Promise<any>
           okList.push('Обновлены настройки пользователя');
         } else if (setUserSettingsResponse.type === 'AUTH/SET_USER_SETTINGS_FAILURE') {
           errList.push('Настройки пользователя не загружены в хранилище');
+        }
+        break;
+      }
+
+      case 'APP_SYSTEM_SETTINGS': {
+        //TODO: обработка
+        if ((msg.body.version || 1) !== setVersion) {
+          errList.push(
+            `Структура загружаемых данных для настроек приложения с версией '${msg.body.version}' не поддерживается приложением`,
+          );
+          break;
+        }
+
+        try {
+          const appSetts = Object.entries(msg.body.payload as Settings);
+          for (const [optionName, value] of appSetts) {
+            if (value) {
+              settDispatch(settingsActions.updateOption({ optionName, value }));
+            }
+          }
+
+          const removeMess = await api.message.removeMessage(msg.id, params, authMiddleware);
+          if (removeMess.type === 'ERROR') {
+            errList.push(`Настройки приложения загружены, но сообщение на сервере не удалено: ${removeMess.message}`);
+          }
+          okList.push('Обновлены настройки приложения');
+        } catch (err) {
+          errList.push('Настройки приложения не загружены в хранилище');
         }
         break;
       }
