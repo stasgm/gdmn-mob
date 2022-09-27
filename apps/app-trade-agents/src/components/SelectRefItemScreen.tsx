@@ -187,6 +187,7 @@ const SelectRefItemScreen = () => {
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
+        keyboardShouldPersistTaps={'handled'}
       />
     </AppScreen>
   );
