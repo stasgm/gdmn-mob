@@ -54,6 +54,7 @@ const addOne = (userData: NewUser): IUser => {
     email: userData.email,
     erpUserId: userData.erpUser?.id,
     appSystemId: userData.appSystem?.id,
+    disabled: userData.disabled,
     creationDate: new Date().toISOString(),
     editionDate: new Date().toISOString(),
   });
@@ -136,6 +137,7 @@ const updateOne = (id: string, userData: Partial<IUser & { password: string }>):
     email: userData.email === undefined ? oldUser.email : userData.email,
     erpUserId: userData.erpUser === null ? undefined : newErpUserId || oldUser.erpUserId,
     appSystemId: userData.appSystem === null ? undefined : newAppSystemId || oldUser.appSystemId,
+    disabled: userData.disabled === undefined ? oldUser.disabled : userData.disabled,
     creationDate: oldUser.creationDate,
     editionDate: new Date().toISOString(),
   });
@@ -306,6 +308,7 @@ export const makeUser = (user: IDBUser): IUser => {
     email: user.email,
     appSystem: user.appSystemId ? appSystems.getNamedItem(user.appSystemId) : undefined,
     erpUser: user.erpUserId ? users.getNamedItem(user.erpUserId) : undefined,
+    disabled: user.disabled,
   };
 };
 

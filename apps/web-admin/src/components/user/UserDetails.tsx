@@ -75,6 +75,7 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
       appSystem: (user.appSystem || null) as INamedEntity,
       erpUser: (user.erpUser || null) as INamedEntity,
       externalId: user.externalId || '',
+      disabled: user.disabled || true,
     },
 
     validationSchema: yup.object().shape({
@@ -102,6 +103,8 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
   const handleUserERP = () => {
     userERP ? setUserERP(false) : setUserERP(true);
   };
+
+  console.log('isActivae', formik.values.disabled);
 
   return (
     <FormikProvider value={formik}>
@@ -253,6 +256,16 @@ const UserDetails = ({ user, loading, onSubmit, onCancel }: IProps) => {
                 <Grid item md={12} xs={12}>
                   <Checkbox checked={userERP} color="primary" onChange={handleUserERP} />
                   Пользователь ERP
+                </Grid>
+                <Grid item md={12} xs={12}>
+                  <Checkbox
+                    checked={!formik.values.disabled}
+                    color="primary"
+                    onChange={formik.handleChange}
+                    value={formik.values.disabled}
+                    disabled={loading}
+                  />
+                  Неактивен
                 </Grid>
                 <Grid item md={6} xs={12} display={open ? 'block' : 'none'}>
                   <TextField
