@@ -220,6 +220,14 @@ const OrderListScreen = () => {
     setShowDateEnd(true);
   };
 
+  const handleSearchContact = useCallback(() => {
+    navigation.navigate('SelectRefItem', {
+      refName: 'contact',
+      fieldName: 'contact',
+      // value:
+    });
+  }, [navigation]);
+
   console.log('dateBegin', dateBegin);
   console.log('dateEnd', dateEnd);
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
@@ -275,22 +283,36 @@ const OrderListScreen = () => {
               selectionColor={searchStyle}
             />
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginHorizontal: -10 }}>
-            <View style={{ width: '50%' }}>
-              <SelectableInput
-                label="С даты"
-                value={dateBegin ? getDateString(dateBegin) : ''}
-                // value={getDateString(dateBegin || '') || ''}
-                onPress={handlePresentDateBegin}
-              />
+          <View>
+            <View
+              style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginHorizontal: -10 }}
+            >
+              <View style={{ width: '50%' }}>
+                <SelectableInput
+                  label="С даты"
+                  value={dateBegin ? getDateString(dateBegin) : ''}
+                  // value={getDateString(dateBegin || '') || ''}
+                  onPress={handlePresentDateBegin}
+                />
+              </View>
+              <View style={{ width: '50%' }}>
+                <SelectableInput
+                  label="По дату"
+                  value={dateEnd ? getDateString(dateEnd) : ''}
+                  onPress={handlePresentDateEnd}
+                />
+              </View>
             </View>
-            <View style={{ width: '50%' }}>
-              <SelectableInput
-                label="По дату"
-                value={dateEnd ? getDateString(dateEnd) : ''}
-                onPress={handlePresentDateEnd}
-              />
-            </View>
+            <SelectableInput
+              label="Организация"
+              value={dateEnd ? getDateString(dateEnd) : ''}
+              onPress={handlePresentDateEnd}
+            />
+            <SelectableInput
+              label="Магазин"
+              value={dateEnd ? getDateString(dateEnd) : ''}
+              onPress={handlePresentDateEnd}
+            />
           </View>
           <ItemSeparator />
         </>

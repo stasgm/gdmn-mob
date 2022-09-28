@@ -30,4 +30,56 @@ const getStatusColor = (status: StatusType) => {
   return statusColor;
 };
 
-export { getStatusColor };
+const statusIcons = ['file-edit-outline', 'file-certificate-outline', 'file-outline', 'file-check-outline'] as const;
+
+const getStatusIcon = (status: StatusType) => {
+  let statusIcon: typeof statusIcons[number];
+
+  // switch (status) {
+  //   case 'DRAFT':
+  //     statusIcon = statusIcons[0];
+  //     break;
+
+  //   case 'PROCESSED':
+  //     statusIcon = statusIcons[1];
+  //     break;
+
+  //   case 'READY':
+  //     statusIcon = statusIcons[2];
+  //     break;
+
+  //   case 'SENT':
+  //     statusIcon = statusIcons[3];
+  //     break;
+
+  //   default:
+  //     statusIcon = statusIcons[0];
+  //     break;
+  // }
+
+  switch (status) {
+    case 'DRAFT':
+      statusIcon = statusIcons[0];
+      break;
+
+    case 'PROCESSED':
+      statusIcon = statusIcons[1];
+      break;
+
+    case 'READY':
+      statusIcon = statusIcons[2];
+      break;
+
+    case 'SENT':
+      statusIcon = statusIcons[3];
+      break;
+
+    default:
+      statusIcon = statusIcons[0];
+      break;
+  }
+
+  return statusIcon;
+};
+
+export { getStatusColor, getStatusIcon };
