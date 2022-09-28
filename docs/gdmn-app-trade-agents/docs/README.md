@@ -163,7 +163,11 @@
 Чтобы добавить новую позицию в документ заявки нажимаем на иконку **✚** и переходим на экран Выбора группы и товара:
 
 <img src="img/3.Orders/3.GroupOne.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.GoodsOne.jpg" alt="drawing" height="400"/>
-<img src="img/3.Orders/3.GoodsNine.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.GoodsNine2.jpg" alt="drawing" height="400"/> 
+
+Чтобы найти товар по наименованию можно воспользоваться строкой поиска, нажав на иконку <img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>  **Поиск** в правом верхнем углу экрана.
+
+<img src="img/3.Orders/3.3.GoodsTen.jpg" alt="drawing" height="400"/>
 
 Также можно добавить позицию через меню " **⁝** " в правом верхнем углу, выбрав пункт **Добавить товар**.
 
