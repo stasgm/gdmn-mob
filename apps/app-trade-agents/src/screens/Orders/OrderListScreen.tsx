@@ -26,15 +26,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { deleteSelectedItems, formatValue, getDateString, getDelList, keyExtractor } from '@lib/mobile-app';
 
-import { documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
+import { appActions, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
 import { IDelList } from '@lib/mobile-types';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
-import { IReferenceData } from '@lib/types';
-
-import { IDebt, IOrderDocument, IOutlet } from '../../store/types';
+import { IDebt, IOrderDocument, IOrderListFormParam, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import OrderListTotal from './components/OrderListTotal';
@@ -59,10 +57,51 @@ const OrderListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const address = refSelectors.selectByName<IOutlet>('outlet')?.data;
+  const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
   const [dateBegin, setDateBegin] = useState('');
-  const [dateEnd, setDateEnd] = useState<Date | undefined>(undefined);
+
+  const formParams = useSelector((state) => state.app.formParams as IOrderListFormParam);
+
+  const {
+    filterContact: docFilterContact,
+    filterOutlet: docFilterOutlet,
+    filterDateBegin: docFilterDateBegin,
+    filterDateEnd: docFilterDateEnd,
+  } = useMemo(() => {
+    return formParams;
+  }, [formParams]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(appActions.clearFormParams());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docFilterOutlet?.id);
+
+  useEffect(() => {
+    if (!!docFilterContact && !!docFilterOutlet && docFilterContact.id !== outlet?.company.id) {
+      dispatch(
+        appActions.setFormParams({
+          filterOutlet: undefined,
+        }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, docFilterContact?.id, outlet?.company.id]);
+
+  useEffect(() => {
+    // Инициализируем параметры
+
+    dispatch(
+      appActions.setFormParams({
+        filterDateBegin: '',
+        filterDate: '',
+      }),
+    );
+  }, [dispatch]);
 
   const orderList = orders
     ?.filter((i) =>
@@ -72,13 +111,13 @@ const OrderListScreen = () => {
           i.number ||
           i.documentDate ||
           i.head.onDate ||
-          address.find((a) => a.id === i.head.outlet.id)?.address
+          outlets.find((a) => a.id === i.head.outlet.id)?.address
           ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
             i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
             getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
             getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
-            address
+            outlets
               .find((a) => a.id === i.head.outlet.id)
               ?.address.toUpperCase()
               .includes(searchQuery.toUpperCase())
@@ -91,6 +130,17 @@ const OrderListScreen = () => {
         new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
     );
 
+  const filteredOrderList = useMemo(() => {
+    const listByCompany = docFilterContact
+      ? orderList.filter((i) => i.head.contact.id === docFilterContact?.id)
+      : orderList;
+    const listByOutlet =
+      docFilterContact && docFilterOutlet
+        ? listByCompany.filter((i) => i.head.outlet.id === docFilterOutlet.id)
+        : listByCompany;
+    return listByOutlet;
+  }, [docFilterContact, docFilterOutlet, orderList]);
+
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
   const [status, setStatus] = useState<Status>('all');
@@ -98,11 +148,11 @@ const OrderListScreen = () => {
   const filteredListByStatus: IListItemProps[] = useMemo(() => {
     const res =
       status === 'all'
-        ? orderList
+        ? filteredOrderList
         : status === 'active'
-        ? orderList.filter((e) => e.status !== 'PROCESSED')
+        ? filteredOrderList.filter((e) => e.status !== 'PROCESSED')
         : status === 'archive'
-        ? orderList.filter((e) => e.status === 'PROCESSED')
+        ? filteredOrderList.filter((e) => e.status === 'PROCESSED')
         : [];
 
     return res.map(
@@ -118,7 +168,7 @@ const OrderListScreen = () => {
           errorMessage: i.errorMessage,
         } as IListItemProps),
     );
-  }, [status, orderList]);
+  }, [status, filteredOrderList]);
 
   const sections = useMemo(
     () =>
@@ -166,6 +216,11 @@ const OrderListScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
+  const handleSearch = useCallback(() => {
+    setFilterVisible((prev) => !prev);
+    dispatch(appActions.clearFormParams());
+  }, [dispatch]);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
@@ -178,13 +233,13 @@ const OrderListScreen = () => {
               icon="card-search-outline"
               style={filterVisible && { backgroundColor: colors.card }}
               size={26}
-              onPress={() => setFilterVisible((prev) => !prev)}
+              onPress={handleSearch}
             />
           </>
         )}
       </View>
     ),
-    [colors.card, filterVisible, handleAddDocument, handleDeleteDocs, isDelList],
+    [colors.card, filterVisible, handleAddDocument, handleDeleteDocs, handleSearch, isDelList],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -210,33 +265,51 @@ const OrderListScreen = () => {
   };
 
   const [showDateEnd, setShowDateEnd] = useState(false);
+
   const handleApplyDateEnd = (_event: any, selectedDateEnd: Date | undefined) => {
     setShowDateEnd(false);
 
-    if (selectedDateEnd) {
-      setDateEnd(selectedDateEnd);
+    if (selectedDateEnd && docFilterDateEnd) {
+      dispatch(appActions.setFormParams({ filterDateEnd: selectedDateEnd.toISOString().slice(0, 10) }));
+
       // setDateEnd(selectedDateEnd.toISOString().slice(0, 10));
     }
   };
+
   const handlePresentDateEnd = () => {
     setShowDateEnd(true);
   };
 
-  const [cont, setCont] = useState<IReferenceData | undefined>(undefined);
+  console.log('docFilterDateEnd', docFilterDateEnd);
+
   const handleSearchContact = useCallback(() => {
-    const a: IReferenceData | undefined = cont;
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
-      fieldName: 'contact',
-      value: a && [a],
+      fieldName: 'filterContact',
+      value: docFilterContact && [docFilterContact],
     });
-    setCont(a);
-  }, [cont, navigation]);
+  }, [docFilterContact, navigation]);
 
-  console.log('dateBegin', dateBegin);
-  console.log('dateEnd', dateEnd);
+  const handleSearchOutlet = useCallback(() => {
+    //TODO: если изменился контакт, то и магазин должен обнулиться
+    const params: Record<string, string> = {};
+
+    if (docFilterContact?.id) {
+      params.companyId = docFilterContact?.id;
+    }
+
+    navigation.navigate('SelectRefItem', {
+      refName: 'outlet',
+      fieldName: 'filterOutlet',
+      clause: params,
+      value: docFilterOutlet && [docFilterOutlet],
+      descrFieldName: 'address',
+    });
+  }, [docFilterContact?.id, docFilterOutlet, navigation]);
+
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
+    const address = outlets.find((a) => a.id === orderList.find((o) => o.id === item.id)?.head?.outlet.id)?.address;
 
     return (
       <ScreenListItem
@@ -267,6 +340,7 @@ const OrderListScreen = () => {
     (item: any) => (status === 'all' && sections ? <OrderListTotal sectionOrders={item.section} /> : null),
     [sections, status],
   );
+  const data = new Date();
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -288,9 +362,34 @@ const OrderListScreen = () => {
               selectionColor={searchStyle}
             />
           </View>
-          <View>
+          <View
+            style={[
+              {
+                // marginHorizontal: 10,
+                paddingTop: 5,
+                marginVertical: 5,
+                marginBottom: 12,
+                borderWidth: 1,
+                borderRadius: 2,
+              },
+              { borderColor: colors.primary },
+            ]}
+          >
+            <SelectableInput label="Организация" value={docFilterContact?.name || ''} onPress={handleSearchContact} />
             <View
-              style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginHorizontal: -10 }}
+              style={{
+                marginTop: -5,
+              }}
+            >
+              <SelectableInput label="Магазин" value={docFilterOutlet?.name || ''} onPress={handleSearchOutlet} />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center' /*, marginHorizontal: -10*/,
+                marginTop: -5,
+              }}
             >
               <View style={{ width: '50%' }}>
                 <SelectableInput
@@ -303,17 +402,11 @@ const OrderListScreen = () => {
               <View style={{ width: '50%' }}>
                 <SelectableInput
                   label="По дату"
-                  value={dateEnd ? getDateString(dateEnd) : ''}
+                  value={docFilterDateEnd ? getDateString(docFilterDateEnd || '') : ''}
                   onPress={handlePresentDateEnd}
                 />
               </View>
             </View>
-            <SelectableInput label="Организация" value={cont?.name || ''} onPress={handleSearchContact} />
-            <SelectableInput
-              label="Магазин"
-              value={dateEnd ? getDateString(dateEnd) : ''}
-              onPress={handlePresentDateEnd}
-            />
           </View>
           <ItemSeparator />
         </>
@@ -341,12 +434,14 @@ const OrderListScreen = () => {
       {showDateEnd && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(dateEnd || new Date())}
+          value={new Date(docFilterDateEnd || data)}
+          // value={new Date(docFilterDateEnd || new Date())}
           // value={new Date(dateEnd || '')}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
-          // onTouchCancel={() => setShowDateBegin(false)}
+          onTouchCancel={() => setShowDateBegin(false)}
+          // onTouchCancel
         />
       )}
     </AppScreen>
