@@ -32,6 +32,8 @@ import { IDelList } from '@lib/mobile-types';
 
 import { IconButton, Searchbar } from 'react-native-paper';
 
+import { IReferenceData } from '@lib/types';
+
 import { IDebt, IOrderDocument, IOutlet } from '../../store/types';
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
@@ -220,13 +222,16 @@ const OrderListScreen = () => {
     setShowDateEnd(true);
   };
 
+  const [cont, setCont] = useState<IReferenceData | undefined>(undefined);
   const handleSearchContact = useCallback(() => {
+    const a: IReferenceData | undefined = cont;
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'contact',
-      // value:
+      value: a && [a],
     });
-  }, [navigation]);
+    setCont(a);
+  }, [cont, navigation]);
 
   console.log('dateBegin', dateBegin);
   console.log('dateEnd', dateEnd);
@@ -303,11 +308,7 @@ const OrderListScreen = () => {
                 />
               </View>
             </View>
-            <SelectableInput
-              label="Организация"
-              value={dateEnd ? getDateString(dateEnd) : ''}
-              onPress={handlePresentDateEnd}
-            />
+            <SelectableInput label="Организация" value={cont?.name || ''} onPress={handleSearchContact} />
             <SelectableInput
               label="Магазин"
               value={dateEnd ? getDateString(dateEnd) : ''}

@@ -45,12 +45,14 @@ const ScreenListItem = ({
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <View style={styles.item}>
         <View style={styles.iconsWithCheck}>
-          <View style={[styles.icon, { backgroundColor: getStatusColor(status) }]}>
+          {/* <View /*style={[styles.icon , { backgroundColor: getStatusColor(status) }]}/> */}
+          <View style={{ justifyContent: 'center', alignItems: 'center', borderRadius: 18, height: 30, width: 30 }}>
             <MaterialCommunityIcons
               // name="file-certificate-outline"
               name={getStatusIcon(status)}
-              size={20}
-              color={'#FFF'}
+              size={25}
+              // color={'#FFF'}
+              color={getStatusColor(status)}
             />
           </View>
           {checked ? (
