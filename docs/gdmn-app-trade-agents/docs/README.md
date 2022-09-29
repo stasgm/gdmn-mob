@@ -173,7 +173,9 @@
 
 <img src="img/3.Orders/3.ViewMenu.jpg" alt="drawing" height="400"/>
 
-После того, как выбераем необходимый товар, откроется экран позиции документа для ввода количества мест товара и выбора упаковки. 
+После того, как выберем необходимый товар, откроется экран позиции документа для ввода количества мест товара и выбора упаковки. 
+
+<img src="img/3.Orders/3.GoodsWithoutCont.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.GoodsWithCont.jpg" alt="drawing" height="400"/>
 
 **Наименование** и **Цена** заполнены автоматически и не могут быть изменены. 
 
@@ -181,10 +183,14 @@
 
  **Упаковка** заполняется только при наличии предложенных вариантов.
 
+ После выбора товара и заполнения формы **Количество**, выбранный товар будет отображаться в списках товара (так выглядят списки **Товарные группы** и **Справочник ТМЦ**)
+
+ <img src="img/3.Orders/3.ProductGroupsOfGoods.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/>
+
 
 По нажатию на иконку " **✓** " позиция сохранится и приложение перейдет на экран просмотра документа.
 
- <img src="img/3.Orders/3.GoodPositionOne.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
+ <img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
 
 #### Удаление позиции
 
