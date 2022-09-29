@@ -6,9 +6,9 @@
 
 1. Установить [Node.js](https://nodejs.org/en/download/). Проверено с версией Node 16.13.1 LTS
 2. Установить [Yarn 1 (он же Yarn Classic)](https://classic.yarnpkg.com/lang/en/)
-3. Установить **Microsoft Visual Studio 2017 Build Tools**. Например, из командной строки командой `choco install visualstudio2017buildtools`
-4. Зайти в программу конфигурации/инстоляции **Microsoft Visual Studio Build Tools** и установить **Visual C++ Build Tools Workload**
-5. Установить **Python 3.9.9**
+3. Установить **Python 3.x**
+4. Для Windows: установить **Microsoft Visual Studio 2017 Build Tools**. Например, из командной строки командой `choco install visualstudio2017buildtools`. Зайти в программу конфигурации/инстоляции **Microsoft Visual Studio Build Tools** и установить **Visual C++ Build Tools Workload**
+5. Для Linux/Ubuntu выполнить: `apt install build-essential`
 6. Клонировать репозиторий командой `git clone https://github.com/stasgm/gdmn-mob`
 7. Перейти в папку `gdmn-mob` и выполнить команду `yarn` для установки зависимостей
 8. Настроить конфигурацию сервера:
