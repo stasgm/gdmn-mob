@@ -37,7 +37,6 @@ const statusIcons = [
   'plus-circle-outline',
   'check-circle-outline',
 ] as const;
-// const statusIcons = ['file-edit-outline', 'file-certificate-outline', 'file-outline', 'file-check-outline'] as const;
 
 const getStatusIcon = (status: StatusType) => {
   let statusIcon: typeof statusIcons[number];
