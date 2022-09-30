@@ -337,10 +337,10 @@ const OrderViewScreen = () => {
           isBlocked={isBlocked}
         >
           <View style={styles.directionColumn}>
+            <MediumText>Адрес: {address}</MediumText>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
-            <MediumText>Адрес: {address}</MediumText>
             <MediumText style={debtTextStyle}>
               {(!!debt?.saldo && debt.saldo < 0
                 ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`

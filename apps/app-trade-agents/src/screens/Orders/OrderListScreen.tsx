@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useLayoutEffect, useMemo, useEffect } from 'react';
-import { ListRenderItem, Platform, SectionList, SectionListData, View } from 'react-native';
+import { ListRenderItem, Platform, SectionList, SectionListData, View, StyleSheet } from 'react-native';
 import { useIsFocused, useNavigation, useTheme } from '@react-navigation/native';
 
 import {
@@ -58,8 +58,6 @@ const OrderListScreen = () => {
   const [filterVisible, setFilterVisible] = useState(false);
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
-
-  const [dateBegin, setDateBegin] = useState('');
 
   const formParams = useSelector((state) => state.app.formParams as IOrderListFormParam);
 
@@ -138,8 +136,16 @@ const OrderListScreen = () => {
       docFilterContact && docFilterOutlet
         ? listByCompany.filter((i) => i.head.outlet.id === docFilterOutlet.id)
         : listByCompany;
-    return listByOutlet;
-  }, [docFilterContact, docFilterOutlet, orderList]);
+    const listByDate =
+      docFilterDateBegin && docFilterDateEnd
+        ? listByOutlet.filter(
+            (i) =>
+              new Date(docFilterDateBegin) <= new Date(new Date(i.head?.onDate).toISOString().slice(0, 10)) &&
+              new Date(docFilterDateEnd) >= new Date(new Date(i.head?.onDate).toISOString().slice(0, 10)),
+          )
+        : listByOutlet;
+    return listByDate;
+  }, [docFilterContact, docFilterDateBegin, docFilterDateEnd, docFilterOutlet, orderList]);
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
@@ -256,8 +262,8 @@ const OrderListScreen = () => {
   const handleApplyDateBegin = (_event: any, selectedDateBegin: Date | undefined) => {
     setShowDateBegin(false);
 
-    if (selectedDateBegin) {
-      setDateBegin(selectedDateBegin.toISOString().slice(0, 10));
+    if (selectedDateBegin && _event.type !== 'dismissed') {
+      dispatch(appActions.setFormParams({ filterDateBegin: selectedDateBegin.toISOString().slice(0, 10) }));
     }
   };
   const handlePresentDateBegin = () => {
@@ -269,10 +275,8 @@ const OrderListScreen = () => {
   const handleApplyDateEnd = (_event: any, selectedDateEnd: Date | undefined) => {
     setShowDateEnd(false);
 
-    if (selectedDateEnd && docFilterDateEnd) {
+    if (selectedDateEnd && _event.type !== 'dismissed') {
       dispatch(appActions.setFormParams({ filterDateEnd: selectedDateEnd.toISOString().slice(0, 10) }));
-
-      // setDateEnd(selectedDateEnd.toISOString().slice(0, 10));
     }
   };
 
@@ -291,7 +295,6 @@ const OrderListScreen = () => {
   }, [docFilterContact, navigation]);
 
   const handleSearchOutlet = useCallback(() => {
-    //TODO: если изменился контакт, то и магазин должен обнулиться
     const params: Record<string, string> = {};
 
     if (docFilterContact?.id) {
@@ -309,7 +312,6 @@ const OrderListScreen = () => {
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
-    const address = outlets.find((a) => a.id === orderList.find((o) => o.id === item.id)?.head?.outlet.id)?.address;
 
     return (
       <ScreenListItem
@@ -340,7 +342,6 @@ const OrderListScreen = () => {
     (item: any) => (status === 'all' && sections ? <OrderListTotal sectionOrders={item.section} /> : null),
     [sections, status],
   );
-  const data = new Date();
 
   const isFocused = useIsFocused();
   if (!isFocused) {
@@ -362,44 +363,20 @@ const OrderListScreen = () => {
               selectionColor={searchStyle}
             />
           </View>
-          <View
-            style={[
-              {
-                // marginHorizontal: 10,
-                paddingTop: 5,
-                marginVertical: 5,
-                marginBottom: 12,
-                borderWidth: 1,
-                borderRadius: 2,
-              },
-              { borderColor: colors.primary },
-            ]}
-          >
+          <View style={[localStyles.filter, { borderColor: colors.primary }]}>
             <SelectableInput label="Организация" value={docFilterContact?.name || ''} onPress={handleSearchContact} />
-            <View
-              style={{
-                marginTop: -5,
-              }}
-            >
+            <View style={localStyles.marginTop}>
               <SelectableInput label="Магазин" value={docFilterOutlet?.name || ''} onPress={handleSearchOutlet} />
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center' /*, marginHorizontal: -10*/,
-                marginTop: -5,
-              }}
-            >
-              <View style={{ width: '50%' }}>
+            <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
+              <View style={localStyles.width}>
                 <SelectableInput
                   label="С даты"
-                  value={dateBegin ? getDateString(dateBegin) : ''}
-                  // value={getDateString(dateBegin || '') || ''}
+                  value={docFilterDateBegin ? getDateString(docFilterDateBegin) : ''}
                   onPress={handlePresentDateBegin}
                 />
               </View>
-              <View style={{ width: '50%' }}>
+              <View style={localStyles.width}>
                 <SelectableInput
                   label="По дату"
                   value={docFilterDateEnd ? getDateString(docFilterDateEnd || '') : ''}
@@ -424,7 +401,7 @@ const OrderListScreen = () => {
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(dateBegin || new Date())}
+          value={new Date(docFilterDateBegin || new Date())}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
@@ -434,14 +411,10 @@ const OrderListScreen = () => {
       {showDateEnd && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docFilterDateEnd || data)}
-          // value={new Date(docFilterDateEnd || new Date())}
-          // value={new Date(dateEnd || '')}
+          value={new Date(docFilterDateEnd || new Date())}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}
-          onTouchCancel={() => setShowDateBegin(false)}
-          // onTouchCancel
         />
       )}
     </AppScreen>
@@ -449,3 +422,18 @@ const OrderListScreen = () => {
 };
 
 export default OrderListScreen;
+
+const localStyles = StyleSheet.create({
+  filter: {
+    // marginHorizontal: 10,
+    paddingTop: 5,
+    marginVertical: 5,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderRadius: 2,
+  },
+  marginTop: {
+    marginTop: -5,
+  },
+  width: { width: '50%' },
+});

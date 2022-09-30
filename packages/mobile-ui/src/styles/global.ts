@@ -150,6 +150,13 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 30,
   },
+  iconWithoutBackground: {
+    alignItems: 'center',
+    borderRadius: 18,
+    height: 30,
+    justifyContent: 'center',
+    width: 30,
+  },
   checkedIcon: {
     alignItems: 'center',
     backgroundColor: '#587a20',
