@@ -78,6 +78,18 @@ const getUser = async (ctx: ParameterizedContext) => {
   ok(ctx as Context, user, `getUser: user '${user.name}' (${user.id}) is successfully received'`);
 };
 
+const getUserWithDevice = async (ctx: ParameterizedContext) => {
+  const { id: userId } = ctx.params;
+
+  const user = userService.findOneWithDevice(userId);
+
+  if (!user) {
+    throw new DataNotFoundException(`Пользователь ${userId} не найден`);
+  }
+
+  ok(ctx as Context, user, ` getUserWithDevice : user '${user.name}' (${user.id}) is successfully received'`);
+};
+
 const getUsers = async (ctx: ParameterizedContext) => {
   const { companyId, name, filterText, fromRecord, toRecord, version, appSystemId, erpUserId } = ctx.query;
 
@@ -181,7 +193,7 @@ const getUsersWithDevice = async (ctx: ParameterizedContext) => {
       break;
   }
 
-  ok(ctx as Context, users, 'getUsers: users are successfully received');
+  ok(ctx as Context, users, 'getUsersWithDevice: users are successfully received');
 };
 
-export { addUser, updateUser, removeUser, getUser, getUsers, getUsersWithDevice };
+export { addUser, updateUser, removeUser, getUser, getUsers, getUsersWithDevice, getUserWithDevice };

@@ -324,6 +324,20 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
   });
 };
 
+/**
+ *  Возвращает пользователя c uid device по указанным параметрам
+ * @id id пользователя
+ * @returns
+ */
+export const findOneWithDevice = (id: string): IUserWithDevice => {
+  const user = findOne(id);
+  const { devices, deviceBindings } = getDb();
+  const fullUser: IUserWithDevice = user;
+  const deviceId = deviceBindings.data.find((i) => i.userId === user.id)?.deviceId;
+  if (deviceId) fullUser.deviceUid = devices.data.find((i) => i.id === deviceId)?.uid;
+  return fullUser;
+};
+
 export const makeUser = (user: IDBUser): IUser => {
   const { companies, users, appSystems } = getDb();
 
