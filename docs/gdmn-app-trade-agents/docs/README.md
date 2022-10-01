@@ -192,6 +192,19 @@
 
  <img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
 
+Так как вид упаковки бывает разных вариантов, то возникает ситуация, когда нужно добавить один и тот же товар, но с разной тарой. 
+
+<img src="img/3.Orders/3.GoodsWithCont.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.GoodsSomeContDiff.jpg" alt="drawing" height="400"/>
+
+Для этого нужно снова выбрать необходимую позицию нажатием, далее выбрать из дополнительного меню пункт **Добавить**.
+
+  <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.AddMenuAddGoods.jpg" alt="drawing" height="400"/>
+
+
+ И далее действовать по уже знакомой схеме - ввести количество товара, необходимый вид упаковки и нажать на иконку " **✓** ". Выбранный повторно товар не отразится в списках товаров, но будет виден в самой заявке.
+
+ <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderViewGoodsTwo.jpg" alt="drawing" height="400"/>
+
 #### Удаление позиции
 
 Если в экране просмотра документа смахнуть влево по позиции, то появится дополнительное меню.
