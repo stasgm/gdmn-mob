@@ -38,7 +38,8 @@ export interface IRouteFormParam extends IFormParam {
 }
 
 export interface IGroupFormParam extends IFormParam {
-  goodItemId?: number;
+  parentGroupId?: string;
+  groupId?: string;
 }
 
 export interface ISellBillFormParam extends IFormParam {
