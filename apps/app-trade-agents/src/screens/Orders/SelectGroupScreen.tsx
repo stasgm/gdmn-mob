@@ -44,11 +44,6 @@ interface IItemLine {
   item: IOrderLine;
 }
 
-export interface GroupListSectionProps {
-  groupId: string;
-  groupName: string;
-}
-
 const SelectGroupScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
   const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
