@@ -59,16 +59,9 @@ const OrderListScreen = () => {
 
   const outlets = refSelectors.selectByName<IOutlet>('outlet')?.data;
 
-  const formParams = useSelector((state) => state.app.formParams as IOrderListFormParam);
-
-  const {
-    filterContact: docFilterContact,
-    filterOutlet: docFilterOutlet,
-    filterDateBegin: docFilterDateBegin,
-    filterDateEnd: docFilterDateEnd,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  const { filterContact, filterOutlet, filterDateBegin, filterDateEnd } = useSelector(
+    (state) => state.app.formParams as IOrderListFormParam,
+  );
 
   useEffect(() => {
     return () => {
@@ -77,10 +70,10 @@ const OrderListScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === docFilterOutlet?.id);
+  const outlet = refSelectors.selectByName<IOutlet>('outlet')?.data?.find((e) => e.id === filterOutlet?.id);
 
   useEffect(() => {
-    if (!!docFilterContact && !!docFilterOutlet && docFilterContact.id !== outlet?.company.id) {
+    if (!!filterContact && !!filterOutlet && filterContact.id !== outlet?.company.id) {
       dispatch(
         appActions.setFormParams({
           filterOutlet: undefined,
@@ -88,7 +81,7 @@ const OrderListScreen = () => {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, docFilterContact?.id, outlet?.company.id]);
+  }, [dispatch, filterContact?.id, outlet?.company.id]);
 
   useEffect(() => {
     // Инициализируем параметры
@@ -101,51 +94,56 @@ const OrderListScreen = () => {
     );
   }, [dispatch]);
 
-  const orderList = orders
-    ?.filter((i) =>
-      i.documentType?.name === 'order'
-        ? i?.head?.contact.name ||
-          i?.head?.outlet.name ||
-          i.number ||
-          i.documentDate ||
-          i.head.onDate ||
-          outlets.find((a) => a.id === i.head.outlet.id)?.address
-          ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
-            getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
-            outlets
-              .find((a) => a.id === i.head.outlet.id)
-              ?.address.toUpperCase()
-              .includes(searchQuery.toUpperCase())
-          : true
-        : false,
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
-        new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
-    );
+  const orderList = useMemo(
+    () =>
+      orders
+        ?.filter((i) =>
+          i.documentType?.name === 'order'
+            ? i?.head?.contact.name ||
+              i?.head?.outlet.name ||
+              i.number ||
+              i.documentDate ||
+              i.head.onDate ||
+              outlets.find((a) => a.id === i.head.outlet.id)?.address
+              ? i?.head?.contact?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+                i?.head?.outlet?.name.toUpperCase().includes(searchQuery.toUpperCase()) ||
+                i.number.toUpperCase().includes(searchQuery.toUpperCase()) ||
+                getDateString(i.documentDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
+                getDateString(i.head.onDate).toUpperCase().includes(searchQuery.toUpperCase()) ||
+                outlets
+                  .find((a) => a.id === i.head.outlet.id)
+                  ?.address.toUpperCase()
+                  .includes(searchQuery.toUpperCase())
+              : true
+            : false,
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.documentDate).getTime() - new Date(a.documentDate).getTime() &&
+            new Date(b.head.onDate).getTime() - new Date(a.head.onDate).getTime(),
+        ),
+    [orders, outlets, searchQuery],
+  );
 
   const filteredOrderList = useMemo(() => {
-    const listByCompany = docFilterContact
-      ? orderList.filter((i) => i.head.contact.id === docFilterContact?.id)
-      : orderList;
-    const listByOutlet =
-      docFilterContact && docFilterOutlet
-        ? listByCompany.filter((i) => i.head.outlet.id === docFilterOutlet.id)
-        : listByCompany;
-    const listByDate =
-      docFilterDateBegin && docFilterDateEnd
-        ? listByOutlet.filter(
-            (i) =>
-              new Date(docFilterDateBegin) <= new Date(new Date(i.head?.onDate).toISOString().slice(0, 10)) &&
-              new Date(docFilterDateEnd) >= new Date(new Date(i.head?.onDate).toISOString().slice(0, 10)),
-          )
-        : listByOutlet;
-    return listByDate;
-  }, [docFilterContact, docFilterDateBegin, docFilterDateEnd, docFilterOutlet, orderList]);
+    if (filterContact?.id || filterOutlet?.id || filterDateBegin || filterDateEnd) {
+      let dateEnd: Date | undefined;
+      if (filterDateEnd) {
+        dateEnd = new Date(filterDateEnd);
+        dateEnd.setDate(dateEnd.getDate() + 1);
+      }
+
+      return orderList.filter(
+        (i) =>
+          (filterContact?.id ? i.head.contact.id === filterContact.id : true) &&
+          (filterOutlet?.id ? i.head.outlet.id === filterOutlet.id : true) &&
+          (filterDateBegin ? new Date(filterDateBegin).getTime() <= new Date(i.head?.onDate).getTime() : true) &&
+          (dateEnd ? new Date(dateEnd).getTime() >= new Date(i.head?.onDate).getTime() : true),
+      );
+    } else {
+      return orderList;
+    }
+  }, [filterContact, filterDateBegin, filterDateEnd, filterOutlet, orderList]);
 
   const debets = refSelectors.selectByName<IDebt>('debt')?.data;
 
@@ -284,31 +282,35 @@ const OrderListScreen = () => {
     setShowDateEnd(true);
   };
 
-  console.log('docFilterDateEnd', docFilterDateEnd);
+  console.log('filterDateEnd', filterDateEnd);
 
   const handleSearchContact = useCallback(() => {
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
       fieldName: 'filterContact',
-      value: docFilterContact && [docFilterContact],
+      value: filterContact && [filterContact],
     });
-  }, [docFilterContact, navigation]);
+  }, [filterContact, navigation]);
 
   const handleSearchOutlet = useCallback(() => {
-    const params: Record<string, string> = {};
+    // const params: Record<string, string> = {};
 
-    if (docFilterContact?.id) {
-      params.companyId = docFilterContact?.id;
-    }
+    // if (filterContact?.id) {
+    //   params.companyId = filterContact?.id;
+    // }
 
     navigation.navigate('SelectRefItem', {
       refName: 'outlet',
       fieldName: 'filterOutlet',
-      clause: params,
-      value: docFilterOutlet && [docFilterOutlet],
+      clause: filterContact?.id
+        ? {
+            companyId: filterContact?.id,
+          }
+        : undefined,
+      value: filterOutlet && [filterOutlet],
       descrFieldName: 'address',
     });
-  }, [docFilterContact?.id, docFilterOutlet, navigation]);
+  }, [filterContact?.id, filterOutlet, navigation]);
 
   const renderItem: ListRenderItem<IListItemProps> = ({ item }) => {
     const debt = debets.find((d) => d.id === orderList.find((o) => o.id === item.id)?.head?.contact.id);
@@ -359,27 +361,27 @@ const OrderListScreen = () => {
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
+              // autoFocus
               selectionColor={searchStyle}
             />
           </View>
           <View style={[localStyles.filter, { borderColor: colors.primary }]}>
-            <SelectableInput label="Организация" value={docFilterContact?.name || ''} onPress={handleSearchContact} />
+            <SelectableInput label="Организация" value={filterContact?.name || ''} onPress={handleSearchContact} />
             <View style={localStyles.marginTop}>
-              <SelectableInput label="Магазин" value={docFilterOutlet?.name || ''} onPress={handleSearchOutlet} />
+              <SelectableInput label="Магазин" value={filterOutlet?.name || ''} onPress={handleSearchOutlet} />
             </View>
             <View style={[styles.flexDirectionRow, localStyles.marginTop]}>
               <View style={localStyles.width}>
                 <SelectableInput
                   label="С даты"
-                  value={docFilterDateBegin ? getDateString(docFilterDateBegin) : ''}
+                  value={filterDateBegin ? getDateString(filterDateBegin) : ''}
                   onPress={handlePresentDateBegin}
                 />
               </View>
               <View style={localStyles.width}>
                 <SelectableInput
                   label="По дату"
-                  value={docFilterDateEnd ? getDateString(docFilterDateEnd || '') : ''}
+                  value={filterDateEnd ? getDateString(filterDateEnd || '') : ''}
                   onPress={handlePresentDateEnd}
                 />
               </View>
@@ -401,7 +403,7 @@ const OrderListScreen = () => {
       {showDateBegin && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docFilterDateBegin || new Date())}
+          value={new Date(filterDateBegin || new Date())}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateBegin}
@@ -411,7 +413,7 @@ const OrderListScreen = () => {
       {showDateEnd && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={new Date(docFilterDateEnd || new Date())}
+          value={new Date(filterDateEnd || new Date())}
           mode="date"
           display={Platform.OS === 'ios' ? 'inline' : 'default'}
           onChange={handleApplyDateEnd}

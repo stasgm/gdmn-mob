@@ -42,8 +42,7 @@ const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
-  const routeId = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeId;
+  const { id, routeId } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
 
   const dispatch = useDispatch();
 

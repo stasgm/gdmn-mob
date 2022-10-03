@@ -193,7 +193,7 @@ const globalStyles = StyleSheet.create({
   },
   name: {
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   number: {
     fontSize: 14,
@@ -214,7 +214,7 @@ const globalStyles = StyleSheet.create({
   },
   textTotal: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   total: {
     margin: 6,
