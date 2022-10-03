@@ -205,6 +205,17 @@
 
  <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderViewGoodsTwo.jpg" alt="drawing" height="400"/>
 
+#### Редакция позиции
+
+При возникновении ситуации, когда вовремя заполнения заявки необходимо изменить уже заявленное количество товара или его тару, можно сделать это повторным нажатием на необходимую позицию в списках товров, далее выбрать из появившегося дополнительного меню пункт **Редактировать**.
+
+<img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> 
+<img src="img/3.Orders/3.AddMenuAddGoods.jpg" alt="drawing" height="400"/>
+
+Или же, зайти в заполненую заявку, нажать на товар, который необходимо откорректировать, ввести нужные данные и снова нажать на иконку " **✓** ".
+
+<img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.GoodsWithoutCont2.jpg" alt="drawing" height="400"/> 
+
 #### Удаление позиции
 
 Если в экране просмотра документа смахнуть влево по позиции, то появится дополнительное меню.
@@ -250,7 +261,8 @@
 
 Далее необходимо подождать 1-2 минуту и синхронизировать данные снова для получения ответа обработки, цвет станет синим.
 
-<img src="img/3.Orders/3.DocsProcessed.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
+ <img src="img/3.Orders/3.DocsProcessed.jpg" alt="drawing" height="400"/>
 
 ### Удаление документа
 
