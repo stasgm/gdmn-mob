@@ -1,5 +1,4 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { FlatList } from 'react-native';
 import { useFocusEffect, useIsFocused, useNavigation, useScrollToTop } from '@react-navigation/native';
 
 import {
@@ -17,6 +16,8 @@ import { keyExtractor, useFilteredDocList } from '@lib/mobile-app';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { appActions, useDispatch, useSelector } from '@lib/store';
+
+import { FlatList } from 'react-native';
 
 import { IRouteDocument, IRouteFormParam } from '../../store/types';
 
@@ -92,6 +93,7 @@ const RouteListScreen = () => {
         ItemSeparatorComponent={ItemSeparator}
         scrollEventThrottle={400}
         ListEmptyComponent={EmptyList}
+        maxToRenderPerBatch={20}
       />
     </AppScreen>
   );

@@ -88,7 +88,7 @@ const globalStyles = StyleSheet.create({
     fontSize: 15,
   },
   textBold: {
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   searchBar: {
     elevation: 0,

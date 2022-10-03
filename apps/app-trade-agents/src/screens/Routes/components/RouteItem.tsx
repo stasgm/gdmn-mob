@@ -19,9 +19,7 @@ const iconsStatus: Icon[] = ['circle-outline', 'arrow-right-drop-circle-outline'
 
 const RouteItem = ({ item, onPressItem }: IItem) => {
   const address = refSelectors.selectByRefId<IOutlet>('outlet', item.outlet.id)?.address;
-
   const visit = useFilteredDocList<IVisitDocument>('visit').find((doc) => doc.head?.routeLineId === item.id);
-
   const status = !visit ? 0 : visit.head.dateEnd ? 2 : 1;
 
   const dateEnd = useMemo(
@@ -58,6 +56,6 @@ export default RouteItem;
 
 const localStyles = StyleSheet.create({
   item: {
-    height: 76,
+    height: 74,
   },
 });

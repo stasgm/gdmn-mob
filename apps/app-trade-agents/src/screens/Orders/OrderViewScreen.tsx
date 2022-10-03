@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, View, FlatList } from 'react-native';
+import { Alert, FlatList, View } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -365,10 +365,9 @@ const OrderViewScreen = () => {
           data={order.lines}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
           updateCellsBatchingPeriod={100}
-          windowSize={7}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>

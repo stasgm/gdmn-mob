@@ -65,8 +65,6 @@ export const debetTypes: IListItem[] = [
   { id: 'debet', value: 'С предоплатой' },
 ];
 
-export const ROUTE_ITEM_HEIGHT = 82;
-
 export const lineTypes: IListItem[] = [
   {
     id: 'new',
@@ -77,3 +75,4 @@ export const lineTypes: IListItem[] = [
     value: 'архив',
   },
 ];
+export const ROUTE_ITEM_HEIGHT = 80;
