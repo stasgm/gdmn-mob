@@ -23,7 +23,7 @@ import {
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
-import { ScreenState } from '@lib/types';
+import { INamedEntity, ScreenState } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -43,6 +43,7 @@ const OrderViewScreen = () => {
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
   const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
+  const routeId = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.routeId;
 
   const dispatch = useDispatch();
 
@@ -83,7 +84,11 @@ const OrderViewScreen = () => {
       id: newId,
       number: 'б\\н',
       status: 'DRAFT',
-      head: { ...order?.head, route: undefined },
+      head: {
+        ...order?.head,
+        route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
+        onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
+      },
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
@@ -92,7 +97,7 @@ const OrderViewScreen = () => {
     docDispatch(documentActions.addDocument(newDoc));
 
     navigation.navigate('OrderView', { id: newId });
-  }, [order, docDispatch, navigation]);
+  }, [order, routeId, docDispatch, navigation]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -230,14 +235,10 @@ const OrderViewScreen = () => {
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        order?.status === 'READY' ? (
-          <View style={styles.buttons}>
-            <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
-            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
-          </View>
-        ) : (
-          order?.status !== 'SENT' && <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
-        )
+        <View style={styles.buttons}>
+          {order?.status === 'READY' && <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />}
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+        </View>
       ) : (
         <View style={styles.buttons}>
           {isDelList ? (

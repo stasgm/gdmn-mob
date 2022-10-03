@@ -66,3 +66,14 @@ export const debetTypes: IListItem[] = [
 ];
 
 export const ROUTE_ITEM_HEIGHT = 82;
+
+export const lineTypes: IListItem[] = [
+  {
+    id: 'new',
+    value: 'текущие',
+  },
+  {
+    id: 'old',
+    value: 'архив',
+  },
+];
