@@ -78,7 +78,9 @@ const RouteDetailScreen = () => {
     .selectByDocType<IOrderDocument>('order')
     ?.filter(
       (doc) =>
-        doc.documentDate.slice(0, 10) === new Date().toISOString().slice(0, 10) && doc.head.outlet?.id === outlet?.id,
+        doc.documentDate.slice(0, 10) === new Date().toISOString().slice(0, 10) &&
+        doc.head?.route?.id === route.id &&
+        doc.head.outlet?.id === outlet?.id,
     );
 
   const orderDocsOld = docSelectors
