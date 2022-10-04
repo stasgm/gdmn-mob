@@ -37,7 +37,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
 
   useEffect(() => {
     //TODO временное решение
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
+    console.log('1111');
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 100);
   }, []);
 
   const handelQuantityChange = useCallback((value: string) => {
@@ -93,7 +94,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
-              autoFocus={true}
             />
           </View>
         </View>
