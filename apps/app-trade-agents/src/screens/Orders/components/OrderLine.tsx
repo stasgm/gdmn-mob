@@ -30,7 +30,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     [packages],
   );
 
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
+  const [goodQty, setGoodQty] = useState<string>((item?.quantity || 0).toString());
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   const qtyRef = useRef<TextInput>(null);
@@ -86,14 +86,13 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
           <View style={styles.details}>
             <Text style={styles.name}>Количество, кг</Text>
             <TextInput
+              ref={qtyRef}
+              value={goodQty}
               style={textStyle}
-              editable={true}
               keyboardType="numeric"
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
-              ref={qtyRef}
-              value={goodQty}
             />
           </View>
         </View>

@@ -253,7 +253,8 @@ const SelectGroupScreen = () => {
               if (isAdded) {
                 setSelectedGood(item);
               } else {
-                setOrderLine({ mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } });
+                const newLine = { mode: 0, docId, item: { id: generateId(), good: item, quantity: 0 } };
+                setOrderLine(newLine);
               }
             }}
           >
@@ -338,50 +339,53 @@ const SelectGroupScreen = () => {
 
   return (
     <AppSafeScreen style={localStyles.container}>
-      {filterVisible && (
-        <View>
-          <View style={styles.flexDirectionRow}>
-            <Searchbar
-              placeholder="Поиск"
-              onChangeText={(text) => {
-                setSearchQuery(text);
-                if (text === '' && goodsByContact.length) {
-                  refListGood?.current?.scrollToIndex({ index: 0, animated: true });
-                }
-              }}
-              value={searchQuery}
-              style={[styles.flexGrow, styles.searchBar]}
-              autoFocus
-              selectionColor={colors.primary}
-            />
-          </View>
-          <ItemSeparator />
-        </View>
-      )}
-      <FlatList
-        ref={refListGood}
-        data={filterVisible ? goodsByContact : goodModel}
-        keyExtractor={keyExtractor}
-        ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
-        renderItem={renderGood}
-        ItemSeparatorComponent={ItemSeparator}
-        keyboardShouldPersistTaps={'handled'}
-        maxToRenderPerBatch={20}
-      />
-      {(selectedLine || selectedGood) && (
-        <OrderLineDialog
-          selectedLine={selectedLine}
-          goodName={selectedLine?.good.name || selectedGood?.name || ''}
-          onEditLine={handleEditLine}
-          onAddLine={handleAddLine}
-          onDeleteLine={handleDeleteLine}
-          onDismissDialog={hadndleDismissDialog}
-        />
-      )}
-      {orderLine && (
+      {orderLine ? (
         <Modal animationType="slide" visible={true}>
           <OrderLineEdit {...orderLine} onDismiss={() => setOrderLine(undefined)} />
         </Modal>
+      ) : (
+        <View>
+          {filterVisible && (
+            <View>
+              <View style={styles.flexDirectionRow}>
+                <Searchbar
+                  placeholder="Поиск"
+                  onChangeText={(text) => {
+                    setSearchQuery(text);
+                    if (text === '' && goodsByContact.length) {
+                      refListGood?.current?.scrollToIndex({ index: 0, animated: true });
+                    }
+                  }}
+                  value={searchQuery}
+                  style={[styles.flexGrow, styles.searchBar]}
+                  autoFocus
+                  selectionColor={colors.primary}
+                />
+              </View>
+              <ItemSeparator />
+            </View>
+          )}
+          <FlatList
+            ref={refListGood}
+            data={filterVisible ? goodsByContact : goodModel}
+            keyExtractor={keyExtractor}
+            ListHeaderComponent={filterVisible ? undefined : renderGroupHeader}
+            renderItem={renderGood}
+            ItemSeparatorComponent={ItemSeparator}
+            keyboardShouldPersistTaps={'handled'}
+            maxToRenderPerBatch={20}
+          />
+          {(selectedLine || selectedGood) && (
+            <OrderLineDialog
+              selectedLine={selectedLine}
+              goodName={selectedLine?.good.name || selectedGood?.name || ''}
+              onEditLine={handleEditLine}
+              onAddLine={handleAddLine}
+              onDeleteLine={handleDeleteLine}
+              onDismissDialog={hadndleDismissDialog}
+            />
+          )}
+        </View>
       )}
     </AppSafeScreen>
   );
