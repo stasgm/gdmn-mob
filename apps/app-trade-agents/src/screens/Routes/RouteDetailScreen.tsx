@@ -76,10 +76,7 @@ const RouteDetailScreen = () => {
 
   const orderDocs = docSelectors
     .selectByDocType<IOrderDocument>('order')
-    ?.filter(
-      (doc) =>
-        doc.documentDate.slice(0, 10) === new Date().toISOString().slice(0, 10) && doc.head.outlet?.id === outlet?.id,
-    );
+    ?.filter((doc) => doc.head?.route?.id === route.id && doc.head.outlet?.id === outlet?.id);
 
   const orderDocsOld = docSelectors
     .selectByDocType<IOrderDocument>('order')
@@ -254,13 +251,6 @@ const RouteDetailScreen = () => {
     [navigation, route.id],
   );
 
-  const renderOrderOldItem: ListRenderItem<IListItemProps> = useCallback(
-    ({ item }) => (
-      <ScreenListItem {...item} onPress={() => navigation.navigate('OrderView', { id: item.id, routeId: route.id })} />
-    ),
-    [navigation, route.id],
-  );
-
   const isFocused = useIsFocused();
 
   if (!point) {
@@ -326,26 +316,14 @@ const RouteDetailScreen = () => {
       </InfoBlock>
 
       <LineTypes />
-
-      {lineType === 'new' ? (
-        <FlatList
-          data={orders}
-          keyExtractor={keyExtractor}
-          renderItem={renderOrderItem}
-          scrollEventThrottle={400}
-          ItemSeparatorComponent={ItemSeparator}
-          ListEmptyComponent={EmptyList}
-        />
-      ) : (
-        <FlatList
-          data={ordersOld}
-          keyExtractor={keyExtractor}
-          renderItem={renderOrderOldItem}
-          scrollEventThrottle={400}
-          ItemSeparatorComponent={ItemSeparator}
-          ListEmptyComponent={EmptyList}
-        />
-      )}
+      <FlatList
+        data={lineType === 'new' ? orders : ordersOld}
+        keyExtractor={keyExtractor}
+        renderItem={renderOrderItem}
+        scrollEventThrottle={400}
+        ItemSeparatorComponent={ItemSeparator}
+        ListEmptyComponent={EmptyList}
+      />
     </AppScreen>
   );
 };

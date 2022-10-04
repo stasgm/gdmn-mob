@@ -282,8 +282,6 @@ const OrderListScreen = () => {
     setShowDateEnd(true);
   };
 
-  console.log('filterDateEnd', filterDateEnd);
-
   const handleSearchContact = useCallback(() => {
     navigation.navigate('SelectRefItem', {
       refName: 'contact',
