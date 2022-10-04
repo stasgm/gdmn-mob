@@ -8,7 +8,7 @@ import styles from '../../styles/global';
 
 import { LargeText, MediumText } from '../AppText';
 
-import { getStatusColor } from './constants';
+import { getStatusColor, getStatusIcon } from './constants';
 export interface IListItemProps {
   title: string;
   documentDate: string;
@@ -45,8 +45,8 @@ const ScreenListItem = ({
     <TouchableOpacity onPress={onPress} onLongPress={onLongPress}>
       <View style={styles.item}>
         <View style={styles.iconsWithCheck}>
-          <View style={[styles.icon, { backgroundColor: getStatusColor(status) }]}>
-            <MaterialCommunityIcons name="view-list" size={20} color={'#FFF'} />
+          <View style={styles.iconWithoutBackground}>
+            <MaterialCommunityIcons name={getStatusIcon(status)} size={25} color={getStatusColor(status)} />
           </View>
           {checked ? (
             <View style={styles.checkedIcon}>

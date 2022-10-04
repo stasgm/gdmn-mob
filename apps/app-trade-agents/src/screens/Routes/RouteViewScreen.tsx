@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { RouteProp, useRoute, useTheme, useNavigation, useIsFocused } from '@react-navigation/native';
-import { View, FlatList, Alert, RefreshControl } from 'react-native';
+import { View, Alert, RefreshControl, FlatList } from 'react-native';
 import { Divider, Searchbar } from 'react-native-paper';
 
 import {
@@ -34,6 +34,8 @@ import { ROUTE_ITEM_HEIGHT } from '../../utils/constants';
 
 import RouteItem from './components/RouteItem';
 import RouteTotal from './components/RouteTotal';
+
+const getItemLayoutRoute = (_: any, index: number) => getItemLayout(index, ROUTE_ITEM_HEIGHT);
 
 interface IFilteredList {
   searchQuery: string;
@@ -94,15 +96,10 @@ const RouteViewScreen = () => {
     }
   }, [filteredList, searchQuery, routeLineList]);
 
-  // const ref = useRef<FlatList<IRouteLine>>(null);
-
   const orders = useFilteredDocList<IOrderDocument>('order');
   const visits = useFilteredDocList<IVisitDocument>('visit');
 
   const geoList = useAppSelector((state) => state.geo?.list)?.filter((g) => g.routeId === id);
-
-  //Первый элемент из списка точек маршрута
-  const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
 
   //Первый элемент записывается в параметры формы при прокрутке списка точек маршрута
   //При возвращении с окна визита, переходит на этот эелемент (initialScrollIndex)
@@ -118,10 +115,6 @@ const RouteViewScreen = () => {
     },
     [dispatch],
   );
-
-  const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
-
-  const getItemLayoutRoute = (_: any, index: number) => getItemLayout(index, ROUTE_ITEM_HEIGHT);
 
   const handleDelete = useCallback(() => {
     const deleteRoute = async () => {
@@ -244,19 +237,11 @@ const RouteViewScreen = () => {
             <ItemSeparator />
           </>
         )}
-        <FlatList
-          // ref={ref}
-          data={filteredList.routeLineList}
-          keyExtractor={keyExtractor}
+        <CalcTopRouteList
           renderItem={renderItem}
-          ItemSeparatorComponent={ItemSeparator}
-          refreshControl={RC}
-          ListEmptyComponent={EmptyList}
-          updateCellsBatchingPeriod={50}
-          viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-          initialScrollIndex={routeItemId}
-          getItemLayout={getItemLayoutRoute}
-          keyboardShouldPersistTaps={'handled'}
+          onViewableItemsChanged={onViewableItemsChanged}
+          RC={RC}
+          data={filteredList.routeLineList}
         />
       </AppScreen>
       {!!routeLineList.length && (
@@ -267,6 +252,37 @@ const RouteViewScreen = () => {
         />
       )}
     </>
+  );
+};
+
+const CalcTopRouteList = ({
+  renderItem,
+  onViewableItemsChanged,
+  RC,
+  data,
+}: {
+  renderItem: any;
+  onViewableItemsChanged: ({ viewableItems }: any) => void;
+  RC: any;
+  data?: IRouteLine[];
+}) => {
+  const viewabilityConfigCallbackPairs = useRef([{ viewabilityConfig, onViewableItemsChanged }]);
+  const routeItemId = useSelector((state) => state.app.formParams as IRouteFormParam)?.routeItemId;
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      ItemSeparatorComponent={ItemSeparator}
+      refreshControl={RC}
+      ListEmptyComponent={EmptyList}
+      updateCellsBatchingPeriod={50}
+      viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+      initialScrollIndex={routeItemId || 0}
+      getItemLayout={getItemLayoutRoute}
+      maxToRenderPerBatch={15}
+    />
   );
 };
 

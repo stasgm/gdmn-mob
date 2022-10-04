@@ -66,7 +66,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'handled'}>
+    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.background }}>
       <View style={styles.content}>
         <View style={styles.item}>
           <View style={styles.details}>

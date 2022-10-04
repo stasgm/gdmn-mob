@@ -17,11 +17,11 @@ export type RefParamList = {
 };
 
 export type OrderParamList = RefParamList & {
-  OrderView: { id: string };
+  OrderView: { id: string; routeId?: string };
   OrderEdit: { id: string } | undefined;
   OrderLine: { mode: number; docId: string; item: IOrderLine };
   SelectGroupItem: { docId: string };
-  SelectGoodItem: { docId: string; groupId: string };
+  // SelectGoodItem: { docId: string; groupId: string };
 };
 
 export type OrdersStackParamList = { OrderList: undefined } & OrderParamList;

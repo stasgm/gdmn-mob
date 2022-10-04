@@ -88,7 +88,7 @@ const globalStyles = StyleSheet.create({
     fontSize: 15,
   },
   textBold: {
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   searchBar: {
     elevation: 0,
@@ -150,6 +150,13 @@ const globalStyles = StyleSheet.create({
     justifyContent: 'center',
     width: 30,
   },
+  iconWithoutBackground: {
+    alignItems: 'center',
+    borderRadius: 18,
+    height: 30,
+    justifyContent: 'center',
+    width: 30,
+  },
   checkedIcon: {
     alignItems: 'center',
     backgroundColor: '#587a20',
@@ -186,7 +193,7 @@ const globalStyles = StyleSheet.create({
   },
   name: {
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   number: {
     fontSize: 14,
@@ -207,7 +214,7 @@ const globalStyles = StyleSheet.create({
   },
   textTotal: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   total: {
     margin: 6,

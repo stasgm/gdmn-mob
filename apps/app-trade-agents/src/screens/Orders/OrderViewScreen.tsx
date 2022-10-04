@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, View, FlatList } from 'react-native';
+import { Alert, FlatList, View } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -23,7 +23,7 @@ import {
 
 import { formatValue, generateId, getDateString, useSendDocs, keyExtractor } from '@lib/mobile-app';
 
-import { ScreenState } from '@lib/types';
+import { INamedEntity, ScreenState } from '@lib/types';
 
 import { sleep } from '@lib/client-api';
 
@@ -42,7 +42,7 @@ const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
   const docDispatch = useDocThunkDispatch();
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'OrderView'>>();
-  const id = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params?.id;
+  const { id, routeId } = useRoute<RouteProp<OrdersStackParamList, 'OrderView'>>().params;
 
   const dispatch = useDispatch();
 
@@ -83,7 +83,11 @@ const OrderViewScreen = () => {
       id: newId,
       number: 'б\\н',
       status: 'DRAFT',
-      head: { ...order?.head, route: undefined },
+      head: {
+        ...order?.head,
+        route: routeId ? ({ id: routeId, name: '' } as INamedEntity) : undefined,
+        onDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
+      },
       documentDate: newDocDate,
       creationDate: newDocDate,
       editionDate: newDocDate,
@@ -92,7 +96,7 @@ const OrderViewScreen = () => {
     docDispatch(documentActions.addDocument(newDoc));
 
     navigation.navigate('OrderView', { id: newId });
-  }, [order, docDispatch, navigation]);
+  }, [order, routeId, docDispatch, navigation]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -230,14 +234,10 @@ const OrderViewScreen = () => {
   const renderRight = useCallback(
     () =>
       isBlocked ? (
-        order?.status === 'READY' ? (
-          <View style={styles.buttons}>
-            <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />
-            <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
-          </View>
-        ) : (
-          order?.status !== 'SENT' && <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
-        )
+        <View style={styles.buttons}>
+          {order?.status === 'READY' && <SendButton onPress={handleSendDocument} disabled={screenState !== 'idle'} />}
+          <MenuButton actionsMenu={actionsMenu} disabled={screenState !== 'idle'} />
+        </View>
       ) : (
         <View style={styles.buttons}>
           {isDelList ? (
@@ -337,10 +337,10 @@ const OrderViewScreen = () => {
           isBlocked={isBlocked}
         >
           <View style={styles.directionColumn}>
+            <MediumText>Адрес: {address}</MediumText>
             <MediumText>{`№ ${order.number} от ${getDateString(order.documentDate)} на ${getDateString(
               order.head?.onDate,
             )}`}</MediumText>
-            <MediumText>Адрес: {address}</MediumText>
             <MediumText style={debtTextStyle}>
               {(!!debt?.saldo && debt.saldo < 0
                 ? `Предоплата: ${formatValue({ type: 'currency', decimals: 2 }, Math.abs(debt.saldo))}`
@@ -364,10 +364,9 @@ const OrderViewScreen = () => {
           data={order.lines}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          initialNumToRender={6}
-          maxToRenderPerBatch={6}
+          initialNumToRender={20}
+          maxToRenderPerBatch={20}
           updateCellsBatchingPeriod={100}
-          windowSize={7}
           ItemSeparatorComponent={ItemSeparator}
         />
       </View>
