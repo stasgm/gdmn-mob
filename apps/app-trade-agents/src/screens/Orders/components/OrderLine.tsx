@@ -30,15 +30,14 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     [packages],
   );
 
-  const [goodQty, setGoodQty] = useState<string>((item?.quantity || 0).toString());
+  const [goodQty, setGoodQty] = useState<string>((item?.quantity).toString());
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   const qtyRef = useRef<TextInput>(null);
 
   useEffect(() => {
     //TODO временное решение
-    console.log('1111');
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 100);
+    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
   }, []);
 
   const handelQuantityChange = useCallback((value: string) => {
@@ -89,11 +88,13 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
             <TextInput
               ref={qtyRef}
               value={goodQty}
+              defaultValue={'0'}
               style={textStyle}
               keyboardType="numeric"
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
+              selection={{ start: goodQty.length }}
             />
           </View>
         </View>
