@@ -93,6 +93,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
+              autoFocus={true}
             />
           </View>
         </View>
