@@ -318,7 +318,7 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
   const { devices, deviceBindings } = getDb();
   return userList.map((item) => {
     const fullUser: IUserWithDevice = item;
-    const deviceId = deviceBindings.data.find((i) => i.userId === item.id)?.deviceId;
+    const deviceId = deviceBindings.data.find((i) => i.userId === item.id && i.state === 'ACTIVE')?.deviceId;
     if (deviceId) fullUser.deviceUid = devices.data.find((i) => i.id === deviceId)?.uid;
     return fullUser;
   });
@@ -333,7 +333,7 @@ export const findOneWithDevice = (id: string): IUserWithDevice => {
   const user = findOne(id);
   const { devices, deviceBindings } = getDb();
   const fullUser: IUserWithDevice = user;
-  const deviceId = deviceBindings.data.find((i) => i.userId === user.id)?.deviceId;
+  const deviceId = deviceBindings.data.find((i) => i.userId === user.id && i.state === 'ACTIVE')?.deviceId;
   if (deviceId) fullUser.deviceUid = devices.data.find((i) => i.id === deviceId)?.uid;
   return fullUser;
 };
