@@ -14,7 +14,7 @@ import {
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
-import { generateId, getDateString, keyExtractor } from '@lib/mobile-app';
+import { generateId, getDateString, keyExtractor, shortenString } from '@lib/mobile-app';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -115,7 +115,11 @@ const SelectGroupScreen = () => {
     }
   }, [filterVisible, searchQuery]);
 
-  useEffect(() => refListGood.current?.scrollToIndex({ index: 0, animated: true }), [filterVisible]);
+  useEffect(() => {
+    if ((filterVisible ? goodsByContact : goodModel).length) {
+      refListGood.current?.scrollToIndex({ index: 0, animated: true });
+    }
+  }, [filterVisible, goodModel, goodsByContact]);
 
   const [selectedLine, setSelectedLine] = useState<IOrderLine | undefined>(undefined);
   const [selectedGood, setSelectedGood] = useState<IGood | undefined>(undefined);
@@ -218,14 +222,13 @@ const SelectGroupScreen = () => {
             {values.map((item) => {
               const colorStyle = { color: item.id === selectedGroupId ? 'white' : colors.text };
               const backColorStyle = { backgroundColor: item.id === selectedGroupId ? colorSelected : colorBack };
-
               return (
                 <TouchableOpacity
                   key={item.id}
                   style={[localStyles.button, backColorStyle]}
                   onPress={() => onPress(item)}
                 >
-                  <Text style={[localStyles.buttonLabel, colorStyle]}>{item.name || item.id}</Text>
+                  <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -417,21 +420,20 @@ const localStyles = StyleSheet.create({
     margin: 2,
   },
   button: {
-    paddingHorizontal: 4,
-    paddingVertical: 4,
+    padding: 4,
     borderRadius: 4,
     alignSelf: 'flex-start',
     marginHorizontal: '1%',
     marginBottom: 6,
     width: '31%',
     textAlign: 'center',
-    height: 70,
+    height: 78,
   },
   buttonLabel: {
     fontSize: 14,
     fontWeight: '500',
     lineHeight: 14,
     textAlignVertical: 'center',
-    height: 62,
+    height: 70,
   },
 });
