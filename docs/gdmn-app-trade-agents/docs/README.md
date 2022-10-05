@@ -222,17 +222,21 @@
 
 Если в экране просмотра заявки нажать и удерживать позицию товара, то появится зеленая галочка. Далее необходимо нажать на иконку  <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/> **Мусорная корзина**, и подтвердить желание удалить данную позицию в заявке. 
 
-<img src="img/3.Docs/3.OrderViewGoodsThree.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.DeletGoods.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.DeletGoods.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.DeletThreeGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.PositionDeletGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderAfterDeletPosit.jpg" alt="drawing" height="400"/>
+
 
 Позиция или позиции будут удалены.
 
 
-
 Отменить удаление позиций документа можно:
 - нажав на иконку " **×** ", в левом верхнем углу. При этом способе счезнут все зеленые галочки с выбранных позиций, экран вернется к изначальному состоянию.
+
+<img src="img/3.Orders/3.DeletThreeGoods.jpg" alt="drawing" height="400"/>
+
 - нажав иконку <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/> **Мусорная корзина** и выбрав кнопку **Отмена** в появившемся окне "Уверены, что хотите удалить позиции документа?". При этом способе все зеленые галочки на выбранных позициях останутся на месте, можно продолжить редактировать удаление позиций документа.
 
-<img src="img/3.Docs/3.DelPositDoc.jpg" alt="drawing" height="400"/> <img src="img/3.Docs/3.SwipeGood.jpg" alt="drawing" height="400"/>
+ <img src="img/3.Orders/3.PositionDeletGoods.jpg" alt="drawing" height="400"/>
 
 
 ### Статус документа
