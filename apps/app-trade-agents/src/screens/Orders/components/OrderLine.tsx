@@ -53,12 +53,17 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   }, []);
 
   useEffect(() => {
-    onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    const q = parseFloat(goodQty);
+    if (item.quantity !== q) {
+      onSetLine({ ...item, quantity: q });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
   useEffect(() => {
-    onSetLine({ ...item, package: pack });
+    if (item.package?.id !== pack?.id) {
+      onSetLine({ ...item, package: pack });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
@@ -94,7 +99,6 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
-              selection={{ start: goodQty.length }}
             />
           </View>
         </View>
