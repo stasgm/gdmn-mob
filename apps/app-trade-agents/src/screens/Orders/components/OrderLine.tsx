@@ -1,10 +1,11 @@
 import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+
+import { INamedEntity } from '@lib/types';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
@@ -12,15 +13,22 @@ import Checkbox from './Checkbox';
 
 interface IProps {
   item: IOrderLine;
+  packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, onSetLine }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const theme = useTheme();
 
-  const packages = refSelectors
-    .selectByName<IPackageGood>('packageGood')
-    ?.data?.filter((e) => e.good.id === item.good.id);
+  //Если упаковка только одна, то ставим ее по умолчанию, иначе
+  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
+  const defaultPack = useMemo(
+    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
+    [packages],
+  );
+
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
+  const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   const qtyRef = useRef<TextInput>(null);
 
@@ -29,45 +37,38 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     qtyRef?.current &&
       setTimeout(() => {
         qtyRef.current?.focus();
-        // handleMoveSelectionPress();
-        // qtyRef.current?.setNativeProps({
-        //   selection: {
-        //     start: 1,
-        //     // end: 1,
-        //   },
-        // });
+        qtyRef.current?.setNativeProps({
+          selection: {
+            start: item.quantity.toString().length,
+          },
+        });
       }, 1000);
-  }, []);
+  }, [item.quantity]);
 
-  const handelQuantityChange = useCallback(
-    (newValue: string) => {
-      let value = newValue;
+  const handelQuantityChange = useCallback((value: string) => {
+    setGoodQty((prev) => {
       value = value.replace(',', '.');
 
       value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
-      console.log('value', value);
-
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      console.log('validNumber', validNumber, validNumber.test(value), value, parseFloat(value));
-      if (validNumber.test(value)) {
-        onSetLine({ ...item, quantity: parseFloat(value) });
-      }
-    },
-    [item, onSetLine],
-  );
+      return validNumber.test(value) ? value : prev;
+    });
+  }, []);
+
+  useEffect(() => {
+    onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goodQty]);
+
+  useEffect(() => {
+    onSetLine({ ...item, package: pack });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pack]);
 
   const textStyle = [styles.number, styles.field, { color: theme.colors.text, blackgroundColor: 'transparent' }];
   const textPackStyle = [localStyles.text, { color: theme.colors.text }, { marginTop: 4 }];
-
-  const handleMoveSelectionPress = () =>
-    qtyRef.current?.setNativeProps({
-      selection: {
-        start: item.quantity.toString().length,
-        // end: item.quantity.toString().length,
-      },
-    });
 
   return (
     <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: theme.colors.background }}>
@@ -91,7 +92,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
             <Text style={styles.name}>Количество, кг</Text>
             <TextInput
               ref={qtyRef}
-              value={item.quantity.toString()}
+              value={goodQty}
               defaultValue={'0'}
               style={textStyle}
               keyboardType="numeric"
@@ -112,9 +113,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                     key={elem.package.id}
                     title={elem.package.name}
                     selected={elem.package.id === item.package?.id}
-                    onSelect={() =>
-                      onSetLine({ ...item, package: elem.package.id === item.package?.id ? undefined : elem.package })
-                    }
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
                   />
                 ))}
               </View>

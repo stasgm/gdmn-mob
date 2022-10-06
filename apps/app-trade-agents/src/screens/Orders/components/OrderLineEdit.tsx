@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Alert, StyleSheet } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
@@ -30,16 +30,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  //Если упаковка только одна, то ставим ее по умолчанию, иначе
-  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
-  const defaultPack = useMemo(
-    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
-    [packages],
-  );
-
-  const [line, setLine] = useState<IOrderLine>(
-    item?.package ? item : ({ ...item, package: defaultPack } as IOrderLine),
-  );
+  const [line, setLine] = useState<IOrderLine>(item);
 
   const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
@@ -87,7 +78,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
           <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
         </View>
       </View>
-      <OrderLine item={line} onSetLine={setLine} />
+      <OrderLine item={line} packages={packages} onSetLine={setLine} />
     </View>
   );
 };
