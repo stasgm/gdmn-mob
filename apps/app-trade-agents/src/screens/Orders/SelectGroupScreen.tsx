@@ -36,13 +36,7 @@ import { UNKNOWN_GROUP } from '../../utils/constants';
 import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/helpers';
 
 import { OrderLineDialog } from './components/OrderLineDialog';
-import OrderLineEdit from './components/OrderLineEdit';
-
-interface IItemLine {
-  mode: number;
-  docId: string;
-  item: IOrderLine;
-}
+import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
 
 const SelectGroupScreen = () => {
   const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
@@ -145,7 +139,7 @@ const SelectGroupScreen = () => {
     });
   }, [navigation, renderRight]);
 
-  const [orderLine, setOrderLine] = useState<IItemLine | undefined>();
+  const [orderLine, setOrderLine] = useState<IOrderItemLine | undefined>();
 
   const handleAddLine = useCallback(() => {
     if (selectedLine) {
@@ -344,7 +338,7 @@ const SelectGroupScreen = () => {
     <AppSafeScreen style={localStyles.container}>
       {orderLine && (
         <Modal animationType="slide" visible={true}>
-          <OrderLineEdit {...orderLine} onDismiss={() => setOrderLine(undefined)} />
+          <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />
         </Modal>
       )}
       {filterVisible && (
