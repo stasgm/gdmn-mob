@@ -1,12 +1,11 @@
 import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
 
-import React, { useCallback, useEffect, useRef } from 'react';
-import { ScrollView, StyleSheet, View, Text, TextInput as RNTextInput } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { TextInput } from 'react-native-paper';
+import { INamedEntity } from '@lib/types';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
@@ -14,41 +13,61 @@ import Checkbox from './Checkbox';
 
 interface IProps {
   item: IOrderLine;
+  packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, onSetLine }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const theme = useTheme();
 
-  const packages = refSelectors
-    .selectByName<IPackageGood>('packageGood')
-    ?.data?.filter((e) => e.good.id === item.good.id);
+  //Если упаковка только одна, то ставим ее по умолчанию, иначе
+  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
+  const defaultPack = useMemo(
+    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
+    [packages],
+  );
 
-  const qtyRef = useRef<RNTextInput>(null);
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
+  const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
+
+  const qtyRef = useRef<TextInput>(null);
 
   useEffect(() => {
     //TODO временное решение
     qtyRef?.current &&
       setTimeout(() => {
         qtyRef.current?.focus();
+        qtyRef.current?.setNativeProps({
+          selection: {
+            start: item.quantity.toString().length,
+          },
+        });
       }, 1000);
-  }, []);
+  }, [item.quantity]);
 
-  const handelQuantityChange = useCallback(
-    (newValue: string) => {
-      let value = newValue;
+  const handelQuantityChange = useCallback((value: string) => {
+    setGoodQty((prev) => {
       value = value.replace(',', '.');
 
       value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      onSetLine({ ...item, quantity: validNumber.test(value) ? parseFloat(value) : item.quantity });
-    },
-    [item, onSetLine],
-  );
+      return validNumber.test(value) ? value : prev;
+    });
+  }, []);
 
-  const textStyle = [styles.number, styles.field, { color: theme.colors.text, backgroundColor: 'transparent' }];
+  useEffect(() => {
+    onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goodQty]);
+
+  useEffect(() => {
+    onSetLine({ ...item, package: pack });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pack]);
+
+  const textStyle = [styles.number, styles.field, { color: theme.colors.text, blackgroundColor: 'transparent' }];
   const textPackStyle = [localStyles.text, { color: theme.colors.text }, { marginTop: 4 }];
 
   return (
@@ -69,20 +88,17 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
         </View>
         <ItemSeparator />
         <View style={styles.item}>
-          <View style={localStyles.itemQuantity}>
+          <View style={styles.details}>
             <Text style={styles.name}>Количество, кг</Text>
             <TextInput
               ref={qtyRef}
-              value={item.quantity.toString()}
+              value={goodQty}
               defaultValue={'0'}
-              style={[textStyle, localStyles.textQuantity]}
+              style={textStyle}
               keyboardType="numeric"
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
-              underlineColor="transparent"
-              theme={{ ...theme, colors: { ...theme.colors, primary: 'transparent' } }}
-              selectionColor={theme.colors.primary}
             />
           </View>
         </View>
@@ -97,9 +113,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                     key={elem.package.id}
                     title={elem.package.name}
                     selected={elem.package.id === item.package?.id}
-                    onSelect={() =>
-                      onSetLine({ ...item, package: elem.package.id === item.package?.id ? undefined : elem.package })
-                    }
+                    onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
                   />
                 ))}
               </View>
@@ -128,12 +142,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 3,
     marginTop: 3,
-  },
-  itemQuantity: {
-    flex: 1,
-  },
-  textQuantity: {
-    height: 40,
   },
 });
 
