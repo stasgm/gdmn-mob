@@ -1,6 +1,6 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ListRenderItem, FlatList, Alert, TouchableHighlight } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   SubTitle,
@@ -52,7 +52,8 @@ const RouteDetailScreen = () => {
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
 
-  const [process, setProcess] = useState(false);
+  const [screenState, setScreenState] = useState<'idle' | 'adding' | 'added'>('idle');
+
   const [sendLoading, setSendLoading] = useState(false);
 
   const [lineType, setLineType] = useState(lineTypes[0].id);
@@ -117,46 +118,54 @@ const RouteDetailScreen = () => {
     });
   }, [orderDocsOld]);
 
-  const handleNewVisit = useCallback(async () => {
-    setProcess(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      setScreenState('idle');
+    }, []),
+  );
 
-    if (!orderType) {
-      setProcess(false);
+  useEffect(() => {
+    const handleNewVisit = async () => {
+      if (!orderType) {
+        setScreenState('idle');
 
-      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
-    }
+        return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
+      }
 
-    if (!contact || !outlet) {
-      setProcess(false);
+      if (!contact || !outlet) {
+        setScreenState('idle');
 
-      return Alert.alert('Ошибка!', 'Магазин не найден', [{ text: 'OK' }]);
-    }
+        return Alert.alert('Ошибка!', 'Магазин не найден', [{ text: 'OK' }]);
+      }
 
-    let coords: ICoords | undefined;
+      let coords: ICoords | undefined;
 
-    try {
-      if (!orderDocs.find((i) => i.head.route)) {
-        coords = await getCurrentPosition();
+      try {
+        if (!orderDocs.find((i) => i.head.route)) {
+          coords = await getCurrentPosition();
 
-        const date = new Date().toISOString();
-        const visitId = generateId();
+          const date = new Date().toISOString();
+          const visitId = generateId();
 
-        const newVisit: IVisitDocument = {
-          id: visitId,
-          documentType: visitDocumentType,
-          number: visitId,
-          documentDate: date,
-          status: 'DRAFT',
-          head: {
-            routeLineId: id,
-            dateBegin: date,
-            beginGeoPoint: coords,
-            takenType: 'ON_PLACE',
-          },
-          creationDate: date,
-          editionDate: date,
-        };
-        dispatch(documentActions.addDocument(newVisit));
+          const newVisit: IVisitDocument = {
+            id: visitId,
+            documentType: visitDocumentType,
+            number: visitId,
+            documentDate: date,
+            status: 'DRAFT',
+            head: {
+              routeLineId: id,
+              dateBegin: date,
+              beginGeoPoint: coords,
+              takenType: 'ON_PLACE',
+            },
+            creationDate: date,
+            editionDate: date,
+          };
+          dispatch(documentActions.addDocument(newVisit));
+        }
+      } catch (e) {
+        // console.log('err', e);
       }
 
       const newOrderDate = new Date().toISOString();
@@ -184,11 +193,25 @@ const RouteDetailScreen = () => {
       dispatch(documentActions.addDocument(newOrder));
 
       navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
-    } catch (e) {
-      // console.log('err', e);
+    };
+
+    if (screenState === 'adding') {
+      handleNewVisit();
+      setScreenState('added');
     }
-    setProcess(false);
-  }, [contact, defaultDepart, dispatch, id, navigation, orderDocs, orderType, outlet, route, visit?.head.takenType]);
+  }, [
+    contact,
+    defaultDepart,
+    dispatch,
+    id,
+    navigation,
+    orderDocs,
+    orderType,
+    outlet,
+    route,
+    screenState,
+    visit?.head.takenType,
+  ]);
 
   const sendDoc = useSendDocs(orderDocs.filter((i) => i.status === 'DRAFT' || i.status === 'READY'));
 
@@ -202,12 +225,12 @@ const RouteDetailScreen = () => {
             setSendLoading(false);
             navigation.navigate('RouteView', { id: route.id });
           }}
-          disabled={sendLoading || process}
+          disabled={sendLoading || screenState !== 'idle'}
         />
-        <AddButton onPress={handleNewVisit} disabled={process} />
+        <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
       </View>
     ),
-    [handleNewVisit, navigation, process, route.id, sendDoc, sendLoading],
+    [navigation, route.id, screenState, sendDoc, sendLoading],
   );
 
   useLayoutEffect(() => {
