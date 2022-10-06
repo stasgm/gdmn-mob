@@ -3,10 +3,8 @@ import { ItemSeparator } from '@lib/mobile-ui';
 import { refSelectors } from '@lib/store';
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import { ScrollView, StyleSheet, View, Text, TextInput as RNTextInput } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-
-import { TextInput } from 'react-native-paper';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
@@ -24,13 +22,20 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
 
-  const qtyRef = useRef<RNTextInput>(null);
+  const qtyRef = useRef<TextInput>(null);
 
   useEffect(() => {
     //TODO временное решение
     qtyRef?.current &&
       setTimeout(() => {
         qtyRef.current?.focus();
+        // handleMoveSelectionPress();
+        // qtyRef.current?.setNativeProps({
+        //   selection: {
+        //     start: 1,
+        //     // end: 1,
+        //   },
+        // });
       }, 1000);
   }, []);
 
@@ -42,14 +47,27 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
       value = !value.includes('.') ? parseFloat(value).toString() : value;
       value = Number.isNaN(parseFloat(value)) ? '0' : value;
 
+      console.log('value', value);
+
       const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      onSetLine({ ...item, quantity: validNumber.test(value) ? parseFloat(value) : item.quantity });
+      console.log('validNumber', validNumber, validNumber.test(value), value, parseFloat(value));
+      if (validNumber.test(value)) {
+        onSetLine({ ...item, quantity: parseFloat(value) });
+      }
     },
     [item, onSetLine],
   );
 
-  const textStyle = [styles.number, styles.field, { color: theme.colors.text, backgroundColor: 'transparent' }];
+  const textStyle = [styles.number, styles.field, { color: theme.colors.text, blackgroundColor: 'transparent' }];
   const textPackStyle = [localStyles.text, { color: theme.colors.text }, { marginTop: 4 }];
+
+  const handleMoveSelectionPress = () =>
+    qtyRef.current?.setNativeProps({
+      selection: {
+        start: item.quantity.toString().length,
+        // end: item.quantity.toString().length,
+      },
+    });
 
   return (
     <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: theme.colors.background }}>
@@ -69,20 +87,17 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
         </View>
         <ItemSeparator />
         <View style={styles.item}>
-          <View style={localStyles.itemQuantity}>
+          <View style={styles.details}>
             <Text style={styles.name}>Количество, кг</Text>
             <TextInput
               ref={qtyRef}
               value={item.quantity.toString()}
               defaultValue={'0'}
-              style={[textStyle, localStyles.textQuantity]}
+              style={textStyle}
               keyboardType="numeric"
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
-              underlineColor="transparent"
-              theme={{ ...theme, colors: { ...theme.colors, primary: 'transparent' } }}
-              selectionColor={theme.colors.primary}
             />
           </View>
         </View>
@@ -128,12 +143,6 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 3,
     marginTop: 3,
-  },
-  itemQuantity: {
-    flex: 1,
-  },
-  textQuantity: {
-    height: 40,
   },
 });
 
