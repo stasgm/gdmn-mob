@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Alert, StyleSheet } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
@@ -10,21 +10,38 @@ import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import OrderLine from './OrderLine';
 
-interface IProps {
+export interface IOrderItemLine {
   mode: number;
   docId: string;
   item: IOrderLine;
+}
+
+interface IProps {
+  orderLine: IOrderItemLine;
   onDismiss: () => void;
 }
 
-const OrderLineEdit = ({ mode, docId, item, onDismiss }: IProps) => {
+const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
   const dispatch = useDispatch();
-  const [line, setLine] = useState<IOrderLine>(item);
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+
+  const { mode, item, docId } = orderLine;
 
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
+
+  //Если упаковка только одна, то ставим ее по умолчанию, иначе
+  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
+  const defaultPack = useMemo(
+    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
+    [packages],
+  );
+
+  const [line, setLine] = useState<IOrderLine>(
+    item?.package ? item : ({ ...item, package: defaultPack } as IOrderLine),
+  );
+
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
   useEffect(() => {
     if (screenState === 'saving') {
