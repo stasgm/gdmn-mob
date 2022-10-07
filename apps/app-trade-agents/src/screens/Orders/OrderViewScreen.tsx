@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, FlatList, Modal, View } from 'react-native';
+import { Alert, FlatList, View } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -332,11 +332,7 @@ const OrderViewScreen = () => {
   return (
     <>
       <View style={styles.container}>
-        {orderLine && (
-          <Modal animationType="slide" visible={true}>
-            <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />
-          </Modal>
-        )}
+        {orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
         <InfoBlock
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}

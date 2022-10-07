@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Alert, StyleSheet } from 'react-native';
+import { View, Alert, StyleSheet, Modal } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { globalStyles as styles, SaveButton } from '@lib/mobile-ui';
 
 import { IconButton, Title } from 'react-native-paper';
+
+import { ScreenState } from '@lib/types';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
@@ -32,7 +34,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
 
   const [line, setLine] = useState<IOrderLine>(item);
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -70,16 +72,18 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
   }, [dispatch, docId, line, mode, onDismiss, packages.length, screenState]);
 
   return (
-    <View style={styles.container}>
-      <View style={localStyles.navigation}>
-        <IconButton icon="chevron-left" onPress={onDismiss} size={30} />
-        <Title>Позиция заявки</Title>
-        <View style={localStyles.btnOk}>
-          <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
+    <Modal animationType="none" visible={true}>
+      <View style={styles.container}>
+        <View style={localStyles.navigation}>
+          <IconButton icon="chevron-left" onPress={onDismiss} size={30} />
+          <Title>Позиция заявки</Title>
+          <View style={localStyles.btnOk}>
+            <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
+          </View>
         </View>
+        <OrderLine item={line} packages={packages} onSetLine={setLine} />
       </View>
-      <OrderLine item={line} packages={packages} onSetLine={setLine} />
-    </View>
+    </Modal>
   );
 };
 
