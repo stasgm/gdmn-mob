@@ -1,6 +1,6 @@
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ListRenderItem, FlatList, Alert, TouchableHighlight } from 'react-native';
-import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 import {
   SubTitle,
@@ -17,15 +17,27 @@ import {
   EmptyList,
   ScreenListItem,
   IListItemProps,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import {
+  deleteSelectedItems,
+  formatValue,
+  generateId,
+  getDateString,
+  getDelList,
+  keyExtractor,
+  useSendDocs,
+} from '@lib/mobile-app';
 
-import { IDocumentType, INamedEntity } from '@lib/types';
+import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
 import { Divider, useTheme } from 'react-native-paper';
+
+import { IDelList } from '@lib/mobile-types';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import {
@@ -52,7 +64,8 @@ const RouteDetailScreen = () => {
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
 
-  const [process, setProcess] = useState(false);
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
+
   const [sendLoading, setSendLoading] = useState(false);
 
   const [lineType, setLineType] = useState(lineTypes[0].id);
@@ -117,105 +130,152 @@ const RouteDetailScreen = () => {
     });
   }, [orderDocsOld]);
 
-  const handleNewVisit = useCallback(async () => {
-    setProcess(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      setScreenState('idle');
+    }, []),
+  );
 
-    if (!orderType) {
-      setProcess(false);
+  useEffect(() => {
+    const handleNewVisit = async () => {
+      if (!orderType) {
+        setScreenState('idle');
 
-      return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
-    }
-
-    if (!contact || !outlet) {
-      setProcess(false);
-
-      return Alert.alert('Ошибка!', 'Магазин не найден', [{ text: 'OK' }]);
-    }
-
-    let coords: ICoords | undefined;
-
-    try {
-      if (!orderDocs.find((i) => i.head.route)) {
-        coords = await getCurrentPosition();
-
-        const date = new Date().toISOString();
-        const visitId = generateId();
-
-        const newVisit: IVisitDocument = {
-          id: visitId,
-          documentType: visitDocumentType,
-          number: visitId,
-          documentDate: date,
-          status: 'DRAFT',
-          head: {
-            routeLineId: id,
-            dateBegin: date,
-            beginGeoPoint: coords,
-            takenType: 'ON_PLACE',
-          },
-          creationDate: date,
-          editionDate: date,
-        };
-        dispatch(documentActions.addDocument(newVisit));
+        return Alert.alert('Ошибка!', 'Тип документа для заявок не найден', [{ text: 'OK' }]);
       }
 
-      const newOrderDate = new Date().toISOString();
-      const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+      if (!contact || !outlet) {
+        setScreenState('idle');
 
-      const newOrder: IOrderDocument = {
-        id: generateId(),
-        number: 'б\\н',
-        status: 'DRAFT',
-        documentDate: newOrderDate,
-        documentType: orderType,
-        head: {
-          contact,
-          outlet,
-          route,
-          onDate: newOnDate,
-          takenOrder: visit?.head.takenType,
-          depart: defaultDepart,
-        },
-        lines: [],
-        creationDate: newOrderDate,
-        editionDate: newOrderDate,
-      };
+        return Alert.alert('Ошибка!', 'Магазин не найден', [{ text: 'OK' }]);
+      }
 
-      dispatch(documentActions.addDocument(newOrder));
+      let coords: ICoords | undefined;
 
-      navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
-    } catch (e) {
-      // console.log('err', e);
+      try {
+        if (!orderDocs.find((i) => i.head.route)) {
+          coords = await getCurrentPosition();
+
+          const date = new Date().toISOString();
+          const visitId = generateId();
+
+          const newVisit: IVisitDocument = {
+            id: visitId,
+            documentType: visitDocumentType,
+            number: visitId,
+            documentDate: date,
+            status: 'DRAFT',
+            head: {
+              routeLineId: id,
+              dateBegin: date,
+              beginGeoPoint: coords,
+              takenType: 'ON_PLACE',
+            },
+            creationDate: date,
+            editionDate: date,
+          };
+          dispatch(documentActions.addDocument(newVisit));
+        }
+
+        const newOrderDate = new Date().toISOString();
+        const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+        const newOrder: IOrderDocument = {
+          id: generateId(),
+          number: 'б\\н',
+          status: 'DRAFT',
+          documentDate: newOrderDate,
+          documentType: orderType,
+          head: {
+            contact,
+            outlet,
+            route,
+            onDate: newOnDate,
+            takenOrder: visit?.head.takenType,
+            depart: defaultDepart,
+          },
+          lines: [],
+          creationDate: newOrderDate,
+          editionDate: newOrderDate,
+        };
+
+        dispatch(documentActions.addDocument(newOrder));
+
+        navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
+      } catch (e) {
+        // console.log('err', e);
+        setScreenState('idle');
+      }
+    };
+
+    if (screenState === 'adding') {
+      handleNewVisit();
+      setScreenState('added');
     }
-    setProcess(false);
-  }, [contact, defaultDepart, dispatch, id, navigation, orderDocs, orderType, outlet, route, visit?.head.takenType]);
+  }, [
+    contact,
+    defaultDepart,
+    dispatch,
+    id,
+    navigation,
+    orderDocs,
+    orderType,
+    outlet,
+    route,
+    screenState,
+    visit?.head.takenType,
+  ]);
 
   const sendDoc = useSendDocs(orderDocs.filter((i) => i.status === 'DRAFT' || i.status === 'READY'));
+
+  const [delList, setDelList] = useState<IDelList>({});
+  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocuments(docIds));
+      setDelList({});
+    };
+
+    deleteSelectedItems(delList, deleteDocs);
+  }, [delList, dispatch]);
 
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SendButton
-          onPress={async () => {
-            setSendLoading(true);
-            await sendDoc();
-            setSendLoading(false);
-            navigation.navigate('RouteView', { id: route.id });
-          }}
-          disabled={sendLoading || process}
-        />
-        <AddButton onPress={handleNewVisit} disabled={process} />
+        {isDelList ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <SendButton
+              onPress={async () => {
+                setSendLoading(true);
+                await sendDoc();
+                setSendLoading(false);
+                navigation.navigate('RouteView', { id: route.id });
+              }}
+              disabled={sendLoading || screenState !== 'idle'}
+            />
+            <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
+          </>
+        )}
       </View>
     ),
-    [handleNewVisit, navigation, process, route.id, sendDoc, sendLoading],
+    [handleDeleteDocs, isDelList, navigation, route.id, screenState, sendDoc, sendLoading],
   );
+
+  const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: isDelList ? renderLeft : navBackButton,
+
       headerRight: renderRight,
+      title: isDelList ? `Выделено заявок: ${Object.values(delList).length}` : 'Визит',
     });
-  }, [navigation, renderRight]);
+  }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
   const LineTypes = useCallback(
     () => (
@@ -246,9 +306,18 @@ const RouteDetailScreen = () => {
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => (
-      <ScreenListItem {...item} onPress={() => navigation.navigate('OrderView', { id: item.id, routeId: route.id })} />
+      <ScreenListItem
+        {...item}
+        onPress={() =>
+          isDelList
+            ? setDelList(getDelList(delList, item.id, item.status!))
+            : navigation.navigate('OrderView', { id: item.id, routeId: route.id })
+        }
+        onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+        checked={!!delList[item.id]}
+      />
     ),
-    [navigation, route.id],
+    [delList, isDelList, navigation, route.id],
   );
 
   const isFocused = useIsFocused();

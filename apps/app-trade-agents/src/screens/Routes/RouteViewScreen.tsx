@@ -282,6 +282,7 @@ const CalcTopRouteList = ({
       initialScrollIndex={routeItemId || 0}
       getItemLayout={getItemLayoutRoute}
       maxToRenderPerBatch={15}
+      keyboardShouldPersistTaps={'handled'}
     />
   );
 };

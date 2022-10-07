@@ -16,7 +16,7 @@ import {
   AppActivityIndicator,
   navBackButton,
 } from '@lib/mobile-ui';
-import { IDocumentType, IReference } from '@lib/types';
+import { IDocumentType, IReference, ScreenState } from '@lib/types';
 
 import { generateId, getDateString, useFilteredDocList } from '@lib/mobile-app';
 
@@ -117,7 +117,7 @@ const OrderEditScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, order, defaultDepart]);
 
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -220,8 +220,8 @@ const OrderEditScreen = () => {
   const isBlocked = useMemo(() => docStatus !== 'DRAFT' || !!docRoute, [docRoute, docStatus]);
 
   const statusName = useMemo(
-    () => (id ? (!isBlocked ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ'),
-    [id, isBlocked],
+    () => (id ? (docStatus === 'DRAFT' ? 'Редактирование документа' : 'Просмотр документа') : 'Новый документ'),
+    [docStatus, id],
   );
 
   // Окно календаря для выбора даты
