@@ -60,6 +60,7 @@ const localStyles = StyleSheet.create({
   text: {
     fontSize: 17,
     opacity: 0.7,
+    textAlign: 'left',
   },
 });
 
