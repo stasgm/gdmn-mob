@@ -1,11 +1,11 @@
 import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator } from '@lib/mobile-ui';
-import { refSelectors } from '@lib/store';
-import { INamedEntity } from '@lib/types';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+
+import { INamedEntity } from '@lib/types';
 
 import { IOrderLine, IPackageGood } from '../../../store/types';
 
@@ -13,15 +13,12 @@ import Checkbox from './Checkbox';
 
 interface IProps {
   item: IOrderLine;
+  packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, onSetLine }: IProps) => {
-  const { colors } = useTheme();
-
-  const packages = refSelectors
-    .selectByName<IPackageGood>('packageGood')
-    ?.data?.filter((e) => e.good.id === item.good.id);
+const OrderLine = ({ item, packages, onSetLine }: IProps) => {
+  const theme = useTheme();
 
   //Если упаковка только одна, то ставим ее по умолчанию, иначе
   //если есть упаковка с признаком 'по умолчанию', то подставляем ее
@@ -30,15 +27,29 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     [packages],
   );
 
-  const [goodQty, setGoodQty] = useState<string>((item?.quantity).toString());
+  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   const qtyRef = useRef<TextInput>(null);
 
   useEffect(() => {
     //TODO временное решение
-    qtyRef?.current && setTimeout(() => qtyRef.current?.focus(), 1000);
+    qtyRef?.current &&
+      setTimeout(() => {
+        qtyRef.current?.focus();
+      }, 1000);
   }, []);
+
+  useEffect(() => {
+    qtyRef?.current &&
+      setTimeout(() => {
+        qtyRef.current?.setNativeProps({
+          selection: {
+            start: item.quantity.toString().length,
+          },
+        });
+      }, 1000);
+  }, [item.quantity]);
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -53,9 +64,8 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
   }, []);
 
   useEffect(() => {
-    const q = parseFloat(goodQty);
-    if (item.quantity !== q) {
-      onSetLine({ ...item, quantity: q });
+    if (item.quantity !== parseFloat(goodQty)) {
+      onSetLine({ ...item, quantity: parseFloat(goodQty) });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
@@ -67,11 +77,11 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const textStyle = [styles.number, styles.field, { color: colors.text }];
-  const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
+  const textStyle = [styles.number, styles.field, { color: theme.colors.text, blackgroundColor: 'transparent' }];
+  const textPackStyle = [localStyles.text, { color: theme.colors.text }, { marginTop: 4 }];
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.background }}>
+    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: theme.colors.background }}>
       <View style={styles.content}>
         <View style={styles.item}>
           <View style={styles.details}>
@@ -93,7 +103,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
             <TextInput
               ref={qtyRef}
               value={goodQty}
-              defaultValue={'0'}
+              defaultValue={goodQty}
               style={textStyle}
               keyboardType="numeric"
               autoCapitalize="words"
@@ -112,7 +122,7 @@ const OrderLine = ({ item, onSetLine }: IProps) => {
                   <Checkbox
                     key={elem.package.id}
                     title={elem.package.name}
-                    selected={elem.package.id === pack?.id}
+                    selected={elem.package.id === item.package?.id}
                     onSelect={() => setPack(elem.package.id === pack?.id ? undefined : elem.package)}
                   />
                 ))}

@@ -10,21 +10,29 @@ import { IOrderLine, IPackageGood } from '../../../store/types';
 
 import OrderLine from './OrderLine';
 
-interface IProps {
+export interface IOrderItemLine {
   mode: number;
   docId: string;
   item: IOrderLine;
+}
+
+interface IProps {
+  orderLine: IOrderItemLine;
   onDismiss: () => void;
 }
 
-const OrderLineEdit = ({ mode, docId, item, onDismiss }: IProps) => {
+const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
   const dispatch = useDispatch();
-  const [line, setLine] = useState<IOrderLine>(item);
-  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
+
+  const { mode, item, docId } = orderLine;
 
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
+
+  const [line, setLine] = useState<IOrderLine>(item);
+
+  const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
   useEffect(() => {
     if (screenState === 'saving') {
@@ -70,7 +78,7 @@ const OrderLineEdit = ({ mode, docId, item, onDismiss }: IProps) => {
           <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
         </View>
       </View>
-      <OrderLine item={line} onSetLine={setLine} />
+      <OrderLine item={line} packages={packages} onSetLine={setLine} />
     </View>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
@@ -17,13 +17,22 @@ const OrderLineScreen = () => {
   const dispatch = useDispatch();
   const { mode, docId, item } = useRoute<RouteProp<OrdersStackParamList, 'OrderLine'>>().params;
 
-  const [line, setLine] = useState<IOrderLine>(item);
-
   const [screenState, setScreenState] = useState<'idle' | 'saving'>('idle');
 
   const packages = refSelectors
     .selectByName<IPackageGood>('packageGood')
     ?.data?.filter((e) => e.good.id === item.good.id);
+
+  //Если упаковка только одна, то ставим ее по умолчанию, иначе
+  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
+  const defaultPack = useMemo(
+    () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
+    [packages],
+  );
+
+  const [line, setLine] = useState<IOrderLine>(
+    item?.package ? item : ({ ...item, package: defaultPack } as IOrderLine),
+  );
 
   useEffect(() => {
     if (screenState === 'saving') {

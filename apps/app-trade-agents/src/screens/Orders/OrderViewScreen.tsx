@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { Alert, FlatList, View } from 'react-native';
+import { Alert, FlatList, Modal, View } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -37,6 +37,7 @@ import { getStatusColor } from '../../utils/constants';
 
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
+import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
 
 const OrderViewScreen = () => {
   const showActionSheet = useActionSheet();
@@ -280,9 +281,11 @@ const OrderViewScreen = () => {
     });
   }, [delList.length, isDelList, navigation, renderLeft, renderRight]);
 
+  const [orderLine, setOrderLine] = useState<IOrderItemLine | undefined>();
+
   const handlePressOrderLine = useCallback(
-    (item: IOrderLine) => !isBlocked && navigation.navigate('OrderLine', { mode: 1, docId: id, item }),
-    [id, isBlocked, navigation],
+    (item: IOrderLine) => !isBlocked && setOrderLine({ mode: 1, docId: id, item }),
+    [id, isBlocked],
   );
 
   const renderItem = useCallback(
@@ -329,6 +332,11 @@ const OrderViewScreen = () => {
   return (
     <>
       <View style={styles.container}>
+        {orderLine && (
+          <Modal animationType="slide" visible={true}>
+            <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />
+          </Modal>
+        )}
         <InfoBlock
           colorLabel={getStatusColor(order?.status || 'DRAFT')}
           title={order.head?.outlet?.name}

@@ -85,7 +85,6 @@ const OrderListScreen = () => {
 
   useEffect(() => {
     // Инициализируем параметры
-
     dispatch(
       appActions.setFormParams({
         filterDateBegin: '',
@@ -291,12 +290,6 @@ const OrderListScreen = () => {
   }, [filterContact, navigation]);
 
   const handleSearchOutlet = useCallback(() => {
-    // const params: Record<string, string> = {};
-
-    // if (filterContact?.id) {
-    //   params.companyId = filterContact?.id;
-    // }
-
     navigation.navigate('SelectRefItem', {
       refName: 'outlet',
       fieldName: 'filterOutlet',
@@ -359,7 +352,6 @@ const OrderListScreen = () => {
               onChangeText={setSearchQuery}
               value={searchQuery}
               style={[styles.flexGrow, styles.searchBar]}
-              // autoFocus
               selectionColor={searchStyle}
             />
           </View>
@@ -425,7 +417,6 @@ export default OrderListScreen;
 
 const localStyles = StyleSheet.create({
   filter: {
-    // marginHorizontal: 10,
     paddingTop: 5,
     marginVertical: 5,
     marginBottom: 12,

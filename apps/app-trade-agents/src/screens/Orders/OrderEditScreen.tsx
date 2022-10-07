@@ -40,11 +40,6 @@ const OrderEditScreen = () => {
     .selectByName<IReference<IDocumentType>>('documentType')
     ?.data.find((t) => t.name === 'order');
 
-  const formParams = useSelector((state) => state.app.formParams as IOrderFormParam);
-
-  // Подразделение по умолчанию
-  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
-
   const {
     contact: docContact,
     outlet: docOutlet,
@@ -55,9 +50,10 @@ const OrderEditScreen = () => {
     status: docStatus,
     route: docRoute,
     comment: docComment,
-  } = useMemo(() => {
-    return formParams;
-  }, [formParams]);
+  } = useSelector((state) => state.app.formParams as IOrderFormParam);
+
+  // Подразделение по умолчанию
+  const defaultDepart = useSelector((state) => state.auth.user?.settings?.depart?.data);
 
   useEffect(() => {
     return () => {
