@@ -318,8 +318,11 @@ export const findManyWithDevice = (params: Record<string, string | number>): IUs
   const { devices, deviceBindings } = getDb();
   return userList.map((item) => {
     const fullUser: IUserWithDevice = item;
-    const deviceId = deviceBindings.data.find((i) => i.userId === item.id && i.state === 'ACTIVE')?.deviceId;
-    if (deviceId) fullUser.deviceUid = devices.data.find((i) => i.id === deviceId)?.uid;
+    const deviceUids = deviceBindings.data
+      .filter((i) => i.userId === item.id && i.state === 'ACTIVE')
+      .map((i) => devices.findById(i.deviceId)?.uid)
+      .filter((i) => i !== undefined) as string[] | undefined;
+    fullUser.deviceUid = deviceUids;
     return fullUser;
   });
 };
@@ -333,8 +336,11 @@ export const findOneWithDevice = (id: string): IUserWithDevice => {
   const user = findOne(id);
   const { devices, deviceBindings } = getDb();
   const fullUser: IUserWithDevice = user;
-  const deviceId = deviceBindings.data.find((i) => i.userId === user.id && i.state === 'ACTIVE')?.deviceId;
-  if (deviceId) fullUser.deviceUid = devices.data.find((i) => i.id === deviceId)?.uid;
+  const deviceUids = deviceBindings.data
+    .filter((i) => i.userId === user.id && i.state === 'ACTIVE')
+    .map((i) => devices.findById(i.deviceId)?.uid)
+    .filter((i) => i !== undefined) as string[] | undefined;
+  fullUser.deviceUid = deviceUids;
   return fullUser;
 };
 
