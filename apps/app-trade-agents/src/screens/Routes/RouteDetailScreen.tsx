@@ -17,15 +17,27 @@ import {
   EmptyList,
   ScreenListItem,
   IListItemProps,
+  DeleteButton,
+  CloseButton,
 } from '@lib/mobile-ui';
 
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { formatValue, generateId, getDateString, keyExtractor, useSendDocs } from '@lib/mobile-app';
+import {
+  deleteSelectedItems,
+  formatValue,
+  generateId,
+  getDateString,
+  getDelList,
+  keyExtractor,
+  useSendDocs,
+} from '@lib/mobile-app';
 
-import { IDocumentType, INamedEntity } from '@lib/types';
+import { IDocumentType, INamedEntity, ScreenState } from '@lib/types';
 
 import { Divider, useTheme } from 'react-native-paper';
+
+import { IDelList } from '@lib/mobile-types';
 
 import { RoutesStackParamList } from '../../navigation/Root/types';
 import {
@@ -52,7 +64,7 @@ const RouteDetailScreen = () => {
 
   const visit = docSelectors.selectByDocType<IVisitDocument>('visit')?.find((e) => e.head.routeLineId === id);
 
-  const [screenState, setScreenState] = useState<'idle' | 'adding' | 'added'>('idle');
+  const [screenState, setScreenState] = useState<ScreenState>('idle');
 
   const [sendLoading, setSendLoading] = useState(false);
 
@@ -215,30 +227,54 @@ const RouteDetailScreen = () => {
 
   const sendDoc = useSendDocs(orderDocs.filter((i) => i.status === 'DRAFT' || i.status === 'READY'));
 
+  const [delList, setDelList] = useState<IDelList>({});
+  const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
+
+  const handleDeleteDocs = useCallback(() => {
+    const docIds = Object.keys(delList);
+
+    const deleteDocs = () => {
+      dispatch(documentActions.removeDocuments(docIds));
+      setDelList({});
+    };
+
+    deleteSelectedItems(delList, deleteDocs);
+  }, [delList, dispatch]);
+
   const renderRight = useCallback(
     () => (
       <View style={styles.buttons}>
-        <SendButton
-          onPress={async () => {
-            setSendLoading(true);
-            await sendDoc();
-            setSendLoading(false);
-            navigation.navigate('RouteView', { id: route.id });
-          }}
-          disabled={sendLoading || screenState !== 'idle'}
-        />
-        <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
+        {isDelList ? (
+          <DeleteButton onPress={handleDeleteDocs} />
+        ) : (
+          <>
+            <SendButton
+              onPress={async () => {
+                setSendLoading(true);
+                await sendDoc();
+                setSendLoading(false);
+                navigation.navigate('RouteView', { id: route.id });
+              }}
+              disabled={sendLoading || screenState !== 'idle'}
+            />
+            <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
+          </>
+        )}
       </View>
     ),
-    [navigation, route.id, screenState, sendDoc, sendLoading],
+    [handleDeleteDocs, isDelList, navigation, route.id, screenState, sendDoc, sendLoading],
   );
+
+  const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerLeft: navBackButton,
+      headerLeft: isDelList ? renderLeft : navBackButton,
+
       headerRight: renderRight,
+      title: isDelList ? `Выделено заявок: ${Object.values(delList).length}` : 'Визит',
     });
-  }, [navigation, renderRight]);
+  }, [delList, isDelList, navigation, renderLeft, renderRight]);
 
   const LineTypes = useCallback(
     () => (
@@ -269,9 +305,18 @@ const RouteDetailScreen = () => {
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
     ({ item }) => (
-      <ScreenListItem {...item} onPress={() => navigation.navigate('OrderView', { id: item.id, routeId: route.id })} />
+      <ScreenListItem
+        {...item}
+        onPress={() =>
+          isDelList
+            ? setDelList(getDelList(delList, item.id, item.status!))
+            : navigation.navigate('OrderView', { id: item.id, routeId: route.id })
+        }
+        onLongPress={() => setDelList(getDelList(delList, item.id, item.status!))}
+        checked={!!delList[item.id]}
+      />
     ),
-    [navigation, route.id],
+    [delList, isDelList, navigation, route.id],
   );
 
   const isFocused = useIsFocused();

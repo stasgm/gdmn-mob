@@ -95,7 +95,7 @@ const OrderViewScreen = () => {
 
     docDispatch(documentActions.addDocument(newDoc));
 
-    navigation.navigate('OrderView', { id: newId });
+    navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
   }, [order, routeId, docDispatch, navigation]);
 
   const handleDelete = useCallback(() => {
