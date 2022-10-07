@@ -176,35 +176,36 @@ const RouteDetailScreen = () => {
           };
           dispatch(documentActions.addDocument(newVisit));
         }
+
+        const newOrderDate = new Date().toISOString();
+        const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+
+        const newOrder: IOrderDocument = {
+          id: generateId(),
+          number: 'б\\н',
+          status: 'DRAFT',
+          documentDate: newOrderDate,
+          documentType: orderType,
+          head: {
+            contact,
+            outlet,
+            route,
+            onDate: newOnDate,
+            takenOrder: visit?.head.takenType,
+            depart: defaultDepart,
+          },
+          lines: [],
+          creationDate: newOrderDate,
+          editionDate: newOrderDate,
+        };
+
+        dispatch(documentActions.addDocument(newOrder));
+
+        navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
       } catch (e) {
         // console.log('err', e);
+        setScreenState('idle');
       }
-
-      const newOrderDate = new Date().toISOString();
-      const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
-
-      const newOrder: IOrderDocument = {
-        id: generateId(),
-        number: 'б\\н',
-        status: 'DRAFT',
-        documentDate: newOrderDate,
-        documentType: orderType,
-        head: {
-          contact,
-          outlet,
-          route,
-          onDate: newOnDate,
-          takenOrder: visit?.head.takenType,
-          depart: defaultDepart,
-        },
-        lines: [],
-        creationDate: newOrderDate,
-        editionDate: newOrderDate,
-      };
-
-      dispatch(documentActions.addDocument(newOrder));
-
-      navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
     };
 
     if (screenState === 'adding') {
