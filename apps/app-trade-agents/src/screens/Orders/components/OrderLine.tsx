@@ -31,19 +31,23 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   const qtyRef = useRef<TextInput>(null);
+  const [cursor, setCursor] = useState<number | undefined>(item.quantity.toString().length);
 
   useEffect(() => {
     //TODO временное решение
     qtyRef?.current &&
       setTimeout(() => {
         qtyRef.current?.focus();
-        qtyRef.current?.setNativeProps({
-          selection: {
-            start: item.quantity.toString().length,
-          },
-        });
       }, 1000);
-  }, [item.quantity]);
+  }, []);
+
+  useEffect(() => {
+    qtyRef.current?.setNativeProps({
+      selection: {
+        start: cursor,
+      },
+    });
+  }, [cursor]);
 
   const handelQuantityChange = useCallback((value: string) => {
     setGoodQty((prev) => {
@@ -58,12 +62,16 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
   }, []);
 
   useEffect(() => {
-    onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    if (item.quantity !== parseFloat(goodQty)) {
+      onSetLine({ ...item, quantity: parseFloat(goodQty) });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goodQty]);
 
   useEffect(() => {
-    onSetLine({ ...item, package: pack });
+    if (item.package?.id !== pack?.id) {
+      onSetLine({ ...item, package: pack });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
@@ -93,12 +101,16 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
             <TextInput
               ref={qtyRef}
               value={goodQty}
-              defaultValue={'0'}
+              defaultValue={goodQty}
               style={textStyle}
               keyboardType="numeric"
               autoCapitalize="words"
               onChangeText={handelQuantityChange}
               returnKeyType="done"
+              onSelectionChange={(event) => {
+                // const selection = event.nativeEvent.selection;
+                setCursor(event.nativeEvent.selection.start);
+              }}
             />
           </View>
         </View>
