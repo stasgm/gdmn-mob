@@ -37,4 +37,4 @@ export type StatusType =
 
 export type BodyType = 'CMD' | 'REFS' | 'DOCS' | 'SETTINGS';
 
-export type ScreenState = 'idle' | 'sending' | 'sent' | 'deleting' | 'deleted';
+export type ScreenState = 'idle' | 'sending' | 'sent' | 'deleting' | 'deleted' | 'saving' | 'adding' | 'added';

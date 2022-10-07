@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ColorValue, Alert, Modal, FlatList } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, ColorValue, Alert, FlatList } from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import {
@@ -336,11 +336,7 @@ const SelectGroupScreen = () => {
 
   return (
     <AppSafeScreen style={localStyles.container}>
-      {orderLine && (
-        <Modal animationType="slide" visible={true}>
-          <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />
-        </Modal>
-      )}
+      {orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>

@@ -1,8 +1,8 @@
 import { styles } from '@lib/mobile-navigation';
-import { ItemSeparator } from '@lib/mobile-ui';
+import { ItemSeparator, QuantityInput } from '@lib/mobile-ui';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
@@ -18,7 +18,7 @@ interface IProps {
 }
 
 const OrderLine = ({ item, packages, onSetLine }: IProps) => {
-  const theme = useTheme();
+  const { colors } = useTheme();
 
   //Если упаковка только одна, то ставим ее по умолчанию, иначе
   //если есть упаковка с признаком 'по умолчанию', то подставляем ее
@@ -27,48 +27,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
     [packages],
   );
 
-  const [goodQty, setGoodQty] = useState<string>(item?.quantity.toString());
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
-
-  const qtyRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    //TODO временное решение
-    qtyRef?.current &&
-      setTimeout(() => {
-        qtyRef.current?.focus();
-      }, 1000);
-  }, []);
-
-  useEffect(() => {
-    qtyRef?.current &&
-      setTimeout(() => {
-        qtyRef.current?.setNativeProps({
-          selection: {
-            start: item.quantity.toString().length,
-          },
-        });
-      }, 1000);
-  }, [item.quantity]);
-
-  const handelQuantityChange = useCallback((value: string) => {
-    setGoodQty((prev) => {
-      value = value.replace(',', '.');
-
-      value = !value.includes('.') ? parseFloat(value).toString() : value;
-      value = Number.isNaN(parseFloat(value)) ? '0' : value;
-
-      const validNumber = new RegExp(/^(\d{1,6}(,|.))?\d{0,4}$/);
-      return validNumber.test(value) ? value : prev;
-    });
-  }, []);
-
-  useEffect(() => {
-    if (item.quantity !== parseFloat(goodQty)) {
-      onSetLine({ ...item, quantity: parseFloat(goodQty) });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [goodQty]);
 
   useEffect(() => {
     if (item.package?.id !== pack?.id) {
@@ -77,11 +36,11 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
-  const textStyle = [styles.number, styles.field, { color: theme.colors.text, blackgroundColor: 'transparent' }];
-  const textPackStyle = [localStyles.text, { color: theme.colors.text }, { marginTop: 4 }];
+  const textStyle = [styles.number, styles.field, { color: colors.text, blackgroundColor: 'transparent' }];
+  const textPackStyle = [localStyles.text, { color: colors.text }, { marginTop: 4 }];
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: theme.colors.background }}>
+    <ScrollView keyboardShouldPersistTaps={'handled'} style={{ backgroundColor: colors.background }}>
       <View style={styles.content}>
         <View style={styles.item}>
           <View style={styles.details}>
@@ -100,15 +59,9 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
         <View style={styles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Количество, кг</Text>
-            <TextInput
-              ref={qtyRef}
-              value={goodQty}
-              defaultValue={goodQty}
-              style={textStyle}
-              keyboardType="numeric"
-              autoCapitalize="words"
-              onChangeText={handelQuantityChange}
-              returnKeyType="done"
+            <QuantityInput
+              value={item.quantity.toString()}
+              onChangeText={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
             />
           </View>
         </View>
