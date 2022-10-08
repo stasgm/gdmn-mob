@@ -134,7 +134,7 @@
 
 ### Cоздание документа
 
-По нажатию на иконку " ✚ " в верхнем правом углу экрана **Заявки** переходим на экран добавления документа **Заявка**.
+По нажатию на иконку " **✚** " в верхнем правом углу экрана **Заявки** переходим на экран добавления документа **Заявка**.
 
 Обязательные поля для заполнения: 
 - **Номер**
@@ -198,7 +198,7 @@
 
 <img src="img/3.Orders/3.GoodsWithCont.jpg" alt="drawing" height="400"/>  <img src="img/3.Orders/3.GoodsSomeContDiff.jpg" alt="drawing" height="400"/>
 
-Для этого нужно снова выбрать необходимую позицию нажатием, далее выбрать из дополнительного меню пункт **Добавить**.
+Для этого нужно нажать " **✚** ", повторно выбрать из списка необходимую позицию нажатием, далее выбрать из дополнительного меню пункт **Добавить**.
 
   <img src="img/3.Orders/3.ReferenceBookOfGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.AddMenuAddGoods.jpg" alt="drawing" height="400"/>
 
@@ -222,8 +222,7 @@
 
 Если в экране просмотра заявки нажать и удерживать позицию товара, то появится зеленая галочка. Далее необходимо нажать на иконку  <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/> **Мусорная корзина**, и подтвердить желание удалить данную позицию в заявке. 
 
-<img src="img/3.Orders/3.DeletGoods.jpg" alt="drawing" height="400"/>
-<img src="img/3.Orders/3.DeletThreeGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.PositionDeletGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderAfterDeletPosit.jpg" alt="drawing" height="400"/>
+<img src="img/3.Orders/3.DeletGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.DeletThreeGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.PositionDeletGoods.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderAfterDeletPosit.jpg" alt="drawing" height="400"/>
 
 
 Позиция или позиции будут удалены.
@@ -269,8 +268,8 @@
 
 <img src="img/3.Orders/3.OrderEditDraft.jpg" alt="drawing" height="400"/> <img src="img/3.Orders/3.OrderEditReady.jpg" alt="drawing" height="400"/> 
 
-- или через нажатие иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>, который автоматически переведёт документ в статус **Готов к отправке**.
-- или отправить документ на обработку сразу, нажав на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>
+- или через нажатие иконки <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/>, над шапкой документа, которая автоматически переведёт документ в статус **Готов к отправке**.
+- или отправить документ на обработку сразу, нажав на иконку <img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>, над шапкой документа. Программа автоматически снимает с документа статус **Черновик**, и автоматически отправляет документ на сервер.
 
 Когда документ перейдет в состояние **Готов к отправке** (зеленый цвет) - редактировать данные нельзя.
 
@@ -291,15 +290,18 @@
 
 ### Удаление документа
 
-Если пальцем смахнуть по документу влево, то появится дополнительное меню.
+Для удаления документа нужно нажать на необходимый документ и удерживать его, на выбранной позиции появится зеленая галочка, которая выделит данный документ среди прочих. Далее необходимо нажать иконку <img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/> Мусорная корзина и подтвердить намерение удалить документ. Документ удаляется.
 
-<img src="img/3.Orders/3.Swipe.jpg" alt="drawing" height="400"/>
 
-Используя пункты меню можно:
+Используя пункты меню " **≡** ", в правом верхнем углу, можно:
+
+<img src="img/3.Orders/3.OrderViewGoods.jpg" alt="drawing" height="400"/>
+
 - перейти на редактирование шапки документа (если статус **Черновик**)
 - копировать документ
 - удалить документ (если статус **Черновик**)
 
+<img src="img/3.Orders/3.DeleteOrder.jpg" alt="drawing" height="400"/>
 
 Документы сгруппированы следующим образом:
 
@@ -434,23 +436,23 @@
 
 <img src="img/10.About/10.About.jpg" alt="drawing" height="400"/>
 
-## 9. Значение иконок
+## 12. Значение иконок
 
 
 | Значок         | Значение         |
 |----------------------|----------------------------------|
 |<img src="img/1.Connection/1.IconDraft.JPG" alt="drawing" height="22"/>| _статус **Черновик**_, новый документ, который можно редактировать|
-|<img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>   |    |
-|<img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>    |     |
-|<img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>    |    |
+|<img src="img/1.Connection/1.IconReadyToGo.JPG" alt="drawing" height="22"/>   | _статус **Готов к отправке**_, документ нельзя редактировать, но можно вернуть в статус **Черновик**   |
+|<img src="img/1.Connection/1.IconSent.JPG" alt="drawing" height="22"/>    | _статус **Отправлен**_, документ отправлен, ожидается подтверждение     |
+|<img src="img/1.Connection/1.IconProcesSucces.JPG" alt="drawing" height="22"/>    | _статус **Обработан успешно**_, документ получил подтверждение об успешной обработке на сервере   |
 |<img src="img/1.Connection/1.IconTrash.jpg" alt="drawing" height="22"/>  | удаление документа |
 |<img src="img/1.Connection/1.ConfigIcon.png" alt="drawing" height="30"/>   | переход на экран настроек  |
-|" **≡** "    |   |
 |<img src="img/1.Connection/1.IconSearch.jpg" alt="drawing" height="22"/>   | поиск  |
 |<img src="img/1.Connection/1.IconEdit.JPG" alt="drawing" height="22"/>   | редактирование документа  |
-| " ✓ " |  |
-| <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/> |  |
-| <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> |  |
-|<img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>  | отравка документа |
-|   |  |
+|  <img src="img/1.Connection/1.Sync.jpg" alt="drawing" height="27"/>   | синхронизация  |
+| <img src="img/1.Connection/1.IconAutoTransl.jpg" alt="drawing" height="22"/> | автоматически перевести документ из статуса **Готов** в статус **Готов к отправке** |
+|<img src="img/1.Connection/1.IconSend.jpg" alt="drawing" height="22"/>   | отравка документа |
+| " **≡** "   | меню документа |
+|" **✓** "  | сохранить  |
+|" **✚** "| добавление нового документа |
 
