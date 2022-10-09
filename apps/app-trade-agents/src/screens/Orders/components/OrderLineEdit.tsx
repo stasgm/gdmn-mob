@@ -74,7 +74,16 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
   const inputRef = React.useRef<TextInput>(null);
 
   return (
-    <Modal animationType="fade" visible={true} onShow={() => inputRef.current!.focus()}>
+    <Modal
+      animationType="fade"
+      visible={true}
+      onShow={() => {
+        const timeout = setTimeout(() => {
+          inputRef?.current?.focus();
+        }, 100);
+        return () => clearTimeout(timeout);
+      }}
+    >
       <SafeAreaView style={localStyles.container}>
         <View style={styles.container}>
           <View style={localStyles.navigation}>
