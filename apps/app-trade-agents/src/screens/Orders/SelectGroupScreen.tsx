@@ -388,7 +388,7 @@ const localStyles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   groupItem: {
-    paddingVertical: 4,
+    paddingTop: 4,
     flex: 1,
   },
   goodItem: {

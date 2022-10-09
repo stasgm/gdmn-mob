@@ -2,7 +2,7 @@ import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator, QuantityInput } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
@@ -12,12 +12,13 @@ import { IOrderLine, IPackageGood } from '../../../store/types';
 import Checkbox from './Checkbox';
 
 interface IProps {
+  inputRef: React.RefObject<TextInput>;
   item: IOrderLine;
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, packages, onSetLine }: IProps) => {
+const OrderLine = ({ item, packages, inputRef, onSetLine }: IProps) => {
   const { colors } = useTheme();
 
   //Если упаковка только одна, то ставим ее по умолчанию, иначе
@@ -60,6 +61,7 @@ const OrderLine = ({ item, packages, onSetLine }: IProps) => {
           <View style={styles.details}>
             <Text style={styles.name}>Количество, кг</Text>
             <QuantityInput
+              inputRef={inputRef}
               value={item.quantity.toString()}
               onChangeText={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
             />

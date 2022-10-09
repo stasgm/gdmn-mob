@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Alert, StyleSheet, Modal } from 'react-native';
+import { View, Alert, StyleSheet, Modal, TextInput, SafeAreaView } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { globalStyles as styles, SaveButton } from '@lib/mobile-ui';
@@ -71,18 +71,22 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
     }
   }, [dispatch, docId, line, mode, onDismiss, packages.length, screenState]);
 
+  const inputRef = React.useRef<TextInput>(null);
+
   return (
-    <Modal animationType="none" visible={true}>
-      <View style={styles.container}>
-        <View style={localStyles.navigation}>
-          <IconButton icon="chevron-left" onPress={onDismiss} size={30} />
-          <Title>Позиция заявки</Title>
-          <View style={localStyles.btnOk}>
-            <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
+    <Modal animationType="fade" visible={true} onShow={() => inputRef.current!.focus()}>
+      <SafeAreaView style={localStyles.container}>
+        <View style={styles.container}>
+          <View style={localStyles.navigation}>
+            <IconButton icon="chevron-left" onPress={onDismiss} size={30} />
+            <Title>Позиция заявки</Title>
+            <View style={localStyles.btnOk}>
+              <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
+            </View>
           </View>
+          <OrderLine item={line} packages={packages} onSetLine={setLine} inputRef={inputRef} />
         </View>
-        <OrderLine item={line} packages={packages} onSetLine={setLine} />
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 };
@@ -99,5 +103,10 @@ const localStyles = StyleSheet.create({
   btnOk: {
     flex: 1,
     alignItems: 'flex-end',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    justifyContent: 'flex-start',
   },
 });

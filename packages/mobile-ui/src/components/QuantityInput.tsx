@@ -3,23 +3,25 @@ import { TextInput, StyleSheet } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 interface IProps {
+  inputRef: React.RefObject<TextInput>;
   value: string;
   onChangeText: (newValue: string) => void;
 }
 
 const QuantityInput = (props: IProps) => {
   const { colors } = useTheme();
-  const { value, onChangeText, ...rest } = props;
+  const { value, onChangeText, inputRef, ...rest } = props;
   const [goodQty, setGoodQty] = useState<string>(value);
 
-  const ref = useRef<TextInput>(null);
+  // const ref = useRef<TextInput>(null);
 
   useEffect(() => {
+    // ref.current?.focus();
     //TODO временное решение
-    ref?.current &&
-      setTimeout(() => {
-        ref.current?.focus();
-      }, 1000);
+    // ref?.current &&
+    //   setTimeout(() => {
+    //     ref.current?.focus();
+    //   }, 1000);
   }, []);
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const QuantityInput = (props: IProps) => {
 
   return (
     <TextInput
-      ref={ref}
+      ref={inputRef}
       value={goodQty}
       style={textStyle}
       keyboardType="numeric"
