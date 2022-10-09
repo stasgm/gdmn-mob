@@ -31,9 +31,9 @@ const OrderLine = ({ item, packages, inputRef, onSetLine }: IProps) => {
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   useEffect(() => {
-    if (item.package?.id !== pack?.id) {
-      onSetLine({ ...item, package: pack });
-    }
+    // if (item.package?.id !== pack?.id) {
+    onSetLine({ ...item, package: pack });
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 

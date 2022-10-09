@@ -15,14 +15,14 @@ const QuantityInput = (props: IProps) => {
 
   // const ref = useRef<TextInput>(null);
 
-  useEffect(() => {
-    // ref.current?.focus();
-    //TODO временное решение
-    // ref?.current &&
-    //   setTimeout(() => {
-    //     ref.current?.focus();
-    //   }, 1000);
-  }, []);
+  // useEffect(() => {
+  // ref.current?.focus();
+  //TODO временное решение
+  // ref?.current &&
+  //   setTimeout(() => {
+  //     ref.current?.focus();
+  //   }, 1000);
+  // }, []);
 
   useEffect(() => {
     if (value !== goodQty) {
