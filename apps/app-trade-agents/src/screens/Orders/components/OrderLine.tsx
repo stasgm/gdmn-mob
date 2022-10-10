@@ -2,7 +2,7 @@ import { styles } from '@lib/mobile-navigation';
 import { ItemSeparator, QuantityInput } from '@lib/mobile-ui';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TextInput } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { INamedEntity } from '@lib/types';
@@ -12,17 +12,25 @@ import { IOrderLine, IPackageGood } from '../../../store/types';
 import Checkbox from './Checkbox';
 
 interface IProps {
-  inputRef: React.RefObject<TextInput>;
+  visibleQuantityInput: boolean;
   item: IOrderLine;
   packages: IPackageGood[];
   onSetLine: (value: IOrderLine) => void;
 }
 
-const OrderLine = ({ item, packages, inputRef, onSetLine }: IProps) => {
+const OrderLine = ({ item, packages, onSetLine, visibleQuantityInput }: IProps) => {
   const { colors } = useTheme();
+  const inputRef = React.useRef<TextInput>(null);
 
-  //Если упаковка только одна, то ставим ее по умолчанию, иначе
-  //если есть упаковка с признаком 'по умолчанию', то подставляем ее
+  useEffect(() => {
+    // TODO временное решение
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 1000);
+  }, [inputRef]);
+
+  // Если упаковка только одна, то ставим ее по умолчанию, иначе
+  // если есть упаковка с признаком 'по умолчанию', то подставляем ее
   const defaultPack = useMemo(
     () => (packages.length === 1 ? packages[0].package : packages.find((i) => i.isDefault)?.package),
     [packages],
@@ -31,9 +39,9 @@ const OrderLine = ({ item, packages, inputRef, onSetLine }: IProps) => {
   const [pack, setPack] = useState<INamedEntity | undefined>(item?.package || defaultPack);
 
   useEffect(() => {
-    // if (item.package?.id !== pack?.id) {
-    onSetLine({ ...item, package: pack });
-    // }
+    if (item.package?.id !== pack?.id) {
+      onSetLine({ ...item, package: pack });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pack]);
 
@@ -60,11 +68,15 @@ const OrderLine = ({ item, packages, inputRef, onSetLine }: IProps) => {
         <View style={styles.item}>
           <View style={styles.details}>
             <Text style={styles.name}>Количество, кг</Text>
-            <QuantityInput
-              inputRef={inputRef}
-              value={item.quantity.toString()}
-              onChangeText={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
-            />
+            {visibleQuantityInput ? (
+              <QuantityInput
+                inputRef={inputRef}
+                value={item.quantity.toString()}
+                onChangeText={(newValue) => onSetLine({ ...item, quantity: parseFloat(newValue) })}
+              />
+            ) : (
+              <View style={localStyles.quantityItem} />
+            )}
           </View>
         </View>
         <ItemSeparator />
@@ -107,6 +119,9 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 3,
     marginTop: 3,
+  },
+  quantityItem: {
+    height: 28,
   },
 });
 

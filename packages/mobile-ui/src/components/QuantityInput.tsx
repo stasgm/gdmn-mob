@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { TextInput, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { TextInput, StyleSheet, View } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 interface IProps {
@@ -12,17 +12,6 @@ const QuantityInput = (props: IProps) => {
   const { colors } = useTheme();
   const { value, onChangeText, inputRef, ...rest } = props;
   const [goodQty, setGoodQty] = useState<string>(value);
-
-  // const ref = useRef<TextInput>(null);
-
-  // useEffect(() => {
-  // ref.current?.focus();
-  //TODO временное решение
-  // ref?.current &&
-  //   setTimeout(() => {
-  //     ref.current?.focus();
-  //   }, 1000);
-  // }, []);
 
   useEffect(() => {
     if (value !== goodQty) {
@@ -42,13 +31,12 @@ const QuantityInput = (props: IProps) => {
     });
   };
 
-  const textStyle = [localStyles.text, { color: colors.text }];
-
   return (
     <TextInput
       ref={inputRef}
       value={goodQty}
-      style={textStyle}
+      defaultValue={'0'}
+      style={[localStyles.text, { color: colors.text }]}
       keyboardType="numeric"
       autoCapitalize="words"
       onChangeText={handelChange}

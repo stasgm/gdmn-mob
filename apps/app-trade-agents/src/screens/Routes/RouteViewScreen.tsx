@@ -244,7 +244,7 @@ const RouteViewScreen = () => {
           data={filteredList.routeLineList}
         />
       </AppScreen>
-      {!!routeLineList.length && (
+      {!!routeLineList.length && !filterVisible && (
         <RouteTotal
           onPress={() => setIsGroupVisible(!isGroupVisible)}
           isGroupVisible={isGroupVisible}

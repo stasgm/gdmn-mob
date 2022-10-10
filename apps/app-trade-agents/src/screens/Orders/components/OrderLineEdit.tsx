@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Alert, StyleSheet, Modal, TextInput, SafeAreaView } from 'react-native';
+import { View, Alert, StyleSheet, Modal, SafeAreaView } from 'react-native';
 
 import { documentActions, refSelectors, useDispatch } from '@lib/store';
 import { globalStyles as styles, SaveButton } from '@lib/mobile-ui';
@@ -71,15 +71,16 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
     }
   }, [dispatch, docId, line, mode, onDismiss, packages.length, screenState]);
 
-  const inputRef = React.useRef<TextInput>(null);
+  const [visibleQuantityInput, setVisibleQuantityInput] = useState(false);
 
   return (
     <Modal
       animationType="fade"
       visible={true}
       onShow={() => {
+        //Для правильной отрисовки курсора после открытия клавиатуры в компоненте ввода количества
         const timeout = setTimeout(() => {
-          inputRef?.current?.focus();
+          setVisibleQuantityInput(true);
         }, 100);
         return () => clearTimeout(timeout);
       }}
@@ -93,7 +94,7 @@ const OrderLineEdit = ({ orderLine, onDismiss }: IProps) => {
               <SaveButton onPress={() => setScreenState('saving')} disabled={screenState === 'saving'} />
             </View>
           </View>
-          <OrderLine item={line} packages={packages} onSetLine={setLine} inputRef={inputRef} />
+          <OrderLine item={line} packages={packages} onSetLine={setLine} visibleQuantityInput={visibleQuantityInput} />
         </View>
       </SafeAreaView>
     </Modal>
