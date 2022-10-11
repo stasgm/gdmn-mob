@@ -248,8 +248,6 @@ const RouteDetailScreen = () => {
   const [delList, setDelList] = useState<IDelList>({});
   const isDelList = useMemo(() => !!Object.keys(delList).length, [delList]);
 
-  console.log('visit', visit?.documentDate);
-
   const handleDeleteDocs = useCallback(() => {
     const docIds = Object.keys(delList);
 
