@@ -51,7 +51,7 @@ import {
 } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
-import { lineTypes } from '../../utils/constants';
+import { getStatusColor, lineTypes } from '../../utils/constants';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
@@ -290,8 +290,8 @@ const RouteDetailScreen = () => {
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
+                e.id === lineType && { backgroundColor: getStatusColor('PROCESSED') },
+                { borderColor: getStatusColor('PROCESSED') },
               ]}
               onPress={() => setLineType(e.id)}
             >
@@ -301,7 +301,7 @@ const RouteDetailScreen = () => {
         })}
       </View>
     ),
-    [colors.background, colors.primary, colors.text, lineType],
+    [colors.background, colors.text, lineType],
   );
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
