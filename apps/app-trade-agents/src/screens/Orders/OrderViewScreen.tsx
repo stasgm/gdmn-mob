@@ -29,13 +29,25 @@ import { sleep } from '@lib/client-api';
 
 import { useTheme } from 'react-native-paper';
 
-import { IDebt, IOrderDocument, IOrderLine, IOutlet } from '../../store/types';
+import {
+  IDebt,
+  IOrderDocument,
+  IOrderLine,
+  IOutlet,
+  IRouteDocument,
+  IVisitDocument,
+  visitDocumentType,
+} from '../../store/types';
 
 import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
 
 import { getNextDocNumber } from '../../utils/helpers';
+
+import { getCurrentPosition } from '../../utils/expoFunctions';
+
+import { ICoords } from '../../store/geo/types';
 
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
@@ -83,7 +95,11 @@ const OrderViewScreen = () => {
       routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order.head.outlet?.id : true,
     );
 
-  const handleCopyOrder = useCallback(() => {
+  const route = routeId ? docSelectors.selectByDocId<IRouteDocument>(routeId) : undefined;
+
+  const routeLineId = route?.lines.find((i) => i.outlet.id === order?.head.outlet.id)?.id;
+
+  const handleCopyOrder = useCallback(async () => {
     const newDocDate = new Date().toISOString();
     const newId = generateId();
 
@@ -104,10 +120,46 @@ const OrderViewScreen = () => {
       editionDate: newDocDate,
     };
 
-    docDispatch(documentActions.addDocument(newDoc));
+    if (routeId && routeLineId && !orderDocs.length) {
+      let coords: ICoords | undefined;
 
-    navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
-  }, [orderDocs, order, routeId, docDispatch, navigation]);
+      try {
+        if (!orderDocs.find((i) => i.head.route)) {
+          coords = await getCurrentPosition();
+
+          const date = new Date().toISOString();
+          const visitId = generateId();
+
+          const newVisit: IVisitDocument = {
+            id: visitId,
+            documentType: visitDocumentType,
+            number: visitId,
+            documentDate: date,
+            status: 'DRAFT',
+            head: {
+              routeLineId: routeLineId,
+              dateBegin: date,
+              beginGeoPoint: coords,
+              takenType: 'ON_PLACE',
+            },
+            creationDate: date,
+            editionDate: date,
+          };
+          dispatch(documentActions.addDocument(newVisit));
+        }
+
+        dispatch(documentActions.addDocument(newDoc));
+
+        navigation.navigate('OrderView', { id: newId, routeId });
+      } catch (e) {
+        // console.log('err', e);
+      }
+    } else {
+      docDispatch(documentActions.addDocument(newDoc));
+
+      navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
+    }
+  }, [orderDocs, order, routeId, routeLineId, dispatch, navigation, docDispatch]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -201,21 +253,32 @@ const OrderViewScreen = () => {
   const actionsMenu = useCallback(() => {
     showActionSheet(
       isBlocked
-        ? [
-            {
-              title: 'Копировать заявку',
-              onPress: handleCopyOrder,
-            },
-            {
-              title: 'Удалить заявку',
-              type: 'destructive',
-              onPress: handleDelete,
-            },
-            {
-              title: 'Отмена',
-              type: 'cancel',
-            },
-          ]
+        ? order?.status === 'SENT'
+          ? [
+              {
+                title: 'Копировать заявку',
+                onPress: handleCopyOrder,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
+          : [
+              {
+                title: 'Копировать заявку',
+                onPress: handleCopyOrder,
+              },
+              {
+                title: 'Удалить заявку',
+                type: 'destructive',
+                onPress: handleDelete,
+              },
+              {
+                title: 'Отмена',
+                type: 'cancel',
+              },
+            ]
         : [
             {
               title: 'Добавить товар',
@@ -240,7 +303,15 @@ const OrderViewScreen = () => {
             },
           ],
     );
-  }, [showActionSheet, isBlocked, handleCopyOrder, handleDelete, handleAddOrderLine, handleEditOrderHead]);
+  }, [
+    showActionSheet,
+    isBlocked,
+    order?.status,
+    handleCopyOrder,
+    handleDelete,
+    handleAddOrderLine,
+    handleEditOrderHead,
+  ]);
 
   const renderRight = useCallback(
     () =>
