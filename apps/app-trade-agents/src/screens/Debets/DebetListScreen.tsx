@@ -117,6 +117,7 @@ const DebetListScreen = () => {
               style={[styles.flexGrow, styles.searchBar]}
               autoFocus
               selectionColor={colors.primary}
+              keyboardType="url"
             />
           </View>
           <ItemSeparator />
