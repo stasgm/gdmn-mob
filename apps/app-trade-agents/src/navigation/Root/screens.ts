@@ -5,7 +5,7 @@ import {
   OrderLineScreen,
   OrderListScreen,
   OrderViewScreen,
-  SelectGroupScreen,
+  SelectGoodScreen,
 } from '../../screens/Orders';
 
 import SelectRefItemScreen from '../../components/SelectRefItemScreen';
@@ -21,7 +21,7 @@ const orderScreens = {
   OrderView: { title: 'Заявка', component: OrderViewScreen },
   OrderEdit: { title: 'Заявка', component: OrderEditScreen },
   OrderLine: { title: 'Позиция заявки', component: OrderLineScreen },
-  SelectGroupItem: { title: 'Выбор товара', component: SelectGroupScreen },
+  SelectGood: { title: 'Выбор товара', component: SelectGoodScreen },
   SelectRefItem: { title: 'Выбор из справочника', component: SelectRefItemScreen },
 };
 

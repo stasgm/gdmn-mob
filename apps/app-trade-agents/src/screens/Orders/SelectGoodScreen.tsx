@@ -1,5 +1,14 @@
 import React, { useState, useLayoutEffect, useCallback, useMemo, useEffect } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, ColorValue, Alert, FlatList } from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ColorValue,
+  Alert,
+  FlatList,
+  useWindowDimensions,
+} from 'react-native';
 import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 
 import {
@@ -38,9 +47,9 @@ import { getGoodMatrixByContact, getGroupModelByContact } from '../../utils/help
 import { OrderLineDialog } from './components/OrderLineDialog';
 import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
 
-const SelectGroupScreen = () => {
-  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGroupItem'>>();
-  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGroupItem'>>().params;
+const SelectGoodScreen = () => {
+  const navigation = useNavigation<StackNavigationProp<OrdersStackParamList, 'SelectGood'>>();
+  const { docId } = useRoute<RouteProp<OrdersStackParamList, 'SelectGood'>>().params;
   const dispatch = useDispatch();
 
   const isUseNetPrice = useSelector((state) => state.settings.data?.isUseNetPrice?.data) as boolean;
@@ -64,6 +73,14 @@ const SelectGroupScreen = () => {
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const windowWidth = useWindowDimensions().width;
+  const groupButtonStyle = useMemo(
+    () => ({
+      width: windowWidth > 550 ? '23%' : '31%',
+    }),
+    [windowWidth],
+  );
 
   const model = useMemo(
     () => getGroupModelByContact(groups, goods, goodMatrix[contactId], isUseNetPrice) as IMGroupModel,
@@ -219,7 +236,7 @@ const SelectGroupScreen = () => {
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[localStyles.button, backColorStyle]}
+                  style={[localStyles.button, backColorStyle, groupButtonStyle]}
                   onPress={() => onPress(item)}
                 >
                   <Text style={[localStyles.buttonLabel, colorStyle]}>{shortenString(item.name, 60) || item.id}</Text>
@@ -230,7 +247,7 @@ const SelectGroupScreen = () => {
         </View>
       );
     },
-    [colors.text],
+    [colors.text, groupButtonStyle],
   );
 
   const renderGood = useCallback(
@@ -381,14 +398,14 @@ const SelectGroupScreen = () => {
   );
 };
 
-export default SelectGroupScreen;
+export default SelectGoodScreen;
 
 const localStyles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
   },
   groupItem: {
-    paddingTop: 4,
+    marginBottom: 2,
     flex: 1,
   },
   goodItem: {
@@ -414,8 +431,7 @@ const localStyles = StyleSheet.create({
     borderRadius: 4,
     alignSelf: 'flex-start',
     marginHorizontal: '1%',
-    marginBottom: 6,
-    width: '31%',
+    margin: 3,
     textAlign: 'center',
     height: 78,
   },

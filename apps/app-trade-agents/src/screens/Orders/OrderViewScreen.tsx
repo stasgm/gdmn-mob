@@ -66,7 +66,7 @@ const OrderViewScreen = () => {
   const address = refSelectors.selectByRefId<IOutlet>('outlet', order?.head?.outlet.id)?.address;
 
   const handleAddOrderLine = useCallback(() => {
-    navigation.navigate('SelectGroupItem', {
+    navigation.navigate('SelectGood', {
       docId: id,
     });
   }, [id, navigation]);
