@@ -52,6 +52,7 @@ import {
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
 import { getStatusColor, lineTypes } from '../../utils/constants';
+import { getNextDocNumber } from '../../utils/helpers';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
@@ -109,7 +110,7 @@ const RouteDetailScreen = () => {
         documentDate: getDateString(i.documentDate),
         status: i.status,
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
-        isFromRoute: false,
+        isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
       } as IListItemProps;
     });
@@ -124,7 +125,7 @@ const RouteDetailScreen = () => {
         documentDate: getDateString(i.documentDate),
         status: i.status,
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
-        isFromRoute: false,
+        isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
       } as IListItemProps;
     });
@@ -179,10 +180,11 @@ const RouteDetailScreen = () => {
 
         const newOrderDate = new Date().toISOString();
         const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+        const newNumber = getNextDocNumber(orderDocs);
 
         const newOrder: IOrderDocument = {
           id: generateId(),
-          number: 'б\\н',
+          number: newNumber,
           status: 'DRAFT',
           documentDate: newOrderDate,
           documentType: orderType,
