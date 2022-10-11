@@ -51,7 +51,8 @@ import {
 } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
-import { lineTypes } from '../../utils/constants';
+import { getStatusColor, lineTypes } from '../../utils/constants';
+import { getNextDocNumber } from '../../utils/helpers';
 
 const RouteDetailScreen = () => {
   const dispatch = useDispatch();
@@ -109,7 +110,7 @@ const RouteDetailScreen = () => {
         documentDate: getDateString(i.documentDate),
         status: i.status,
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
-        isFromRoute: false,
+        isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
       } as IListItemProps;
     });
@@ -124,7 +125,7 @@ const RouteDetailScreen = () => {
         documentDate: getDateString(i.documentDate),
         status: i.status,
         subtitle: `${getDateString(creationDate)} ${creationDate.toLocaleTimeString()}`,
-        isFromRoute: false,
+        isFromRoute: !!i.head.route,
         lineCount: i.lines.length,
       } as IListItemProps;
     });
@@ -179,10 +180,11 @@ const RouteDetailScreen = () => {
 
         const newOrderDate = new Date().toISOString();
         const newOnDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+        const newNumber = getNextDocNumber(orderDocs);
 
         const newOrder: IOrderDocument = {
           id: generateId(),
-          number: 'б\\н',
+          number: newNumber,
           status: 'DRAFT',
           documentDate: newOrderDate,
           documentType: orderType,
@@ -290,8 +292,8 @@ const RouteDetailScreen = () => {
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: colors.primary },
-                { borderColor: colors.primary },
+                e.id === lineType && { backgroundColor: getStatusColor('PROCESSED') },
+                { borderColor: getStatusColor('PROCESSED') },
               ]}
               onPress={() => setLineType(e.id)}
             >
@@ -301,7 +303,7 @@ const RouteDetailScreen = () => {
         })}
       </View>
     ),
-    [colors.background, colors.primary, colors.text, lineType],
+    [colors.background, colors.text, lineType],
   );
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
@@ -321,6 +323,17 @@ const RouteDetailScreen = () => {
   );
 
   const isFocused = useIsFocused();
+
+  if ((screenState === 'adding' || screenState === 'added') && !orderDocs.length) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.containerCenter}>
+          <LargeText>Определение местоположения...</LargeText>
+          <AppActivityIndicator style={{}} />
+        </View>
+      </View>
+    );
+  }
 
   if (!point) {
     return (

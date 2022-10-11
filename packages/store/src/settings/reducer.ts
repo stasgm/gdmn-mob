@@ -30,7 +30,7 @@ const baseSettings: Settings<IBaseSettings> = {
   cleanDocTime: {
     id: '3',
     description: 'Хранение документов, дн.',
-    data: 30,
+    data: 60,
     type: 'number',
     sortOrder: 4,
     visible: true,

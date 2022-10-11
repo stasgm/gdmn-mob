@@ -35,6 +35,8 @@ import { OrdersStackParamList } from '../../navigation/Root/types';
 
 import { getStatusColor } from '../../utils/constants';
 
+import { getNextDocNumber } from '../../utils/helpers';
+
 import OrderItem from './components/OrderItem';
 import OrderTotal from './components/OrderTotal';
 import OrderLineEdit, { IOrderItemLine } from './components/OrderLineEdit';
@@ -75,14 +77,22 @@ const OrderViewScreen = () => {
     navigation.navigate('OrderEdit', { id });
   }, [navigation, id]);
 
+  const orderDocs = docSelectors
+    .selectByDocType<IOrderDocument>('order')
+    ?.filter((doc) =>
+      routeId ? doc.head?.route?.id === routeId && doc.head.outlet?.id === order.head.outlet?.id : true,
+    );
+
   const handleCopyOrder = useCallback(() => {
     const newDocDate = new Date().toISOString();
     const newId = generateId();
 
+    const newNumber = getNextDocNumber(orderDocs);
+
     const newDoc: IOrderDocument = {
       ...order,
       id: newId,
-      number: 'б\\н',
+      number: newNumber,
       status: 'DRAFT',
       head: {
         ...order?.head,
@@ -97,7 +107,7 @@ const OrderViewScreen = () => {
     docDispatch(documentActions.addDocument(newDoc));
 
     navigation.navigate('OrderView', routeId ? { id: newId, routeId } : { id: newId });
-  }, [order, routeId, docDispatch, navigation]);
+  }, [orderDocs, order, routeId, docDispatch, navigation]);
 
   const handleDelete = useCallback(() => {
     if (!id) {
@@ -339,6 +349,7 @@ const OrderViewScreen = () => {
           onPress={handleEditOrderHead}
           disabled={isDelList || !['DRAFT', 'READY'].includes(order.status)}
           isBlocked={isBlocked}
+          isFromRoute={order.head.route ? true : false}
         >
           <View style={styles.directionColumn}>
             <MediumText>Адрес: {address}</MediumText>

@@ -170,6 +170,7 @@ const globalStyles = StyleSheet.create({
   iconsWithCheck: {
     flexDirection: 'row',
     width: '9%',
+    justifyContent: 'center',
   },
   roundButton: {
     alignItems: 'center',
