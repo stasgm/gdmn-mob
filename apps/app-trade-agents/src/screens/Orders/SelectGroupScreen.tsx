@@ -8,9 +8,9 @@ import {
   navBackButton,
   MediumText,
   globalColors,
-  AppSafeScreen,
   ItemSeparator,
   AppActivityIndicator,
+  AppScreen,
 } from '@lib/mobile-ui';
 import { appActions, docSelectors, documentActions, refSelectors, useDispatch, useSelector } from '@lib/store';
 
@@ -335,8 +335,8 @@ const SelectGroupScreen = () => {
   }
 
   return (
-    <AppSafeScreen style={localStyles.container}>
-      {orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
+    <AppScreen style={localStyles.container}>
+      {!!orderLine && <OrderLineEdit orderLine={orderLine} onDismiss={() => setOrderLine(undefined)} />}
       {filterVisible && (
         <View>
           <View style={styles.flexDirectionRow}>
@@ -378,7 +378,7 @@ const SelectGroupScreen = () => {
           onDismissDialog={hadndleDismissDialog}
         />
       )}
-    </AppSafeScreen>
+    </AppScreen>
   );
 };
 
