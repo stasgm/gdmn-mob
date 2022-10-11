@@ -268,7 +268,7 @@ const RouteDetailScreen = () => {
         )}
       </View>
     ),
-    [handleDeleteDocs, isDelList, navigation, route.id, screenState, sendDoc, sendLoading],
+    [handleDeleteDocs, isDelList, navigation, orderDocs, route.id, screenState, sendDoc, sendLoading],
   );
 
   const renderLeft = useCallback(() => isDelList && <CloseButton onPress={() => setDelList({})} />, [isDelList]);
@@ -300,7 +300,9 @@ const RouteDetailScreen = () => {
               ]}
               onPress={() => setLineType(e.id)}
             >
-              <LargeText style={{ color: e.id === lineType ? colors.background : colors.text }}>{e.value}</LargeText>
+              <LargeText style={[{ color: e.id === lineType ? colors.background : colors.text }, localStyles.size]}>
+                {e.value}
+              </LargeText>
             </TouchableHighlight>
           );
         })}
@@ -399,7 +401,9 @@ const RouteDetailScreen = () => {
           )}
         </>
       </InfoBlock>
-
+      <View style={localStyles.order}>
+        <LargeText>Заявки</LargeText>
+      </View>
       <LineTypes />
       <FlatList
         data={lineType === 'new' ? orders : ordersOld}
@@ -415,6 +419,8 @@ const RouteDetailScreen = () => {
 
 const localStyles = StyleSheet.create({
   contract: { fontWeight: '500', fontSize: 15 },
+  order: { alignItems: 'center', justifyContent: 'center', marginBottom: 5 },
+  size: { fontSize: 15 },
 });
 
 export default RouteDetailScreen;
