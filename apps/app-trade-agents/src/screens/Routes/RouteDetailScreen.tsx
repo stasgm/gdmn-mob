@@ -51,7 +51,7 @@ import {
 } from '../../store/types';
 import { ICoords } from '../../store/geo/types';
 import { getCurrentPosition } from '../../utils/expoFunctions';
-import { getStatusColor, lineTypes } from '../../utils/constants';
+import { lineTypes } from '../../utils/constants';
 import { getNextDocNumber } from '../../utils/helpers';
 
 const RouteDetailScreen = () => {
@@ -205,7 +205,6 @@ const RouteDetailScreen = () => {
 
         navigation.navigate('OrderView', { id: newOrder.id, routeId: route.id });
       } catch (e) {
-        // console.log('err', e);
         setScreenState('idle');
       }
     };
@@ -258,7 +257,11 @@ const RouteDetailScreen = () => {
                 setSendLoading(false);
                 navigation.navigate('RouteView', { id: route.id });
               }}
-              disabled={sendLoading || screenState !== 'idle'}
+              disabled={
+                sendLoading ||
+                screenState !== 'idle' ||
+                !orderDocs.find((doc) => doc.status === 'READY' || doc.status === 'DRAFT')
+              }
             />
             <AddButton onPress={() => setScreenState('adding')} disabled={screenState !== 'idle'} />
           </>
@@ -292,8 +295,8 @@ const RouteDetailScreen = () => {
                 styles.btnTab,
                 i === 0 && styles.firstBtnTab,
                 i === lineTypes.length - 1 && styles.lastBtnTab,
-                e.id === lineType && { backgroundColor: getStatusColor('PROCESSED') },
-                { borderColor: getStatusColor('PROCESSED') },
+                e.id === lineType && { backgroundColor: colors.primary },
+                { borderColor: colors.primary },
               ]}
               onPress={() => setLineType(e.id)}
             >
@@ -303,7 +306,7 @@ const RouteDetailScreen = () => {
         })}
       </View>
     ),
-    [colors.background, colors.text, lineType],
+    [colors.background, colors.primary, colors.text, lineType],
   );
 
   const renderOrderItem: ListRenderItem<IListItemProps> = useCallback(
@@ -365,7 +368,7 @@ const RouteDetailScreen = () => {
 
   return (
     <AppScreen style={styles.contentTop}>
-      <InfoBlock colorLabel={'#06567D'} title={point.outlet.name}>
+      <InfoBlock colorLabel={colors.primary} title={point.outlet.name}>
         <>
           {outlet && (
             <>
